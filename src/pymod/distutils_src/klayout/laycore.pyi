@@ -1954,158 +1954,6 @@ class BitmapBuffer:
         ...
     ...
 
-class ButtonState:
-    r"""
-    @brief The namespace for the button state flags in the mouse events of the Plugin class.
-    This class defines the constants for the button state. In the event handler, the button state is indicated by a bitwise combination of these constants. See \Plugin for further details.
-    This class has been introduced in version 0.22.
-    """
-    AltKey: ClassVar[int]
-    r"""
-    @brief Indicates that the Alt key is pressed
-    This constant is combined with other constants within \ButtonState
-    """
-    ControlKey: ClassVar[int]
-    r"""
-    @brief Indicates that the Control key is pressed
-    This constant is combined with other constants within \ButtonState
-    """
-    LeftButton: ClassVar[int]
-    r"""
-    @brief Indicates that the left mouse button is pressed
-    This constant is combined with other constants within \ButtonState
-    """
-    MidButton: ClassVar[int]
-    r"""
-    @brief Indicates that the middle mouse button is pressed
-    This constant is combined with other constants within \ButtonState
-    """
-    RightButton: ClassVar[int]
-    r"""
-    @brief Indicates that the right mouse button is pressed
-    This constant is combined with other constants within \ButtonState
-    """
-    ShiftKey: ClassVar[int]
-    r"""
-    @brief Indicates that the Shift key is pressed
-    This constant is combined with other constants within \ButtonState
-    """
-    @classmethod
-    def new(cls) -> ButtonState:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __copy__(self) -> ButtonState:
-        r"""
-        @brief Creates a copy of self
-        """
-        ...
-    def __deepcopy__(self) -> ButtonState:
-        r"""
-        @brief Creates a copy of self
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def _const_cast(self) -> ButtonState:
-        r"""
-        @brief Returns a non-const reference to self.
-        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
-
-        This method has been introduced in version 0.29.6.
-        """
-        ...
-    def _create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
-    def _destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def _destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
-    def _is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
-        """
-        ...
-    def _manage(self) -> None:
-        r"""
-        @brief Marks the object as managed by the script side.
-        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
-
-        Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-        ...
-    def _to_const_object(self) -> ButtonState:
-        r"""
-        @hide
-        """
-        ...
-    def _unmanage(self) -> None:
-        r"""
-        @brief Marks the object as no longer owned by the script side.
-        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
-
-        Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-        ...
-    def assign(self, other: ButtonState) -> None:
-        r"""
-        @brief Assigns another object to self
-        """
-        ...
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
-    def dup(self) -> ButtonState:
-        r"""
-        @brief Creates a copy of self
-        """
-        ...
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
-        """
-        ...
-    ...
-
 class CellView:
     r"""
     @brief A class describing what is shown inside a layout view
@@ -2533,208 +2381,6 @@ class CellView:
         @brief Gets the view the cellview resides in
         This reference will be nil if the cellview is not a valid one.
         This method has been added in version 0.25.
-        """
-        ...
-    ...
-
-class Cursor:
-    r"""
-    @brief The namespace for the cursor constants
-    This class defines the constants for the cursor setting (for example for class \Plugin, method set_cursor).
-    This class has been introduced in version 0.22.
-    """
-    Arrow: ClassVar[int]
-    r"""
-    @brief 'Arrow cursor' constant
-    """
-    Blank: ClassVar[int]
-    r"""
-    @brief 'Blank cursor' constant
-    """
-    Busy: ClassVar[int]
-    r"""
-    @brief 'Busy state cursor' constant
-    """
-    ClosedHand: ClassVar[int]
-    r"""
-    @brief 'Closed hand cursor' constant
-    """
-    Cross: ClassVar[int]
-    r"""
-    @brief 'Cross cursor' constant
-    """
-    Forbidden: ClassVar[int]
-    r"""
-    @brief 'Forbidden area cursor' constant
-    """
-    IBeam: ClassVar[int]
-    r"""
-    @brief 'I beam (text insert) cursor' constant
-    """
-    None_: ClassVar[int]
-    r"""
-    @brief 'No cursor (default)' constant for \set_cursor (resets cursor to default)
-    """
-    OpenHand: ClassVar[int]
-    r"""
-    @brief 'Open hand cursor' constant
-    """
-    PointingHand: ClassVar[int]
-    r"""
-    @brief 'Pointing hand cursor' constant
-    """
-    SizeAll: ClassVar[int]
-    r"""
-    @brief 'Size all directions cursor' constant
-    """
-    SizeBDiag: ClassVar[int]
-    r"""
-    @brief 'Backward diagonal resize cursor' constant
-    """
-    SizeFDiag: ClassVar[int]
-    r"""
-    @brief 'Forward diagonal resize cursor' constant
-    """
-    SizeHor: ClassVar[int]
-    r"""
-    @brief 'Horizontal resize cursor' constant
-    """
-    SizeVer: ClassVar[int]
-    r"""
-    @brief 'Vertical resize cursor' constant
-    """
-    SplitH: ClassVar[int]
-    r"""
-    @brief 'split_horizontal cursor' constant
-    """
-    SplitV: ClassVar[int]
-    r"""
-    @brief 'Split vertical cursor' constant
-    """
-    UpArrow: ClassVar[int]
-    r"""
-    @brief 'Upward arrow cursor' constant
-    """
-    Wait: ClassVar[int]
-    r"""
-    @brief 'Waiting cursor' constant
-    """
-    WhatsThis: ClassVar[int]
-    r"""
-    @brief 'Question mark cursor' constant
-    """
-    @classmethod
-    def new(cls) -> Cursor:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __copy__(self) -> Cursor:
-        r"""
-        @brief Creates a copy of self
-        """
-        ...
-    def __deepcopy__(self) -> Cursor:
-        r"""
-        @brief Creates a copy of self
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def _const_cast(self) -> Cursor:
-        r"""
-        @brief Returns a non-const reference to self.
-        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
-
-        This method has been introduced in version 0.29.6.
-        """
-        ...
-    def _create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
-    def _destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def _destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
-    def _is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
-        """
-        ...
-    def _manage(self) -> None:
-        r"""
-        @brief Marks the object as managed by the script side.
-        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
-
-        Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-        ...
-    def _to_const_object(self) -> Cursor:
-        r"""
-        @hide
-        """
-        ...
-    def _unmanage(self) -> None:
-        r"""
-        @brief Marks the object as no longer owned by the script side.
-        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
-
-        Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-        ...
-    def assign(self, other: Cursor) -> None:
-        r"""
-        @brief Assigns another object to self
-        """
-        ...
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
-    def dup(self) -> Cursor:
-        r"""
-        @brief Creates a copy of self
-        """
-        ...
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
         """
         ...
     ...
@@ -3234,19 +2880,33 @@ class Image(BasicImage):
 
     The data mapping describes the transformation of a pixel value (any double value) into pixel data which can be sent to the graphics cards for display. See \ImageDataMapping for a more detailed description.
     """
+    layer_binding: db.LayerInfo
+    r"""
+    Getter:
+    @brief Gets the layer binding of the image
+    If this attribute is set to a non-null layer properties object, the images visibility is associated with that of this layer. If the layer becomes invisible, the image is hidden as well.
+
+    This attribute was introduced in version 0.30.4.
+    Setter:
+    @brief Sets the layer binding of the image
+
+    See \layer_binding for details about the layer_binding attribute.
+
+    This attribute was introduced in version 0.30.4.
+    """
     mask_data: List[bool]
     r"""
     Getter:
     @brief Gets the mask from a array of boolean values
     See \set_mask_data for a description of the data field.
 
-    This method has been introduced in version 0.27.
+    This attribute has been introduced in version 0.27.
 
     Setter:
     @brief Sets the mask from a array of boolean values
     The order of the boolean values is line first, from bottom to top and left to right and is the same as the order in the data array.
 
-    This method has been introduced in version 0.27.
+    This attribute has been introduced in version 0.27.
     """
     matrix: db.Matrix3d
     r"""
@@ -3258,7 +2918,7 @@ class Image(BasicImage):
 
     The matrix is more general than the transformation used before and supports shear and perspective transformation. This property replaces the \trans property which is still functional, but deprecated.
 
-    This method has been introduced in version 0.22.
+    This attribute has been introduced in version 0.22.
     Setter:
     @brief Sets the transformation matrix
 
@@ -3267,7 +2927,7 @@ class Image(BasicImage):
 
     The matrix is more general than the transformation used before and supports shear and perspective transformation. This property replaces the \trans property which is still functional, but deprecated.
 
-    This method has been introduced in version 0.22.
+    This attribute has been introduced in version 0.22.
     """
     max_value: float
     r"""
@@ -3305,7 +2965,7 @@ class Image(BasicImage):
     See \pixel_height= for a description of that property.
 
     Starting with version 0.22, this property is incorporated into the transformation matrix.
-    This property is provided for convenience only.
+    This attribute is provided for convenience only.
     Setter:
     @brief Sets the pixel height
 
@@ -3313,7 +2973,7 @@ class Image(BasicImage):
     micron space with the transformation.
 
     Starting with version 0.22, this property is incorporated into the transformation matrix.
-    This property is provided for convenience only.
+    This attribute is provided for convenience only.
     """
     pixel_width: float
     r"""
@@ -3323,7 +2983,7 @@ class Image(BasicImage):
     See \pixel_width= for a description of that property.
 
     Starting with version 0.22, this property is incorporated into the transformation matrix.
-    This property is provided for convenience only.
+    This attribute is provided for convenience only.
     Setter:
     @brief Sets the pixel width
 
@@ -3331,7 +2991,7 @@ class Image(BasicImage):
     micron space with the transformation.
 
     Starting with version 0.22, this property is incorporated into the transformation matrix.
-    This property is provided for convenience only.
+    This attribute is provided for convenience only.
     """
     trans: db.DCplxTrans
     r"""
@@ -3359,14 +3019,14 @@ class Image(BasicImage):
 
     An image object can be made invisible by setting the visible property to false.
 
-    This method has been introduced in version 0.20.
+    This attribute has been introduced in version 0.20.
 
     Setter:
     @brief Sets the visibility
 
     See the \is_visible? method for a description of this property.
 
-    This method has been introduced in version 0.20.
+    This attribute has been introduced in version 0.20.
     """
     z_position: int
     r"""
@@ -3375,13 +3035,13 @@ class Image(BasicImage):
     Images with a higher z position are painted in front of images with lower z position.
     The z value is an integer that controls the position relative to other images.
 
-    This method was introduced in version 0.25.
+    This attribute was introduced in version 0.25.
     Setter:
     @brief Sets the z position of the image
 
     See \z_position for details about the z position attribute.
 
-    This method was introduced in version 0.25.
+    This attribute was introduced in version 0.25.
     """
     @classmethod
     def from_s(cls, s: str) -> Image:
@@ -3815,7 +3475,7 @@ class Image(BasicImage):
 
         An image object can be made invisible by setting the visible property to false.
 
-        This method has been introduced in version 0.20.
+        This attribute has been introduced in version 0.20.
         """
         ...
     def mask(self, x: int, y: int) -> bool:
@@ -4239,194 +3899,6 @@ class ImageDataMapping:
         r"""
         @brief Returns the current number of color map entries.
         @return The number of entries.
-        """
-        ...
-    ...
-
-class KeyCode:
-    r"""
-    @brief The namespace for the some key codes.
-    This namespace defines some key codes understood by built-in \LayoutView components. When compiling with Qt, these codes are compatible with Qt's key codes.
-    The key codes are intended to be used when directly interfacing with \LayoutView in non-Qt-based environments.
-
-    This class has been introduced in version 0.28.
-    """
-    Backspace: ClassVar[int]
-    r"""
-    @brief Indicates the Backspace key
-    """
-    Backtab: ClassVar[int]
-    r"""
-    @brief Indicates the Backtab key
-    """
-    Delete: ClassVar[int]
-    r"""
-    @brief Indicates the Delete key
-    """
-    Down: ClassVar[int]
-    r"""
-    @brief Indicates the Down key
-    """
-    End: ClassVar[int]
-    r"""
-    @brief Indicates the End key
-    """
-    Enter: ClassVar[int]
-    r"""
-    @brief Indicates the Enter key
-    """
-    Escape: ClassVar[int]
-    r"""
-    @brief Indicates the Escape key
-    """
-    Home: ClassVar[int]
-    r"""
-    @brief Indicates the Home key
-    """
-    Insert: ClassVar[int]
-    r"""
-    @brief Indicates the Insert key
-    """
-    Left: ClassVar[int]
-    r"""
-    @brief Indicates the Left key
-    """
-    PageDown: ClassVar[int]
-    r"""
-    @brief Indicates the PageDown key
-    """
-    PageUp: ClassVar[int]
-    r"""
-    @brief Indicates the PageUp key
-    """
-    Return: ClassVar[int]
-    r"""
-    @brief Indicates the Return key
-    """
-    Right: ClassVar[int]
-    r"""
-    @brief Indicates the Right key
-    """
-    Tab: ClassVar[int]
-    r"""
-    @brief Indicates the Tab key
-    """
-    Up: ClassVar[int]
-    r"""
-    @brief Indicates the Up key
-    """
-    @classmethod
-    def new(cls) -> KeyCode:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __copy__(self) -> KeyCode:
-        r"""
-        @brief Creates a copy of self
-        """
-        ...
-    def __deepcopy__(self) -> KeyCode:
-        r"""
-        @brief Creates a copy of self
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def _const_cast(self) -> KeyCode:
-        r"""
-        @brief Returns a non-const reference to self.
-        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
-
-        This method has been introduced in version 0.29.6.
-        """
-        ...
-    def _create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
-    def _destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def _destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
-    def _is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
-        """
-        ...
-    def _manage(self) -> None:
-        r"""
-        @brief Marks the object as managed by the script side.
-        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
-
-        Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-        ...
-    def _to_const_object(self) -> KeyCode:
-        r"""
-        @hide
-        """
-        ...
-    def _unmanage(self) -> None:
-        r"""
-        @brief Marks the object as no longer owned by the script side.
-        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
-
-        Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-        ...
-    def assign(self, other: KeyCode) -> None:
-        r"""
-        @brief Assigns another object to self
-        """
-        ...
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
-    def dup(self) -> KeyCode:
-        r"""
-        @brief Creates a copy of self
-        """
-        ...
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
         """
         ...
     ...
@@ -5993,7 +5465,7 @@ class LayoutView(LayoutViewBase):
         ...
     ...
 
-class LayoutViewBase:
+class LayoutViewBase(Dispatcher):
     r"""
     @hide
     @alias LayoutView
@@ -6677,17 +6149,6 @@ class LayoutViewBase:
         This method has been introduced in version 0.27.
         """
         ...
-    @classmethod
-    def new(cls) -> LayoutViewBase:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> LayoutViewBase:
         r"""
         @brief Returns a non-const reference to self.
@@ -6957,13 +6418,6 @@ class LayoutViewBase:
         @brief Clears all annotations on this view
         """
         ...
-    def clear_config(self) -> None:
-        r"""
-        @brief Clears the local configuration parameters
-
-        See \set_config for a description of the local configuration parameters.
-        """
-        ...
     def clear_images(self) -> None:
         r"""
         @brief Clear all images on this view
@@ -7039,21 +6493,6 @@ class LayoutViewBase:
 
         See \transaction for a detailed description of transactions. 
         This method was introduced in version 0.16.
-        """
-        ...
-    def commit_config(self) -> None:
-        r"""
-        @brief Commits the configuration settings
-
-        Some configuration options are queued for performance reasons and become active only after 'commit_config' has been called. After a sequence of \set_config calls, this method should be called to activate the settings made by these calls.
-
-        This method has been introduced in version 0.25.
-        """
-        ...
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
         ...
     def create_l2ndb(self, name: str) -> int:
@@ -7200,20 +6639,6 @@ class LayoutViewBase:
         The path is assumed to originate from the current cell and contain specific instances sorted from top to bottom.
         """
         ...
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
     def each_annotation(self) -> Iterator[Annotation]:
         r"""
         @brief Iterates over all annotations attached to this view
@@ -7352,28 +6777,6 @@ class LayoutViewBase:
         This method will expand all wildcard specifications in the layer properties by iterating over the specified objects (i.e. layers, cellviews) and by replacing default colors and stipples by the ones specified with the palettes.
 
         This method was introduced in version 0.21.
-        """
-        ...
-    def get_config(self, name: str) -> str:
-        r"""
-        @brief Gets the value of a local configuration parameter
-
-        @param name The name of the configuration parameter whose value shall be obtained (a string)
-
-        @return The value of the parameter
-
-        See \set_config for a description of the local configuration parameters.
-        """
-        ...
-    def get_config_names(self) -> List[str]:
-        r"""
-        @brief Gets the configuration parameter names
-
-        @return A list of configuration parameter names
-
-        This method returns the names of all known configuration parameters. These names can be used to get and set configuration parameter values.
-
-        This method was introduced in version 0.25.
         """
         ...
     def get_current_cell_path(self, cv_index: int) -> List[int]:
@@ -7582,13 +6985,6 @@ class LayoutViewBase:
         @return True, if the cell with "cell_index" is hidden for the cellview "cv_index"
         """
         ...
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
-        """
-        ...
     def is_dirty(self) -> bool:
         r"""
         @brief Gets a flag indicating whether one of the layouts displayed needs saving
@@ -7617,6 +7013,12 @@ class LayoutViewBase:
         @brief Gets the netlist database with the given index
         @return The \LayoutToNetlist object or nil if the index is not valid
         This method has been added in version 0.26.
+        """
+        ...
+    def layer_list_name(self, index: int) -> str:
+        r"""
+        @brief Gets the title of the given layer properties tab
+        This method has been introduced in version 0.30.4.
         """
         ...
     @overload
@@ -8226,16 +7628,6 @@ class LayoutViewBase:
         See \active_cellview_index.
 
         This method has been renamed from set_active_cellview_index to active_cellview_index= in version 0.25. The original name is still available, but is deprecated.
-        """
-        ...
-    def set_config(self, name: str, value: str) -> None:
-        r"""
-        @brief Sets a local configuration parameter with the given name to the given value
-
-        @param name The name of the configuration parameter to set
-        @param value The value to which to set the configuration parameter
-
-        This method sets a local configuration parameter with the given name to the given value. Values can only be strings. Numerical values have to be converted into strings first. Local configuration parameters override global configurations for this specific view. This allows for example to override global settings of background colors. Any local settings are not written to the configuration file. 
         """
         ...
     def set_current_cell_path(self, cv_index: int, cell_path: Sequence[int]) -> None:
@@ -10662,411 +10054,6 @@ class PixelBuffer:
         r"""
         @brief Writes the pixel buffer to a PNG file
         This method may not be available if PNG support is not compiled into KLayout.
-        """
-        ...
-    ...
-
-class Plugin:
-    r"""
-    @brief The plugin object
-
-    This class provides the actual plugin implementation. Each view gets its own instance of the plugin class. The plugin factory \PluginFactory class must be specialized to provide a factory for new objects of the Plugin class. See the documentation there for details about the plugin mechanism and the basic concepts.
-
-    This class has been introduced in version 0.22.
-    """
-    @classmethod
-    def new(cls) -> Plugin:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def _const_cast(self) -> Plugin:
-        r"""
-        @brief Returns a non-const reference to self.
-        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
-
-        This method has been introduced in version 0.29.6.
-        """
-        ...
-    def _create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
-    def _destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def _destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
-    def _is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
-        """
-        ...
-    def _manage(self) -> None:
-        r"""
-        @brief Marks the object as managed by the script side.
-        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
-
-        Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-        ...
-    def _to_const_object(self) -> Plugin:
-        r"""
-        @hide
-        """
-        ...
-    def _unmanage(self) -> None:
-        r"""
-        @brief Marks the object as no longer owned by the script side.
-        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
-
-        Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-        ...
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
-    def grab_mouse(self) -> None:
-        r"""
-        @brief Redirects mouse events to this plugin, even if the plugin is not active.
-        """
-        ...
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
-        """
-        ...
-    def set_cursor(self, cursor_type: int) -> None:
-        r"""
-        @brief Sets the cursor in the view area to the given type
-        Setting the cursor has an effect only inside event handlers, i.e. mouse_press_event. The cursor is not set permanently. Is is reset in the mouse move handler unless a button is pressed or the cursor is explicitly set again in the mouse_move_event.
-
-        The cursor type is one of the cursor constants in the \Cursor class, i.e. 'CursorArrow' for the normal cursor.
-        """
-        ...
-    def ungrab_mouse(self) -> None:
-        r"""
-        @brief Removes a mouse grab registered with \grab_mouse.
-        """
-        ...
-    ...
-
-class PluginFactory:
-    r"""
-    @brief The plugin framework's plugin factory object
-
-    Plugins are components that extend KLayout's functionality in various aspects. Scripting support exists currently for providing mouse mode handlers and general on-demand functionality connected with a menu entry.
-
-    Plugins are objects that implement the \Plugin interface. Each layout view is associated with one instance of such an object. The PluginFactory is a singleton which is responsible for creating \Plugin objects and providing certain configuration information such as where to put the menu items connected to this plugin and what configuration keys are used.
-
-    An implementation of PluginFactory must at least provide an implementation of \create_plugin. This method must instantiate a new object of the specific plugin.
-
-    After the factory has been created, it must be registered in the system using one of the \register methods. It is therefore recommended to put the call to \register at the end of the "initialize" method. For the registration to work properly, the menu items must be defined before \register is called.
-
-    The following features can also be implemented:
-
-    @<ul>
-      @<li>Reserve keys in the configuration file using \add_option in the constructor@</li>
-      @<li>Create menu items by using \add_menu_entry in the constructor@</li>
-      @<li>Set the title for the mode entry that appears in the tool bar using the \register argument@</li>
-      @<li>Provide global functionality (independent from the layout view) using \configure or \menu_activated@</li>
-    @</ul>
-
-    This is a simple example for a plugin in Ruby. It switches the mouse cursor to a 'cross' cursor when it is active:
-
-    @code
-    class PluginTestFactory < RBA::PluginFactory
-
-      # Constructor
-      def initialize
-        # registers the new plugin class at position 100000 (at the end), with name
-        # "my_plugin_test" and title "My plugin test"
-        register(100000, "my_plugin_test", "My plugin test")
-      end
-  
-      # Create a new plugin instance of the custom type
-      def create_plugin(manager, dispatcher, view)
-        return PluginTest.new
-      end
-
-    end
-
-    # The plugin class
-    class PluginTest < RBA::Plugin
-      def mouse_moved_event(p, buttons, prio)
-        if prio
-          # Set the cursor to cross if our plugin is active.
-          set_cursor(RBA::Cursor::Cross)
-        end
-        # Returning false indicates that we don't want to consume the event.
-        # This way for example the cursor position tracker still works.
-        false
-      end
-      def mouse_click_event(p, buttons, prio)
-        if prio
-          puts "mouse button clicked."
-          # This indicates we want to consume the event and others don't receive the mouse click
-          # with prio = false.
-          return true
-        end
-        # don't consume the event if we are not active.
-        false
-      end
-    end
-
-    # Instantiate the new plugin factory.
-    PluginTestFactory.new
-    @/code
-
-    This class has been introduced in version 0.22.
-    """
-    @property
-    def has_tool_entry(self) -> None:
-        r"""
-        WARNING: This variable can only be set, not retrieved.
-        @brief Enables or disables the tool bar entry
-        Initially this property is set to true. This means that the plugin will have a visible entry in the toolbar. This property can be set to false to disable this feature. In that case, the title and icon given on registration will be ignored. 
-        """
-        ...
-    @classmethod
-    def new(cls) -> PluginFactory:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __copy__(self) -> PluginFactory:
-        r"""
-        @brief Creates a copy of self
-        """
-        ...
-    def __deepcopy__(self) -> PluginFactory:
-        r"""
-        @brief Creates a copy of self
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def _const_cast(self) -> PluginFactory:
-        r"""
-        @brief Returns a non-const reference to self.
-        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
-
-        This method has been introduced in version 0.29.6.
-        """
-        ...
-    def _create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
-    def _destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def _destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
-    def _is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
-        """
-        ...
-    def _manage(self) -> None:
-        r"""
-        @brief Marks the object as managed by the script side.
-        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
-
-        Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-        ...
-    def _to_const_object(self) -> PluginFactory:
-        r"""
-        @hide
-        """
-        ...
-    def _unmanage(self) -> None:
-        r"""
-        @brief Marks the object as no longer owned by the script side.
-        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
-
-        Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-        ...
-    def add_config_menu_item(self, menu_name: str, insert_pos: str, title: str, cname: str, cvalue: str) -> None:
-        r"""
-        @brief Adds a configuration menu item
-
-        Menu items created this way will send a configuration request with 'cname' as the configuration parameter name and 'cvalue' as the configuration parameter value.
-
-        This method has been introduced in version 0.27.
-        """
-        ...
-    @overload
-    def add_menu_entry(self, menu_name: str, insert_pos: str) -> None:
-        r"""
-        @brief Specifies a separator
-        Call this method in the factory constructor to build the menu items that this plugin shall create.
-        This specific call inserts a separator at the given position (insert_pos). The position uses abstract menu item paths and "menu_name" names the component that will be created. See \AbstractMenu for a description of the path.
-        """
-        ...
-    @overload
-    def add_menu_entry(self, symbol: str, menu_name: str, insert_pos: str, title: str) -> None:
-        r"""
-        @brief Specifies a menu item
-        Call this method in the factory constructor to build the menu items that this plugin shall create.
-        This specific call inserts a menu item at the specified position (insert_pos). The position uses abstract menu item paths and "menu_name" names the component that will be created. See \AbstractMenu for a description of the path.
-        When the menu item is selected "symbol" is the string that is sent to the \menu_activated callback (either the global one for the factory ot the one of the per-view plugin instance).
-
-        @param symbol The string to send to the plugin if the menu is triggered
-        @param menu_name The name of entry to create at the given position
-        @param insert_pos The position where to create the entry
-        @param title The title string for the item. The title can contain a keyboard shortcut in round braces after the title text, i.e. "My Menu Item(F12)"
-        """
-        ...
-    @overload
-    def add_menu_entry(self, symbol: str, menu_name: str, insert_pos: str, title: str, sub_menu: bool) -> None:
-        r"""
-        @brief Specifies a menu item or sub-menu
-        Similar to the previous form of "add_menu_entry", but this version allows also to create sub-menus by setting the last parameter to "true".
-
-        With version 0.27 it's more convenient to use \add_submenu.
-        """
-        ...
-    def add_menu_item_clone(self, symbol: str, menu_name: str, insert_pos: str, copy_from: str) -> None:
-        r"""
-        @brief Specifies a menu item as a clone of another one
-        Using this method, a menu item can be made a clone of another entry (given as path by 'copy_from').
-        The new item will share the \Action object with the original one, so manipulating the action will change both the original entry and the new entry.
-
-        This method has been introduced in version 0.27.
-        """
-        ...
-    def add_option(self, name: str, default_value: str) -> None:
-        r"""
-        @brief Specifies configuration variables.
-        Call this method in the factory constructor to add configuration key/value pairs to the configuration repository. Without specifying configuration variables, the status of a plugin cannot be persisted. 
-
-        Once the configuration variables are known, they can be retrieved on demand using "get_config" from \MainWindow or listening to \configure callbacks (either in the factory or the plugin instance). Configuration variables can be set using "set_config" from \MainWindow. This scheme also works without registering the configuration options, but doing so has the advantage that it is guaranteed that a variable with this keys exists and has the given default value initially.
-
-        """
-        ...
-    def add_submenu(self, menu_name: str, insert_pos: str, title: str) -> None:
-        r"""
-        @brief Specifies a menu item or sub-menu
-
-        This method has been introduced in version 0.27.
-        """
-        ...
-    def assign(self, other: PluginFactory) -> None:
-        r"""
-        @brief Assigns another object to self
-        """
-        ...
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
-    def dup(self) -> PluginFactory:
-        r"""
-        @brief Creates a copy of self
-        """
-        ...
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
-        """
-        ...
-    @overload
-    def register(self, position: int, name: str, title: str) -> None:
-        r"""
-        @brief Registers the plugin factory
-        @param position An integer that determines the order in which the plugins are created. The internal plugins use the values from 1000 to 50000.
-        @param name The plugin name. This is an arbitrary string which should be unique. Hence it is recommended to use a unique prefix, i.e. "myplugin::ThePluginClass".
-        @param title The title string which is supposed to appear in the tool bar and menu related to this plugin.
-
-        Registration of the plugin factory makes the object known to the system. Registration requires that the menu items have been set already. Hence it is recommended to put the registration at the end of the initialization method of the factory class.
-        """
-        ...
-    @overload
-    def register(self, position: int, name: str, title: str, icon: str) -> None:
-        r"""
-        @brief Registers the plugin factory
-        @param position An integer that determines the order in which the plugins are created. The internal plugins use the values from 1000 to 50000.
-        @param name The plugin name. This is an arbitrary string which should be unique. Hence it is recommended to use a unique prefix, i.e. "myplugin::ThePluginClass".
-        @param title The title string which is supposed to appear in the tool bar and menu related to this plugin.
-        @param icon The path to the icon that appears in the tool bar and menu related to this plugin.
-
-        This version also allows registering an icon for the tool bar.
-
-        Registration of the plugin factory makes the object known to the system. Registration requires that the menu items have been set already. Hence it is recommended to put the registration at the end of the initialization method of the factory class.
         """
         ...
     ...

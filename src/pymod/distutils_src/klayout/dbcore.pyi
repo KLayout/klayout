@@ -1978,29 +1978,30 @@ class Cell:
         """
         ...
     @overload
-    def fill_region(self, region: Region, fill_cell_index: int, fc_bbox: Box, row_step: Vector, column_step: Vector, origin: Optional[Point] = ..., remaining_parts: Optional[Region] = ..., fill_margin: Optional[Vector] = ..., remaining_polygons: Optional[Region] = ..., glue_box: Optional[Box] = ...) -> None:
+    def fill_region(self, region: Region, fill_cell_index: int, fc_bbox: Box, row_step: Vector, column_step: Vector, origin: Optional[Point] = ..., remaining_parts: Optional[Region] = ..., fill_margin: Optional[Vector] = ..., remaining_polygons: Optional[Region] = ..., glue_box: Optional[Box] = ..., exclude_area: Optional[Region] = ...) -> None:
         r"""
         @brief Fills the given region with cells of the given type (skew step version)
         @param region The region to fill
         @param fill_cell_index The fill cell to place
-        @param fc_bbox The fill cell's box to place
+        @param fc_bbox The fill cell's box, defining the box that needs to be inside the fill region
         @param row_step The 'rows' step vector
         @param column_step The 'columns' step vector
         @param origin The global origin of the fill pattern or nil to allow local (per-polygon) optimization
         @param remaining_parts See explanation in other version
         @param fill_margin See explanation in other version
         @param remaining_polygons See explanation in other version
+        @param exclude_area A region that defines the areas which are not be filled
 
         This version is similar to the version providing an orthogonal fill, but it offers more generic stepping of the fill cell.
         The step pattern is defined by an origin and two vectors (row_step and column_step) which span the axes of the fill cell pattern.
 
         The fill box and the step vectors are decoupled which means the fill box can be larger or smaller than the step pitch - it can be overlapping and there can be space between the fill box instances. Fill boxes are placed where they fit entirely into a polygon of the region. The fill boxes lower left corner is the reference for the fill pattern and aligns with the origin if given.
 
-        This variant has been introduced in version 0.27.
+        This variant has been introduced in version 0.27. The 'exclude_area' argument has been added in version 0.30.4.
         """
         ...
     @overload
-    def fill_region(self, region: Region, fill_cell_index: int, fc_box: Box, origin: Optional[Point] = ..., remaining_parts: Optional[Region] = ..., fill_margin: Optional[Vector] = ..., remaining_polygons: Optional[Region] = ..., glue_box: Optional[Box] = ...) -> None:
+    def fill_region(self, region: Region, fill_cell_index: int, fc_box: Box, origin: Optional[Point] = ..., remaining_parts: Optional[Region] = ..., fill_margin: Optional[Vector] = ..., remaining_polygons: Optional[Region] = ..., glue_box: Optional[Box] = ..., exclude_area: Optional[Region] = ...) -> None:
         r"""
         @brief Fills the given region with cells of the given type (extended version)
         @param region The region to fill
@@ -2011,12 +2012,14 @@ class Cell:
         @param fill_margin See explanation below
         @param remaining_polygons See explanation below
         @param glue_box Guarantees fill cell compatibility to neighbor regions in enhanced mode
+        @param exclude_area A region that defines the areas which are not be filled
 
         This method creates a regular pattern of fill cells to cover the interior of the given region as far as possible. This process is also known as tiling. This implementation supports rectangular (not necessarily square) tile cells. The tile cell's footprint is given by the fc_box parameter and the cells will be arranged with their footprints forming a seamless array.
 
         The algorithm supports a global fill raster as well as local (per-polygon) origin optimization. In the latter case the origin of the regular raster is optimized per individual polygon of the fill region. To enable optimization, pass 'nil' to the 'origin' argument.
 
         The implementation will basically try to find a repetition pattern of the tile cell's footprint and produce instances which fit entirely into the fill region.
+        If an exclude area is given, the fill cells also must not overlap that region.
 
         There is also a version available which offers skew step vectors as a generalization of the orthogonal ones.
 
@@ -2024,7 +2027,10 @@ class Cell:
 
         If the 'remaining_polygons' argument is non-nil, the corresponding region will receive all polygons from the input region which could not be filled and where there is no chance of filling because not a single tile will fit into them.
 
-        'remaining_parts' and 'remaining_polygons' can be identical with the input. In that case the input will be overwritten with the respective output. Otherwise, the respective polygons are added to these regions.
+        'remaining_parts' and 'remaining_polygons' can point to the same Region object.
+        They can also be identical with the input. In that case the input will be overwritten with the respective output. Otherwise, the respective polygons are added to these regions.
+        'remaining_polygons' is not used if 'exclude_area' is present and non-empty. In that case, the
+        original polygons, which cannot be filled at all, are copied to 'remaining_parts'.
 
         This allows setting up a more elaborate fill scheme using multiple iterations and local origin-optimization ('origin' is nil):
 
@@ -2037,7 +2043,7 @@ class Cell:
         fill_margin = RBA::Point::new(0, 0)   # x/y distance between tile cells with different origin
 
         # Iteration: fill a region and fill the remaining parts as long as there is anything left.
-        # Polygons not worth being considered further are dropped (last argument is nil).
+        # Polygons not worth being considered further are dropped ('remaining_polygons' argument is nil).
         while !r.is_empty?
           c.fill_region(r, fc_index, fc_box, nil, r, fill_margin, nil)
         end
@@ -2045,17 +2051,17 @@ class Cell:
 
         The glue box parameter supports fill cell array compatibility with neighboring regions. This is specifically useful when putting the fill_cell method into a tiling processor. Fill cell array compatibility means that the fill cell array continues over tile boundaries. This is easy with an origin: you can chose the origin identically over all tiles which is sufficient to guarantee fill cell array compatibility across the tiles. However there is no freedom of choice of the origin then and fill cell placement may not be optimal. To enable the origin for the tile boundary only, a glue box can given. The origin will then be used only when the polygons to fill not entirely inside and not at the border of the glue box. Hence, while a certain degree of freedom is present for the placement of fill cells inside the glue box, the fill cells are guaranteed to be placed at the raster implied by origin at the glue box border and beyond. To ensure fill cell compatibility inside the tiling processor, it is sufficient to use the tile box as the glue box.
 
-        This method has been introduced in version 0.23 and enhanced in version 0.27.
+        This method has been introduced in version 0.23 and enhanced in version 0.27. The 'exclude_area' argument has been added in version 0.30.4.
         """
         ...
-    def fill_region_multi(self, region: Region, fill_cell_index: int, fc_bbox: Box, row_step: Vector, column_step: Vector, fill_margin: Optional[Vector] = ..., remaining_polygons: Optional[Region] = ..., glue_box: Optional[Box] = ...) -> None:
+    def fill_region_multi(self, region: Region, fill_cell_index: int, fc_bbox: Box, row_step: Vector, column_step: Vector, fill_margin: Optional[Vector] = ..., remaining_polygons: Optional[Region] = ..., glue_box: Optional[Box] = ..., exclude_area: Optional[Region] = ...) -> None:
         r"""
         @brief Fills the given region with cells of the given type in enhanced mode with iterations
         This version operates like \fill_region, but repeats the fill generation until no further fill cells can be placed. As the fill pattern origin changes between the iterations, narrow regions can be filled which cannot with a fixed fill pattern origin. The \fill_margin parameter is important as it controls the distance between fill cells with a different origin and therefore introduces a safety distance between pitch-incompatible arrays.
 
         The origin is ignored unless a glue box is given. See \fill_region for a description of this concept.
 
-        This method has been introduced in version 0.27.
+        This method has been introduced in version 0.27. The 'exclude_area' argument has been added in version 0.30.4.
         """
         ...
     @overload
@@ -35802,11 +35808,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis in micrometer units
+    @brief Sets the displacement vector for the 'a' axis
 
-    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     b: Vector
     r"""
@@ -35862,9 +35868,10 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array
+    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     da: DVector
     r"""
@@ -36358,7 +36365,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
         ...
     @overload
@@ -36366,7 +36373,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
         ...
     def pcell_declaration(self) -> PCellDeclaration_Native:
@@ -40785,6 +40792,14 @@ class Layout:
         @brief Updates the internals of the layout
         This method updates the internal state of the layout. Usually this is done automatically
         This method is provided to ensure this explicitly. This can be useful while using \start_changes and \end_changes to wrap a performance-critical operation. See \start_changes for more details.
+        """
+        ...
+    def update_needed(self) -> bool:
+        r"""
+        @brief Gets a value indicating whether the Layout object needs an update
+        If this method returns false, \update will not do anything. This is useful to force an update at specific times during 'under_construction' conditions.
+
+        This method has been introduced in version 0.30.4.
         """
         ...
     @overload
@@ -47756,17 +47771,17 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     def device_class(self) -> DeviceClass:
@@ -51425,6 +51440,11 @@ class PCellDeclaration(PCellDeclaration_Native):
         @hide
         """
         ...
+    def description(self) -> str:
+        r"""
+        @hide
+        """
+        ...
     def display_text(self, arg0: Sequence[Any]) -> str:
         r"""
         @hide
@@ -51446,6 +51466,11 @@ class PCellDeclaration(PCellDeclaration_Native):
         """
         ...
     def transformation_from_shape(self, arg0: Layout, arg1: Shape, arg2: int) -> Trans:
+        r"""
+        @hide
+        """
+        ...
+    def via_types(self) -> List[ViaType]:
         r"""
         @hide
         """
@@ -51562,6 +51587,10 @@ class PCellDeclaration_Native:
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
         ...
+    def description(self) -> str:
+        r"""
+        """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
@@ -51626,6 +51655,10 @@ class PCellDeclaration_Native:
         """
         ...
     def transformation_from_shape(self, layout: Layout, shape: Shape, layer: int) -> Trans:
+        r"""
+        """
+        ...
+    def via_types(self) -> List[ViaType]:
         r"""
         """
         ...
@@ -60880,32 +60913,32 @@ class Region(ShapeCollection):
         """
         ...
     @overload
-    def fill(self, in_cell: Cell, fill_cell_index: int, fc_box: Box, origin: Optional[Point] = ..., remaining_parts: Optional[Region] = ..., fill_margin: Optional[Vector] = ..., remaining_polygons: Optional[Region] = ..., glue_box: Optional[Box] = ...) -> None:
+    def fill(self, in_cell: Cell, fill_cell_index: int, fc_bbox: Box, row_step: Vector, column_step: Vector, origin: Optional[Point] = ..., remaining_parts: Optional[Region] = ..., fill_margin: Optional[Vector] = ..., remaining_polygons: Optional[Region] = ..., glue_box: Optional[Box] = ..., exclude_area: Optional[Region] = ...) -> None:
         r"""
         @brief A mapping of \Cell#fill_region to the Region class
 
         This method is equivalent to \Cell#fill_region, but is based on Region (with the cell being the first parameter).
 
-        This method has been introduced in version 0.27.
+        This method has been introduced in version 0.27. The 'exclude_area' argument has been added in version 0.30.4.
         """
         ...
     @overload
-    def fill(self, in_cell: Cell, fill_cell_index: int, fc_origin: Box, row_step: Vector, column_step: Vector, origin: Optional[Point] = ..., remaining_parts: Optional[Region] = ..., fill_margin: Optional[Vector] = ..., remaining_polygons: Optional[Region] = ..., glue_box: Optional[Box] = ...) -> None:
+    def fill(self, in_cell: Cell, fill_cell_index: int, fc_box: Box, origin: Optional[Point] = ..., remaining_parts: Optional[Region] = ..., fill_margin: Optional[Vector] = ..., remaining_polygons: Optional[Region] = ..., glue_box: Optional[Box] = ..., exclude_area: Optional[Region] = ...) -> None:
         r"""
         @brief A mapping of \Cell#fill_region to the Region class
 
         This method is equivalent to \Cell#fill_region, but is based on Region (with the cell being the first parameter).
 
-        This method has been introduced in version 0.27.
+        This method has been introduced in version 0.27. The 'exclude_area' argument has been added in version 0.30.4.
         """
         ...
-    def fill_multi(self, in_cell: Cell, fill_cell_index: int, fc_origin: Box, row_step: Vector, column_step: Vector, fill_margin: Optional[Vector] = ..., remaining_polygons: Optional[Region] = ..., glue_box: Optional[Box] = ...) -> None:
+    def fill_multi(self, in_cell: Cell, fill_cell_index: int, fc_bbox: Box, row_step: Vector, column_step: Vector, fill_margin: Optional[Vector] = ..., remaining_polygons: Optional[Region] = ..., glue_box: Optional[Box] = ..., exclude_area: Optional[Region] = ...) -> None:
         r"""
         @brief A mapping of \Cell#fill_region to the Region class
 
         This method is equivalent to \Cell#fill_region, but is based on Region (with the cell being the first parameter).
 
-        This method has been introduced in version 0.27.
+        This method has been introduced in version 0.27. The 'exclude_area' argument has been added in version 0.30.4.
         """
         ...
     def filter(self, filter: PolygonFilterBase) -> None:
@@ -63552,6 +63585,26 @@ class SaveLayoutOptions:
     The format string can be either "GDS2", "OASIS", "CIF" or "DXF". Other formats may be available if
     a suitable plugin is installed.
     """
+    gds2_default_text_size: Any
+    r"""
+    Getter:
+    @brief Gets the default text size to use when a text does not have a size
+
+    This property has been added in version 0.30.4.
+
+    Setter:
+    @brief Specifies the default text size to use when a text does not have a size
+
+    Text object can have no size, e.g. when they are read from OASIS files. Technically such texts
+    are represented by text object with a zero size. You can configure the GDS writer to use a specific
+    text size in this case. This property specifies the default text size in micrometer units. This
+    size can be set to 0 to preserve a zero size in GDS files read.
+
+    Set this attribute to nil to disable writing of a text size if none is specified.
+
+
+    This property has been added in version 0.30.4.
+    """
     gds2_libname: str
     r"""
     Getter:
@@ -64989,10 +65042,11 @@ class Shape:
     Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a simple polygon.
 
     Setter:
-    @brief Replaces the shape by the given simple polygon (in micrometer units)
-    This method replaces the shape by the given text, like \simple_polygon= with a \SimplePolygon argument does. This version translates the polygon from micrometer units to database units internally.
+    @brief Replaces the shape by the given simple polygon object
+    This method replaces the shape by the given simple polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     text: Any
     r"""
@@ -69221,16 +69275,16 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit referenced by the subcircuit (non-const version).
+
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit (non-const version).
-
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
@@ -69900,7 +69954,8 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: int
     r"""
@@ -69936,7 +69991,8 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: int
     r"""
@@ -77341,6 +77397,225 @@ class Vector:
 
 
         @return 1 if the vector product is positive, 0 if it is zero and -1 if it is negative.
+        """
+        ...
+    ...
+
+class ViaType:
+    r"""
+    @brief Describes a via type
+    These objects are used by \PCellDeclaration#via_types to specify the via types a via PCell is able to provide.
+
+    The basic parameters of a via type are bottom and top layers (the layers that are connected by the via) and width and height. Width and height are the dimensions of the core via area - that is the part where bottom and top layers overlap. The actual layout may exceed these dimensions if different enclosure rules require so for example.
+
+    This class has been introduced in version 0.30.
+    """
+    bottom: LayerInfo
+    r"""
+    Getter:
+    @brief The bottom layer of the via.
+
+    Setter:
+    @brief The bottom layer of the via.
+    """
+    bottom_grid: float
+    r"""
+    Getter:
+    @brief If non-zero, the bottom layer's dimensions will be rounded to this grid.
+
+    Setter:
+    @brief If non-zero, the bottom layer's dimensions will be rounded to this grid.
+    """
+    cut: LayerInfo
+    r"""
+    Getter:
+    @brief The cut layer of the via.
+
+    Setter:
+    @brief The cut layer of the via.
+    """
+    description: str
+    r"""
+    Getter:
+    @brief The description of the via type.
+    The description is an optional free-style text that describes the via type for a human.
+    Setter:
+    @brief The description of the via type.
+    The description is an optional free-style text that describes the via type for a human.
+    """
+    hbmin: float
+    r"""
+    Getter:
+    @brief The minimum bottom-layer height of the via.
+    This values specifies the minimum height of the bottom layer in micrometers. The default is zero.
+    Setter:
+    @brief The minimum bottom-layer height of the via.
+    This values specifies the minimum height of the bottom layer in micrometers. The default is zero.
+    """
+    htmin: float
+    r"""
+    Getter:
+    @brief The minimum top-layer height of the via.
+    This values specifies the minimum height of the top layer in micrometers. The default is zero.
+    Setter:
+    @brief The minimum top-layer height of the via.
+    This values specifies the minimum height of the top layer in micrometers. The default is zero.
+    """
+    name: str
+    r"""
+    Getter:
+    @brief The formal name of the via type.
+    The name should be unique and identify the via type in the context of the via declaration.
+    Setter:
+    @brief The formal name of the via type.
+    The name should be unique and identify the via type in the context of the via declaration.
+    """
+    top: LayerInfo
+    r"""
+    Getter:
+    @brief The top layer of the via.
+
+    Setter:
+    @brief The top layer of the via.
+    """
+    top_grid: float
+    r"""
+    Getter:
+    @brief If non-zero, the top layer's dimensions will be rounded to this grid.
+
+    Setter:
+    @brief If non-zero, the top layer's dimensions will be rounded to this grid.
+    """
+    wbmin: float
+    r"""
+    Getter:
+    @brief The minimum bottom-layer width of the via.
+    This values specifies the minimum width of the bottom layer in micrometers. The default is zero.
+    Setter:
+    @brief The minimum bottom-layer width of the via.
+    This values specifies the minimum width of the bottom layer in micrometers. The default is zero.
+    """
+    wtmin: float
+    r"""
+    Getter:
+    @brief The minimum top-layer width of the via.
+    This values specifies the minimum width of the top layer in micrometers. The default is zero.
+    Setter:
+    @brief The minimum top-layer width of the via.
+    This values specifies the minimum width of the top layer in micrometers. The default is zero.
+    """
+    @classmethod
+    def new(cls, name: str, description: Optional[str] = ...) -> ViaType:
+        r"""
+        @brief Creates a new via type object with the given name and description.
+        """
+        ...
+    def __copy__(self) -> ViaType:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> ViaType:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self, name: str, description: Optional[str] = ...) -> None:
+        r"""
+        @brief Creates a new via type object with the given name and description.
+        """
+        ...
+    def _const_cast(self) -> ViaType:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> ViaType:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: ViaType) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> ViaType:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
         """
         ...
     ...

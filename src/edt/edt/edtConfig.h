@@ -26,11 +26,9 @@
 
 #include <string>
 
-#include "laySnap.h"
 #include "edtCommon.h"
 #include "tlString.h"
 #include "dbPoint.h"
-#include "dbHersheyFont.h"
 
 namespace edt
 {
@@ -87,35 +85,10 @@ struct EDT_PUBLIC CMConverter
 
 enum path_ext_type { Flush = 0, Square, Variable, Round, NumPEModes };
 
-struct EDT_PUBLIC ACConverter
-{
-  std::string to_string (const lay::angle_constraint_type &m);
-  void from_string (const std::string &s, lay::angle_constraint_type &m);
-};
-
 struct EDT_PUBLIC PathExtConverter
 {
   std::string to_string (const edt::path_ext_type &m);
   void from_string (const std::string &s, edt::path_ext_type &m);
-};
-
-struct EDT_PUBLIC EditGridConverter
-{
-  std::string to_string (const db::DVector &eg);
-  void from_string (const std::string &s, db::DVector &eg);
-  void from_string_picky (const std::string &s, db::DVector &eg);
-};
-
-struct EDT_PUBLIC HAlignConverter
-{
-  std::string to_string (db::HAlign a);
-  void from_string (const std::string &s, db::HAlign &a);
-};
-
-struct EDT_PUBLIC VAlignConverter
-{
-  std::string to_string (db::VAlign a);
-  void from_string (const std::string &s, db::VAlign &a);
 };
 
 }

@@ -28,7 +28,7 @@
 #include "layEditorOptionsPages.h"
 #include "layCursor.h"
 #include "layEditorUtils.h"
-#include "edtConfig.h"
+#include "layConverters.h"
 
 namespace gsi
 {
@@ -309,14 +309,28 @@ PluginImpl::snap2_from_to (const db::DPoint &p, const db::DPoint &plast, bool co
   return details.snapped_point;
 }
 
+namespace edt
+{
+
+//  This is a replication of the codes from edtConfig.cc, but avoids
+//  linking laybasic to edt module.
+static std::string cfg_edit_grid ("edit-grid");
+static std::string cfg_edit_global_grid ("grid-micron");
+static std::string cfg_edit_snap_to_objects ("edit-snap-to-objects");
+static std::string cfg_edit_snap_objects_to_grid ("edit-snap-objects-to-grid");
+static std::string cfg_edit_move_angle_mode ("edit-move-angle-mode");
+static std::string cfg_edit_connect_angle_mode ("edit-connect-angle-mode");
+
+}
+
 /**
  *  @brief Captures some edt space configuration events for convencience
  */
 void
 PluginImpl::configure_edt (const std::string &name, const std::string &value)
 {
-  edt::EditGridConverter egc;
-  edt::ACConverter acc;
+  lay::EditGridConverter egc;
+  lay::ACConverter acc;
 
   if (name == edt::cfg_edit_global_grid) {
     egc.from_string (value, m_global_grid);

@@ -25,6 +25,7 @@
 #include "layLayoutViewBase.h"
 #include "laySnap.h"
 #include "layFinder.h"
+#include "layConverters.h"
 #include "tlProgress.h"
 #include "edtPartialService.h"
 #include "edtService.h"
@@ -1344,8 +1345,8 @@ PartialService::menu_activated (const std::string & /*symbol*/)
 bool 
 PartialService::configure (const std::string &name, const std::string &value)
 {
-  edt::EditGridConverter egc;
-  edt::ACConverter acc;
+  lay::EditGridConverter egc;
+  lay::ACConverter acc;
 
   if (name == cfg_edit_global_grid) {
     egc.from_string (value, m_global_grid);

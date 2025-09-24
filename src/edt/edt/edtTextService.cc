@@ -24,6 +24,7 @@
 #include "edtTextService.h"
 
 #include "layLayoutViewBase.h"
+#include "layConverters.h"
 
 #if defined(HAVE_QT)
 #  include "edtPropertiesPages.h"
@@ -215,7 +216,7 @@ TextService::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_edit_text_halign) {
     db::HAlign ha = db::HAlignLeft;
-    HAlignConverter hac;
+    lay::HAlignConverter hac;
     hac.from_string (value, ha);
     if (m_text.halign () != ha) {
       m_text.halign (ha);
@@ -226,7 +227,7 @@ TextService::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_edit_text_valign) {
     db::VAlign va = db::VAlignBottom;
-    VAlignConverter vac;
+    lay::VAlignConverter vac;
     vac.from_string (value, va);
     if (m_text.valign () != va) {
       m_text.valign (va);

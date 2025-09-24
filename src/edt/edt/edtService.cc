@@ -33,6 +33,7 @@
 #include "layFinder.h"
 #include "layLayoutView.h"
 #include "laySnap.h"
+#include "layConverters.h"
 #if defined(HAVE_QT)
 #  include "layEditorOptionsPages.h"
 #endif
@@ -309,8 +310,8 @@ Service::service_configuration_changed ()
 bool
 Service::configure (const std::string &name, const std::string &value)
 {
-  edt::EditGridConverter egc;
-  edt::ACConverter acc;
+  lay::EditGridConverter egc;
+  lay::ACConverter acc;
 
   if (name == cfg_edit_global_grid) {
 

@@ -53,6 +53,13 @@ class BasicTest(unittest.TestCase):
     p.name = "u"
     self.assertEqual(p.name, "u")
 
+  def test_3(self):
+
+    # smoke test (issue #2154)
+    x = lay.Cursor.Arrow
+    x = lay.ButtonState.ShiftKey
+    x = lay.KeyCode.Escape
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestSuite()

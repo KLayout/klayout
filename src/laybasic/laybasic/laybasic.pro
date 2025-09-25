@@ -27,6 +27,7 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
 }
 
 SOURCES += \
+  gsiDeclLayAdded.cc \
   gsiDeclLayLayers.cc \
   gsiDeclLayDispatcher.cc \
   gsiDeclLayLayoutViewBase.cc \
@@ -34,6 +35,10 @@ SOURCES += \
   gsiDeclLayMenu.cc \
   gsiDeclLayTlAdded.cc \
   gsiDeclLayRdbAdded.cc \
+  gsiDeclLayConfigPage.cc \
+  gsiDeclLayEditorOptionsPage.cc \
+  gsiDeclLayPlugin.cc \
+  gsiDeclLayPluginFactory.cc \
   layAbstractMenu.cc \
   layEditorOptionsPage.cc \
   layEditorOptionsPages.cc \
@@ -90,6 +95,9 @@ SOURCES += \
   layUtils.cc \
 
 HEADERS += \
+  gsiDeclLayConfigPage.h \
+  gsiDeclLayEditorOptionsPage.h \
+  gsiDeclLayPlugin.h \
   layEditorOptionsPage.h \
   layEditorOptionsPages.h \
   layEditorUtils.h \

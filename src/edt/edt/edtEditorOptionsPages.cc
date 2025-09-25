@@ -33,6 +33,7 @@
 #include "edtPropertiesPageUtils.h"
 #include "tlExceptions.h"
 #include "layPlugin.h"
+#include "layConverters.h"
 #include "layLayoutViewBase.h"
 #include "layCellSelectionForm.h"
 #include "layQtTools.h"
@@ -107,7 +108,7 @@ EditorOptionsGeneric::apply (lay::Dispatcher *root)
 {
   //  Edit grid
 
-  EditGridConverter egc;
+  lay::EditGridConverter egc;
   if (mp_ui->grid_cb->currentIndex () == 0) {
     root->config_set (cfg_edit_grid, egc.to_string (db::DVector (-1.0, -1.0)));
   } else if (mp_ui->grid_cb->currentIndex () == 1) {
@@ -125,7 +126,7 @@ EditorOptionsGeneric::apply (lay::Dispatcher *root)
 
   //  Edit & move angle
 
-  ACConverter acc;
+  lay::ACConverter acc;
   root->config_set (cfg_edit_move_angle_mode, acc.to_string (lay::angle_constraint_type (mp_ui->move_angle_cb->currentIndex ())));
   root->config_set (cfg_edit_connect_angle_mode, acc.to_string (lay::angle_constraint_type (mp_ui->conn_angle_cb->currentIndex ())));
 
@@ -156,7 +157,7 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
 {
   //  Edit grid
 
-  EditGridConverter egc;
+  lay::EditGridConverter egc;
   db::DVector eg;
   root->config_get (cfg_edit_grid, eg, egc);
 
@@ -173,7 +174,7 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
 
   //  edit & move angle
 
-  ACConverter acc;
+  lay::ACConverter acc;
   lay::angle_constraint_type ac;
 
   ac = lay::AC_Any;
@@ -244,11 +245,11 @@ EditorOptionsText::apply (lay::Dispatcher *root)
   root->config_set (cfg_edit_text_string, tl::unescape_string (tl::to_string (mp_ui->text_le->text ())));
 
   //  HAlign
-  HAlignConverter hac;
+  lay::HAlignConverter hac;
   root->config_set (cfg_edit_text_halign, hac.to_string (db::HAlign (mp_ui->halign_cbx->currentIndex () - 1)));
 
   //  VAlign
-  VAlignConverter vac;
+  lay::VAlignConverter vac;
   root->config_set (cfg_edit_text_valign, vac.to_string (db::VAlign (mp_ui->valign_cbx->currentIndex () - 1)));
 
   //  Text size
@@ -271,12 +272,12 @@ EditorOptionsText::setup (lay::Dispatcher *root)
 
   //  HAlign
   db::HAlign ha = db::HAlignLeft;
-  root->config_get (cfg_edit_text_halign, ha, HAlignConverter ());
+  root->config_get (cfg_edit_text_halign, ha, lay::HAlignConverter ());
   mp_ui->halign_cbx->setCurrentIndex (int (ha) + 1);
 
   //  VAlign
   db::VAlign va = db::VAlignBottom;
-  root->config_get (cfg_edit_text_valign, va, VAlignConverter ());
+  root->config_get (cfg_edit_text_valign, va, lay::VAlignConverter ());
   mp_ui->valign_cbx->setCurrentIndex (int (va) + 1);
 
   double sz = 0.0;

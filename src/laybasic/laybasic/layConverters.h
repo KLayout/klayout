@@ -25,7 +25,9 @@
 #define HDR_layConverters
 
 #include "laybasicCommon.h"
+#include "laySnap.h"
 #include "tlColor.h"
+#include "dbHersheyFont.h"
 
 #if defined(HAVE_QT)
 #  include <QColor>
@@ -45,6 +47,34 @@ struct LAYBASIC_PUBLIC ColorConverter
 #endif
   std::string to_string (const tl::Color &c) const;
   void from_string (const std::string &s, tl::Color &c) const;
+};
+
+/**
+ *  @brief A converter for the angle constraint type
+ */
+struct LAYBASIC_PUBLIC ACConverter
+{
+  std::string to_string (const lay::angle_constraint_type &m);
+  void from_string (const std::string &s, lay::angle_constraint_type &m);
+};
+
+struct LAYBASIC_PUBLIC EditGridConverter
+{
+  std::string to_string (const db::DVector &eg);
+  void from_string (const std::string &s, db::DVector &eg);
+  void from_string_picky (const std::string &s, db::DVector &eg);
+};
+
+struct LAYBASIC_PUBLIC HAlignConverter
+{
+  std::string to_string (db::HAlign a);
+  void from_string (const std::string &s, db::HAlign &a);
+};
+
+struct LAYBASIC_PUBLIC VAlignConverter
+{
+  std::string to_string (db::VAlign a);
+  void from_string (const std::string &s, db::VAlign &a);
 };
 
 }

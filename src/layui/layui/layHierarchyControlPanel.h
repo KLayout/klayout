@@ -346,6 +346,9 @@ private:
 
   //  ask for cell copy mode
   bool ask_for_cell_copy_mode (const db::Layout &layout, const std::vector<cell_path_type> &paths, int &cell_copy_mode);
+
+  //  changes the active cellview
+  void change_active_cellview (int index);
 };
 
 } // namespace lay

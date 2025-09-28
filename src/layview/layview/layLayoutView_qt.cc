@@ -418,7 +418,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   copy_from (source);
 
   bookmarks (source->bookmarks ());
-  set_active_cellview_index_silent (source->active_cellview_index ());
+  LayoutView::set_active_cellview_index (source->active_cellview_index ());
 }
 
 LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewWidget *widget, unsigned int options)
@@ -445,7 +445,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   copy_from (source);
 
   bookmarks (source->bookmarks ());
-  set_active_cellview_index_silent (source->active_cellview_index ());
+  LayoutView::set_active_cellview_index (source->active_cellview_index ());
 }
 
 bool

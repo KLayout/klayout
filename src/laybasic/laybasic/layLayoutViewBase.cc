@@ -475,6 +475,12 @@ LayoutViewBase::shutdown ()
     }
   }
 
+  //  NOTE: this must happen before the services are deleted
+  mp_move_service = 0;
+  mp_selection_service = 0;
+  mp_tracker = 0;
+  mp_zoom_service = 0;
+
   //  delete all plugins
   std::vector<lay::Plugin *> plugins;
   plugins.swap (mp_plugins);

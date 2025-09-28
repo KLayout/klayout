@@ -418,7 +418,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   copy_from (source);
 
   bookmarks (source->bookmarks ());
-  LayoutView::set_active_cellview_index (source->active_cellview_index ());
+  set_active_cellview_index_silent (source->active_cellview_index ());
 }
 
 LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewWidget *widget, unsigned int options)
@@ -445,7 +445,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   copy_from (source);
 
   bookmarks (source->bookmarks ());
-  LayoutView::set_active_cellview_index (source->active_cellview_index ());
+  set_active_cellview_index_silent (source->active_cellview_index ());
 }
 
 bool
@@ -1387,12 +1387,13 @@ LayoutView::active_cellview_index () const
   }
 }
 
-void 
+void
 LayoutView::set_active_cellview_index (int index) 
 {
   if (index >= 0 && index < int (cellviews ())) {
     if (mp_hierarchy_panel) {
-      mp_hierarchy_panel->select_active (index);
+      //  NOTE: we don't send events from here, that is done in "LayoutViewBase::set_active_cellview_index"
+      mp_hierarchy_panel->select_active (index, true /*no events*/);
     }
     LayoutViewBase::set_active_cellview_index (index);
   }

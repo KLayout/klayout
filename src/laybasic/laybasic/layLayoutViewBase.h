@@ -2152,6 +2152,12 @@ public:
   virtual void set_active_cellview_index (int index);
 
   /**
+   *  @brief Select a certain cellview for the active one
+   *  This version does not emit any events while changing the cellview index
+   */
+  void set_active_cellview_index_silent (int index);
+
+  /**
    *  @brief An event triggered if the active cellview changes
    *  This event is triggered after the active cellview changed.
    */

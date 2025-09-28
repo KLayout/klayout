@@ -4944,6 +4944,19 @@ LayoutViewBase::active_cellview_index () const
 }
 
 void
+LayoutViewBase::set_active_cellview_index_silent (int index)
+{
+  enable_active_cellview_changed_event (false);
+  try {
+    set_active_cellview_index (index);
+    enable_active_cellview_changed_event (true, true /*silent*/);
+  } catch (...) {
+    enable_active_cellview_changed_event (true, true /*silent*/);
+    throw;
+  }
+}
+
+void
 LayoutViewBase::set_active_cellview_index (int index)
 {
   if (index >= 0 && index < int (cellviews ())) {

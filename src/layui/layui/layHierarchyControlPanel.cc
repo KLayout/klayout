@@ -707,11 +707,13 @@ HierarchyControlPanel::update_required ()
 }
 
 void 
-HierarchyControlPanel::select_active (int cellview_index)
+HierarchyControlPanel::select_active (int cellview_index, bool silent)
 {
   if (cellview_index != m_active_index) {
     mp_selector->setCurrentIndex (cellview_index);
-    selection_changed (cellview_index);
+    if (! silent) {
+      selection_changed (cellview_index);
+    }
   }
 }
 

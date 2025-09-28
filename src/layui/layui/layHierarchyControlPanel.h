@@ -140,7 +140,7 @@ public:
    *  selects the active cellview by index. The index must be
    *  a valid index within the context of the layout view.
    */
-  void select_active (int cellview_index);
+  void select_active (int cellview_index, bool silent = false);
 
   /**
    *  @brief Get the active cellview

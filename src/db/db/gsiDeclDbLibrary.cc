@@ -37,14 +37,6 @@ namespace gsi
 // ---------------------------------------------------------------
 //  db::Library binding
 
-/**
- *  @brief A basic implementation of the library
- */
-static db::Library *new_lib ()
-{
-  return new db::Library ();
-}
-
 static db::Library *library_by_name (const std::string &name, const std::string &for_technology)
 {
   return db::LibraryManager::instance ().lib_ptr_by_name (name, for_technology);
@@ -135,7 +127,10 @@ class LibraryImpl
   : public db::Library
 {
 public:
-  LibraryImpl () : db::Library () { }
+  LibraryImpl () : db::Library ()
+  {
+    //  .. nothing yet ..
+  }
 
   virtual std::string reload ()
   {
@@ -150,6 +145,15 @@ public:
 };
 
 }
+
+static LibraryImpl *new_lib ()
+{
+  return new LibraryImpl ();
+}
+
+/**
+ *  @brief A basic implementation of the library
+ */
 
 LibraryClass<db::Library> decl_Library ("db", "LibraryBase",
   gsi::method ("library_by_name", &library_by_name, gsi::arg ("name"), gsi::arg ("for_technology", std::string (), "unspecific"),
@@ -288,6 +292,10 @@ LibraryClass<db::Library> decl_Library ("db", "LibraryBase",
   ),
   "@hide"
 );
+
+/**
+ *  @brief The reimplementation stub
+ */
 
 LibraryClass<LibraryImpl> decl_LibraryImpl (decl_Library, "db", "Library",
   gsi::constructor ("new", &new_lib,

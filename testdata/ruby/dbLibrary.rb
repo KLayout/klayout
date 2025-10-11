@@ -167,6 +167,37 @@ class DBLibrary_TestClass < TestBase
 
   end
 
+  def test_6_cells_become_defunct_after_unregister
+
+    lib = RBA::Library::new
+    lib.description = "LIB1"
+    lib.register("RBA-unit-test")
+
+    cell_a = lib.layout.create_cell("A")
+    l1 = lib.layout.layer(1, 0)
+    cell_a.shapes(l1).insert(RBA::Box::new(0, 0, 1000, 2000))
+
+    ly = RBA::Layout::new
+    lc = ly.create_cell("A", "RBA-unit-test")
+    assert_equal(lc.qname, "RBA-unit-test.A")
+    ci = lc.cell_index
+
+    lib.unregister
+
+    # NOTE: cleanup has not been called, so we can find the cell using the cell_index
+    # (the actual cell object is no longer there because it has been replaced by
+    # a cold proxy)
+    lc = ly.cell(ci)
+    assert_equal(lc.qname, "<defunct>RBA-unit-test.A")
+
+    # this will restore the reference
+    lib.register("RBA-unit-test")
+
+    lc = ly.cell(ci)
+    assert_equal(lc.qname, "RBA-unit-test.A")
+
+  end
+
 end
 
 load("test_epilogue.rb")

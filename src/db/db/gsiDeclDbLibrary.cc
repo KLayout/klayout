@@ -314,7 +314,8 @@ LibraryClass<LibraryImpl> decl_LibraryImpl (decl_Library, "db", "Library",
   gsi::callback ("reload", &LibraryImpl::reload, &LibraryImpl::cb_reload,
     "@brief Reloads resources for the library.\n"
     "Reimplement this method if you like to reload resources the library was created from - "
-    "for example layout files.\n"
+    "for example layout files. Make sure you return the new name of the library from this function. "
+    "If you do not want to change the name of the library, return the current name (i.e. the value of \\name).\n"
     "\n"
     "@return The new name of the library or the original name if it did not change.\n"
     "\n"

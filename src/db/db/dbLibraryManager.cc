@@ -126,6 +126,9 @@ LibraryManager::unregister_lib (Library *library)
 
   library->remap_to (0);
   library->set_id (std::numeric_limits<lib_id_type>::max ());
+
+  //  issue the change notification
+  changed_event ();
 }
 
 void

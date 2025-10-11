@@ -146,8 +146,24 @@ Library::is_retired (const db::cell_index_type library_cell_index) const
 }
 
 void
+Library::rename (const std::string &name)
+{
+  if (name != get_name () && db::LibraryManager::initialized ()) {
+
+    //  if the name changed, reregister the library under the new name
+    db::LibraryManager::instance ().unregister_lib (this);
+    set_name (name);
+    db::LibraryManager::instance ().register_lib (this);
+
+  }
+}
+
+void
 Library::refresh ()
 {
+  std::string name = reload ();
+  rename (name);
+
   layout ().refresh ();
   remap_to (this);
 }

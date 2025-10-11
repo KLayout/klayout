@@ -23,6 +23,19 @@ end
 
 load("test_prologue.rb")
 
+class MyLibImpl < RBA::Library
+  def initialize
+    @reload_count = 0
+  end
+  def reload_count
+    @reload_count
+  end
+  def reload
+    @reload_count += 1
+    return "RBA-unit-test2"
+  end
+end
+
 class DBLibrary_TestClass < TestBase
 
   def test_1_registration
@@ -106,10 +119,51 @@ class DBLibrary_TestClass < TestBase
 
   end
 
-  def test_4_library_registration
+  def test_4_library_registration_and_rename
 
-    
+    lib = RBA::Library::new
+    lib.description = "LIB1"
+    lib.delete
+    assert_equal(lib.destroyed?, true)
 
+    lib = RBA::Library::new
+    lib.description = "LIB1"
+    lib.register("RBA-unit-test")
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test").description, "LIB1")
+
+    lib.unregister
+    assert_equal(lib.destroyed?, false)
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test"), nil)
+
+    lib.register("RBA-unit-test")
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test").description, "LIB1")
+
+    lib.rename("RBA-unit-test2")
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test"), nil)
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test2").description, "LIB1")
+
+    lib.delete
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test"), nil)
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test2"), nil)
+
+  end
+
+  def test_5_reload
+
+    lib = MyLibImpl::new
+    lib.description = "LIB1"
+    lib.register("RBA-unit-test")
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test").description, "LIB1")
+
+    lib.refresh
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test"), nil)
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test2").description, "LIB1")
+
+    assert_equal(lib.reload_count, 1)
+
+    lib.delete
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test"), nil)
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test2"), nil)
 
   end
 

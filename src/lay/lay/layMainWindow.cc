@@ -2556,6 +2556,12 @@ MainWindow::cm_writer_options ()
 }
 
 void
+MainWindow::cm_refresh ()
+{
+  db::LibraryManager::instance ().refresh_all ();
+}
+
+void
 MainWindow::cm_new_panel ()
 {
   create_view ();
@@ -4036,6 +4042,8 @@ MainWindow::menu_activated (const std::string &symbol)
     cm_reader_options ();
   } else if (symbol == "cm_writer_options") {
     cm_writer_options ();
+  } else if (symbol == "cm_refresh") {
+    cm_refresh ();
   } else if (symbol == "cm_new_panel") {
     cm_new_panel ();
   } else if (symbol == "cm_new_layout") {
@@ -4449,6 +4457,7 @@ public:
     menu_entries.push_back (lay::menu_item ("cm_close_all", "close_all:edit", at, tl::to_string (QObject::tr ("Close All(Shift+Ctrl+W)"))));
     menu_entries.push_back (lay::menu_item ("cm_clone", "clone", at, tl::to_string (QObject::tr ("Clone Panel"))));
     menu_entries.push_back (lay::menu_item ("cm_reload", "reload:edit", at, tl::to_string (QObject::tr ("Reload(Ctrl+R)"))));
+    menu_entries.push_back (lay::menu_item ("cm_refresh", "refresh:edit", at, tl::to_string (QObject::tr ("Refresh Libraries"))));
     menu_entries.push_back (lay::menu_item ("cm_pull_in", "pull_in:edit", at, tl::to_string (QObject::tr ("Pull In Other Layout"))));
     menu_entries.push_back (lay::menu_item ("cm_reader_options", "reader_options", at, tl::to_string (QObject::tr ("Reader Options"))));
     menu_entries.push_back (lay::separator ("open_recent_group", at));

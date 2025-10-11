@@ -212,6 +212,11 @@ public:
    */
   void clear ();
 
+  /**
+   *  @brief Refreshes all libraries
+   */
+  void refresh_all ();
+
 private:
   std::vector<Library *> m_libs;
   lib_name_map m_lib_by_name;

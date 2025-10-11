@@ -65,6 +65,11 @@ static std::vector<db::lib_id_type> library_ids ()
   return r;
 }
 
+static void refresh_all ()
+{
+  db::LibraryManager::instance ().refresh_all ();
+}
+
 static void register_lib (db::Library *lib, const std::string &name)
 {
   lib->set_name (name);
@@ -183,6 +188,11 @@ LibraryClass<db::Library> decl_Library ("db", "LibraryBase",
     "See \\library_names for the reasoning behind this method."
     "\n"
     "This method has been introduced in version 0.27."
+  ) +
+  gsi::method ("refresh_all", &refresh_all,
+    "@brief Calls \\refresh on all libraries.\n"
+    "\n"
+    "This convenience method has been introduced in version 0.30.4."
   ) +
   gsi::method_ext ("register", &register_lib, gsi::arg ("name"),
     "@brief Registers the library with the given name\n"

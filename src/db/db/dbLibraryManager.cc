@@ -249,6 +249,16 @@ LibraryManager::lib_internal (lib_id_type id) const
 }
 
 void
+LibraryManager::refresh_all ()
+{
+  for (std::vector<Library *>::iterator l = m_libs.begin (); l != m_libs.end (); ++l) {
+    if (*l) {
+      (*l)->refresh ();
+    }
+  }
+}
+
+void
 LibraryManager::clear ()
 {
   std::vector<Library *> libs;

@@ -149,12 +149,7 @@ void
 Library::rename (const std::string &name)
 {
   if (name != get_name () && db::LibraryManager::initialized ()) {
-
-    //  if the name changed, reregister the library under the new name
-    db::LibraryManager::instance ().unregister_lib (this);
-    set_name (name);
-    db::LibraryManager::instance ().register_lib (this);
-
+    db::LibraryManager::instance ().rename (get_id (), name);
   }
 }
 

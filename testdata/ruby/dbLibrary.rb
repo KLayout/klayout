@@ -127,6 +127,7 @@ class DBLibrary_TestClass < TestBase
     assert_equal(lib.destroyed?, true)
 
     lib = RBA::Library::new
+    lib.layout.create_cell("A")
     lib.description = "LIB1"
     lib.register("RBA-unit-test")
     assert_equal(RBA::Library::library_by_name("RBA-unit-test").description, "LIB1")
@@ -138,13 +139,21 @@ class DBLibrary_TestClass < TestBase
     lib.register("RBA-unit-test")
     assert_equal(RBA::Library::library_by_name("RBA-unit-test").description, "LIB1")
 
+    ly = RBA::Layout::new
+    ci = ly.create_cell("A", "RBA-unit-test").cell_index
+    assert_equal(ly.cell(ci).qname, "RBA-unit-test.A")
+
     lib.rename("RBA-unit-test2")
     assert_equal(RBA::Library::library_by_name("RBA-unit-test"), nil)
     assert_equal(RBA::Library::library_by_name("RBA-unit-test2").description, "LIB1")
 
+    assert_equal(ly.cell(ci).qname, "RBA-unit-test2.A")
+
     lib.delete
     assert_equal(RBA::Library::library_by_name("RBA-unit-test"), nil)
     assert_equal(RBA::Library::library_by_name("RBA-unit-test2"), nil)
+
+    assert_equal(ly.cell(ci).qname, "<defunct>RBA-unit-test2.A")
 
   end
 

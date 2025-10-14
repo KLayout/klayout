@@ -216,8 +216,8 @@ LibraryClass<db::Library> decl_Library ("db", "LibraryBase",
   gsi::method ("rename", &db::Library::rename, gsi::arg ("name"),
     "@brief Renames the library\n"
     "\n"
-    "Re-registers the library under a new name. Note that this will not change library references - "
-    "i.e. references to the old name will become invalid after calling this method.\n"
+    "Re-registers the library under a new name. Note that this method will also change the references "
+    "to the library.\n"
     "\n"
     "This method has been introduced in version 0.30.5."
   ) +

@@ -92,6 +92,11 @@ public:
   }
 
   /**
+   *  @brief Renames a library
+   */
+  void rename (lib_id_type lib_id, const std::string &name);
+
+  /**
    *  @brief Get the library by name which is valid for all given technologies
    *
    *  This method looks up a library which is valid for all technologies listed in "for_technologies". It may be

@@ -207,6 +207,40 @@ class DBLibrary_TestClass < TestBase
 
   end
 
+  def test_7_change_ref
+
+    lib = RBA::Library::new
+    lib.description = "LIB1"
+    lib.register("RBA-unit-test")
+    l1 = lib.layout.layer(1, 0)
+
+    cell_a = lib.layout.create_cell("A")
+    cell_a.shapes(l1).insert(RBA::Box::new(0, 0, 1000, 2000))
+
+    lib2 = RBA::Library::new
+    lib2.description = "LIB2"
+    lib2.register("RBA-unit-test2")
+    l1 = lib2.layout.layer(1, 0)
+
+    cell_b = lib2.layout.create_cell("B")
+    cell_b.shapes(l1).insert(RBA::Box::new(0, 0, 2000, 1000))
+
+    ly = RBA::Layout::new
+    c1 = ly.create_cell("A", "RBA-unit-test")
+    assert_equal(c1.qname, "RBA-unit-test.A")
+
+    c1.change_ref(lib2.id, cell_b.cell_index)
+    assert_equal(c1.qname, "RBA-unit-test2.B")
+
+    ly = RBA::Layout::new
+    c1 = ly.create_cell("A", "RBA-unit-test")
+    assert_equal(c1.qname, "RBA-unit-test.A")
+
+    c1.change_ref("RBA-unit-test2", "B")
+    assert_equal(c1.qname, "RBA-unit-test2.B")
+
+  end
+
 end
 
 load("test_epilogue.rb")

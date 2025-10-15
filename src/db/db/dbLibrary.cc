@@ -282,6 +282,9 @@ Library::remap_to (db::Library *other)
   //  Do a cleanup later since the referrers now might have invalid proxy instances
   for (std::set<db::Layout *>::const_iterator c = needs_cleanup.begin (); c != needs_cleanup.end (); ++c) {
     (*c)->cleanup ();
+    //  forces an update of the cell tree in the application - this will reflect the changed name
+    //  of the library reference
+    (*c)->invalidate_hier ();
   }
 }
 

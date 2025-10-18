@@ -4327,6 +4327,62 @@ LayoutViewBase::set_view_ops ()
     }
   }
 
+  //  ghost cells
+  if (m_cell_box_visible) { // @@@
+
+    lay::ViewOp vop, vopv;
+
+    //  context level
+    if (m_ctx_color.is_valid ()) {
+      vop = lay::ViewOp (m_ctx_color.rgb (), lay::ViewOp::Copy, 0, 0, 0);
+    } else {
+      vop = lay::ViewOp (lay::LayerProperties::brighter (box_color.rgb (), brightness_for_context), lay::ViewOp::Copy, 0, 0, 0);
+    }
+    vopv = vop;
+    vopv.shape (lay::ViewOp::Cross);
+    vopv.width (mark_size);
+
+    //  fill, frame, text, vertex
+    view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
+    view_ops.push_back (vop);
+    view_ops.push_back (vop);
+    view_ops.push_back (vopv);
+
+    //  child level
+    if (m_child_ctx_color.is_valid ()) {
+      vop = lay::ViewOp (m_child_ctx_color.rgb (), lay::ViewOp::Copy, 0, 0, 0);
+    } else {
+      vop = lay::ViewOp (lay::LayerProperties::brighter (box_color.rgb (), brightness_for_context), lay::ViewOp::Copy, 0, 0, 0);
+    }
+    vopv = vop;
+    vopv.shape (lay::ViewOp::Cross);
+    vopv.width (mark_size);
+
+    //  fill, frame, text, vertex
+    view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
+    view_ops.push_back (vop);
+    view_ops.push_back (vop);
+    view_ops.push_back (vopv);
+
+    //  current level
+    vop = lay::ViewOp (box_color.rgb (), lay::ViewOp::Copy, 0, 0, 0);
+    vopv = vop;
+    vopv.shape (lay::ViewOp::Cross);
+    vopv.width (mark_size);
+
+    //  fill, frame, text, vertex
+    view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
+    view_ops.push_back (vop);
+    view_ops.push_back (vop);
+    view_ops.push_back (vopv);
+
+  } else {
+    //  invisible
+    for (unsigned int i = 0; i < (unsigned int) planes_per_layer; ++i) {  //  frame, fill, vertex, text
+      view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
+    }
+  }
+
   //  sanity check: number of planes defined in layRedrawThreadWorker must match to view_ops layout
   tl_assert (view_ops.size () == (size_t)cell_box_planes);
 

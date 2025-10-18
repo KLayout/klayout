@@ -109,6 +109,7 @@ public slots:
   void active_library_changed (int index);
   void side_panel_destroyed ();
   void current_layer_changed_slot (const lay::LayerPropertiesConstIterator &iter);
+  void selected_layers_changed_slot ();
   void layer_tab_changed ();
   void layer_order_changed ();
   void select_cell_dispatch (const cell_path_type &path, int cellview_index);

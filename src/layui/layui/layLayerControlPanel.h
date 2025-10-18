@@ -296,6 +296,7 @@ signals:
   void order_changed ();
   void tab_changed ();
   void current_layer_changed (const lay::LayerPropertiesConstIterator &iter);
+  void selected_layers_changed ();
 
 public slots:
   void cm_new_tab ();

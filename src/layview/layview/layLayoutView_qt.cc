@@ -358,6 +358,11 @@ void LayoutViewSignalConnector::current_layer_changed_slot (const lay::LayerProp
   mp_view->current_layer_changed_slot (iter);
 }
 
+void LayoutViewSignalConnector::selected_layers_changed_slot ()
+{
+  mp_view->selected_layers_changed_slot ();
+}
+
 void LayoutViewSignalConnector::timer ()
 {
   mp_view->timer ();
@@ -603,6 +608,7 @@ LayoutView::init_ui (db::Manager *mgr)
       QObject::connect (mp_control_panel, SIGNAL (tab_changed ()), mp_connector, SLOT (layer_tab_changed ()));
       QObject::connect (mp_control_panel, SIGNAL (order_changed ()), mp_connector, SLOT (layer_order_changed ()));
       QObject::connect (mp_control_panel, SIGNAL (current_layer_changed (const lay::LayerPropertiesConstIterator &)), mp_connector, SLOT (current_layer_changed_slot (const lay::LayerPropertiesConstIterator &)));
+      QObject::connect (mp_control_panel, SIGNAL (selected_layers_changed ()), mp_connector, SLOT (selected_layers_changed_slot ()));
 
       mp_toolbox_frame = new QFrame (0);
       mp_toolbox_frame->setObjectName (QString::fromUtf8 ("lt_frame"));

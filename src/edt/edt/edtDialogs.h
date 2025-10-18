@@ -34,6 +34,9 @@
 
 #include "dbLayout.h"
 #include "dbPoint.h"
+#include "dbLayerProperties.h"
+
+#include "layLayoutView.h"
 
 #include "ui_InstantiationForm.h"
 #include "ui_ChangeLayerOptionsDialog.h"
@@ -47,7 +50,6 @@
 
 namespace lay
 {
-  class LayoutViewBase;
   class Marker;
   class ObjectInstPath;
 }
@@ -221,6 +223,17 @@ public:
 
   bool exec_dialog (double area, double perimeter);
 };
+
+/**
+ *  @brief Obtains an layer iterator for one of the layers present under the mouse cursor
+ *
+ *  This is not really a dialog, but a popup menu.
+ *
+ *  @param view The LayoutView object
+ *  @param filter An optional set of layers to show. Only layers from this set are shown.
+ *  @return A layer iterator which is at_end if no specific layer was selected
+ */
+lay::LayerPropertiesConstIterator popup_tap_layer_menu (lay::LayoutViewBase *view, const std::set<db::LayerProperties, db::LPLogicalLessFunc> *filter = 0, int cv_index = -1);
 
 } // namespace edt
 

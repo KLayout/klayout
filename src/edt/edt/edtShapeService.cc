@@ -22,15 +22,14 @@
 
 #include "edtShapeService.h"
 #include "edtMainService.h"
+#include "edtPathService.h"
+#include "edtPropertiesPages.h"
 #include "layLayoutView.h"
 #include "dbEdgeProcessor.h"
 #include "dbPolygonTools.h"
 
-#if defined(HAVE_QT)
-#  include "edtPropertiesPages.h"
-#  include "layTipDialog.h"
-#  include "layEditorOptionsPages.h"
-#endif
+#include "layTipDialog.h"
+#include "layEditorOptionsPages.h"
 
 namespace edt
 {

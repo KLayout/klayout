@@ -29,8 +29,9 @@
 #include "layEditorUtils.h"
 #include "layObjectInstPath.h"
 #include "layCellView.h"
-#include "layLayoutViewBase.h"
 #include "layMarker.h"
+#include "layFinder.h"
+#include "layLayerTreeModel.h"
 #include "tlException.h"
 #include "tlExceptions.h"
 
@@ -723,6 +724,93 @@ AreaAndPerimeterDialog::exec_dialog (double area, double perimeter)
   perimeter_le->setText (tl::to_qstring (tl::sprintf ("%.12g", perimeter)));
 
   return exec () != 0;
+}
+
+// --------------------------------------------------------------------------------
+//  popup_tap_layer_menu implementation
+
+lay::LayerPropertiesConstIterator
+popup_tap_layer_menu (lay::LayoutViewBase *view, const std::set<db::LayerProperties, db::LPLogicalLessFunc> *filter, int cv_index)
+{
+  QWidget *view_widget = lay::widget_from_view (view);
+  if (! view_widget) {
+    return lay::LayerPropertiesConstIterator ();
+  }
+
+  if (! view->canvas ()->mouse_in_window ()) {
+    return lay::LayerPropertiesConstIterator ();
+  }
+
+  lay::ShapeFinder finder (true,    //  point mode
+                           false,   //  all hierarchy levels
+                           db::ShapeIterator::flags_type (db::ShapeIterator::All - db::ShapeIterator::Texts),  //  do not consider texts - their bounding box may be too large
+                           0,       //  no excludes
+                           true     //  capture all shapes
+                          );
+
+  //  capture all objects in point mode (default: capture one only)
+  finder.set_catch_all (true);
+
+  //  go through all visible layers of all cellviews
+  db::DPoint pt = view->canvas ()->mouse_position_um ();
+  finder.find (view, db::DBox (pt, pt));
+
+  std::set<std::pair<unsigned int, unsigned int> > layers_in_selection;
+
+  for (lay::ShapeFinder::iterator f = finder.begin (); f != finder.end (); ++f) {
+    if (cv_index < 0 || f->cv_index () == cv_index) {
+      const db::Layout &ly = view->cellview (f->cv_index ())->layout ();
+      //  ignore guiding shapes and only provide layers from the filter
+      if (f->layer () != ly.guiding_shape_layer ()
+          && (! filter || filter->find (ly.get_properties (f->layer ())) != filter->end ())) {
+        layers_in_selection.insert (std::make_pair (f->cv_index (), f->layer ()));
+      }
+    }
+  }
+
+  std::vector<lay::LayerPropertiesConstIterator> tapped_layers;
+  for (lay::LayerPropertiesConstIterator lp = view->begin_layers (view->current_layer_list ()); ! lp.at_end (); ++lp) {
+    const lay::LayerPropertiesNode *ln = lp.operator-> ();
+    if (layers_in_selection.find (std::make_pair ((unsigned int) ln->cellview_index (), (unsigned int) ln->layer_index ())) != layers_in_selection.end ()) {
+      tapped_layers.push_back (lp);
+    }
+  }
+
+  if (tapped_layers.empty ()) {
+    return lay::LayerPropertiesConstIterator ();
+  } else if (tapped_layers.size () == 1) {
+    return tapped_layers.front ();
+  }
+
+  //  List the layers under the cursor as pop up a menu
+
+#if QT_VERSION >= 0x050000
+  double dpr = view_widget->devicePixelRatio ();
+#else
+  double dpr = 1.0;
+#endif
+
+  std::unique_ptr<QMenu> menu (new QMenu (view_widget));
+  menu->show ();
+
+  int icon_size = menu->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
+
+  db::DPoint mp_local = view->canvas ()->mouse_position ();
+  QPoint mp = view->canvas ()->widget ()->mapToGlobal (QPoint (mp_local.x (), mp_local.y ()));
+
+  for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = tapped_layers.begin (); l != tapped_layers.end (); ++l) {
+    QAction *a = menu->addAction (lay::LayerTreeModel::icon_for_layer (*l, view, icon_size, icon_size, dpr, 0, true), tl::to_qstring ((*l)->display_string (view, true, true /*with source*/)));
+    a->setData (int (l - tapped_layers.begin ()));
+  }
+
+  QAction *action = menu->exec (mp);
+  if (action) {
+    int index = action->data ().toInt ();
+    return tapped_layers [index];
+  } else {
+    return lay::LayerPropertiesConstIterator ();
+  }
+
 }
 
 }

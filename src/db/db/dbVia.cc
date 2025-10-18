@@ -46,8 +46,8 @@ ViaType::init ()
 
 // ---------------------------------------------------------------------------------------
 
-std::vector<SelectedViaDefinition>
-find_via_definitions_for (const std::string &technology, const db::LayerProperties &layer, int dir)
+static std::vector<SelectedViaDefinition>
+find_via_definitions_impl (const std::string &technology, const db::LayerProperties &layer, int dir, bool all)
 {
   std::vector<SelectedViaDefinition> via_defs;
 
@@ -65,7 +65,8 @@ find_via_definitions_for (const std::string &technology, const db::LayerProperti
 
       auto via_types = pcell->via_types ();
       for (auto vt = via_types.begin (); vt != via_types.end (); ++vt) {
-        if ((dir >= 0 && vt->bottom.log_equal (layer) && vt->bottom_wired) ||
+        if (all ||
+            (dir >= 0 && vt->bottom.log_equal (layer) && vt->bottom_wired) ||
             (dir <= 0 && vt->top.log_equal (layer) && vt->top_wired)) {
           via_defs.push_back (SelectedViaDefinition (lib, pc->second, *vt));
         }
@@ -76,6 +77,18 @@ find_via_definitions_for (const std::string &technology, const db::LayerProperti
   }
 
   return via_defs;
+}
+
+std::vector<SelectedViaDefinition>
+get_via_definitions (const std::string &technology)
+{
+  return find_via_definitions_impl (technology, db::LayerProperties (), 0, true);
+}
+
+std::vector<SelectedViaDefinition>
+find_via_definitions_for (const std::string &technology, const db::LayerProperties &layer, int dir)
+{
+  return find_via_definitions_impl (technology, layer, dir, false);
 }
 
 }

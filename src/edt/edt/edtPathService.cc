@@ -22,14 +22,11 @@
 
 
 #include "edtPathService.h"
+#include "edtDialogs.h"
+#include "edtPropertiesPages.h"
 
 #include "layLayoutViewBase.h"
 #include "layFinder.h"
-
-#if defined(HAVE_QT)
-#  include "edtPropertiesPages.h"
-#  include "layLayoutView.h"
-#endif
 
 namespace edt
 {
@@ -268,6 +265,35 @@ PathService::via (int dir)
 #endif
 }
 
+db::LayerProperties
+PathService::get_layer_for_via (unsigned int cv_index)
+{
+#if defined(HAVE_QT)
+  const lay::CellView &cv = view ()->cellview (cv_index);
+  if (! cv.is_valid ()) {
+    return db::LayerProperties ();
+  }
+
+  std::vector<db::SelectedViaDefinition> via_defs = db::get_via_definitions (cv->layout ().technology_name ());
+
+  std::set<db::LayerProperties, db::LPLogicalLessFunc> lp_filter;
+  for (auto vd = via_defs.begin (); vd != via_defs.end (); ++vd) {
+    lp_filter.insert (vd->via_type.bottom);
+    lp_filter.insert (vd->via_type.top);
+  }
+
+  lay::LayerPropertiesConstIterator iter;
+  iter = edt::popup_tap_layer_menu (view (), &lp_filter, cv_index);
+  if (iter.at_end ()) {
+    return db::LayerProperties ();
+  }
+
+  return cv->layout ().get_properties (iter->layer_index ());
+#else
+  return db::LayerProperties ();
+#endif
+}
+
 bool
 PathService::get_via_for (const db::LayerProperties &lp, unsigned int cv_index, int dir, db::SelectedViaDefinition &via_def)
 {
@@ -364,19 +390,20 @@ PathService::via_initial (int dir)
     return;
   }
 
-  const lay::CellView &cv = view ()->cellview (r->cv_index ());
-  if (! cv.is_valid ()) {
+  //  the first found provides the cellview index
+  int cv_index = r->cv_index ();
+
+  db::LayerProperties lp = get_layer_for_via (cv_index);
+  if (lp.is_null ()) {
     return;
   }
-
-  db::LayerProperties lp = cv->layout ().get_properties (r->layer ());
 
   db::SelectedViaDefinition via_def;
-  if (! get_via_for (lp, r->cv_index (), dir, via_def)) {
+  if (! get_via_for (lp, cv_index, dir, via_def)) {
     return;
   }
 
-  set_layer (lp, r->cv_index ());
+  set_layer (lp, cv_index);
 
   bool is_bottom = via_def.via_type.bottom.log_equal (lp);
   db::LayerProperties lp_new = is_bottom ? via_def.via_type.top : via_def.via_type.bottom;

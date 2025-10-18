@@ -66,6 +66,20 @@ public:
   virtual ~Library ();
 
   /**
+   *  @brief Called to reload the library
+   *
+   *  If the library is a file-based one, this method can be reimplemented to reload
+   *  the file. This method must not change the name of the library, but return a new
+   *  name in case it has changed.
+   *
+   *  @return The new name of the library
+   */
+  virtual std::string reload ()
+  {
+    return get_name ();
+  }
+
+  /**
    *  @brief The layout object
    *
    *  This method must be reimplemented by some derived class to actually provide the
@@ -210,6 +224,14 @@ public:
    *  This will refresh PCells, retire cells (turn them into "cold proxies") and reload layouts.
    */
   void refresh ();
+
+  /**
+   *  @brief Renames the library
+   *
+   *  Unlike "set_name", this method will take care of properly re-registering the library
+   *  under the new name.
+   */
+  void rename (const std::string &name);
 
   /**
    *  @brief Remap the library proxies to a different library

@@ -146,8 +146,19 @@ Library::is_retired (const db::cell_index_type library_cell_index) const
 }
 
 void
+Library::rename (const std::string &name)
+{
+  if (name != get_name () && db::LibraryManager::initialized ()) {
+    db::LibraryManager::instance ().rename (get_id (), name);
+  }
+}
+
+void
 Library::refresh ()
 {
+  std::string name = reload ();
+  rename (name);
+
   layout ().refresh ();
   remap_to (this);
 }
@@ -271,6 +282,9 @@ Library::remap_to (db::Library *other)
   //  Do a cleanup later since the referrers now might have invalid proxy instances
   for (std::set<db::Layout *>::const_iterator c = needs_cleanup.begin (); c != needs_cleanup.end (); ++c) {
     (*c)->cleanup ();
+    //  forces an update of the cell tree in the application - this will reflect the changed name
+    //  of the library reference
+    (*c)->invalidate_hier ();
   }
 }
 

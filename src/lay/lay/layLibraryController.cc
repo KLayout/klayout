@@ -32,11 +32,52 @@
 #include "dbReader.h"
 #include "tlLog.h"
 #include "tlStream.h"
+#include "tlFileUtils.h"
 
 #include <QDir>
 
 namespace lay
 {
+
+// -------------------------------------------------------------------------------------------
+
+class FileBasedLibrary
+  : public db::Library
+{
+public:
+  FileBasedLibrary (const std::string &path)
+    : db::Library (), m_path (path)
+  {
+    set_description (tl::filename (path));
+  }
+
+  virtual std::string reload ()
+  {
+    std::string name = tl::basename (m_path);
+
+    layout ().clear ();
+
+    tl::InputStream stream (m_path);
+    db::Reader reader (stream);
+    reader.read (layout ());
+
+    //  Use the libname if there is one
+    db::Layout::meta_info_name_id_type libname_name_id = layout ().meta_info_name_id ("libname");
+    for (db::Layout::meta_info_iterator m = layout ().begin_meta (); m != layout ().end_meta (); ++m) {
+      if (m->first == libname_name_id && ! m->second.value.is_nil ()) {
+        name = m->second.value.to_string ();
+        break;
+      }
+    }
+
+    return name;
+  }
+
+private:
+  std::string m_path;
+};
+
+// -------------------------------------------------------------------------------------------
 
 LibraryController::LibraryController ()
   : m_file_watcher (0),
@@ -166,7 +207,6 @@ LibraryController::sync_files ()
       QStringList libs = lp.entryList (name_filters, QDir::Files);
       for (QStringList::const_iterator im = libs.begin (); im != libs.end (); ++im) {
 
-        std::string filename = tl::to_string (*im);
         std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
 
         try {
@@ -187,26 +227,13 @@ LibraryController::sync_files ()
 
           if (needs_load) {
 
-            std::unique_ptr<db::Library> lib (new db::Library ());
-            lib->set_description (filename);
+            std::unique_ptr<db::Library> lib (new FileBasedLibrary (lib_path));
             if (! p->second.empty ()) {
               lib->set_technology (p->second);
             }
-            lib->set_name (tl::to_string (QFileInfo (*im).baseName ()));
 
             tl::log << "Reading library '" << lib_path << "'";
-            tl::InputStream stream (lib_path);
-            db::Reader reader (stream);
-            reader.read (lib->layout ());
-
-            //  Use the libname if there is one
-            db::Layout::meta_info_name_id_type libname_name_id = lib->layout ().meta_info_name_id ("libname");
-            for (db::Layout::meta_info_iterator m = lib->layout ().begin_meta (); m != lib->layout ().end_meta (); ++m) {
-              if (m->first == libname_name_id && ! m->second.value.is_nil ()) {
-                lib->set_name (m->second.value.to_string ());
-                break;
-              }
-            }
+            lib->set_name (lib->reload ());
 
             if (! p->second.empty ()) {
               tl::log << "Registering as '" << lib->get_name () << "' for tech '" << p->second << "'";

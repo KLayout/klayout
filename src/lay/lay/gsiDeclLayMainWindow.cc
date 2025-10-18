@@ -73,6 +73,7 @@ static const char *cm_symbols[] = {
   "cm_save",
   "cm_save_all",
   "cm_reload",
+  "cm_refresh",
   "cm_close",
   "cm_close_all",
   "cm_clone",

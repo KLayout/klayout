@@ -36,10 +36,15 @@
 namespace lay
 {
 
-static db::DVector text_box_enlargement (const db::DCplxTrans &vp_trans)
+double marker_text_border_in_pixels ()
 {
   //  4.0 is the text box border in pixels
-  double b = 4.0 / vp_trans.mag ();
+  return 4.0;
+}
+
+static db::DVector text_box_enlargement (const db::DCplxTrans &vp_trans)
+{
+  double b = marker_text_border_in_pixels () / vp_trans.mag ();
   return db::DVector (b, b);
 }
 

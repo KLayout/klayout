@@ -31,6 +31,7 @@
 #include "lymMacroInterpreter.h"
 #include "lymMacro.h"
 #include "gsiDecl.h"
+#include "tlFileUtils.h"
 
 #include <QDir>
 #include <QUrl>
@@ -354,11 +355,22 @@ MacroController::sync_package_paths ()
 {
   std::vector<std::string> package_locations;
 
+  //  Add package locations for packages
+
   lay::SaltController *sc = lay::SaltController::instance ();
   if (sc) {
     lay::Salt &salt = sc->salt ();
     for (lay::Salt::flat_iterator i = salt.begin_flat (); i != salt.end_flat (); ++i) {
       package_locations.push_back ((*i)->path ());
+    }
+  }
+
+  //  Add package locations for technologies which share the same structure
+
+  for (db::Technologies::const_iterator t = db::Technologies::instance ()->begin (); t != db::Technologies::instance ()->end (); ++t) {
+    std::string bd = t->base_path ();
+    if (! bd.empty () && tl::is_dir (bd)) {
+      package_locations.push_back (bd);
     }
   }
 

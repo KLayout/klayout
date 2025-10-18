@@ -315,6 +315,12 @@ class DBLayoutTests1_TestClass < TestBase
     # delete_cell
    
     l = RBA::Layout.new
+    begin
+      l.delete_cell(0) # must throw an exception
+      assert_equal(true, false)
+    rescue
+    end
+
     l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
     c0 = l.cell(l.add_cell("c0"))
     c1 = l.cell(l.add_cell("c1"))
@@ -371,6 +377,12 @@ class DBLayoutTests1_TestClass < TestBase
     # delete_cells
    
     l = RBA::Layout.new
+    begin
+      l.delete_cells([0, 1]) # must throw an exception
+      assert_equal(true, false)
+    rescue
+    end
+
     l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
     c0 = l.cell(l.add_cell("c0"))
     c1 = l.cell(l.add_cell("c1"))
@@ -412,6 +424,12 @@ class DBLayoutTests1_TestClass < TestBase
     # prune_cell
    
     l = RBA::Layout.new
+    begin
+      l.prune_cell(0) # must throw an exception
+      assert_equal(true, false)
+    rescue
+    end
+
     l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
     c0 = l.cell(l.add_cell("c0"))
     c1 = l.cell(l.add_cell("c1"))
@@ -488,6 +506,12 @@ class DBLayoutTests1_TestClass < TestBase
     # delete_cell_rec
    
     l = RBA::Layout.new
+    begin
+      l.delete_cell_rec(0) # must throw an exception
+      assert_equal(true, false)
+    rescue
+    end
+
     l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
     c0 = l.cell(l.add_cell("c0"))
     c1 = l.cell(l.add_cell("c1"))
@@ -643,6 +667,12 @@ class DBLayoutTests1_TestClass < TestBase
     # prune_subcells
    
     l = RBA::Layout.new
+    begin
+      l.prune_subcells(0) # must throw an exception
+      assert_equal(true, false)
+    rescue
+    end
+
     l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
     c0 = l.cell(l.add_cell("c0"))
     c1 = l.cell(l.add_cell("c1"))

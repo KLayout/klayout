@@ -150,8 +150,7 @@ ShapeEditService::get_edit_layer ()
   mp_layout = &(cv->layout ());
   mp_cell = cv.cell ();
 
-  //  fetches the last configuration for the given layer
-  view ()->set_active_cellview_index (cv_index);
+  view ()->set_active_cellview_index_silent (cv_index);
 }
 
 void
@@ -173,8 +172,9 @@ ShapeEditService::change_edit_layer (const db::LayerProperties &lp)
     close_editor_hooks (false);
   }
 
+  view ()->set_active_cellview_index_silent (m_cv_index);
+
   //  fetches the last configuration for the given layer
-  view ()->set_active_cellview_index (m_cv_index);
   config_recent_for_layer (lp, m_cv_index);
 
   if (editing ()) {
@@ -237,7 +237,9 @@ ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl
     return;
   }
 
-  view ()->set_active_cellview_index (cv_index);
+  //  NOTE: we don't want side effects during this operation - i.e. some that
+  //  change the selection. Hence no events here.
+  view ()->set_active_cellview_index_silent (cv_index);
 
   const lay::ParsedLayerSource &source = cl->source (true /*real*/);
   int layer = cl->layer_index ();

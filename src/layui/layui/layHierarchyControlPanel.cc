@@ -707,11 +707,41 @@ HierarchyControlPanel::update_required ()
 }
 
 void 
-HierarchyControlPanel::select_active (int cellview_index)
+HierarchyControlPanel::select_active (int cellview_index, bool silent)
 {
   if (cellview_index != m_active_index) {
     mp_selector->setCurrentIndex (cellview_index);
-    selection_changed (cellview_index);
+    change_active_cellview (cellview_index);
+    if (! silent) {
+      emit active_cellview_changed (cellview_index);
+    }
+  }
+}
+
+void
+HierarchyControlPanel::change_active_cellview (int index)
+{
+  search_editing_finished ();
+
+  m_active_index = index;
+
+  bool split_mode = m_split_mode;
+  //  for more than max_cellviews_in_split_mode cellviews, switch to overlay mode
+  if (int (m_cellviews.size ()) > max_cellviews_in_split_mode) {
+    split_mode = false;
+  }
+
+  int i = 0;
+  for (std::vector <QFrame *>::const_iterator f = mp_cell_list_frames.begin (); f != mp_cell_list_frames.end (); ++f, ++i) {
+    (*f)->setVisible (i == index || split_mode);
+    if (i == index) {
+      mp_cell_lists [i]->setFocus ();
+    }
+  }
+
+  i = 0;
+  for (std::vector <QToolButton *>::const_iterator f = mp_cell_list_headers.begin (); f != mp_cell_list_headers.end (); ++f, ++i) {
+    (*f)->setChecked (i == index);
   }
 }
 
@@ -719,32 +749,8 @@ void
 HierarchyControlPanel::selection_changed (int index)
 {
   if (index != m_active_index) {
-
-    search_editing_finished ();
-
-    m_active_index = index;
-
-    bool split_mode = m_split_mode;
-    //  for more than max_cellviews_in_split_mode cellviews, switch to overlay mode
-    if (int (m_cellviews.size ()) > max_cellviews_in_split_mode) {
-      split_mode = false;
-    }
-
-    int i = 0;
-    for (std::vector <QFrame *>::const_iterator f = mp_cell_list_frames.begin (); f != mp_cell_list_frames.end (); ++f, ++i) {
-      (*f)->setVisible (i == index || split_mode);
-      if (i == index) {
-        mp_cell_lists [i]->setFocus ();
-      }
-    }
-
-    i = 0;
-    for (std::vector <QToolButton *>::const_iterator f = mp_cell_list_headers.begin (); f != mp_cell_list_headers.end (); ++f, ++i) {
-      (*f)->setChecked (i == index);
-    }
-
+    change_active_cellview (index);
     emit active_cellview_changed (index);
-
   }
 }
 

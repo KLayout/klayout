@@ -879,6 +879,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (decl_Dispatcher,
   gsi::method ("active_cellview_index=|#active_setview_index=|#set_active_cellview_index", &lay::LayoutViewBase::set_active_cellview_index, gsi::arg ("index"),
     "@brief Makes the cellview with the given index the active one (shown in hierarchy browser)\n"
     "See \\active_cellview_index.\n"
+    "Note, that this changing the active cell view index has side effects such as terminating an editing operation.\n"
     "\n"
     "This method has been renamed from set_active_cellview_index to active_cellview_index= in version 0.25. "
     "The original name is still available, but is deprecated."

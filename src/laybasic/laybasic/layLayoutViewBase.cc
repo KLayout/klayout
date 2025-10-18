@@ -343,6 +343,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_box_font = 0;
   m_min_size_for_label = 16;
   m_cell_box_visible = true;
+  m_ghost_cells_visible = true;
   m_text_visible = true;
   m_default_font_size = lay::FixedFont::default_font_size ();
   m_text_lazy_rendering = true;
@@ -956,6 +957,13 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
     bool flag;
     tl::from_string (value, flag);
     cell_box_visible (flag);
+    return true;
+
+  } else if (name == cfg_ghost_cells_visible) {
+
+    bool flag;
+    tl::from_string (value, flag);
+    ghost_cells_visible (flag);
     return true;
 
   } else if (name == cfg_cell_box_color) {
@@ -4328,7 +4336,7 @@ LayoutViewBase::set_view_ops ()
   }
 
   //  ghost cells
-  if (m_cell_box_visible) { // @@@
+  if (m_ghost_cells_visible) {
 
     lay::ViewOp vop, vopv;
 
@@ -5422,7 +5430,16 @@ LayoutViewBase::cell_box_visible (bool vis)
   }
 }
 
-void 
+void
+LayoutViewBase::ghost_cells_visible (bool vis)
+{
+  if (m_ghost_cells_visible != vis) {
+    m_ghost_cells_visible = vis;
+    update_content ();
+  }
+}
+
+void
 LayoutViewBase::text_font (unsigned int f)
 {
   if (m_text_font != f) {

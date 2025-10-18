@@ -59,6 +59,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_cell_box_text_transform, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_cell_box_color, "auto"));
     options.push_back (std::pair<std::string, std::string> (cfg_cell_box_visible, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_ghost_cells_visible, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_text_color, "auto"));
     options.push_back (std::pair<std::string, std::string> (cfg_text_visible, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_text_lazy_rendering, "true"));

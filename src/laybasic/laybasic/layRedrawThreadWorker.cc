@@ -841,7 +841,7 @@ RedrawThreadWorker::draw_boxes_impl (bool drawing_context, db::cell_index_type c
     //  paint the box on this level
     draw_cell (drawing_context, level, trans, bbox, empty_cell, mp_layout->display_name (ci));
 
-  } else if (! for_ghosts && (level == m_to_level || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ()))) {
+  } else if (! for_ghosts && ! cell.is_ghost_cell () && (level == m_to_level || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ()))) {
 
     //  paint the box on this level
     draw_cell (drawing_context, level, trans, bbox, empty_cell, mp_layout->display_name (ci));
@@ -1003,7 +1003,7 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
 void
 RedrawThreadWorker::draw_box_properties_for_ghosts (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vp, int level)
 {
-  draw_box_properties_impl (drawing_context, ci, trans, vp, level, false);
+  draw_box_properties_impl (drawing_context, ci, trans, vp, level, true);
 }
 
 void
@@ -1057,7 +1057,7 @@ RedrawThreadWorker::draw_box_properties_impl (bool drawing_context, db::cell_ind
     //  paint the box on this level
     draw_cell_properties (drawing_context, level, trans, bbox, prop_id);
 
-  } else if (! for_ghosts && (level == m_to_level || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ()))) {
+  } else if (! for_ghosts && ! cell.is_ghost_cell () && (level == m_to_level || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ()))) {
 
     //  paint the box on this level
     draw_cell_properties (drawing_context, level, trans, bbox, prop_id);

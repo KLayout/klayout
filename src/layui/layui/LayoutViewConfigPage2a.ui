@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>631</width>
-    <height>320</height>
+    <width>656</width>
+    <height>397</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,12 +21,32 @@
     <number>9</number>
    </property>
    <item>
-    <widget class="QGroupBox" name="cell_group">
-     <property name="title">
+    <widget class="QCheckBox" name="cell_boxes_visible">
+     <property name="text">
       <string>Show cell boxes</string>
      </property>
-     <property name="checkable">
+     <property name="checked">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="ghost_cells_visible">
+     <property name="text">
+      <string>Show unresolved references (ghost cells) </string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="cell_group">
+     <property name="title">
+      <string>Cell box appearance</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
      </property>
      <layout class="QGridLayout">
       <property name="margin" stdset="0">

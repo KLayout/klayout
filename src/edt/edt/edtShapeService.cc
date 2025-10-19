@@ -28,7 +28,10 @@
 #include "dbEdgeProcessor.h"
 #include "dbPolygonTools.h"
 
-#include "layTipDialog.h"
+#if defined(HAVE_QT)
+#   include "layTipDialog.h"
+#endif
+
 #include "layEditorOptionsPages.h"
 
 namespace edt

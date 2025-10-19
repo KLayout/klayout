@@ -1208,7 +1208,7 @@ Service::transient_select (const db::DPoint &pos)
         //  In viewer mode, individual instances of arrays can be selected. Since that is not supported by
         //  InstanceMarker, we just indicate the individual instance's bounding box.
         lay::Marker *marker = new lay::Marker (view (), r->cv_index ());
-        db::box_convert<db::CellInst> bc (cv->layout ());
+        db::box_convert<db::CellInst, false> bc (cv->layout ());
         marker->set (bc (r->back ().inst_ptr.cell_inst ().object ()), gt * r->back ().inst_ptr.cell_inst ().complex_trans (*r->back ().array_inst), tv);
         marker->set_vertex_size (view ()->default_transient_marker_vertex_size ());
         marker->set_line_width (view ()->default_transient_marker_line_width ());
@@ -1806,7 +1806,7 @@ Service::do_selection_to_view ()
         if (r->seq () > 0 && m_indicate_secondary_selection) {
           marker->set_dither_pattern (3);
         }
-        db::box_convert<db::CellInst> bc (cv->layout ());
+        db::box_convert<db::CellInst, false> bc (cv->layout ());
         marker->set (bc (r->back ().inst_ptr.cell_inst ().object ()), gt * r->back ().inst_ptr.cell_inst ().complex_trans (*r->back ().array_inst), *tv_list);
         m_markers.push_back (std::make_pair (r.operator-> (), marker));
 

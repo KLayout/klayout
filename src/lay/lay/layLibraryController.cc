@@ -30,6 +30,7 @@
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
 #include "dbReader.h"
+#include "dbCellMapping.h"
 #include "tlLog.h"
 #include "tlStream.h"
 
@@ -160,39 +161,64 @@ LibraryController::sync_files ()
         m_file_watcher->add_file (tl::to_string (lp.absolutePath ()));
       }
 
+      tl::log << "Scanning library path '" << tl::to_string (lp.absolutePath ()) << "'";
+
       QStringList name_filters;
       name_filters << QString::fromUtf8 ("*");
 
+      //  NOTE: this should return a list sorted by name
       QStringList libs = lp.entryList (name_filters, QDir::Files);
-      for (QStringList::const_iterator im = libs.begin (); im != libs.end (); ++im) {
 
-        std::string filename = tl::to_string (*im);
+      bool needs_load = false;
+
+      for (QStringList::const_iterator im = libs.begin (); im != libs.end () && ! needs_load; ++im) {
+
         std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
+        QFileInfo fi (tl::to_qstring (lib_path));
 
-        try {
+        auto ll = m_lib_files.find (lib_path);
+        if (ll == m_lib_files.end ()) {
+          needs_load = true;
+        } else if (fi.lastModified () > ll->second.time) {
+          needs_load = true;
+        }
 
-          QFileInfo fi (tl::to_qstring (lib_path));
+      }
 
-          bool needs_load = false;
-          std::map<std::string, LibInfo>::iterator ll = m_lib_files.find (lib_path);
-          if (ll == m_lib_files.end ()) {
-            needs_load = true;
-          } else {
-            if (fi.lastModified () > ll->second.time) {
-              needs_load = true;
-            } else {
-              new_lib_files.insert (*ll);
-            }
+      if (! needs_load) {
+
+        //  If not reloading, register the existing files as known ones - this allows detecting if
+        //  a file got removed.
+        for (QStringList::const_iterator im = libs.begin (); im != libs.end () && ! needs_load; ++im) {
+
+          std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
+          auto ll = m_lib_files.find (lib_path);
+          if (ll != m_lib_files.end ()) {
+            new_lib_files.insert (*ll);
           }
 
-          if (needs_load) {
+        }
+
+      } else {
+
+        std::map<std::string, db::Library *> libs_by_name_here;
+
+        //  Reload all files
+        for (QStringList::const_iterator im = libs.begin (); im != libs.end (); ++im) {
+
+          std::string filename = tl::to_string (*im);
+          std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
+          QFileInfo fi (tl::to_qstring (lib_path));
+
+          try {
 
             std::unique_ptr<db::Library> lib (new db::Library ());
             lib->set_description (filename);
             if (! p->second.empty ()) {
               lib->set_technology (p->second);
             }
-            lib->set_name (tl::to_string (QFileInfo (*im).baseName ()));
+
+            std::string libname = tl::to_string (QFileInfo (*im).baseName ());
 
             tl::log << "Reading library '" << lib_path << "'";
             tl::InputStream stream (lib_path);
@@ -203,31 +229,72 @@ LibraryController::sync_files ()
             db::Layout::meta_info_name_id_type libname_name_id = lib->layout ().meta_info_name_id ("libname");
             for (db::Layout::meta_info_iterator m = lib->layout ().begin_meta (); m != lib->layout ().end_meta (); ++m) {
               if (m->first == libname_name_id && ! m->second.value.is_nil ()) {
-                lib->set_name (m->second.value.to_string ());
+                libname = m->second.value.to_string ();
                 break;
               }
             }
 
-            if (! p->second.empty ()) {
-              tl::log << "Registering as '" << lib->get_name () << "' for tech '" << p->second << "'";
+            //  merge with existing lib if there is already one in this folder with the right name
+            auto il = libs_by_name_here.find (libname);
+            if (il != libs_by_name_here.end ()) {
+
+              tl::log << "Merging with other library file with the same name: " << libname;
+
+              db::Library *org_lib = il->second;
+              db::Layout &org_layout = org_lib->layout ();
+
+              std::vector<db::cell_index_type> target_cells, source_cells;
+
+              //  collect the cells to pull in (all top cells of the library layout)
+              for (auto c = lib->layout ().begin_top_down (); c != lib->layout ().end_top_cells (); ++c) {
+                std::string cn = lib->layout ().cell_name (*c);
+                source_cells.push_back (*c);
+                target_cells.push_back (org_layout.add_cell (cn.c_str ()));
+              }
+
+              db::CellMapping cm;
+              cm.create_multi_mapping_full (org_layout, target_cells, lib->layout (), source_cells);
+              org_layout.copy_tree_shapes (lib->layout (), cm);
+
+              //  now, we can forget the new library as it is included in the first one
+
             } else {
-              tl::log << "Registering as '" << lib->get_name () << "'";
+
+              //  otherwise register the new library
+
+              if (! p->second.empty ()) {
+                tl::log << "Registering as '" << libname << "' for tech '" << p->second << "'";
+              } else {
+                tl::log << "Registering as '" << libname << "'";
+              }
+
+              LibInfo li;
+              li.name = libname;
+              li.time = fi.lastModified ();
+              if (! p->second.empty ()) {
+                li.tech.insert (p->second);
+              }
+              new_lib_files.insert (std::make_pair (lib_path, li));
+
+              lib->set_name (libname);
+              libs_by_name_here.insert (std::make_pair (libname, lib.release ()));
+
             }
 
-            LibInfo li;
-            li.name = lib->get_name ();
-            li.time = fi.lastModified ();
-            if (! p->second.empty ()) {
-              li.tech.insert (p->second);
-            }
-            new_lib_files.insert (std::make_pair (lib_path, li));
-
-            db::LibraryManager::instance ().register_lib (lib.release ());
-
+          } catch (tl::Exception &ex) {
+            tl::error << ex.msg ();
           }
 
-        } catch (tl::Exception &ex) {
-          tl::error << ex.msg ();
+        }
+
+        //  Register the libs (NOTE: this needs to happen after the merge)
+        for (auto l = libs_by_name_here.begin (); l != libs_by_name_here.end (); ++l) {
+          try {
+            db::LibraryManager::instance ().register_lib (l->second);
+          } catch (tl::Exception &ex) {
+            tl::error << ex.msg ();
+          } catch (...) {
+          }
         }
 
       }

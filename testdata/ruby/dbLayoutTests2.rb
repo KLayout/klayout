@@ -1487,6 +1487,49 @@ class DBLayoutTests2_TestClass < TestBase
 
   end
 
+  def test_gds2_libname
+
+    ly = RBA::Layout::new
+    options = RBA::SaveLayoutOptions::new
+    options.format = "GDS2"
+    byte_buffer = ly.write_bytes(options)
+
+    # undefined libname is written as "LIB"
+    ly2 = RBA::Layout::new
+    ly2.read_bytes(byte_buffer)
+    assert_equal(ly2.meta_info_value("libname").to_s, "LIB")
+
+    options.libname = "ABC"
+    ly.remove_meta_info("libname")
+    byte_buffer = ly.write_bytes(options)
+
+    # libname is taken from options
+    ly2 = RBA::Layout::new
+    ly2.read_bytes(byte_buffer)
+    assert_equal(ly2.meta_info_value("libname").to_s, "ABC")
+
+    ly.remove_meta_info("libname")
+    ly.add_meta_info(RBA::LayoutMetaInfo::new("libname", "X"))
+    options.libname = ""
+    byte_buffer = ly.write_bytes(options)
+
+    # libname from layout is used
+    ly2 = RBA::Layout::new
+    ly2.read_bytes(byte_buffer)
+    assert_equal(ly2.meta_info_value("libname").to_s, "X")
+
+    options.libname = "Z"
+    byte_buffer = ly.write_bytes(options)
+
+    # libname from options has priority
+    ly2 = RBA::Layout::new
+    ly2.read_bytes(byte_buffer)
+    assert_equal(ly2.meta_info_value("libname").to_s, "Z")
+    # ... and replaces the info in the source layout
+    assert_equal(ly.meta_info_value("libname").to_s, "Z")
+
+  end
+
 end
 
 load("test_epilogue.rb")

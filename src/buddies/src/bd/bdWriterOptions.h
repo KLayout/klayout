@@ -118,7 +118,7 @@ private:
   bool m_gds2_multi_xy_records;
   bool m_gds2_resolve_skew_arrays;
   unsigned int m_gds2_max_cellname_length;
-  std::string m_gds2_libname;
+  std::string m_libname;
   double m_gds2_user_units;
   bool m_gds2_write_timestamps;
   bool m_gds2_write_cell_properties;

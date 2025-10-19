@@ -35,6 +35,7 @@ GenericWriterOptions::GenericWriterOptions ()
   db::SaveLayoutOptions save_options;
 
   m_dbu = save_options.get_option_by_name ("dbu").to_double ();
+  m_libname = save_options.get_option_by_name ("libname").to_string ();
 
   m_dont_write_empty_cells = save_options.get_option_by_name ("no_empty_cells").to_bool ();
   m_keep_instances = save_options.get_option_by_name ("keep_instances").to_bool ();
@@ -45,7 +46,6 @@ GenericWriterOptions::GenericWriterOptions ()
   m_gds2_multi_xy_records = save_options.get_option_by_name ("gds2_multi_xy_records").to_bool ();
   m_gds2_resolve_skew_arrays = save_options.get_option_by_name ("gds2_resolve_skew_arrays").to_bool ();
   m_gds2_max_cellname_length = save_options.get_option_by_name ("gds2_max_cellname_length").to_uint ();
-  m_gds2_libname = save_options.get_option_by_name ("gds2_libname").to_string ();
   m_gds2_user_units = save_options.get_option_by_name ("gds2_user_units").to_double ();
   m_gds2_write_timestamps = save_options.get_option_by_name ("gds2_write_timestamps").to_bool ();
   m_gds2_write_cell_properties = save_options.get_option_by_name ("gds2_write_cell_properties").to_bool ();
@@ -97,6 +97,11 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                     "in micron units. By default, the original unit is used. The layout will not "
                     "change physically because internally, the coordinates are scaled to match the "
                     "new database unit."
+                   );
+    cmd << tl::arg (group +
+                    "-ol|--libname=libname", &m_libname, "Uses the given library name",
+                    "This option can specify the LIBNAME for the output file. By default, the original LIBNAME is "
+                    "written. This option is generic, but currently only supported by GDS2."
                    );
   }
 
@@ -177,11 +182,6 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
         << tl::arg (group +
                     "-on|--cellname-length=length", &m_gds2_max_cellname_length, "Limits cell names to the given length",
                     "If this option is given, long cell names will truncated if their length exceeds the given length."
-                   )
-        << tl::arg (group +
-                    "-ol|--libname=libname", &m_gds2_libname, "Uses the given library name",
-                    "This option can specify the GDS2 LIBNAME for the output file. By default, the original LIBNAME is "
-                    "written."
                    )
         << tl::arg (group +
                     "#--user-units=unit", &m_gds2_user_units, "Specifies the user unit to use",
@@ -374,6 +374,7 @@ GenericWriterOptions::configure (db::SaveLayoutOptions &save_options, const db::
 {
   save_options.set_scale_factor (m_scale_factor);
   save_options.set_dbu (m_dbu);
+  save_options.set_libname (m_libname);
   save_options.set_dont_write_empty_cells (m_dont_write_empty_cells);
   save_options.set_keep_instances (m_keep_instances);
   save_options.set_write_context_info (m_write_context_info);
@@ -383,7 +384,6 @@ GenericWriterOptions::configure (db::SaveLayoutOptions &save_options, const db::
   save_options.set_option_by_name ("gds2_multi_xy_records", m_gds2_multi_xy_records);
   save_options.set_option_by_name ("gds2_resolve_skew_arrays", m_gds2_resolve_skew_arrays);
   save_options.set_option_by_name ("gds2_max_cellname_length", m_gds2_max_cellname_length);
-  save_options.set_option_by_name ("gds2_libname", m_gds2_libname);
   save_options.set_option_by_name ("gds2_user_units", m_gds2_user_units);
   save_options.set_option_by_name ("gds2_write_timestamps", m_gds2_write_timestamps);
   save_options.set_option_by_name ("gds2_write_cell_properties", m_gds2_write_cell_properties);

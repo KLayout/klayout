@@ -319,7 +319,6 @@ LayoutHandle::update_save_options (db::SaveLayoutOptions &options)
     }
 
     if (specific_options.get ()) {
-      decl->initialize_options_from_layout_handle (specific_options.get (), *this);
       options.set_options (specific_options.release ());
     }
 

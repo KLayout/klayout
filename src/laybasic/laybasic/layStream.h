@@ -258,18 +258,6 @@ public:
   {
     return 0;
   }
-
-  /**
-   *  @brief Initialize the writer options from a layout handle
-   *
-   *  The layout handle carries information about meta data read and similar. This
-   *  method gives the plugin a chance to modify the options based on the meta data
-   *  of the layout.
-   */
-  virtual void initialize_options_from_layout_handle (db::FormatSpecificWriterOptions * /*options*/, const lay::LayoutHandle & /*lh*/) const
-  {
-    //  the default implementation does nothing.
-  }
 };
 
 }

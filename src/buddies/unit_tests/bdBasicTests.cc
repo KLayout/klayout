@@ -43,13 +43,13 @@ TEST(1)
                    "--drop-empty-cells",
                    "--keep-instances",
                    "--no-context-info",
+                   "-ol=MYLIBNAME",
                    //  CIF
                    "--blank-separator",
                    "--dummy-calls",
                    //  DXF
                    "-op=2",
                    //  GDS2
-                   "-ol=MYLIBNAME",
                    "-ov=250",
                    "--multi-xy-records",
                    "--no-timestamps",
@@ -77,7 +77,7 @@ TEST(1)
   EXPECT_EQ (stream_opt.get_option_by_name ("cif_blank_separator").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("cif_dummy_calls").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("dxf_polygon_mode").to_int (), 0);
-  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_libname").to_string (), "LIB");
+  EXPECT_EQ (stream_opt.get_option_by_name ("libname").to_string (), "");
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_max_vertex_count").to_uint (), (unsigned int) 8000);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_multi_xy_records").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_timestamps").to_bool (), true);
@@ -100,10 +100,11 @@ TEST(1)
   EXPECT_EQ (stream_opt.dont_write_empty_cells (), true);
   EXPECT_EQ (stream_opt.keep_instances (), true);
   EXPECT_EQ (stream_opt.write_context_info (), false);
+  EXPECT_EQ (stream_opt.libname (), "MYLIBNAME");
+  EXPECT_EQ (stream_opt.get_option_by_name ("libname").to_string (), "MYLIBNAME");
   EXPECT_EQ (stream_opt.get_option_by_name ("cif_blank_separator").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("cif_dummy_calls").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("dxf_polygon_mode").to_int (), 2);
-  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_libname").to_string (), "MYLIBNAME");
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_max_vertex_count").to_uint (), (unsigned int) 250);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_multi_xy_records").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_timestamps").to_bool (), false);

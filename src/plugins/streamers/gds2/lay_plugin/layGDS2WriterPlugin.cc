@@ -66,7 +66,6 @@ GDS2WriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db:
     mp_ui->max_vertex_le->setText (tl::to_qstring (tl::to_string (options->max_vertex_count)));
     mp_ui->cell_name_length_le->setText (tl::to_qstring (tl::to_string (options->max_cellname_length)));
     mp_ui->default_text_size_le->setText (tl::to_qstring (options->default_text_size >= 0.0 ? tl::to_string (options->default_text_size) : std::string ()));
-    mp_ui->libname_le->setText (tl::to_qstring (tl::to_string (options->libname)));
   }
 }
 
@@ -118,8 +117,6 @@ GDS2WriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Tech
     }
     options->max_cellname_length = n;
 
-    options->libname = tl::to_string (mp_ui->libname_le->text ());
-
   }
 }
 
@@ -152,20 +149,6 @@ public:
   db::FormatSpecificWriterOptions *create_specific_options () const
   {
     return new db::GDS2WriterOptions ();
-  }
-
-  void initialize_options_from_layout_handle (db::FormatSpecificWriterOptions *o, const lay::LayoutHandle &lh) const
-  {
-    //  Initialize the libname property from meta data with key "libname".
-    db::GDS2WriterOptions *options = dynamic_cast<db::GDS2WriterOptions *> (o);
-    if (options) {
-      db::Layout::meta_info_name_id_type libname_name_id = lh.layout().meta_info_name_id ("libname");
-      for (db::Layout::meta_info_iterator meta = lh.layout().begin_meta (); meta != lh.layout().end_meta (); ++meta) {
-        if (meta->first == libname_name_id && !meta->second.value.is_nil ()) {
-          options->libname = meta->second.value.to_string ();
-        }
-      }
-    }
   }
 };
 

@@ -168,6 +168,7 @@ protected:
 private:
   db::WriterCellNameMap m_cell_name_map;
   double m_dbu;
+  std::string m_libname;
   bool m_resolve_skew_arrays;
   bool m_multi_xy;
   bool m_no_zero_length_paths;

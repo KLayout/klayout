@@ -195,6 +195,19 @@ public:
   }
 
   /**
+   *  @brief Sets the libname
+   */
+  void set_libname (const std::string &libname);
+
+  /**
+   *  @brief Gets the libname
+   */
+  const std::string &libname () const
+  {
+    return m_libname;
+  }
+
+  /**
    *  @brief Set the "don't write empty cells flag"
    */
   void set_dont_write_empty_cells (bool f);
@@ -440,6 +453,7 @@ private:
   bool m_all_cells;
   double m_dbu;
   double m_scale_factor;
+  std::string m_libname;
   bool m_keep_instances;
   bool m_write_context_info;
   bool m_dont_write_empty_cells;

@@ -3022,7 +3022,7 @@ Class<db::SaveLayoutOptions> decl_SaveLayoutOptions ("db", "SaveLayoutOptions",
     "This method was introduced in version 0.23.\n"
   ) +
   gsi::method ("dbu=", &db::SaveLayoutOptions::set_dbu, gsi::arg ("dbu"),
-    "@brief Set the database unit to be used in the stream file\n"
+    "@brief Sets the database unit to be used in the stream file\n"
     "\n"
     "By default, the database unit of the layout is used. This method allows one to explicitly use a different\n"
     "database unit. A scale factor is introduced automatically which scales all layout objects accordingly so their physical dimensions remain the same. "
@@ -3030,7 +3030,7 @@ Class<db::SaveLayoutOptions> decl_SaveLayoutOptions ("db", "SaveLayoutOptions",
     "layout may become slightly distorted."
   ) + 
   gsi::method ("dbu", &db::SaveLayoutOptions::dbu,
-    "@brief Get the explicit database unit if one is set\n"
+    "@brief Gets the explicit database unit if one is set\n"
     "\n"
     "See \\dbu= for a description of that attribute.\n"
   ) + 
@@ -3044,8 +3044,24 @@ Class<db::SaveLayoutOptions> decl_SaveLayoutOptions ("db", "SaveLayoutOptions",
   gsi::method ("no_empty_cells?", &db::SaveLayoutOptions::dont_write_empty_cells,
     "@brief Returns a flag indicating whether empty cells are not written.\n"
   ) + 
+  gsi::method ("libname=|#gds2_libname=", &db::SaveLayoutOptions::set_libname, gsi::arg ("libname"),
+    "@brief Sets the library name\n"
+    "\n"
+    "The library name is an attribute and specifies a formal name for a library, if the layout files is to be used as one.\n"
+    "Currently, this attribute is only supported by the GDS2 format. Hence the alias.\n"
+    "\n"
+    "By default or if the libname is an empty string, the current library name of the layout or 'LIB' is used.\n"
+    "\n"
+    "The 'libname' alias has been introduced in version 0.30.5. The original name \\gds2_libname= is still available."
+  ) +
+  gsi::method ("libname|#gds2_libname", &db::SaveLayoutOptions::libname,
+    "@brief Gets the library name\n"
+    "\n"
+    "See \\libname= for details.\n"
+    "The 'libname' alias has been introduced in version 0.30.5. The original name \\gds2_libname is still available."
+  ) +
   gsi::method ("scale_factor=", &db::SaveLayoutOptions::set_scale_factor, gsi::arg ("scale_factor"),
-    "@brief Set the scaling factor for the saving \n"
+    "@brief Sets the scaling factor for the saving \n"
     "\n"
     "Using a scaling factor will scale all objects accordingly. "
     "This scale factor adds to a potential scaling implied by using an explicit database unit.\n"

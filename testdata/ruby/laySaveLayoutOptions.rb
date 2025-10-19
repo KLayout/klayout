@@ -41,9 +41,17 @@ class SaveLayoutOptions_TestClass < TestBase
     opt.select_all_cells
     opt.select_all_layers
     
-    
+    assert_equal(opt.dbu, 0.0)
     opt.dbu = 0.5
     assert_equal(opt.dbu, 0.5)
+
+    assert_equal(opt.libname, "")
+    opt.libname = "ABC"
+    assert_equal(opt.libname, "ABC")
+    assert_equal(opt.gds2_libname, "ABC")
+    opt.gds2_libname = "X"
+    assert_equal(opt.libname, "X")
+    assert_equal(opt.gds2_libname, "X")
 
     opt.scale_factor = 1.5
     assert_equal(opt.scale_factor, 1.5)

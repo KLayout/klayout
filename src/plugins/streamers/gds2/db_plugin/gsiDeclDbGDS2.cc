@@ -126,16 +126,6 @@ static tl::Variant get_gds2_default_text_size (const db::SaveLayoutOptions *opti
   return ts < 0.0 ? tl::Variant () : tl::Variant (ts);
 }
 
-static void set_gds2_libname (db::SaveLayoutOptions *options, const std::string &n)
-{
-  options->get_options<db::GDS2WriterOptions> ().libname = n;
-}
-
-static std::string get_gds2_libname (const db::SaveLayoutOptions *options)
-{
-  return options->get_options<db::GDS2WriterOptions> ().libname;
-}
-
 static void set_gds2_user_units (db::SaveLayoutOptions *options, double n)
 {
   options->get_options<db::GDS2WriterOptions> ().user_units = n;
@@ -261,18 +251,6 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
   gsi::method_ext ("gds2_max_cellname_length", &get_gds2_max_cellname_length,
     "@brief Get the maximum length of cell names\n"
     "See \\gds2_max_cellname_length= method for a description of the maximum cell name length."
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_libname=", &set_gds2_libname, gsi::arg ("libname"),
-    "@brief Set the library name\n"
-    "\n"
-    "The library name is the string written into the LIBNAME records of the GDS file.\n"
-    "The library name should not be an empty string and is subject to certain limitations in the character choice.\n"
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_libname", &get_gds2_libname,
-    "@brief Get the library name\n"
-    "See \\gds2_libname= method for a description of the library name."
     "\nThis property has been added in version 0.18.\n"
   ) +
   gsi::method_ext ("gds2_user_units=", &set_gds2_user_units, gsi::arg ("uu"),

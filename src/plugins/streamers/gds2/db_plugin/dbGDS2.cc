@@ -77,8 +77,7 @@ class GDS2FormatDeclaration
       tl::make_member (&db::GDS2WriterOptions::multi_xy_records, "multi-xy-records") +
       tl::make_member (&db::GDS2WriterOptions::resolve_skew_arrays, "resolve-skew-arrays") +
       tl::make_member (&db::GDS2WriterOptions::max_vertex_count, "max-vertex-count") +
-      tl::make_member (&db::GDS2WriterOptions::max_cellname_length, "max-cellname-length") +
-      tl::make_member (&db::GDS2WriterOptions::libname, "libname")
+      tl::make_member (&db::GDS2WriterOptions::max_cellname_length, "max-cellname-length")
     );
   }
 

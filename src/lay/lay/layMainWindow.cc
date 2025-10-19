@@ -2315,7 +2315,16 @@ MainWindow::do_save (bool as)
             options.set_format (cv->save_options ().format ());
           }
 
+          //  preconfigure options with current values
+
           options.set_dbu (cv->layout ().dbu ());
+
+          if (cv->layout ().has_meta_info ("libname")) {
+            tl::Variant libname = cv->layout ().meta_info ("libname").value;
+            if (libname.is_a_string ()) {
+              options.set_libname (libname.to_stdstring ());
+            }
+          }
 
           if (as || options.format ().empty ()) {
             options.set_format_from_filename (fn);

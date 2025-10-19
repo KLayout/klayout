@@ -61,6 +61,7 @@ SaveLayoutOptions::operator= (const SaveLayoutOptions &d)
     m_all_cells = d.m_all_cells;
     m_dbu = d.m_dbu;
     m_scale_factor = d.m_scale_factor;
+    m_libname = d.m_libname;
     m_keep_instances = d.m_keep_instances;
     m_write_context_info = d.m_write_context_info;
     m_dont_write_empty_cells = d.m_dont_write_empty_cells;
@@ -220,7 +221,13 @@ SaveLayoutOptions::set_dbu (double dbu)
   m_dbu = dbu;
 }
 
-void 
+void
+SaveLayoutOptions::set_libname (const std::string &libname)
+{
+  m_libname = libname;
+}
+
+void
 SaveLayoutOptions::set_scale_factor (double f)
 {
   m_scale_factor = f;

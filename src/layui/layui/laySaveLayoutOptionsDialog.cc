@@ -462,6 +462,7 @@ SaveLayoutAsOptionsDialog::get_options (lay::LayoutViewBase *view, unsigned int 
   mp_ui->compression->setCurrentIndex (om_to_index (om));
 
   mp_ui->dbu_le->setText (tl::to_qstring (tl::to_string (options.dbu ())));
+  mp_ui->libname_le->setText (tl::to_qstring (options.libname ()));
 
   mp_ui->fmt_cbx->setCurrentIndex (0);
   fmt_cbx_changed (0);
@@ -489,8 +490,6 @@ SaveLayoutAsOptionsDialog::get_options (lay::LayoutViewBase *view, unsigned int 
       } else {
         specific_options.reset (decl->create_specific_options ());
       }
-
-      decl->initialize_options_from_layout_handle (specific_options.get (), *cv.handle ());
 
       if (page->first) {
         page->first->setup (specific_options.get (), mp_tech);
@@ -524,6 +523,7 @@ SaveLayoutAsOptionsDialog::get_options (lay::LayoutViewBase *view, unsigned int 
     options.set_dbu (dbu);
     options.set_scale_factor (sf);
 
+    options.set_libname (tl::to_string (mp_ui->libname_le->text ()));
     options.set_dont_write_empty_cells (mp_ui->no_empty_cells_cb->isChecked ());
     options.set_keep_instances (mp_ui->keep_instances_cb->isChecked ());
     options.set_write_context_info (mp_ui->store_context_cb->isChecked ());

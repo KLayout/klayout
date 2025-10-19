@@ -435,9 +435,20 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
 
   db::GDS2WriterOptions gds2_options = options.get_options<db::GDS2WriterOptions> ();
 
+  m_libname = options.libname ();
+  if (m_libname.empty () && layout.has_meta_info ("libname")) {
+    tl::Variant libname = layout.meta_info ("libname").value;
+    if (libname.is_a_string ()) {
+      m_libname = libname.to_stdstring ();
+    }
+  }
+  if (m_libname.empty ()) {
+    m_libname = "LIB";
+  }
+
   layout.add_meta_info ("dbuu", MetaInfo (tl::to_string (tr ("Database unit in user units")), tl::to_string (m_dbu / std::max (1e-9, gds2_options.user_units))));
   layout.add_meta_info ("dbum", MetaInfo (tl::to_string (tr ("Database unit in meter")), tl::to_string (m_dbu * 1e-6)));
-  layout.add_meta_info ("libname", MetaInfo (tl::to_string (tr ("Library name")), gds2_options.libname));
+  layout.add_meta_info ("libname", MetaInfo (tl::to_string (tr ("Library name")), m_libname));
 
   std::vector <std::pair <unsigned int, db::LayerProperties> > layers;
   options.get_valid_layers (layout, layers, db::SaveLayoutOptions::LP_AssignNumber);
@@ -517,7 +528,7 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
   write_time (time_data);
 
   try {
-    write_string_record (sLIBNAME, gds2_options.libname);
+    write_string_record (sLIBNAME, m_libname);
   } catch (tl::Exception &ex) {
     throw tl::Exception (ex.msg () + tl::to_string (tr (", writing LIBNAME")));
   }

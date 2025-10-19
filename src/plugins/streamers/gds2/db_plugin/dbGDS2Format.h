@@ -111,7 +111,6 @@ public:
       multi_xy_records (false),
       resolve_skew_arrays (false),
       max_cellname_length (32000),
-      libname ("LIB"),
       user_units (1.0),
       write_timestamps (true),
       write_cell_properties (false),
@@ -162,13 +161,6 @@ public:
    *  Longer cell names will be shortened.
    */
   unsigned int max_cellname_length;
-
-  /**
-   *  @brief The library name
-   *
-   *  This property describes that library name written to the LIBNAME record.
-   */
-  std::string libname;
 
   /**
    *  @brief The user units to use

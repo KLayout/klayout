@@ -341,6 +341,8 @@ BEGIN_PROTECTED
 
   //  confine the selection
 
+  auto prev_selected = mp_editables->selection_size ();
+
   mp_tree_model->begin_reset_model ();
 
   auto selection = mp_ui->tree->selectionModel ()->selectedIndexes ();
@@ -408,6 +410,10 @@ BEGIN_PROTECTED
   m_signals_enabled = true;
 
   update_controls ();
+
+  if (m_objects != prev_selected) {
+    mp_editables->signal_selection_changed ();
+  }
 
 END_PROTECTED
 }

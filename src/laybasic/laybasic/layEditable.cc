@@ -110,6 +110,8 @@ Editables::del (db::Transaction *transaction)
         e->del ();
       }
 
+      signal_selection_changed ();
+
     } catch (...) {
       trans_holder->cancel ();
       throw;

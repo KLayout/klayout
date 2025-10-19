@@ -33,11 +33,85 @@
 #include "dbCellMapping.h"
 #include "tlLog.h"
 #include "tlStream.h"
+#include "tlFileUtils.h"
 
 #include <QDir>
 
 namespace lay
 {
+
+// -------------------------------------------------------------------------------------------
+
+class FileBasedLibrary
+  : public db::Library
+{
+public:
+  FileBasedLibrary (const std::string &path)
+    : db::Library (), m_path (path)
+  {
+    set_description (tl::filename (path));
+  }
+
+  void merge_with_other_layout (const std::string &path)
+  {
+    m_other_paths.push_back (path);
+    merge_impl (path);
+  }
+
+  virtual std::string reload ()
+  {
+    std::string name = tl::basename (m_path);
+
+    layout ().clear ();
+
+    tl::InputStream stream (m_path);
+    db::Reader reader (stream);
+    reader.read (layout ());
+
+    //  Use the libname if there is one
+    db::Layout::meta_info_name_id_type libname_name_id = layout ().meta_info_name_id ("libname");
+    for (db::Layout::meta_info_iterator m = layout ().begin_meta (); m != layout ().end_meta (); ++m) {
+      if (m->first == libname_name_id && ! m->second.value.is_nil ()) {
+        name = m->second.value.to_string ();
+        break;
+      }
+    }
+
+    for (auto p = m_other_paths.begin (); p != m_other_paths.end (); ++p) {
+      merge_impl (*p);
+    }
+
+    return name;
+  }
+
+private:
+  std::string m_path;
+  std::list<std::string> m_other_paths;
+
+  void merge_impl (const std::string &path)
+  {
+    db::Layout ly;
+
+    tl::InputStream stream (path);
+    db::Reader reader (stream);
+    reader.read (ly);
+
+    std::vector<db::cell_index_type> target_cells, source_cells;
+
+    //  collect the cells to pull in (all top cells of the library layout)
+    for (auto c = ly.begin_top_down (); c != ly.end_top_cells (); ++c) {
+      std::string cn = ly.cell_name (*c);
+      source_cells.push_back (*c);
+      target_cells.push_back (layout ().add_cell (cn.c_str ()));
+    }
+
+    db::CellMapping cm;
+    cm.create_multi_mapping_full (layout (), target_cells, ly, source_cells);
+    layout ().copy_tree_shapes (ly, cm);
+  }
+};
+
+// -------------------------------------------------------------------------------------------
 
 LibraryController::LibraryController ()
   : m_file_watcher (0),
@@ -201,38 +275,23 @@ LibraryController::sync_files ()
 
       } else {
 
-        std::map<std::string, db::Library *> libs_by_name_here;
+        std::map<std::string, FileBasedLibrary *> libs_by_name_here;
 
         //  Reload all files
         for (QStringList::const_iterator im = libs.begin (); im != libs.end (); ++im) {
 
-          std::string filename = tl::to_string (*im);
           std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
           QFileInfo fi (tl::to_qstring (lib_path));
 
           try {
 
-            std::unique_ptr<db::Library> lib (new db::Library ());
-            lib->set_description (filename);
+            std::unique_ptr<FileBasedLibrary> lib (new FileBasedLibrary (lib_path));
             if (! p->second.empty ()) {
               lib->set_technology (p->second);
             }
 
-            std::string libname = tl::to_string (QFileInfo (*im).baseName ());
-
             tl::log << "Reading library '" << lib_path << "'";
-            tl::InputStream stream (lib_path);
-            db::Reader reader (stream);
-            reader.read (lib->layout ());
-
-            //  Use the libname if there is one
-            db::Layout::meta_info_name_id_type libname_name_id = lib->layout ().meta_info_name_id ("libname");
-            for (db::Layout::meta_info_iterator m = lib->layout ().begin_meta (); m != lib->layout ().end_meta (); ++m) {
-              if (m->first == libname_name_id && ! m->second.value.is_nil ()) {
-                libname = m->second.value.to_string ();
-                break;
-              }
-            }
+            std::string libname = lib->reload ();
 
             //  merge with existing lib if there is already one in this folder with the right name
             auto il = libs_by_name_here.find (libname);
@@ -240,21 +299,7 @@ LibraryController::sync_files ()
 
               tl::log << "Merging with other library file with the same name: " << libname;
 
-              db::Library *org_lib = il->second;
-              db::Layout &org_layout = org_lib->layout ();
-
-              std::vector<db::cell_index_type> target_cells, source_cells;
-
-              //  collect the cells to pull in (all top cells of the library layout)
-              for (auto c = lib->layout ().begin_top_down (); c != lib->layout ().end_top_cells (); ++c) {
-                std::string cn = lib->layout ().cell_name (*c);
-                source_cells.push_back (*c);
-                target_cells.push_back (org_layout.add_cell (cn.c_str ()));
-              }
-
-              db::CellMapping cm;
-              cm.create_multi_mapping_full (org_layout, target_cells, lib->layout (), source_cells);
-              org_layout.copy_tree_shapes (lib->layout (), cm);
+              il->second->merge_with_other_layout (lib_path);
 
               //  now, we can forget the new library as it is included in the first one
 

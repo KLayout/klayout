@@ -1034,7 +1034,7 @@ Class<db::EqualDeviceParameters> decl_dbEqualDeviceParameters ("db", "EqualDevic
 
 Class<GenericDeviceParameterCompare> decl_GenericDeviceParameterCompare (decl_dbEqualDeviceParameters, "db", "GenericDeviceParameterCompare",
   gsi::callback ("less", &GenericDeviceParameterCompare::less, &GenericDeviceParameterCompare::cb_less, gsi::arg ("device_a"), gsi::arg ("device_b"),
-    "@brief Compares the parameters of two devices for a begin less than b. "
+    "@brief Compares the parameters of two devices for a begin less than b.\n"
     "Returns true, if the parameters of device a are considered less than those of device b."
     "The 'less' implementation needs to ensure strict weak ordering. Specifically, less(a,b) == false and less(b,a) implies that a is equal to b and "
     "less(a,b) == true implies that less(b,a) is false and vice versa. If not, an internal error "

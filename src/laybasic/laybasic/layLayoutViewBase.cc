@@ -475,6 +475,12 @@ LayoutViewBase::shutdown ()
     }
   }
 
+  //  NOTE: this must happen before the services are deleted
+  mp_move_service = 0;
+  mp_selection_service = 0;
+  mp_tracker = 0;
+  mp_zoom_service = 0;
+
   //  delete all plugins
   std::vector<lay::Plugin *> plugins;
   plugins.swap (mp_plugins);
@@ -4941,6 +4947,19 @@ int
 LayoutViewBase::active_cellview_index () const
 {
   return m_active_cellview_index;
+}
+
+void
+LayoutViewBase::set_active_cellview_index_silent (int index)
+{
+  enable_active_cellview_changed_event (false);
+  try {
+    set_active_cellview_index (index);
+    enable_active_cellview_changed_event (true, true /*silent*/);
+  } catch (...) {
+    enable_active_cellview_changed_event (true, true /*silent*/);
+    throw;
+  }
 }
 
 void

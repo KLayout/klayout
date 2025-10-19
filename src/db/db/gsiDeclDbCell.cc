@@ -974,6 +974,45 @@ static db::Library *library (const db::Cell *cell)
   }
 }
 
+static void change_library_ref (db::Cell *cell, db::lib_id_type lib_id, db::cell_index_type cell_index)
+{
+  db::LibraryProxy *l = dynamic_cast<db::LibraryProxy *> (cell);
+  if (! l) {
+    throw tl::Exception (tl::to_string (tr ("Cell is not a library reference - cannot change that reference")));
+  }
+
+  const db::Library *lib = db::LibraryManager::instance ().lib (lib_id);
+  if (! lib) {
+    throw tl::Exception (tl::to_string (tr ("'lib_id' is not a valid library ID")));
+  }
+
+  if (! lib->layout ().is_valid_cell_index (cell_index)) {
+    throw tl::Exception (tl::to_string (tr ("'cell_index' is not a valid cell index in the context of the library")));
+  }
+
+  l->remap (lib_id, cell_index);
+}
+
+static void change_library_ref2 (db::Cell *cell, const std::string &lib_name, const std::string &cell_name)
+{
+  db::LibraryProxy *l = dynamic_cast<db::LibraryProxy *> (cell);
+  if (! l) {
+    throw tl::Exception (tl::to_string (tr ("Cell is not a library reference - cannot change that reference")));
+  }
+
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (lib_name);
+  if (! lib) {
+    throw tl::Exception (tl::to_string (tr ("Not a valid library name: ")) + lib_name);
+  }
+
+  auto cbn = lib->layout ().cell_by_name (cell_name.c_str ());
+  if (! cbn.first) {
+    throw tl::Exception (tl::to_string (tr ("Not a valid cell name: ")) + cell_name);
+  }
+
+  l->remap (lib->get_id (), cbn.second);
+}
+
 static const db::Layout *layout_const (const db::Cell *cell)
 {
   return cell->layout ();
@@ -3194,8 +3233,24 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@brief Returns a reference to the library from which the cell is imported\n"
     "if the cell is not imported from a library, this reference is nil.\n"
     "\n"
-    "this method has been introduced in version 0.22.\n"
+    "This method has been introduced in version 0.22.\n"
   ) +  
+  gsi::method_ext ("change_ref", &change_library_ref, gsi::arg ("lib_id"), gsi::arg ("lib_cell_index"),
+    "@brief Changes the reference to a different library cell\n"
+    "This method requires a cell that is a library reference (i.e. \\is_library_cell? is true). It will "
+    "change that reference to a new cell, potentially from a different library.\n"
+    "The library is given by library ID, the cell by cell inside inside that library.\n"
+    "\n"
+    "This method has been introduced in version 0.30.5.\n"
+  ) +
+  gsi::method_ext ("change_ref", &change_library_ref2, gsi::arg ("lib_name"), gsi::arg ("cell_name"),
+    "@brief Changes the reference to a different library cell\n"
+    "This method requires a cell that is a library reference (i.e. \\is_library_cell? is true). It will "
+    "change that reference to a new cell, potentially from a different library.\n"
+    "This version takes a library name and cell name (from that library).\n"
+    "\n"
+    "This method has been introduced in version 0.30.5.\n"
+  ) +
   gsi::method_ext ("layout", &layout,
     "@brief Returns a reference to the layout where the cell resides\n"
     "\n"

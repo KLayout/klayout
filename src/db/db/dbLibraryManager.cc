@@ -67,6 +67,39 @@ LibraryManager::~LibraryManager ()
   clear ();
 }
 
+void
+LibraryManager::rename (lib_id_type lib_id, const std::string &name)
+{
+  db::Library *lib = 0;
+
+  {
+    tl::MutexLocker locker (&m_lock);
+
+    lib = lib_internal (lib_id);
+    if (! lib) {
+      return;
+    }
+
+    std::string org_name = lib->get_name ();
+
+    for (auto it = m_lib_by_name.find (org_name);it != m_lib_by_name.end () && it->first == org_name; ++it) {
+      if (it->second == lib_id) {
+        m_lib_by_name.erase (it);
+        break;
+      }
+    }
+
+    m_lib_by_name.insert (std::make_pair (name, lib_id));
+    lib->set_name (name);
+  }
+
+  //  triggers a layout update
+  lib->remap_to (lib);
+
+  //  issue the change notification
+  changed_event ();
+}
+
 std::pair<bool, lib_id_type> 
 LibraryManager::lib_by_name (const std::string &name, const std::set<std::string> &for_technologies) const
 {
@@ -112,6 +145,8 @@ LibraryManager::unregister_lib (Library *library)
     return;
   }
 
+  library->remap_to (0);
+
   {
     tl::MutexLocker locker (&m_lock);
 
@@ -124,8 +159,10 @@ LibraryManager::unregister_lib (Library *library)
     }
   }
 
-  library->remap_to (0);
   library->set_id (std::numeric_limits<lib_id_type>::max ());
+
+  //  issue the change notification
+  changed_event ();
 }
 
 void
@@ -241,6 +278,16 @@ LibraryManager::lib_internal (lib_id_type id) const
     return 0;
   } else {
     return m_libs [id];
+  }
+}
+
+void
+LibraryManager::refresh_all ()
+{
+  for (std::vector<Library *>::iterator l = m_libs.begin (); l != m_libs.end (); ++l) {
+    if (*l) {
+      (*l)->refresh ();
+    }
   }
 }
 

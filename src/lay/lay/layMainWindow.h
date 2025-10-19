@@ -837,6 +837,7 @@ private:
   void cm_pull_in ();
   void cm_reader_options ();
   void cm_writer_options ();
+  void cm_refresh ();
   void cm_new_panel ();
   void cm_new_layout ();
   void cm_clone ();

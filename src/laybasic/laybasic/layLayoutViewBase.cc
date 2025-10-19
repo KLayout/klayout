@@ -5662,7 +5662,13 @@ LayoutViewBase::current_layer_changed_slot (const lay::LayerPropertiesConstItera
   current_layer_changed_event (iter);
 }
 
-void 
+void
+LayoutViewBase::selected_layers_changed_slot ()
+{
+  selected_layers_changed_event ();
+}
+
+void
 LayoutViewBase::add_new_layers (const LayerState &state)
 {
   std::vector <lay::ParsedLayerSource> actual;

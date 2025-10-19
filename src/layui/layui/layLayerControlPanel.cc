@@ -2165,6 +2165,7 @@ LayerControlPanel::selection_changed (const QItemSelection &, const QItemSelecti
   if (m_layer_visibility_follows_selection) {
     m_do_update_visibility_dm ();
   }
+  emit selected_layers_changed ();
 }
 
 void

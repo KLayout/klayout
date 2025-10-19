@@ -786,9 +786,17 @@ public:
 
   /**
    *  @brief An event signalling that the current layer has changed
+   *
+   *  The event is emitted when the user changes the current layer.
    */
   tl::event<const lay::LayerPropertiesConstIterator &> current_layer_changed_event;
 
+  /**
+   *  @brief An event signalling that the selected layers have changed
+   *
+   *  The event is emitted when the user changes the selection.
+   */
+  tl::Event selected_layers_changed_event;
 
   /**
    *  @brief An event signalling that the visibility of some cells has changed
@@ -2799,6 +2807,11 @@ public:
    *  @brief Called when the current layer changed
    */
   void current_layer_changed_slot (const lay::LayerPropertiesConstIterator &iter);
+
+  /**
+   *  @brief Called when the layer selection changed
+   */
+  void selected_layers_changed_slot ();
 
   //  zoom slots
   void zoom_fit ();

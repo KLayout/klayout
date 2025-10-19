@@ -33,6 +33,7 @@ SOURCES += \
   gsiDeclLayLayoutViewBase.cc \
   gsiDeclLayMarker.cc \
   gsiDeclLayMenu.cc \
+  gsiDeclLayTextInfo.cc \
   gsiDeclLayTlAdded.cc \
   gsiDeclLayRdbAdded.cc \
   gsiDeclLayConfigPage.cc \

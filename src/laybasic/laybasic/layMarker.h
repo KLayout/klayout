@@ -48,6 +48,14 @@ namespace lay
 class LayoutViewBase;
 
 /**
+ *  @brief Returns the marker text border in pixels
+ *
+ *  This is the amount by which the text bounding box (including glyphs) is enlarged
+ *  in pixels for better readability of the labels when they are selected.
+ */
+double marker_text_border_in_pixels ();
+
+/**
  *  @brief The marker base class
  *
  *  This base class defines the properties common to all marker objects

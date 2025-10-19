@@ -99,10 +99,14 @@ private:
     std::vector<db::cell_index_type> target_cells, source_cells;
 
     //  collect the cells to pull in (all top cells of the library layout)
+    //  NOTE: cells are not overwritten - the first layout wins, in terms
+    //  of cell names and also in terms of database unit.
     for (auto c = ly.begin_top_down (); c != ly.end_top_cells (); ++c) {
       std::string cn = ly.cell_name (*c);
-      source_cells.push_back (*c);
-      target_cells.push_back (layout ().add_cell (cn.c_str ()));
+      if (! layout ().has_cell (cn.c_str ())) {
+        source_cells.push_back (*c);
+        target_cells.push_back (layout ().add_cell (cn.c_str ()));
+      }
     }
 
     db::CellMapping cm;

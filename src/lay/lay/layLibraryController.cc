@@ -320,8 +320,15 @@ LibraryController::sync_files ()
       try {
         std::pair<bool, db::lib_id_type> li = db::LibraryManager::instance ().lib_by_name (lf->second.name, lf->second.tech);
         if (li.first) {
+          if (! lf->second.tech.empty ()) {
+            tl::log << "Unregistering lib '" << lf->second.name << "' for technology '" << *lf->second.tech.begin () << "' as the file no longer exists: " << lf->first;
+          } else {
+            tl::log << "Unregistering lib '" << lf->second.name << "' as the file no longer exists: " << lf->first;
+          }
           db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (li.second));
         }
+      } catch (tl::Exception &ex) {
+        tl::error << ex.msg ();
       } catch (...) {
       }
     }

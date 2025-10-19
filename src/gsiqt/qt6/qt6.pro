@@ -33,7 +33,10 @@ QtWidgets.depends += QtGui
 
 !equals(HAVE_QT_MULTIMEDIA, "0") {
   SUBDIRS += QtMultimedia
-  QtMultimedia.depends += QtCore QtWidgets QtNetwork
+  QtMultimedia.depends += QtCore QtWidgets
+  !equals(HAVE_QT_NETWORK, "0") {
+    QtMultimedia.depends += QtNetwork
+  }
 }
 
 !equals(HAVE_QT_XML, "0") {

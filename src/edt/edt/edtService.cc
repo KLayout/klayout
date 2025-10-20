@@ -1159,6 +1159,8 @@ Service::transient_select (const db::DPoint &pos)
   if (m_cell_inst_service) {
 
     lay::InstFinder finder (true, view ()->is_editable () && m_top_level_sel, view ()->is_editable () /*full arrays in editable mode*/, true /*enclose instances*/, &m_previous_selection, true /*visible layers only*/);
+    finder.consider_ghost_cells (view ()->ghost_cells_visible ());
+    finder.consider_normal_cells (view ()->cell_box_visible ());
 
     //  go through all transform variants
     std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants_with_empty ();
@@ -1493,6 +1495,8 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
   } else if (m_cell_inst_service) {
 
     lay::InstFinder finder (box.is_point (), view ()->is_editable () && m_top_level_sel, view ()->is_editable () /*full arrays in editable mode*/, true /*enclose_inst*/, exclude, true /*only visible layers*/);
+    finder.consider_ghost_cells (view ()->ghost_cells_visible ());
+    finder.consider_normal_cells (view ()->cell_box_visible ());
 
     //  go through all cell views
     std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants_with_empty ();

@@ -343,7 +343,17 @@ public:
 
   bool find (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans, const db::DBox &region_mu);
   bool find (LayoutViewBase *view, const db::DBox &region_mu);
+
+  void consider_ghost_cells (bool f)
+  {
+    m_consider_ghost_cells = f;
+  }
  
+  void consider_normal_cells (bool f)
+  {
+    m_consider_normal_cells = f;
+  }
+
   iterator begin () const
   {
     return m_founds.begin ();
@@ -360,6 +370,7 @@ private:
   virtual void visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level);
 
   bool find_internal (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu);
+  bool consider_cell (const db::Cell &cell) const;
 
   unsigned int m_cv_index;
   db::cell_index_type m_topcell;
@@ -369,6 +380,8 @@ private:
   bool m_full_arrays;
   bool m_enclose_insts;
   bool m_visible_layers;
+  bool m_consider_ghost_cells;
+  bool m_consider_normal_cells;
   std::vector<int> m_visible_layer_indexes;
   LayoutViewBase *mp_view;
   tl::AbsoluteProgress *mp_progress;

@@ -210,6 +210,9 @@ struct SelectedViaDefinition
 DB_PUBLIC std::vector<SelectedViaDefinition>
 find_via_definitions_for (const std::string &technology, const db::LayerProperties &layer, int dir);
 
+DB_PUBLIC std::vector<SelectedViaDefinition>
+get_via_definitions (const std::string &technology);
+
 }
 
 #endif

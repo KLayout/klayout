@@ -26,17 +26,13 @@
 #include "dbLibrary.h"
 #include "edtPlugin.h"
 #include "edtService.h"
-#if defined(HAVE_QT)
-#  include "edtEditorOptionsPages.h"
-#  include "edtDialogs.h"
-#endif
+#include "edtEditorOptionsPages.h"
+#include "edtDialogs.h"
 #include "layFinder.h"
 #include "layLayoutView.h"
 #include "laySnap.h"
 #include "layConverters.h"
-#if defined(HAVE_QT)
-#  include "layEditorOptionsPages.h"
-#endif
+#include "layEditorOptionsPages.h"
 #include "tlProgress.h"
 #include "tlTimer.h"
 
@@ -1709,13 +1705,13 @@ Service::begin_edit (const db::DPoint &p)
 }
 
 void
-Service::tap (const db::DPoint & /*initial*/)
+Service::tap (const db::DPoint & /*pt*/)
 {
   //  .. nothing here ..
 }
 
 void
-Service::via (int)
+Service::via (int /*dir*/)
 {
   //  .. nothing here ..
 }

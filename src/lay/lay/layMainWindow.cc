@@ -4507,6 +4507,7 @@ public:
     menu_entries.push_back (lay::config_menu_item ("show_markers", at, tl::to_string (QObject::tr ("Show Markers")), cfg_markers_visible, "?"));
     menu_entries.push_back (lay::config_menu_item ("show_texts", at, tl::to_string (QObject::tr ("Show Texts")), cfg_text_visible, "?"));
     menu_entries.push_back (lay::config_menu_item ("show_cell_boxes", at, tl::to_string (QObject::tr ("Show Cell Frames")), cfg_cell_box_visible, "?"));
+    menu_entries.push_back (lay::config_menu_item ("show_ghost_cells", at, tl::to_string (QObject::tr ("Show Unresolved References")), cfg_ghost_cells_visible, "?"));
     menu_entries.push_back (lay::config_menu_item ("no_stipples", at, tl::to_string (QObject::tr ("Show Layers Without Fill")), cfg_no_stipple, "?"));
     menu_entries.push_back (lay::config_menu_item ("synchronized_views", at, tl::to_string (QObject::tr ("Synchronized Views")), cfg_synchronized_views, "?"));
     menu_entries.push_back (lay::config_menu_item ("edit_top_level_selection:edit_mode", at, tl::to_string (QObject::tr ("Select Top Level Objects")), edt::cfg_edit_top_level_selection, "?"));

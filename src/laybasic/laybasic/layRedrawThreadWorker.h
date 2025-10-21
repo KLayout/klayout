@@ -44,7 +44,8 @@ class CanvasPlane;
 
 //  some helpful constants
 const int planes_per_layer = 12;
-const int cell_box_planes = planes_per_layer; // for cell boxes
+const int plain_cell_box_planes = planes_per_layer; // for cell boxes, not including ghost_cells
+const int cell_box_planes = planes_per_layer * 2; // for cell boxes, including ghost cells
 const int guiding_shape_planes = planes_per_layer; // for guiding shapes 
 const int special_planes_before = cell_box_planes + guiding_shape_planes; 
 const int special_planes_after = 1;
@@ -181,11 +182,15 @@ private:
   void draw_layer_wo_cache (int from_level, int to_level, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vv, int level, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text, const UpdateSnapshotCallback *update_snapshot);
   void draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
   void draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_region, int level, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text, Bitmap *opt_bitmap);
+  void draw_boxes_for_ghosts (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
   void draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
-  void draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_region, int level);
+  void draw_boxes_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level, bool for_ghosts);
+  void draw_boxes_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_region, int level, bool for_ghosts);
+  void draw_box_properties_for_ghosts (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
   void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
-  void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level, db::properties_id_type prop_id);
-  void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level, db::properties_id_type prop_id);
+  void draw_box_properties_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level, bool for_ghosts);
+  void draw_box_properties_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level, db::properties_id_type prop_id, bool for_ghosts);
+  void draw_box_properties_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level, db::properties_id_type prop_id, bool for_ghosts);
   void draw_cell (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, bool empty_cell, const std::string &txt);
   void draw_cell_properties (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, db::properties_id_type prop_id);
   void draw_cell_shapes (const db::CplxTrans &trans, const db::Cell &cell, const db::Box &vp, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text);
@@ -199,7 +204,7 @@ private:
   bool any_shapes (db::cell_index_type cell_index, unsigned int levels);
   bool any_text_shapes (db::cell_index_type cell_index, unsigned int levels);
   bool any_cell_box (db::cell_index_type cell_index, unsigned int levels);
-  bool need_draw_box (const db::Layout *layout, const db::Cell &cell, int level);
+  bool need_draw_box (const db::Layout *layout, const db::Cell &cell, int level, bool for_ghosts);
 
   RedrawThread *mp_redraw_thread;
   std::vector <db::Box> m_redraw_region;

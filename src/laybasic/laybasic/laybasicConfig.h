@@ -95,6 +95,7 @@ static const std::string cfg_cell_box_text_font ("inst-label-font");
 static const std::string cfg_cell_box_text_transform ("inst-label-transform");
 static const std::string cfg_cell_box_color ("inst-color");
 static const std::string cfg_cell_box_visible ("inst-visible");
+static const std::string cfg_ghost_cells_visible ("ghost-cells-visible");
 static const std::string cfg_text_color ("text-color");
 static const std::string cfg_text_visible ("text-visible");
 static const std::string cfg_text_lazy_rendering ("text-lazy-rendering");

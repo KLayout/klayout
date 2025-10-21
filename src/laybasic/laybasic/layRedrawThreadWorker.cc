@@ -316,6 +316,73 @@ RedrawThreadWorker::perform_task (tl::Task *task)
 
     transfer ();
 
+    //  Draw the ghost cells
+
+    //  HINT: the order in which the planes are delivered (the index stored in the first member of the pair below)
+    //  must correspond with the order by which the ViewOp's are created inside LayoutView::set_view_ops
+    m_buffers.clear ();
+    for (unsigned int i = 0; i < (unsigned int) planes_per_layer / 3; ++i) {
+
+      //  context level planes
+      unsigned int i1 = plain_cell_box_planes + i;
+      mp_canvas->initialize_plane (m_planes[i], i1);
+      m_buffers.push_back (std::make_pair (i1, m_planes [i]));
+
+      //  child level planes (if used)
+      unsigned int i2 = plain_cell_box_planes + i + planes_per_layer / 3;
+      mp_canvas->initialize_plane (m_planes [i + planes_per_layer / 3], i2);
+      m_buffers.push_back (std::make_pair (i2, m_planes [i + planes_per_layer / 3]));
+
+      //  current level planes
+      unsigned int i3 = plain_cell_box_planes + i + 2 * (planes_per_layer / 3);
+      mp_canvas->initialize_plane (m_planes [i + 2 * (planes_per_layer / 3)], i3);
+      m_buffers.push_back (std::make_pair (i3, m_planes [i + 2 * (planes_per_layer / 3)]));
+
+    }
+
+    //  detect whether the text planes are empty. If not, the whole text plane must be redrawn to account for clipped texts
+    text_planes_empty = true;
+    for (unsigned int i = 0; i < (unsigned int) planes_per_layer && text_planes_empty; i += (unsigned int) planes_per_layer / 3) {
+      lay::Bitmap *text = dynamic_cast<lay::Bitmap *> (m_planes[i + 2]);
+      if (text && ! text->empty ()) {
+        text_planes_empty = false;
+      }
+    }
+
+    text_redraw_regions = m_redraw_region;
+    if (! text_planes_empty) {
+      //  if there are non-empty text planes, redraw the whole area for texts
+      text_redraw_regions.clear ();
+      text_redraw_regions.push_back(db::Box(0, 0, mp_canvas->canvas_width (), mp_canvas->canvas_height ()));
+      for (unsigned int i = 0; i < (unsigned int) planes_per_layer; i += (unsigned int) planes_per_layer / 3) {
+        lay::Bitmap *text = dynamic_cast<lay::Bitmap *> (m_planes[i + 2]);
+        if (text) {
+          text->clear ();
+        }
+      }
+    }
+
+    for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator b = m_box_variants.begin (); b != m_box_variants.end (); ++b) {
+
+      const lay::CellView &cv = m_cellviews [b->second];
+      if (cv.is_valid () && ! cv->layout ().under_construction () && ! (cv->layout ().manager () && cv->layout ().manager ()->transacting ())) {
+
+        mp_layout = &cv->layout ();
+        m_cv_index = b->second;
+
+        db::CplxTrans trans = m_vp_trans * b->first * db::CplxTrans (mp_layout->dbu ());
+
+        iterate_variants (m_redraw_region, cv.cell_index (), trans, &RedrawThreadWorker::draw_boxes_for_ghosts);
+        iterate_variants (text_redraw_regions, cv.cell_index (), trans, &RedrawThreadWorker::draw_box_properties_for_ghosts);
+
+      }
+
+    }
+
+    transfer ();
+
+    //  draw guiding and error shapes
+
     //  HINT: the order in which the planes are delivered (the index stored in the first member of the pair below)
     //  must correspond with the order by which the ViewOp's are created inside LayoutView::set_view_ops
     m_buffers.clear ();
@@ -689,31 +756,51 @@ cells_in (const db::Layout *layout, const db::Cell &cell,
 }
 
 bool
-RedrawThreadWorker::need_draw_box (const db::Layout *layout, const db::Cell &cell, int level)
+RedrawThreadWorker::need_draw_box (const db::Layout *layout, const db::Cell &cell, int level, bool for_ghosts)
 {
   if (level > m_to_level) {
+
     return false;
-  }
 
-  if (m_ghost_cells.size () > (size_t) m_cv_index && ! m_ghost_cells [m_cv_index].empty ()) {
-    std::set <std::pair <int, db::cell_index_type> > cache;
-    if (cells_in (layout, cell, m_ghost_cells [m_cv_index], m_to_level - level, cache)) {
-      return true;
+  } else if (for_ghosts) {
+
+    if (m_ghost_cells.size () > (size_t) m_cv_index && ! m_ghost_cells [m_cv_index].empty ()) {
+      std::set <std::pair <int, db::cell_index_type> > cache;
+      if (cells_in (layout, cell, m_ghost_cells [m_cv_index], m_to_level - level, cache)) {
+        return true;
+      }
     }
-  }
 
-  if (m_hidden_cells.size () > (size_t) m_cv_index && ! m_hidden_cells [m_cv_index].empty ()) {
-    std::set <std::pair <int, db::cell_index_type> > cache;
-    if (cells_in (layout, cell, m_hidden_cells [m_cv_index], m_to_level - level, cache)) {
-      return true;
+    return false;
+
+  } else {
+
+    if (m_hidden_cells.size () > (size_t) m_cv_index && ! m_hidden_cells [m_cv_index].empty ()) {
+      std::set <std::pair <int, db::cell_index_type> > cache;
+      if (cells_in (layout, cell, m_hidden_cells [m_cv_index], m_to_level - level, cache)) {
+        return true;
+      }
     }
-  }
 
-  return int (cell.hierarchy_levels ()) + level >= m_to_level;
+    return int (cell.hierarchy_levels ()) + level >= m_to_level;
+
+  }
 }
 
 void
 RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &redraw_regions, int level)
+{
+  draw_boxes_impl (drawing_context, ci, trans, redraw_regions, level, false);
+}
+
+void
+RedrawThreadWorker::draw_boxes_for_ghosts (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &redraw_regions, int level)
+{
+  draw_boxes_impl (drawing_context, ci, trans, redraw_regions, level, true);
+}
+
+void
+RedrawThreadWorker::draw_boxes_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &redraw_regions, int level, bool for_ghosts)
 {
   //  do not draw, if there is nothing to draw
   if (mp_layout->cells () <= ci || redraw_regions.empty ()) {
@@ -723,7 +810,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
   const db::Cell &cell = mp_layout->cell (ci);
 
   //  we will never come to a valid level ..
-  if (! need_draw_box (mp_layout, cell, level)) {
+  if (! need_draw_box (mp_layout, cell, level, for_ghosts)) {
     return;
   }
   if (cell_var_cached (ci, trans)) {
@@ -731,12 +818,12 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
   }
 
   for (std::vector<db::Box>::const_iterator b = redraw_regions.begin (); b != redraw_regions.end (); ++b) {
-    draw_boxes (drawing_context, ci, trans, *b, level);
+    draw_boxes_impl (drawing_context, ci, trans, *b, level, for_ghosts);
   }
 }
 
 void
-RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level)
+RedrawThreadWorker::draw_boxes_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level, bool for_ghosts)
 {
   lay::Renderer &r = *mp_renderer;
   const db::Cell &cell = mp_layout->cell (ci);
@@ -749,7 +836,12 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
 
     //  small cell dropped
 
-  } else if (level == m_to_level || cell.is_ghost_cell () || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ())) {
+  } else if (for_ghosts && cell.is_ghost_cell ()) {
+
+    //  paint the box on this level
+    draw_cell (drawing_context, level, trans, bbox, empty_cell, mp_layout->display_name (ci));
+
+  } else if (! for_ghosts && ! cell.is_ghost_cell () && (level == m_to_level || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ()))) {
 
     //  paint the box on this level
     draw_cell (drawing_context, level, trans, bbox, empty_cell, mp_layout->display_name (ci));
@@ -759,7 +851,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
     db::DBox dbbox = trans * bbox;
     if (!empty_cell && (dbbox.width () < 1.5 && dbbox.height () < 1.5)) {
 
-      if (need_draw_box (mp_layout, cell, level)) {
+      if (need_draw_box (mp_layout, cell, level, for_ghosts)) {
         //  the cell is a very small box and we know there must be
         //  some level at which to draw the boundary: just draw it
         //  here and stop looking further down ..
@@ -836,7 +928,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
               if (simplify) {
 
                 //  The array can be simplified if there are levels below to draw
-                if (need_draw_box (mp_layout, mp_layout->cell (new_ci), level + 1)) {
+                if (need_draw_box (mp_layout, mp_layout->cell (new_ci), level + 1, for_ghosts)) {
 
                   unsigned int plane_group = 2;
                   if (drawing_context) {
@@ -865,7 +957,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
                   test_snapshot (0);
                   db::ICplxTrans t (cell_inst.complex_trans (*p));
                   db::Box new_vp = safe_transformed_box (*v, t.inverted ());
-                  draw_boxes (drawing_context, new_ci, trans * t, new_vp, level + 1);
+                  draw_boxes_impl (drawing_context, new_ci, trans * t, new_vp, level + 1, for_ghosts);
 
                   if (p.quad_id () > 0 && p.quad_id () != qid) {
 
@@ -902,18 +994,30 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
 
 }
 
-void 
+void
 RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vp, int level)
+{
+  draw_box_properties_impl (drawing_context, ci, trans, vp, level, false);
+}
+
+void
+RedrawThreadWorker::draw_box_properties_for_ghosts (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vp, int level)
+{
+  draw_box_properties_impl (drawing_context, ci, trans, vp, level, true);
+}
+
+void
+RedrawThreadWorker::draw_box_properties_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vp, int level, bool for_ghosts)
 {
   if (! m_text_visible) {
     return;
   }
 
-  draw_box_properties (drawing_context, ci, trans, vp, level, 0);
+  draw_box_properties_impl (drawing_context, ci, trans, vp, level, 0, for_ghosts);
 }
 
 void 
-RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vp, int level, db::properties_id_type prop_id)
+RedrawThreadWorker::draw_box_properties_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vp, int level, db::properties_id_type prop_id, bool for_ghosts)
 {
   //  do not draw, if there is nothing to draw
   if (mp_layout->cells () <= ci || vp.empty ()) {
@@ -923,7 +1027,7 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
   const db::Cell &cell = mp_layout->cell (ci);
 
   //  we will never come to a valid level ..
-  if (! need_draw_box (mp_layout, cell, level)) {
+  if (! need_draw_box (mp_layout, cell, level, for_ghosts)) {
     return;
   }
   if (cell_var_cached (ci, trans)) {
@@ -931,12 +1035,12 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
   }
 
   for (std::vector<db::Box>::const_iterator b = vp.begin (); b != vp.end (); ++b) {
-    draw_box_properties (drawing_context, ci, trans, *b, level, prop_id);
+    draw_box_properties_impl (drawing_context, ci, trans, *b, level, prop_id, for_ghosts);
   }
 }
 
 void
-RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level, db::properties_id_type prop_id)
+RedrawThreadWorker::draw_box_properties_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level, db::properties_id_type prop_id, bool for_ghosts)
 {
   const db::Cell &cell = mp_layout->cell (ci);
 
@@ -948,7 +1052,12 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
 
     //  small cell dropped
 
-  } else if (level == m_to_level || cell.is_ghost_cell () || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ())) {
+  } else if (for_ghosts && cell.is_ghost_cell ()) {
+
+    //  paint the box on this level
+    draw_cell_properties (drawing_context, level, trans, bbox, prop_id);
+
+  } else if (! for_ghosts && ! cell.is_ghost_cell () && (level == m_to_level || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ()))) {
 
     //  paint the box on this level
     draw_cell_properties (drawing_context, level, trans, bbox, prop_id);
@@ -1036,7 +1145,7 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
                   test_snapshot (0); 
                   db::ICplxTrans t (cell_inst.complex_trans (*p));
                   db::Box new_vp = safe_transformed_box (*v, t.inverted ());
-                  draw_box_properties (drawing_context, new_ci, trans * t, new_vp, level + 1, cell_inst_prop);
+                  draw_box_properties_impl (drawing_context, new_ci, trans * t, new_vp, level + 1, cell_inst_prop, for_ghosts);
 
                 }
 

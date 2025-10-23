@@ -721,6 +721,8 @@ InstFinder::InstFinder (bool point_mode, bool top_level_sel, bool full_arrays, b
     m_full_arrays (full_arrays), 
     m_enclose_insts (enclose_inst), 
     m_visible_layers (visible_layers),
+    m_consider_ghost_cells (true),
+    m_consider_normal_cells (true),
     mp_view (0), 
     mp_progress (0)
 {
@@ -805,6 +807,12 @@ InstFinder::checkpoint ()
   }
 }
 
+bool
+InstFinder::consider_cell (const db::Cell &cell) const
+{
+  return cell.is_ghost_cell () ? m_consider_ghost_cells : m_consider_normal_cells;
+}
+
 void 
 InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const db::Box & /*scan_box*/, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level)
 {
@@ -818,15 +826,18 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
     ++*mp_progress;
 
     //  look for instances to check here ..
-    db::Cell::touching_iterator inst = cell.begin_touching (search_box); 
-    while (! inst.at_end ()) {
+    for (db::Cell::touching_iterator inst = cell.begin_touching (search_box); ! inst.at_end (); ++inst) {
 
       const db::CellInstArray &cell_inst = inst->cell_inst ();
       const db::Cell &inst_cell = layout ().cell (cell_inst.object ().cell_index ());
 
       ++*mp_progress;
 
-      //  just consider the instances exactly at the last level of 
+      if (! consider_cell (inst_cell)) {
+        continue;
+      }
+
+      //  just consider the instances exactly at the last level of
       //  hierarchy (this is where the boxes are drawn) or of cells that
       //  are hidden.
       if (level == max_level () - 1 || inst_cell.is_proxy () || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
@@ -887,20 +898,21 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
 
       }
 
-      ++inst;
-
     }
 
   } else {
 
     //  look for instances to check here ..
-    db::Cell::touching_iterator inst = cell.begin_touching (search_box); 
-    while (! inst.at_end ()) {
+    for (db::Cell::touching_iterator inst = cell.begin_touching (search_box); ! inst.at_end (); ++inst) {
 
       checkpoint ();
 
       const db::CellInstArray &cell_inst = inst->cell_inst ();
       const db::Cell &inst_cell = layout ().cell (cell_inst.object ().cell_index ());
+
+      if (! consider_cell (inst_cell)) {
+        continue;
+      }
 
       //  just consider the instances exactly at the last level of 
       //  hierarchy (this is where the boxes are drawn) or if of cells that
@@ -909,7 +921,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
 
         db::box_convert <db::CellInst, false> bc (layout ());
         for (db::CellInstArray::iterator p = cell_inst.begin_touching (search_box, bc); ! p.at_end (); ++p) {
-        
+
           checkpoint ();
 
           bool match = false;
@@ -999,8 +1011,6 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
         }
 
       }
-
-      ++inst;
 
     }
 

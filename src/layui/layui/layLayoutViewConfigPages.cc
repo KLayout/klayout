@@ -207,7 +207,10 @@ LayoutViewConfigPage2a::setup (lay::Dispatcher *root)
   mp_ui->cell_xform_text_cbx->setChecked (flag);
 
   root->config_get (cfg_cell_box_visible, flag);
-  mp_ui->cell_group->setChecked (flag);
+  mp_ui->cell_boxes_visible->setChecked (flag);
+
+  root->config_get (cfg_ghost_cells_visible, flag);
+  mp_ui->ghost_cells_visible->setChecked (flag);
 
   int font = 0;
   root->config_get (cfg_cell_box_text_font, font);
@@ -247,7 +250,8 @@ LayoutViewConfigPage2a::commit (lay::Dispatcher *root)
   root->config_set (cfg_cell_box_text_transform, mp_ui->cell_xform_text_cbx->isChecked ());
   root->config_set (cfg_cell_box_text_font, mp_ui->cell_font_cb->currentIndex ());
   root->config_set (cfg_cell_box_color, mp_ui->cell_box_color_pb->get_color (), ColorConverter ());
-  root->config_set (cfg_cell_box_visible, mp_ui->cell_group->isChecked ());
+  root->config_set (cfg_cell_box_visible, mp_ui->cell_boxes_visible->isChecked ());
+  root->config_set (cfg_ghost_cells_visible, mp_ui->ghost_cells_visible->isChecked ());
 
   root->config_set (cfg_guiding_shape_visible, mp_ui->pcell_gs_group->isChecked ());
   root->config_set (cfg_guiding_shape_line_width, mp_ui->pcell_gs_lw->value ());

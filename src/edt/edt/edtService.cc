@@ -26,17 +26,13 @@
 #include "dbLibrary.h"
 #include "edtPlugin.h"
 #include "edtService.h"
-#if defined(HAVE_QT)
-#  include "edtEditorOptionsPages.h"
-#  include "edtDialogs.h"
-#endif
+#include "edtEditorOptionsPages.h"
+#include "edtDialogs.h"
 #include "layFinder.h"
 #include "layLayoutView.h"
 #include "laySnap.h"
 #include "layConverters.h"
-#if defined(HAVE_QT)
-#  include "layEditorOptionsPages.h"
-#endif
+#include "layEditorOptionsPages.h"
 #include "tlProgress.h"
 #include "tlTimer.h"
 
@@ -1159,6 +1155,8 @@ Service::transient_select (const db::DPoint &pos)
   if (m_cell_inst_service) {
 
     lay::InstFinder finder (true, view ()->is_editable () && m_top_level_sel, view ()->is_editable () /*full arrays in editable mode*/, true /*enclose instances*/, &m_previous_selection, true /*visible layers only*/);
+    finder.consider_ghost_cells (view ()->ghost_cells_visible ());
+    finder.consider_normal_cells (view ()->cell_box_visible ());
 
     //  go through all transform variants
     std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants_with_empty ();
@@ -1208,7 +1206,7 @@ Service::transient_select (const db::DPoint &pos)
         //  In viewer mode, individual instances of arrays can be selected. Since that is not supported by
         //  InstanceMarker, we just indicate the individual instance's bounding box.
         lay::Marker *marker = new lay::Marker (view (), r->cv_index ());
-        db::box_convert<db::CellInst> bc (cv->layout ());
+        db::box_convert<db::CellInst, false> bc (cv->layout ());
         marker->set (bc (r->back ().inst_ptr.cell_inst ().object ()), gt * r->back ().inst_ptr.cell_inst ().complex_trans (*r->back ().array_inst), tv);
         marker->set_vertex_size (view ()->default_transient_marker_vertex_size ());
         marker->set_line_width (view ()->default_transient_marker_line_width ());
@@ -1493,6 +1491,8 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
   } else if (m_cell_inst_service) {
 
     lay::InstFinder finder (box.is_point (), view ()->is_editable () && m_top_level_sel, view ()->is_editable () /*full arrays in editable mode*/, true /*enclose_inst*/, exclude, true /*only visible layers*/);
+    finder.consider_ghost_cells (view ()->ghost_cells_visible ());
+    finder.consider_normal_cells (view ()->cell_box_visible ());
 
     //  go through all cell views
     std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants_with_empty ();
@@ -1709,13 +1709,13 @@ Service::begin_edit (const db::DPoint &p)
 }
 
 void
-Service::tap (const db::DPoint & /*initial*/)
+Service::tap (const db::DPoint & /*pt*/)
 {
   //  .. nothing here ..
 }
 
 void
-Service::via (int)
+Service::via (int /*dir*/)
 {
   //  .. nothing here ..
 }
@@ -1806,7 +1806,7 @@ Service::do_selection_to_view ()
         if (r->seq () > 0 && m_indicate_secondary_selection) {
           marker->set_dither_pattern (3);
         }
-        db::box_convert<db::CellInst> bc (cv->layout ());
+        db::box_convert<db::CellInst, false> bc (cv->layout ());
         marker->set (bc (r->back ().inst_ptr.cell_inst ().object ()), gt * r->back ().inst_ptr.cell_inst ().complex_trans (*r->back ().array_inst), *tv_list);
         m_markers.push_back (std::make_pair (r.operator-> (), marker));
 

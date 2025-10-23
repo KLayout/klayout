@@ -97,6 +97,11 @@ public:
   bool is_outside () const;
 
   /**
+   *  @brief Gets a value indicating whether is on the outline - i.e. one edge is a segment
+   */
+  bool is_on_outline () const;
+
+  /**
    *  @brief Gets a list of polygons that are attached to this vertex
    */
   std::vector<Polygon *> polygons() const;

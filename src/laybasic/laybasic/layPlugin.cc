@@ -197,6 +197,12 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
 
     if (! m->copy_from.empty ()) {
 
+      //  As a general strategy for now we take primary ownership from the copy source as pass it to
+      //  the copy. This is important for "next/prev_display_state" as the first registry is @toolbar
+      //  (which is not accessible by Setup menu) and the second one is "zoom_menu" which should be
+      //  the primary one. For later, we may want to make this configurable (move/leave primary flag).
+      menu.find_item_exact (m->copy_from)->set_primary (false);
+
       menu.insert_item (m->insert_pos, m->menu_name, menu.action (m->copy_from));
 
     } else if (m->separator) {

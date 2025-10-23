@@ -621,6 +621,11 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
     return m_primary;
   }
 
+  void set_primary (bool p)
+  {
+    m_primary = p;
+  }
+
   std::list <AbstractMenuItem> children;
 
 private:

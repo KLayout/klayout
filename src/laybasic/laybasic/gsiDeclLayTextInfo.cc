@@ -139,7 +139,7 @@ public:
 
     }
 
-    db::DCplxTrans vp_trans = mp_view->viewport ().trans () * tv_trans;
+    db::DCplxTrans vp_trans = db::DCplxTrans (double (mp_view->canvas ()->oversampling ())) * mp_view->viewport ().trans () * tv_trans;
     db::DBox box = m_textinfo.bbox (ctx_trans * dtext, vp_trans);
 
     double b = m_border / vp_trans.mag ();

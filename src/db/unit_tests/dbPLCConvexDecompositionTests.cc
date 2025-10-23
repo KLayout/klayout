@@ -23,6 +23,8 @@
 
 #include "dbPLCConvexDecomposition.h"
 #include "dbWriter.h"
+#include "dbReader.h"
+#include "dbLayout.h"
 #include "dbRegionProcessors.h"
 #include "dbTestSupport.h"
 #include "tlUnitTest.h"
@@ -188,5 +190,36 @@ TEST(problematic_polygon2)
 
   std::unique_ptr<db::Layout> ly (plc.to_layout ());
   db::compare_layouts (_this, *ly, tl::testdata () + "/algo/hm_decomposition_au6.gds");
+}
+
+TEST(polygon_with_holes)
+{
+  db::Layout ly;
+  tl::InputStream s (tl::testdata () + "/algo/hm_decomposition_7.gds");
+  db::Reader reader (s);
+  reader.read (ly);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  const db::Cell &top = ly.cell (*ly.begin_top_down ());
+
+  db::Region r (db::RecursiveShapeIterator (ly, top, l1));
+  r.merge ();
+  db::Polygon poly = *r.begin ();
+
+  double dbu = 0.001;
+
+  db::plc::ConvexDecompositionParameters param;
+  param.with_segments = false;
+  param.split_edges = false;
+  param.tri_param.max_area = 1000000;
+  param.tri_param.min_b = 0.5;
+
+  db::plc::Graph plc;
+  TestableConvexDecomposition decomp (&plc);
+
+  decomp.decompose (poly, param, dbu);
+
+  std::unique_ptr<db::Layout> ly_out (plc.to_layout ());
+  db::compare_layouts (_this, *ly_out, tl::testdata () + "/algo/hm_decomposition_au7.gds");
 }
 

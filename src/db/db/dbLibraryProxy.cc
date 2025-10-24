@@ -257,7 +257,23 @@ LibraryProxy::get_basic_name () const
   }
 }
 
-std::string 
+std::string
+LibraryProxy::get_variant_name () const
+{
+  Library *lib = LibraryManager::instance ().lib (lib_id ());
+  if (lib) {
+    if (! lib->layout ().is_valid_cell_index (library_cell_index ())) {
+      return "<defunct>";
+    } else {
+      const db::Cell &lib_cell = lib->layout ().cell (library_cell_index ());
+      return lib_cell.get_variant_name ();
+    }
+  } else {
+    return Cell::get_variant_name ();
+  }
+}
+
+std::string
 LibraryProxy::get_display_name () const
 {
   Library *lib = LibraryManager::instance ().lib (lib_id ());

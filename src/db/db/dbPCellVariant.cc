@@ -86,7 +86,18 @@ PCellVariant::get_basic_name () const
   }
 }
 
-std::string 
+std::string
+PCellVariant::get_variant_name () const
+{
+  const PCellHeader *header = pcell_header ();
+  if (header) {
+    return m_variant_name;
+  } else {
+    return Cell::get_basic_name ();
+  }
+}
+
+std::string
 PCellVariant::get_display_name () const
 {
   const PCellHeader *header = pcell_header ();
@@ -172,6 +183,7 @@ PCellVariant::update (ImportLayerMapping *layer_mapping)
       header->declaration ()->produce (*layout (), layer_ids, plist, *this);
 
       m_display_name = header->declaration ()->get_display_name (plist);
+      m_variant_name = header->declaration ()->get_cell_name (plist);
 
     } catch (tl::Exception &ex) {
 

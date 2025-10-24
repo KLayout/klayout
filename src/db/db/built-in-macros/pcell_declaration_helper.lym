@@ -478,7 +478,7 @@ module RBA
       text
     end
     
-    # implementation of display_text
+    # implementation of cell_name
     def cell_name(parameters)
       self._start
       @param_values = parameters

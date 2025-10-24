@@ -109,12 +109,12 @@ public:
   virtual std::string get_display_name () const;
 
   /**
-   *  @brief Unregisters a cell from it's context.
+   *  @brief Unregisters a cell from its context.
    */
   virtual void unregister ();
 
   /**
-   *  @brief Re-registers a cell inside it's context.
+   *  @brief Re-registers a cell inside its context.
    */
   virtual void reregister ();
 

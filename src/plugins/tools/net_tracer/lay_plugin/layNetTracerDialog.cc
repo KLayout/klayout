@@ -202,13 +202,32 @@ NetTracerDialog::item_double_clicked (QListWidgetItem *item)
   }
 }
 
+void
+NetTracerDialog::drag_cancel ()
+{
+  if (m_mouse_state > 0) {
+
+    view ()->message ();
+    ui ()->ungrab_mouse (this);
+    set_cursor (lay::Cursor::none);
+
+    m_mouse_state = 0;
+
+  }
+}
+
+bool
+NetTracerDialog::claims_message_bar () const
+{
+  return true;
+}
+
 bool 
 NetTracerDialog::mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool prio) 
 { 
   if (prio && m_mouse_state != 0) {
     set_cursor (lay::Cursor::cross);
   }
-
   return false;
 }
 
@@ -397,11 +416,13 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
 {
   unsigned int start_layer = 0;
   db::Point start_point;
+  db::Shape start_shape;
 
   //  locate the seed
   {
 
     lay::ShapeFinder finder (true /*point mode*/, false /*all levels*/, db::ShapeIterator::All);
+    finder.set_consider_viewport (false);
 
     //  go through all visible layers of all cellviews and find a seed shape
     for (lay::LayerPropertiesConstIterator lprop = view ()->begin_layers (); ! lprop.at_end (); ++lprop) {
@@ -417,7 +438,7 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
     }
 
     m_cv_index = r->cv_index ();
-
+    start_shape = r->shape ();
     start_layer = r->layer ();
 
   }
@@ -440,6 +461,12 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
 
     start_point = tt.inverted ().trans (start_search_box.center ());
 
+    //  stop if the center start point is not inside the start polygon
+    db::Polygon poly;
+    if (start_shape.polygon (poly) && db::inside_poly (poly.begin_edge (), start_point) < 0) {
+      return 0;
+    }
+
   }
 
   //  Set up the net tracer environment
@@ -455,6 +482,7 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
   if (trace_path) {
 
     lay::ShapeFinder finder (true /*point mode*/, false /*all levels*/, db::ShapeIterator::All);
+    finder.set_consider_viewport (false);
 
     //  go through all visible layers of all cellviews and find a seed shape
     for (lay::LayerPropertiesConstIterator lprop = view ()->begin_layers (); ! lprop.at_end (); ++lprop) {
@@ -482,6 +510,12 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
 
     stop_point = tt.inverted ().trans (stop_search_box.center ());
     stop_layer = r->layer ();
+
+    //  stop if the center stop point is not inside the stop polygon
+    db::Polygon poly;
+    if (r->shape ().polygon (poly) && db::inside_poly (poly.begin_edge (), stop_point) < 0) {
+      return 0;
+    }
 
   }
 
@@ -1261,6 +1295,7 @@ NetTracerDialog::release_mouse ()
   m_mouse_state = 0;
   view ()->message ();
   ui ()->ungrab_mouse (this);
+  set_cursor (lay::Cursor::none);
 }
 
 void

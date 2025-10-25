@@ -60,6 +60,8 @@ public:
   NetTracerDialog (lay::Dispatcher *root, lay::LayoutViewBase *view);
   virtual ~NetTracerDialog ();
 
+  virtual void drag_cancel ();
+  virtual bool claims_message_bar () const;
   virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual void menu_activated (const std::string &symbol);

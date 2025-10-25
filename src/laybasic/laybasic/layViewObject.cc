@@ -621,7 +621,10 @@ END_PROTECTED
 void 
 ViewObjectUI::set_cursor (lay::Cursor::cursor_shape cursor)
 {
-  m_cursor = cursor;
+  if (m_cursor != cursor) {
+    m_cursor = cursor;
+    realize_cursor ();
+  }
 }
 
 void
@@ -629,15 +632,7 @@ ViewObjectUI::set_default_cursor (lay::Cursor::cursor_shape cursor)
 {
   if (cursor != m_default_cursor) {
     m_default_cursor = cursor;
-#if defined(HAVE_QT)
-    if (m_cursor == lay::Cursor::none && mp_widget) {
-      if (m_default_cursor == lay::Cursor::none) {
-        mp_widget->unsetCursor ();
-      } else {
-        mp_widget->setCursor (lay::Cursor::qcursor (m_default_cursor));
-      }
-    }
-#endif
+    realize_cursor ();
   }
 }
 
@@ -652,11 +647,17 @@ ViewObjectUI::ensure_entered ()
 void 
 ViewObjectUI::begin_mouse_event (lay::Cursor::cursor_shape cursor)
 {
-  m_cursor = cursor;
+  set_cursor (cursor);
 }
 
 void 
 ViewObjectUI::end_mouse_event ()
+{
+  realize_cursor ();
+}
+
+void
+ViewObjectUI::realize_cursor ()
 {
 #if defined(HAVE_QT)
   if (mp_widget) {

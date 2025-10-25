@@ -286,6 +286,14 @@ public:
   virtual void drag_cancel () { }
 
   /**
+   *  @brief Gets a value indicating whether the mouse receiver claims the view message bar
+   *
+   *  If this method returns true, other services are not supposed to emit transient
+   *  messages.
+   */
+  virtual bool claims_message_bar () const { return false; }
+
+  /**
    *  @brief Gets a value indicating whether a cursor position it set
    */
   virtual bool has_tracking_position () const { return false; }
@@ -1121,6 +1129,7 @@ private:
   void objects_changed ();
   int widget_height () const;
   int widget_width () const;
+  void realize_cursor ();
 
   /**
    *  @brief Register a service

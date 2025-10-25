@@ -96,25 +96,28 @@ public:
   /**
    *  @brief Gets the basic name
    *
-   *  The basic name of the cell is either the cell name or the cell name in the
-   *  target library (for library proxies) or the PCell name (for PCell proxies).
-   *  The actual name may be different by a extension to make it unique.
+   *  This returns the basic name of the proxy target
    */
   virtual std::string get_basic_name () const;
 
   /**
+   *  @brief Gets the variant name
+   *
+   *  This returns the basic name of the proxy target
+   */
+  virtual std::string get_variant_name () const;
+
+  /**
    *  @brief Gets the display name
    *
-   *  The display name is some "nice" descriptive name of the cell (variant)
-   *  For normal cells this name is equivalent to the normal cell name.
+   *  This returns the basic name of the proxy target
    */
   virtual std::string get_display_name () const;
 
   /**
    *  @brief Gets the qualified name
    *
-   *  The qualified name for a library proxy is made from the library name, a
-   *  dot and the cell's name.
+   *  Gets a combination of the library name and the target cell's qualified name
    */
   virtual std::string get_qualified_name () const;
 

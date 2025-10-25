@@ -675,7 +675,7 @@ public:
   std::string display_name (cell_index_type cell_index) const;
 
   /**
-   *  @brief Return the basic name for the given cell 
+   *  @brief Returns the basic name for the given cell
    *
    *  This method is forwarded to the respective method of the cell.
    *  The basic name is the "original"  cell name within the library or
@@ -684,7 +684,16 @@ public:
    */
   std::string basic_name (cell_index_type cell_index) const;
 
-  /** 
+  /**
+   *  @brief Returns the variant name for the given cell
+   *
+   *  The variant name usually is the basic name. For PCells, this name
+   *  can encode PCell parameters, depending on the definition of the
+   *  PCell.
+   */
+  std::string variant_name (cell_index_type cell_index) const;
+
+  /**
    *  @brief Add a cell object with the given ID and name
    *
    *  This method is basically supposed to be used for "undo" and "redo". 

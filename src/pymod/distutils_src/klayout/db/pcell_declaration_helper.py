@@ -138,6 +138,21 @@ class _PCellDeclarationHelperMixin:
       self._finish()
     return text
   
+  def cell_name(self, parameters):
+    """
+    Reimplementation of PCellDeclaration.cell_name
+
+    This function delegates the implementation to self.cell_name_impl
+    after configuring the PCellDeclaration object.
+    """
+    self._start()
+    self._param_values = parameters
+    try:
+      text = self.cell_name_impl()
+    finally:
+      self._finish()
+    return text
+  
   def get_parameters(self):
     """
     Reimplementation of PCellDeclaration.get_parameters
@@ -332,6 +347,12 @@ class _PCellDeclarationHelperMixin:
     default implementation
     """
     return ""
+ 
+  def cell_name_impl(self):
+    """
+    default implementation
+    """
+    return self.name()
  
   def coerce_parameters_impl(self):
     """

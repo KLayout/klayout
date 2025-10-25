@@ -2462,7 +2462,7 @@ Layout::get_pcell_variant_dict (pcell_id_type pcell_id, const std::map<std::stri
   pcell_variant_type *variant = header->get_variant (*this, parameters);
   if (! variant) {
 
-    std::string b (header->get_name ());
+    std::string b (header->declaration ()->get_cell_name (parameters));
     if (m_cell_map.find (b.c_str ()) != m_cell_map.end ()) {
       b = uniquify_cell_name (b.c_str ());
     }
@@ -2501,7 +2501,7 @@ Layout::get_pcell_variant (pcell_id_type pcell_id, const std::vector<tl::Variant
   pcell_variant_type *variant = header->get_variant (*this, parameters);
   if (! variant) {
 
-    std::string b (header->get_name ());
+    std::string b (header->declaration ()->get_cell_name (parameters));
     if (m_cell_map.find (b.c_str ()) != m_cell_map.end ()) {
       b = uniquify_cell_name (b.c_str ());
     }
@@ -2627,9 +2627,18 @@ Layout::convert_cell_to_static (db::cell_index_type ci)
 
     const cell_type &org_cell = cell (ci);
 
-    //  Note: convert to static cell by explicitly cloning to the db::Cell class
-    ret_ci = add_cell (org_cell.get_basic_name ().c_str ());
+    std::string vn = org_cell.get_variant_name ();
+    if (vn == std::string (cell_name (ci), vn.size ())) {
+      //  there is a cell name conflict: give priority to the static cell, so it
+      //  will see the variant name or at least the original disambiguated name
+      std::string rename_org = uniquify_cell_name (vn.c_str ());
+      vn = cell_name (ci);
+      rename_cell (ci, rename_org.c_str ());
+    }
+
+    ret_ci = add_cell (vn.c_str ());
     cell_type &new_cell = cell (ret_ci);
+    //  Note: we convert to static cell by explicitly converting to the db::Cell class
     new_cell = org_cell;
     new_cell.set_cell_index (ret_ci);
 
@@ -3126,6 +3135,12 @@ Layout::basic_name (cell_index_type cell_index) const
   return cell (cell_index).get_basic_name ();
 }
 
+std::string
+Layout::variant_name (cell_index_type cell_index) const
+{
+  return cell (cell_index).get_variant_name ();
+}
+
 void
 Layout::register_lib_proxy (db::LibraryProxy *lib_proxy)
 {
@@ -3161,7 +3176,7 @@ Layout::get_lib_proxy (Library *lib, cell_index_type cell_index)
   } else {
 
     //  create a new unique name
-    std::string b (lib->layout ().basic_name (cell_index));
+    std::string b (lib->layout ().variant_name (cell_index));
     if (m_cell_map.find (b.c_str ()) != m_cell_map.end ()) {
       b = uniquify_cell_name (b.c_str ());
     }

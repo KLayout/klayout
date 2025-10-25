@@ -674,6 +674,18 @@ public:
   }
 
   /**
+   *  @brief Gets a cell name for the PCell, which can depend on the parameters
+   *
+   *  The actual cell name in the layout may differ by disambiguation. This method
+   *  delivers a proposal for a cell name.
+   *  By default, the PCell name is returned.
+   */
+  virtual std::string get_cell_name (const pcell_parameters_type &) const
+  {
+    return m_name;
+  }
+
+  /**
    *  @brief Returns the description text of the PCell
    *
    *  The description text is a for human interpretation only. By default, the name will be returned.

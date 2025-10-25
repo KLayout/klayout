@@ -890,13 +890,21 @@ public:
   void set_name (const std::string &name);
 
   /**
-   *  @brief Get the basic name
+   *  @brief Gets the basic name
    *
    *  The basic name of the cell is either the cell name or the cell name in the
    *  target library (for library proxies) or the PCell name (for PCell proxies).
    *  The actual name may be different by a extension to make it unique.
    */
   virtual std::string get_basic_name () const;
+
+  /**
+   *  @brief Gets the variant name
+   *
+   *  The variant name is the PCell's "cell_name" - which may encode the PCell parameters
+   *  into a formal name. Usually that is identical to the PCell name.
+   */
+  virtual std::string get_variant_name () const;
 
   /**
    *  @brief Gets the display name

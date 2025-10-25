@@ -27,6 +27,10 @@ class BoxPCell(pya.PCellDeclaration):
     # provide a descriptive text for the cell
     return "Box(L=" + str(parameters[0]) + ",W=" + ('%.3f' % parameters[1]) + ",H=" + ('%.3f' % parameters[2]) + ")"
   
+  def cell_name(self, parameters):
+    # provide a descriptive text for the cell
+    return "Box_L" + str(parameters[0]).replace("/", "d") + "_W" + ('%.3f' % parameters[1]).replace(".", "p") + "_H" + ('%.3f' % parameters[2]).replace(".", "p")
+  
   def get_parameters(self):
   
     # prepare a set of parameter declarations
@@ -99,6 +103,10 @@ if "PCellDeclarationHelper" in pya.__dict__:
     def display_text_impl(self):
       # provide a descriptive text for the cell
       return "Box2(L=" + str(self.layer) + ",W=" + ('%.3f' % self.width) + ",H=" + ('%.3f' % self.height) + ")"
+    
+    def cell_name_impl(self):
+      # provide a descriptive text for the cell
+      return "Box2_L" + str(self.layer).replace("/", "d") + "_W" + ('%.3f' % self.width).replace(".", "p") + "_H" + ('%.3f' % self.height).replace(".", "p")
     
     def wants_lazy_evaluation(self):
       return True
@@ -260,6 +268,8 @@ class DBPCellTests(unittest.TestCase):
     self.assertEqual(pcell_var.is_pcell_variant(), True)
     self.assertEqual(pcell_var.display_title(), "PCellTestLib.Box(L=1/0,W=1.000,H=1.000)")
     self.assertEqual(pcell_var.basic_name(), "Box")
+    self.assertEqual(pcell_var.qname(), "PCellTestLib.Box")
+    self.assertEqual(pcell_var.name, "Box_L1d0_W1p000_H1p000")
     self.assertEqual(pcell_var.pcell_declaration().wants_lazy_evaluation(), False)
     self.assertEqual(c1.is_pcell_variant(), False)
     self.assertEqual(c1.is_pcell_variant(pcell_inst), True)
@@ -394,6 +404,8 @@ class DBPCellTests(unittest.TestCase):
     pcell_var = ly.cell(pcell_var_id)
     pcell_inst = c1.insert(pya.CellInstArray(pcell_var_id, pya.Trans()))
     self.assertEqual(pcell_var.basic_name(), "Box2")
+    self.assertEqual(pcell_var.name, "Box2_L1d0_W1p000_H1p000")
+    self.assertEqual(pcell_var.qname(), "PCellTestLib2.Box2")
     self.assertEqual(pcell_var.pcell_parameters().__repr__(), "[<1/0>, 1.0, 1.0]")
     self.assertEqual(pcell_var.display_title(), "PCellTestLib2.Box2(L=1/0,W=1.000,H=1.000)")
     self.assertEqual(nh(pcell_var.pcell_parameters_by_name()), "{'height': 1.0, 'layer': <1/0>, 'width': 1.0}")

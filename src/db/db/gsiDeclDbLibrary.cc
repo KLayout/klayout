@@ -368,6 +368,7 @@ Class<db::PCellDeclaration> decl_PCellDeclaration_Native ("db", "PCellDeclaratio
   gsi::method ("via_types", &db::PCellDeclaration::via_types) +
   gsi::method ("description", &db::PCellDeclaration::get_description) +
   gsi::method ("display_text", &db::PCellDeclaration::get_display_name, gsi::arg ("parameters")) +
+  gsi::method ("cell_name", &db::PCellDeclaration::get_cell_name, gsi::arg ("parameters")) +
   gsi::method ("layout", &db::PCellDeclaration::layout,
     "@brief Gets the Layout object the PCell is registered in or nil if it is not registered yet.\n"
     "This attribute has been added in version 0.27.5."
@@ -659,6 +660,20 @@ public:
     }
   }
 
+  std::string get_cell_name_fb (const db::pcell_parameters_type &parameters) const
+  {
+    return db::PCellDeclaration::get_cell_name (parameters);
+  }
+
+  virtual std::string get_cell_name (const db::pcell_parameters_type &parameters) const
+  {
+    if (cb_get_cell_name.can_issue ()) {
+      return cb_get_cell_name.issue<db::PCellDeclaration, std::string, const db::pcell_parameters_type &> (&db::PCellDeclaration::get_cell_name, parameters);
+    } else {
+      return db::PCellDeclaration::get_cell_name (parameters);
+    }
+  }
+
   gsi::Callback cb_get_layer_declarations;
   gsi::Callback cb_get_parameter_declarations;
   gsi::Callback cb_produce;
@@ -669,6 +684,7 @@ public:
   gsi::Callback cb_coerce_parameters;
   gsi::Callback cb_callback;
   gsi::Callback cb_get_display_name;
+  gsi::Callback cb_get_cell_name;
   gsi::Callback cb_get_description;
   gsi::Callback cb_via_types;
 };
@@ -682,6 +698,7 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
   gsi::method ("parameters_from_shape", &PCellDeclarationImpl::parameters_from_shape_fb, "@hide") +
   gsi::method ("transformation_from_shape", &PCellDeclarationImpl::transformation_from_shape_fb, "@hide") +
   gsi::method ("display_text", &PCellDeclarationImpl::get_display_name_fb, "@hide") +
+  gsi::method ("cell_name", &PCellDeclarationImpl::get_cell_name_fb, "@hide") +
   gsi::method ("wants_lazy_evaluation", &PCellDeclarationImpl::wants_lazy_evaluation_fb, "@hide") +
   gsi::method ("description", &PCellDeclarationImpl::get_description_fb, "@hide") +
   gsi::method ("via_types", &PCellDeclarationImpl::via_types_fb, "@hide") +
@@ -809,6 +826,13 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
     "@brief Returns the display text for this PCell given a certain parameter set\n"
     "Reimplement this method to create a distinct display text for a PCell variant with \n"
     "the given parameter set. If this method is not implemented, a default text is created. \n"
+  ) +
+  gsi::callback ("cell_name", &PCellDeclarationImpl::get_cell_name, &PCellDeclarationImpl::cb_get_cell_name, gsi::arg ("parameters"),
+    "@brief Returns a cell name used for the PCell variant\n"
+    "Reimplement this method to create a cell name the system uses for the PCell variant. By default that is the PCell name.\n"
+    "This feature allows encoding the PCell parameters into the cell name for easier identification of the PCell variant in a cell tree.\n"
+    "\n"
+    "This feature has been added in version 0.30.5.\n"
   ),
   "@brief A PCell declaration providing the parameters and code to produce the PCell\n"
   "\n"

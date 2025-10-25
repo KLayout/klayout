@@ -698,6 +698,7 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
   gsi::method ("parameters_from_shape", &PCellDeclarationImpl::parameters_from_shape_fb, "@hide") +
   gsi::method ("transformation_from_shape", &PCellDeclarationImpl::transformation_from_shape_fb, "@hide") +
   gsi::method ("display_text", &PCellDeclarationImpl::get_display_name_fb, "@hide") +
+  gsi::method ("cell_name", &PCellDeclarationImpl::get_cell_name_fb, "@hide") +
   gsi::method ("wants_lazy_evaluation", &PCellDeclarationImpl::wants_lazy_evaluation_fb, "@hide") +
   gsi::method ("description", &PCellDeclarationImpl::get_description_fb, "@hide") +
   gsi::method ("via_types", &PCellDeclarationImpl::via_types_fb, "@hide") +

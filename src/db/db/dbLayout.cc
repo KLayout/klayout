@@ -2627,18 +2627,18 @@ Layout::convert_cell_to_static (db::cell_index_type ci)
 
     const cell_type &org_cell = cell (ci);
 
-
     std::string vn = org_cell.get_variant_name ();
-    if (vn == cell_name (ci)) {
+    if (vn == std::string (cell_name (ci), vn.size ())) {
       //  there is a cell name conflict: give priority to the static cell, so it
-      //  will see the variant name
-      std::string rename_org = uniquify_cell_name (cell_name (ci));
+      //  will see the variant name or at least the original disambiguated name
+      std::string rename_org = uniquify_cell_name (vn.c_str ());
+      vn = cell_name (ci);
       rename_cell (ci, rename_org.c_str ());
     }
 
     ret_ci = add_cell (vn.c_str ());
     cell_type &new_cell = cell (ret_ci);
-    //  Note: we convert to static cell by explicitly cloning to the db::Cell class
+    //  Note: we convert to static cell by explicitly converting to the db::Cell class
     new_cell = org_cell;
     new_cell.set_cell_index (ret_ci);
 

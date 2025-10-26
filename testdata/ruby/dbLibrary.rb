@@ -121,6 +121,12 @@ class DBLibrary_TestClass < TestBase
 
   def test_4_library_registration_and_rename
 
+    # clean up before
+    [ "RBA-unit-test", "RBA-unit-test2" ].each do |name|
+      l = RBA::Library::library_by_name(name)
+      l && l.unregister
+    end
+
     lib = RBA::Library::new
     lib.description = "LIB1"
     lib.delete
@@ -159,6 +165,12 @@ class DBLibrary_TestClass < TestBase
 
   def test_5_reload
 
+    # clean up before
+    [ "RBA-unit-test", "RBA-unit-test2" ].each do |name|
+      l = RBA::Library::library_by_name(name)
+      l && l.unregister
+    end
+
     lib = MyLibImpl::new
     lib.description = "LIB1"
     lib.register("RBA-unit-test")
@@ -177,6 +189,12 @@ class DBLibrary_TestClass < TestBase
   end
 
   def test_6_cells_become_defunct_after_unregister
+
+    # clean up before
+    [ "RBA-unit-test", "RBA-unit-test2" ].each do |name|
+      l = RBA::Library::library_by_name(name)
+      l && l.unregister
+    end
 
     lib = RBA::Library::new
     lib.description = "LIB1"
@@ -208,6 +226,12 @@ class DBLibrary_TestClass < TestBase
   end
 
   def test_7_change_ref
+
+    # clean up before
+    [ "RBA-unit-test", "RBA-unit-test2" ].each do |name|
+      l = RBA::Library::library_by_name(name)
+      l && l.unregister
+    end
 
     lib = RBA::Library::new
     lib.description = "LIB1"

@@ -129,6 +129,48 @@ TEST(1A_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
+  const char *argv[] = { "x", "--deep", "--drop-empty-cells=false", input_a.c_str (), input_b.c_str (), output.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
+  EXPECT_EQ (cap.captured_text (),
+    "Layer 10/0 is not present in first layout, but in second\n"
+    "Result summary (layers without differences are not shown):\n"
+    "\n"
+    "  Layer      Output       Differences (hierarchical shape count)\n"
+    "  ----------------------------------------------------------------\n"
+    "  3/0        3/0          3\n"
+    "  6/0        6/0          314\n"
+    "  8/1        8/1          1\n"
+    "  10/0       -            (no such layer in first layout)\n"
+    "\n"
+  );
+}
+
+TEST(1A_DeepNoEmptyCells)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
+
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
+
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au1d2.oas";
+
+  std::string output = this->tmp_file ("tmp.oas");
+
   const char *argv[] = { "x", "--deep", input_a.c_str (), input_b.c_str (), output.c_str () };
 
   EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
@@ -342,7 +384,7 @@ TEST(2_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-u", "--no-summary", "-l", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv[] = { "x", "-u", "--no-summary", "--drop-empty-cells=false", "-l", input_a.c_str (), input_b.c_str (), output.c_str () };
 
   EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
@@ -508,7 +550,7 @@ TEST(3_Deep)
   std::string output = this->tmp_file ("tmp.oas");
 
   //  NOTE: -p is ignored in deep mode
-  const char *argv[] = { "x", "-u", "--no-summary", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv[] = { "x", "-u", "--drop-empty-cells=false", "--no-summary", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str (), output.c_str () };
 
   EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
@@ -607,7 +649,7 @@ TEST(4_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-u", "--no-summary", "-p=1.0", "-n=4", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv[] = { "x", "-u", "--drop-empty-cells=false", "--no-summary", "-p=1.0", "-n=4", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
 
   EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
@@ -673,7 +715,7 @@ TEST(5_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-u", "--no-summary", "-b=1000", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv[] = { "x", "-u", "--drop-empty-cells=false", "--no-summary", "-b=1000", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
 
   EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 

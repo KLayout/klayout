@@ -1327,6 +1327,13 @@ static std::string path_to_string (const db::Layout &layout, const lay::ObjectIn
 void 
 Service::display_status (bool transient)
 {
+  if (transient && view ()->canvas ()->begin_mouse_receivers () != view ()->canvas ()->end_mouse_receivers ()
+                && (*view ()->canvas ()->begin_mouse_receivers ())->claims_message_bar ()) {
+    //  do not display transient if there is a plugin active that has captured the mouse and claims the message bar -
+    //  this way we can use messages in active plugins and still get visual feedback by the transient selection.
+    return;
+  }
+
   EditableSelectionIterator r = transient ? begin_transient_selection () : begin_selection ();
   EditableSelectionIterator rr = r;
 

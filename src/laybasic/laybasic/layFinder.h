@@ -97,6 +97,25 @@ public:
   }
 
   /**
+   *  @brief Gets a flag indicating that the viewport will be considered
+   */
+  bool consider_viewport () const
+  {
+    return m_consider_viewport;
+  }
+
+  /**
+   *  @brief Sets a flag indicating that the viewport will be considered
+   *  If this flag is true (the default), only shapes and instances will be considered
+   *  if edges (or polygons) or boundary edges (for instances) are visible in the
+   *  viewport. If this flag is false, shapes or instances are considered always.
+   */
+  void set_consider_viewport (bool f)
+  {
+    m_consider_viewport = f;
+  }
+
+  /**
    *  @brief Destructor (just provided to please the compiler)
    */
   virtual ~Finder ();
@@ -217,6 +236,7 @@ private:
   double m_distance;
   bool m_point_mode;
   bool m_catch_all;
+  bool m_consider_viewport;
   bool m_top_level_sel;
   db::box_convert <db::CellInst, false> m_box_convert;
   db::box_convert <db::Cell, false> m_cell_box_convert;

@@ -63,7 +63,7 @@ static int inst_point_sel_tests = 10000;
 
 Finder::Finder (bool point_mode, bool top_level_sel)
   : m_min_level (0), m_max_level (0),
-    mp_layout (0), mp_view (0), m_cv_index (0), m_point_mode (point_mode), m_catch_all (false), m_top_level_sel (top_level_sel)
+    mp_layout (0), mp_view (0), m_cv_index (0), m_point_mode (point_mode), m_catch_all (false), m_consider_viewport (true), m_top_level_sel (top_level_sel)
 {
   m_distance = std::numeric_limits<double>::max ();
 }
@@ -482,7 +482,10 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
   checkpoint ();
 
   //  Viewport in current cell coordinate space (DBU)
-  db::Box viewport_box = (vp * db::CplxTrans (layout ().dbu ()) * t).inverted () * db::DBox (0, 0, view ()->viewport ().width (), view ()->viewport ().height ());
+  db::Box viewport_box;
+  if (consider_viewport ()) {
+    viewport_box = (vp * db::CplxTrans (layout ().dbu ()) * t).inverted () * db::DBox (0, 0, view ()->viewport ().width (), view ()->viewport ().height ());
+  }
 
   if (! m_context_layers.empty ()) {
 
@@ -583,7 +586,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
 
             bool any_valid_edge = m_capture_all_shapes;
             for (db::Shape::polygon_edge_iterator e = shape->begin_edge (); ! e.at_end (); ++e) {
-              if ((*e).clipped (viewport_box).first) {
+              if (viewport_box.empty () || (*e).clipped (viewport_box).first) {
                 any_valid_edge = true;
                 test_edge (t, *e, d, match);
               }
@@ -606,7 +609,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
               ++pt;
               for (; pt != shape->end_point (); ++pt) {
                 db::Edge e (p, *pt);
-                if (e.clipped (viewport_box).first) {
+                if (viewport_box.empty () || e.clipped (viewport_box).first) {
                   any_valid_edge = true;
                   test_edge (t, e, d, match);
                 }
@@ -618,7 +621,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
             db::Polygon poly;
             shape->polygon (poly);
             for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-              if ((*e).clipped (viewport_box).first) {
+              if (viewport_box.empty () || (*e).clipped (viewport_box).first) {
                 any_valid_edge = true;
                 test_edge (t, *e, d, match);
               }
@@ -651,7 +654,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
               //  convert to polygon and test those edges
               db::Polygon poly (box);
               for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-                if ((*e).clipped (viewport_box).first) {
+                if (viewport_box.empty () || (*e).clipped (viewport_box).first) {
                   any_valid_edge = true;
                   test_edge (t, *e, d, match);
                 }
@@ -819,7 +822,10 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
   checkpoint ();
 
   //  Viewport in current cell coordinate space (DBU)
-  db::Box viewport_box = (vp * db::CplxTrans (layout ().dbu ()) * t).inverted () * db::DBox (0, 0, view ()->viewport ().width (), view ()->viewport ().height ());
+  db::Box viewport_box;
+  if (consider_viewport ()) {
+    viewport_box = (vp * db::CplxTrans (layout ().dbu ()) * t).inverted () * db::DBox (0, 0, view ()->viewport ().width (), view ()->viewport ().height ());
+  }
 
   if (! point_mode ()) {
 
@@ -952,7 +958,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
               bool any_valid_edge = false;
               for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
                 //  only consider edges that cut through the viewport
-                if ((*e).clipped (viewport_box).first) {
+                if (viewport_box.empty () || (*e).clipped (viewport_box).first) {
                   any_valid_edge = true;
                   test_edge (t, *e, d, match);
                 }

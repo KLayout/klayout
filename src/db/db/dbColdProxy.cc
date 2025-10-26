@@ -89,7 +89,7 @@ ColdProxy::get_basic_name () const
   }
 }
 
-std::string 
+std::string
 ColdProxy::get_display_name () const
 {
   if (! mp_context_info->lib_name.empty ()) {

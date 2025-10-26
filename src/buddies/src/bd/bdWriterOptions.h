@@ -54,6 +54,13 @@ public:
   GenericWriterOptions ();
 
   /**
+   *  @brief Constructor
+   *
+   *  The "options" object specifies the defaults to be used.
+   */
+  GenericWriterOptions (const db::SaveLayoutOptions &options);
+
+  /**
    *  @brief Adds the generic options to the command line parser object
    *  The format string gives a hint about the target format. Certain options will be
    *  suppressed if they are known to be unavailable for the given format.
@@ -142,6 +149,7 @@ private:
   int m_dxf_polygon_mode;
 
   void set_oasis_substitution_char (const std::string &text);
+  void init_from_options (const db::SaveLayoutOptions &options);
 };
 
 }

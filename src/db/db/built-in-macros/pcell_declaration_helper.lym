@@ -149,6 +149,18 @@ created as well.
 This method must be reimplemented in a PCell class to identify the PCell in human-readable form.
 This text is shown in the cell tree for the PCell for example.
 
+@method cell_name_impl
+
+@brief Delivers the cell name to be used for the PCell variant
+
+A PCell variant is represented in the cell tree by a placeholder cell. By
+default, the name of this cell is the PCell name. Since multiple variants
+may exist, usually a disambiguator is added to the name (e.g. "..$1"). 
+
+This method allows encoding the PCell parameters into that cell name, 
+so the PCell variant is easier to identify in the cell tree - for example
+in the GDS file - instead of the unspecific disambiguator.
+
 @method produce_impl
 
 @brief Produces the layout
@@ -466,6 +478,19 @@ module RBA
       text
     end
     
+    # implementation of cell_name
+    def cell_name(parameters)
+      self._start
+      @param_values = parameters
+      text = ""
+      begin
+        text = cell_name_impl
+      ensure
+        self._finish
+      end
+      text
+    end
+    
     # get the parameters
     def get_parameters
       @param_decls
@@ -566,6 +591,11 @@ module RBA
     # default implementation
     def display_text_impl
       ""
+    end
+   
+    # default implementation
+    def cell_name_impl
+      self.name
     end
    
     # default implementation 

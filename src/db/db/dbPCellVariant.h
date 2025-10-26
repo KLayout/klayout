@@ -94,42 +94,37 @@ public:
   }
 
   /**
-   *  @brief Get the basic name
-   *
-   *  The basic name of the cell is either the cell name or the cell name in the
-   *  target library (for library proxies) or the PCell name (for PCell proxies).
-   *  The actual name may be different by a extension to make it unique.
+   *  @brief Gets the basic name
    */
   virtual std::string get_basic_name () const;
 
   /**
-   *  @brief Get the display name
-   *
-   *  The display name is some "nice" descriptive name of the cell (variant)
-   *  For normal cells this name is equivalent to the normal cell name.
+   *  @brief Gets the variant name
+   */
+  virtual std::string get_variant_name () const;
+
+  /**
+   *  @brief Gets the display name
    */
   virtual std::string get_display_name () const;
 
   /**
-   *  @brief Unregister a cell from it's context.
+   *  @brief Unregisters a cell from its context.
    */
   virtual void unregister ();
 
   /**
-   *  @brief Reregister a cell inside it's context.
+   *  @brief Re-registers a cell inside its context.
    */
   virtual void reregister ();
 
   /**
-   *  @brief Update the layout
+   *  @brief Updates the layout
    */
   virtual void update (ImportLayerMapping *layer_mapping = 0);
 
   /**
-   *  @brief Tell, if this cell is a proxy cell
-   *
-   *  Proxy cells are such whose layout represents a snapshot of another entity.
-   *  Such cells can be PCell variants or library references for example.
+   *  @brief Gets a value indicating if this cell is a proxy cell
    */
   virtual bool is_proxy () const 
   { 
@@ -138,7 +133,7 @@ public:
 
 protected:
   /**
-   *  @brief Get the PCell header for this variant
+   *  @brief Gets the PCell header for this variant
    */
   PCellHeader *pcell_header () 
   {
@@ -146,7 +141,7 @@ protected:
   }
 
   /**
-   *  @brief Get the PCell header for this variant
+   *  @brief Gets the PCell header for this variant
    */
   const PCellHeader *pcell_header () const
   {
@@ -156,6 +151,7 @@ protected:
 private:
   pcell_parameters_type m_parameters;
   mutable std::string m_display_name;
+  mutable std::string m_variant_name;
   db::pcell_id_type m_pcell_id;
   bool m_registered;
 };

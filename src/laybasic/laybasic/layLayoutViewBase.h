@@ -1124,6 +1124,19 @@ public:
   }
 
   /**
+   *  @brief Visibility of ghost cells
+   */
+  void ghost_cells_visible (bool vis);
+
+  /**
+   *  @brief Visibility of ghost cells
+   */
+  bool ghost_cells_visible () const
+  {
+    return m_ghost_cells_visible;
+  }
+
+  /**
    *  @brief Min instance label size setter
    */
   void min_inst_label_size (int px);
@@ -2929,6 +2942,7 @@ private:
   unsigned int m_box_font;
   int m_min_size_for_label;
   bool m_cell_box_visible;
+  bool m_ghost_cells_visible;
 
   tl::Color m_marker_color;
   int m_marker_line_width;

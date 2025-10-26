@@ -380,7 +380,9 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   generic_reader_options_a.add_options (cmd);
   generic_reader_options_b.add_options (cmd);
 
-  bd::GenericWriterOptions writer_options;
+  db::SaveLayoutOptions def_writer_options;
+  def_writer_options.set_dont_write_empty_cells (true);
+  bd::GenericWriterOptions writer_options (def_writer_options);
   writer_options.add_options (cmd);
 
   cmd << tl::arg ("input_a",                   &infile_a,   "The first input file (any format, may be gzip compressed)")
@@ -447,7 +449,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   cmd.parse (argc, argv);
 
   if (top_a.empty () != top_b.empty ()) {
-    throw tl::Exception ("Both -ta|--top-a and -tb|--top-b top cells must be given");
+    throw tl::Exception ("Both -ta|--top-a and -tb|--top-b top cells must be given, not just one of them");
   }
 
   if (tolerances.empty ()) {

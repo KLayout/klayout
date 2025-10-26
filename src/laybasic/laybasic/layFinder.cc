@@ -63,7 +63,7 @@ static int inst_point_sel_tests = 10000;
 
 Finder::Finder (bool point_mode, bool top_level_sel)
   : m_min_level (0), m_max_level (0),
-    mp_layout (0), mp_view (0), m_cv_index (0), m_point_mode (point_mode), m_catch_all (false), m_top_level_sel (top_level_sel)
+    mp_layout (0), mp_view (0), m_cv_index (0), m_point_mode (point_mode), m_catch_all (false), m_consider_viewport (true), m_top_level_sel (top_level_sel)
 {
   m_distance = std::numeric_limits<double>::max ();
 }
@@ -482,7 +482,10 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
   checkpoint ();
 
   //  Viewport in current cell coordinate space (DBU)
-  db::Box viewport_box = (vp * db::CplxTrans (layout ().dbu ()) * t).inverted () * db::DBox (0, 0, view ()->viewport ().width (), view ()->viewport ().height ());
+  db::Box viewport_box;
+  if (consider_viewport ()) {
+    viewport_box = (vp * db::CplxTrans (layout ().dbu ()) * t).inverted () * db::DBox (0, 0, view ()->viewport ().width (), view ()->viewport ().height ());
+  }
 
   if (! m_context_layers.empty ()) {
 
@@ -583,7 +586,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
 
             bool any_valid_edge = m_capture_all_shapes;
             for (db::Shape::polygon_edge_iterator e = shape->begin_edge (); ! e.at_end (); ++e) {
-              if ((*e).clipped (viewport_box).first) {
+              if (viewport_box.empty () || (*e).clipped (viewport_box).first) {
                 any_valid_edge = true;
                 test_edge (t, *e, d, match);
               }
@@ -606,7 +609,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
               ++pt;
               for (; pt != shape->end_point (); ++pt) {
                 db::Edge e (p, *pt);
-                if (e.clipped (viewport_box).first) {
+                if (viewport_box.empty () || e.clipped (viewport_box).first) {
                   any_valid_edge = true;
                   test_edge (t, e, d, match);
                 }
@@ -618,7 +621,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
             db::Polygon poly;
             shape->polygon (poly);
             for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-              if ((*e).clipped (viewport_box).first) {
+              if (viewport_box.empty () || (*e).clipped (viewport_box).first) {
                 any_valid_edge = true;
                 test_edge (t, *e, d, match);
               }
@@ -651,7 +654,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
               //  convert to polygon and test those edges
               db::Polygon poly (box);
               for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-                if ((*e).clipped (viewport_box).first) {
+                if (viewport_box.empty () || (*e).clipped (viewport_box).first) {
                   any_valid_edge = true;
                   test_edge (t, *e, d, match);
                 }
@@ -721,6 +724,8 @@ InstFinder::InstFinder (bool point_mode, bool top_level_sel, bool full_arrays, b
     m_full_arrays (full_arrays), 
     m_enclose_insts (enclose_inst), 
     m_visible_layers (visible_layers),
+    m_consider_ghost_cells (true),
+    m_consider_normal_cells (true),
     mp_view (0), 
     mp_progress (0)
 {
@@ -805,28 +810,40 @@ InstFinder::checkpoint ()
   }
 }
 
+bool
+InstFinder::consider_cell (const db::Cell &cell) const
+{
+  return cell.is_ghost_cell () ? m_consider_ghost_cells : m_consider_normal_cells;
+}
+
 void 
 InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const db::Box & /*scan_box*/, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level)
 {
   checkpoint ();
 
   //  Viewport in current cell coordinate space (DBU)
-  db::Box viewport_box = (vp * db::CplxTrans (layout ().dbu ()) * t).inverted () * db::DBox (0, 0, view ()->viewport ().width (), view ()->viewport ().height ());
+  db::Box viewport_box;
+  if (consider_viewport ()) {
+    viewport_box = (vp * db::CplxTrans (layout ().dbu ()) * t).inverted () * db::DBox (0, 0, view ()->viewport ().width (), view ()->viewport ().height ());
+  }
 
   if (! point_mode ()) {
 
     ++*mp_progress;
 
     //  look for instances to check here ..
-    db::Cell::touching_iterator inst = cell.begin_touching (search_box); 
-    while (! inst.at_end ()) {
+    for (db::Cell::touching_iterator inst = cell.begin_touching (search_box); ! inst.at_end (); ++inst) {
 
       const db::CellInstArray &cell_inst = inst->cell_inst ();
       const db::Cell &inst_cell = layout ().cell (cell_inst.object ().cell_index ());
 
       ++*mp_progress;
 
-      //  just consider the instances exactly at the last level of 
+      if (! consider_cell (inst_cell)) {
+        continue;
+      }
+
+      //  just consider the instances exactly at the last level of
       //  hierarchy (this is where the boxes are drawn) or of cells that
       //  are hidden.
       if (level == max_level () - 1 || inst_cell.is_proxy () || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
@@ -887,20 +904,21 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
 
       }
 
-      ++inst;
-
     }
 
   } else {
 
     //  look for instances to check here ..
-    db::Cell::touching_iterator inst = cell.begin_touching (search_box); 
-    while (! inst.at_end ()) {
+    for (db::Cell::touching_iterator inst = cell.begin_touching (search_box); ! inst.at_end (); ++inst) {
 
       checkpoint ();
 
       const db::CellInstArray &cell_inst = inst->cell_inst ();
       const db::Cell &inst_cell = layout ().cell (cell_inst.object ().cell_index ());
+
+      if (! consider_cell (inst_cell)) {
+        continue;
+      }
 
       //  just consider the instances exactly at the last level of 
       //  hierarchy (this is where the boxes are drawn) or if of cells that
@@ -909,7 +927,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
 
         db::box_convert <db::CellInst, false> bc (layout ());
         for (db::CellInstArray::iterator p = cell_inst.begin_touching (search_box, bc); ! p.at_end (); ++p) {
-        
+
           checkpoint ();
 
           bool match = false;
@@ -940,7 +958,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
               bool any_valid_edge = false;
               for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
                 //  only consider edges that cut through the viewport
-                if ((*e).clipped (viewport_box).first) {
+                if (viewport_box.empty () || (*e).clipped (viewport_box).first) {
                   any_valid_edge = true;
                   test_edge (t, *e, d, match);
                 }
@@ -999,8 +1017,6 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
         }
 
       }
-
-      ++inst;
 
     }
 

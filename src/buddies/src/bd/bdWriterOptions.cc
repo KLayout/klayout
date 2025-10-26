@@ -30,9 +30,23 @@ namespace bd
 {
 
 GenericWriterOptions::GenericWriterOptions ()
-  : m_scale_factor (1.0)
 {
-  db::SaveLayoutOptions save_options;
+  db::SaveLayoutOptions options;
+  init_from_options (options);
+}
+
+GenericWriterOptions::GenericWriterOptions (const db::SaveLayoutOptions &options)
+{
+  init_from_options (options);
+}
+
+void
+GenericWriterOptions::init_from_options (const db::SaveLayoutOptions &save_options_nc)
+{
+  //  const_cast needed because "get_option_by_name" is not const as it should be
+  db::SaveLayoutOptions &save_options = const_cast<db::SaveLayoutOptions &> (save_options_nc);
+
+  m_scale_factor = 1.0;
 
   m_dbu = save_options.get_option_by_name ("dbu").to_double ();
   m_libname = save_options.get_option_by_name ("libname").to_string ();

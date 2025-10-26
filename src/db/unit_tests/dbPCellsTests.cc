@@ -88,6 +88,13 @@ class PD
 
     cell.shapes (l_metal0).insert (db::Box (0, 0, width, height));
   }
+
+  virtual std::string get_display_name (const db::pcell_parameters_type &parameters) const
+  {
+    db::Coord width = db::coord_traits<db::Coord>::rounded (parameters[0].to_double () * 1000.0);
+    db::Coord height = db::coord_traits<db::Coord>::rounded (parameters[1].to_double () * 1000.0);
+    return tl::sprintf ("PD(W=%d,H=%d)", width, height);
+  }
 };
 
 TEST(0) 
@@ -252,3 +259,114 @@ TEST(1)
   }
 }
 
+//  PCell names, convert PCell to static
+
+class PD2
+  : public PD
+{
+public:
+  virtual std::string get_cell_name (const db::pcell_parameters_type &parameters) const
+  {
+    db::Coord width = db::coord_traits<db::Coord>::rounded (parameters[0].to_double () * 1000.0);
+    db::Coord height = db::coord_traits<db::Coord>::rounded (parameters[1].to_double () * 1000.0);
+    return tl::sprintf ("PD_W%d_H%d", width, height);
+  }
+};
+
+TEST(2)
+{
+  db::Manager m (true);
+  db::Layout layout(&m);
+  layout.dbu (0.001);
+
+  db::LayerProperties p;
+
+  p.layer = 23;
+  p.datatype = 0;
+  unsigned int l_cont = layout.insert_layer (p);
+
+  p.layer = 16;
+  p.datatype = 0;
+  unsigned int l_gate = layout.insert_layer (p);
+
+  db::Cell &cell_a = layout.cell (layout.add_cell ("A"));
+  cell_a.shapes(l_cont).insert(db::Box (50, 50, 150, 150));
+  cell_a.shapes(l_gate).insert(db::Box (0, 0, 200, 1000));
+
+  db::Cell &top = layout.cell (layout.add_cell ("TOP"));
+
+  db::pcell_id_type pd = layout.register_pcell ("PD", new PD2 ());
+
+  std::vector<tl::Variant> parameters;
+  parameters.push_back (tl::Variant ());
+  parameters.push_back (tl::Variant ());
+  parameters.push_back (tl::Variant ());
+  tl::Variant &width = parameters[0];
+  tl::Variant &height = parameters[1];
+  tl::Variant &orientation = parameters[2];
+
+  width = 0.5;
+  height = 1.0;
+  orientation = long (0);
+
+  db::cell_index_type pd1 = layout.get_pcell_variant (pd, parameters);
+  top.insert (db::CellInstArray (db::CellInst (pd1), db::Trans (db::Vector (0, 0))));
+
+  EXPECT_EQ (layout.display_name (pd1), "PD(W=500,H=1000)");
+  EXPECT_EQ (layout.cell_name (pd1), "PD_W500_H1000");
+  EXPECT_EQ (layout.variant_name (pd1), "PD_W500_H1000");
+
+  width = 0.4;
+  height = 0.8;
+
+  db::cell_index_type pd2 = layout.get_pcell_variant (pd, parameters);
+  top.insert (db::CellInstArray (db::CellInst (pd2), db::Trans (db::Vector (0, 2000))));
+
+  EXPECT_EQ (layout.display_name (pd2), "PD(W=400,H=800)");
+  EXPECT_EQ (layout.cell_name (pd2), "PD_W400_H800");
+  EXPECT_EQ (layout.variant_name (pd2), "PD_W400_H800");
+
+  EXPECT_NE (pd1, pd2);
+
+  width = 0.4;
+  height = 0.8;
+  orientation = long (1);
+
+  db::cell_index_type pd3 = layout.get_pcell_variant (pd, parameters);
+  auto i3 = top.insert (db::CellInstArray (db::CellInst (pd3), db::Trans (db::Vector (2000, 0))));
+
+  EXPECT_EQ (layout.display_name (pd3), "PD(W=400,H=800)");
+  EXPECT_EQ (layout.cell_name (pd3), "PD_W400_H800$1");
+  EXPECT_EQ (layout.variant_name (pd3), "PD_W400_H800");
+
+  EXPECT_NE (pd2, pd3);
+
+  auto pd3_org = pd3;
+  pd3 = layout.convert_cell_to_static (pd3);
+  EXPECT_NE (pd3, pd3_org);
+
+  auto ci3 = i3.cell_inst ();
+  ci3.object ().cell_index (pd3);
+  top.replace (i3, ci3);
+
+  EXPECT_EQ (layout.cell (pd3_org).is_proxy (), true);
+  EXPECT_EQ (layout.cell (pd3).is_proxy (), false);
+
+  EXPECT_EQ (layout.display_name (pd3_org), "PD(W=400,H=800)");
+  EXPECT_EQ (layout.cell_name (pd3_org), "PD_W400_H800$2");
+  EXPECT_EQ (layout.variant_name (pd3_org), "PD_W400_H800");
+
+  layout.do_cleanup (true);
+  layout.cleanup ();
+
+  EXPECT_EQ (layout.is_valid_cell_index (pd3_org), false);
+
+  EXPECT_EQ (layout.display_name (pd3), "PD_W400_H800$1");
+  EXPECT_EQ (layout.cell_name (pd3), "PD_W400_H800$1");
+  EXPECT_EQ (layout.variant_name (pd3), "PD_W400_H800$1");
+
+
+
+  CHECKPOINT ();
+  db::compare_layouts (_this, layout, tl::testdata () + "/gds/pcell_test20.gds", db::NoNormalization);
+}

@@ -97,6 +97,25 @@ public:
   }
 
   /**
+   *  @brief Gets a flag indicating that the viewport will be considered
+   */
+  bool consider_viewport () const
+  {
+    return m_consider_viewport;
+  }
+
+  /**
+   *  @brief Sets a flag indicating that the viewport will be considered
+   *  If this flag is true (the default), only shapes and instances will be considered
+   *  if edges (or polygons) or boundary edges (for instances) are visible in the
+   *  viewport. If this flag is false, shapes or instances are considered always.
+   */
+  void set_consider_viewport (bool f)
+  {
+    m_consider_viewport = f;
+  }
+
+  /**
    *  @brief Destructor (just provided to please the compiler)
    */
   virtual ~Finder ();
@@ -217,6 +236,7 @@ private:
   double m_distance;
   bool m_point_mode;
   bool m_catch_all;
+  bool m_consider_viewport;
   bool m_top_level_sel;
   db::box_convert <db::CellInst, false> m_box_convert;
   db::box_convert <db::Cell, false> m_cell_box_convert;
@@ -343,7 +363,17 @@ public:
 
   bool find (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans, const db::DBox &region_mu);
   bool find (LayoutViewBase *view, const db::DBox &region_mu);
+
+  void consider_ghost_cells (bool f)
+  {
+    m_consider_ghost_cells = f;
+  }
  
+  void consider_normal_cells (bool f)
+  {
+    m_consider_normal_cells = f;
+  }
+
   iterator begin () const
   {
     return m_founds.begin ();
@@ -360,6 +390,7 @@ private:
   virtual void visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level);
 
   bool find_internal (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu);
+  bool consider_cell (const db::Cell &cell) const;
 
   unsigned int m_cv_index;
   db::cell_index_type m_topcell;
@@ -369,6 +400,8 @@ private:
   bool m_full_arrays;
   bool m_enclose_insts;
   bool m_visible_layers;
+  bool m_consider_ghost_cells;
+  bool m_consider_normal_cells;
   std::vector<int> m_visible_layer_indexes;
   LayoutViewBase *mp_view;
   tl::AbsoluteProgress *mp_progress;

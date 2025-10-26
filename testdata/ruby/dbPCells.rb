@@ -39,6 +39,11 @@ class BoxPCell < RBA::PCellDeclaration
     # provide a descriptive text for the cell
     return "Box(L=#{parameters[0].to_s},W=#{'%.3f' % parameters[1].to_s},H=#{'%.3f' % parameters[2].to_s})"
   end
+
+  def cell_name(parameters)
+    # provide a cell name for the PCell
+    return "Box_L#{parameters[0].to_s.gsub('/','d')}_W#{('%.3f' % parameters[1]).gsub('.','p')}_H#{('%.3f' % parameters[2]).gsub('.','p')}"
+  end
   
   def get_parameters
   
@@ -127,6 +132,11 @@ if RBA.constants.member?(:PCellDeclarationHelper)
     def display_text_impl
       # provide a descriptive text for the cell
       return "Box2(L=" + layer.to_s + ",W=" + ('%.3f' % width) + ",H=" + ('%.3f' % height) + ")"
+    end
+    
+    def cell_name_impl
+      # provide a cell name for the PCell
+      return "Box2_L" + layer.to_s.gsub('/', 'd') + "_W" + ('%.3f' % width).gsub('.', 'p') + "_H" + ('%.3f' % height).gsub('.', 'p')
     end
     
     def produce_impl
@@ -371,6 +381,9 @@ class DBPCell_TestClass < TestBase
     param = [ RBA::LayerInfo::new(1, 0) ]  # rest is filled with defaults
     pcell_var_id = ly.add_pcell_variant(lib, pcell_decl_id, param)
     pcell_var = ly.cell(pcell_var_id)
+    assert_equal(pcell_var.name, "Box_L1d0_W1p000_H1p000")
+    assert_equal(pcell_var.qname, "PCellTestLib.Box")
+    assert_equal(pcell_var.basic_name, "Box")
     pcell_inst = c1.insert(RBA::CellInstArray::new(pcell_var_id, RBA::Trans::new))
     assert_equal(pcell_var.layout.inspect, ly.inspect)
     assert_equal(pcell_var.library.inspect, lib.inspect)
@@ -512,6 +525,8 @@ class DBPCell_TestClass < TestBase
     pcell_var = ly.cell(pcell_var_id)
     pcell_inst = c1.insert(RBA::CellInstArray::new(pcell_var_id, RBA::Trans::new))
     assert_equal(pcell_var.basic_name, "Box2")
+    assert_equal(pcell_var.name, "Box2_L1d0_W1p000_H1p000")
+    assert_equal(pcell_var.qname, "PCellTestLib2.Box2")
     assert_equal(pcell_var.pcell_parameters().inspect, "[<1/0>, 1.0, 1.0, 0]")
     assert_equal(pcell_var.display_title(), "PCellTestLib2.Box2(L=1/0,W=1.000,H=1.000)")
     assert_equal(norm_hash(pcell_var.pcell_parameters_by_name()), "{\"height\"=>1.0, \"layer\"=><1/0>, \"secret\"=>0, \"width\"=>1.0}")
@@ -905,6 +920,37 @@ class DBPCell_TestClass < TestBase
 
     assert_equal(c2.display_title, "PCellTestLib3.RecursivePCell(L=1/0,E=(0,0;20,0),LVL=4")
     assert_equal(c1.dbbox.to_s, "(0,0;20,5.774)")
+
+  end
+
+  # convert to static cell
+  def test_13
+
+    if !RBA.constants.member?(:PCellDeclarationHelper)
+      return
+    end
+
+    # instantiate and register the library
+    tl = PCellTestLib2::new
+
+    ly = RBA::Layout::new(true)
+    ly.dbu = 0.01
+
+    ci1 = ly.add_cell("c1")
+    c1 = ly.cell(ci1)
+
+    lib = RBA::Library.library_by_name("PCellTestLib2")
+    assert_equal(lib != nil, true)
+    pcell_decl = lib.layout().pcell_declaration("Box2")
+
+    param = [ RBA::LayerInfo::new(1, 0) ]  # rest is filled with defaults
+    pcell_var_id = ly.add_pcell_variant(lib, pcell_decl.id(), param)
+    static_id = ly.convert_cell_to_static(pcell_var_id)
+    static = ly.cell(static_id)
+    assert_equal(static.basic_name, "Box2_L1d0_W1p000_H1p000")
+    assert_equal(static.name, "Box2_L1d0_W1p000_H1p000")
+    assert_equal(static.qname, "Box2_L1d0_W1p000_H1p000")
+    assert_equal(static.is_proxy?, false)
 
   end
 

@@ -89,6 +89,7 @@ private:
   void via_initial (int dir);
   void via_editing (int dir);
   bool get_via_for (const db::LayerProperties &lp, unsigned int cv_index, int dir, db::SelectedViaDefinition &via_def);
+  db::LayerProperties get_layer_for_via (unsigned int cv_index);
   void push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type, db::Manager::transaction_id_t transaction_id);
   void pop_segment ();
 };

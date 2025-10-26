@@ -863,6 +863,12 @@ Cell::get_basic_name () const
 }
 
 std::string
+Cell::get_variant_name () const
+{
+  return get_basic_name ();
+}
+
+std::string
 Cell::get_qualified_name () const
 {
   return get_basic_name ();

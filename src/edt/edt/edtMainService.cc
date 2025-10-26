@@ -47,7 +47,6 @@
 
 #if defined(HAVE_QT)
 #  include "layDialogs.h"
-#  include "layLayerTreeModel.h"
 #  include "layCellSelectionForm.h"
 #  include "edtDialogs.h"
 #  include "edtEditorOptionsPages.h"
@@ -2361,88 +2360,16 @@ void
 MainService::cm_tap ()
 {
 #if ! defined(HAVE_QT)
-  tl_assert (false); // see TODO
-#endif
-
-#if defined(HAVE_QT)
-  QWidget *view_widget = lay::widget_from_view (view ());
-  if (! view_widget) {
-    return;
-  }
-#endif
-
-  if (! view ()->canvas ()->mouse_in_window ()) {
-    return;
-  }
-
-  lay::ShapeFinder finder (true,    //  point mode
-                           false,   //  all hierarchy levels
-                           db::ShapeIterator::flags_type (db::ShapeIterator::All - db::ShapeIterator::Texts),  //  do not consider texts - their bounding box may be too large
-                           0,       //  no excludes
-                           true     //  capture all shapes
-                          );
-
-  //  capture all objects in point mode (default: capture one only)
-  finder.set_catch_all (true);
-
-  //  go through all visible layers of all cellviews
-  db::DPoint pt = view ()->canvas ()->mouse_position_um ();
-  finder.find (view (), db::DBox (pt, pt));
-
-  std::set<std::pair<unsigned int, unsigned int> > layers_in_selection;
-
-  for (lay::ShapeFinder::iterator f = finder.begin (); f != finder.end (); ++f) {
-    //  ignore guiding shapes
-    if (f->layer () != view ()->cellview (f->cv_index ())->layout ().guiding_shape_layer ()) {
-      layers_in_selection.insert (std::make_pair (f->cv_index (), f->layer ()));
-    }
-  }
-
-  std::vector<lay::LayerPropertiesConstIterator> tapped_layers;
-  for (lay::LayerPropertiesConstIterator lp = view ()->begin_layers (view ()->current_layer_list ()); ! lp.at_end (); ++lp) {
-    const lay::LayerPropertiesNode *ln = lp.operator-> ();
-    if (layers_in_selection.find (std::make_pair ((unsigned int) ln->cellview_index (), (unsigned int) ln->layer_index ())) != layers_in_selection.end ()) {
-      tapped_layers.push_back (lp);
-    }
-  }
-
-  if (tapped_layers.empty ()) {
-    return;
-  }
-
-  //  List the layers under the cursor as pop up a menu
-
-#if defined(HAVE_QT)
-  //  TODO: what to do here in Qt-less case? Store results in configuration so they can be retrieved externally?
-
-#if QT_VERSION >= 0x050000
-  double dpr = view_widget->devicePixelRatio ();
+  tl_assert (false); //  TODO
 #else
-  double dpr = 1.0;
-#endif
+  lay::LayerPropertiesConstIterator iter = edt::popup_tap_layer_menu (view ());
+  if (! iter.at_end ()) {
 
-  std::unique_ptr<QMenu> menu (new QMenu (view_widget));
-  menu->show ();
-
-  int icon_size = menu->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
-
-  db::DPoint mp_local = view ()->canvas ()->mouse_position ();
-  QPoint mp = view ()->canvas ()->widget ()->mapToGlobal (QPoint (mp_local.x (), mp_local.y ()));
-
-  for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = tapped_layers.begin (); l != tapped_layers.end (); ++l) {
-    QAction *a = menu->addAction (lay::LayerTreeModel::icon_for_layer (*l, view (), icon_size, icon_size, dpr, 0, true), tl::to_qstring ((*l)->display_string (view (), true, true /*with source*/)));
-    a->setData (int (l - tapped_layers.begin ()));
-  }
-
-  QAction *action = menu->exec (mp);
-  if (action) {
-
-    int index = action->data ().toInt ();
-    lay::LayerPropertiesConstIterator iter = tapped_layers [index];
     view ()->set_current_layer (iter);
 
     edt::Service *es = dynamic_cast<edt::Service *> (view ()->canvas ()->active_service ());
     if (es) {
+      db::DPoint pt = view ()->canvas ()->mouse_position_um ();
       es->tap (pt);
     }
 
@@ -2486,9 +2413,11 @@ MainService::via_impl (int dir)
     return;
   }
 
-  edt::Service *es = dynamic_cast<edt::Service *> (view ()->canvas ()->active_service ());
-  if (es) {
-    es->via (dir);
+  //  via generation is delegated to the path service always
+  edt::PathService *ps = view ()->get_plugin<edt::PathService> ();
+  if (ps) {
+    view ()->switch_mode (ps->plugin_declaration ()->id ());
+    ps->via (dir);
   }
 }
 

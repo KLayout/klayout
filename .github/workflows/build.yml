@@ -66,7 +66,7 @@ jobs:
           mkdir -p $HOST_CCACHE_DIR
       - name: Build wheels (ARM)
         if: matrix.os == 'ubuntu-24.04-arm'
-        uses: pypa/cibuildwheel@v3.2.0
+        uses: pypa/cibuildwheel@v3.2.1
         env:
           # override the default CentOS “yum install … ccache” and drop ccache
           CIBW_BEFORE_ALL_LINUX: |
@@ -81,7 +81,7 @@ jobs:
 
       - name: Build wheels (all other platforms)
         if: matrix.os != 'ubuntu-24.04-arm'
-        uses: pypa/cibuildwheel@v3.2.0
+        uses: pypa/cibuildwheel@v3.2.1
         env:
           CIBW_BUILD: ${{ matrix.cibuild }}
           CIBW_ARCHS_MACOS: ${{ matrix.macos-arch }}

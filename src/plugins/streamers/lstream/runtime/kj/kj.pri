@@ -1,0 +1,56 @@
+
+KJ_SOURCES=\
+  kj/array.c++ \
+  kj/cidr.c++ \
+  kj/list.c++ \
+  kj/common.c++ \
+  kj/debug.c++ \
+  kj/exception.c++ \
+  kj/io.c++ \
+  kj/memory.c++ \
+  kj/mutex.c++ \
+  kj/string.c++ \
+  kj/source-location.c++ \
+  kj/hash.c++ \
+  kj/table.c++ \
+  kj/thread.c++ \
+  kj/main.c++ \
+  kj/arena.c++ \
+  kj/units.c++ \
+  kj/encoding.c++ \
+
+KJ_HEADERS=\
+  kj/cidr.h \
+  kj/common.h \
+  kj/units.h \
+  kj/memory.h \
+  kj/refcount.h \
+  kj/array.h \
+  kj/list.h \
+  kj/vector.h \
+  kj/string.h \
+  kj/string-tree.h \
+  kj/source-location.h \
+  kj/hash.h \
+  kj/table.h \
+  kj/map.h \
+  kj/encoding.h \
+  kj/exception.h \
+  kj/debug.h \
+  kj/arena.h \
+  kj/io.h \
+  kj/tuple.h \
+  kj/one-of.h \
+  kj/function.h \
+  kj/mutex.h \
+  kj/thread.h \
+  kj/threadlocal.h \
+  kj/filesystem.h \
+  kj/time.h \
+  kj/main.h \
+  kj/win32-api-version.h \
+  kj/windows-sanity.h \
+  kj/miniposix.h \
+  kj/parse/common.h \
+  kj/parse/char.h \
+  kj/std/iostream.h \

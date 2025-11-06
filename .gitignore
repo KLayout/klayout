@@ -74,3 +74,6 @@ py.typed
 *.dmg.md5
 .DS_Store
 
+# temp files
+.tmp*
+

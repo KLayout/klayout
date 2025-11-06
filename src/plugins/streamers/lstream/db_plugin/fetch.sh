@@ -1,7 +1,8 @@
 #!/bin/bash -e
 
 rm -rf capnp_src
-rm *.cc *.h
+mkdir capnp_src
+rm -f *.cc *.h
 
 tmp=.tmp
 rm -rf $tmp

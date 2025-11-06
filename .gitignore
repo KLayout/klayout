@@ -76,4 +76,5 @@ py.typed
 
 # temp files
 .tmp*
+.venv
 

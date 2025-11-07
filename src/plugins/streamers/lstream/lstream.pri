@@ -1,0 +1,15 @@
+
+# .c++ is not a standard C++ extension in qmake
+QMAKE_EXT_CPP += .c++
+
+# capnp needs C++ 14 in version 1.0.1
+# Qt6 comes with C++ 17 requirement.
+equals(HAVE_QT, "0") || lessThan(QT_MAJOR_VERSION, 6) {
+  QMAKE_CXXFLAGS += -std=c++14
+}
+
+!msvc {
+  # capnp runtimes have some unused arguments
+  QMAKE_CXXFLAGS += \
+      -Wno-unused-parameter
+}

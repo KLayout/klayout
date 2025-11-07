@@ -3,6 +3,7 @@ DESTDIR_UT = $$OUT_PWD/../../../..
 
 TARGET = lstream_tests
 
+include($$PWD/../lstream.pri)
 include($$PWD/../../../../lib_ut.pri)
 
 SOURCES = \

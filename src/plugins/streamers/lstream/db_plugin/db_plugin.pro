@@ -2,6 +2,7 @@
 TARGET = lstream
 DESTDIR = $$OUT_PWD/../../../../db_plugins
 
+include($$PWD/../lstream.pri)
 include($$PWD/../../../db_plugin.pri)
 include($$PWD/capnp/capnp.pri)
 

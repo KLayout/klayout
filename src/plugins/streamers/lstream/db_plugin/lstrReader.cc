@@ -354,7 +354,7 @@ make_regular_array (stream::repetition::Repetition::Reader repetition, db::regul
 Reader::Reader (tl::InputStream &s)
   : m_stream (&s), m_source (s.source ()),
     m_progress (tl::to_string (tr ("Reading LStream file"))),
-    m_library_index (0), mp_layout (0), mp_cell (0), m_layout_view_id (0)
+    m_library_index (0), mp_cell (0), mp_layout (0), m_layout_view_id (0)
 {
   m_progress.set_format (tl::to_string (tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
@@ -423,6 +423,9 @@ Reader::do_read (db::Layout &layout)
   } catch (lstr::CoordinateOverflowException &ex) {
     //  this adds source information
     error (ex.msg ());
+  } catch (kj::Exception &ex) {
+    //  this adds source information
+    error (ex.getDescription ().cStr ());
   }
 }
 

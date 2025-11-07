@@ -20,8 +20,7 @@
 
 */
 
-#if 0 // @@@
-#include "dbMALYReader.h"
+#include "lstrReader.h"
 #include "dbLayoutDiff.h"
 #include "dbWriter.h"
 #include "dbTestSupport.h"
@@ -29,37 +28,16 @@
 
 #include <stdlib.h>
 
-static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001)
+static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au)
 {
-  db::MALYReaderOptions *opt = new db::MALYReaderOptions();
-  opt->dbu = dbu;
-
-  db::LayerMap lm;
-  if (map) {
-    unsigned int ln = 0;
-    tl::Extractor ex (map);
-    while (! ex.at_end ()) {
-      std::string n;
-      int l;
-      ex.read_word_or_quoted (n);
-      ex.test (":");
-      ex.read (l);
-      ex.test (",");
-      lm.map (n, ln++, db::LayerProperties (l, 0));
-    }
-    opt->layer_map = lm;
-    opt->create_other_layers = true;
-  }
-
   db::LoadLayoutOptions options;
-  options.set_options (opt);
 
   db::Manager m (false);
   db::Layout layout (&m);
 
   {
     std::string fn (base);
-    fn += "/maly/";
+    fn += "/lstream/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -67,82 +45,89 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   }
 
   std::string fn_au (base);
-  fn_au += "/maly/";
+  fn_au += "/lstream/";
   fn_au += file_au;
 
   db::compare_layouts (_this, layout, fn_au, db::WriteOAS);
 }
 
-TEST(1_Basic)
+TEST(basic)
 {
-  std::string fn (tl::testdata ());
-  fn += "/maly/MALY_test1.maly";
-
-  tl::InputStream stream (fn);
-  db::MALYReader reader (stream);
-
-  db::MALYData data = reader.read_maly_file ();
-
-  EXPECT_EQ (data.to_string (),
-    "Mask A\n"
-    "  Size 127000\n"
-    "    Title \"<SERIAL>\" m90 0,-50 1,1,1 [Standard]\n"
-    "    Title \"MaskA1\" m90 50,50 1,1,1 [Standard]\n"
-    "    Title \"WITH \"QUOTES\"\" r270 -50,0 1,1,1 [Standard]\n"
-    "    Ref A1.oas{CHIP_A}(1) (0,0;10,10) m90 *1 20,0\n"
-    "    Ref A2.oas{CHIP_A}(2) ename(e001) dname(d001) (0,0;50,50) m90 *0.8 20,0 [2x5,1x2]\n"
-    "    Ref B3.oas{CHIP_A}(2) (0,0;12,12) m90 *1 20,0"
-  )
+  run_test (_this, tl::testdata (), "basic.lstr", "basic_au.oas");
 }
 
-static std::string run_test_with_error (tl::TestBase * /*_this*/, const std::string &file)
+TEST(boxes)
 {
-  std::string fn (tl::testdata ());
-  fn += "/maly/";
-  fn += file;
-
-  tl::InputStream stream (fn);
-  db::MALYReader reader (stream);
-
-  try {
-    reader.read_maly_file ();
-    tl_assert (false);
-  } catch (tl::Exception &ex) {
-    tl::error << ex.msg ();
-    return ex.msg ();
-  }
+  run_test (_this, tl::testdata (), "boxes.lstr", "boxes_au.oas");
 }
 
-TEST(2_Errors)
+TEST(cells)
 {
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2a.maly").find ("Line break inside quoted string (line=17,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2b.maly").find ("/*...*/ comment not closed (line=43,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2c.maly").find ("Expected value STANDARD or NATIVE for FONT (line=7,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2d.maly").find ("Unknown base specification: NOVALIDBASE (line=8,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2e.maly").find ("Expected end of text here: NOVALIDKEY .. (line=15,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2f.maly").find ("Expected 'Y' or 'NONE' for MIRROR spec (line=15,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2g.maly").find ("Expected end of text here: UNEXPECTED (line=20,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2h.maly").find ("Expected value Y or NONE for MASKMIRROR (line=23,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2i.maly").find ("Expected end of text here: UNEXPECTED (line=29,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2j.maly").find ("Expected end of text here: NOVALIDKEY .. (line=30,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2k.maly").find ("Expected a real number here: SCALE 0.80 .. (line=31,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2l.maly").find ("Expected 'PARAMETER' here: CMASK (line=19,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2m.maly").find ("Expected 'CMASK' here: TITLE (line=18,"), size_t (0));
-  EXPECT_EQ (run_test_with_error (_this, "MALY_test2n.maly").find ("Header expected ('BEGIN MALY') (line=2, "), size_t (0));
+  run_test (_this, tl::testdata (), "cells.lstr", "cells_au.oas");
 }
 
-TEST(10_BasicLayout)
+TEST(cells_with_instances)
 {
-  run_test (_this, tl::testdata (), "MALY_test10.maly", "maly_test10_au.oas");
-  run_test (_this, tl::testdata (), "MALY_test10.maly", "maly_test10_lm_au.oas", "A: 10, B: 11, C: 12, D: 13");
-  run_test (_this, tl::testdata (), "MALY_test10.maly", "maly_test10_dbu10nm_au.oas", 0, 0.01);
+  run_test (_this, tl::testdata (), "cells_with_instances.lstr", "cells_with_instances_au.oas");
 }
 
-TEST(11_Titles)
+TEST(edge_pairs)
 {
-  run_test (_this, tl::testdata (), "MALY_test11.maly", "maly_test11_au.oas");
+  run_test (_this, tl::testdata (), "edge_pairs.lstr", "edge_pairs_au.oas");
 }
 
-#endif
-// @@@
+TEST(edges)
+{
+  run_test (_this, tl::testdata (), "edges.lstr", "edges_au.oas");
+}
+
+TEST(ghost_cells)
+{
+  run_test (_this, tl::testdata (), "ghost_cells.lstr", "ghost_cells_au.oas");
+}
+
+TEST(meta_data)
+{
+  run_test (_this, tl::testdata (), "meta_data.lstr", "meta_data_au.oas");
+}
+
+TEST(paths)
+{
+  run_test (_this, tl::testdata (), "paths.lstr", "paths_au.oas");
+}
+
+TEST(pcells)
+{
+  run_test (_this, tl::testdata (), "pcells.lstr", "pcells_au.oas");
+}
+
+TEST(points)
+{
+  run_test (_this, tl::testdata (), "points.lstr", "points_au.oas");
+}
+
+TEST(polygons)
+{
+  run_test (_this, tl::testdata (), "polygons.lstr", "polygons_au.oas");
+}
+
+TEST(properties)
+{
+  run_test (_this, tl::testdata (), "properties.lstr", "properties_au.oas");
+}
+
+TEST(simple_polygons)
+{
+  run_test (_this, tl::testdata (), "simple_polygons.lstr", "simple_polygons_au.oas");
+}
+
+TEST(texts)
+{
+  run_test (_this, tl::testdata (), "texts.lstr", "texts_au.oas");
+}
+
+TEST(variants)
+{
+  run_test (_this, tl::testdata (), "variants.lstr", "variants_au.oas");
+}
 

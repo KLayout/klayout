@@ -437,6 +437,21 @@ Writer::collect_property_ids (std::vector<db::properties_id_type> &prop_ids, std
   }
 }
 
+namespace 
+{
+
+struct ComparePropertyNameIdByValue
+{
+  bool operator() (db::property_names_id_type a, db::property_names_id_type b) const
+  {
+    const tl::Variant &na = db::property_name (a);
+    const tl::Variant &nb = db::property_name (b);
+    return na.less (nb);
+  }
+};
+
+}
+
 /**
  *  @brief Gets the LStream property set Id from a KLayout properties Id
  * 
@@ -463,8 +478,13 @@ Writer::make_property_id (db::properties_id_type id, std::vector<db::properties_
       prop_ids.push_back (id);
 
       auto ps = db::properties (id);
+      std::set<db::property_names_id_type, ComparePropertyNameIdByValue> ps_sorted;
       for (auto i = ps.begin (); i != ps.end (); ++i) {
-        make_property_name_id_from_id (i->first, prop_names);
+        ps_sorted.insert (i->first);
+      }
+
+      for (auto i = ps_sorted.begin (); i != ps_sorted.end (); ++i) {
+        make_property_name_id_from_id (*i, prop_names);
       }
 
       return ls_id;
@@ -684,7 +704,6 @@ Writer::make_layer_table (stream::library::LayerTable::Builder layers)
 
   for (auto l = m_layers_to_write.begin (); l != m_layers_to_write.end (); ++l) {
 
-    auto li = l->first;
     auto lp = l->second;
 
     //  NOTE: currently, the purpose is always DRAWING
@@ -876,11 +895,11 @@ Writer::write_cell (db::cell_index_type ci, kj::BufferedOutputStream &os)
   int view_index = 0;
   if (needs_layout_view) {
     tl_assert (m_layout_view_id >= 0);
-    cell.getViewIds ().set (view_index++, m_layout_view_id);
+    cell.getViewIds ().set (view_index++, (unsigned int) m_layout_view_id);
   }
   if (needs_meta_data_view) {
     tl_assert (m_meta_data_view_id >= 0);
-    cell.getViewIds ().set (view_index++, m_meta_data_view_id);
+    cell.getViewIds ().set (view_index++, (unsigned int) m_meta_data_view_id);
   }
 
   writePackedMessage (os, message);

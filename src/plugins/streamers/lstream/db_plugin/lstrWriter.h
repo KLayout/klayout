@@ -78,8 +78,8 @@ private:
   bool m_permissive;
   db::Layout *mp_layout;
   std::string m_cellname;
-  unsigned int m_layout_view_id;
-  unsigned int m_meta_data_view_id;
+  int m_layout_view_id;
+  int m_meta_data_view_id;
   std::map<db::lib_id_type, uint64_t> m_ls_lib_ids;
   std::vector<std::pair <unsigned int, db::LayerProperties> > m_layers_to_write;
   std::set<db::cell_index_type> m_cells_to_write;

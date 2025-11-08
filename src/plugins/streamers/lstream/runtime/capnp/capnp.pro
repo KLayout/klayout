@@ -1,3 +1,6 @@
+# DO NOT EDIT!
+# (SEE ../capnp.pro)
+
 
 TEMPLATE = lib
 DESTDIR = $$OUT_PWD/../../../../..

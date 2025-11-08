@@ -1,7 +1,6 @@
 
 KJ_SOURCES=\
   kj/array.cc \
-  kj/cidr.cc \
   kj/list.cc \
   kj/common.cc \
   kj/debug.cc \
@@ -18,9 +17,9 @@ KJ_SOURCES=\
   kj/arena.cc \
   kj/units.cc \
   kj/encoding.cc \
+  kj/time.cc \
 
 KJ_HEADERS=\
-  kj/cidr.h \
   kj/common.h \
   kj/units.h \
   kj/memory.h \

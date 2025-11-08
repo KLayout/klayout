@@ -25,8 +25,15 @@ mkdir capnp/capnp/compat
 cp $tmp/{LICENSE,CONTRIBUTORS} kj
 cp $tmp/{LICENSE,CONTRIBUTORS} capnp
 
-cp kj.pro kj
-cp capnp.pro capnp
+echo "# DO NOT EDIT!" >kj/kj.pro
+echo "# (SEE ../kj.pro)" >>kj/kj.pro
+echo "" >>kj/kj.pro
+cat kj.pro >>kj/kj.pro
+
+echo "# DO NOT EDIT!" >capnp/capnp.pro
+echo "# (SEE ../capnp.pro)" >>capnp/capnp.pro
+echo "" >>capnp/capnp.pro
+cat capnp.pro >>capnp/capnp.pro
 
 capnp_sources_lite=(
   c++.capnp.c++
@@ -78,7 +85,6 @@ capnp_compat_headers=(
 
 kj_sources_lite=(
   array.c++
-  cidr.c++
   list.c++
   common.c++
   debug.c++
@@ -95,10 +101,10 @@ kj_sources_lite=(
   arena.c++
   units.c++
   encoding.c++
+  time.c++
 )
 
 kj_headers=(
-  cidr.h
   common.h
   units.h
   memory.h

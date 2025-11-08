@@ -6,7 +6,7 @@ include($$PWD/../lstream.pri)
 include($$PWD/../../../db_plugin.pri)
 include($$PWD/capnp/capnp.pri)
 
-INCLUDEPATH += capnp $$VERSION_INC $$PWD/../runtime/capnp
+INCLUDEPATH += capnp $$VERSION_INC $$PWD/../runtime/capnp $$PWD/../runtime/kj
 LIBS += -L$$DESTDIR/.. -lxkj -lxcapnp
 
 HEADERS += \

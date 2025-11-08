@@ -3,8 +3,10 @@ DESTDIR_UT = $$OUT_PWD/../../../..
 
 TARGET = lstream_tests
 
-include($$PWD/../lstream.pri)
 include($$PWD/../../../../lib_ut.pri)
+include($$PWD/../lstream.pri)
+
+INCLUDEPATH += $$PWD/../runtime/capnp $$PWD/../runtime/kj
 
 SOURCES = \
   dbLStreamReaderTests.cc \

@@ -472,6 +472,15 @@ class Config(object):
 
         return macros
 
+    def extra_macros(self, mod):
+        """
+        Returns extra module-dependent macros
+        """
+        if mod == "_lstream_dbpi":
+            return [("CAPNP_LITE", 1)]
+        else:
+            return []
+
     def minor_version(self):
         """
         Gets the version string
@@ -858,7 +867,7 @@ for pi in dbpi_dirs:
 
     pi_ext = Library(
         config.root + ".db_plugins." + mod_name,
-        define_macros=config.macros() + [("MAKE_DB_PLUGIN_LIBRARY", 1)],
+        define_macros=config.macros() + [("MAKE_DB_PLUGIN_LIBRARY", 1)] + config.extra_macros(mod_name),
         include_dirs=[
             pi,
             os.path.join("src", "plugins", "common"),

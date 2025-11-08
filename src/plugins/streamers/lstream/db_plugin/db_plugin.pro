@@ -2,8 +2,8 @@
 TARGET = lstream
 DESTDIR = $$OUT_PWD/../../../../db_plugins
 
-include($$PWD/../lstream.pri)
 include($$PWD/../../../db_plugin.pri)
+include($$PWD/../lstream.pri)
 include($$PWD/capnp/capnp.pri)
 
 INCLUDEPATH += capnp $$VERSION_INC $$PWD/../runtime/capnp $$PWD/../runtime/kj

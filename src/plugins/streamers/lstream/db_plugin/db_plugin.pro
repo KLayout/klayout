@@ -7,7 +7,7 @@ include($$PWD/../lstream.pri)
 include($$PWD/capnp/capnp.pri)
 
 INCLUDEPATH += capnp $$VERSION_INC
-LIBS += -L$$DESTDIR/.. -lxkj -lxcapnp
+LIBS += -L$$DESTDIR/.. -lxcapnp -lxkj
 
 HEADERS += \
   lstrCompressed.h \

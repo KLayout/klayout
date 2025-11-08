@@ -7,6 +7,7 @@ include($$PWD/../../lstream.pri)
 include($$PWD/capnp.pri)
 
 TARGET = xcapnp
+CONFIG += staticlib
 SOURCES = $$CAPNP_SOURCES
 HEADERS = $$CAPNP_HEADERS
 

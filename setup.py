@@ -253,6 +253,10 @@ setuptools.command.build_ext.link_shared_object = always_link_shared_object
 # ----------------------------------------------------------------------------------------
 
 
+# TODO: 
+# * Pull this from module-specific configuration files?
+# * Include dependencies: "extra_objects", "include_dirs"
+
 class Config(object):
 
     """
@@ -323,6 +327,39 @@ class Config(object):
         else:
             return os.path.join(self.build_platlib, self.root, self.libname_of(mod))
 
+    def extra_include_dirs(self, mod, root):
+        """
+        Gets extra include directories per module
+        """
+        if mod == "_lstream_dbpi":
+            return [ 
+                os.path.join("src", "version"),  # does not use tlVersion.h
+                os.path.join(root, "capnp"),
+                os.path.join(root, "..", "runtime", "capnp"),
+                os.path.join(root, "..", "runtime", "kj")
+            ]
+        else:
+            return []
+
+    def sources(self, mod, root):
+        """
+        Gets the source files for the given module and root source path
+        """
+        if mod == "_gds2_dbpi":
+            # GDS2 module has the contrib subfolder
+            files = glob.glob(os.path.join(root, "*.cc"))
+            files += glob.glob(os.path.join(root, "contrib", "*.cc"))
+            return files
+        elif mod == "_lstream_dbpi":
+            # LStream module is .. complex
+            files = glob.glob(os.path.join(root, "*.cc"))
+            files += glob.glob(os.path.join(root, "capnp", "*.cc"))
+            files += glob.glob(os.path.join(root, "..", "runtime", "capnp", "capnp", "*.cc"))
+            files += glob.glob(os.path.join(root, "..", "runtime", "kj", "kj", "*.cc"))
+            return files
+        else:
+            return glob.glob(os.path.join(root, "*.cc"))
+          
     def compile_args(self, mod):
         """
         Gets additional compiler arguments
@@ -340,6 +377,10 @@ class Config(object):
                 ]
             else:
                 args = []
+        elif mod == "_lstream_dbpi":
+            args = [
+                "-std=c++14",  # cap'n'proto needs this
+            ]
         else:
             args = [
                 "-Wno-strict-aliasing",  # Avoids many "type-punned pointer" warnings
@@ -423,6 +464,7 @@ class Config(object):
             ("HAVE_CURL", 1),
             ("HAVE_EXPAT", 1),
             ("HAVE_PNG", 1),
+            ("KLAYOUT_VERSION", self.version()),
             ("KLAYOUT_MAJOR_VERSION", self.major_version()),
             ("KLAYOUT_MINOR_VERSION", self.minor_version()),
             ("GSI_ALIAS_INSPECT", 1),
@@ -492,15 +534,7 @@ config = Config()
 # _tl dependency library
 
 _tl_path = os.path.join("src", "tl", "tl")
-_tl_sources = set(glob.glob(os.path.join(_tl_path, "*.cc")))
-
-# Exclude sources which are compatible with Qt only
-# Caveat, in source distribution tarballs from pypi, these files will
-# not exist. So we need an error-free discard method instead of list's remove.
-_tl_sources.discard(os.path.join(_tl_path, "tlHttpStreamQt.cc"))
-_tl_sources.discard(os.path.join(_tl_path, "tlHttpStreamNoQt.cc"))
-_tl_sources.discard(os.path.join(_tl_path, "tlFileSystemWatcher.cc"))
-_tl_sources.discard(os.path.join(_tl_path, "tlDeferredExecutionQt.cc"))
+_tl_sources = set(config.sources("_tl", _tl_path))
 
 _tl = Library(
     config.root + "._tl",
@@ -518,7 +552,7 @@ config.add_extension(_tl)
 # _gsi dependency library
 
 _gsi_path = os.path.join("src", "gsi", "gsi")
-_gsi_sources = set(glob.glob(os.path.join(_gsi_path, "*.cc")))
+_gsi_sources = set(config.sources("_gsi", _gsi_path))
 
 _gsi = Library(
     config.root + "._gsi",
@@ -537,13 +571,13 @@ config.add_extension(_gsi)
 # _pya dependency library
 
 _pya_path = os.path.join("src", "pya", "pya")
-_pya_sources = set(glob.glob(os.path.join(_pya_path, "*.cc")))
+_pya_sources = set(config.sources("_pya", _pya_path))
 
 _version_path = os.path.join("src", "version")
 
 _pya = Library(
     config.root + "._pya",
-    define_macros=config.macros() + [("MAKE_PYA_LIBRARY", 1), ("KLAYOUT_VERSION", config.version())],
+    define_macros=config.macros() + [("MAKE_PYA_LIBRARY", 1)],
     include_dirs=[_version_path, _tl_path, _gsi_path],
     extra_objects=[config.path_of("_tl", _tl_path), config.path_of("_gsi", _gsi_path)],
     language="c++",
@@ -558,7 +592,7 @@ config.add_extension(_pya)
 # _rba dependency library (dummy)
 
 _rba_path = os.path.join("src", "rbastub")
-_rba_sources = set(glob.glob(os.path.join(_rba_path, "*.cc")))
+_rba_sources = set(config.sources("_rba", _rba_path))
 
 _rba = Library(
     config.root + '._rba',
@@ -577,7 +611,7 @@ config.add_extension(_rba)
 # _db dependency library
 
 _db_path = os.path.join("src", "db", "db")
-_db_sources = set(glob.glob(os.path.join(_db_path, "*.cc")))
+_db_sources = set(config.sources("_db", _db_path))
 
 _db = Library(
     config.root + "._db",
@@ -596,7 +630,7 @@ config.add_extension(_db)
 # _pex dependency library
 
 _pex_path = os.path.join("src", "pex", "pex")
-_pex_sources = set(glob.glob(os.path.join(_pex_path, "*.cc")))
+_pex_sources = set(config.sources("_pex", _pex_path))
 
 _pex = Library(
     config.root + "._pex",
@@ -615,7 +649,7 @@ config.add_extension(_pex)
 # _lib dependency library
 
 _lib_path = os.path.join("src", "lib", "lib")
-_lib_sources = set(glob.glob(os.path.join(_lib_path, "*.cc")))
+_lib_sources = set(config.sources("_lib", _lib_path))
 
 _lib = Library(
     config.root + "._lib",
@@ -638,7 +672,7 @@ config.add_extension(_lib)
 # _rdb dependency library
 
 _rdb_path = os.path.join("src", "rdb", "rdb")
-_rdb_sources = set(glob.glob(os.path.join(_rdb_path, "*.cc")))
+_rdb_sources = set(config.sources("_rdb", _rdb_path))
 
 _rdb = Library(
     config.root + "._rdb",
@@ -661,7 +695,7 @@ config.add_extension(_rdb)
 # _laybasic dependency library
 
 _laybasic_path = os.path.join("src", "laybasic", "laybasic")
-_laybasic_sources = set(glob.glob(os.path.join(_laybasic_path, "*.cc")))
+_laybasic_sources = set(config.sources("_laybasic", _laybasic_path))
 
 _laybasic = Library(
     config.root + '._laybasic',
@@ -685,7 +719,7 @@ config.add_extension(_laybasic)
 # _layview dependency library
 
 _layview_path = os.path.join("src", "layview", "layview")
-_layview_sources = set(glob.glob(os.path.join(_layview_path, "*.cc")))
+_layview_sources = set(config.sources("_layview", _layview_path))
 
 _layview = Library(
     config.root + '._layview',
@@ -710,7 +744,7 @@ config.add_extension(_layview)
 # _lym dependency library
 
 _lym_path = os.path.join("src", "lym", "lym")
-_lym_sources = set(glob.glob(os.path.join(_lym_path, "*.cc")))
+_lym_sources = set(config.sources("_lym", _lym_path))
 
 _lym = Library(
     config.root + '._lym',
@@ -734,7 +768,7 @@ config.add_extension(_lym)
 # _ant dependency library
 
 _ant_path = os.path.join("src", "ant", "ant")
-_ant_sources = set(glob.glob(os.path.join(_ant_path, "*.cc")))
+_ant_sources = set(config.sources("_ant", _ant_path))
 
 _ant = Library(
     config.root + '._ant',
@@ -760,7 +794,7 @@ config.add_extension(_ant)
 # _img dependency library
 
 _img_path = os.path.join("src", "img", "img")
-_img_sources = set(glob.glob(os.path.join(_img_path, "*.cc")))
+_img_sources = set(config.sources("_img", _img_path))
 
 _img = Library(
     config.root + '._img',
@@ -786,7 +820,7 @@ config.add_extension(_img)
 # _edt dependency library
 
 _edt_path = os.path.join("src", "edt", "edt")
-_edt_sources = set(glob.glob(os.path.join(_edt_path, "*.cc")))
+_edt_sources = set(config.sources("_edt", _edt_path))
 
 _edt = Library(
     config.root + '._edt',
@@ -820,8 +854,7 @@ for pi in dbpi_dirs:
 
     mod_name = "_" + os.path.split(os.path.split(pi)[-2])[-1] + "_dbpi"
 
-    pi_sources = glob.glob(os.path.join(pi, "*.cc"))
-    pi_sources += glob.glob(os.path.join(pi, "contrib", "*.cc"))
+    pi_sources = set(config.sources(mod_name, pi))
 
     pi_ext = Library(
         config.root + ".db_plugins." + mod_name,
@@ -832,7 +865,7 @@ for pi in dbpi_dirs:
             _db_path,
             _tl_path,
             _gsi_path,
-        ],
+        ] + config.extra_include_dirs(mod_name, pi),
         extra_objects=[
             config.path_of("_tl", _tl_path),
             config.path_of("_gsi", _gsi_path),
@@ -841,7 +874,7 @@ for pi in dbpi_dirs:
         language="c++",
         extra_link_args=config.link_args(mod_name),
         extra_compile_args=config.compile_args(mod_name),
-        sources=pi_sources,
+        sources=list(pi_sources),
     )
 
     db_plugins.append(pi_ext)
@@ -851,7 +884,7 @@ for pi in dbpi_dirs:
 # tl extension library
 
 tl_path = os.path.join("src", "pymod", "tl")
-tl_sources = set(glob.glob(os.path.join(tl_path, "*.cc")))
+tl_sources = set(config.sources("tlcore", tl_path))
 
 tl = Extension(
     config.root + ".tlcore",
@@ -871,7 +904,7 @@ tl = Extension(
 # db extension library
 
 db_path = os.path.join("src", "pymod", "db")
-db_sources = set(glob.glob(os.path.join(db_path, "*.cc")))
+db_sources = set(config.sources("dbcore", db_path))
 
 db = Extension(
     config.root + ".dbcore",
@@ -892,7 +925,7 @@ db = Extension(
 # pex extension library
 
 pex_path = os.path.join("src", "pymod", "pex")
-pex_sources = set(glob.glob(os.path.join(pex_path, "*.cc")))
+pex_sources = set(config.sources("pexcore", pex_path))
 
 pex = Extension(
     config.root + ".pexcore",
@@ -914,7 +947,7 @@ pex = Extension(
 # lib extension library
 
 lib_path = os.path.join("src", "pymod", "lib")
-lib_sources = set(glob.glob(os.path.join(lib_path, "*.cc")))
+lib_sources = set(config.sources("libcore", lib_path))
 
 lib = Extension(
     config.root + ".libcore",
@@ -935,7 +968,7 @@ lib = Extension(
 # rdb extension library
 
 rdb_path = os.path.join("src", "pymod", "rdb")
-rdb_sources = set(glob.glob(os.path.join(rdb_path, "*.cc")))
+rdb_sources = set(config.sources("rdbcore", rdb_path))
 
 rdb = Extension(
     config.root + ".rdbcore",
@@ -956,7 +989,7 @@ rdb = Extension(
 # lay extension library
 
 lay_path = os.path.join("src", "pymod", "lay")
-lay_sources = set(glob.glob(os.path.join(lay_path, "*.cc")))
+lay_sources = set(config.sources("laycore", lay_path))
 
 lay = Extension(config.root + '.laycore',
                 define_macros=config.macros(),
@@ -986,7 +1019,7 @@ lay = Extension(config.root + '.laycore',
 # pya extension library (all inclusive, basis of pya module)
 
 pyacore_path = os.path.join("src", "pymod", "pya")
-pyacore_sources = set(glob.glob(os.path.join(pyacore_path, "*.cc")))
+pyacore_sources = set(config.sources("pyacore", pyacore_path))
 
 pya = Extension(config.root + '.pyacore',
                 define_macros=config.macros(),
@@ -1032,7 +1065,7 @@ if __name__ == "__main__":
         description="KLayout standalone Python package",
         long_description="This package is a standalone distribution of KLayout's Python API.\n\nFor more details see here: https://www.klayout.org/klayout-pypi",
         author="Matthias Koefferlein",
-        author_email="matthias@klayout.de",
+        author_email="matthias@klayout.org",
         classifiers=[
             # Recommended classifiers
             "Programming Language :: Python :: 2",

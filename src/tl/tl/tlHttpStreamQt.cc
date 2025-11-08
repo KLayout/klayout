@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT) && !defined(HAVE_CURL)
+
 #include "tlHttpStream.h"
 #include "tlHttpStreamQt.h"
 #include "tlLog.h"
@@ -557,3 +559,6 @@ InputHttpStreamPrivateData::filename () const
 }
 
 }
+
+#endif
+

@@ -6,8 +6,6 @@ TARGET = lstream_tests
 include($$PWD/../../../../lib_ut.pri)
 include($$PWD/../lstream.pri)
 
-INCLUDEPATH += $$PWD/../runtime/capnp $$PWD/../runtime/kj
-
 SOURCES = \
   dbLStreamReaderTests.cc \
   dbLStreamWriterTests.cc

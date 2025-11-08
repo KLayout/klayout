@@ -1,6 +1,7 @@
 
 TEMPLATE = lib
 DESTDIR = $$OUT_PWD/../../../../..
+INCLUDEPATH =
 
 include($$PWD/../../lstream.pri)
 include($$PWD/capnp.pri)
@@ -10,7 +11,6 @@ SOURCES = $$CAPNP_SOURCES
 HEADERS = $$CAPNP_HEADERS
 
 DEFINES += CAPNP_LITE
-INCLUDEPATH = $$PWD/../kj
 LIBS = 
 QT = 
 

@@ -1,8 +1,8 @@
 
 DESTDIR = $$OUT_PWD/../../../../lay_plugins
 
-include($$PWD/../lstream.pri)
 include($$PWD/../../../lay_plugin.pri)
+include($$PWD/../lstream.pri)
 
 INCLUDEPATH += $$PWD/../db_plugin $$PWD/../db_plugin/capnp
 DEPENDPATH += $$PWD/../db_plugin

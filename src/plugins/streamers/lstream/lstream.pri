@@ -10,3 +10,5 @@ equals(HAVE_QT, "0") || lessThan(QT_MAJOR_VERSION, 6) {
   QMAKE_CXXFLAGS += \
       -Wno-unused-parameter
 }
+
+ INCLUDEPATH += $$PWD/runtime/capnp $$PWD/runtime/kj

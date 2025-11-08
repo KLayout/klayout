@@ -443,7 +443,7 @@ Reader::do_read_internal (db::Layout &layout)
   m_stream.reset ();
 
   size_t nhdr = strlen (LStream_sig) + 1;
-  std::unique_ptr<char> hdr (new char [nhdr]);
+  std::unique_ptr<char[]> hdr (new char [nhdr]);
   size_t nhdr_read = m_stream.tryRead (hdr.get (), nhdr, nhdr);
   if (nhdr_read != nhdr || memcmp (LStream_sig, hdr.get (), nhdr) != 0) {
     error (tl::to_string (tr ("LStream format not recognized (missing magic bytes)")));
@@ -730,6 +730,8 @@ Reader::read_cells (stream::library::Library::Reader library)
 
       db::CommonReaderLayerMapping layer_mapping (this, mp_layout);
       mp_layout->recover_proxy_as (cell_index, context_info, &layer_mapping);
+
+      cell = &mp_layout->cell (cell_index);
 
     }
 

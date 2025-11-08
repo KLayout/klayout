@@ -7,7 +7,8 @@ include($$PWD/../lstream.pri)
 include($$PWD/../../../../lib_ut.pri)
 
 SOURCES = \
-  dbLStreamReaderTests.cc
+  dbLStreamReaderTests.cc \
+  dbLStreamWriterTests.cc
 
 INCLUDEPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin $$PWD/../../../common $$PWD/../db_plugin/capnp
 DEPENDPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin $$PWD/../../../common

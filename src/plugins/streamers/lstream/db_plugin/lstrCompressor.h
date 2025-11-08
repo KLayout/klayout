@@ -137,7 +137,7 @@ static inline db::Vector reduce_object (db::EdgePairWithProperties &ep)
  */
 static inline db::Vector reduce_object_point (db::Point &pt)
 {
-  db::Vector d = db::Point () - pt;
+  db::Vector d = db::Vector (pt);
   pt = db::Point ();
   return d;
 }

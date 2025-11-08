@@ -12,14 +12,14 @@ HEADERS=\
   capnp/variant.capnp.h \
 
 SOURCES=\
-  capnp/cell.capnp.c++ \
-  capnp/geometry.capnp.c++ \
-  capnp/header.capnp.c++ \
-  capnp/layoutView.capnp.c++ \
-  capnp/library.capnp.c++ \
-  capnp/metaData.capnp.c++ \
-  capnp/metaDataView.capnp.c++ \
-  capnp/propertySet.capnp.c++ \
-  capnp/repetition.capnp.c++ \
-  capnp/variant.capnp.c++ \
+  capnp/cell.capnp.cc \
+  capnp/geometry.capnp.cc \
+  capnp/header.capnp.cc \
+  capnp/layoutView.capnp.cc \
+  capnp/library.capnp.cc \
+  capnp/metaData.capnp.cc \
+  capnp/metaDataView.capnp.cc \
+  capnp/propertySet.capnp.cc \
+  capnp/repetition.capnp.cc \
+  capnp/variant.capnp.cc \
 

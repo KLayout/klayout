@@ -29,6 +29,7 @@ cd $srcdir
 for f in ${src[@]}; do
   echo "Compiling $f .."
 	capnp compile -o /usr/bin/capnpc-c++:$dest --src-prefix $dest -I $srcdir $f
+  mv $dest/$f.c++ $dest/$f.cc
 done
 
 pri=$dest/capnp.pri
@@ -41,7 +42,7 @@ echo "" >>$pri
 
 echo "SOURCES=\\" >>$pri
 for f in ${src[@]}; do
-  echo "  capnp/$f.c++ \\" >>$pri
+  echo "  capnp/$f.cc \\" >>$pri
 done
 echo "" >>$pri
 

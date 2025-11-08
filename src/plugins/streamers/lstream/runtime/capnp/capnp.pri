@@ -1,16 +1,16 @@
 
 CAPNP_SOURCES=\
-  capnp/c++.capnp.c++ \
-  capnp/blob.c++ \
-  capnp/arena.c++ \
-  capnp/layout.c++ \
-  capnp/list.c++ \
-  capnp/any.c++ \
-  capnp/message.c++ \
-  capnp/schema.capnp.c++ \
-  capnp/stream.capnp.c++ \
-  capnp/serialize.c++ \
-  capnp/serialize-packed.c++ \
+  capnp/c++.capnp.cc \
+  capnp/blob.cc \
+  capnp/arena.cc \
+  capnp/layout.cc \
+  capnp/list.cc \
+  capnp/any.cc \
+  capnp/message.cc \
+  capnp/schema.capnp.cc \
+  capnp/stream.capnp.cc \
+  capnp/serialize.cc \
+  capnp/serialize-packed.cc \
 
 CAPNP_HEADERS=\
   capnp/arena.h \

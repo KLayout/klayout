@@ -140,7 +140,8 @@ kj_std_headers=(
 )
 
 for f in ${capnp_sources_lite[@]}; do
-  cp $tmp/c++/src/capnp/$f capnp/capnp
+  ftarget=${f/.c++/.cc}
+  cp $tmp/c++/src/capnp/$f capnp/capnp/$ftarget
 done
 for f in ${capnp_headers[@]}; do
   cp $tmp/c++/src/capnp/$f capnp/capnp
@@ -153,7 +154,8 @@ pri=capnp/capnp.pri
 echo "" >$pri
 echo "CAPNP_SOURCES=\\" >>$pri
 for f in ${capnp_sources_lite[@]}; do
-  echo "  capnp/$f \\" >>$pri
+  ftarget=${f/.c++/.cc}
+  echo "  capnp/$ftarget \\" >>$pri
 done
 echo "" >>$pri
 echo "CAPNP_HEADERS=\\" >>$pri
@@ -165,7 +167,8 @@ for f in ${capnp_compat_headers[@]}; do
 done
 
 for f in ${kj_sources_lite[@]}; do
-  cp $tmp/c++/src/kj/$f kj/kj
+  ftarget=${f/.c++/.cc}
+  cp $tmp/c++/src/kj/$f kj/kj/$ftarget
 done
 for f in ${kj_headers[@]}; do
   cp $tmp/c++/src/kj/$f kj/kj
@@ -181,7 +184,8 @@ pri=kj/kj.pri
 echo "" >$pri
 echo "KJ_SOURCES=\\" >>$pri
 for f in ${kj_sources_lite[@]}; do
-  echo "  kj/$f \\" >>$pri
+  ftarget=${f/.c++/.cc}
+  echo "  kj/$ftarget \\" >>$pri
 done
 echo "" >>$pri
 echo "KJ_HEADERS=\\" >>$pri

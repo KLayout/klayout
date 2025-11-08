@@ -1,23 +1,23 @@
 
 KJ_SOURCES=\
-  kj/array.c++ \
-  kj/cidr.c++ \
-  kj/list.c++ \
-  kj/common.c++ \
-  kj/debug.c++ \
-  kj/exception.c++ \
-  kj/io.c++ \
-  kj/memory.c++ \
-  kj/mutex.c++ \
-  kj/string.c++ \
-  kj/source-location.c++ \
-  kj/hash.c++ \
-  kj/table.c++ \
-  kj/thread.c++ \
-  kj/main.c++ \
-  kj/arena.c++ \
-  kj/units.c++ \
-  kj/encoding.c++ \
+  kj/array.cc \
+  kj/cidr.cc \
+  kj/list.cc \
+  kj/common.cc \
+  kj/debug.cc \
+  kj/exception.cc \
+  kj/io.cc \
+  kj/memory.cc \
+  kj/mutex.cc \
+  kj/string.cc \
+  kj/source-location.cc \
+  kj/hash.cc \
+  kj/table.cc \
+  kj/thread.cc \
+  kj/main.cc \
+  kj/arena.cc \
+  kj/units.cc \
+  kj/encoding.cc \
 
 KJ_HEADERS=\
   kj/cidr.h \

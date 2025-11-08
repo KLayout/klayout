@@ -2998,3 +2998,24 @@ TEST(issue_909)
   EXPECT_EQ (r.to_string (), "(0,0;0,100;100,100;100,0);(0,0;0,300;200,300;200,0)");
 }
 
+TEST(issue_2208)
+{
+  db::Point points[] = {
+    db::Point (-36, -2698),
+    db::Point (-3226, 492),
+    db::Point (-2871, 847),
+    db::Point (-746, -1278),
+    db::Point (-751, -1283),
+    db::Point (-746, -1288),
+    db::Point (-741, -1283),
+    db::Point (319, -2343)
+  };
+
+  db::Region r;
+  db::Polygon p;
+  p.assign_hull (points + 0, points + sizeof (points) / sizeof (points [0]));
+  r.insert (p);
+
+  db::EdgePairs ep = r.width_check (500);
+  EXPECT_EQ (ep.to_string (), "(-1046,-1688;-1151,-1583)|(-751,-1283;-746,-1288)");
+}

@@ -858,7 +858,7 @@ public:
   coord_type distance (const db::point<C> &p) const
   {
     //  the distance is computed from 
-    //    d = (a x b) / sqrt (a * a)
+    //    d = (a x b) / |a|
     //  where b = p - p1, a = p2 - p1
     if (is_degenerate ()) {
       //  for safety handle this case - without a reasonable result
@@ -866,7 +866,7 @@ public:
     } else {
       //  compute the distance as described above 
       area_type axb = coord_traits::vprod (m_p2.x (), m_p2.y (), p.x (), p.y (), m_p1.x (), m_p1.y ()); 
-      double d = double (axb) / double (length ());
+      double d = double (axb) / double_length ();
       //  and round
       return coord_traits::rounded (d);
     }
@@ -929,7 +929,7 @@ public:
   distance_type distance_abs (const db::point<C> &p) const
   {
     //  the distance is computed from 
-    //    d = (a x b) / sqrt (a * a)
+    //    d = (a x b) / |a|
     //  where b = p - p1, a = p2 - p1
     if (is_degenerate ()) {
       //  for safety handle this case - without a reasonable result
@@ -937,7 +937,7 @@ public:
     } else {
       //  compute the distance as described above 
       area_type axb = coord_traits::vprod (m_p2.x (), m_p2.y (), p.x (), p.y (), m_p1.x (), m_p1.y ()); 
-      double d = fabs (double (axb)) / double (length ());
+      double d = fabs (double (axb)) / double_length ();
       //  and round
       return coord_traits::rounded_distance (d);
     }

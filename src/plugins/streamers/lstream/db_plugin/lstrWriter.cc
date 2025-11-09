@@ -91,6 +91,18 @@ Writer::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayou
   m_compression_level = lstr_options.compression_level;
   m_recompress = lstr_options.recompress;
 
+  double dbu = (options.dbu () == 0.0) ? layout.dbu () : options.dbu ();
+  double sf = options.scale_factor () * (layout.dbu () / dbu);
+  if (fabs (sf - 1.0) < 1e-9) {
+    //  to avoid rounding problems, set to 1.0 exactly if possible.
+    sf = 1.0;
+  }
+
+  //  TODO: implement
+  if (sf != 1.0) {
+    throw tl::Exception (tl::to_string (tr ("Scaling is not supported in LStream writer currently")));
+  }
+
   mp_stream = &stream;
   m_options = options;
   mp_layout = &layout;

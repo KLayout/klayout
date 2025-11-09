@@ -149,6 +149,10 @@ private:
 
   int m_dxf_polygon_mode;
 
+  int m_lstream_compression_level;
+  bool m_lstream_recompress;
+  bool m_lstream_permissive;
+
   void set_oasis_substitution_char (const std::string &text);
   void init_from_options (const db::SaveLayoutOptions &options);
 };

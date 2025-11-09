@@ -115,7 +115,7 @@ class LStreamFormatDeclaration
   }
 };
 
-static tl::RegisteredClass<db::StreamFormatDeclaration> format_decl (new LStreamFormatDeclaration (), 0, "LStream");
+static tl::RegisteredClass<db::StreamFormatDeclaration> format_decl (new LStreamFormatDeclaration (), 2050, "LStream");
 
 }
 

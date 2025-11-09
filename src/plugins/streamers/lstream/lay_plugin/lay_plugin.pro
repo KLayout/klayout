@@ -14,8 +14,12 @@ LIBS += -L$$DESTDIR/../db_plugins -llstream
 
 HEADERS = \
   layLStreamReaderPlugin.h \
+  layLStreamWriterPlugin.h \
 
 SOURCES = \
   layLStreamReaderPlugin.cc \
+  layLStreamWriterPlugin.cc \
 
 FORMS = \
+  LStreamWriterOptionPage.ui \
+

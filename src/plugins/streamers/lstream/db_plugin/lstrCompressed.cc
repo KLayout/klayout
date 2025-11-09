@@ -484,7 +484,12 @@ Compressed::compress_instances (const db::Cell::const_iterator &begin_instances,
           disp = create_repetition_from_array (&inst_array, array, irregular_array);
         }
 
-        db::CellInstArray single_inst (inst_array.object (), db::Trans (-disp) * inst_array.front ());
+        db::CellInstArray single_inst;
+        if (! inst_array.is_complex ()) {
+          single_inst = db::CellInstArray (inst_array.object (), db::Trans (-disp) * inst_array.front ());
+        } else {
+          single_inst = db::CellInstArray (inst_array.object (), inst_array.complex_trans (db::Trans (-disp) * inst_array.front ()));
+        }
 
         //  no compression -> just keep as is
         if (prop_id != 0) {
@@ -499,7 +504,13 @@ Compressed::compress_instances (const db::Cell::const_iterator &begin_instances,
         //  As we configured the compressor with level 0, no regular array formation will happen here. This is
         //  good for instances as array instances are special.
         db::Vector disp = inst_array.front ().disp ();
-        db::CellInstArray single_inst (inst_array.object (), db::Trans (-disp) * inst_array.front ());
+
+        db::CellInstArray single_inst;
+        if (! inst_array.is_complex ()) {
+          single_inst = db::CellInstArray (inst_array.object (), db::Trans (-disp) * inst_array.front ());
+        } else {
+          single_inst = db::CellInstArray (inst_array.object (), inst_array.complex_trans (db::Trans (-disp) * inst_array.front ()));
+        }
 
         if (prop_id != 0) {
           inst_with_properties_compressor.add (db::CellInstArrayWithProperties (single_inst, prop_id), disp);

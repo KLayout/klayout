@@ -111,8 +111,26 @@ Writer::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayou
   m_meta_data_view_id = -1;
 
   m_layers_to_write.clear ();
-  options.get_valid_layers (layout, m_layers_to_write, db::SaveLayoutOptions::LP_OnlyNumbered);
-  options.get_valid_layers (layout, m_layers_to_write, db::SaveLayoutOptions::LP_OnlyNamed);
+
+#if KLAYOUT_MAJOR_VERSION == 0 && (KLAYOUT_MINOR_VERSION < 30 || (KLAYOUT_MINOR_VERSION == 30 && KLAYOUT_TINY_VERSION < 5))
+  {
+    options.get_valid_layers (layout, m_layers_to_write, db::SaveLayoutOptions::LP_OnlyNumbered);
+    options.get_valid_layers (layout, m_layers_to_write, db::SaveLayoutOptions::LP_OnlyNamed);
+
+    //  clean up layer duplicates - see TODO above
+    auto lw = m_layers_to_write.begin ();
+    std::set<unsigned int> lseen;
+    for (auto l = m_layers_to_write.begin (); l != m_layers_to_write.end (); ++l) {
+      if (lseen.find (l->first) == lseen.end ()) {
+        *lw++ = *l;
+        lseen.insert (l->first);
+      }
+    }
+    m_layers_to_write.erase (lw, m_layers_to_write.end ());
+  }
+#else
+  options.get_valid_layers (layout, m_layers_to_write, db::SaveLayoutOptions::LP_AsIs);
+#endif
 
   m_cells_to_write.clear ();
   options.get_cells (layout, m_cells_to_write, m_layers_to_write);

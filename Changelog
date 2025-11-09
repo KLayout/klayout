@@ -1,3 +1,30 @@
+0.30.5           (2025-11-09):
+* Enhancement: %GITHUB%/issues/2147 Feature request: collect multiple files into a single library if the library name is identical
+* Bugfix: %GITHUB%/issues/2156 Crash when loading library with mabrains klayout_lib_manager
+* Bugfix: %GITHUB%/issues/2160 Compiling with QT6 and -without-qt-network
+* Bugfix: %GITHUB%/issues/2162 Select rectangle, query => coredump. asan: heap-use-after-free
+* Enhancement: %GITHUB%/issues/2168 Reloading cell libraries does not work
+* Bugfix: %GITHUB%/issues/2169 Tech-specific "python" folder not added to path
+* Enhancement: %GITHUB%/issues/2170 Ergonomics / Interface / "Select Cell" dialog: position of the "Show all cells" tick box 
+* Enhancement: %GITHUB%/issues/2172 Finer-grained library API
+* Enhancement: %GITHUB%/issues/2174 Publish "on_current_layer_changed_event" of LayoutView
+* Enhancement: %GITHUB%/issues/2175 True text bounding box for labels in Python/Ruby
+* Enhancement: %GITHUB%/issues/2176 Allow placing vias in all modes
+* Enhancement: %GITHUB%/issues/2180 Feature request: View->Show Unresolved References
+* Enhancement: %GITHUB%/issues/2183 strmxor --deep, --drop-empty-cells should be the default
+* Bugfix: %GITHUB%/issues/2191 LIBNAME is not maintained in GDS in "File/Save"
+* Bugfix: %GITHUB%/issues/2194 Forward/backward features can't be bound to a key
+* Bugfix: %GITHUB%/issues/2195 Feature request: extend PCell API to provide a suitable cell name including PCell parameters
+* Bugfix: %GITHUB%/issues/2201 Net Tracer "Trace path" not working when zooming
+* Bugfix: %GITHUB%/issues/2208 DRC Failed to report results correctly
+* Bugfix: Fixing problem with HM decomposition with non-trivial triangulation constraints
+* Enhancement: Cursor now snaps to center of edges and centers of boxes too
+* Enhancement: Experimental integration of the LStream format
+  Details about the LStream format and the motivation can be found here: 
+  https://codeberg.org/klayoutmatthias/lstream/src/branch/main/doc/doc.md
+  If you encounter problems building KLayout, you can use the -nolstream option 
+  in the build script to disable this module.
+  
 0.30.4           (2025-09-09):
 * Bugfix: %GITHUB%/issues/2110 Feature request: make unresolved references visible and editable in the layout view
 * Bugfix: %GITHUB%/issues/2111 Internal error on R extraction

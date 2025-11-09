@@ -14,6 +14,7 @@ SOURCES = \
   strm2cif.cc \
   strm2gds.cc \
   strm2oas.cc \
+  strm2lstr.cc \
   strmclip.cc \
   strm2dxf.cc \
   strm2gdstxt.cc \

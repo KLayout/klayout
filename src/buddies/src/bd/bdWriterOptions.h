@@ -108,6 +108,7 @@ public:
   static const std::string gds2_format_name;
   static const std::string gds2text_format_name;
   static const std::string oasis_format_name;
+  static const std::string lstream_format_name;
   static const std::string cif_format_name;
   static const std::string dxf_format_name;
   static const std::string mag_format_name;

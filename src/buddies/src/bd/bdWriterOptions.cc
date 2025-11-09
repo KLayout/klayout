@@ -89,6 +89,7 @@ GenericWriterOptions::init_from_options (const db::SaveLayoutOptions &save_optio
 const std::string GenericWriterOptions::gds2_format_name      = "GDS2";
 const std::string GenericWriterOptions::gds2text_format_name  = "GDS2Text";  //  no special options
 const std::string GenericWriterOptions::oasis_format_name     = "OASIS";
+const std::string GenericWriterOptions::lstream_format_name   = "LStream";
 const std::string GenericWriterOptions::dxf_format_name       = "DXF";
 const std::string GenericWriterOptions::cif_format_name       = "CIF";
 const std::string GenericWriterOptions::mag_format_name       = "MAG";

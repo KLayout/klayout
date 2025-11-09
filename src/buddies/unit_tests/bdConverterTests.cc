@@ -187,6 +187,31 @@ TEST(6)
   db::compare_layouts (this, layout, input_au, db::WriteGDS2);
 }
 
+//  Testing the converter main implementation (LStream)
+TEST(7)
+{
+  std::string input = tl::testdata ();
+  input += "/gds/t10.gds";
+
+  std::string output = this->tmp_file ();
+
+  const char *argv[] = { "x", input.c_str (), output.c_str () };
+
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::lstream_format_name), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::LoadLayoutOptions options;
+    db::Reader reader (stream);
+    reader.read (layout, options);
+    EXPECT_EQ (reader.format (), "LStream");
+  }
+
+  db::compare_layouts (this, layout, input, db::NoNormalization);
+}
+
 //  Large LEF/DEF to OAS converter test
 TEST(10)
 {

@@ -110,6 +110,17 @@ Vertex::is_outside () const
   return false;
 }
 
+bool
+Vertex::is_on_outline () const
+{
+  for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
+    if ((*e)->is_segment ()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void
 Vertex::set_is_precious (bool f, unsigned int id)
 {

@@ -31,6 +31,8 @@
 #include <vector>
 #include <map>
 
+// #define DEBUG_DUMP_ESSENTIAL_EDGES
+
 namespace db
 {
 
@@ -286,64 +288,133 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
   //  them one-by-one, but using them in length order, from the
 
   std::unordered_set<const Edge *> essential_edges;
+  std::unordered_set<const Vertex *> concave_vertexes_seen;
 
-  typedef std::list<std::pair<double, const Edge *> > angles_and_edges_list;
-  angles_and_edges_list angles_and_edges;
-  std::vector<angles_and_edges_list::iterator> sorted_edges;
+  while (! concave_vertexes.empty ()) {
 
-  for (auto cc = concave_vertexes.begin (); cc != concave_vertexes.end (); ++cc) {
+    typedef std::list<std::pair<double, const Edge *> > angles_and_edges_list;
+    angles_and_edges_list angles_and_edges;
+    std::vector<angles_and_edges_list::iterator> sorted_edges;
 
-    angles_and_edges.clear ();
-    const Vertex *v0 = cc->corner;
+    std::unordered_set<const Vertex *> new_inner_vertexes;
 
-    const Edge *e = cc->incoming;
-    while (e) {
+    for (auto cc = concave_vertexes.begin (); cc != concave_vertexes.end (); ++cc) {
 
-      const Polygon *t = e->v2 () == v0 ? e->right () : e->left ();
-      tl_assert (t != 0);
+      angles_and_edges.clear ();
+      const Vertex *v0 = cc->corner;
 
-      const Edge *en = t->next_edge (e, v0);
-      tl_assert (en != 0);
+      concave_vertexes_seen.insert (v0);
 
-      db::DVector v1 = e->edge ().d () * (e->v1 () == v0 ? 1.0 : -1.0);
-      db::DVector v2 = en->edge ().d () * (en->v1 () == v0 ? 1.0 : -1.0);
+      const Edge *e = cc->incoming;
+      while (e) {
 
-      double angle = atan2 (db::vprod (v1, v2), db::sprod (v1, v2));
+        const Polygon *t = e->v2 () == v0 ? e->right () : e->left ();
+        tl_assert (t != 0);
 
-      e = (en == cc->outgoing) ? 0 : en;
-      angles_and_edges.push_back (std::make_pair (angle, e));
+        const Edge *en = t->next_edge (e, v0);
+        tl_assert (en != 0);
+
+        db::DVector v1 = e->edge ().d () * (e->v1 () == v0 ? 1.0 : -1.0);
+        db::DVector v2 = en->edge ().d () * (en->v1 () == v0 ? 1.0 : -1.0);
+
+        double angle = atan2 (db::vprod (v1, v2), db::sprod (v1, v2));
+
+        e = (en == cc->outgoing) ? 0 : en;
+        angles_and_edges.push_back (std::make_pair (angle, e));
+
+      }
+
+      sorted_edges.clear ();
+
+      for (auto i = angles_and_edges.begin (); i != angles_and_edges.end (); ++i) {
+        if (i->second) {
+          sorted_edges.push_back (i);
+        }
+      }
+
+      std::sort (sorted_edges.begin (), sorted_edges.end (), SortAngleAndEdgesByEdgeLength ());
+
+      for (auto i = sorted_edges.end (); i != sorted_edges.begin (); ) {
+        --i;
+        angles_and_edges_list::iterator ii = *i;
+        angles_and_edges_list::iterator iin = ii;
+        ++iin;
+        if (ii->first + iin->first < (split_edges ? M_PI + db::epsilon : M_PI - db::epsilon)) {
+          //  not an essential edge -> remove
+          iin->first += ii->first;
+          angles_and_edges.erase (ii);
+        }
+      }
+
+      for (auto i = angles_and_edges.begin (); i != angles_and_edges.end (); ++i) {
+        if (i->second) {
+          essential_edges.insert (i->second);
+          //  record new endpoints of essential edges which are inside the polygon - i.e. they
+          //  have a segment attached. Below we will turn them into new concave "corners" and
+          //  continue deriving essential edges from there.
+          if (! i->second->v1 ()->is_on_outline () && concave_vertexes_seen.find (i->second->v1 ()) == concave_vertexes_seen.end ()) {
+            new_inner_vertexes.insert (i->second->v1 ());
+          }
+          if (! i->second->v2 ()->is_on_outline () && concave_vertexes_seen.find (i->second->v2 ()) == concave_vertexes_seen.end ()) {
+            new_inner_vertexes.insert (i->second->v2 ());
+          }
+        }
+      }
 
     }
 
-    sorted_edges.clear ();
+    //  new inner vertexes (i.e. endpoints of essential edges inside the polygon) are treated as new convex vertexes
 
-    for (auto i = angles_and_edges.begin (); i != angles_and_edges.end (); ++i) {
-      if (i->second) {
-        sorted_edges.push_back (i);
-      }
-    }
+    concave_vertexes.clear ();
 
-    std::sort (sorted_edges.begin (), sorted_edges.end (), SortAngleAndEdgesByEdgeLength ());
+    for (auto i = new_inner_vertexes.begin (); i != new_inner_vertexes.end (); ++i) {
 
-    for (auto i = sorted_edges.end (); i != sorted_edges.begin (); ) {
-      --i;
-      angles_and_edges_list::iterator ii = *i;
-      angles_and_edges_list::iterator iin = ii;
-      ++iin;
-      if (ii->first + iin->first < (split_edges ? M_PI + db::epsilon : M_PI - db::epsilon)) {
-        //  not an essential edge -> remove
-        iin->first += ii->first;
-        angles_and_edges.erase (ii);
-      }
-    }
+      const Vertex *v0 = *i;
+      auto ie = v0->begin_edges ();
+      for ( ; ie != v0->end_edges () && essential_edges.find (*ie) == essential_edges.end (); ++ie)
+        ;
+      tl_assert (ie != v0->end_edges ());
+      const Edge *e = *ie;
 
-    for (auto i = angles_and_edges.begin (); i != angles_and_edges.end (); ++i) {
-      if (i->second) {
-        essential_edges.insert (i->second);
-      }
+      const Edge *en = e;
+
+      do {
+
+        const Edge *enn = en;
+
+        //  look for the next edge (clockwise) which is an essential edge
+        do {
+          const Polygon *t = enn->v2 () == v0 ? enn->right () : enn->left ();
+          tl_assert (t != 0);
+          enn = t->next_edge (enn, v0);
+          tl_assert (enn != 0);
+        } while (enn != en && essential_edges.find (enn) == essential_edges.end ());
+
+        db::DEdge e1 (*en->other (v0), *v0);
+        db::DEdge e2 (*v0, *enn->other (v0));
+
+        //  vp > 0: concave, vp < 0: convex
+        int vp_sign = db::vprod_sign (e1, e2);
+        if (vp_sign > 0 || en == enn /*folding back*/) {
+          concave_vertexes.push_back (ConcaveCorner (v0, en, enn));
+        }
+
+        en = enn;
+
+      } while (en != e);
     }
 
   }
+
+#if defined(DEBUG_DUMP_ESSENTIAL_EDGES)
+  //  dump the essential edges for debugging
+  db::Edges edges;
+  for (auto e = essential_edges.begin (); e != essential_edges.end (); ++e) {
+    db::DEdge de = (*e)->edge ();
+    edges.insert (db::VCplxTrans (1000.0) * de);
+  }
+  edges.write ("debug_dump_essential_edges.gds");
+#endif
 
   //  Combine triangles, but don't cross essential edges
 

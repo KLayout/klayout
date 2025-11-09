@@ -16,6 +16,7 @@ import dbPCells
 import dbLayoutTest
 import dbPolygonTest
 import dbReaders
+import dbStreams
 import dbRegionTest
 import dbTransTest
 import dbLayoutToNetlist
@@ -32,6 +33,7 @@ if __name__ == '__main__':
     unittest.TestLoader().loadTestsFromTestCase(dbLayoutTest.DBLayoutTest),
     unittest.TestLoader().loadTestsFromTestCase(dbPolygonTest.DBPolygonTests),
     unittest.TestLoader().loadTestsFromTestCase(dbReaders.DBReadersTests),
+    unittest.TestLoader().loadTestsFromTestCase(dbStreams.DBStreamsTests),
     unittest.TestLoader().loadTestsFromTestCase(dbRegionTest.DBRegionTest),
     unittest.TestLoader().loadTestsFromTestCase(dbTransTest.DBTransTests),
     # aborts on Azure/MSVC pipeline with "src\tl\tl\tlThreadedWorkers.cc,259,! m_running", needs debugging:

@@ -149,7 +149,15 @@ void
 Library::rename (const std::string &name)
 {
   if (name != get_name () && db::LibraryManager::initialized ()) {
+
+    std::pair<bool, lib_id_type> n2l = db::LibraryManager::instance ().lib_by_name (name, get_technologies ());
+    if (n2l.first && n2l.second != get_id ()) {
+      //  remove any existing library that has our target name/tech combination
+      db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (n2l.second));
+    }
+
     db::LibraryManager::instance ().rename (get_id (), name);
+
   }
 }
 

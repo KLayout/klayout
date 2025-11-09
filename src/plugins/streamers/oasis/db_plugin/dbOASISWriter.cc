@@ -3309,6 +3309,46 @@ OASISWriter::write_shapes (const db::LayerProperties &lprops, const db::Shapes &
 
         break;
 
+      case db::Shape::EdgePair:
+
+        if (shape->has_prop_id ()) {
+          db::EdgePairWithProperties edge_pair = *shape->basic_ptr (db::EdgePairWithProperties::tag ());
+          db::EdgeWithProperties e1 (edge_pair.first (), edge_pair.properties_id ());
+          db::EdgeWithProperties e2 (edge_pair.second (), edge_pair.properties_id ());
+          db::Disp tr;
+          e1.reduce (tr);
+          edge_with_properties_compressor.add (e1, tr.disp ());
+          e2.reduce (tr);
+          edge_with_properties_compressor.add (e2, tr.disp ());
+        } else {
+          db::EdgePair edge_pair = *shape->basic_ptr (db::EdgePair::tag ());
+          db::Disp tr;
+          edge_pair.first ().reduce (tr);
+          edge_compressor.add (edge_pair.first (), tr.disp ());
+          edge_pair.second ().reduce (tr);
+          edge_compressor.add (edge_pair.second (), tr.disp ());
+        }
+
+        break;
+
+      case db::Shape::Point:
+
+        if (shape->has_prop_id ()) {
+          db::PointWithProperties point = *shape->basic_ptr (db::PointWithProperties::tag ());
+          db::EdgeWithProperties e (db::Edge (point, point), point.properties_id ());
+          db::Disp tr;
+          e.reduce (tr);
+          edge_with_properties_compressor.add (e, tr.disp ());
+        } else {
+          db::Point point = *shape->basic_ptr (db::Point::tag ());
+          db::Disp tr;
+          db::Edge e (point, point);
+          e.reduce (tr);
+          edge_compressor.add (e, tr.disp ());
+        }
+
+        break;
+
       case db::Shape::Path:
 
         if (shape->has_prop_id ()) {

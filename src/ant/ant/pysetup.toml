@@ -1,0 +1,6 @@
+
+[library]
+  name = "_ant"
+  defines = [["MAKE_ANT_LIBRARY", 1]]
+  depends = ["_tl", "_gsi", "_db", "_rdb", "_laybasic", "_layview"]
+

@@ -23,6 +23,8 @@
 
 #include "dbPLCConvexDecomposition.h"
 #include "dbWriter.h"
+#include "dbReader.h"
+#include "dbLayout.h"
 #include "dbRegionProcessors.h"
 #include "dbTestSupport.h"
 #include "tlUnitTest.h"
@@ -142,5 +144,82 @@ TEST(problematic_polygon)
 
   std::unique_ptr<db::Layout> ly (plc.to_layout ());
   db::compare_layouts (_this, *ly, tl::testdata () + "/algo/hm_decomposition_au5.gds");
+}
+
+TEST(problematic_polygon2)
+{
+  db::Point contour[] = {
+    db::Point (-2100, 200),
+    db::Point (-2100, 2000),
+    db::Point (-500, 2000),
+    db::Point (-500, 1700),
+    db::Point (-849, 1700),
+    db::Point (-947, 1690),
+    db::Point (-1043, 1671),
+    db::Point (-1137, 1643),
+    db::Point (-1228, 1605),
+    db::Point (-1315, 1559),
+    db::Point (-1396, 1504),
+    db::Point (-1472, 1442),
+    db::Point (-1542, 1372),
+    db::Point (-1604, 1296),
+    db::Point (-1659, 1215),
+    db::Point (-1705, 1128),
+    db::Point (-1743, 1037),
+    db::Point (-1771, 943),
+    db::Point (-1790, 847),
+    db::Point (-1800, 749),
+    db::Point (-1800, 200)
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  double dbu = 0.001;
+
+  db::plc::ConvexDecompositionParameters param;
+  param.with_segments = false;
+  param.split_edges = false;
+  param.tri_param.max_area = 1000000;
+  param.tri_param.min_b = 0.5;
+
+  db::plc::Graph plc;
+  TestableConvexDecomposition decomp (&plc);
+
+  decomp.decompose (poly, param, dbu);
+
+  std::unique_ptr<db::Layout> ly (plc.to_layout ());
+  db::compare_layouts (_this, *ly, tl::testdata () + "/algo/hm_decomposition_au6.gds");
+}
+
+TEST(polygon_with_holes)
+{
+  db::Layout ly;
+  tl::InputStream s (tl::testdata () + "/algo/hm_decomposition_7.gds");
+  db::Reader reader (s);
+  reader.read (ly);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  const db::Cell &top = ly.cell (*ly.begin_top_down ());
+
+  db::Region r (db::RecursiveShapeIterator (ly, top, l1));
+  r.merge ();
+  db::Polygon poly = *r.begin ();
+
+  double dbu = 0.001;
+
+  db::plc::ConvexDecompositionParameters param;
+  param.with_segments = false;
+  param.split_edges = false;
+  param.tri_param.max_area = 1000000;
+  param.tri_param.min_b = 0.5;
+
+  db::plc::Graph plc;
+  TestableConvexDecomposition decomp (&plc);
+
+  decomp.decompose (poly, param, dbu);
+
+  std::unique_ptr<db::Layout> ly_out (plc.to_layout ());
+  db::compare_layouts (_this, *ly_out, tl::testdata () + "/algo/hm_decomposition_au7.gds");
 }
 

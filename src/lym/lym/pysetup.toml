@@ -1,0 +1,6 @@
+
+[library]
+  name = "_lym"
+  defines = [["MAKE_LYM_LIBRARY", 1]]
+  depends = ["_tl", "_gsi", "_rba", "_pya"]
+

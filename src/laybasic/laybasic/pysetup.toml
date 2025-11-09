@@ -1,0 +1,6 @@
+
+[library]
+  name = "_laybasic"
+  defines = [["MAKE_LAYBASIC_LIBRARY", 1]]
+  depends = ["_tl", "_gsi", "_db", "_rdb"]
+

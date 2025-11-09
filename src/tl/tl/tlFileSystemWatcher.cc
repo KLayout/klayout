@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "tlFileSystemWatcher.h"
 #include "tlString.h"
 #include "tlTimer.h"
@@ -221,3 +223,4 @@ FileSystemWatcher::timeout ()
 }
 
 }
+#endif

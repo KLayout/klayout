@@ -1,0 +1,10 @@
+
+[library]
+  name = "_tl"
+  defines = [["MAKE_TL_LIBRARY", 1]]
+  cxxflags-darwin = ["$libpng_cflags"]
+  libraries-win32 = ["libcurl", "expat", "pthreadVCE2", "zlib", "wsock32", "libpng16"]
+  libraries-darwin = ["curl", "expat"]  # png is added via ldflags-darwin
+  libraries-linux = ["curl", "expat", "png"]
+  ldflags-darwin = ["$libpng_ldflags"]
+

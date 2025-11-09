@@ -1,0 +1,5 @@
+
+[extension]
+  name = "laycore"
+  defines = []
+  depends = ["_tl", "_gsi", "_pya", "_lym", "_edt", "_ant", "_img", "_laybasic", "_layview"]

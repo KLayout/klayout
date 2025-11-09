@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_CURL)
+
 #define NOMINMAX   //  for windows.h -> min/max not defined
 
 #include "tlHttpStream.h"
@@ -1450,3 +1452,6 @@ InputHttpStreamPrivateData::absolute_path () const
 }
 
 }
+
+#endif
+

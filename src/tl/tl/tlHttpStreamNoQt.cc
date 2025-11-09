@@ -20,6 +20,8 @@
 
 */
 
+#if !defined(HAVE_QT) && !defined(HAVE_CURL)
+
 #include "tlHttpStream.h"
 #include "tlEvents.h"
 
@@ -156,3 +158,5 @@ InputHttpStream::timeout () const
 
 
 }
+
+#endif

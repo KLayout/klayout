@@ -1474,6 +1474,26 @@ class Cell:
         This method has been introduced in version 0.22.
         """
         ...
+    @overload
+    def change_ref(self, lib_id: int, lib_cell_index: int) -> None:
+        r"""
+        @brief Changes the reference to a different library cell
+        This method requires a cell that is a library reference (i.e. \is_library_cell? is true). It will change that reference to a new cell, potentially from a different library.
+        The library is given by library ID, the cell by cell inside inside that library.
+
+        This method has been introduced in version 0.30.5.
+        """
+        ...
+    @overload
+    def change_ref(self, lib_name: str, cell_name: str) -> None:
+        r"""
+        @brief Changes the reference to a different library cell
+        This method requires a cell that is a library reference (i.e. \is_library_cell? is true). It will change that reference to a new cell, potentially from a different library.
+        This version takes a library name and cell name (from that library).
+
+        This method has been introduced in version 0.30.5.
+        """
+        ...
     def child_cells(self) -> int:
         r"""
         @brief Gets the number of child cells
@@ -2291,12 +2311,12 @@ class Cell:
         this method has been introduced in version 0.22.
         """
         ...
-    def library(self) -> Library:
+    def library(self) -> LibraryBase:
         r"""
         @brief Returns a reference to the library from which the cell is imported
         if the cell is not imported from a library, this reference is nil.
 
-        this method has been introduced in version 0.22.
+        This method has been introduced in version 0.22.
         """
         ...
     def library_cell_index(self) -> int:
@@ -2506,7 +2526,7 @@ class Cell:
         This method has been introduced in version 0.22.
         """
         ...
-    def pcell_library(self) -> Library:
+    def pcell_library(self) -> LibraryBase:
         r"""
         @brief Returns the library where the PCell is declared if this cell is a PCell and it is not defined locally.
         A PCell often is not declared within the current layout but in some library. 
@@ -15707,8 +15727,7 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: float
     r"""
@@ -35808,11 +35827,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis
+    @brief Sets the displacement vector for the 'a' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     b: Vector
     r"""
@@ -35821,11 +35840,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'b' axis in micrometer units
+    @brief Sets the displacement vector for the 'b' axis
 
-    Like \b= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     cell: Cell
     r"""
@@ -35868,10 +35887,9 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
-    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
+    @brief Sets the complex transformation of the instance or the first instance in the array
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     da: DVector
     r"""
@@ -36000,9 +36018,10 @@ class Instance:
     @brief Gets the transformation of the instance or the first instance in the array
     The transformation returned is only valid if the array does not represent a complex transformation array
     Setter:
-    @brief Sets the transformation of the instance or the first instance in the array
+    @brief Sets the transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     @classmethod
     def new(cls) -> Instance:
@@ -36365,7 +36384,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
         ...
     @overload
@@ -36373,7 +36392,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
         ...
     def pcell_declaration(self) -> PCellDeclaration_Native:
@@ -38997,7 +39016,7 @@ class Layout:
         From version 0.23 on this method is deprecated because another method exists which is more convenient because is returns a \Cell object (\create_cell).
         """
         ...
-    def add_lib_cell(self, library: Library, lib_cell_index: int) -> int:
+    def add_lib_cell(self, library: LibraryBase, lib_cell_index: int) -> int:
         r"""
         @brief Imports a cell from the library
         @param library The reference to the library from which to import the cell
@@ -39019,7 +39038,7 @@ class Layout:
         """
         ...
     @overload
-    def add_pcell_variant(self, library: Library, pcell_id: int, parameters: Dict[str, Any]) -> int:
+    def add_pcell_variant(self, library: LibraryBase, pcell_id: int, parameters: Dict[str, Any]) -> int:
         r"""
         @brief Creates a PCell variant for a PCell located in an external library with the parameters given as a name/value dictionary
         @return The cell index of the new proxy cell in this layout
@@ -39040,7 +39059,7 @@ class Layout:
         """
         ...
     @overload
-    def add_pcell_variant(self, library: Library, pcell_id: int, parameters: Sequence[Any]) -> int:
+    def add_pcell_variant(self, library: LibraryBase, pcell_id: int, parameters: Sequence[Any]) -> int:
         r"""
         @brief Creates a PCell variant for a PCell located in an external library
         @return The cell index of the new proxy cell in this layout
@@ -40205,7 +40224,7 @@ class Layout:
         The number of layers reports the maximum (plus 1) layer index used so far. Not all of the layers with an index in the range of 0 to layers-1 needs to be a valid layer. These layers can be either valid, special or unused. Use \is_valid_layer? and \is_special_layer? to test for the first two states.
         """
         ...
-    def library(self) -> Library:
+    def library(self) -> LibraryBase:
         r"""
         @brief Gets the library this layout lives in or nil if the layout is not part of a library
         This attribute has been introduced in version 0.27.5.
@@ -43842,7 +43861,7 @@ class LayoutVsSchematic(LayoutToNetlist):
         ...
     ...
 
-class Library:
+class Library(LibraryBase):
     r"""
     @brief A Library 
 
@@ -43855,6 +43874,89 @@ class Library:
     After a library is created and the layout is filled, it must be registered using the register method.
 
     This class has been introduced in version 0.22.
+    """
+    @classmethod
+    def new(cls) -> Library:
+        r"""
+        @brief Creates a new, empty library
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new, empty library
+        """
+        ...
+    def _assign(self, other: LibraryBase) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> Library:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> Library:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Library:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    ...
+
+class LibraryBase:
+    r"""
+    @hide
     """
     description: str
     r"""
@@ -43877,7 +43979,7 @@ class Library:
     See \technology for details. This attribute has been introduced in version 0.25. In version 0.27, a library can be associated with multiple technologies and this method will revert the selection to a single one. Passing an empty string is equivalent to \clear_technologies.
     """
     @classmethod
-    def library_by_id(cls, id: int) -> Library:
+    def library_by_id(cls, id: int) -> LibraryBase:
         r"""
         @brief Gets the library object for the given ID
         If the ID is not valid, nil is returned.
@@ -43886,11 +43988,10 @@ class Library:
         """
         ...
     @classmethod
-    def library_by_name(cls, name: str, for_technology: Optional[str] = ...) -> Library:
+    def library_by_name(cls, name: str, for_technology: Optional[str] = ...) -> LibraryBase:
         r"""
         @brief Gets a library by name
-        Returns the library object for the given name. If the name is not a valid
-        library name, nil is returned.
+        Returns the library object for the given name. If the name is not a valid library name, nil is returned.
 
         Different libraries can be registered under the same names for different technologies. When a technology name is given in 'for_technologies', the first library matching this technology is returned. If no technology is given, the first library is returned.
 
@@ -43914,27 +44015,35 @@ class Library:
         """
         ...
     @classmethod
-    def new(cls) -> Library:
+    def new(cls) -> LibraryBase:
         r"""
-        @brief Creates a new, empty library
+        @brief Creates a new object of this class
         """
         ...
-    def __copy__(self) -> Library:
+    @classmethod
+    def refresh_all(cls) -> None:
+        r"""
+        @brief Calls \refresh on all libraries.
+
+        This convenience method has been introduced in version 0.30.4.
+        """
+        ...
+    def __copy__(self) -> LibraryBase:
         r"""
         @brief Creates a copy of self
         """
         ...
-    def __deepcopy__(self) -> Library:
+    def __deepcopy__(self) -> LibraryBase:
         r"""
         @brief Creates a copy of self
         """
         ...
     def __init__(self) -> None:
         r"""
-        @brief Creates a new, empty library
+        @brief Creates a new object of this class
         """
         ...
-    def _const_cast(self) -> Library:
+    def _const_cast(self) -> LibraryBase:
         r"""
         @brief Returns a non-const reference to self.
         Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
@@ -43977,7 +44086,7 @@ class Library:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
-    def _to_const_object(self) -> Library:
+    def _to_const_object(self) -> LibraryBase:
         r"""
         @hide
         """
@@ -43998,7 +44107,7 @@ class Library:
         This method has been introduced in version 0.27
         """
         ...
-    def assign(self, other: Library) -> None:
+    def assign(self, other: LibraryBase) -> None:
         r"""
         @brief Assigns another object to self
         """
@@ -44040,7 +44149,7 @@ class Library:
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
         ...
-    def dup(self) -> Library:
+    def dup(self) -> LibraryBase:
         r"""
         @brief Creates a copy of self
         """
@@ -44085,14 +44194,15 @@ class Library:
     def name(self) -> str:
         r"""
         @brief Returns the libraries' name
-        The name is set when the library is registered and cannot be changed
+        The name is set when the library is registered. To change it use \rename.
         """
         ...
     def refresh(self) -> None:
         r"""
         @brief Updates all layouts using this library.
         This method will retire cells or update layouts in the attached clients.
-        It will also recompute the PCells inside the library. 
+        It will also recompute the PCells inside the library. Starting with version 0.30.5, this method will also call 'reload' on all libraries to refresh cells located in external files.
+
         This method has been introduced in version 0.27.8.
         """
         ...
@@ -44109,10 +44219,28 @@ class Library:
         The technology specific behaviour has been introduced in version 0.27.
         """
         ...
+    def rename(self, name: str) -> None:
+        r"""
+        @brief Renames the library
+
+        Re-registers the library under a new name. Note that this method will also change the references to the library.
+
+        This method has been introduced in version 0.30.5.
+        """
+        ...
     def technologies(self) -> List[str]:
         r"""
         @brief Gets the list of technologies this library is associated with.
         This method has been introduced in version 0.27
+        """
+        ...
+    def unregister(self) -> None:
+        r"""
+        @brief Unregisters the library
+
+        Unregisters the library from the system. This will break all references of cells using this library and make them 'defunct'.
+
+        This method has been introduced in version 0.30.5.
         """
         ...
     ...
@@ -44643,6 +44771,13 @@ class LoadLayoutOptions:
 
 
     This method has been added in version 0.25.
+    """
+    lstream_bbox_meta_info_key: str
+    r"""
+    Getter:
+    @brief If not an empty string, this attribute specifies the key under which the cell bounding box information is stored
+    Setter:
+    @brief If not an empty string, this attribute specifies the key under which the cell bounding box information is stored
     """
     mag_create_other_layers: bool
     r"""
@@ -47473,15 +47608,15 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
         ...
     def pin(self) -> Pin:
@@ -47804,15 +47939,15 @@ class NetTerminalRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to.
+        @brief Gets the net this terminal reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this terminal reference is attached to.
         """
         ...
     def terminal_def(self) -> DeviceTerminalDefinition:
@@ -51440,6 +51575,11 @@ class PCellDeclaration(PCellDeclaration_Native):
         @hide
         """
         ...
+    def cell_name(self, arg0: Sequence[Any]) -> str:
+        r"""
+        @hide
+        """
+        ...
     def description(self) -> str:
         r"""
         @hide
@@ -51574,6 +51714,10 @@ class PCellDeclaration_Native:
         """
         ...
     def can_create_from_shape(self, layout: Layout, shape: Shape, layer: int) -> bool:
+        r"""
+        """
+        ...
+    def cell_name(self, parameters: Sequence[Any]) -> str:
         r"""
         """
         ...
@@ -63549,12 +63693,12 @@ class SaveLayoutOptions:
     dbu: float
     r"""
     Getter:
-    @brief Get the explicit database unit if one is set
+    @brief Gets the explicit database unit if one is set
 
     See \dbu= for a description of that attribute.
 
     Setter:
-    @brief Set the database unit to be used in the stream file
+    @brief Sets the database unit to be used in the stream file
 
     By default, the database unit of the layout is used. This method allows one to explicitly use a different
     database unit. A scale factor is introduced automatically which scales all layout objects accordingly so their physical dimensions remain the same. When scaling to a larger database unit or one that is not an integer fraction of the original one, rounding errors may occur and the layout may become slightly distorted.
@@ -63608,17 +63752,19 @@ class SaveLayoutOptions:
     gds2_libname: str
     r"""
     Getter:
-    @brief Get the library name
-    See \gds2_libname= method for a description of the library name.
-    This property has been added in version 0.18.
+    @brief Gets the library name
 
+    See \libname= for details.
+    The 'libname' alias has been introduced in version 0.30.5. The original name \gds2_libname is still available.
     Setter:
-    @brief Set the library name
+    @brief Sets the library name
 
-    The library name is the string written into the LIBNAME records of the GDS file.
-    The library name should not be an empty string and is subject to certain limitations in the character choice.
+    The library name is an attribute and specifies a formal name for a library, if the layout files is to be used as one.
+    Currently, this attribute is only supported by the GDS2 format. Hence the alias.
 
-    This property has been added in version 0.18.
+    By default or if the libname is an empty string, the current library name of the layout or 'LIB' is used.
+
+    The 'libname' alias has been introduced in version 0.30.5. The original name \gds2_libname= is still available.
     """
     gds2_max_cellname_length: int
     r"""
@@ -63775,6 +63921,50 @@ class SaveLayoutOptions:
     The default value is false (instances of dropped cells are not written).
 
     This method was introduced in version 0.23.
+    """
+    libname: str
+    r"""
+    Getter:
+    @brief Gets the library name
+
+    See \libname= for details.
+    The 'libname' alias has been introduced in version 0.30.5. The original name \gds2_libname is still available.
+    Setter:
+    @brief Sets the library name
+
+    The library name is an attribute and specifies a formal name for a library, if the layout files is to be used as one.
+    Currently, this attribute is only supported by the GDS2 format. Hence the alias.
+
+    By default or if the libname is an empty string, the current library name of the layout or 'LIB' is used.
+
+    The 'libname' alias has been introduced in version 0.30.5. The original name \gds2_libname= is still available.
+    """
+    lstream_compression_level: int
+    r"""
+    Getter:
+    @brief Get the LStream compression level
+    See \oasis_compression_level= method for a description of the LStream compression level.
+    Setter:
+    @brief Set the LStream compression level
+    The LStream compression level is an integer number between 0 and 10. 0 basically is no compression, 1 produces shape arrays in a simple fashion. 2 and higher compression levels will use a more elaborate algorithm to find shape arrays which uses 2nd and further neighbor distances. The higher the level, the higher the memory requirements and run times.
+    """
+    lstream_permissive: bool
+    r"""
+    Getter:
+    @brief Gets the LStream permissive mode
+    See \oasis_permissive= method for a description of this predicate.
+    Setter:
+    @brief Sets LStream permissive mode
+    If this flag is true, certain shapes which cannot be written to LStream are reported as warnings, not as errors. For example, paths with odd width (are rounded).
+    """
+    lstream_recompress: bool
+    r"""
+    Getter:
+    @brief Gets the LStream recompression mode
+    See \oasis_recompress= method for a description of this predicate.
+    Setter:
+    @brief Sets LStream recompression mode
+    If this flag is true, shape arrays already existing will be resolved and compression is applied to the individual shapes again. If this flag is false (the default), shape arrays already existing will be written as such.
     """
     mag_lambda: float
     r"""
@@ -63939,7 +64129,7 @@ class SaveLayoutOptions:
     @brief Gets the scaling factor currently set
 
     Setter:
-    @brief Set the scaling factor for the saving 
+    @brief Sets the scaling factor for the saving 
 
     Using a scaling factor will scale all objects accordingly. This scale factor adds to a potential scaling implied by using an explicit database unit.
 
@@ -65055,11 +65245,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a text.
     Setter:
-    @brief Replaces the shape by the given text object
-    This method replaces the shape by the given text object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given text (in micrometer units)
+    This method replaces the shape by the given text, like \text= with a \Text argument does. This version translates the text from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     text_dpos: DVector
     r"""
@@ -69275,16 +69464,16 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit (non-const version).
-
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit referenced by the subcircuit (non-const version).
+
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
@@ -69330,17 +69519,17 @@ class SubCircuit(NetlistObject):
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit.
+        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
         If the pin is not connected, nil is returned for the net.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
+        @brief Gets the net connected to the specified pin of the subcircuit.
         If the pin is not connected, nil is returned for the net.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     ...
@@ -69991,8 +70180,7 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: int
     r"""

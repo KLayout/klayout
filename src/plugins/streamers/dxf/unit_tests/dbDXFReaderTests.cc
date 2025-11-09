@@ -104,7 +104,7 @@ TEST(1b)
 
 TEST(2)
 {
-  run_test (_this, "t2.dxf.gz", "t2_au.gds.gz");
+  run_test (_this, "t2.dxf.gz", "t2_au2.gds.gz");
 }
 
 TEST(3)

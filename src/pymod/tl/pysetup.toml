@@ -1,0 +1,6 @@
+
+[extension]
+  name = "tlcore"
+  defines = []
+  depends = ["_tl", "_gsi", "_pya"]
+

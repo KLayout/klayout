@@ -1,0 +1,8 @@
+
+[library]
+  name = "_oasis_dbpi"
+  defines = [["MAKE_DB_PLUGIN_LIBRARY", 1]]
+  depends = ["_tl", "_db", "_gsi"]
+  includes = ["/src/plugins/common"]
+  submodules = ["db_plugins"]
+

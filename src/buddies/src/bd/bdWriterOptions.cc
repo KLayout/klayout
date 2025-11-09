@@ -84,11 +84,16 @@ GenericWriterOptions::init_from_options (const db::SaveLayoutOptions &save_optio
   m_magic_lambda = 1.0;
 
   m_dxf_polygon_mode = save_options.get_option_by_name ("dxf_polygon_mode").to_int ();
+
+  m_lstream_compression_level = save_options.get_option_by_name ("lstream_compression_level").to_int ();
+  m_lstream_recompress = save_options.get_option_by_name ("lstream_recompress").to_bool ();
+  m_lstream_permissive = save_options.get_option_by_name ("lstream_permissive").to_bool ();
 }
 
 const std::string GenericWriterOptions::gds2_format_name      = "GDS2";
 const std::string GenericWriterOptions::gds2text_format_name  = "GDS2Text";  //  no special options
 const std::string GenericWriterOptions::oasis_format_name     = "OASIS";
+const std::string GenericWriterOptions::lstream_format_name   = "LStream";
 const std::string GenericWriterOptions::dxf_format_name       = "DXF";
 const std::string GenericWriterOptions::cif_format_name       = "CIF";
 const std::string GenericWriterOptions::mag_format_name       = "MAG";
@@ -277,6 +282,34 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
 
   }
 
+  if (format.empty () || format == lstream_format_name) {
+
+    //  Add LStream format options
+    std::string group = "[Output options - LStream specific]";
+
+    cmd << tl::arg (group +
+                    "-oc|--lstr-compression-level=level", &m_lstream_compression_level, "Specifies the LStream compression level",
+                    "This level describes how hard the LStream writer will try to compress the shapes "
+                    "using shape arrays. Building shape arrays may take some time and requires some memory. "
+                    "The default compression level is 2.\n"
+                    "* 0 - no shape array building\n"
+                    "* 1 - nearest neighbor shape array formation\n"
+                    "* 2++ - enhanced shape array search algorithm using 2nd and further neighbor distances as well\n"
+                   )
+        << tl::arg (group +
+                    "#--lstr-recompress", &m_lstream_recompress, "Compresses shape arrays again",
+                    "With this option, shape arrays will be expanded and recompressed. This may result in a better "
+                    "compression ratio, but at the cost of slower execution."
+                   )
+        << tl::arg (group +
+                    "#--lstr-permissive", &m_lstream_permissive, "Permissive mode",
+                    "In permissive mode, certain forbidden objects are reported as warnings, not as errors: "
+                    "paths with odd width, polygons with less than three points etc."
+                   )
+      ;
+
+  }
+
   if (format.empty () || format == dxf_format_name) {
 
     //  Add DXF format options
@@ -417,6 +450,10 @@ GenericWriterOptions::configure (db::SaveLayoutOptions &save_options, const db::
   save_options.set_option_by_name ("cif_blank_separator", m_cif_blank_separator);
 
   save_options.set_option_by_name ("dxf_polygon_mode", m_dxf_polygon_mode);
+
+  save_options.set_option_by_name ("lstream_compression_level", m_lstream_compression_level);
+  save_options.set_option_by_name ("lstream_recompress", m_lstream_recompress);
+  save_options.set_option_by_name ("lstream_permissive", m_lstream_permissive);
 
   save_options.set_option_by_name ("mag_lambda", m_magic_lambda);
   save_options.set_option_by_name ("mag_tech", m_magic_tech);

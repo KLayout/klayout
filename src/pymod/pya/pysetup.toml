@@ -1,0 +1,5 @@
+
+[extension]
+  name = "pyacore"
+  defines = []
+  depends = ["_tl", "_gsi", "_pya", "_lym", "_edt", "_ant", "_img", "_rdb", "_db", "_lib", "_laybasic", "_layview"]

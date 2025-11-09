@@ -72,6 +72,14 @@ public:
       //  by the stream and won't trigger a reset of the stream which is not available
       //  on some sources.
       std::string head = s.read_all (4000);
+
+      //  CIF files must not contain null characters
+      for (auto c = head.begin (); c != head.end (); ++c) {
+        if (*c == 0) {
+          return false;
+        }
+      }
+
       int n = 0;
 
       tl::Extractor ex (head.c_str ());

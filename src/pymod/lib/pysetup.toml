@@ -1,0 +1,5 @@
+
+[extension]
+  name = "libcore"
+  defines = []
+  depends = ["_tl", "_gsi", "_lib", "_pya"]

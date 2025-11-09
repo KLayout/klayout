@@ -58,8 +58,12 @@ TEST(1)
   EXPECT_EQ (res.object_snap, lay::PointSnapToObjectResult::NoObject);
   EXPECT_EQ (res.snapped_point.to_string (), "1.505,1.505");
 
-  res = lay::obj_snap (&view, db::DPoint (0.505, 0.505), db::DVector (), 0.1);
+  res = lay::obj_snap (&view, db::DPoint (0.805, 0.205), db::DVector (), 0.1);
   EXPECT_EQ (res.object_snap, lay::PointSnapToObjectResult::ObjectEdge);
+  EXPECT_EQ (res.snapped_point.to_string (), "0.8,0.2");
+
+  res = lay::obj_snap (&view, db::DPoint (0.505, 0.505), db::DVector (), 0.1);
+  EXPECT_EQ (res.object_snap, lay::PointSnapToObjectResult::ObjectUnspecific);  //  center point of edge
   EXPECT_EQ (res.snapped_point.to_string (), "0.5,0.5");
 
   res = lay::obj_snap (&view, db::DPoint (0.485, 0.505), db::DVector (0.01, 0.01), 0.1);
@@ -83,9 +87,9 @@ TEST(1)
   EXPECT_EQ (res.object_snap, lay::PointSnapToObjectResult::ObjectVertex);
   EXPECT_EQ (res.snapped_point.to_string (), "0,1");
 
-  res = lay::obj_snap (&view, db::DPoint (1.000, 0.505), db::DPoint (0.505, 0.500), db::DVector (), lay::AC_Horizontal, 0.1);
+  res = lay::obj_snap (&view, db::DPoint (1.000, 0.605), db::DPoint (0.405, 0.600), db::DVector (), lay::AC_Horizontal, 0.1);
   EXPECT_EQ (res.object_snap, lay::PointSnapToObjectResult::ObjectEdge);
-  EXPECT_EQ (res.snapped_point.to_string (), "0.495,0.505");
+  EXPECT_EQ (res.snapped_point.to_string (), "0.395,0.605");
 
   //  projected snapping
   res = lay::obj_snap (&view, db::DPoint (1.000, 0.505), db::DPoint (0.005, 1.005), db::DVector (), lay::AC_Horizontal, 0.1);
@@ -132,21 +136,32 @@ TEST(1)
   EXPECT_EQ (db::DEdge (res2.first, res2.second).to_string (), "(0.355,0.645;0,0.29)");
 
   res2 = lay::obj_snap2 (&view, db::DPoint (0.5, 0.5), db::DVector (), 0.005, 1.0);
+  EXPECT_EQ (res2.any, true);
+  EXPECT_EQ (db::DEdge (res2.first, res2.second).to_string (), "(0.5,0.5;0.5,0.5)");
+
+  res2 = lay::obj_snap2 (&view, db::DPoint (0.6, 0.4), db::DVector (), 0.005, 1.0);
   EXPECT_EQ (res2.any, false);
   EXPECT_EQ (db::DEdge (res2.first, res2.second).to_string (), "(0,0;0,0)");
 
   res2 = lay::obj_snap2 (&view, db::DPoint (0.005, 0.5), db::DVector (), 0.005, 1.0);
   EXPECT_EQ (res2.any, true);
-  EXPECT_EQ (db::DEdge (res2.first, res2.second).to_string (), "(0,0.5;0.5,0.5)");
+  EXPECT_EQ (db::DEdge (res2.first, res2.second).to_string (), "(0,0.5;0,0.5)");
 
-  res2 = lay::obj_snap2 (&view, db::DPoint (0.0, 0.5), db::DVector (), 0.005, 1.0);
+  res2 = lay::obj_snap2 (&view, db::DPoint (0.005, 0.4), db::DVector (), 0.005, 1.0);
+  EXPECT_EQ (res2.any, true);
+  EXPECT_EQ (db::DEdge (res2.first, res2.second).to_string (), "(0,0.4;0.6,0.4)");
+
+  res2 = lay::obj_snap2 (&view, db::DPoint (0.0, 0.4), db::DVector (), 0.005, 1.0);
   EXPECT_EQ (res2.any, false);
   EXPECT_EQ (db::DEdge (res2.first, res2.second).to_string (), "(0,0;0,0)");
 
   res2 = lay::obj_snap2 (&view, db::DPoint (-0.2, 0.5), db::DVector (), 0.005, 1.0);
+  EXPECT_EQ (res2.any, true);
+  EXPECT_EQ (db::DEdge (res2.first, res2.second).to_string (), "(0,0.5;0,0.5)");
+
+  res2 = lay::obj_snap2 (&view, db::DPoint (-0.2, 0.4), db::DVector (), 0.005, 1.0);
   EXPECT_EQ (res2.any, false);
   EXPECT_EQ (db::DEdge (res2.first, res2.second).to_string (), "(0,0;0,0)");
-
 }
 
 // .. TODO: implement ..

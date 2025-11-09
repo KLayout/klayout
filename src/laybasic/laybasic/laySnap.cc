@@ -613,7 +613,7 @@ private:
         if (shape->is_polygon ()) {
 
           for (db::Shape::polygon_edge_iterator e = shape->begin_edge (); ! e.at_end (); ++e) {
-            test_edge (t * *e);
+            test_edge_with_center (t * *e);
           }
 
         } else if (shape->is_path ()) {
@@ -649,16 +649,20 @@ private:
             }
 
             test_edge (db::DEdge (*p, pts [0]));
+
           }
 
         } else if (shape->is_box ()) {
 
           const db::Box &box = shape->box ();
 
-          test_edge (t * db::Edge (box.p1 (), db::Point (box.left (), box.top ())));
-          test_edge (t * db::Edge (db::Point (box.left (), box.top ()), box.p2 ()));
-          test_edge (t * db::Edge (box.p2 (), db::Point (box.right (), box.bottom ())));
-          test_edge (t * db::Edge (db::Point (box.right (), box.bottom ()), box.p1 ()));
+          test_edge_with_center (t * db::Edge (box.p1 (), db::Point (box.left (), box.top ())));
+          test_edge_with_center (t * db::Edge (db::Point (box.left (), box.top ()), box.p2 ()));
+          test_edge_with_center (t * db::Edge (box.p2 (), db::Point (box.right (), box.bottom ())));
+          test_edge_with_center (t * db::Edge (db::Point (box.right (), box.bottom ()), box.p1 ()));
+
+          //  test for box center
+          test_edge (t * db::Edge (box.center (), box.center ()));
 
         } else if (shape->is_point ()) {
 
@@ -695,6 +699,22 @@ private:
 
     }
 
+  }
+
+  void
+  test_edge_with_center (const db::DEdge &edg)
+  {
+    if (m_with_vertex && ! edg.is_degenerate ()) {
+
+      db::DPoint c = edg.p1 () + (edg.p2 () - edg.p1 ()) * 0.5;
+
+      if (m_region.contains (c)) {
+        closest (c);
+      }
+
+    }
+
+    test_edge (edg);
   }
 
   void

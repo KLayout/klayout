@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "tlDeferredExecutionQt.h"
 #include "tlException.h"
 #include "tlLog.h"
@@ -87,3 +89,5 @@ DeferredMethodSchedulerQt::timer ()
 }
 
 }
+
+#endif

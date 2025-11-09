@@ -1,0 +1,55 @@
+
+KJ_SOURCES=\
+  kj/array.cc \
+  kj/list.cc \
+  kj/common.cc \
+  kj/debug.cc \
+  kj/exception.cc \
+  kj/io.cc \
+  kj/memory.cc \
+  kj/mutex.cc \
+  kj/string.cc \
+  kj/source-location.cc \
+  kj/hash.cc \
+  kj/table.cc \
+  kj/thread.cc \
+  kj/main.cc \
+  kj/arena.cc \
+  kj/units.cc \
+  kj/encoding.cc \
+  kj/time.cc \
+
+KJ_HEADERS=\
+  kj/common.h \
+  kj/units.h \
+  kj/memory.h \
+  kj/refcount.h \
+  kj/array.h \
+  kj/list.h \
+  kj/vector.h \
+  kj/string.h \
+  kj/string-tree.h \
+  kj/source-location.h \
+  kj/hash.h \
+  kj/table.h \
+  kj/map.h \
+  kj/encoding.h \
+  kj/exception.h \
+  kj/debug.h \
+  kj/arena.h \
+  kj/io.h \
+  kj/tuple.h \
+  kj/one-of.h \
+  kj/function.h \
+  kj/mutex.h \
+  kj/thread.h \
+  kj/threadlocal.h \
+  kj/filesystem.h \
+  kj/time.h \
+  kj/main.h \
+  kj/win32-api-version.h \
+  kj/windows-sanity.h \
+  kj/miniposix.h \
+  kj/parse/common.h \
+  kj/parse/char.h \
+  kj/std/iostream.h \

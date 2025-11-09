@@ -1,0 +1,10 @@
+
+[library]
+  name = "_lstream_dbpi"
+  defines = [["MAKE_DB_PLUGIN_LIBRARY", 1], ["CAPNP_LITE", 1]]
+  depends = ["_tl", "_db", "_gsi"]
+  includes = ["/src/plugins/common", "/src/version", "capnp", "../runtime/capnp", "../runtime/kj"]
+  submodules = ["db_plugins"]
+  sources = ["capnp", "../runtime/capnp/capnp", "../runtime/kj/kj"]
+  cxxflags-gcc = ["-std=c++14"]
+

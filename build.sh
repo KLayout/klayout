@@ -40,6 +40,7 @@ HAVE_PNG=0
 HAVE_CURL=0
 HAVE_EXPAT=0
 HAVE_GIT2=1
+HAVE_LSTREAM=1
 
 RUBYINCLUDE=""
 RUBYINCLUDE2=""
@@ -213,6 +214,9 @@ while [ "$*" != "" ]; do
   -nolibgit2)
     HAVE_GIT2=0
     ;;
+  -nolstream)
+    HAVE_LSTREAM=0
+    ;;
   -qt5)
     echo "*** WARNING: -qt5 option is ignored - Qt version is auto-detected now."
     ;;
@@ -270,6 +274,7 @@ while [ "$*" != "" ]; do
     echo "  -libexpat             Use libexpat instead of QtXml"
     echo "  -libpng               Use libpng instead of Qt for PNG generation"
     echo "  -nolibgit2            Do not include libgit2 for Git package support"
+    echo "  -nolstream            Do not include the LStream plugin"
     echo ""
     echo "Environment Variables:"
     echo ""
@@ -503,6 +508,9 @@ fi
 if [ $HAVE_GIT2 != 0 ]; then
   echo "    Uses libgit2 for Git access"
 fi
+if [ $HAVE_LSTREAM != 0 ]; then
+  echo "    Includes LStream plugin"
+fi
 if [ "$RPATH" = "" ]; then
   RPATH="$BIN"
 fi
@@ -587,6 +595,7 @@ echo "      HAVE_CURL=$HAVE_CURL"
 echo "      HAVE_PNG=$HAVE_PNG"
 echo "      HAVE_EXPAT=$HAVE_EXPAT"
 echo "      HAVE_GIT2=$HAVE_GIT2"
+echo "      HAVE_LSTREAM=$HAVE_LSTREAM"
 echo "      RPATH=$RPATH"
 
 mkdir -p $BUILD
@@ -660,6 +669,7 @@ qmake_options=(
   HAVE_EXPAT="$HAVE_EXPAT"
   HAVE_PNG="$HAVE_PNG"
   HAVE_GIT2="$HAVE_GIT2"
+  HAVE_LSTREAM="$HAVE_LSTREAM"
   PREFIX="$BIN"
   RPATH="$RPATH"
   KLAYOUT_VERSION="$KLAYOUT_VERSION"

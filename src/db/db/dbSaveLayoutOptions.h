@@ -405,7 +405,8 @@ public:
     LP_OnlyNamed = 1,
     LP_AssignName = 2,
     LP_AssignNameWithPriority = 3,
-    LP_AssignNumber = 4
+    LP_AssignNumber = 4,
+    LP_AsIs = 5
   };
 
   /**

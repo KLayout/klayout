@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pcb-project>
+ <invert-negative-layers>false</invert-negative-layers>
+ <border>5000</border>
+ <free-layer-mapping>true</free-layer-mapping>
+ <layout-layers>
+  <layout-layer>1/0</layout-layer>
+  <layout-layer>2/0</layout-layer>
+ </layout-layers>
+ <mounting>top</mounting>
+ <num-metal-layers>0</num-metal-layers>
+ <num-via-types>0</num-via-types>
+ <artwork-files>
+ </artwork-files>
+ <drill-files>
+ </drill-files>
+ <free-files>
+  <free-file>
+   <filename>test1.gbr</filename>
+   <layout-layers>
+    <index>0</index>
+   </layout-layers>
+  </free-file>
+  <free-file>
+   <filename>test2.gbr</filename>
+   <layout-layers>
+    <index>1</index>
+   </layout-layers>
+  </free-file>
+ </free-files>
+ <reference-points>
+ </reference-points>
+ <explicit-trans>r0 *1 0,0</explicit-trans>
+ <layer-properties-file/>
+ <num-circle-points>-1</num-circle-points>
+ <merge-flag>false</merge-flag>
+ <dbu>0.001</dbu>
+ <cell-name>PCB</cell-name>
+</pcb-project>

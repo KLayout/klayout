@@ -136,14 +136,14 @@ private:
       //  .. nothing yet ..
     }
 
-    ConcaveCorner (Vertex *_corner, Edge *_incoming, Edge *_outgoing)
+    ConcaveCorner (const Vertex *_corner, const Edge *_incoming, const Edge *_outgoing)
       : corner (_corner), incoming (_incoming), outgoing (_outgoing)
     {
       //  .. nothing yet ..
     }
 
-    Vertex *corner;
-    Edge *incoming, *outgoing;
+    const Vertex *corner;
+    const Edge *incoming, *outgoing;
   };
 
   void hertel_mehlhorn_decomposition (Triangulation &tris, const ConvexDecompositionParameters &param);

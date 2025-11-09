@@ -1,0 +1,5 @@
+
+[extension]
+  name = "pexcore"
+  defines = []
+  depends = ["_tl", "_gsi", "_db", "_pex", "_pya"]

@@ -1,0 +1,5 @@
+
+[extension]
+  name = "rdbcore"
+  defines = []
+  depends = ["_tl", "_gsi", "_rdb", "_pya"]

@@ -68,7 +68,7 @@ import distutils.command.build_ext
 import setuptools.command.build_ext
 from setuptools.command.build_ext import build_ext as _build_ext
 import multiprocessing
-import tomllib
+import tomli
 
 # for Jenkins we do not want to be greedy
 multicore = os.getenv("KLAYOUT_SETUP_MULTICORE")
@@ -323,7 +323,7 @@ class Config(object):
             raise RuntimeError("Cannot find 'pysetup.toml' in " + src_path)
           
         with open(pysetup_file, "rb") as f:
-            pysetup = tomllib.load(f)
+            pysetup = tomli.load(f)
 
         header = {}
         is_library = None

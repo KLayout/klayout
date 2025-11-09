@@ -93,7 +93,7 @@ jobs:
 
   - script: |
       # setuptools 67.0.0 is not working as of now (pypa/setuptools#4885)
-      python -m pip install --upgrade pip "setuptools<76.0.0" wheel
+      python -m pip install --upgrade pip "setuptools<76.0.0" wheel tomli
     displayName: 'Update pip, setuptools and wheel'
 
   - script: |

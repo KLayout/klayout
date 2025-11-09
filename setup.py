@@ -68,6 +68,7 @@ import distutils.command.build_ext
 import setuptools.command.build_ext
 from setuptools.command.build_ext import build_ext as _build_ext
 import multiprocessing
+import tomllib
 
 # for Jenkins we do not want to be greedy
 multicore = os.getenv("KLAYOUT_SETUP_MULTICORE")
@@ -286,13 +287,127 @@ class Config(object):
 
         self.root = "klayout"
 
-        self.modules = { }
+        self.src_paths = { }
+        self.modules = []
 
     def module(self, name, src_path):
-        self.modules[name] = src_path
+        """
+        Declares a module with the given name and source path
+
+        If a file called "pysetup.toml" is found in that 
+        path, it is read and a Library or Extension module 
+        is created.
+
+        Structure of TOML is:
+        [library] or [extension]:
+          name = "<module name>"
+          depends = [ list of module names this extension depends on ]
+          defines = [ list of [name, value] pairs of defines for this module ]
+          submodules = [ additional parent modules: klayout.<submodules>.mod_name ]
+          includes = [ additional include paths, "/a/b/..." is absolute in src, "a/b/..." is relative to module source ]
+          sources = [ additional source paths, see 'includes', takes '*.cc' from there ]
+          cxxflags = [ additional compiler options ]
+          cxxflags-gcc = [ additional compiler options for gcc ]
+          cxxflags-msvc = [ additional compiler options for msvc ]
+          cxxflags-win32 = [ additional compiler options for Windows ]
+          cxxflags-linux = [ additional compiler options for Linux ]
+          cxxflags-darwin = [ additional compiler options for MacOS ]
+            Compiler option "$libpng_cflags" is replaced by the libpng build flags
+          ldflags* = [ additional linker options (*=same suffixes as cxxflags) ]
+            Linker option "$libpng_ldflags" is replaced by the libpng linker flags
+          libraries* = [ additional libraries (*=same suffixes as cxxflags) ]
+        """
+
+        pysetup_file = os.path.join(src_path, "pysetup.toml")
+        if not os.path.isfile(pysetup_file):
+            raise RuntimeError("Cannot find 'pysetup.toml' in " + src_path)
+          
+        with open(pysetup_file, "rb") as f:
+            pysetup = tomllib.load(f)
+
+        header = {}
+        is_library = None
+        if "library" in pysetup: 
+            is_library = True
+            header = pysetup["library"]
+        elif "extension" in pysetup: 
+            is_library = False
+            header = pysetup["extension"]
+        else:
+            raise RuntimeError("Invalid format - library or extension section expected in " + pysetup_file)
+
+        header_name = header.get("name", None)
+        if name is not None and header_name is not None and name != header_name:
+            raise RuntimeError("Module name and specified name in setup file do not match in " + pysetup_file + ": " + header_name + " vs. " + name)
+        elif name is None:
+            if header_name is None:
+                raise RuntimeError("No module name specified in " + pysetup_file)
+            name = header_name
+
+        depends = header.get("depends", [])
+        for d in depends:
+            # can't resolve now -> maybe later
+            if d not in self.src_paths:
+                return False
+
+        print("Adding module " + name + " from pysetup file " + pysetup_file + " ...")
+
+        self.src_paths[name] = src_path
+
+        defines = header.get("defines", [])
+        submodules = header.get("submodules", [])
+        includes = header.get("includes", [])
+        source_paths = header.get("sources", [])
+
+        mod_path = ".".join([ self.root ] + submodules + [ name ])
+        include_dirs = [ self.src_path(m) for m in depends ] + [ src_path ]
+        extra_objects = [ self.path_of(m) for m in depends ]
+        define_macros = self.macros() + [ tuple(d) for d in defines ]
+
+        sources = self.sources(name)
+        for i in source_paths:
+            p = i.split("/")
+            if len(p) > 0 and p[0] == "":
+                del p[0]
+            else:
+                p = [ src_path ] + p
+            p.append("*.cc")
+            sources += glob.glob(os.path.join(*p))
+
+        for i in includes:
+            p = i.split("/")
+            if len(p) > 0 and p[0] == "":
+                del p[0]
+            else:
+                p = [ src_path ] + p
+            include_dirs.append(os.path.join(*p))
+
+        if is_library:
+            ext = Library(mod_path,
+                          define_macros=define_macros,
+                          include_dirs=include_dirs,
+                          extra_objects=extra_objects,
+                          language="c++",
+                          libraries=self.libraries(header),
+                          extra_link_args=self.link_args(header, True),
+                          extra_compile_args=self.compile_args(header),
+                          sources=sources)
+            self.add_extension(ext)
+        else:
+            ext = Extension(mod_path,
+                            define_macros=define_macros,
+                            include_dirs=include_dirs,
+                            extra_objects=extra_objects,
+                            extra_link_args=self.link_args(header, False),
+                            extra_compile_args=self.compile_args(header),
+                            sources=sources)
+
+        self.modules.append(ext)
+
+        return True
 
     def src_path(self, name):
-        return self.modules[name]
+        return self.src_paths[name]
 
     def add_extension(self, ext):
         self.build_ext_cmd.ext_map[ext.name] = ext
@@ -331,97 +446,78 @@ class Config(object):
         if platform.system() == "Windows":
             # On Windows, the library to link is the import library
             (dll_name, dll_ext) = os.path.splitext(self.libname_of(mod))
-            return os.path.join(self.build_temp, self.modules[mod], dll_name + ".lib")
+            return os.path.join(self.build_temp, self.src_path(mod), dll_name + ".lib")
         else:
             return os.path.join(self.build_platlib, self.root, self.libname_of(mod))
-
-    def extra_include_dirs(self, mod):
-        """
-        Gets extra include directories per module
-        """
-        if mod == "_lstream_dbpi":
-            mod_src = self.src_path(mod)
-            return [ 
-                os.path.join("src", "version"),  # does not use tlVersion.h
-                os.path.join(mod_src, "capnp"),
-                os.path.join(mod_src, "..", "runtime", "capnp"),
-                os.path.join(mod_src, "..", "runtime", "kj")
-            ]
-        else:
-            return []
 
     def sources(self, mod):
         """
         Gets the source files for the given module and root source path
         """
-        mod_src = self.src_path(mod)
-        if mod == "_gds2_dbpi":
-            # GDS2 module has the contrib subfolder
-            files = glob.glob(os.path.join(mod_src, "*.cc"))
-            files += glob.glob(os.path.join(mod_src, "contrib", "*.cc"))
-            return files
-        elif mod == "_lstream_dbpi":
-            # LStream module is .. complex
-            files = glob.glob(os.path.join(mod_src, "*.cc"))
-            files += glob.glob(os.path.join(mod_src, "capnp", "*.cc"))
-            files += glob.glob(os.path.join(mod_src, "..", "runtime", "capnp", "capnp", "*.cc"))
-            files += glob.glob(os.path.join(mod_src, "..", "runtime", "kj", "kj", "*.cc"))
-            return files
-        else:
-            return glob.glob(os.path.join(mod_src, "*.cc"))
+        return glob.glob(os.path.join(self.src_path(mod), "*.cc"))
           
-    def compile_args(self, mod):
+    def compile_args(self, options):
         """
         Gets additional compiler arguments
         """
-        args: List[str]
+        args = []
+        args += options.get("cxxflags", [])
         if platform.system() == "Windows":
             bits = os.getenv("KLAYOUT_BITS")
             if bits:
-                args = [
+                args += [
                     quote_path("-I" + os.path.join(bits, "zlib", "include")),
                     quote_path("-I" + os.path.join(bits, "ptw", "include")),
                     quote_path("-I" + os.path.join(bits, "png", "include")),
                     quote_path("-I" + os.path.join(bits, "expat", "include")),
                     quote_path("-I" + os.path.join(bits, "curl", "include")),
                 ]
-            else:
-                args = []
-        elif mod == "_lstream_dbpi":
-            args = [
-                "-std=c++14",  # cap'n'proto needs this
-            ]
+            args += options.get("cxxflags-msvc", [])
+            args += options.get("cxxflags-win32", [])
         else:
             args = [
                 "-Wno-strict-aliasing",  # Avoids many "type-punned pointer" warnings
                 "-std=c++11",  # because we use unordered_map/unordered_set
             ]
-        if platform.system() == "Darwin" and mod == "_tl":
-            if check_libpng():
-                args += libpng_cflags()
-        return args
+            args += options.get("cxxflags-gcc", [])
+            if platform.system() == "Darwin":
+                args += options.get("cxxflags-darwin", [])
+            else:
+                args += options.get("cxxflags-linux", [])
 
-    def libraries(self, mod):
+        result = []
+        for a in args:
+            if a == "$libpng_cflags":
+                if check_libpng():
+                    result += libpng_cflags()
+            else:
+                result.append(a)
+        return result
+
+    def libraries(self, options):
         """
         Gets the libraries to add
         """
+        libs = []
+        libs += options.get("libraries", [])
         if platform.system() == "Windows":
-            if mod == "_tl":
-                return ["libcurl", "expat", "pthreadVCE2", "zlib", "wsock32", "libpng16"]
-        elif platform.system() == "Darwin":
-            if mod == "_tl":
-                libs = ["curl", "expat"]  # libpng is included by libpng_ldflags
-                return libs
+            libs += options.get("libraries-msvc", [])
+            libs += options.get("libraries-win32", [])
         else:
-            if mod == "_tl":
-                libs = ["curl", "expat", "png"]
-                return libs
-        return []
+            libs += options.get("libraries-gcc", [])
+            if platform.system() == "Darwin":
+                libs += options.get("libraries-darwin", [])
+            else:
+                libs += options.get("libraries-linux", [])
+        return libs
 
-    def link_args(self, mod):
+    def link_args(self, options, is_library):
         """
         Gets additional linker arguments
         """
+        mod = options["name"]
+        args = []
+        args += options.get("ldflags", [])
         if platform.system() == "Windows":
             args = ["/DLL"]
             bits = os.getenv("KLAYOUT_BITS")
@@ -433,20 +529,20 @@ class Config(object):
                     quote_path("/LIBPATH:" + os.path.join(bits, "expat", "libraries")),
                     quote_path("/LIBPATH:" + os.path.join(bits, "curl", "libraries")),
                 ]
-            return args
+            args += options.get("ldflags-msvc", [])
+            args += options.get("ldflags-win32", [])
         elif platform.system() == "Darwin":
             # For the dependency modules, make sure we produce a dylib.
             # We can only link against such, but the bundles produced otherwise.
             args = []
-            if mod[0] == "_":
+            if is_library:
                 args += [
                     "-Wl,-dylib",
                     "-Wl,-install_name,@rpath/%s" % self.libname_of(mod, is_lib=True),
                 ]
             args += ["-Wl,-rpath,@loader_path/"]
-            if mod == "_tl" and check_libpng():
-                args += libpng_ldflags()
-            return args
+            args += options.get("ldflags-gcc", [])
+            args += options.get("ldflags-darwin", [])
         else:
             # this makes the libraries suitable for linking with a path -
             # i.e. from path_of('_tl'). Without this option, the path
@@ -455,16 +551,23 @@ class Config(object):
             # build path and the loader will fail.
             args = []
             args += ["-Wl,-soname," + self.libname_of(mod, is_lib=True)]
-            if "_dbpi" not in mod:
-                loader_path = "$ORIGIN"
-            else:
-                loader_path = "$ORIGIN/.."
-            args += ["-Wl,-rpath," + loader_path]
+            loader_path = ["$ORIGIN"] + [".."]*len(options.get("submodules", []))
+            args += ["-Wl,-rpath," + "/".join(loader_path)]
             # default linux shared object compilation uses the '-g' flag,
             # which generates unnecessary debug information
             # removing with strip-all during the linking stage
             args += ["-Wl,--strip-all"]
-            return args
+            args += options.get("ldflags-gcc", [])
+            args += options.get("ldflags-linux", [])
+
+        result = []
+        for a in args:
+            if a == "$libpng_ldflags":
+                if check_libpng():
+                    result += libpng_ldflags()
+            else:
+                result.append(a)
+        return result
 
     def macros(self):
         """
@@ -481,15 +584,6 @@ class Config(object):
         ]
 
         return macros
-
-    def extra_macros(self, mod):
-        """
-        Returns extra module-dependent macros
-        """
-        if mod == "_lstream_dbpi":
-            return [("CAPNP_LITE", 1)]
-        else:
-            return []
 
     def minor_version(self):
         """
@@ -549,504 +643,28 @@ class Config(object):
 
 config = Config()
 
-# ------------------------------------------------------------------
-# _tl dependency library
-
-config.module("_tl", os.path.join("src", "tl", "tl"))
-
-_tl = Library(
-    config.root + "._tl",
-    define_macros=config.macros() + [("MAKE_TL_LIBRARY", 1)],
-    language="c++",
-    libraries=config.libraries("_tl"),
-    extra_link_args=config.link_args("_tl"),
-    extra_compile_args=config.compile_args("_tl"),
-    sources=config.sources("_tl")
-)
-
-config.add_extension(_tl)
-
-# ------------------------------------------------------------------
-# _gsi dependency library
-
-config.module("_gsi", os.path.join("src", "gsi", "gsi"))
-
-_gsi = Library(
-    config.root + "._gsi",
-    define_macros=config.macros() + [("MAKE_GSI_LIBRARY", 1)],
-    include_dirs=[config.src_path("_tl")],
-    extra_objects=[config.path_of("_tl")],
-    language="c++",
-    libraries=config.libraries('_gsi'),
-    extra_link_args=config.link_args("_gsi"),
-    extra_compile_args=config.compile_args("_gsi"),
-    sources=config.sources("_gsi")
-)
-config.add_extension(_gsi)
-
-# ------------------------------------------------------------------
-# _pya dependency library
-
-config.module("_pya", os.path.join("src", "pya", "pya"))
-
-_version_path = os.path.join("src", "version")
-
-_pya = Library(
-    config.root + "._pya",
-    define_macros=config.macros() + [("MAKE_PYA_LIBRARY", 1)],
-    include_dirs=[_version_path, config.src_path("_tl"), config.src_path("_gsi")],
-    extra_objects=[config.path_of("_tl"), config.path_of("_gsi")],
-    language="c++",
-    libraries=config.libraries("_pya"),
-    extra_link_args=config.link_args("_pya"),
-    extra_compile_args=config.compile_args("_pya"),
-    sources=config.sources("_pya")
-)
-config.add_extension(_pya)
-
-# ------------------------------------------------------------------
-# _rba dependency library (dummy)
-
-config.module("_rba", os.path.join("src", "rbastub"))
-
-_rba = Library(
-    config.root + '._rba',
-    define_macros=config.macros() + [('MAKE_RBA_LIBRARY', 1)],
-    include_dirs=[config.src_path("_tl"), config.src_path("_gsi")],
-    extra_objects=[config.path_of("_tl"), config.path_of("_gsi")],
-    language="c++",
-    libraries=config.libraries("_rba"),
-    extra_link_args=config.link_args("_rba"),
-    extra_compile_args=config.compile_args("_rba"),
-    sources=config.sources("_rba")
-)
-config.add_extension(_rba)
-
-# ------------------------------------------------------------------
-# _db dependency library
-
-config.module("_db", os.path.join("src", "db", "db"))
-
-_db = Library(
-    config.root + "._db",
-    define_macros=config.macros() + [("MAKE_DB_LIBRARY", 1)],
-    include_dirs=[config.src_path("_tl"), config.src_path("_gsi"), config.src_path("_db")],
-    extra_objects=[config.path_of("_tl"), config.path_of("_gsi")],
-    language="c++",
-    libraries=config.libraries("_db"),
-    extra_link_args=config.link_args("_db"),
-    extra_compile_args=config.compile_args("_db"),
-    sources=config.sources("_db")
-)
-config.add_extension(_db)
-
-# ------------------------------------------------------------------
-# _pex dependency library
-
-config.module("_pex", os.path.join("src", "pex", "pex"))
-
-_pex = Library(
-    config.root + "._pex",
-    define_macros=config.macros() + [("MAKE_PEX_LIBRARY", 1)],
-    include_dirs=[config.src_path("_tl"), config.src_path("_gsi"), config.src_path("_db"), config.src_path("_pex")],
-    extra_objects=[config.path_of("_tl"), config.path_of("_gsi"), config.path_of("_db")],
-    language="c++",
-    libraries=config.libraries("_pex"),
-    extra_link_args=config.link_args("_pex"),
-    extra_compile_args=config.compile_args("_pex"),
-    sources=config.sources("_pex")
-)
-config.add_extension(_pex)
-
-# ------------------------------------------------------------------
-# _lib dependency library
-
-config.module("_lib", os.path.join("src", "lib", "lib"))
-
-_lib = Library(
-    config.root + "._lib",
-    define_macros=config.macros() + [("MAKE_LIB_LIBRARY", 1)],
-    include_dirs=[config.src_path("_tl"), config.src_path("_gsi"), config.src_path("_db"), config.src_path("_lib")],
-    extra_objects=[
-        config.path_of("_tl"),
-        config.path_of("_gsi"),
-        config.path_of("_db"),
-    ],
-    language="c++",
-    libraries=config.libraries("_lib"),
-    extra_link_args=config.link_args("_lib"),
-    extra_compile_args=config.compile_args("_lib"),
-    sources=config.sources("_lib")
-)
-config.add_extension(_lib)
-
-# ------------------------------------------------------------------
-# _rdb dependency library
-
-config.module("_rdb", os.path.join("src", "rdb", "rdb"))
-
-_rdb = Library(
-    config.root + "._rdb",
-    define_macros=config.macros() + [("MAKE_RDB_LIBRARY", 1)],
-    include_dirs=[config.src_path("_db"), config.src_path("_tl"), config.src_path("_gsi")],
-    extra_objects=[
-        config.path_of("_tl"),
-        config.path_of("_gsi"),
-        config.path_of("_db"),
-    ],
-    language="c++",
-    libraries=config.libraries('_rdb'),
-    extra_link_args=config.link_args("_rdb"),
-    extra_compile_args=config.compile_args("_rdb"),
-    sources=config.sources("_rdb")
-)
-config.add_extension(_rdb)
-
-# ------------------------------------------------------------------
-# _laybasic dependency library
-
-config.module("_laybasic", os.path.join("src", "laybasic", "laybasic"))
-
-_laybasic = Library(
-    config.root + '._laybasic',
-    define_macros=config.macros() + [('MAKE_LAYBASIC_LIBRARY', 1)],
-    include_dirs=[config.src_path("_rdb"), config.src_path("_db"), config.src_path("_tl"), config.src_path("_gsi")],
-    extra_objects=[
-        config.path_of('_rdb'),
-        config.path_of('_tl'),
-        config.path_of('_gsi'),
-        config.path_of('_db')
-    ],
-    language='c++',
-    libraries=config.libraries('_laybasic'),
-    extra_link_args=config.link_args('_laybasic'),
-    extra_compile_args=config.compile_args('_laybasic'),
-    sources=config.sources("_laybasic")
-)
-config.add_extension(_laybasic)
-
-# ------------------------------------------------------------------
-# _layview dependency library
-
-config.module("_layview", os.path.join("src", "layview", "layview"))
-
-_layview = Library(
-    config.root + '._layview',
-    define_macros=config.macros() + [('MAKE_LAYVIEW_LIBRARY', 1)],
-    include_dirs=[config.src_path("_laybasic"), config.src_path("_rdb"), config.src_path("_db"), config.src_path("_tl"), config.src_path("_gsi")],
-    extra_objects=[
-        config.path_of('_laybasic'),
-        config.path_of('_rdb'),
-        config.path_of('_tl'),
-        config.path_of('_gsi'),
-        config.path_of('_db')
-    ],
-    language='c++',
-    libraries=config.libraries('_layview'),
-    extra_link_args=config.link_args('_layview'),
-    extra_compile_args=config.compile_args('_layview'),
-    sources=config.sources("_layview")
-)
-config.add_extension(_layview)
-
-# ------------------------------------------------------------------
-# _lym dependency library
-
-config.module("_lym", os.path.join("src", "lym", "lym"))
-
-_lym = Library(
-    config.root + '._lym',
-    define_macros=config.macros() + [('MAKE_LYM_LIBRARY', 1)],
-    include_dirs=[config.src_path("_pya"), config.src_path("_rba"), config.src_path("_tl"), config.src_path("_gsi")],
-    extra_objects=[
-        config.path_of('_rba'),
-        config.path_of('_pya'),
-        config.path_of('_tl'),
-        config.path_of('_gsi')
-    ],
-    language='c++',
-    libraries=config.libraries('_lym'),
-    extra_link_args=config.link_args('_lym'),
-    extra_compile_args=config.compile_args('_lym'),
-    sources=config.sources("_lym")
-)
-config.add_extension(_lym)
-
-# ------------------------------------------------------------------
-# _ant dependency library
-
-config.module("_ant", os.path.join("src", "ant", "ant"))
-
-_ant = Library(
-    config.root + '._ant',
-    define_macros=config.macros() + [('MAKE_ANT_LIBRARY', 1)],
-    include_dirs=[config.src_path("_laybasic"), config.src_path("_layview"), config.src_path("_rdb"), config.src_path("_db"), config.src_path("_tl"), config.src_path("_gsi")],
-    extra_objects=[
-        config.path_of('_laybasic'),
-        config.path_of('_layview'),
-        config.path_of('_rdb'),
-        config.path_of('_tl'),
-        config.path_of('_gsi'),
-        config.path_of('_db')
-    ],
-    language='c++',
-    libraries=config.libraries('_ant'),
-    extra_link_args=config.link_args('_ant'),
-    extra_compile_args=config.compile_args('_ant'),
-    sources=config.sources("_ant")
-)
-config.add_extension(_ant)
-
-# ------------------------------------------------------------------
-# _img dependency library
-
-config.module("_img", os.path.join("src", "img", "img"))
-
-_img = Library(
-    config.root + '._img',
-    define_macros=config.macros() + [('MAKE_IMG_LIBRARY', 1)],
-    include_dirs=[config.src_path("_laybasic"), config.src_path("_layview"), config.src_path("_rdb"), config.src_path("_db"), config.src_path("_tl"), config.src_path("_gsi")],
-    extra_objects=[
-        config.path_of('_laybasic'),
-        config.path_of('_layview'),
-        config.path_of('_rdb'),
-        config.path_of('_tl'),
-        config.path_of('_gsi'),
-        config.path_of('_db')
-    ],
-    language='c++',
-    libraries=config.libraries('_img'),
-    extra_link_args=config.link_args('_img'),
-    extra_compile_args=config.compile_args('_img'),
-    sources=config.sources("_img")
-)
-config.add_extension(_img)
-
-# ------------------------------------------------------------------
-# _edt dependency library
-
-config.module("_edt", os.path.join("src", "edt", "edt"))
-
-_edt = Library(
-    config.root + '._edt',
-    define_macros=config.macros() + [('MAKE_EDT_LIBRARY', 1)],
-    include_dirs=[config.src_path("_laybasic"), config.src_path("_layview"), config.src_path("_rdb"), config.src_path("_db"), config.src_path("_tl"), config.src_path("_gsi")],
-    extra_objects=[
-        config.path_of('_laybasic'),
-        config.path_of('_layview'),
-        config.path_of('_rdb'),
-        config.path_of('_tl'),
-        config.path_of('_gsi'),
-        config.path_of('_db')
-    ],
-    language='c++',
-    libraries=config.libraries('_edt'),
-    extra_link_args=config.link_args('_edt'),
-    extra_compile_args=config.compile_args('_edt'),
-    sources=config.sources("_edt")
-)
-config.add_extension(_edt)
-
-# ------------------------------------------------------------------
-# dependency libraries from db_plugins
-
-db_plugins = []
-
-dbpi_dirs = glob.glob(os.path.join("src", "plugins", "*", "db_plugin"))
-dbpi_dirs += glob.glob(os.path.join("src", "plugins", "*", "*", "db_plugin"))
-
-for pi in dbpi_dirs:
-
-    mod_name = "_" + os.path.split(os.path.split(pi)[-2])[-1] + "_dbpi"
-    config.module(mod_name, pi)
-
-    pi_ext = Library(
-        config.root + ".db_plugins." + mod_name,
-        define_macros=config.macros() + [("MAKE_DB_PLUGIN_LIBRARY", 1)] + config.extra_macros(mod_name),
-        include_dirs=[
-            pi,
-            os.path.join("src", "plugins", "common"),
-            config.src_path("_db"),
-            config.src_path("_tl"),
-            config.src_path("_gsi")
-        ] + config.extra_include_dirs(mod_name),
-        extra_objects=[
-            config.path_of("_tl"),
-            config.path_of("_gsi"),
-            config.path_of("_db"),
-        ],
-        language="c++",
-        extra_link_args=config.link_args(mod_name),
-        extra_compile_args=config.compile_args(mod_name),
-        sources=config.sources(mod_name)
-    )
-
-    db_plugins.append(pi_ext)
-    config.add_extension(pi_ext)
-
-# ------------------------------------------------------------------
-# tl extension library
-
-config.module("tlcore", os.path.join("src", "pymod", "tl"))
-
-tl = Extension(
-    config.root + ".tlcore",
-    define_macros=config.macros(),
-    include_dirs=[config.src_path("_tl"), config.src_path("_gsi"), config.src_path("_pya")],
-    extra_objects=[
-        config.path_of("_tl"),
-        config.path_of("_gsi"),
-        config.path_of("_pya"),
-    ],
-    extra_link_args=config.link_args("tlcore"),
-    extra_compile_args=config.compile_args("tlcore"),
-    sources=config.sources("tlcore")
-)
-
-# ------------------------------------------------------------------
-# db extension library
-
-config.module("dbcore", os.path.join("src", "pymod", "db"))
-
-db = Extension(
-    config.root + ".dbcore",
-    define_macros=config.macros(),
-    include_dirs=[config.src_path("_db"), config.src_path("_tl"), config.src_path("_gsi"), config.src_path("_pya")],
-    extra_objects=[
-        config.path_of("_db"),
-        config.path_of("_tl"),
-        config.path_of("_gsi"),
-        config.path_of("_pya"),
-    ],
-    extra_link_args=config.link_args("dbcore"),
-    extra_compile_args=config.compile_args("dbcore"),
-    sources=config.sources("dbcore")
-)
-
-# ------------------------------------------------------------------
-# pex extension library
-
-config.module("pexcore", os.path.join("src", "pymod", "pex"))
-
-pex = Extension(
-    config.root + ".pexcore",
-    define_macros=config.macros(),
-    include_dirs=[config.src_path("_db"), config.src_path("_tl"), config.src_path("_gsi"), config.src_path("_pya"), config.src_path("_pex")],
-    extra_objects=[
-        config.path_of("_db"),
-        config.path_of("_pex"),
-        config.path_of("_tl"),
-        config.path_of("_gsi"),
-        config.path_of("_pya"),
-    ],
-    extra_link_args=config.link_args("pexcore"),
-    extra_compile_args=config.compile_args("pexcore"),
-    sources=config.sources("pexcore")
-)
-
-# ------------------------------------------------------------------
-# lib extension library
-
-config.module("libcore", os.path.join("src", "pymod", "lib"))
-
-lib = Extension(
-    config.root + ".libcore",
-    define_macros=config.macros(),
-    include_dirs=[config.src_path("_lib"), config.src_path("_tl"), config.src_path("_gsi"), config.src_path("_pya")],
-    extra_objects=[
-        config.path_of("_lib"),
-        config.path_of("_tl"),
-        config.path_of("_gsi"),
-        config.path_of("_pya"),
-    ],
-    extra_link_args=config.link_args("libcore"),
-    extra_compile_args=config.compile_args("libcore"),
-    sources=config.sources("libcore")
-)
-
-# ------------------------------------------------------------------
-# rdb extension library
-
-config.module("rdbcore", os.path.join("src", "pymod", "rdb"))
-
-rdb = Extension(
-    config.root + ".rdbcore",
-    define_macros=config.macros(),
-    include_dirs=[config.src_path("_rdb"), config.src_path("_tl"), config.src_path("_gsi"), config.src_path("_pya")],
-    extra_objects=[
-        config.path_of("_rdb"),
-        config.path_of("_tl"),
-        config.path_of("_gsi"),
-        config.path_of("_pya"),
-    ],
-    extra_link_args=config.link_args("rdbcore"),
-    extra_compile_args=config.compile_args("rdbcore"),
-    sources=config.sources("rdbcore")
-)
-
-# ------------------------------------------------------------------
-# lay extension library
-
-config.module("laycore", os.path.join("src", "pymod", "lay"))
-
-lay = Extension(config.root + '.laycore',
-                define_macros=config.macros(),
-                include_dirs=[config.src_path("_laybasic"),
-                              config.src_path("_layview"),
-                              config.src_path("_img"),
-                              config.src_path("_ant"),
-                              config.src_path("_edt"),
-                              config.src_path("_lym"),
-                              config.src_path("_tl"),
-                              config.src_path("_gsi"),
-                              config.src_path("_pya")],
-                extra_objects=[config.path_of('_laybasic'),
-                               config.path_of('_layview'),
-                               config.path_of('_img'),
-                               config.path_of('_ant'),
-                               config.path_of('_edt'),
-                               config.path_of('_lym'),
-                               config.path_of('_tl'),
-                               config.path_of('_gsi'),
-                               config.path_of('_pya')],
-                extra_link_args=config.link_args('laycore'),
-                extra_compile_args=config.compile_args('laycore'),
-                sources=config.sources("laycore"))
-
-# ------------------------------------------------------------------
-# pya extension library (all inclusive, basis of pya module)
-
-config.module("pyacore", os.path.join("src", "pymod", "pya"))
-
-pya = Extension(config.root + '.pyacore',
-                define_macros=config.macros(),
-                include_dirs=[config.src_path("_laybasic"),
-                              config.src_path("_layview"),
-                              config.src_path("_lib"),
-                              config.src_path("_db"),
-                              config.src_path("_rdb"),
-                              config.src_path("_img"),
-                              config.src_path("_ant"),
-                              config.src_path("_edt"),
-                              config.src_path("_lym"),
-                              config.src_path("_tl"),
-                              config.src_path("_gsi"),
-                              config.src_path("_pya")],
-                extra_objects=[config.path_of('_laybasic'),
-                               config.path_of('_layview'),
-                               config.path_of('_lib'),
-                               config.path_of('_db'),
-                               config.path_of('_rdb'),
-                               config.path_of('_img'),
-                               config.path_of('_ant'),
-                               config.path_of('_edt'),
-                               config.path_of('_lym'),
-                               config.path_of('_tl'),
-                               config.path_of('_gsi'),
-                               config.path_of('_pya')],
-                extra_link_args=config.link_args('pyacore'),
-                extra_compile_args=config.compile_args('pyacore'),
-                sources=config.sources("pyacore"))
+# Collect the module spec files with dependent modules coming after
+# the dependencies:
+
+mod_specs = glob.glob(os.path.join("src", "*", "pysetup.toml"))
+mod_specs += glob.glob(os.path.join("src", "*", "*", "pysetup.toml"))
+mod_specs += glob.glob(os.path.join("src", "*", "*", "*", "pysetup.toml"))
+mod_specs += glob.glob(os.path.join("src", "*", "*", "*", "*", "pysetup.toml"))
+
+todo = mod_specs
+while len(todo) > 0:
+
+    not_done = []
+    for ms in todo:
+        p = list(os.path.split(ms))
+        p.pop()
+        if not config.module(None, os.path.join(*p)):
+            not_done.append(ms)
+      
+    if len(not_done) == len(todo):
+        raise RuntimeError("Dependency resolution failed - circular dependencies?")
+
+    todo = not_done
 
 # ------------------------------------------------------------------
 # Core setup function
@@ -1081,8 +699,6 @@ if __name__ == "__main__":
         package_data={config.root: ["src/pymod/distutils_src/klayout/*.pyi"]},
         data_files=[(config.root, ["src/pymod/distutils_src/klayout/py.typed"])],
         include_package_data=True,
-        ext_modules=[_tl, _gsi, _pya, _rba, _db, _pex, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img]
-            + db_plugins
-            + [tl, db, pex, lib, rdb, lay, pya],
+        ext_modules=config.modules,
         cmdclass={'build_ext': klayout_build_ext}
     )

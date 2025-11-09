@@ -1,0 +1,5 @@
+
+[extension]
+  name = "dbcore"
+  defines = []
+  depends = ["_tl", "_gsi", "_db", "_pya"]

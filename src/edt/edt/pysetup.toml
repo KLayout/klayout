@@ -1,0 +1,6 @@
+
+[library]
+  name = "_edt"
+  defines = [["MAKE_EDT_LIBRARY", 1]]
+  depends = ["_tl", "_gsi", "_db", "_rdb", "_laybasic", "_layview"]
+

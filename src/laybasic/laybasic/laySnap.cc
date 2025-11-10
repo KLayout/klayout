@@ -444,7 +444,10 @@ private:
   void 
   find_closest_exact (const db::DPoint &p, const db::DEdge &e)
   {
-    if (! m_any_exact || m_original.distance (p) < m_original.distance (m_closest_exact)) {
+    bool was_vertex = m_edge1_exact.is_degenerate () && m_edge2_exact.is_degenerate ();
+    bool is_vertex = e.is_degenerate ();
+
+    if (! m_any_exact || (! (was_vertex && ! is_vertex) && (m_original.distance (p) < m_original.distance (m_closest_exact) || (! was_vertex && is_vertex)))) {
 
       if (m_directed) {
         for (std::vector<db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {
@@ -465,7 +468,10 @@ private:
   void 
   find_closest (const db::DPoint &p, const db::DEdge &e)
   {
-    if (! m_any || m_original.distance (p) < m_original.distance (m_closest)) {
+    bool was_vertex = m_edge1.is_degenerate () && m_edge2.is_degenerate ();
+    bool is_vertex = e.is_degenerate ();
+
+    if (! m_any || (! (was_vertex && ! is_vertex) && (m_original.distance (p) < m_original.distance (m_closest) || (! was_vertex && is_vertex)))) {
 
       if (m_directed) {
         for (std::vector<db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {

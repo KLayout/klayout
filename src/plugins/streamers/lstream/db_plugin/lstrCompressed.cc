@@ -69,12 +69,11 @@ Compressed::make_rep_id (const RegularArray &array, const std::vector<db::Vector
 
 template <class Obj>
 void 
-Compressed::write_shape (const db::Shape &shape, const db::Vector &disp, RegularArray &regular, std::vector<db::Vector> &irregular_array)
+Compressed::write_shape (const db::Shape &shape, RegularArray &regular, std::vector<db::Vector> &irregular_array)
 {
   Obj sh;
   shape.instantiate (sh);
   if (! object_is_empty (sh)) {
-    sh.move (disp);
     if (shape.prop_id () != 0) {
       write (db::object_with_properties<Obj> (sh, shape.prop_id ()), regular, irregular_array);
     } else {
@@ -115,27 +114,26 @@ Compressed::compress_shapes (const db::Shapes &shapes, unsigned int level, bool 
       std::vector<db::Vector> irregular_array;
 
       bool transfer_array = (shape.in_array () && level > 0);
-      db::Vector disp;
       if (transfer_array) {
-        disp = create_repetition (shape.array (), array, irregular_array);
+        create_repetition (shape.array (), array, irregular_array);
       }
 
       if (shape->is_simple_polygon ()) {
-        write_shape<db::SimplePolygon> (*shape, disp, array, irregular_array);
+        write_shape<db::SimplePolygon> (*shape, array, irregular_array);
       } else if (shape->is_polygon ()) {
-        write_shape<db::Polygon> (*shape, disp, array, irregular_array);
+        write_shape<db::Polygon> (*shape, array, irregular_array);
       } else if (shape->is_path ()) {
-        write_shape<db::Path> (*shape, disp, array, irregular_array);
+        write_shape<db::Path> (*shape, array, irregular_array);
       } else if (shape->is_text ()) {
-        write_shape<db::Text> (*shape, disp, array, irregular_array);
+        write_shape<db::Text> (*shape, array, irregular_array);
       } else if (shape->is_edge ()) {
-        write_shape<db::Edge> (*shape, disp, array, irregular_array);
+        write_shape<db::Edge> (*shape, array, irregular_array);
       } else if (shape->is_edge_pair ()) {
-        write_shape<db::EdgePair> (*shape, disp, array, irregular_array);
+        write_shape<db::EdgePair> (*shape, array, irregular_array);
       } else if (shape->is_box ()) {
-        write_shape<db::Box> (*shape, disp, array, irregular_array);
+        write_shape<db::Box> (*shape, array, irregular_array);
       } else if (shape->is_point ()) {
-        write_shape<db::Point> (*shape, disp, array, irregular_array);
+        write_shape<db::Point> (*shape, array, irregular_array);
       } else if (shape->is_user_object ()) {
         // ignore
       } else {
@@ -486,9 +484,9 @@ Compressed::compress_instances (const db::Cell::const_iterator &begin_instances,
 
         db::CellInstArray single_inst;
         if (! inst_array.is_complex ()) {
-          single_inst = db::CellInstArray (inst_array.object (), db::Trans (-disp) * inst_array.front ());
+          single_inst = db::CellInstArray (inst_array.object (), db::Trans (disp) * inst_array.front ());
         } else {
-          single_inst = db::CellInstArray (inst_array.object (), inst_array.complex_trans (db::Trans (-disp) * inst_array.front ()));
+          single_inst = db::CellInstArray (inst_array.object (), inst_array.complex_trans (db::Trans (disp) * inst_array.front ()));
         }
 
         //  no compression -> just keep as is

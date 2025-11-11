@@ -275,8 +275,6 @@ private:
   db::Vector create_repetition (const db::Shape &array, RegularArray &regular, std::vector<db::Vector> &irregular_array);
   template <class Obj>
   void write_shape(const db::Shape &shape, RegularArray &regular, std::vector<db::Vector> &irregular_array);
-  template <class Obj>
-  void write_shape(const db::Shape &shape, const db::Vector &disp, RegularArray &regular, std::vector<db::Vector> &irregular_array);
 };
 
 template <> inline Compressed::compressed_container<db::Point> &Compressed::get_container () { return m_points; }

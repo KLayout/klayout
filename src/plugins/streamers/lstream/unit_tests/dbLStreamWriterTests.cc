@@ -151,3 +151,13 @@ TEST(variants)
   run_test (_this, tl::testdata (), "variants.lstr", "variants_au.oas");
 }
 
+TEST(sample1)
+{
+  run_test (_this, tl::testdata (), "sample1.lstr", "sample1_au.oas");
+}
+
+TEST(sample2)
+{
+  run_test (_this, tl::testdata (), "sample2.lstr", "sample2_au.oas");
+}
+

@@ -34,7 +34,7 @@ from build4mac_util import *
 # @return (usage, moduleset)-tuple
 #-------------------------------------------------------------------------------
 def GenerateUsage(platform):
-    if platform.upper() in [ "SEQUOIA", "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
+    if platform.upper() in [ "TAHOE", "SEQUOIA", "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
         myQt56    = "qt5macports"
         myRuby    = "sys"
         myPython  = "sys"
@@ -117,7 +117,9 @@ def Get_Default_Config():
     # Dropped [ElCapitan - BigSur] (2023-10-24).
     # See 415b5aa2efca04928f1148a69e77efd5d76f8c1d for the previous states.
     #----------------------------------------------------------------------------
-    if   release == 24:
+    if   release == 25:
+        Platform = "Tahoe"
+    elif release == 24:
         Platform = "Sequoia"
     elif release == 23:
         Platform = "Sonoma"
@@ -134,7 +136,7 @@ def Get_Default_Config():
 
     if not Machine == "x86_64":
 		# with an Apple Silicon Chip?
-        if Machine == "arm64" and Platform in ["Sequoia", "Sonoma", "Ventura", "Monterey"]:
+        if Machine == "arm64" and Platform in ["Tahoe", "Sequoia", "Sonoma", "Ventura", "Monterey"]:
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print( "    Setting QMAKE_APPLE_DEVICE_ARCHS=arm64\n")
@@ -152,7 +154,11 @@ def Get_Default_Config():
     ToolDebug = list()
 
     # Set the default modules
-    if   Platform == "Sequoia":
+    if   Platform == "Tahoe":
+        ModuleQt     = "Qt5MacPorts"
+        ModuleRuby   = "Sys"
+        ModulePython = "Sys"
+    elif Platform == "Sequoia":
         ModuleQt     = "Qt5MacPorts"
         ModuleRuby   = "Sys"
         ModulePython = "Sys"
@@ -186,7 +192,7 @@ def Get_Default_Config():
     PackagePrefix = ""
     DeployVerbose = 1
     Version       = GetKLayoutVersionFrom( "./version.sh" )
-    OSPython3FW   = None  # system Python3 frameworks in [ None, MontereyPy3FW, VenturaPy3FW, SonomaPy3FW, SequoiaPy3FW ]
+    OSPython3FW   = None  # system Python3 frameworks in [ None, MontereyPy3FW, VenturaPy3FW, SonomaPy3FW, SequoiaPy3FW, TahoePy3FW ]
     EmbedQt       = False
     EmbedPython3  = False
 
@@ -213,7 +219,7 @@ def Get_Default_Config():
     config['Version']       = Version           # KLayout's version
     config['ModuleSet']     = ModuleSet         # (Qt, Ruby, Python)-tuple
     config['ToolDebug']     = ToolDebug         # debug level list for this tool
-    config['OSPython3FW']   = OSPython3FW       # system Python3 frameworks in [ None, MontereyPy3FW, VenturaPy3FW, SonomaPy3FW, SequoiaPy3FW ]
+    config['OSPython3FW']   = OSPython3FW       # system Python3 frameworks in [ None, MontereyPy3FW, VenturaPy3FW, SonomaPy3FW, SequoiaPy3FW, TahoePy3FW ]
     config['EmbedQt']       = EmbedQt           # True if Qt is embedded
     config['EmbedPython3']  = EmbedPython3      # True if Python3 is embedded
     # auxiliary variables on platform
@@ -344,7 +350,7 @@ def Parse_CLI_Args(config):
                     default=False,
                     help='check usage' )
 
-    if Platform.upper() in [ "SEQUOIA", "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
+    if Platform.upper() in [ "TAHOE", "SEQUOIA", "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
         p.set_defaults( type_qt         = "qt5macports",
                         type_ruby       = "sys",
                         type_python     = "sys",
@@ -417,7 +423,9 @@ def Parse_CLI_Args(config):
         if choiceRuby == "nil":
             ModuleRuby = 'nil'
         elif choiceRuby == "Sys":
-            if Platform == "Sequoia":
+            if Platform == "Tahoe":
+                ModuleRuby = 'RubyTahoe'
+            elif Platform == "Sequoia":
                 ModuleRuby = 'RubySequoia'
             elif Platform == "Sonoma":
                 ModuleRuby = 'RubySonoma'
@@ -462,7 +470,10 @@ def Parse_CLI_Args(config):
             ModulePython = 'nil'
             OSPython3FW  = None
         elif choicePython == "Sys":
-            if Platform == "Sequoia":
+            if Platform == "Tahoe":
+                ModulePython = 'PythonTahoe'
+                OSPython3FW  = TahoePy3FW
+            elif Platform == "Sequoia":
                 ModulePython = 'PythonSequoia'
                 OSPython3FW  = SequoiaPy3FW
             elif Platform == "Sonoma":
@@ -740,7 +751,7 @@ def Get_Build_Parameters(config):
     parameters['ModulePython']  = ModulePython
 
     PymodDistDir = dict()
-    if Platform in [ 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]:
+    if Platform in [ 'Tahoe', 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]:
         if ModuleRuby in [ 'Ruby33MacPorts', 'Ruby34Brew', 'RubyAnaconda3' ]:
             if ModulePython in [ 'Python312MacPorts', 'Python311MacPorts' ]:
                 PymodDistDir[ModulePython] = 'dist-MP3-%s' % ModuleQt
@@ -775,7 +786,7 @@ def Build_pymod_wheel(parameters):
     ModulePython  = parameters['ModulePython']
     if not BuildPymodWhl:
         return 0
-    if not Platform in [ 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]:
+    if not Platform in [ 'Tahoe', 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]:
         return 0
     elif not ModuleRuby in [ 'Ruby33MacPorts', 'Ruby34Brew', 'RubyAnaconda3' ]:
         return 0

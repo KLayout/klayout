@@ -78,13 +78,13 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.30.2 or later on different Apple macOS platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.30.5 or later on different Apple macOS platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
     Usage += "   ----------------------------------------------------------------------------------+-----------------\n"
     Usage += "   <-p|--pkg <dir>>     : package directory created by `build4mac.py` with [-y|-Y]   | ``\n"
-    Usage += "                        : like 'LW-qt5MP.pkg.macos-Sequoia-release-Rmp33Pmp312'      | \n"
+    Usage += "                        : like 'LW-qt5MP.pkg.macos-Sequoia-release-Rmp34Pmp313'      | \n"
     Usage += "   <-c|--clean>         : clean the work directory                                   | disabled\n"
     Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled\n"
     Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
@@ -106,7 +106,11 @@ def SetGlobals():
 
     release = int( Release.split(".")[0] ) # take the first of ['21', '0', '0']
     LatestOS = ""
-    if release == 24:
+    if release == 25:
+        GenOSName = "macOS"
+        Platform  = "Tahoe"
+        LatestOS  = Platform
+    elif release == 24:
         GenOSName = "macOS"
         Platform  = "Sequoia"
         LatestOS  = Platform
@@ -131,7 +135,7 @@ def SetGlobals():
 
     if not Machine == "x86_64":
         # with an Apple Silicon Chip?
-        if Machine == "arm64" and Platform in ["Sequoia", "Sonoma", "Ventura", "Monterey"]:
+        if Machine == "arm64" and Platform in ["Tahoe", "Sequoia", "Sonoma", "Ventura", "Monterey"]:
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")
@@ -293,9 +297,15 @@ def CheckPkgDirectory():
         PackagePrefix    = pkgdirComponents[0]
         QtIdentification = pkgdirComponents[2]
         if QtIdentification.find('qt5') == 0:
-            BackgroundPNG = "KLayoutDMG-BackQt5.png"
+            if Machine == "x86_64":
+                BackgroundPNG = "KLayoutDMG-BackQt5-X86.png"
+            else: # arm64
+                BackgroundPNG = "KLayoutDMG-BackQt5-Mx.png"
         elif QtIdentification.find('qt6') == 0:
-            BackgroundPNG = "KLayoutDMG-BackQt6.png"
+            if Machine == "x86_64":
+                BackgroundPNG = "KLayoutDMG-BackQt6-X86.png"
+            else: # arm64
+                BackgroundPNG = "KLayoutDMG-BackQt6-Mx.png"
         else:
             BackgroundPNG = None
             raise Exception( "! neither qt5 nor qt6" )
@@ -319,16 +329,16 @@ def CheckPkgDirectory():
         LatestOSMacPorts   = Platform == LatestOS
         LatestOSMacPorts  &= PackagePrefix == "LW"
         LatestOSMacPorts  &= QtIdentification in [ "qt5MP", "qt6MP" ]
-        LatestOSMacPorts  &= RubyPythonID in [ "Rmp33Pmp312", "Rmp33Pmp311" ]
+        LatestOSMacPorts  &= RubyPythonID in [ "Rmp34Pmp313", "Rmp34Pmp312", "Rmp34Pmp311" ]
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"
         LatestOSHomebrew  &= QtIdentification in [ "qt5Brew", "qt6Brew", "qt5MP", "qt6MP" ] # "qt[5|6]MP" are the alternatives
-        LatestOSHomebrew  &= RubyPythonID in [ "Rhb34Phb312", "Rhb34Phb311", "Rhb34Phbauto" ]
+        LatestOSHomebrew  &= RubyPythonID in [ "Rhb34Phb313", "Rhb34Phb312", "Rhb34Phb311", "Rhb34Phbauto" ]
 
         LatestOSAnaconda3  = Platform == LatestOS
         LatestOSAnaconda3 &= PackagePrefix == "LW"
-        LatestOSAnaconda3 &= QtIdentification in [ "qt5Ana3" ]
+        LatestOSAnaconda3 &= QtIdentification in [ "qt5Ana3", "qt6Ana3" ]
         LatestOSAnaconda3 &= RubyPythonID in [ "Rana3Pana3" ]
 
         LatestOSHomebrewH  = Platform == LatestOS

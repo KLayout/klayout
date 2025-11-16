@@ -262,7 +262,7 @@ public:
    *  "vertex_mode" is:
    *    0: no snapping to vertexes
    *    1: snapping to edge vertexes
-   *    2: also snapping to centers
+   *    2: snapping to edge vertexes with high prio and also snapping to centers
    */
   ContourFinder (const db::DPoint &original, const db::DVector &grid, const std::vector <db::DEdge> &cutlines, int vertex_mode = 2, bool directed = false)
     : m_any (false), m_any_exact (false), 
@@ -449,8 +449,11 @@ private:
   void 
   find_closest_exact (const db::DPoint &p, const db::DEdge &e)
   {
-    bool was_vertex = m_edge1_exact.is_degenerate () && m_edge2_exact.is_degenerate ();
-    bool is_vertex = e.is_degenerate ();
+    //  NOTE: in vertex mode 2, vertices have higher priority than edges, so we capture the nature of the
+    //  object to snap to. In vertex mode 1, "was_vertex" and "is_vertex" is always false and priority
+    //  is given by distance. That mode is used in measurements (aka obj_snap2).
+    bool was_vertex = m_vertex_mode > 1 && m_edge1_exact.is_degenerate () && m_edge2_exact.is_degenerate ();
+    bool is_vertex = m_vertex_mode > 1 && e.is_degenerate ();
 
     if (! m_any_exact || (! (was_vertex && ! is_vertex) && (m_original.distance (p) < m_original.distance (m_closest_exact) || (! was_vertex && is_vertex)))) {
 
@@ -473,8 +476,11 @@ private:
   void 
   find_closest (const db::DPoint &p, const db::DEdge &e)
   {
-    bool was_vertex = m_edge1.is_degenerate () && m_edge2.is_degenerate ();
-    bool is_vertex = e.is_degenerate ();
+    //  NOTE: in vertex mode 2, vertices have higher priority than edges, so we capture the nature of the
+    //  object to snap to. In vertex mode 1, "was_vertex" and "is_vertex" is always false and priority
+    //  is given by distance. That mode is used in measurements (aka obj_snap2).
+    bool was_vertex = m_vertex_mode > 1 && m_edge1.is_degenerate () && m_edge2.is_degenerate ();
+    bool is_vertex = m_vertex_mode > 1 && e.is_degenerate ();
 
     if (! m_any || (! (was_vertex && ! is_vertex) && (m_original.distance (p) < m_original.distance (m_closest) || (! was_vertex && is_vertex)))) {
 

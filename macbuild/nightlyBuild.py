@@ -287,6 +287,7 @@ def Parse_CommandLine_Arguments():
     global Target       # target list
     global QtTarget     # list of (Qt, target, bdType)-tuple
     global Build        # operation flag
+    global Deploy       # operation flag
     global WithPymod    # operation flag
     global QATest       # operation flag
     global QACheck      # operation flag
@@ -322,10 +323,11 @@ def Parse_CommandLine_Arguments():
     Usage += "      + You can use this option multiple times.                              |\n"
     Usage += "      + Or you can pass those list by the 'nightlyBuild.csv' file.           |\n"
     Usage += "        A sample file 'macbuild/nightlyBuild.sample.csv' is available.       |\n"
-    Usage += "   [--build] : build and deploy                                              | disabled\n"
-    Usage += "   [--pymod] : build and deploy Pymod, too (release build only)              | disabled\n"
-    Usage += "   [--test]  : run the QA Test                                               | disabled\n"
-    Usage += "   [--check] : check the QA Test results                                     | disabled\n"
+    Usage += "   [--build]  : build and deploy                                             | disabled\n"
+    Usage += "   [--deploy] : deploy only                                                  | disabled\n"
+    Usage += "   [--pymod]  : build and deploy Pymod, too (release build only)             | disabled\n"
+    Usage += "   [--test]   : run the QA Test                                              | disabled\n"
+    Usage += "   [--check]  : check the QA Test results                                    | disabled\n"
     Usage += "   [--makedmg|--cleandmg <srlno>] : make or clean DMGs                       | disabled\n"
     Usage += "   [--upload <dropbox>] : upload DMGs to $HOME/Dropbox/klayout/<dropbox>     | disabled\n"
     Usage += "   [--dryrun]           : dry-run for --build option                         | disabled\n"
@@ -364,6 +366,12 @@ def Parse_CommandLine_Arguments():
                     dest='build',
                     default=False,
                     help='build and deploy' )
+
+    p.add_option( '--deploy',
+                    action='store_true',
+                    dest='deploy',
+                    default=False,
+                    help='deploy only' )
 
     p.add_option( '--pymod',
                     action='store_true',
@@ -411,6 +419,7 @@ def Parse_CommandLine_Arguments():
                     targets    = "%s" % targetopt,
                     qt_target  = list(),
                     build      = False,
+                    deploy     = False,
                     with_pymod = False,
                     qa_test    = False,
                     qa_check   = False,
@@ -501,6 +510,7 @@ def Parse_CommandLine_Arguments():
             sys.exit(0)
 
     Build     = opt.build
+    Deploy    = opt.deploy
     WithPymod = opt.with_pymod
     QATest    = opt.qa_test
     QACheck   = opt.qa_check
@@ -526,7 +536,7 @@ def Parse_CommandLine_Arguments():
         Upload  = True
         Dropbox = opt.upload
 
-    if not (Build or QATest or QACheck or MakeDMG or CleanDMG or Upload):
+    if not (Build or Deploy or QATest or QACheck or MakeDMG or CleanDMG or Upload):
         print( "! No action selected" )
         print(Usage)
         sys.exit(0)
@@ -534,7 +544,7 @@ def Parse_CommandLine_Arguments():
 #------------------------------------------------------------------------------
 ## To build and deploy
 #------------------------------------------------------------------------------
-def Build_Deploy():
+def Build_Deploy( deployonly=False ):
     pyBuilder  = "./build4mac.py"
     myPlatform = Test_My_Platform()
     buildOp, logfile = Get_Build_Options( Get_Build_Target_Dict(), myPlatform )
@@ -571,19 +581,20 @@ def Build_Deploy():
             print( "" )
             continue
 
-        if subprocess.call( command1, shell=False ) != 0:
-            print( "", file=sys.stderr )
-            print( "-----------------------------------------------------------------", file=sys.stderr )
-            print( "!!! <%s>: failed to build KLayout" % pyBuilder, file=sys.stderr )
-            print( "-----------------------------------------------------------------", file=sys.stderr )
-            print( "", file=sys.stderr )
-            sys.exit(1)
-        else:
-            print( "", file=sys.stderr )
-            print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
-            print( "### <%s>: successfully built KLayout" % pyBuilder, file=sys.stderr )
-            print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
-            print( "", file=sys.stderr )
+        if not deployonly:
+            if subprocess.call( command1, shell=False ) != 0:
+                print( "", file=sys.stderr )
+                print( "-----------------------------------------------------------------", file=sys.stderr )
+                print( "!!! <%s>: failed to build KLayout" % pyBuilder, file=sys.stderr )
+                print( "-----------------------------------------------------------------", file=sys.stderr )
+                print( "", file=sys.stderr )
+                sys.exit(1)
+            else:
+                print( "", file=sys.stderr )
+                print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
+                print( "### <%s>: successfully built KLayout" % pyBuilder, file=sys.stderr )
+                print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
+                print( "", file=sys.stderr )
 
         if subprocess.call( command2, shell=True ) != 0:
             print( "", file=sys.stderr )
@@ -784,7 +795,10 @@ def Main():
     Parse_CommandLine_Arguments()
 
     if Build:
-        Build_Deploy()
+        Build_Deploy(deployonly=False)
+    if Deploy:
+        Build_Deploy(deployonly=True)
+        sys.exit(0)
     if QATest:
         Run_QATest( [] ) # ex. ['pymod', 'pya']
     if QACheck:

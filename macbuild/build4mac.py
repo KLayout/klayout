@@ -2262,20 +2262,22 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     else:
         print( " [8] Skipped deploying Qt's Frameworks and optional Python/Ruby Frameworks..." )
     print( "##### Finished deploying the libraries and executables for <klayout.app> #####" )
+    print("")
 
     #-------------------------------------------------------------
     # [11] Sign the application bundle
     #-------------------------------------------------------------
-    print("")
-    print( " [11] Signing the macOS application bundle (ad-hoc) after all post-build edits (install_name_tool/strip)..." )
-    appbundle = "%s/klayout.app" % AbsMacPkgDir
-    res = Sign_App_Bundle(appbundle)
-    print(res["ok"], res["verify_codesign_ok"], res["verify_spctl_ok"])
-    if not res["ok"]:
-        print("ERROR:", res.get("error",""))
-        for tag, ok, out in res["log"][-6:]:
-            print(f"[{tag}] ok={ok}\n{out}")
-    os.chdir(ProjectDir)
+    if Platform in ['Tahoe']:
+        print( " [11] Signing the macOS application bundle (ad-hoc) after all post-build edits (install_name_tool/strip)..." )
+        appbundle = "%s/klayout.app" % AbsMacPkgDir
+        res = Sign_App_Bundle(appbundle)
+        print(res["ok"], res["verify_codesign_ok"], res["verify_spctl_ok"])
+        if not res["ok"]:
+            print("ERROR:", res.get("error",""))
+            for tag, ok, out in res["log"][-6:]:
+                print(f"[{tag}] ok={ok}\n{out}")
+        os.chdir(ProjectDir)
+        print("")
     return 0
 
 #------------------------------------------------------------------------------

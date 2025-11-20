@@ -84,11 +84,15 @@ class ButtonStateNamespace { };
 static int const_ShiftButton()      { return (int) lay::ShiftButton; }
 static int const_ControlButton()    { return (int) lay::ControlButton; }
 static int const_AltButton()        { return (int) lay::AltButton; }
+static int const_ModifierMask()     { return (int) lay::ModifierMask; }
 static int const_LeftButton()       { return (int) lay::LeftButton; }
 static int const_MidButton()        { return (int) lay::MidButton; }
 static int const_RightButton()      { return (int) lay::RightButton; }
+static int const_MouseButtonMask()  { return (int) lay::MouseButtonMask; }
 
 Class<gsi::ButtonStateNamespace> decl_ButtonState ("lay", "ButtonState",
+  method ("ModifierMask", &const_ModifierMask, "@brief A bit mask that selects all keyboard modifiers in the button state mask\nThis constant has been introduced in version 0.30.6.") +
+  method ("MouseButtonMask", &const_MouseButtonMask, "@brief A bit mask that selects all mouse buttons in the button state mask\nThis constant has been introduced in version 0.30.6.") +
   method ("ShiftKey", &const_ShiftButton, "@brief Indicates that the Shift key is pressed\nThis constant is combined with other constants within \\ButtonState") +
   method ("ControlKey", &const_ControlButton, "@brief Indicates that the Control key is pressed\nThis constant is combined with other constants within \\ButtonState") +
   method ("AltKey", &const_AltButton, "@brief Indicates that the Alt key is pressed\nThis constant is combined with other constants within \\ButtonState") +

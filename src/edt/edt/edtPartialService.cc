@@ -2315,8 +2315,8 @@ PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, 
     if (ui ()->mouse_event_viewport ().contains (p)) { 
 
       lay::Editable::SelectionMode mode = lay::Editable::Replace;
-      bool shift = ((m_buttons & lay::ShiftButton) != 0);
-      bool ctrl = ((m_buttons & lay::ControlButton) != 0);
+      bool shift = ((buttons & lay::ShiftButton) != 0);
+      bool ctrl = ((buttons & lay::ControlButton) != 0);
       if (shift && ctrl) {
         mode = lay::Editable::Invert;
       } else if (shift) {

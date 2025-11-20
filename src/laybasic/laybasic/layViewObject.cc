@@ -907,7 +907,7 @@ ViewObjectUI::send_mouse_double_clicked_event (const db::DPoint &pt, unsigned in
 }
 
 void
-ViewObjectUI::send_mouse_release_event (const db::DPoint &pt, unsigned int /*buttons*/)
+ViewObjectUI::send_mouse_release_event (const db::DPoint &pt, unsigned int buttons)
 {
   try {
 
@@ -916,23 +916,27 @@ ViewObjectUI::send_mouse_release_event (const db::DPoint &pt, unsigned int /*but
 
     bool done = false;
 
+    //  Qt does not include the released button in the mask, so we take the mouse buttons that we stored
+    //  on "press", but use the current modifiers (issue #2214)
+    unsigned int effective_buttons = (m_mouse_buttons & lay::MouseButtonMask) | (buttons & lay::ModifierMask);
+
     m_mouse_pos = pt;
     db::DPoint p = pixel_to_um (m_mouse_pos);
 
     auto grabbed = m_grabbed;
     for (auto g = grabbed.begin (); !done && g != grabbed.end (); ++g) {
       if (m_mouse_pressed_state) {
-        done = (*g)->enabled () && (*g)->mouse_click_event (p, m_mouse_buttons, true);
+        done = (*g)->enabled () && (*g)->mouse_click_event (p, effective_buttons, true);
       } else {
-        done = (*g)->enabled () && (*g)->mouse_release_event (p, m_mouse_buttons, true);
+        done = (*g)->enabled () && (*g)->mouse_release_event (p, effective_buttons, true);
       }
     }
 
     if (! done && mp_active_service && mp_active_service->enabled ()) {
       if (m_mouse_pressed_state) {
-        done = mp_active_service->mouse_click_event (p, m_mouse_buttons, true);
+        done = mp_active_service->mouse_click_event (p, effective_buttons, true);
       } else {
-        done = mp_active_service->mouse_release_event (p, m_mouse_buttons, true);
+        done = mp_active_service->mouse_release_event (p, effective_buttons, true);
       }
     }
 
@@ -942,9 +946,9 @@ ViewObjectUI::send_mouse_release_event (const db::DPoint &pt, unsigned int /*but
       ++next;
       if ((*svc)->enabled ()) {
         if (m_mouse_pressed_state) {
-          done = (*svc)->mouse_click_event (p, m_mouse_buttons, false);
+          done = (*svc)->mouse_click_event (p, effective_buttons, false);
         } else {
-          done = (*svc)->mouse_release_event (p, m_mouse_buttons, false);
+          done = (*svc)->mouse_release_event (p, effective_buttons, false);
         }
       }
       svc = next;
@@ -952,9 +956,9 @@ ViewObjectUI::send_mouse_release_event (const db::DPoint &pt, unsigned int /*but
 
     if (! done) {
       if (m_mouse_pressed_state) {
-        mouse_click_event (p, m_mouse_buttons);
+        mouse_click_event (p, effective_buttons);
       } else {
-        mouse_release_event (p, m_mouse_buttons);
+        mouse_release_event (p, effective_buttons);
       }
     }
 

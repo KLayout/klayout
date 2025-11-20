@@ -47,7 +47,6 @@ SelectionService::SelectionService (lay::LayoutViewBase *view) :
     mp_view (view),
     mp_box (0),
     m_color (0),
-    m_buttons (0),
     m_hover (false),
     m_hover_wait (false),
     m_mouse_in_window (false)
@@ -204,7 +203,6 @@ SelectionService::mouse_press_event (const db::DPoint &p, unsigned int buttons, 
 
     if ((buttons & lay::LeftButton) != 0) {
       mp_view->stop_redraw (); // TODO: how to restart if selection is aborted?
-      m_buttons = buttons;
       begin (p);
       return true;
     }
@@ -263,7 +261,7 @@ SelectionService::mouse_click_event (const db::DPoint &p, unsigned int buttons, 
 }
 
 bool 
-SelectionService::mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool prio) 
+SelectionService::mouse_release_event (const db::DPoint & /*p*/, unsigned int buttons, bool prio)
 { 
   hover_reset ();
 
@@ -274,8 +272,8 @@ SelectionService::mouse_release_event (const db::DPoint & /*p*/, unsigned int /*
     if (mp_view) { 
 
       lay::Editable::SelectionMode mode = lay::Editable::Replace;
-      bool shift = ((m_buttons & lay::ShiftButton) != 0);
-      bool ctrl = ((m_buttons & lay::ControlButton) != 0);
+      bool shift = ((buttons & lay::ShiftButton) != 0);
+      bool ctrl = ((buttons & lay::ControlButton) != 0);
       if (shift && ctrl) {
         mode = lay::Editable::Invert;
       } else if (shift) {

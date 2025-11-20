@@ -40,6 +40,90 @@ static inline db::Box safe_transformed_box (const db::Box &box, const db::ICplxT
   return db::Box (db);
 }
 
+static bool
+has_zero_bit (const lay::Bitmap *bitmap, unsigned int ixmin, unsigned int iymin, unsigned int ixmax, unsigned int iymax)
+{
+  uint32_t imin = ixmin / 32;
+  uint32_t imax = ixmax / 32;
+
+  if (imin == imax) {
+
+    uint32_t m = ((unsigned int) 0xffffffff << (ixmin % 32)) & ((unsigned int) 0xffffffff >> (31 - (ixmax % 32)));
+
+    for (unsigned int y = iymin; y <= iymax; ++y) {
+
+      if (bitmap->is_scanline_empty (y)) {
+        return true;
+      }
+
+      if ((bitmap->scanline (y) [imin] & m) != m) {
+        return true;
+      }
+
+    }
+
+  } else {
+
+    uint32_t m1 = ((unsigned int) 0xffffffff << (ixmin % 32));
+    uint32_t m2 = ((unsigned int) 0xffffffff >> (31 - (ixmax % 32)));
+
+    for (unsigned int y = iymin; y <= iymax; ++y) {
+
+      if (bitmap->is_scanline_empty (y)) {
+        return true;
+      }
+
+      if ((bitmap->scanline (y) [imin] & m1) != m1) {
+        return true;
+      }
+      for (unsigned int i = imin + 1; i < imax; ++i) {
+        if (bitmap->scanline (y) [i] != 0xffffffff) {
+          return true;
+        }
+      }
+      if ((bitmap->scanline (y) [imax] & m2) != m2) {
+        return true;
+      }
+
+    }
+
+  }
+
+  return false;
+}
+
+static bool
+skip_quad (const db::Box &qb, const lay::Bitmap *vertex_bitmap, const db::CplxTrans &trans)
+{
+  double threshold = 32 / trans.mag (); // only check cells below 32x32 pixels
+  if (qb.empty () || qb.width () > threshold || qb.height () > threshold || !vertex_bitmap) {
+    return false;
+  }
+
+  db::DBox qb_trans = (trans * qb) & db::DBox (0, 0, vertex_bitmap->width () - 1.0 - 1e-6, vertex_bitmap->height () - 1.0 - 1e-6);
+  if (qb_trans.empty ()) {
+    return true;
+  }
+
+  int ixmin = (unsigned int)(qb_trans.left () + 0.5);
+  int ixmax = (unsigned int)(qb_trans.right () + 0.5);
+  int iymin = (unsigned int)(qb_trans.bottom () + 0.5);
+  int iymax = (unsigned int)(qb_trans.top () + 0.5);
+  if (! has_zero_bit (vertex_bitmap, ixmin, iymin, ixmax, iymax)) {
+    return true; // skip
+  } else {
+    return false;
+  }
+}
+
+inline void
+copy_bitmap (const lay::Bitmap *from, lay::Bitmap *to, int dx, int dy)
+{
+  if (to) {
+    to->merge (from, dx, dy);
+  }
+}
+
 // -------------------------------------------------------------
 //  RedrawThreadWorker implementation 
 
@@ -61,6 +145,7 @@ RedrawThreadWorker::RedrawThreadWorker (RedrawThread *redraw_thread)
   m_box_text_transform = false;
   m_box_font = 0;
   m_min_size_for_label = 1;
+  m_empty_cell_dimension = 1.0;
   m_text_font = 0;
   m_text_visible = false;
   m_text_lazy_rendering = false;
@@ -600,6 +685,7 @@ RedrawThreadWorker::setup (LayoutViewBase *view, RedrawThreadCanvas *canvas, con
   m_from_level_default = view->get_hier_levels ().first;
   m_to_level_default = view->get_hier_levels ().second;
   m_min_size_for_label = view->min_inst_label_size ();
+  m_empty_cell_dimension = view->empty_cell_dimension ();
   m_box_text_transform = view->cell_box_text_transform ();
   m_box_font = view->cell_box_text_font ();
   m_text_font = view->text_font ();
@@ -680,7 +766,7 @@ RedrawThreadWorker::test_snapshot (const UpdateSnapshotCallback *update_snapshot
 }
 
 void 
-RedrawThreadWorker::draw_cell (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, bool empty_cell, const std::string &txt)
+RedrawThreadWorker::draw_cell (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, const db::Box &box_for_label, bool empty_cell, const std::string &txt, lay::Bitmap *opt_bitmap)
 {
   lay::Renderer &r = *mp_renderer;
 
@@ -699,13 +785,17 @@ RedrawThreadWorker::draw_cell (bool drawing_context, int level, const db::CplxTr
 
   if (empty_cell) {
     r.draw (dbox, 0, contour, vertices, 0);
+    if (opt_bitmap) {
+      r.draw (dbox, 0, 0, opt_bitmap, 0);
+    }
   } else {
     r.draw (dbox, fill, contour, 0, 0);
   }
 
-  if (! txt.empty () && (empty_cell || (dbox.width () > m_min_size_for_label && dbox.height () > m_min_size_for_label))) {
+  db::DBox dbox_for_label = trans * box_for_label;
+  if (! txt.empty () && (empty_cell || (dbox_for_label.width () > m_min_size_for_label && dbox_for_label.height () > m_min_size_for_label))) {
     //  Hint: we render to contour because the texts plane is reserved for properties
-    r.draw (dbox, txt,
+    r.draw (dbox_for_label, txt,
             db::Font (m_box_font),
             db::HAlignCenter,
             db::VAlignCenter,
@@ -817,34 +907,58 @@ RedrawThreadWorker::draw_boxes_impl (bool drawing_context, db::cell_index_type c
     return;
   }
 
+  std::unique_ptr<lay::Bitmap> opt_bitmap;
+
+  unsigned int plane_group = 2;
+  if (drawing_context) {
+    plane_group = 0;
+  } else if (m_child_context_enabled && level + 1 > 0) {
+    plane_group = 1;
+  }
+
+  lay::CanvasPlane *vertex = m_planes[3 + plane_group * (planes_per_layer / 3)];
+  lay::Bitmap *vertex_bitmap = dynamic_cast<lay::Bitmap *> (vertex);
+  if (vertex_bitmap) {
+    opt_bitmap.reset (new lay::Bitmap (vertex_bitmap->width (), vertex_bitmap->height (), vertex_bitmap->resolution (), vertex_bitmap->font_resolution ()));
+  }
+
   for (std::vector<db::Box>::const_iterator b = redraw_regions.begin (); b != redraw_regions.end (); ++b) {
-    draw_boxes_impl (drawing_context, ci, trans, *b, level, for_ghosts);
+    draw_boxes_impl (drawing_context, ci, trans, *b, level, for_ghosts, opt_bitmap.get ());
   }
 }
 
 void
-RedrawThreadWorker::draw_boxes_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level, bool for_ghosts)
+RedrawThreadWorker::draw_boxes_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level, bool for_ghosts, lay::Bitmap *opt_bitmap)
 {
   lay::Renderer &r = *mp_renderer;
   const db::Cell &cell = mp_layout->cell (ci);
+
+  //  small cells are dropped
+  if (m_drop_small_cells && drop_cell (cell, trans)) {
+    return;
+  }
 
   //  For small bboxes, the cell outline can be reduced ..
   db::Box bbox = cell.bbox_with_empty ();
   bool empty_cell = cell.bbox ().empty ();
 
-  if (m_drop_small_cells && drop_cell (cell, trans)) {
+  db::Box bbox_for_label;
+  if (empty_cell) {
+    db::Coord d = db::coord_traits<db::Coord>::rounded (0.5 * m_empty_cell_dimension / mp_layout->dbu ());
+    bbox_for_label = bbox.enlarged (db::Vector (d, d));
+  } else {
+    bbox_for_label = bbox;
+  }
 
-    //  small cell dropped
-
-  } else if (for_ghosts && cell.is_ghost_cell ()) {
+  if (for_ghosts && cell.is_ghost_cell ()) {
 
     //  paint the box on this level
-    draw_cell (drawing_context, level, trans, bbox, empty_cell, mp_layout->display_name (ci));
+    draw_cell (drawing_context, level, trans, bbox, bbox_for_label, empty_cell, mp_layout->display_name (ci), opt_bitmap);
 
   } else if (! for_ghosts && ! cell.is_ghost_cell () && (level == m_to_level || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ()))) {
 
     //  paint the box on this level
-    draw_cell (drawing_context, level, trans, bbox, empty_cell, mp_layout->display_name (ci));
+    draw_cell (drawing_context, level, trans, bbox, bbox_for_label, empty_cell, mp_layout->display_name (ci), opt_bitmap);
 
   } else if (level < m_to_level) {
 
@@ -855,7 +969,7 @@ RedrawThreadWorker::draw_boxes_impl (bool drawing_context, db::cell_index_type c
         //  the cell is a very small box and we know there must be
         //  some level at which to draw the boundary: just draw it
         //  here and stop looking further down ..
-        draw_cell (drawing_context, level, trans, bbox, empty_cell, std::string ());
+        draw_cell (drawing_context, level, trans, bbox, bbox_for_label, empty_cell, std::string (), opt_bitmap);
       }
 
     } else {
@@ -884,6 +998,8 @@ RedrawThreadWorker::draw_boxes_impl (bool drawing_context, db::cell_index_type c
           bool anything = false;
           db::cell_index_type last_ci = std::numeric_limits<db::cell_index_type>::max ();
 
+          size_t current_quad_id = 0;
+
           db::Cell::touching_iterator inst = cell.begin_touching (*v);
           while (! inst.at_end ()) {
 
@@ -892,6 +1008,20 @@ RedrawThreadWorker::draw_boxes_impl (bool drawing_context, db::cell_index_type c
             db::cell_index_type new_ci = cell_inst.object ().cell_index ();
             db::Box new_cell_box = cell_inst.bbox (bc);
             bool empty_inst_cell = mp_layout->cell (new_ci).bbox ().empty ();
+
+            //  skip this quad if we have drawn something here already
+            size_t qid = inst.quad_id ();
+            bool skip = false;
+            if (empty_inst_cell && qid != current_quad_id) {
+              current_quad_id = qid;
+              skip = opt_bitmap && skip_quad (inst.quad_box () & bbox, opt_bitmap, trans);
+            }
+
+            if (skip) {
+              //  move on to the next quad
+              inst.skip_quad ();
+              continue;
+            }
 
             if (last_ci != new_ci) {
               //  Hint: don't use any_cell_box on partially visible cells because that will degrade performance
@@ -940,6 +1070,9 @@ RedrawThreadWorker::draw_boxes_impl (bool drawing_context, db::cell_index_type c
                   if (empty_inst_cell) {
                     lay::CanvasPlane *vertices  = m_planes[3 + plane_group * (planes_per_layer / 3)];
                     r.draw (cell_inst.bbox (bc), trans, 0, 0, vertices, 0);
+                    if (opt_bitmap) {
+                      r.draw (cell_inst.bbox (bc), trans, opt_bitmap, 0, 0, 0);
+                    }
                   }
 
                   lay::CanvasPlane *contour  = m_planes[1 + plane_group * (planes_per_layer / 3)];
@@ -955,9 +1088,10 @@ RedrawThreadWorker::draw_boxes_impl (bool drawing_context, db::cell_index_type c
                 for (db::CellInstArray::iterator p = cell_inst.begin_touching (*v, bc); ! p.at_end (); ) {
 
                   test_snapshot (0);
+
                   db::ICplxTrans t (cell_inst.complex_trans (*p));
                   db::Box new_vp = safe_transformed_box (*v, t.inverted ());
-                  draw_boxes_impl (drawing_context, new_ci, trans * t, new_vp, level + 1, for_ghosts);
+                  draw_boxes_impl (drawing_context, new_ci, trans * t, new_vp, level + 1, for_ghosts, opt_bitmap);
 
                   if (p.quad_id () > 0 && p.quad_id () != qid) {
 
@@ -1292,91 +1426,7 @@ RedrawThreadWorker::any_text_shapes (db::cell_index_type cell_index, unsigned in
   return c->second;
 }
 
-static bool 
-has_zero_bit (const lay::Bitmap *bitmap, unsigned int ixmin, unsigned int iymin, unsigned int ixmax, unsigned int iymax)
-{
-  uint32_t imin = ixmin / 32;
-  uint32_t imax = ixmax / 32;
-
-  if (imin == imax) {
-
-    uint32_t m = ((unsigned int) 0xffffffff << (ixmin % 32)) & ((unsigned int) 0xffffffff >> (31 - (ixmax % 32)));
-
-    for (unsigned int y = iymin; y <= iymax; ++y) {
-
-      if (bitmap->is_scanline_empty (y)) {
-        return true;
-      }
-
-      if ((bitmap->scanline (y) [imin] & m) != m) {
-        return true;
-      }
-
-    }
-
-  } else {
-
-    uint32_t m1 = ((unsigned int) 0xffffffff << (ixmin % 32));
-    uint32_t m2 = ((unsigned int) 0xffffffff >> (31 - (ixmax % 32)));
-
-    for (unsigned int y = iymin; y <= iymax; ++y) {
-
-      if (bitmap->is_scanline_empty (y)) {
-        return true;
-      }
-
-      if ((bitmap->scanline (y) [imin] & m1) != m1) {
-        return true;
-      }
-      for (unsigned int i = imin + 1; i < imax; ++i) {
-        if (bitmap->scanline (y) [i] != 0xffffffff) {
-          return true;
-        }
-      }
-      if ((bitmap->scanline (y) [imax] & m2) != m2) {
-        return true;
-      }
-
-    }
-
-  }
-
-  return false;
-}
-
-static bool 
-skip_quad (const db::Box &qb, const lay::Bitmap *vertex_bitmap, const db::CplxTrans &trans)
-{
-  double threshold = 32 / trans.mag (); // don't check cells below 32x32 pixels
-  if (qb.empty () || qb.width () > threshold || qb.height () > threshold || !vertex_bitmap) {
-    return false;
-  }
-
-  db::DBox qb_trans = (trans * qb) & db::DBox (0, 0, vertex_bitmap->width () - 1.0 - 1e-6, vertex_bitmap->height () - 1.0 - 1e-6);
-  if (qb_trans.empty ()) {
-    return true;
-  }
-
-  int ixmin = (unsigned int)(qb_trans.left () + 0.5);
-  int ixmax = (unsigned int)(qb_trans.right () + 0.5);
-  int iymin = (unsigned int)(qb_trans.bottom () + 0.5);
-  int iymax = (unsigned int)(qb_trans.top () + 0.5);
-  if (! has_zero_bit (vertex_bitmap, ixmin, iymin, ixmax, iymax)) {
-    return true; // skip
-  } else {
-    return false;
-  }
-}
-
-inline void 
-copy_bitmap (const lay::Bitmap *from, lay::Bitmap *to, int dx, int dy)
-{
-  if (to) {
-    to->merge (from, dx, dy);
-  }
-}
-
-std::vector<db::Box> 
+std::vector<db::Box>
 RedrawThreadWorker::search_regions (const db::Box &cell_bbox, const db::Box &vp, int level)
 {
   std::vector<db::Box> vv;

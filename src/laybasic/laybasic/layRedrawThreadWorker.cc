@@ -1437,7 +1437,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
 }
 
 void
-RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level, CanvasPlane *fill, CanvasPlane *frame, CanvasPlane *vertex, CanvasPlane *text, lay::Bitmap *opt_bitmap)
+RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp_in, int level, CanvasPlane *fill, CanvasPlane *frame, CanvasPlane *vertex, CanvasPlane *text, lay::Bitmap *opt_bitmap)
 {
   test_snapshot (0);
 
@@ -1446,6 +1446,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
 
   //  For small bboxes, the cell outline can be reduced ..
   db::Box bbox = cell.bbox (m_layer);
+  db::Box vp = vp_in & bbox;
 
   if (m_drop_small_cells && drop_cell (cell, trans)) {
 
@@ -1756,9 +1757,12 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
   if (level >= from_level && level < to_level) {
 
     //  draw the shapes or insert into the cell cache.
-    for (std::vector<db::Box>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+    for (std::vector<db::Box>::const_iterator iv = vv.begin (); iv != vv.end (); ++iv) {
 
-      if (v->empty ()) {
+      db::Box vp = *iv;
+      vp &= bbox;
+
+      if (vp.empty ()) {
         continue;
       }
 
@@ -1768,7 +1772,7 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
       size_t current_quad_id = 0;
       size_t current_array_quad_id = 0;
 
-      db::ShapeIterator shape (shapes.begin_touching (*v, db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Points, mp_prop_sel, m_inv_prop_sel));
+      db::ShapeIterator shape (shapes.begin_touching (vp, db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Points, mp_prop_sel, m_inv_prop_sel));
       while (! shape.at_end ()) {
 
         test_snapshot (update_snapshot); 
@@ -1855,9 +1859,12 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
     db::box_convert <db::CellInst> bc (*mp_layout, m_layer);
 
     //  dive down into the hierarchy ..
-    for (std::vector<db::Box>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+    for (std::vector<db::Box>::const_iterator iv = vv.begin (); iv != vv.end (); ++iv) {
 
-      if (v->empty ()) {
+      db::Box vp = *iv;
+      vp &= bbox;
+
+      if (vp.empty ()) {
         continue;
       }
 
@@ -1865,7 +1872,7 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
       db::cell_index_type last_ci = std::numeric_limits<db::cell_index_type>::max ();
       bool anything = false;
 
-      db::Cell::touching_iterator inst = cell.begin_touching (*v); 
+      db::Cell::touching_iterator inst = cell.begin_touching (vp);
       while (! inst.at_end ()) {
 
         test_snapshot (update_snapshot); 
@@ -1900,7 +1907,7 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
 
             if (last_ci != new_ci) {
               //  Hint: don't use any_text_shapes on partially visible cells because that will degrade performance 
-              if (new_cell_box.inside (*v)) {
+              if (new_cell_box.inside (vp)) {
                 last_ci = new_ci;
                 anything = any_shapes (new_ci, to_level - (level + 1));
               } else {
@@ -1942,13 +1949,13 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
 
               size_t qid = 0;
 
-              for (db::CellInstArray::iterator p = cell_inst.begin_touching (*v, bc); ! p.at_end (); ) {
+              for (db::CellInstArray::iterator p = cell_inst.begin_touching (vp, bc); ! p.at_end (); ) {
 
                 if (! m_draw_array_border_instances || 
                     p.index_a () <= 0 || (unsigned long)p.index_a () == amax - 1 || p.index_b () <= 0 || (unsigned long)p.index_b () == bmax - 1) {
 
                   db::ICplxTrans t (cell_inst.complex_trans (*p));
-                  db::Box new_vp = safe_transformed_box (*v, t.inverted ());
+                  db::Box new_vp = safe_transformed_box (vp, t.inverted ());
                   draw_layer (from_level, to_level, new_ci, trans * t, new_vp, level + 1, fill, frame, vertex, text, update_snapshot);
 
                   if (p.quad_id () > 0 && p.quad_id () != qid) {

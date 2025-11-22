@@ -805,8 +805,12 @@ InstFinder::find_internal (LayoutViewBase *view, unsigned int cv_index, const db
 void
 InstFinder::checkpoint ()
 {
-  if (--m_tries < 0) {
-    throw StopException ();
+  if (! point_mode ()) {
+    ++*mp_progress;
+  } else {
+    if (--m_tries < 0) {
+      throw StopException ();
+    }
   }
 }
 
@@ -829,15 +833,13 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
 
   if (! point_mode ()) {
 
-    ++*mp_progress;
-
     //  look for instances to check here ..
     for (db::Cell::touching_iterator inst = cell.begin_touching (search_box); ! inst.at_end (); ++inst) {
 
       const db::CellInstArray &cell_inst = inst->cell_inst ();
       const db::Cell &inst_cell = layout ().cell (cell_inst.object ().cell_index ());
 
-      ++*mp_progress;
+      checkpoint ();
 
       if (! consider_cell (inst_cell)) {
         continue;
@@ -851,7 +853,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
         db::box_convert <db::CellInst, false> bc (layout ());
         for (db::CellInstArray::iterator p = cell_inst.begin_touching (search_box, bc); ! p.at_end (); ++p) {
         
-          ++*mp_progress;
+          checkpoint ();
 
           db::Box ibox;
           if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {

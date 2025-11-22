@@ -300,32 +300,6 @@ LayoutHandle::set_save_options (const db::SaveLayoutOptions &options, bool valid
   m_save_options_valid = valid;
 }
 
-void
-LayoutHandle::update_save_options (db::SaveLayoutOptions &options)
-{
-#if defined(HAVE_QT)
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-
-    const lay::StreamWriterPluginDeclaration *decl = dynamic_cast <const lay::StreamWriterPluginDeclaration *> (&*cls);
-    if (! decl || decl->options_alias ()) {
-      continue;
-    }
-
-    std::unique_ptr<db::FormatSpecificWriterOptions> specific_options;
-    if (options.get_options (decl->format_name ())) {
-      specific_options.reset (options.get_options (decl->format_name ())->clone ());
-    } else {
-      specific_options.reset (decl->create_specific_options ());
-    }
-
-    if (specific_options.get ()) {
-      options.set_options (specific_options.release ());
-    }
-
-  }
-#endif
-}
-
 void 
 LayoutHandle::save_as (const std::string &fn, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update, int keep_backups)
 {

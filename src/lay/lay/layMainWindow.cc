@@ -2277,6 +2277,29 @@ MainWindow::cm_save_as ()
   do_save (true);
 }
 
+static db::SaveLayoutOptions
+get_save_options_from_cv (const lay::CellView &cv)
+{
+  db::SaveLayoutOptions options = cv->save_options ();
+  if (!cv->save_options_valid () && cv->technology ()) {
+    options = cv->technology ()->save_layout_options ();
+    options.set_format (cv->save_options ().format ());
+  }
+
+  //  preconfigure options with current values
+
+  options.set_dbu (cv->layout ().dbu ());
+
+  if (cv->layout ().has_meta_info ("libname")) {
+    tl::Variant libname = cv->layout ().meta_info ("libname").value;
+    if (libname.is_a_string ()) {
+      options.set_libname (libname.to_stdstring ());
+    }
+  }
+
+  return options;
+}
+
 void
 MainWindow::do_save (bool as)
 {
@@ -2309,22 +2332,7 @@ MainWindow::do_save (bool as)
           //  - if the layout's save options are valid we take the options from there, otherwise we take the options from the technology
           //  - on "save as" we let the user edit the options
 
-          db::SaveLayoutOptions options = cv->save_options ();
-          if (!cv->save_options_valid () && cv->technology ()) {
-            options = cv->technology ()->save_layout_options ();
-            options.set_format (cv->save_options ().format ());
-          }
-
-          //  preconfigure options with current values
-
-          options.set_dbu (cv->layout ().dbu ());
-
-          if (cv->layout ().has_meta_info ("libname")) {
-            tl::Variant libname = cv->layout ().meta_info ("libname").value;
-            if (libname.is_a_string ()) {
-              options.set_libname (libname.to_stdstring ());
-            }
-          }
+          db::SaveLayoutOptions options = get_save_options_from_cv (cv);
 
           if (as || options.format ().empty ()) {
             options.set_format_from_filename (fn);
@@ -2362,8 +2370,7 @@ MainWindow::cm_save_all ()
 
       if (! fn.empty () || mp_layout_fdia->get_save (fn, tl::to_string (tr ("Save Layout '%1'").arg (tl::to_qstring (cv->name ()))))) {
 
-        db::SaveLayoutOptions options (cv->save_options ());
-        options.set_dbu (cv->layout ().dbu ());
+        db::SaveLayoutOptions options = get_save_options_from_cv (cv);
 
         if (options.format ().empty ()) {
           options.set_format_from_filename (fn);

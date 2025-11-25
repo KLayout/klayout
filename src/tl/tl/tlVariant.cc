@@ -110,7 +110,7 @@ template <>
 TL_PUBLIC void extractor_impl (tl::Extractor &ex, __int128 &v)
 {
   if (! test_extractor_impl (ex, v)) {
-    ex.error (tl::to_string (QObject::tr ("Expected a value specification")));
+    ex.error (tl::to_string (tr ("Expected a value specification")));
   }
 }
 

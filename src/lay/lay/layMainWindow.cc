@@ -2345,7 +2345,18 @@ MainWindow::do_save (bool as)
           }
 
           current_view ()->save_as ((unsigned int) cv_index, fn, om, options, true, m_keep_backups);
-          add_mru (fn, current_view ()->cellview (cv_index)->tech_name ());
+          add_mru (fn, cv->tech_name ());
+
+          if (as) {
+
+            lay::LayoutViewNotification n ("reload", tl::to_string (tr ("The next 'save' operations will use the writer options you have picked, instead of the application-wide ones.")));
+            current_view ()->add_notification (n);
+
+            //  freeze writer options in the 'save_as' case, so we can do another "save" and get the
+            //  selected options again
+            cv->set_save_options (options, true);
+
+          }
 
         }
 
@@ -2377,14 +2388,6 @@ MainWindow::cm_save_all ()
         }
 
         tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
-
-        //  initialize the specific options from the configuration if required
-        for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-          const StreamWriterPluginDeclaration *decl = dynamic_cast <const StreamWriterPluginDeclaration *> (&*cls);
-          if (decl) {
-            options.set_options (decl->create_specific_options ());
-          }
-        }
 
         view (view_index)->save_as (cv_index, fn, om, options, true, m_keep_backups);
         add_mru (fn, cv->tech_name ());

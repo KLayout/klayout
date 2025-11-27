@@ -305,8 +305,6 @@ LayoutHandle::save_as (const std::string &fn, tl::OutputStream::OutputStreamMode
 {
   if (update) {
 
-    m_save_options = options;
-    m_save_options_valid = true;
     //  We must not load with the original options after we have saved the file - hence we reset the
     //  reader options.
     m_load_options = db::LoadLayoutOptions ();

@@ -58,7 +58,7 @@ public:
     return false;
   }
 
-  virtual db::Shape do_apply (db::Shapes & /*shapes*/, const db::Shape & /*shape*/, double /*dbu*/, bool /*relative*/) const 
+  virtual db::Shape do_apply (db::Shapes & /*shapes*/, const db::Shape & /*shape*/, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool /*relative*/) const
   { 
     return db::Shape (); 
   }
@@ -90,7 +90,7 @@ public:
   void add (ChangeApplicator *a);
 
   bool supports_relative_mode () const;
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
   db::Instance do_apply_inst (db::Cell &cell, const db::Instance &instance, double dbu, bool relative) const;
 
 private:
@@ -107,11 +107,27 @@ public:
   ChangePropertiesApplicator (db::properties_id_type prop_id);
 
   bool supports_relative_mode () const { return false; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
   db::Instance do_apply_inst (db::Cell &cell, const db::Instance &instance, double dbu, bool relative) const;
 
 private:
   db::properties_id_type m_prop_id;
+};
+
+/**
+ *  @brief A property ID change applicator
+ */
+class ChangeLayerApplicator
+  : public ChangeApplicator
+{
+public:
+  ChangeLayerApplicator (unsigned int cv_index, unsigned int new_layer);
+
+  bool supports_relative_mode () const { return false; }
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
+
+private:
+  unsigned int m_cv_index, m_new_layer;
 };
 
 /**
@@ -124,7 +140,7 @@ public:
   BoxDimensionsChangeApplicator (db::Coord dl, db::Coord db, db::Coord dr, db::Coord dt, db::Coord l, db::Coord b, db::Coord r, db::Coord t);
 
   bool supports_relative_mode () const { return true; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   db::Coord m_dl, m_db, m_dr, m_dt;
@@ -141,7 +157,7 @@ public:
   PointDimensionsChangeApplicator (const db::Point &point, const db::Point &org_point);
 
   bool supports_relative_mode () const { return true; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   db::Point m_point, m_org_point;
@@ -157,7 +173,7 @@ public:
   PolygonChangeApplicator (const db::Polygon &poly, const db::Polygon &org_poly);
 
   bool supports_relative_mode () const { return true; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   db::Polygon m_poly, m_org_poly;
@@ -173,7 +189,7 @@ public:
   TextOrientationChangeApplicator (const db::FTrans &trans);
 
   bool supports_relative_mode () const { return false; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   db::FTrans m_trans;
@@ -189,7 +205,7 @@ public:
   TextPositionChangeApplicator (const db::Vector &disp, const db::Vector &org_disp);
 
   bool supports_relative_mode () const { return true; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   db::Vector m_disp, m_org_disp;
@@ -205,7 +221,7 @@ public:
   TextHAlignChangeApplicator (db::HAlign halign);
 
   bool supports_relative_mode () const { return false; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   db::HAlign m_halign;
@@ -221,7 +237,7 @@ public:
   TextVAlignChangeApplicator (db::VAlign valign);
 
   bool supports_relative_mode () const { return false; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   db::VAlign m_valign;
@@ -237,7 +253,7 @@ public:
   TextSizeChangeApplicator (db::Coord size);
 
   bool supports_relative_mode () const { return false; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   db::Coord m_size;
@@ -253,7 +269,7 @@ public:
   TextStringChangeApplicator (const std::string &string);
 
   bool supports_relative_mode () const { return false; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   std::string m_string;
@@ -269,7 +285,7 @@ public:
   PathPointsChangeApplicator (const std::vector<db::Point> &points, const std::vector<db::Point> &org_points);
 
   bool supports_relative_mode () const { return true; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   std::vector<db::Point> m_points, m_org_points;
@@ -285,7 +301,7 @@ public:
   PathWidthChangeApplicator (db::Coord w, db::Coord org_w);
 
   bool supports_relative_mode () const { return true; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   db::Coord m_width, m_org_width;
@@ -301,7 +317,7 @@ public:
   PathStartExtensionChangeApplicator (db::Coord e);
 
   bool supports_relative_mode () const { return false; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   db::Coord m_ext;
@@ -317,7 +333,7 @@ public:
   PathEndExtensionChangeApplicator (db::Coord e);
 
   bool supports_relative_mode () const { return false; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   db::Coord m_ext;
@@ -333,7 +349,7 @@ public:
   PathRoundEndChangeApplicator (bool r);
 
   bool supports_relative_mode () const { return false; }
-  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
 
 private:
   bool m_round;

@@ -96,7 +96,6 @@
          <font>
           <family>Sans Serif</family>
           <pointsize>12</pointsize>
-          <weight>75</weight>
           <italic>false</italic>
           <bold>true</bold>
           <underline>false</underline>
@@ -109,10 +108,10 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="layer_lbl">
+       <widget class="QLabel" name="cell_lbl">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
+         <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+          <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
@@ -123,6 +122,9 @@
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="lay::LayerSelectionComboBox" name="layer_cbx"/>
       </item>
      </layout>
     </widget>
@@ -334,6 +336,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>lay::LayerSelectionComboBox</class>
+   <extends>QComboBox</extends>
+   <header>layWidgets.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>width_le</tabstop>
   <tabstop>ptlist_le</tabstop>

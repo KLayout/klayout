@@ -310,6 +310,13 @@ public:
    */
   db::LayerProperties current_layer_props () const;
 
+signals:
+  /**
+   *  @brief Signal indicating that the user selected a new layer
+   *  This signal is emitted if the layer is edited. It is not emitted on programmatic changes.
+   */
+  void current_layer_changed ();
+
 protected slots:
   void item_selected (int index);
 

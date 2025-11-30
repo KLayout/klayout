@@ -608,8 +608,12 @@ BEGIN_PROTECTED
       //  NOTE: add_new_layers has triggered update_layer_list which already added the new layer
       set_current_layer (lp);
 
+      emit current_layer_changed ();
+
     }
 
+  } else {
+    emit current_layer_changed ();
   }
 
 END_PROTECTED;

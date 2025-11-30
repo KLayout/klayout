@@ -28,6 +28,7 @@
 
 #include "layPlugin.h"
 #include "layProperties.h"
+#include "layWidgets.h"
 #include "edtService.h"
 #include "ui_PolygonPropertiesPage.h"
 #include "ui_BoxPropertiesPage.h"
@@ -78,10 +79,12 @@ protected:
   bool m_enable_cb_callback;
   db::properties_id_type m_prop_id;
 
-  virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname) = 0;
+  virtual void do_update (const db::Shape &shape, double dbu) = 0;
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu) = 0;
   virtual QCheckBox *dbu_checkbox () const = 0;
   virtual QCheckBox *abs_checkbox () const = 0;
+  virtual lay::LayerSelectionComboBox *layer_selector () const = 0;
+  virtual QLabel *cell_label () const = 0;
   bool dbu_units () const;
   bool abs_trans () const;
   db::ICplxTrans trans () const;
@@ -95,6 +98,7 @@ public slots:
   void show_props ();
   void display_mode_changed (bool);
   void update_shape ();
+  void current_layer_changed ();
 };
 
 
@@ -109,12 +113,14 @@ public:
 
   virtual std::string description (size_t entry) const;
   virtual std::string description () const { return ShapePropertiesPage::description (); }
-  virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
+  virtual void do_update (const db::Shape &shape, double dbu);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
 
 protected:
   virtual QCheckBox *dbu_checkbox () const { return dbu_cb; }
   virtual QCheckBox *abs_checkbox () const { return abs_cb; }
+  virtual lay::LayerSelectionComboBox *layer_selector () const { return layer_cbx; }
+  virtual QLabel *cell_label () const { return cell_lbl; }
 
 public slots:
   void text_changed ();
@@ -134,7 +140,7 @@ public:
 
   virtual std::string description (size_t entry) const;
   virtual std::string description () const { return ShapePropertiesPage::description (); }
-  virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
+  virtual void do_update (const db::Shape &shape, double dbu);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
 
 public slots:
@@ -143,6 +149,8 @@ public slots:
 protected:
   virtual QCheckBox *dbu_checkbox () const { return dbu_cb; }
   virtual QCheckBox *abs_checkbox () const { return abs_cb; }
+  virtual lay::LayerSelectionComboBox *layer_selector () const { return layer_cbx; }
+  virtual QLabel *cell_label () const { return cell_lbl; }
 
 private:
   bool m_recursion_sentinel;
@@ -165,7 +173,7 @@ public:
 
   virtual std::string description (size_t entry) const;
   virtual std::string description () const { return ShapePropertiesPage::description (); }
-  virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
+  virtual void do_update (const db::Shape &shape, double dbu);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
 
 public slots:
@@ -174,6 +182,8 @@ public slots:
 protected:
   virtual QCheckBox *dbu_checkbox () const { return dbu_cb; }
   virtual QCheckBox *abs_checkbox () const { return abs_cb; }
+  virtual lay::LayerSelectionComboBox *layer_selector () const { return layer_cbx; }
+  virtual QLabel *cell_label () const { return cell_lbl; }
 
 private:
   double m_dbu;
@@ -193,12 +203,14 @@ public:
 
   virtual std::string description (size_t entry) const;
   virtual std::string description () const { return ShapePropertiesPage::description (); }
-  virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
+  virtual void do_update (const db::Shape &shape, double dbu);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
 
 protected:
   virtual QCheckBox *dbu_checkbox () const { return dbu_cb; }
   virtual QCheckBox *abs_checkbox () const { return abs_cb; }
+  virtual lay::LayerSelectionComboBox *layer_selector () const { return layer_cbx; }
+  virtual QLabel *cell_label () const { return cell_lbl; }
 };
 
 class PathPropertiesPage
@@ -212,12 +224,14 @@ public:
 
   virtual std::string description (size_t entry) const;
   virtual std::string description () const { return ShapePropertiesPage::description (); }
-  virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
+  virtual void do_update (const db::Shape &shape, double dbu);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
 
 protected:
   virtual QCheckBox *dbu_checkbox () const { return dbu_cb; }
   virtual QCheckBox *abs_checkbox () const { return abs_cb; }
+  virtual lay::LayerSelectionComboBox *layer_selector () const { return layer_cbx; }
+  virtual QLabel *cell_label () const { return cell_lbl; }
 
 private:
   bool m_in_text_changed;
@@ -234,12 +248,14 @@ public:
 
   virtual std::string description (size_t entry) const;
   virtual std::string description () const { return ShapePropertiesPage::description (); }
-  virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
+  virtual void do_update (const db::Shape &shape, double dbu);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
 
 protected:
   virtual QCheckBox *dbu_checkbox () const { return dbu_cb; }
   virtual QCheckBox *abs_checkbox () const { return abs_cb; }
+  virtual lay::LayerSelectionComboBox *layer_selector () const { return layer_cbx; }
+  virtual QLabel *cell_label () const { return cell_lbl; }
 
 public slots:
   void type_selected (int); 

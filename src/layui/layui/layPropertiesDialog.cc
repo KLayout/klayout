@@ -157,7 +157,17 @@ public:
 
   void emit_data_changed ()
   {
-    emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex ()) - 1, columnCount (QModelIndex ()) - 1, QModelIndex ()));
+    int cc = columnCount (QModelIndex ());
+    int rc = rowCount (QModelIndex ());
+
+    emit dataChanged (index (0, 0, QModelIndex ()), index (rc - 1, cc - 1, QModelIndex ()));
+
+    //  data changes for the children too
+    for (int i = 0; i < rc; ++i) {
+      auto p = index (i, 0, QModelIndex ());
+      int ec = rowCount (p);
+      emit dataChanged (index (0, 0, p), index (ec - 1, cc - 1, p));
+    }
   }
 
   void begin_reset_model ()

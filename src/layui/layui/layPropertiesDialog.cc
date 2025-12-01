@@ -262,12 +262,11 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, 0));
   m_signals_enabled = true;
 
-  update_controls ();
-
   mp_ui->apply_to_all_cbx->setChecked (true); // TODO: persist
   mp_ui->relative_cbx->setChecked (true);
 
   fetch_config ();
+  update_controls ();
 
   connect (mp_ui->ok_button, SIGNAL (clicked ()), this, SLOT (ok_pressed ()));
   connect (mp_ui->cancel_button, SIGNAL (clicked ()), this, SLOT (cancel_pressed ()));

@@ -702,13 +702,19 @@ LayerSelectionComboBox::do_update_layer_list ()
 
     } else {
 
+      int icon_width = iconSize ().width ();
+      int icon_height = iconSize ().height ();
+
       LPIPairCompareOp cmp_op;
-      std::map<std::pair <db::LayerProperties, int>, std::string, LPIPairCompareOp> name_for_layer (cmp_op);
+      std::map<std::pair<db::LayerProperties, int>, std::string, LPIPairCompareOp> name_for_layer (cmp_op);
+      std::map<std::pair<db::LayerProperties, int>, QIcon, LPIPairCompareOp> icon_for_layer;
       LayerPropertiesConstIterator lp = mp_private->view->begin_layers ();
       while (! lp.at_end ()) {
         if (lp->cellview_index () == mp_private->cv_index && ! lp->has_children () && (mp_private->all_layers || lp->layer_index () >= 0) && lp->source (true).layer_props () != db::LayerProperties ()) {
           std::pair <db::LayerProperties, int> k (lp->source (true).layer_props (), lp->layer_index ());
           name_for_layer.insert (std::make_pair (k, lp->display_string (mp_private->view, true, true /*always show source*/)));
+          QIcon icon = QIcon (QPixmap::fromImage (mp_private->view->icon_for_layer (lp, icon_width, icon_height).to_image ()));
+          icon_for_layer.insert (std::make_pair (k, icon));
           mp_private->layers.push_back (k);
         }
         ++lp;
@@ -728,11 +734,18 @@ LayerSelectionComboBox::do_update_layer_list ()
       std::sort (mp_private->layers.begin () + nk, mp_private->layers.end ());
 
       for (std::vector <std::pair <db::LayerProperties, int> >::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
-        std::map<std::pair <db::LayerProperties, int>, std::string, LPIPairCompareOp>::const_iterator ln = name_for_layer.find (*ll);
+        auto ln = name_for_layer.find (*ll);
+        QString text;
         if (ln != name_for_layer.end ()) {
-          addItem (tl::to_qstring (ln->second));
+          text = tl::to_qstring (ln->second);
         } else {
-          addItem (tl::to_qstring (ll->first.to_string ()));
+          text = tl::to_qstring (ll->first.to_string ());
+        }
+        auto li = icon_for_layer.find (*ll);
+        if (li != icon_for_layer.end ()) {
+          addItem (li->second, text);
+        } else {
+          addItem (text);
         }
       }
 

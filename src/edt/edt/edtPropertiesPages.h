@@ -68,8 +68,9 @@ private:
   virtual void apply (bool commit);
   virtual void apply_to_all (bool relative, bool commit);
   virtual bool can_apply_to_all () const;
-  virtual void do_apply (bool current_only, bool relative, bool commit);
+  void do_apply (bool current_only, bool relative, bool commit);
   void recompute_selection_ptrs (const std::vector<lay::ObjectInstPath> &new_sel);
+  void apply_change (const ChangeApplicator *applicator, unsigned int cv_index, bool current_only, bool relative, bool commit);
 
 protected:
   std::string m_description;

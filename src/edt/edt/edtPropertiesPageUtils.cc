@@ -120,6 +120,12 @@ db::Instance ChangePropertiesApplicator::do_apply_inst (db::Cell &cell, const db
 // -------------------------------------------------------------------------
 //  ChangeLayerApplicator implementation
 
+ChangeLayerApplicator::ChangeLayerApplicator (const ChangeLayerApplicator &other)
+  : ChangeApplicator (), m_cv_index (other.m_cv_index), m_new_layer (other.m_new_layer), m_skipped_layers (other.m_skipped_layers)
+{
+  //  .. nothing yet ...
+}
+
 ChangeLayerApplicator::ChangeLayerApplicator (unsigned int cv_index, unsigned int new_layer)
   : m_cv_index (cv_index), m_new_layer (new_layer)
 {

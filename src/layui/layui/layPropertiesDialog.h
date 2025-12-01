@@ -26,6 +26,7 @@
 #define HDR_layPropertiesDialog
 
 #include "layuiCommon.h"
+#include "layProperties.h"
 
 #include <vector>
 
@@ -52,7 +53,6 @@ namespace lay
 
 class Editable;
 class Editables;
-class PropertiesPage;
 class MainWindow;
 class PropertiesTreeModel;
 
@@ -65,7 +65,7 @@ class PropertiesTreeModel;
  */
 
 class LAYUI_PUBLIC PropertiesDialog
-  : public QDialog
+  : public QDialog, public lay::PropertiesPageSet
 {
 Q_OBJECT
 
@@ -79,6 +79,14 @@ public:
    *  @brief The Destructor
    */
   ~PropertiesDialog ();
+
+  /**
+   *  @brief Implementation of PropertiesPageSet
+   */
+  virtual const std::vector<lay::PropertiesPage *> &properties_pages () const
+  {
+    return mp_properties_pages;
+  }
 
 private:
   friend class PropertiesTreeModel;

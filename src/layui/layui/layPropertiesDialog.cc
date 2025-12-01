@@ -214,6 +214,7 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
         delete *p;
       } else {
         mp_properties_pages.push_back (*p);
+        (*p)->set_page_set (this);
       }
     }
   }
@@ -263,7 +264,7 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
 
   update_controls ();
 
-  mp_ui->apply_to_all_cbx->setChecked (false);
+  mp_ui->apply_to_all_cbx->setChecked (true); // TODO: persist
   mp_ui->relative_cbx->setChecked (true);
 
   fetch_config ();
@@ -321,13 +322,7 @@ PropertiesDialog::disconnect ()
 void
 PropertiesDialog::apply_to_all_pressed ()
 {
-  m_signals_enabled = false;
-  if (mp_ui->apply_to_all_cbx->isChecked ()) {
-    mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index));
-  } else if (! m_object_indexes.empty ()) {
-    mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, int (m_object_indexes.front ())));
-  }
-  m_signals_enabled = true;
+  mp_ui->relative_cbx->setEnabled (mp_ui->apply_to_all_cbx->isEnabled () && mp_ui->apply_to_all_cbx->isChecked ());
 }
 
 void
@@ -495,7 +490,6 @@ PropertiesDialog::current_index_changed (const QModelIndex &index, const QModelI
     } else {
 
       m_index = index.row ();
-      mp_ui->apply_to_all_cbx->setChecked (mp_properties_pages [m_index]->can_apply_to_all ());
 
       if (mp_properties_pages [m_index]->can_apply_to_all ()) {
 
@@ -536,8 +530,6 @@ PropertiesDialog::update_controls ()
     }
   }
   m_prev_index = m_index;
-
-  mp_ui->apply_to_all_cbx->setChecked (m_object_indexes.size () > 1);
 
   if (m_index < 0 || m_index >= int (mp_properties_pages.size ())) {
 

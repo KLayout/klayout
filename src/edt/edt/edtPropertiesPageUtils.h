@@ -121,6 +121,7 @@ class ChangeLayerApplicator
   : public ChangeApplicator
 {
 public:
+  ChangeLayerApplicator (const ChangeLayerApplicator &other);
   ChangeLayerApplicator (unsigned int cv_index, unsigned int new_layer);
 
   bool supports_relative_mode () const { return false; }

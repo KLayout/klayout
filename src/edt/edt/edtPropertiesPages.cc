@@ -261,6 +261,7 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
   }
 
   std::unique_ptr<ChangeApplicator> applicator;
+  std::unique_ptr<ChangeApplicator> other_applicator;
 
   unsigned int cv_index = m_selection_ptrs [m_indexes.front ()]->cv_index ();
 
@@ -277,6 +278,9 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
 
     if (m_prop_id != pos->shape ().prop_id ()) {
       applicator.reset (new CombinedChangeApplicator (applicator.release (), new ChangePropertiesApplicator (m_prop_id)));
+      if (! current_only) {
+        other_applicator.reset (new ChangePropertiesApplicator (m_prop_id));
+      }
     }
 
     int new_layer = layer_selector ()->current_layer ();
@@ -285,10 +289,36 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
       ChangeLayerApplicator *cla = new ChangeLayerApplicator (cv_index, (unsigned int) new_layer);
       cla->skip_layer (gs_layer);
       applicator.reset (new CombinedChangeApplicator (applicator.release (), cla));
+      if (! current_only) {
+        other_applicator.reset (new CombinedChangeApplicator (other_applicator.release (), new ChangeLayerApplicator (*cla)));
+      }
     }
   }
 
   if (! applicator.get ()) {
+    return;
+  }
+
+  apply_change (applicator.get (), cv_index, current_only, relative, commit);
+
+  if (other_applicator.get () && page_set ()) {
+
+    //  apply to other pages
+    auto pages = page_set ()->properties_pages ();
+    for (auto p = pages.begin (); p != pages.end (); ++p) {
+      ShapePropertiesPage *sp = dynamic_cast<ShapePropertiesPage *> (*p);
+      if (sp && sp != this) {
+        sp->apply_change (other_applicator.get (), cv_index, current_only, relative, commit);
+      }
+    }
+
+  }
+}
+
+void
+ShapePropertiesPage::apply_change (const ChangeApplicator *applicator, unsigned int cv_index, bool current_only, bool relative, bool commit)
+{
+  if (m_indexes.empty ()) {
     return;
   }
 

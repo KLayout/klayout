@@ -125,9 +125,11 @@ public:
 
   bool supports_relative_mode () const { return false; }
   db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const;
+  void skip_layer (unsigned int l);
 
 private:
   unsigned int m_cv_index, m_new_layer;
+  std::set<unsigned int> m_skipped_layers;
 };
 
 /**

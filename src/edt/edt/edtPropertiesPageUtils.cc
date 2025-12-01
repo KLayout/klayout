@@ -129,10 +129,15 @@ ChangeLayerApplicator::ChangeLayerApplicator (unsigned int cv_index, unsigned in
 db::Shape ChangeLayerApplicator::do_apply (db::Shapes & /*shapes*/, const db::Shape &shape, double /*dbu*/, unsigned int cv_index, unsigned int layer, bool /*relative*/) const
 {
   db::Shape s = shape;
-  if (m_cv_index == cv_index && layer != m_new_layer) {
+  if (m_cv_index == cv_index && layer != m_new_layer && m_skipped_layers.find (layer) == m_skipped_layers.end ()) {
     s.set_layer (m_new_layer);
   }
   return s;
+}
+
+void ChangeLayerApplicator::skip_layer (unsigned int l)
+{
+  m_skipped_layers.insert (l);
 }
 
 // -------------------------------------------------------------------------

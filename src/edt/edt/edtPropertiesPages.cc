@@ -281,7 +281,10 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
 
     int new_layer = layer_selector ()->current_layer ();
     if (new_layer >= 0 && int (pos->layer ()) != new_layer) {
-      applicator.reset (new CombinedChangeApplicator (applicator.release (), new ChangeLayerApplicator (cv_index, (unsigned int) new_layer)));
+      unsigned int gs_layer = cv->layout ().guiding_shape_layer ();
+      ChangeLayerApplicator *cla = new ChangeLayerApplicator (cv_index, (unsigned int) new_layer);
+      cla->skip_layer (gs_layer);
+      applicator.reset (new CombinedChangeApplicator (applicator.release (), cla));
     }
   }
 
@@ -425,10 +428,17 @@ ShapePropertiesPage::update_shape ()
 
   const lay::CellView &cv = view ()->cellview (pos->cv_index ());
   double dbu = cv->layout ().dbu ();
+  unsigned int gs_layer = cv->layout ().guiding_shape_layer ();
 
   m_enable_cb_callback = false;
   layer_selector ()->set_view (view (), pos->cv_index (), true);
-  layer_selector ()->set_current_layer (pos->layer ());
+  if (pos->layer () == gs_layer) {
+    layer_selector ()->setEnabled (false);
+    layer_selector ()->set_current_layer (-1);
+  } else {
+    layer_selector ()->setEnabled (true);
+    layer_selector ()->set_current_layer (pos->layer ());
+  }
   m_enable_cb_callback = true;
 
   std::string cell_str;

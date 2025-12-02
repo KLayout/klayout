@@ -414,9 +414,24 @@ NetTracerDialog::get_net_tracer_setup (const lay::CellView &cv, db::NetTracerDat
 db::NetTracerNet *
 NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &stop_search_box, bool trace_path)
 {
+  //  determine the cellview
+  lay::CellView cv = view ()->cellview (m_cv_index);
+  if (! cv.is_valid ()) {
+    return 0;
+  }
+
+  //  Set up the net tracer environment
+  db::NetTracerData tracer_data;
+  if (! get_net_tracer_setup (cv, tracer_data)) {
+    return 0;
+  }
+
+  std::set<unsigned int> original_layers = tracer_data.original_layers ();
+
   unsigned int start_layer = 0;
   db::Point start_point;
   db::Shape start_shape;
+  db::ICplxTrans start_trans;
 
   //  locate the seed
   {
@@ -426,7 +441,7 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
 
     //  go through all visible layers of all cellviews and find a seed shape
     for (lay::LayerPropertiesConstIterator lprop = view ()->begin_layers (); ! lprop.at_end (); ++lprop) {
-      if (lprop->is_visual ()) {
+      if (lprop->is_visual () && lprop->cellview_index () == m_cv_index && original_layers.find ((unsigned int) lprop->layer_index ()) != original_layers.end ()) {
         finder.find (view (), *lprop, start_search_box);
       }
     }
@@ -440,13 +455,8 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
     m_cv_index = r->cv_index ();
     start_shape = r->shape ();
     start_layer = r->layer ();
+    start_trans = r->trans ();
 
-  }
-
-  //  determine the cellview
-  lay::CellView cv = view ()->cellview (m_cv_index);
-  if (! cv.is_valid ()) {
-    return 0;
   }
 
   //  determine the start point
@@ -463,20 +473,15 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
 
     //  stop if the center start point is not inside the start polygon
     db::Polygon poly;
-    if (start_shape.polygon (poly) && db::inside_poly (poly.begin_edge (), start_point) < 0) {
+    if (start_shape.polygon (poly) && db::inside_poly (poly.begin_edge (), start_trans.inverted () * start_point) < 0) {
       return 0;
     }
 
   }
 
-  //  Set up the net tracer environment
-  db::NetTracerData tracer_data;
-  if (! get_net_tracer_setup (cv, tracer_data)) {
-    return 0;
-  }
-
   unsigned int stop_layer = 0;
   db::Point stop_point;
+  db::ICplxTrans stop_trans;
 
   //  locate the stop shape (the second mouse click)
   if (trace_path) {
@@ -486,7 +491,7 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
 
     //  go through all visible layers of all cellviews and find a seed shape
     for (lay::LayerPropertiesConstIterator lprop = view ()->begin_layers (); ! lprop.at_end (); ++lprop) {
-      if (lprop->is_visual ()) {
+      if (lprop->is_visual () && lprop->cellview_index () == m_cv_index && original_layers.find ((unsigned int) lprop->layer_index ()) != original_layers.end ()) {
         finder.find (view (), *lprop, stop_search_box);
       }
     }
@@ -510,10 +515,11 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
 
     stop_point = tt.inverted ().trans (stop_search_box.center ());
     stop_layer = r->layer ();
+    stop_trans = r->trans ();
 
     //  stop if the center stop point is not inside the stop polygon
     db::Polygon poly;
-    if (r->shape ().polygon (poly) && db::inside_poly (poly.begin_edge (), stop_point) < 0) {
+    if (r->shape ().polygon (poly) && db::inside_poly (poly.begin_edge (), stop_trans.inverted () * stop_point) < 0) {
       return 0;
     }
 

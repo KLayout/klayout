@@ -132,7 +132,7 @@ public:
   }
   
 protected:
-  const std::vector<int> &layers () const
+  const std::vector<unsigned int> &layers () const
   {
     return m_layers;
   }
@@ -183,7 +183,7 @@ protected:
    *  @param max_level The maximum hierarchy level to check
    *  @param layers A set of layers to check
    */
-  void start (LayoutViewBase *view, unsigned int cv_index, const std::vector<db::DCplxTrans> &trans, const db::DBox &region, const db::DBox &scan_region, int min_level, int max_level, const std::vector<int> &layers = std::vector<int> ());
+  void start (LayoutViewBase *view, unsigned int cv_index, const std::vector<db::DCplxTrans> &trans, const db::DBox &region, const db::DBox &scan_region, int min_level, int max_level, const std::vector<unsigned int> &layers = std::vector<unsigned int> ());
 
   /**
    *  @brief Provide a basic edge test facility
@@ -232,7 +232,7 @@ private:
   unsigned int m_cv_index;
   db::Box m_region;
   db::Box m_scan_region;
-  std::vector<int> m_layers;
+  std::vector<unsigned int> m_layers;
   double m_distance;
   bool m_point_mode;
   bool m_catch_all;
@@ -267,8 +267,8 @@ public:
    */
   ShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator::flags_type flags, const std::set<lay::ObjectInstPath> *excludes = 0, bool capture_all_shapes = false);
 
-  bool find (LayoutViewBase *view, const lay::LayerProperties &lprops, const db::DBox &region_mu);
-  bool find (LayoutViewBase *view, const db::DBox &region_mu);
+  bool find (lay::LayoutViewBase *view, const lay::LayerProperties &lprops, const db::DBox &region_mu);
+  bool find (lay::LayoutViewBase *view, const db::DBox &region_mu);
 
   iterator begin () const
   {
@@ -327,7 +327,7 @@ private:
                       bool inv_prop_sel,
                       const lay::HierarchyLevelSelection &hier_sel,
                       const std::vector<db::DCplxTrans> &trans_mu,
-                      const std::vector<int> &layers,
+                      const std::vector<unsigned int> &layers,
                       const db::DBox &region_mu);
 
   const std::set<lay::ObjectInstPath> *mp_excludes;

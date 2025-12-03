@@ -182,7 +182,7 @@ public:
   /**
    *  @brief Displays a status message
    */
-  void message (const std::string &s = "", int timeout = 10);
+  virtual void message (const std::string &s = "", int timeout = 10, int priority = 0);
 
   /**
    *  @brief Sets the keyboard focus to the view
@@ -832,7 +832,7 @@ public:
 
   void emit_title_changed (lay::LayoutView *view) { emit title_changed (view); }
   void emit_dirty_changed (lay::LayoutView *view) { emit dirty_changed (view); }
-  void emit_show_message (const std::string &s, int ms) { emit show_message (s, ms); }
+  void emit_show_message (const std::string &s, int ms, int priority) { emit show_message (s, ms, priority); }
   void emit_current_pos_changed (double x, double y, bool dbu_units) { emit current_pos_changed (x, y, dbu_units); }
   void emit_clear_current_pos () { emit clear_current_pos (); }
   void emit_edits_enabled_changed () { emit edits_enabled_changed (); }
@@ -885,7 +885,7 @@ signals:
   /**
    *  @brief This signal is emitted when the view wants to show a message for the given time (of infinitely for ms == 0)
    */
-  void show_message (const std::string &s, int ms);
+  void show_message (const std::string &s, int ms, int priority);
 
   /**
    *  @brief This signal is emitted when the view wants to indicate a mouse position change

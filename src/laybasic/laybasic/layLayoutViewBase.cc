@@ -693,7 +693,7 @@ LayoutViewBase::set_synchronous (bool s)
 }
 
 void
-LayoutViewBase::message (const std::string & /*s*/, int /*timeout*/)
+LayoutViewBase::message (const std::string & /*s*/, int /*timeout*/, int /*priority*/)
 {
   //  .. nothing yet ..
 }
@@ -4156,7 +4156,7 @@ void
 LayoutViewBase::cancel_edits ()
 {
   //  clear any messages
-  message ();
+  message (std::string (), 0, -1);
 
   //  the move service takes a special role here as it manages the
   //  transaction for the collective move operation.

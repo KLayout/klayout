@@ -207,7 +207,7 @@ NetTracerDialog::drag_cancel ()
 {
   if (m_mouse_state > 0) {
 
-    view ()->message ();
+    view ()->message (std::string (), 0, 10);
     ui ()->ungrab_mouse (this);
     set_cursor (lay::Cursor::none);
 
@@ -241,7 +241,7 @@ NetTracerDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, b
       m_mouse_first_point = p;
       m_mouse_state = 3;
 
-      view ()->message (tl::to_string (QObject::tr ("Click on the second point in the net")));
+      view ()->message (tl::to_string (QObject::tr ("Click on the second point in the net")), -1 /*infinitely*/, 10);
 
     } else {
 
@@ -1264,7 +1264,7 @@ BEGIN_PROTECTED
   commit ();
   net_list->setCurrentItem (0);
   m_mouse_state = 2;
-  view ()->message (tl::to_string (QObject::tr ("Click on the first point in the net")));
+  view ()->message (tl::to_string (QObject::tr ("Click on the first point in the net")), -1 /*infinitely*/, 10);
   ui ()->grab_mouse (this, false);
 END_PROTECTED
 }
@@ -1276,7 +1276,7 @@ BEGIN_PROTECTED
   commit ();
   net_list->setCurrentItem (0);
   m_mouse_state = 1;
-  view ()->message (tl::to_string (QObject::tr ("Click on a point in the net")));
+  view ()->message (tl::to_string (QObject::tr ("Click on a point in the net")), -1 /*infinitely*/, 10);
   ui ()->grab_mouse (this, false);
 END_PROTECTED
 }
@@ -1299,7 +1299,7 @@ NetTracerDialog::release_mouse ()
   add_pb->setChecked (false);
   add2_pb->setChecked (false);
   m_mouse_state = 0;
-  view ()->message ();
+  view ()->message (std::string (), 0, 10);
   ui ()->ungrab_mouse (this);
   set_cursor (lay::Cursor::none);
 }

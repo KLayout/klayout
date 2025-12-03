@@ -1577,10 +1577,10 @@ LayoutView::signal_selection_changed ()
 }
 
 void
-LayoutView::message (const std::string &s, int timeout)
+LayoutView::message (const std::string &s, int timeout, int priority)
 {
   if (mp_widget) {
-    mp_widget->emit_show_message (s, timeout * 1000);
+    mp_widget->emit_show_message (s, timeout * 1000, priority);
   }
 }
 

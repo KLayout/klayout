@@ -328,6 +328,12 @@ set_menu_items_hidden (lay::MainWindow *mw, const std::map<std::string, bool> &h
   mw->dispatcher ()->config_set (lay::cfg_menu_items_hidden, lay::pack_menu_items_hidden (hv));
 }
 
+static void
+clear_message (lay::MainWindow *mw, int priority)
+{
+  mw->message (std::string (), 0, priority);
+}
+
 Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "MainWindow",
 
   //  Dispatcher interface and convenience functions
@@ -475,15 +481,36 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This method has been added in version 0.24."
   ) +
-  gsi::method ("message", &lay::MainWindow::message, gsi::arg ("message"), gsi::arg ("time", -1, "infinite"),
+  gsi::method_ext ("clear_message", &clear_message, gsi::arg ("priority", -1, "all priorities"),
+    "@brief Clears the message\n"
+    "When calling this method with a priority, it will clear the message in the given priority slot, thus "
+    "unhiding the messages with lower priority. This is equivalent to calling \\message with an empty string.\n"
+    "\n"
+    "When calling without a priority, all messages in all priority slots will be cleared.\n"
+    "\n"
+    "This method has been added in version 0.30.6."
+  ) +
+  gsi::method ("message", &lay::MainWindow::message, gsi::arg ("message"), gsi::arg ("time", -1, "infinite"), gsi::arg ("priority", 0),
     "@brief Displays a message in the status bar\n"
     "\n"
     "@param message The message to display\n"
     "@param time The time how long to display the message in ms. A negative value means 'infinitely'.\n"
+    "@param priority The priority of the message. Higher-priority messages have precendence over lower-priority ones.\n"
     "\n"
     "This given message is shown in the status bar for the given time.\n" 
+    "If a priority is given, higher-priority messages have precedence over lower-priority ones.\n"
+    "Placing an empty message clears a message with a given priority and unhides messages with lower "
+    "priority. Standard messages like selection descriptions have priority 0, which is the lowest priority.\n"
     "\n"
-    "This method has been added in version 0.18. The 'time' parameter was made optional in version 0.28.10."
+    "Messages generated during modal actions (e.g. 'Click on first point') by convention should have priority 10 "
+    "and should be tied to the active state of a plugin. This ensures there is only one such message.\n"
+    "Higher-priority messages must be cleared (set to empty string) explicitly to unhide lower-priority messages "
+    "when the indicated action is finished.\n"
+    "\n"
+    "\\clear_message is a convenience method that will clear messages.\n"
+    "\n"
+    "This method has been added in version 0.18. The 'time' parameter was made optional in version 0.28.10.\n"
+    "The 'priority' argument has been added in version 0.30.6."
   ) +
   gsi::method ("resize", (void (lay::MainWindow::*)(int, int)) &lay::MainWindow::resize, gsi::arg ("width"), gsi::arg ("height"),
     "@brief Resizes the window\n"

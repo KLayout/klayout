@@ -283,7 +283,7 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
       }
     }
 
-    int new_layer = layer_selector ()->current_layer ();
+    int new_layer = layer_selector ()->current_layer_ensure ();
     if (new_layer >= 0 && int (pos->layer ()) != new_layer) {
       unsigned int gs_layer = cv->layout ().guiding_shape_layer ();
       ChangeLayerApplicator *cla = new ChangeLayerApplicator (cv_index, (unsigned int) new_layer);

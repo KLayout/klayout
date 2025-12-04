@@ -235,10 +235,11 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   m_current_object = 0;
 
   //  look for next usable editable 
+  m_object_indexes.resize (mp_properties_pages.size ());
   if (m_index >= int (mp_properties_pages.size ())) {
     m_index = -1;
   } else {
-    m_object_indexes.push_back (0);
+    m_object_indexes [m_index].push_back (0);
   }
 
   update_title ();
@@ -383,6 +384,7 @@ BEGIN_PROTECTED
         delete *p;
       } else {
         mp_properties_pages.push_back (*p);
+        (*p)->set_page_set (this);
       }
     }
   }
@@ -398,10 +400,11 @@ BEGIN_PROTECTED
   //  look for next usable editable
   m_index = 0;
   m_object_indexes.clear ();
+  m_object_indexes.resize (mp_properties_pages.size ());
   if (m_index >= int (mp_properties_pages.size ())) {
     m_index = -1;
   } else {
-    m_object_indexes.push_back (0);
+    m_object_indexes [m_index].push_back (0);
   }
 
   mp_tree_model->end_reset_model ();
@@ -436,6 +439,7 @@ PropertiesDialog::current_index_changed (const QModelIndex &index, const QModelI
   }
 
   m_object_indexes.clear ();
+  m_object_indexes.resize (mp_properties_pages.size ());
 
   if (! index.isValid ()) {
 
@@ -462,56 +466,66 @@ PropertiesDialog::current_index_changed (const QModelIndex &index, const QModelI
 
     }
 
+    m_index = -1;
+
+    auto selection = mp_ui->tree->selectionModel ()->selectedIndexes ();
+
+    //  establish a single-selection on the current item
     if (mp_tree_model->parent (index).isValid ()) {
+      int oi = mp_tree_model->object_index (index);
+      int pi = mp_tree_model->page_index (index);
+      m_index = pi;
+      m_object_indexes [pi].push_back (size_t (oi));
+    }
 
-      m_index = mp_tree_model->page_index (index);
+    //  establish individual selections for the other items
+    //  as far as allowed by "can_apply_to_all"
+    for (auto i = selection.begin (); i != selection.end (); ++i) {
+      if (*i != index && mp_tree_model->parent (*i).isValid ()) {
+        int oi = mp_tree_model->object_index (*i);
+        int pi = mp_tree_model->page_index (*i);
+        if (mp_properties_pages [pi]->can_apply_to_all ()) {
+          m_object_indexes [pi].push_back (size_t (oi));
+        }
+      }
+    }
 
-      if (mp_properties_pages [m_index]->can_apply_to_all ()) {
+    //  establish group node selection as current item -> translate into "all" for "can_apply_to_all" pages
+    //  or first item unless an item is explicitly selected.
+    if (! mp_tree_model->parent (index).isValid ()) {
+      int pi = index.row ();
+      m_index = pi;
+      m_object_indexes [pi].clear ();
+      if (mp_properties_pages [pi]->can_apply_to_all ()) {
+        for (size_t oi = 0; oi < mp_properties_pages [pi]->count (); ++oi) {
+          m_object_indexes [pi].push_back (oi);
+        }
+      } else if (mp_properties_pages [pi]->count () > 0 && m_object_indexes [pi].empty ()) {
+        m_object_indexes [pi].push_back (0);
+      }
+    }
 
-        m_object_indexes.push_back (size_t (mp_tree_model->object_index (index)));
-
-        auto selection = mp_ui->tree->selectionModel ()->selectedIndexes ();
-        for (auto i = selection.begin (); i != selection.end (); ++i) {
-          if (mp_tree_model->parent (*i).isValid () && mp_tree_model->page_index (*i) == m_index) {
-            int oi = mp_tree_model->object_index (*i);
-            if (oi != int (m_object_indexes.front ())) {
-              m_object_indexes.push_back (size_t (oi));
-            }
+    //  establish group node selection for other items -> translate into "all" for "can_apply_to_all" pages
+    for (auto i = selection.begin (); i != selection.end (); ++i) {
+      if (*i != index && ! mp_tree_model->parent (*i).isValid ()) {
+        int pi = i->row ();
+        m_object_indexes [pi].clear ();
+        if (mp_properties_pages [pi]->can_apply_to_all ()) {
+          for (size_t oi = 0; oi < mp_properties_pages [pi]->count (); ++oi) {
+            m_object_indexes[pi].push_back (oi);
           }
         }
-
-      } else {
-
-        m_object_indexes.push_back (size_t (mp_tree_model->object_index (index)));
-
       }
-
-    } else {
-
-      m_index = index.row ();
-
-      if (mp_properties_pages [m_index]->can_apply_to_all ()) {
-
-        for (size_t oi = 0; oi < mp_properties_pages [m_index]->count (); ++oi) {
-          m_object_indexes.push_back (oi);
-        }
-
-      } else if (mp_properties_pages [m_index]->count () > 0) {
-
-        m_object_indexes.push_back (0);
-
-      }
-
     }
 
   }
 
-  if (! m_object_indexes.empty ()) {
+  if (m_index >= 0 && ! m_object_indexes [m_index].empty ()) {
     m_current_object = 0;
     for (int i = 0; i < m_index; ++i) {
       m_current_object += mp_properties_pages [i]->count ();
     }
-    m_current_object += int (m_object_indexes.front ());
+    m_current_object += int (m_object_indexes [m_index].front ());
   } else {
     m_current_object = -1;
   }
@@ -552,7 +566,10 @@ PropertiesDialog::update_controls ()
     mp_ui->ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
     mp_ui->tree->setEnabled (true);
 
-    mp_properties_pages [m_index]->select_entries (m_object_indexes);
+    for (int i = 0; i < int (mp_properties_pages.size ()); ++i) {
+      mp_properties_pages [i]->select_entries (m_object_indexes [i]);
+    }
+
     mp_properties_pages [m_index]->update ();
 
   }
@@ -563,7 +580,7 @@ PropertiesDialog::next_pressed ()
 {
 BEGIN_PROTECTED
 
-  if (m_object_indexes.empty ()) {
+  if (m_index < 0 || m_object_indexes [m_index].empty ()) {
     return;
   }
 
@@ -576,7 +593,7 @@ BEGIN_PROTECTED
   }
 
   //  advance the current entry
-  int object_index = int (m_object_indexes.front ());
+  int object_index = int (m_object_indexes [m_index].front ());
   ++object_index;
 
   //  look for next usable editable if at end
@@ -593,7 +610,8 @@ BEGIN_PROTECTED
   }
 
   m_object_indexes.clear ();
-  m_object_indexes.push_back (object_index);
+  m_object_indexes.resize (mp_properties_pages.size ());
+  m_object_indexes [m_index].push_back (object_index);
 
   ++m_current_object;
   update_title ();
@@ -611,7 +629,7 @@ PropertiesDialog::prev_pressed ()
 {
 BEGIN_PROTECTED
 
-  if (m_object_indexes.empty ()) {
+  if (m_index < 0 || m_object_indexes [m_index].empty ()) {
     return;
   }
 
@@ -624,7 +642,7 @@ BEGIN_PROTECTED
   }
 
   //  advance the current entry
-  int object_index = int (m_object_indexes.front ());
+  int object_index = int (m_object_indexes [m_index].front ());
   if (object_index == 0) {
 
     //  look for last usable editable if at end
@@ -643,7 +661,8 @@ BEGIN_PROTECTED
   --object_index;
 
   m_object_indexes.clear ();
-  m_object_indexes.push_back (object_index);
+  m_object_indexes.resize (mp_properties_pages.size ());
+  m_object_indexes [m_index].push_back (object_index);
 
   --m_current_object;
   update_title ();
@@ -669,12 +688,12 @@ PropertiesDialog::update_title ()
 bool
 PropertiesDialog::any_next () const
 {
-  if (m_object_indexes.empty ()) {
+  if (m_index < 0 || m_object_indexes [m_index].empty ()) {
     return false;
   }
 
   int index = m_index;
-  if (m_object_indexes.front () + 1 >= mp_properties_pages [index]->count ()) {
+  if (m_object_indexes [m_index].front () + 1 >= mp_properties_pages [index]->count ()) {
     ++index;
   }
 
@@ -685,12 +704,12 @@ PropertiesDialog::any_next () const
 bool
 PropertiesDialog::any_prev () const
 {
-  if (m_object_indexes.empty ()) {
+  if (m_index < 0 || m_object_indexes [m_index].empty ()) {
     return false;
   }
 
   int index = m_index;
-  if (m_object_indexes.front () == 0) {
+  if (m_object_indexes [m_index].front () == 0) {
     --index;
   }
 

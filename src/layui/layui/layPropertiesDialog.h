@@ -95,7 +95,7 @@ private:
   db::Manager *mp_manager;
   lay::Editables *mp_editables;
   int m_index, m_prev_index;
-  std::vector<size_t> m_object_indexes;
+  std::vector<std::vector<size_t> > m_object_indexes;
   QStackedLayout *mp_stack;
   QLabel *mp_none;
   lay::MainWindow *mp_mw;

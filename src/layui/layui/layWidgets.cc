@@ -514,7 +514,7 @@ struct LayerSelectionComboBoxPrivateData
 };
 
 LayerSelectionComboBox::LayerSelectionComboBox (QWidget *parent)
-  : QComboBox (parent), dm_update_layer_list (this, &LayerSelectionComboBox::do_update_layer_list)
+  : QComboBox (parent), dm_update_layer_list (this, &LayerSelectionComboBox::do_update_layer_list), m_ignore_layer_list_changed (false)
 {
   mp_private = new LayerSelectionComboBoxPrivateData ();
   mp_private->no_layer_available = false;
@@ -651,7 +651,9 @@ LayerSelectionComboBox::set_view (lay::LayoutViewBase *view, int cv_index, bool 
 void
 LayerSelectionComboBox::on_layer_list_changed (int)
 {
-  update_layer_list ();
+  if (! m_ignore_layer_list_changed) {
+    update_layer_list ();
+  }
 }
 
 void 
@@ -795,8 +797,8 @@ LayerSelectionComboBox::set_current_layer (const db::LayerProperties &props)
   setCurrentIndex (-1);
 }
 
-void 
-LayerSelectionComboBox::set_current_layer (int l)
+const db::Layout *
+LayerSelectionComboBox::layout () const
 {
   const db::Layout *layout = mp_private->layout;
   if (! layout && mp_private->view) {
@@ -805,9 +807,22 @@ LayerSelectionComboBox::set_current_layer (int l)
       layout = & cv->layout ();
     }
   }
+  return layout;
+}
 
-  if (l >= 0 && layout && layout->is_valid_layer ((unsigned int) l)) {
-    mp_private->last_props = layout->get_properties ((unsigned int) l);
+db::Layout *
+LayerSelectionComboBox::layout ()
+{
+  return const_cast<db::Layout *> (((const LayerSelectionComboBox *) this)->layout ());
+}
+
+void 
+LayerSelectionComboBox::set_current_layer (int l)
+{
+  const db::Layout *ly = layout ();
+
+  if (l >= 0 && ly && ly->is_valid_layer ((unsigned int) l)) {
+    mp_private->last_props = ly->get_properties ((unsigned int) l);
   }
 
   if (l < 0) {
@@ -821,6 +836,12 @@ LayerSelectionComboBox::set_current_layer (int l)
   }
 }
 
+bool
+LayerSelectionComboBox::is_no_layer_selected () const
+{
+  return currentIndex () < 0;
+}
+
 int 
 LayerSelectionComboBox::current_layer () const
 {
@@ -832,7 +853,40 @@ LayerSelectionComboBox::current_layer () const
   }
 }
 
-db::LayerProperties 
+int
+LayerSelectionComboBox::current_layer_ensure ()
+{
+  int i = currentIndex ();
+  if (i < 0 || i > int (mp_private->layers.size ())) {
+
+    return -1;
+
+  } else if (mp_private->layers [i].second < 0) {
+
+    db::Layout *ly = layout ();
+    if (! ly) {
+      return -1;
+    }
+
+    m_ignore_layer_list_changed = true;
+    try {
+      unsigned int l = ly->insert_layer (mp_private->layers [i].first);
+      mp_private->layers [i].second = l;
+      m_ignore_layer_list_changed = false;
+      return l;
+    } catch (...) {
+      m_ignore_layer_list_changed = false;
+      throw;
+    }
+
+  } else {
+
+    return mp_private->layers [i].second;
+
+  }
+}
+
+db::LayerProperties
 LayerSelectionComboBox::current_layer_props () const
 {
   int i = currentIndex ();

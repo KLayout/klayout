@@ -186,6 +186,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
       m_synchronous (false),
       m_busy (false),
       mp_app (app),
+      m_message_timer_priority (-1),
       m_manager (undo_enabled)
 {
   setAnimated (false);
@@ -823,10 +824,15 @@ static int fm_width (const QFontMetrics &fm, const QString &s)
 void
 MainWindow::format_message ()
 {
+  std::string msg;
+  if (! m_messages.empty ()) {
+    msg = (--m_messages.end ())->second;
+  }
+
   QFontMetrics fm (mp_msg_label->font ());
 
   std::string full_message;
-  for (const char *c = m_message.c_str (); *c; ++c) {
+  for (const char *c = msg.c_str (); *c; ++c) {
     if (*c == '\\' && (c[1] == '(' || c[1] == ')')) {
       ++c;
     } else {
@@ -847,7 +853,7 @@ MainWindow::format_message ()
 
     short_message.clear ();
 
-    for (const char *c = m_message.c_str (); *c; ++c) {
+    for (const char *c = msg.c_str (); *c; ++c) {
       if (*c == '\\' && c[1] == '(') {
         if (nsection++ < ndrop) {
           in_drop = true;
@@ -875,24 +881,53 @@ MainWindow::format_message ()
 }
 
 void
-MainWindow::message (const std::string &s, int ms)
+MainWindow::message (const std::string &s, int ms, int priority)
 {
-  m_message = s;
+  if (s.empty () && priority < 0) {
+
+    m_messages.clear ();
+
+  } else if (s.empty ()) {
+
+    m_messages.erase (priority);
+
+  } else {
+
+    //  simulate timeout of previous message timer
+    if (m_message_timer_priority >= 0) {
+      m_messages.erase (m_message_timer_priority);
+    }
+
+    m_messages[priority] = s;
+
+    if (ms >= 0) {
+      m_message_timer_priority = priority;
+      m_message_timer.start (ms);
+    } else {
+      m_message_timer_priority = -1;
+    }
+
+  }
+
   format_message ();
-  m_message_timer.start (ms);
 }
 
 void
-MainWindow::clear_message ()
+MainWindow::clear_messages ()
 {
-  m_message.clear ();
-  m_message_timer.start (0);
+  m_message_timer.stop ();
+  m_message_timer_priority = -1;
+  m_messages.clear ();
+  format_message ();
 }
 
 void
 MainWindow::message_timer ()
 {
-  m_message.clear ();
+  if (m_message_timer_priority >= 0) {
+    m_messages.erase (m_message_timer_priority);
+  }
+  m_message_timer_priority = -1;
   format_message ();
 }
 
@@ -2467,7 +2502,7 @@ MainWindow::select_view (int index)
     update_editor_options_dock ();
     clear_current_pos ();
     edits_enabled_changed ();
-    clear_message ();
+    clear_messages ();
     menu_needs_update ();
 
     m_disable_tab_selected = dis;
@@ -2994,7 +3029,7 @@ MainWindow::close_view (int index)
         clear_current_pos ();
         edits_enabled_changed ();
         menu_needs_update ();
-        clear_message ();
+        clear_messages ();
 
         update_dock_widget_state ();
 
@@ -3479,7 +3514,7 @@ MainWindow::add_view (lay::LayoutViewWidget *view)
   connect (view, SIGNAL (dirty_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
   connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
   connect (view, SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
-  connect (view, SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
+  connect (view, SIGNAL (show_message (const std::string &, int, int)), this, SLOT (message (const std::string &, int, int)));
   connect (view, SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
   connect (view, SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
   connect (view, SIGNAL (mode_change (int)), this, SLOT (select_mode (int)));

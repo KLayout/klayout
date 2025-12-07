@@ -365,7 +365,7 @@ public:
   /**
    *  @brief Display a status message
    */
-  virtual void message (const std::string &s = "", int timeout = 10);
+  virtual void message (const std::string &s = "", int timeout = 10, int priority = 0);
 
   /**
    *  @brief Sets the keyboard focus to the view

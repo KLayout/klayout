@@ -649,12 +649,12 @@ public slots:
   /**
    *  @brief Displays a status message next to the coordinates
    */
-  void message (const std::string &s, int ms);
+  void message (const std::string &s, int ms, int);
 
   /**
    *  @brief Clears the current message
    */
-  void clear_message ();
+  void clear_messages ();
 
   /**
    *  @brief Selects the given mode
@@ -789,7 +789,8 @@ private:
   QApplication *mp_app;
   lay::HelpDialog *mp_assistant;
   std::string m_current_session;
-  std::string m_message;
+  int m_message_timer_priority;
+  std::map<int, std::string> m_messages;
   std::unique_ptr<QPrinter> mp_printer;
   std::vector<QString> m_changed_files;
   std::string m_title;

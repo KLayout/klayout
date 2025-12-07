@@ -1,4 +1,4 @@
-
+#
 /*
 
   KLayout Layout Viewer
@@ -148,6 +148,11 @@ public:
    *  @brief Destructor
    */
   ~LayoutView ();
+
+  /**
+   *  @brief Adds a notification
+   */
+  virtual void add_notification (const LayoutViewNotification &notification);
 
   /**
    *  @brief Gets the widget object that view is embedded in
@@ -696,70 +701,6 @@ private:
 };
 
 /**
- *  @brief Descriptor for a notification inside the layout view
- *
- *  Notifications are popups added at the top of the view to indicate need for reloading for example.
- *  Notifications have a name, a title, optional actions (id, title) and a parameter (e.g. file path to reload).
- *  Actions are mapped to QPushButtons.
- */
-class LAYVIEW_PUBLIC LayoutViewNotification
-{
-public:
-  LayoutViewNotification (const std::string &name, const std::string &title, const tl::Variant &parameter = tl::Variant ())
-    : m_name (name), m_title (title), m_parameter (parameter)
-  {
-    //  .. nothing yet ..
-  }
-
-  void add_action (const std::string &name, const std::string &title)
-  {
-    m_actions.push_back (std::make_pair (name, title));
-  }
-
-  const std::vector<std::pair<std::string, std::string> > &actions () const
-  {
-    return m_actions;
-  }
-
-  const std::string &name () const
-  {
-    return m_name;
-  }
-
-  const std::string &title () const
-  {
-    return m_title;
-  }
-
-  const tl::Variant &parameter () const
-  {
-    return m_parameter;
-  }
-
-  bool operator<(const LayoutViewNotification &other) const
-  {
-    if (m_name != other.name ()) {
-      return m_name < other.name ();
-    }
-    return m_parameter < other.parameter ();
-  }
-
-  bool operator==(const LayoutViewNotification &other) const
-  {
-    if (m_name != other.name ()) {
-      return false;
-    }
-    return m_parameter == other.parameter ();
-  }
-
-private:
-  std::string m_name;
-  std::string m_title;
-  tl::Variant m_parameter;
-  std::vector<std::pair<std::string, std::string> > m_actions;
-};
-
-/**
  *  @brief A widget representing a notification
  */
 class LAYVIEW_PUBLIC LayoutViewNotificationWidget
@@ -810,12 +751,12 @@ public:
   /**
    *  @brief Adds a notification
    */
-  void add_notification (const LayoutViewNotification &notificaton);
+  void add_notification (const LayoutViewNotification &notification);
 
   /**
    *  @brief Removes a notification
    */
-  void remove_notification (const LayoutViewNotification &notificaton);
+  void remove_notification (const LayoutViewNotification &notification);
 
   /**
    *  @brief Gets the LayoutView embedded into this widget

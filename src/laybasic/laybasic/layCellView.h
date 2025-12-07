@@ -243,15 +243,6 @@ public:
   }
 
   /**
-   *  @brief Updates the given save options with attributes from this cell view
-   *
-   *  Some formats will initialize attributes from the cell view and the layout's
-   *  metadata (example: libname of GDS2). This method will update the options
-   *  if the layout provides attributes for initializing the latter.
-   */
-  void update_save_options (db::SaveLayoutOptions &options);
-
-  /**
    *  @brief Gets a flag indicating whether the save options are valid
    *
    *  The save options are valid once the layout has been saved with specific

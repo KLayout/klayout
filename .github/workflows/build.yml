@@ -49,7 +49,7 @@ jobs:
       - uses: hmarr/debug-action@v3
       - name: Cancel Workflow Action
         uses: styfle/cancel-workflow-action@0.12.1
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: ccache
         if: matrix.os != 'ubuntu-24.04-arm'
         uses: hendrikmuhs/ccache-action@v1.2
@@ -108,7 +108,7 @@ jobs:
     name: Make SDist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Build SDist
       run: pipx run build --sdist

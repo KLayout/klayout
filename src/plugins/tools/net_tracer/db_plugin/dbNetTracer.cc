@@ -337,6 +337,16 @@ NetTracerData::requires_booleans (unsigned int from_layer) const
   return r->second;
 }
 
+std::set<unsigned int>
+NetTracerData::original_layers () const
+{
+  std::set<unsigned int> ol;
+  for (std::map <unsigned int, std::set <unsigned int> >::const_iterator g = m_original_layers.begin (); g != m_original_layers.end (); ++g) {
+    ol.insert (g->second.begin (), g->second.end ());
+  }
+  return ol;
+}
+
 void
 NetTracerData::clean_l2n_regions ()
 {

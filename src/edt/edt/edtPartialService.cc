@@ -762,9 +762,9 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
 {
   if (! point_mode ()) {
 
-    for (std::vector<int>::const_iterator l = layers ().begin (); l != layers ().end (); ++l) {
+    for (std::vector<unsigned int>::const_iterator l = layers ().begin (); l != layers ().end (); ++l) {
 
-      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (scan_box))) {
+      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox (*l).touches (scan_box))) {
 
         checkpoint ();
 
@@ -897,9 +897,9 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
 
   } else {
 
-    for (std::vector<int>::const_iterator l = layers ().begin (); l != layers ().end (); ++l) {
+    for (std::vector<unsigned int>::const_iterator l = layers ().begin (); l != layers ().end (); ++l) {
 
-      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (hit_box))) {
+      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox (*l).touches (hit_box))) {
 
         checkpoint ();
 
@@ -2315,8 +2315,8 @@ PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, 
     if (ui ()->mouse_event_viewport ().contains (p)) { 
 
       lay::Editable::SelectionMode mode = lay::Editable::Replace;
-      bool shift = ((m_buttons & lay::ShiftButton) != 0);
-      bool ctrl = ((m_buttons & lay::ControlButton) != 0);
+      bool shift = ((buttons & lay::ShiftButton) != 0);
+      bool ctrl = ((buttons & lay::ControlButton) != 0);
       if (shift && ctrl) {
         mode = lay::Editable::Invert;
       } else if (shift) {

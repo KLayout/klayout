@@ -342,6 +342,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_box_text_transform = true;
   m_box_font = 0;
   m_min_size_for_label = 16;
+  m_empty_cell_dimension = 4.0;
   m_cell_box_visible = true;
   m_ghost_cells_visible = true;
   m_text_visible = true;
@@ -693,7 +694,7 @@ LayoutViewBase::set_synchronous (bool s)
 }
 
 void
-LayoutViewBase::message (const std::string & /*s*/, int /*timeout*/)
+LayoutViewBase::message (const std::string & /*s*/, int /*timeout*/, int /*priority*/)
 {
   //  .. nothing yet ..
 }
@@ -942,6 +943,13 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
     int n;
     tl::from_string (value, n);
     min_inst_label_size (n);
+    return true;
+
+  } else if (name == cfg_empty_cell_dimension) {
+
+    double n;
+    tl::from_string (value, n);
+    empty_cell_dimension (n);
     return true;
 
   } else if (name == cfg_cell_box_text_font) {
@@ -4156,7 +4164,7 @@ void
 LayoutViewBase::cancel_edits ()
 {
   //  clear any messages
-  message ();
+  message (std::string (), 0, -1);
 
   //  the move service takes a special role here as it manages the
   //  transaction for the collective move operation.
@@ -5403,7 +5411,16 @@ LayoutViewBase::min_inst_label_size (int px)
   }
 }
 
-void 
+void
+LayoutViewBase::empty_cell_dimension (double um)
+{
+  if (m_empty_cell_dimension != um) {
+    m_empty_cell_dimension = um;
+    redraw ();
+  }
+}
+
+void
 LayoutViewBase::text_visible (bool vis)
 {
   if (m_text_visible != vis) {

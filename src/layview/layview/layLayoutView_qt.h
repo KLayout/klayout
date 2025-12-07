@@ -1,4 +1,4 @@
-
+#
 /*
 
   KLayout Layout Viewer
@@ -150,6 +150,11 @@ public:
   ~LayoutView ();
 
   /**
+   *  @brief Adds a notification
+   */
+  virtual void add_notification (const LayoutViewNotification &notification);
+
+  /**
    *  @brief Gets the widget object that view is embedded in
    */
   QWidget *widget ();
@@ -182,7 +187,7 @@ public:
   /**
    *  @brief Displays a status message
    */
-  void message (const std::string &s = "", int timeout = 10);
+  virtual void message (const std::string &s = "", int timeout = 10, int priority = 0);
 
   /**
    *  @brief Sets the keyboard focus to the view
@@ -696,70 +701,6 @@ private:
 };
 
 /**
- *  @brief Descriptor for a notification inside the layout view
- *
- *  Notifications are popups added at the top of the view to indicate need for reloading for example.
- *  Notifications have a name, a title, optional actions (id, title) and a parameter (e.g. file path to reload).
- *  Actions are mapped to QPushButtons.
- */
-class LAYVIEW_PUBLIC LayoutViewNotification
-{
-public:
-  LayoutViewNotification (const std::string &name, const std::string &title, const tl::Variant &parameter = tl::Variant ())
-    : m_name (name), m_title (title), m_parameter (parameter)
-  {
-    //  .. nothing yet ..
-  }
-
-  void add_action (const std::string &name, const std::string &title)
-  {
-    m_actions.push_back (std::make_pair (name, title));
-  }
-
-  const std::vector<std::pair<std::string, std::string> > &actions () const
-  {
-    return m_actions;
-  }
-
-  const std::string &name () const
-  {
-    return m_name;
-  }
-
-  const std::string &title () const
-  {
-    return m_title;
-  }
-
-  const tl::Variant &parameter () const
-  {
-    return m_parameter;
-  }
-
-  bool operator<(const LayoutViewNotification &other) const
-  {
-    if (m_name != other.name ()) {
-      return m_name < other.name ();
-    }
-    return m_parameter < other.parameter ();
-  }
-
-  bool operator==(const LayoutViewNotification &other) const
-  {
-    if (m_name != other.name ()) {
-      return false;
-    }
-    return m_parameter == other.parameter ();
-  }
-
-private:
-  std::string m_name;
-  std::string m_title;
-  tl::Variant m_parameter;
-  std::vector<std::pair<std::string, std::string> > m_actions;
-};
-
-/**
  *  @brief A widget representing a notification
  */
 class LAYVIEW_PUBLIC LayoutViewNotificationWidget
@@ -810,12 +751,12 @@ public:
   /**
    *  @brief Adds a notification
    */
-  void add_notification (const LayoutViewNotification &notificaton);
+  void add_notification (const LayoutViewNotification &notification);
 
   /**
    *  @brief Removes a notification
    */
-  void remove_notification (const LayoutViewNotification &notificaton);
+  void remove_notification (const LayoutViewNotification &notification);
 
   /**
    *  @brief Gets the LayoutView embedded into this widget
@@ -832,7 +773,7 @@ public:
 
   void emit_title_changed (lay::LayoutView *view) { emit title_changed (view); }
   void emit_dirty_changed (lay::LayoutView *view) { emit dirty_changed (view); }
-  void emit_show_message (const std::string &s, int ms) { emit show_message (s, ms); }
+  void emit_show_message (const std::string &s, int ms, int priority) { emit show_message (s, ms, priority); }
   void emit_current_pos_changed (double x, double y, bool dbu_units) { emit current_pos_changed (x, y, dbu_units); }
   void emit_clear_current_pos () { emit clear_current_pos (); }
   void emit_edits_enabled_changed () { emit edits_enabled_changed (); }
@@ -885,7 +826,7 @@ signals:
   /**
    *  @brief This signal is emitted when the view wants to show a message for the given time (of infinitely for ms == 0)
    */
-  void show_message (const std::string &s, int ms);
+  void show_message (const std::string &s, int ms, int priority);
 
   /**
    *  @brief This signal is emitted when the view wants to indicate a mouse position change

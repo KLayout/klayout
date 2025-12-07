@@ -548,12 +548,14 @@ private:
  *  @brief Describes the button state (supposed to be ored)
  */
 enum ButtonState {
-  ShiftButton   = 1,
-  ControlButton = 2,
-  AltButton     = 4,
-  LeftButton    = 8,
-  MidButton     = 16,
-  RightButton   = 32
+  ShiftButton     = 0x01,
+  ControlButton   = 0x02,
+  AltButton       = 0x04,
+  ModifierMask    = 0x07,  //  all keyboard modifiers
+  LeftButton      = 0x08,
+  MidButton       = 0x10,
+  RightButton     = 0x20,
+  MouseButtonMask = 0x38   //  all mouse buttons
 };
 
 /**

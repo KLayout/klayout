@@ -150,6 +150,70 @@ struct LAYBASIC_PUBLIC LayerDisplayProperties
 };
 
 /**
+ *  @brief Descriptor for a notification inside the layout view
+ *
+ *  Notifications are popups added at the top of the view to indicate need for reloading for example.
+ *  Notifications have a name, a title, optional actions (id, title) and a parameter (e.g. file path to reload).
+ *  Actions are mapped to QPushButtons.
+ */
+class LAYBASIC_PUBLIC LayoutViewNotification
+{
+public:
+  LayoutViewNotification (const std::string &name, const std::string &title, const tl::Variant &parameter = tl::Variant ())
+    : m_name (name), m_title (title), m_parameter (parameter)
+  {
+    //  .. nothing yet ..
+  }
+
+  void add_action (const std::string &name, const std::string &title)
+  {
+    m_actions.push_back (std::make_pair (name, title));
+  }
+
+  const std::vector<std::pair<std::string, std::string> > &actions () const
+  {
+    return m_actions;
+  }
+
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  const std::string &title () const
+  {
+    return m_title;
+  }
+
+  const tl::Variant &parameter () const
+  {
+    return m_parameter;
+  }
+
+  bool operator<(const LayoutViewNotification &other) const
+  {
+    if (m_name != other.name ()) {
+      return m_name < other.name ();
+    }
+    return m_parameter < other.parameter ();
+  }
+
+  bool operator==(const LayoutViewNotification &other) const
+  {
+    if (m_name != other.name ()) {
+      return false;
+    }
+    return m_parameter == other.parameter ();
+  }
+
+private:
+  std::string m_name;
+  std::string m_title;
+  tl::Variant m_parameter;
+  std::vector<std::pair<std::string, std::string> > m_actions;
+};
+
+/**
  *  @brief The layout view object
  *
  *  The layout view is responsible for displaying one or a set of layouts.
@@ -280,6 +344,14 @@ public:
   virtual void cut ();
 
   /**
+   *  @brief Adds a notification
+   */
+  virtual void add_notification (const LayoutViewNotification & /*notification*/)
+  {
+    //  the base implementation does nothing
+  }
+
+  /**
    *  @brief Gets the explicit title string of the view
    *
    *  This is the one explicitly set, not the one displayed. The displayed text is composed of internal information 
@@ -293,7 +365,7 @@ public:
   /**
    *  @brief Display a status message
    */
-  virtual void message (const std::string &s = "", int timeout = 10);
+  virtual void message (const std::string &s = "", int timeout = 10, int priority = 0);
 
   /**
    *  @brief Sets the keyboard focus to the view
@@ -1149,7 +1221,20 @@ public:
     return m_min_size_for_label;
   }
 
-  /** 
+  /**
+   *  @brief Empty cell dimension for the purpose of label generation setter
+   */
+  void empty_cell_dimension (double um);
+
+  /**
+   *  @brief Empty cell dimension for the purpose of label generation getter
+   */
+  int empty_cell_dimension () const
+  {
+    return m_empty_cell_dimension;
+  }
+
+  /**
    *  @brief Visibility of text objects
    */
   void text_visible (bool vis);
@@ -2941,6 +3026,7 @@ private:
   bool m_box_text_transform;
   unsigned int m_box_font;
   int m_min_size_for_label;
+  double m_empty_cell_dimension;
   bool m_cell_box_visible;
   bool m_ghost_cells_visible;
 

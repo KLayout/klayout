@@ -49,7 +49,7 @@ jobs:
       - uses: hmarr/debug-action@v3
       - name: Cancel Workflow Action
         uses: styfle/cancel-workflow-action@0.12.1
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: ccache
         if: matrix.os != 'ubuntu-24.04-arm'
         uses: hendrikmuhs/ccache-action@v1.2
@@ -66,7 +66,7 @@ jobs:
           mkdir -p $HOST_CCACHE_DIR
       - name: Build wheels (ARM)
         if: matrix.os == 'ubuntu-24.04-arm'
-        uses: pypa/cibuildwheel@v3.2.1
+        uses: pypa/cibuildwheel@v3.3.0
         env:
           # override the default CentOS “yum install … ccache” and drop ccache
           CIBW_BEFORE_ALL_LINUX: |
@@ -81,7 +81,7 @@ jobs:
 
       - name: Build wheels (all other platforms)
         if: matrix.os != 'ubuntu-24.04-arm'
-        uses: pypa/cibuildwheel@v3.2.1
+        uses: pypa/cibuildwheel@v3.3.0
         env:
           CIBW_BUILD: ${{ matrix.cibuild }}
           CIBW_ARCHS_MACOS: ${{ matrix.macos-arch }}
@@ -98,7 +98,7 @@ jobs:
           mv ./wheelhouse/.ccache $HOST_CCACHE_DIR
           ls -la $HOST_CCACHE_DIR
           ccache -s
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: artifact-${{ matrix.os }}-${{ matrix.cibw_arch }}-${{ strategy.job-index }}
           path: ./wheelhouse/*.whl
@@ -108,12 +108,12 @@ jobs:
     name: Make SDist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Build SDist
       run: pipx run build --sdist
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: artifact-sdist
         path: dist/*.tar.gz
@@ -122,7 +122,7 @@ jobs:
     needs: [build, make_sdist]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v5
+    - uses: actions/download-artifact@v6
       with:
         merge-multiple: true
         path: dist
@@ -139,7 +139,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
-    - uses: actions/download-artifact@v5
+    - uses: actions/download-artifact@v6
       with:
         merge-multiple: true
         path: dist

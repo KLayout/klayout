@@ -185,13 +185,13 @@ private:
   void draw_boxes_for_ghosts (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
   void draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
   void draw_boxes_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level, bool for_ghosts);
-  void draw_boxes_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_region, int level, bool for_ghosts);
+  void draw_boxes_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_region, int level, bool for_ghosts, Bitmap *opt_bitmap);
   void draw_box_properties_for_ghosts (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
   void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
   void draw_box_properties_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level, bool for_ghosts);
   void draw_box_properties_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level, db::properties_id_type prop_id, bool for_ghosts);
   void draw_box_properties_impl (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level, db::properties_id_type prop_id, bool for_ghosts);
-  void draw_cell (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, bool empty_cell, const std::string &txt);
+  void draw_cell (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, const db::Box &box_for_label, bool empty_cell, const std::string &txt, Bitmap *opt_bitmap);
   void draw_cell_properties (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, db::properties_id_type prop_id);
   void draw_cell_shapes (const db::CplxTrans &trans, const db::Cell &cell, const db::Box &vp, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text);
   void test_snapshot (const UpdateSnapshotCallback *update_snapshot);
@@ -216,6 +216,7 @@ private:
   int m_from_level, m_to_level;
   int m_from_level_default, m_to_level_default;
   int m_min_size_for_label;
+  double m_empty_cell_dimension;
   bool m_box_text_transform;
   unsigned int m_box_font;
   unsigned int m_text_font;

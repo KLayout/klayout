@@ -453,6 +453,14 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   LayoutView::set_active_cellview_index (source->active_cellview_index ());
 }
 
+void
+LayoutView::add_notification (const LayoutViewNotification &notification)
+{
+  if (mp_widget) {
+    mp_widget->add_notification (notification);
+  }
+}
+
 bool
 LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
 {
@@ -1577,10 +1585,10 @@ LayoutView::signal_selection_changed ()
 }
 
 void
-LayoutView::message (const std::string &s, int timeout)
+LayoutView::message (const std::string &s, int timeout, int priority)
 {
   if (mp_widget) {
-    mp_widget->emit_show_message (s, timeout * 1000);
+    mp_widget->emit_show_message (s, timeout * 1000, priority);
   }
 }
 

@@ -125,58 +125,76 @@ static void drag_cancel_impl (lay::EditorServiceBase *p)
 
 Class<lay::EditorServiceBase> decl_PluginBase ("lay", "PluginBase",
   gsi::method_ext ("tracking_position", &tracking_position_impl,
-    "@brief Gets the tracking position (base class implementation)"
+    "@brief Gets the tracking position (base class implementation)\n"
+    "See \\Plugin#tracking_position for details."
   ) +
   gsi::method_ext ("has_tracking_position", &has_tracking_position_impl,
-    "@brief Gets a value indicating whether the plugin provides a tracking position (base class implementation)"
+    "@brief Gets a value indicating whether the plugin provides a tracking position (base class implementation)\n"
+    "See \\Plugin#has_tracking_position for details."
   ) +
   gsi::method_ext ("menu_activated", &menu_activated_impl, gsi::arg ("symbol"),
-    "@brief Gets called when a custom menu item is selected (base class implementation)"
+    "@brief Gets called when a custom menu item is selected (base class implementation)\n"
+    "See \\Plugin#menu_activated for details."
   ) +
   gsi::method_ext ("configure", &configure_impl, gsi::arg ("name"), gsi::arg ("value"),
-    "@brief Sends configuration requests to the plugin (base class implementation)"
+    "@brief Sends configuration requests to the plugin (base class implementation)\n"
+    "See \\Plugin#configure for details."
   ) +
   gsi::method_ext ("config_finalize", &config_finalize_impl,
-    "@brief Sends the post-configuration request to the plugin (base class implementation)"
+    "@brief Sends the post-configuration request to the plugin (base class implementation)\n"
+    "See \\Plugin#config_finalize for details."
   ) +
   gsi::method_ext ("key_event", &key_event_impl, gsi::arg ("key"), gsi::arg ("buttons"),
-    "@brief Handles the key pressed event (base class implementation)"
+    "@brief Handles the key pressed event (base class implementation)\n"
+    "See \\Plugin#key_event for details."
   ) +
   gsi::method_ext ("mouse_button_pressed_event", &mouse_press_event_impl, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
-    "@brief Handles the mouse button pressed event (base class implementation)"
+    "@brief Handles the mouse button pressed event (base class implementation)\n"
+    "See \\Plugin#mouse_button_pressed_event for details."
   ) +
   gsi::method_ext ("mouse_click_event", &mouse_click_event_impl, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
-    "@brief Handles the mouse button click event after the button has been released (base class implementation)"
+    "@brief Handles the mouse button click event after the button has been released (base class implementation)\n"
+    "See \\Plugin#mouse_click_event for details."
   ) +
   gsi::method_ext ("mouse_double_click_event", &mouse_double_click_event_impl, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
-    "@brief Handles the mouse button double-click event (base class implementation)"
+    "@brief Handles the mouse button double-click event (base class implementation)\n"
+    "See \\Plugin#mouse_double_click_event for details."
   ) +
   gsi::method_ext ("leave_event", &leave_event_impl, gsi::arg ("prio"),
-    "@brief Handles the leave event (base class implementation)"
+    "@brief Handles the leave event (base class implementation)\n"
+    "See \\Plugin#leave_event for details."
   ) +
   gsi::method_ext ("enter_event", &enter_event_impl, gsi::arg ("prio"),
-    "@brief Handles the enter event (base class implementation)"
+    "@brief Handles the enter event (base class implementation)\n"
+    "See \\Plugin#enter_event for details."
   ) +
   gsi::method_ext ("mouse_moved_event", &mouse_move_event_impl, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
-    "@brief Handles the mouse move event (base class implementation)"
+    "@brief Handles the mouse move event (base class implementation)\n"
+    "See \\Plugin#mouse_moved_event for details."
   ) +
   gsi::method_ext ("mouse_button_released_event", &mouse_release_event_impl, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
-    "@brief Handles the mouse button release event (base class implementation)"
+    "@brief Handles the mouse button release event (base class implementation)\n"
+    "See \\Plugin#mouse_button_released_event for details."
   ) +
   gsi::method_ext ("wheel_event", &wheel_event_impl, gsi::arg ("delta"), gsi::arg ("horizontal"), gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
-    "@brief Handles the mouse wheel event (base class implementation)"
+    "@brief Handles the mouse wheel event (base class implementation)\n"
+    "See \\Plugin#wheel_event for details."
   ) +
   gsi::method_ext ("activated", &activated_impl,
-    "@brief Gets called when the plugin is activated (base class implementation)"
+    "@brief Gets called when the plugin is activated (base class implementation)\n"
+    "See \\Plugin#activated for details."
   ) +
   gsi::method_ext ("deactivated", &deactivated_impl,
-    "@brief Gets called when the plugin is deactivated and another plugin is activated (base class implementation)"
+    "@brief Gets called when the plugin is deactivated and another plugin is activated (base class implementation)\n"
+    "See \\Plugin#deactivated for details."
   ) +
   gsi::method_ext ("drag_cancel", &drag_cancel_impl,
-    "@brief This method is called when some mouse dragging operation should be cancelled (base class implementation)"
+    "@brief This method is called when some mouse dragging operation should be cancelled (base class implementation)\n"
+    "See \\Plugin#drag_cancel for details."
   ) +
   gsi::method_ext ("update", &update_impl,
-    "@brief Gets called when the view has changed (base class implementation)"
+    "@brief Gets called when the view has changed (base class implementation)\n"
+    "See \\Plugin#update for details."
   ),
   "@brief The plugin base class\n"
   "\n"
@@ -735,36 +753,44 @@ Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
   ) +
   callback ("mouse_click_event", &gsi::PluginImpl::mouse_click_event_noref, &gsi::PluginImpl::f_mouse_click_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button click event (after the button has been released)\n"
-    "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse button has been released without moving it.\n"
+    "The behaviour of this callback is the same than for \\mouse_button_pressed_event, except that it is called when the mouse button has been released without moving it.\n"
+    "A mouse click is not defined by duration, but by releasing a button without moving the mouse after the button was pressed. "
+    "As a consequence, a \\mouse_button_pressed_event is always issued at the beginning, but it is not followed by a \\mouse_button_released_event.\n"
+    "Instead, the 'mouse_click_event' is issued.\n"
+    "\n"
+    "Starting with version 0.30.6, the button mask reflects the keyboard modifiers at the moment the mouse was released. Before, the keyboard modifiers were "
+    "captured at the moment when the mouse was pressed."
   ) +
   callback ("mouse_double_click_event", &gsi::PluginImpl::mouse_double_click_event_noref, &gsi::PluginImpl::f_mouse_double_click_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button double-click event\n"
-    "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse button has been double-clicked.\n"
+    "The behaviour of this callback is the same than for \\mouse_button_pressed_event, except that it is called when the mouse button has been double-clicked.\n"
   ) +
   callback ("leave_event", &gsi::PluginImpl::leave_event, &gsi::PluginImpl::f_leave_event, gsi::arg ("prio"),
     "@brief Handles the leave event (mouse leaves canvas area of view)\n"
-    "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse leaves the canvas area.\n"
+    "The behaviour of this callback is the same than for \\mouse_button_pressed_event, except that it is called when the mouse leaves the canvas area.\n"
     "This method does not have a position nor button flags.\n"
   ) +
   callback ("enter_event", &gsi::PluginImpl::enter_event, &gsi::PluginImpl::f_enter_event, gsi::arg ("prio"),
     "@brief Handles the enter event (mouse enters canvas area of view)\n"
-    "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse enters the canvas area.\n"
+    "The behaviour of this callback is the same than for \\mouse_button_pressed_event, except that it is called when the mouse enters the canvas area.\n"
     "This method does not have a position nor button flags.\n"
   ) +
   callback ("mouse_moved_event", &gsi::PluginImpl::mouse_move_event_noref, &gsi::PluginImpl::f_mouse_move_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse move event\n"
-    "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse is moved in the canvas area.\n"
+    "The behaviour of this callback is the same than for \\mouse_button_pressed_event, except that it is called when the mouse is moved in the canvas area.\n"
     "\n"
     "The mouse move event is important for a number of background jobs, such as coordinate display in the status bar.\n"
     "Hence, you should not consume the event - i.e. you should return 'false' from this method.\n"
   ) +
   callback ("mouse_button_released_event", &gsi::PluginImpl::mouse_release_event_noref, &gsi::PluginImpl::f_mouse_release_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button release event\n"
-    "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse button is released.\n"
+    "The behaviour of this callback is the same than for \\mouse_button_pressed_event, except that it is called when the mouse button is released.\n"
+    "Starting with version 0.30.6, the button mask reflects the keyboard modifiers at the moment the mouse was released. Before, the keyboard modifiers were "
+    "captured at the moment when the mouse was pressed."
   ) +
   callback ("wheel_event", &gsi::PluginImpl::wheel_event_noref, &gsi::PluginImpl::f_wheel_event, gsi::arg ("delta"), gsi::arg ("horizontal"), gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse wheel event\n"
-    "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse wheel is rotated.\n"
+    "The behaviour of this callback is the same than for \\mouse_button_pressed_event, except that it is called when the mouse wheel is rotated.\n"
     "Additional parameters for this event are 'delta' (the rotation angle in units of 1/8th degree) and 'horizontal' which is true when the horizontal wheel was rotated and "
     "false if the vertical wheel was rotated.\n"
   ) +

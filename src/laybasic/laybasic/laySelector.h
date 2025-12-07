@@ -91,7 +91,6 @@ private:
   lay::LayoutViewBase *mp_view;
   lay::RubberBox *mp_box;
   unsigned int m_color;
-  unsigned int m_buttons;
   bool m_hover;
   bool m_hover_wait;
   db::DPoint m_hover_point;

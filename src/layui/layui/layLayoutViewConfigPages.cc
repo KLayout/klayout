@@ -227,6 +227,10 @@ LayoutViewConfigPage2a::setup (lay::Dispatcher *root)
   root->config_get (cfg_min_inst_label_size, n);
   mp_ui->cell_min_size_for_label_edit->setText (tl::to_qstring (tl::to_string (n)));
 
+  double ecd = 0;
+  root->config_get (cfg_empty_cell_dimension, ecd);
+  mp_ui->empty_cell_dimension->setText (tl::to_qstring (tl::to_string (ecd)));
+
   bool gs_visible = true;
   root->config_get (cfg_guiding_shape_visible, gs_visible);
   mp_ui->pcell_gs_group->setChecked (gs_visible);
@@ -262,6 +266,12 @@ LayoutViewConfigPage2a::commit (lay::Dispatcher *root)
     int n;
     tl::from_string_ext (tl::to_string (mp_ui->cell_min_size_for_label_edit->text ()), n);
     root->config_set (cfg_min_inst_label_size, n);
+  } catch (...) { }
+
+  try {
+    double ecd;
+    tl::from_string_ext (tl::to_string (mp_ui->empty_cell_dimension->text ()), ecd);
+    root->config_set (cfg_empty_cell_dimension, ecd);
   } catch (...) { }
 }
 

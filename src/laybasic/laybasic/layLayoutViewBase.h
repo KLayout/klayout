@@ -1149,7 +1149,20 @@ public:
     return m_min_size_for_label;
   }
 
-  /** 
+  /**
+   *  @brief Empty cell dimension for the purpose of label generation setter
+   */
+  void empty_cell_dimension (double um);
+
+  /**
+   *  @brief Empty cell dimension for the purpose of label generation getter
+   */
+  int empty_cell_dimension () const
+  {
+    return m_empty_cell_dimension;
+  }
+
+  /**
    *  @brief Visibility of text objects
    */
   void text_visible (bool vis);
@@ -2941,6 +2954,7 @@ private:
   bool m_box_text_transform;
   unsigned int m_box_font;
   int m_min_size_for_label;
+  double m_empty_cell_dimension;
   bool m_cell_box_visible;
   bool m_ghost_cells_visible;
 

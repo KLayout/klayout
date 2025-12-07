@@ -55,6 +55,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_current_lib_view, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_hide_empty_layers, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_min_inst_label_size, "16"));
+    options.push_back (std::pair<std::string, std::string> (cfg_empty_cell_dimension, "4"));
     options.push_back (std::pair<std::string, std::string> (cfg_cell_box_text_font, "0"));
     options.push_back (std::pair<std::string, std::string> (cfg_cell_box_text_transform, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_cell_box_color, "auto"));

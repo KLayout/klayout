@@ -91,6 +91,7 @@ static const std::string cfg_crosshair_cursor_enabled ("crosshair-cursor-enabled
 static const std::string cfg_markers_visible ("markers-visible");
 
 static const std::string cfg_min_inst_label_size ("min-inst-label-size");
+static const std::string cfg_empty_cell_dimension ("empty-cell-dimension");
 static const std::string cfg_cell_box_text_font ("inst-label-font");
 static const std::string cfg_cell_box_text_transform ("inst-label-transform");
 static const std::string cfg_cell_box_color ("inst-color");

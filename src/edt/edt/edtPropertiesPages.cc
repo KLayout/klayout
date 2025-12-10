@@ -137,7 +137,7 @@ ShapePropertiesPage::icon (size_t entry, int w, int h) const
   for (auto lp = view->begin_layers (view->current_layer_list ()); ! lp.at_end (); ++lp) {
     const lay::LayerPropertiesNode *ln = lp.operator-> ();
     if (ln->cellview_index () == cv_index && ln->layer_index () == layer) {
-      return QIcon (QPixmap::fromImage (view->icon_for_layer (lp, w, h).to_image ()));
+      return QIcon (QPixmap::fromImage (view->icon_for_layer (lp, w, h).to_image_copy ()));
     }
   }
 

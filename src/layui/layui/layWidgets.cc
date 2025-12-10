@@ -721,7 +721,7 @@ LayerSelectionComboBox::do_update_layer_list ()
         if (lp->cellview_index () == mp_private->cv_index && ! lp->has_children () && (mp_private->all_layers || lp->layer_index () >= 0) && lp->source (true).layer_props () != db::LayerProperties ()) {
           std::pair <db::LayerProperties, int> k (lp->source (true).layer_props (), lp->layer_index ());
           name_for_layer.insert (std::make_pair (k, lp->display_string (mp_private->view, true, true /*always show source*/)));
-          QIcon icon = QIcon (QPixmap::fromImage (mp_private->view->icon_for_layer (lp, icon_width, icon_height, dpr, 0, true).to_image ()));
+          QIcon icon = QIcon (QPixmap::fromImage (mp_private->view->icon_for_layer (lp, icon_width, icon_height, dpr, 0, true).to_image_copy ()));
           icon_for_layer.insert (std::make_pair (k, icon));
           mp_private->layers.push_back (k);
         }

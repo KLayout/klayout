@@ -595,7 +595,7 @@ class RDB_TestClass < TestBase
     assert_equal(db.is_modified?, false)
 
     tag_id = db.tag_id("x")
-    assert_equal(tag_id, 1)
+    assert_equal(db.tag_name(tag_id), "x")
     db.set_tag_description(tag_id, "xdesc")
     assert_equal(db.tag_description(tag_id), "xdesc")
 

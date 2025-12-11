@@ -166,6 +166,8 @@ GerberImportData::setup_importer (db::GerberImporter *importer)
 
 struct MountingConverter
 {
+  typedef GerberImportData::mounting_type value_type;
+
   std::string to_string (GerberImportData::mounting_type m) const
   {
     return m == GerberImportData::MountingTop ? "top" : "bottom";
@@ -190,9 +192,9 @@ pcb_project_structure ("pcb-project",
   tl::make_member (&GerberImportData::border, "border") +
   tl::make_member (&GerberImportData::free_layer_mapping, "free-layer-mapping") +
   tl::make_element (&GerberImportData::layout_layers, "layout-layers",
-    tl::make_member<db::LayerProperties, std::vector<db::LayerProperties>::const_iterator, std::vector<db::LayerProperties> > (&std::vector<db::LayerProperties>::begin, &std::vector<db::LayerProperties>::end, &std::vector<db::LayerProperties>::push_back, "layout-layer", db::LayoutLayerConverter ())
+    tl::make_member<db::LayerProperties, std::vector<db::LayerProperties>::const_iterator, std::vector<db::LayerProperties> > (&std::vector<db::LayerProperties>::begin, &std::vector<db::LayerProperties>::end, &std::vector<db::LayerProperties>::push_back, "layout-layer", tl::XMLStringBasedConverter<db::LayoutLayerConverter> ())
   ) +
-  tl::make_member (&GerberImportData::mounting, "mounting", MountingConverter ()) +
+  tl::make_member (&GerberImportData::mounting, "mounting", tl::XMLStringBasedConverter<MountingConverter> ()) +
   tl::make_member (&GerberImportData::num_metal_layers, "num-metal-layers") +
   tl::make_member (&GerberImportData::num_via_types, "num-via-types") +
   tl::make_element (&GerberImportData::artwork_files, "artwork-files",
@@ -217,11 +219,11 @@ pcb_project_structure ("pcb-project",
   ) +
   tl::make_element (&GerberImportData::reference_points, "reference-points",
     tl::make_element<std::pair <db::DPoint, db::DPoint>, std::vector<std::pair <db::DPoint, db::DPoint> >::const_iterator, std::vector<std::pair <db::DPoint, db::DPoint> > > (&std::vector<std::pair <db::DPoint, db::DPoint> >::begin, &std::vector<std::pair <db::DPoint, db::DPoint> >::end, &std::vector<std::pair <db::DPoint, db::DPoint> >::push_back, "reference-point",
-      tl::make_member (&std::pair <db::DPoint, db::DPoint>::first, "pcb", db::PointConverter<db::DPoint> ()) +
-      tl::make_member (&std::pair <db::DPoint, db::DPoint>::second, "layout", db::PointConverter<db::DPoint> ())
+      tl::make_member (&std::pair <db::DPoint, db::DPoint>::first, "pcb", tl::XMLStringBasedConverter<db::PointConverter<db::DPoint> > ()) +
+      tl::make_member (&std::pair <db::DPoint, db::DPoint>::second, "layout", tl::XMLStringBasedConverter<db::PointConverter<db::DPoint> > ())
     )
   ) +
-  tl::make_member (&GerberImportData::explicit_trans, "explicit-trans", db::TransformationConverter<db::DCplxTrans> ()) +
+  tl::make_member (&GerberImportData::explicit_trans, "explicit-trans", tl::XMLStringBasedConverter<db::TransformationConverter<db::DCplxTrans> > ()) +
   tl::make_member (&GerberImportData::layer_properties_file, "layer-properties-file") +
   tl::make_member (&GerberImportData::num_circle_points, "num-circle-points") +
   tl::make_member (&GerberImportData::merge_flag, "merge-flag") +

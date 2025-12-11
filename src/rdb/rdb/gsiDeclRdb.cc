@@ -1733,10 +1733,12 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "The reader recognizes the format automatically and will choose the appropriate decoder. 'gzip' compressed files are uncompressed "
     "automatically.\n"
   ) + 
-  gsi::method ("save", &rdb::Database::save, gsi::arg ("filename"),
+  gsi::method ("save", &rdb::Database::save, gsi::arg ("filename"), gsi::arg ("binary", false),
     "@brief Saves the database to the given file\n"
     "@param filename The file to which to save the database\n"
-    "The database is always saved in KLayout's XML-based format.\n"
+    "The database is saved in KLayout's XML-based format if 'binary' is false or a ProtocolBuffer-based binary format if 'binary' is true.\n"
+    "\n"
+    "The 'binary' argument has been added in version 0.29.7."
   ),
   "@brief The report database object\n"
   "A report database is organized around a set of items which are associated with cells and categories. "

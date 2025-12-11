@@ -49,6 +49,8 @@ static struct {
 
 struct ModeConverter
 {
+  typedef lay::StreamImportData::mode_type value_type;
+
   std::string to_string (lay::StreamImportData::mode_type t) const
   {
     for (unsigned int i = 0; i < sizeof (mode_strings) / sizeof (mode_strings [0]); ++i) {
@@ -82,6 +84,8 @@ static struct {
 
 struct LayerModeConverter
 {
+  typedef lay::StreamImportData::layer_mode_type value_type;
+
   std::string to_string (lay::StreamImportData::layer_mode_type t) const
   {
     for (unsigned int i = 0; i < sizeof (layer_mode_strings) / sizeof (layer_mode_strings [0]); ++i) {
@@ -144,8 +148,8 @@ static tl::XMLElementList xml_elements ()
     ) +
     tl::make_member (&StreamImportData::topcell, "cell-name") +
     tl::make_member (&StreamImportData::layer_offset, "layer-offset") +
-    tl::make_member (&StreamImportData::layer_mode, "layer-mode", LayerModeConverter ()) +
-    tl::make_member (&StreamImportData::mode, "import-mode", ModeConverter ()) +
+    tl::make_member (&StreamImportData::layer_mode, "layer-mode", tl::XMLStringBasedConverter<LayerModeConverter> ()) +
+    tl::make_member (&StreamImportData::mode, "import-mode", tl::XMLStringBasedConverter<ModeConverter> ()) +
     tl::make_element (&StreamImportData::reference_points, "reference-points",
       tl::make_element<ref_point, ref_point_v::const_iterator, ref_point_v> (&ref_point_v::begin, &ref_point_v::end, &ref_point_v::push_back, "reference-point",
         tl::make_member (&ref_point::first, "p1") +

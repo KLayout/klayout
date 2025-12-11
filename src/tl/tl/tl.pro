@@ -29,6 +29,7 @@ SOURCES = \
     tlObject.cc \
     tlProgress.cc \
     tlPixelBuffer.cc \
+    tlProtocolBuffer.cc \
     tlResources.cc \
     tlScriptError.cc \
     tlSleep.cc \
@@ -43,6 +44,7 @@ SOURCES = \
     tlUnitTest.cc \
     tlInt128Support.cc \
     tlXMLParser.cc \
+    tlXMLReader.cc \
     tlXMLWriter.cc \
     tlThreadedWorkers.cc \
     tlThreads.cc \
@@ -86,6 +88,7 @@ HEADERS = \
     tlObjectCollection.h \
     tlProgress.h \
     tlPixelBuffer.h \
+    tlProtocolBuffer.h \
     tlResources.h \
     tlReuseVector.h \
     tlScriptError.h \
@@ -110,6 +113,7 @@ HEADERS = \
     tlInt128Support.h \
     tlDefs.h \
     tlXMLParser.h \
+    tlXMLReader.h \
     tlXMLWriter.h \
     tlThreadedWorkers.h \
     tlThreads.h \

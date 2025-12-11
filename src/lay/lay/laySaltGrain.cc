@@ -353,6 +353,8 @@ SaltGrain::valid_version (const std::string &v)
 
 struct TimeConverter
 {
+  typedef QDateTime value_type;
+
   std::string to_string (const QDateTime &time) const
   {
     if (time.isNull ()) {
@@ -374,6 +376,8 @@ struct TimeConverter
 
 struct ImageConverter
 {
+  typedef QImage value_type;
+
   std::string to_string (const QImage &image) const
   {
     if (image.isNull ()) {
@@ -416,10 +420,10 @@ SaltGrain::xml_elements ()
       tl::make_member (&SaltGrain::license, &SaltGrain::set_license, "license") +
       tl::make_member (&SaltGrain::author, &SaltGrain::set_author, "author") +
       tl::make_member (&SaltGrain::author_contact, &SaltGrain::set_author_contact, "author-contact") +
-      tl::make_member (&SaltGrain::authored_time, &SaltGrain::set_authored_time, "authored-time", TimeConverter ()) +
-      tl::make_member (&SaltGrain::installed_time, &SaltGrain::set_installed_time, "installed-time", TimeConverter ()) +
-      tl::make_member (&SaltGrain::icon, &SaltGrain::set_icon, "icon", ImageConverter ()) +
-      tl::make_member (&SaltGrain::screenshot, &SaltGrain::set_screenshot, "screenshot", ImageConverter ()) +
+      tl::make_member (&SaltGrain::authored_time, &SaltGrain::set_authored_time, "authored-time", tl::XMLStringBasedConverter<TimeConverter> ()) +
+      tl::make_member (&SaltGrain::installed_time, &SaltGrain::set_installed_time, "installed-time", tl::XMLStringBasedConverter<TimeConverter> ()) +
+      tl::make_member (&SaltGrain::icon, &SaltGrain::set_icon, "icon",  tl::XMLStringBasedConverter<ImageConverter> ()) +
+      tl::make_member (&SaltGrain::screenshot, &SaltGrain::set_screenshot, "screenshot", tl::XMLStringBasedConverter<ImageConverter> ()) +
       tl::make_element (&SaltGrain::begin_dependencies, &SaltGrain::end_dependencies, &SaltGrain::add_dependency, "depends",
         tl::make_member (&SaltGrainDependency::name, "name") +
         tl::make_member (&SaltGrainDependency::url, "url") +

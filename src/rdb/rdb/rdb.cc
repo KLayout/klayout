@@ -278,7 +278,7 @@ template <> RDB_PUBLIC bool Value<db::DText>::is_shape () const
 }
 
 
-bool ValueBase::compare (const ValueBase *a, const ValueBase *b) 
+bool ValueBase::compare (const ValueBase *a, const ValueBase *b)
 {
   //  compare is the intrinsic compare of equal type and type index for different types.
   if (a->type_index () == b->type_index ()) {
@@ -416,19 +416,19 @@ ValueBase::create_from_shape (const db::Shape &shape, const db::CplxTrans &trans
 // ------------------------------------------------------------------------------------------
 //  ValueWrapper implementation
 
-std::string 
-ValueWrapper::to_string (const Database *rdb) const
+std::string
+ValueWrapper::to_string () const
 {
   std::string r;
   r.reserve (200);
 
-  if (tag_id () > 0 && rdb) {
+  if (tag_id () > 0) {
     r += "[";
-    const Tag &tag = rdb->tags ().tag (tag_id ());
-    if (tag.is_user_tag ()) {
+    auto np = rdb::Tags::name_for_id (tag_id ());
+    if (np.second) {
       r += "#";
     }
-    r += tl::to_word_or_quoted_string (tag.name ());
+    r += tl::to_word_or_quoted_string (np.first);
     r += "] ";
   }
 
@@ -437,15 +437,15 @@ ValueWrapper::to_string (const Database *rdb) const
   return r;
 }
 
-void 
-ValueWrapper::from_string (Database *rdb, const std::string &s)
+void
+ValueWrapper::from_string (const std::string &s)
 {
   tl::Extractor ex (s.c_str ());
-  from_string (rdb, ex);
+  from_string (ex);
 }
 
-void 
-ValueWrapper::from_string (Database *rdb, tl::Extractor &ex)
+void
+ValueWrapper::from_string (tl::Extractor &ex)
 {
   id_type tag_id = 0;
 
@@ -453,10 +453,10 @@ ValueWrapper::from_string (Database *rdb, tl::Extractor &ex)
 
     bool user_tag = ex.test ("#");
 
-    std::string tn;  
+    std::string tn;
     ex.read_word_or_quoted (tn);
 
-    tag_id = rdb->tags ().tag (tn, user_tag).id ();
+    tag_id = rdb::Tags::id_for_name (tn, user_tag);
 
     ex.test ("]");
 
@@ -477,16 +477,16 @@ Values::operator= (const Values &d)
 }
 
 bool
-Values::compare (const Values &other, const std::map<id_type, id_type> &tag_map, const std::map<id_type, id_type> &rev_tag_map) const
+Values::compare (const Values &other, const std::set<id_type> &common_tags) const
 {
   Values::const_iterator a = begin (), b = other.begin ();
   while (a != end () && b != other.end ()) {
 
-    id_type t12 = 0;
+    id_type t1 = 0;
     while (a != end () && a->tag_id () != 0) {
-      auto j = tag_map.find (a->tag_id ());
-      if (j != tag_map.end ()) {
-        t12 = j->second;
+      auto j = common_tags.find (a->tag_id ());
+      if (j != common_tags.end ()) {
+        t1 = a->tag_id ();
         break;
       }
       ++a;
@@ -494,9 +494,9 @@ Values::compare (const Values &other, const std::map<id_type, id_type> &tag_map,
 
     id_type t2 = 0;
     while (b != other.end () && b->tag_id () != 0) {
-      auto j = rev_tag_map.find (b->tag_id ());
-      if (j != rev_tag_map.end ()) {
-        t2 = j->first;
+      auto j = common_tags.find (b->tag_id ());
+      if (j != common_tags.end ()) {
+        t2 = b->tag_id ();
         break;
       }
       ++b;
@@ -506,8 +506,8 @@ Values::compare (const Values &other, const std::map<id_type, id_type> &tag_map,
       return b != other.end ();
     }
 
-    if (t12 != t2) {
-      return t12 < t2;
+    if (t1 != t2) {
+      return t1 < t2;
     }
 
     if (a->get () && b->get ()) {
@@ -528,8 +528,8 @@ Values::compare (const Values &other, const std::map<id_type, id_type> &tag_map,
   return b != other.end ();
 }
 
-std::string 
-Values::to_string (const Database *rdb) const
+std::string
+Values::to_string () const
 {
   std::string r;
   r.reserve (200);
@@ -540,22 +540,22 @@ Values::to_string (const Database *rdb) const
       r += ";";
     }
 
-    r += v->to_string (rdb);
+    r += v->to_string ();
 
   }
 
   return r;
 }
 
-void 
-Values::from_string (Database *rdb, const std::string &s) 
+void
+Values::from_string (const std::string &s)
 {
   tl::Extractor ex (s.c_str ());
 
   while (! ex.at_end ()) {
 
     ValueWrapper v;
-    v.from_string (rdb, ex);
+    v.from_string (ex);
 
     add (v);
 
@@ -567,7 +567,7 @@ Values::from_string (Database *rdb, const std::string &s)
 // ------------------------------------------------------------------------------------------
 //  Cell implementation
 
-void 
+void
 Cells::import_cell (const Cell &c)
 {
   Cell *cell;
@@ -582,7 +582,7 @@ Cells::import_cell (const Cell &c)
     cell->references ().insert (*r);
   }
 }
-  
+
 // ------------------------------------------------------------------------------------------
 //  Cell implementation
 
@@ -615,7 +615,7 @@ Cell::~Cell ()
   //  .. nothing yet ..
 }
 
-std::pair<bool, db::DCplxTrans> 
+std::pair<bool, db::DCplxTrans>
 Cell::path_to (id_type parent_cell_id, const Database *db) const
 {
   if (parent_cell_id == id ()) {
@@ -626,7 +626,7 @@ Cell::path_to (id_type parent_cell_id, const Database *db) const
   }
 }
 
-std::pair<bool, db::DCplxTrans> 
+std::pair<bool, db::DCplxTrans>
 Cell::path_to (id_type parent_cell_id, const Database *db, std::set <id_type> &visited, const db::DCplxTrans &trans) const
 {
   for (reference_iterator r = references ().begin (); r != references ().end (); ++r) {
@@ -654,15 +654,15 @@ Cell::path_to (id_type parent_cell_id, const Database *db, std::set <id_type> &v
   return std::pair<bool, db::DCplxTrans> (false, db::DCplxTrans ());
 }
 
-void 
+void
 Cell::import_references (const References &references)
 {
   for (References::const_iterator r = references.begin (); r != references.end (); ++r) {
     m_references.insert (*r);
   }
 }
-  
-std::string 
+
+std::string
 Cell::qname () const
 {
   if (m_variant.empty ()) {
@@ -687,7 +687,7 @@ References::References (Cell *cell)
   //  .. nothing yet ..
 }
 
-void 
+void
 References::set_database (Database *database)
 {
   mp_database = database;
@@ -705,20 +705,20 @@ Reference::Reference (References *references)
   //  .. nothing yet ..
 }
 
-void 
+void
 Reference::set_trans_str (const std::string &s)
 {
   tl::Extractor ex (s.c_str ());
   ex.read (m_trans);
 }
 
-std::string 
+std::string
 Reference::trans_str () const
 {
   return m_trans.to_string ();
 }
 
-void 
+void
 Reference::set_parent_cell_qname (const std::string &qname)
 {
   tl_assert (mp_database != 0);
@@ -729,7 +729,7 @@ Reference::set_parent_cell_qname (const std::string &qname)
   m_parent_cell_id = cell->id ();
 }
 
-std::string 
+std::string
 Reference::parent_cell_qname () const
 {
   tl_assert (mp_database != 0);
@@ -787,7 +787,7 @@ Category::sub_categories ()
   return *mp_sub_categories;
 }
 
-std::string 
+std::string
 Category::path () const
 {
   std::vector <std::string> path_elements;
@@ -810,7 +810,7 @@ Category::path () const
   return r;
 }
 
-void 
+void
 Category::import_sub_categories (Categories *categories)
 {
   if (mp_sub_categories) {
@@ -826,7 +826,7 @@ Category::import_sub_categories (Categories *categories)
   }
 }
 
-void 
+void
 Category::set_database (Database *database)
 {
   mp_database = database;
@@ -838,14 +838,14 @@ Category::set_database (Database *database)
 // ------------------------------------------------------------------------------------------
 //  Categories implementation
 
-void 
+void
 Categories::clear ()
 {
   m_categories.clear ();
   m_categories_by_name.clear ();
 }
 
-void 
+void
 Categories::add_category (Category *cat)
 {
   cat->set_database (mp_database.get ());
@@ -853,7 +853,7 @@ Categories::add_category (Category *cat)
   m_categories_by_name.insert (std::make_pair (cat->name (), cat));
 }
 
-void  
+void
 Categories::set_database (Database *database)
 {
   mp_database = database;
@@ -863,7 +863,7 @@ Categories::set_database (Database *database)
 }
 
 Category *
-Categories::category_by_name (const char *path) 
+Categories::category_by_name (const char *path)
 {
   std::string component;
   tl::Extractor ex (path);
@@ -912,16 +912,69 @@ Categories::import_category (Category *category)
 // ------------------------------------------------------------------------------------------
 //  Tags implementation
 
+static tl::Mutex s_tag_namespace_mutex;
+static std::map<std::pair<std::string, bool>, id_type> s_tag_namespace;
+static std::vector<std::pair<std::string, bool> > s_tags;
+
+const std::pair<std::string, bool> &
+Tags::name_for_id (id_type tag_id)
+{
+  tl::MutexLocker locker (&s_tag_namespace_mutex);
+  tl_assert (tag_id > 0 && tag_id <= s_tags.size ());
+  return s_tags [tag_id - 1];
+}
+
+id_type
+Tags::id_for_name (const std::string &name, bool user_flag)
+{
+  tl::MutexLocker locker (&s_tag_namespace_mutex);
+
+  auto k = std::make_pair (name, user_flag);
+  auto t = s_tag_namespace.find (k);
+  if (t != s_tag_namespace.end ()) {
+    return t->second;
+  }
+
+  id_type id = s_tags.size () + 1;
+  s_tag_namespace [k] = id;
+  s_tags.push_back (k);
+  return id;
+}
+
+Tag
+Tags::tag_for_name (const std::string &name, bool user_flag)
+{
+  return Tag (id_for_name (name, user_flag), name, user_flag);
+}
+
 Tags::Tags ()
 {
   //  .. nothing yet ..
 }
 
-void 
+void
 Tags::clear ()
 {
-  m_ids_for_names.clear ();
+  m_tags_per_id.clear ();
   m_tags.clear ();
+}
+
+void
+Tags::remove_tag (id_type id)
+{
+  auto j = m_tags_per_id.find (id);
+  if (j != m_tags_per_id.end ()) {
+
+    m_tags.erase (m_tags.begin () + j->second);
+
+    for (auto i = m_tags_per_id.begin (); i != m_tags_per_id.end (); ++i) {
+      if (i->second > j->second) {
+        i->second -= 1;
+      }
+    }
+    m_tags_per_id.erase (id);
+
+  }
 }
 
 const Tag &
@@ -933,26 +986,31 @@ Tags::tag (const std::string &name, bool user_tag) const
 Tag &
 Tags::tag (const std::string &name, bool user_tag)
 {
-  std::map <std::pair<std::string, bool>, id_type>::const_iterator i = m_ids_for_names.find (std::make_pair (name, user_tag));
-  if (i == m_ids_for_names.end ()) {
-    i = m_ids_for_names.insert (std::make_pair (std::make_pair (name, user_tag), m_tags.size () + 1)).first;
-    m_tags.push_back (Tag (i->second, name, user_tag));
+  id_type id = id_for_name (name, user_tag);
+  auto i = m_tags_per_id.find (id);
+  if (i == m_tags_per_id.end ()) {
+    m_tags.push_back (Tag (id, name, user_tag));
+    m_tags_per_id [id] = m_tags.size () - 1;
+    return m_tags.back ();
+  } else {
+    return m_tags [i->second];
   }
-  return m_tags [i->second - 1];
 }
 
 const Tag &
 Tags::tag (id_type id) const
 {
-  tl_assert (id < m_tags.size () + 1 && id > 0);
-  return m_tags [id - 1];
+  auto i = m_tags_per_id.find (id);
+  tl_assert (i != m_tags_per_id.end ());
+  return m_tags [i->second];
 }
 
 Tag &
 Tags::tag (id_type id)
 {
-  tl_assert (id < m_tags.size () + 1 && id > 0);
-  return m_tags [id - 1];
+  auto i = m_tags_per_id.find (id);
+  tl_assert (i != m_tags_per_id.end ());
+  return m_tags [i->second];
 }
 
 void
@@ -962,10 +1020,10 @@ Tags::import_tag (const Tag &t)
   tt.set_description (t.description ());
 }
 
-bool 
+bool
 Tags::has_tag (const std::string &name, bool user_tag) const
 {
-  return m_ids_for_names.find (std::make_pair (name, user_tag)) != m_ids_for_names.end ();
+  return m_tags_per_id.find (id_for_name (name, user_tag)) != m_tags_per_id.end ();
 }
 
 // ------------------------------------------------------------------------------------------
@@ -1010,36 +1068,31 @@ Item &Item::operator= (const Item &d)
   return *this;
 }
 
-void 
+void
 Item::add_tag (id_type tag_id)
 {
-  if (m_tag_ids.size () <= tag_id) {
-    m_tag_ids.resize (tag_id + 1, false);
-  }
-  m_tag_ids [tag_id] = true;
+  m_tag_ids.insert (tag_id);
 }
 
-void 
+void
 Item::remove_tag (id_type tag_id)
 {
-  if (m_tag_ids.size () > tag_id) {
-    m_tag_ids [tag_id] = false;
-  }
+  m_tag_ids.erase (tag_id);
 }
 
-void 
+void
 Item::remove_tags ()
 {
-  m_tag_ids = std::vector <bool> ();
+  m_tag_ids.clear ();
 }
 
-bool 
+bool
 Item::has_tag (id_type tag_id) const
 {
-  return m_tag_ids.size () > tag_id && m_tag_ids [tag_id];
+  return m_tag_ids.find (tag_id) != m_tag_ids.end ();
 }
 
-std::string 
+std::string
 Item::cell_qname () const
 {
   tl_assert (mp_database != 0);
@@ -1048,7 +1101,7 @@ Item::cell_qname () const
   return cell->qname ();
 }
 
-void 
+void
 Item::set_cell_qname (const std::string &qname)
 {
   tl_assert (mp_database != 0);
@@ -1068,7 +1121,7 @@ Item::category_name () const
   return category->path ();
 }
 
-void 
+void
 Item::set_category_name (const std::string &path)
 {
   tl_assert (mp_database != 0);
@@ -1079,7 +1132,7 @@ Item::set_category_name (const std::string &path)
   m_category_id = category->id ();
 }
 
-std::string 
+std::string
 Item::tag_str () const
 {
   tl_assert (mp_database != 0);
@@ -1089,13 +1142,12 @@ Item::tag_str () const
 
   if (! m_tag_ids.empty ()) {
 
-    id_type tag_id = 0;
-    for (std::vector<bool>::const_iterator t = m_tag_ids.begin (); t != m_tag_ids.end (); ++t, ++tag_id) {
+    for (std::set<id_type>::const_iterator t = m_tag_ids.begin (); t != m_tag_ids.end (); ++t) {
       if (*t) {
         if (! r.empty ()) {
           r += ",";
         }
-        const Tag &tag = mp_database->tags ().tag (tag_id);
+        const Tag &tag = mp_database->tags ().tag (*t);
         if (tag.is_user_tag ()) {
           r += "#";
         }
@@ -1108,7 +1160,7 @@ Item::tag_str () const
   return r;
 }
 
-void 
+void
 Item::set_tag_str (const std::string &tags)
 {
   tl_assert (mp_database != 0);
@@ -1126,7 +1178,7 @@ Item::set_tag_str (const std::string &tags)
 }
 
 #if defined(HAVE_QT)
-void 
+void
 Item::set_image (const QImage &image)
 {
   if (image.isNull ()) {
@@ -1314,7 +1366,7 @@ Database::import_tags (const Tags &tags)
   }
 }
 
-void 
+void
 Database::import_categories (Categories *categories)
 {
   set_modified ();
@@ -1325,7 +1377,7 @@ Database::import_categories (Categories *categories)
   mp_categories->set_database (this);
 }
 
-void 
+void
 Database::import_cells (const Cells &cells)
 {
   set_modified ();
@@ -1377,13 +1429,13 @@ Database::create_category (Categories *container, const std::string &name)
 }
 
 Category *
-Database::category_by_name_non_const (const std::string &name) 
+Database::category_by_name_non_const (const std::string &name)
 {
   return mp_categories->category_by_name (name.c_str ());
 }
 
 Category *
-Database::category_by_id_non_const (id_type id) 
+Database::category_by_id_non_const (id_type id)
 {
   std::map <id_type, Category *>::const_iterator c = m_categories_by_id.find (id);
   if (c != m_categories_by_id.end ()) {
@@ -1438,7 +1490,7 @@ Database::create_cell (const std::string &name, const std::string &variant, cons
     } else {
 
       new_cell = new Cell (++m_next_id, name, std::string (), layout_name);
-      
+
     }
 
     m_cells.add_cell (new_cell);
@@ -1446,7 +1498,7 @@ Database::create_cell (const std::string &name, const std::string &variant, cons
     m_cells_by_qname.insert (std::make_pair (new_cell->qname (), new_cell));
 
   } else {
-      
+
     new_cell = new Cell (++m_next_id, name, variant, layout_name);
     m_cells.add_cell (new_cell);
     m_cells_by_id.insert (std::make_pair (new_cell->id (), new_cell));
@@ -1474,7 +1526,7 @@ Database::create_cell (const std::string &name, const std::string &variant, cons
       }
 
       other_cell->set_variant (tl::to_string (variant_index + 1));
-      
+
       m_cells_by_qname.insert (std::make_pair (other_cell->qname (), other_cell));
 
     }
@@ -1520,21 +1572,21 @@ Database::cell_by_id_non_const (id_type id)
   }
 }
 
-void 
+void
 Database::set_tag_description (id_type tag_id, const std::string &description)
 {
   set_modified ();
   tags_non_const ().tag (tag_id).set_description (description);
 }
 
-void  
+void
 Database::add_item_tag (const Item *item, id_type tag)
 {
   set_modified ();
   const_cast <Item *> (item)->add_tag (tag);
 }
 
-void  
+void
 Database::remove_item_tag (const Item *item, id_type tag)
 {
   set_modified ();
@@ -1549,7 +1601,7 @@ Database::set_item_comment (const Item *item, const std::string &comment)
 }
 
 #if defined(HAVE_QT)
-void 
+void
 Database::set_item_image (const Item *item, const QImage &image)
 {
   set_modified ();
@@ -1564,14 +1616,14 @@ Database::set_item_image_str (const Item *item, const std::string &image_str)
   const_cast <Item *> (item)->set_image_str (image_str);
 }
 
-void 
+void
 Database::set_item_multiplicity (const Item *item, size_t n)
 {
   set_modified ();
   const_cast <Item *> (item)->set_multiplicity (n);
 }
 
-void 
+void
 Database::set_item_visited (const Item *item_c, bool visited)
 {
   if (visited != item_c->visited ()) {
@@ -1632,7 +1684,7 @@ Database::create_item (id_type cell_id, id_type category_id)
 
 static std::list<ItemRef> empty_list;
 
-std::pair<Database::const_item_ref_iterator, Database::const_item_ref_iterator> 
+std::pair<Database::const_item_ref_iterator, Database::const_item_ref_iterator>
 Database::items_by_cell_and_category (id_type cell_id, id_type category_id) const
 {
   std::map <std::pair <id_type, id_type>, std::list<ItemRef> >::const_iterator i = m_items_by_cell_and_category_id.find (std::make_pair (cell_id, category_id));
@@ -1709,7 +1761,7 @@ Database::num_items (id_type cell_id, id_type category_id) const
   }
 }
 
-size_t 
+size_t
 Database::num_items_visited (id_type cell_id, id_type category_id) const
 {
   std::map <std::pair <id_type, id_type>, size_t>::const_iterator n = m_num_items_visited_by_cell_and_category.find (std::make_pair (cell_id, category_id));
@@ -1727,6 +1779,7 @@ Database::clear ()
 
   m_generator = "";
   m_filename = "";
+  m_binary = false;
   m_description = "";
   m_name = "";
   m_topcell = "";
@@ -1779,6 +1832,7 @@ Database::load (std::string fn)
   tl::log << "Loading RDB from " << fn;
 
   clear ();
+  set_binary (false);
 
   tl::InputStream stream (fn);
 
@@ -1813,33 +1867,30 @@ namespace
   class ValueMapEntryCompare
   {
   public:
-    ValueMapEntryCompare (const std::map<id_type, id_type> &tag2tag, const std::map<id_type, id_type> &rev_tag2tag)
+    ValueMapEntryCompare (const std::set<id_type> &common_tags)
     {
-      mp_tag2tag = &tag2tag;
-      mp_rev_tag2tag = &rev_tag2tag;
+      mp_common_tags = &common_tags;
     }
 
     bool operator() (const Item *a, const Item *b) const
     {
-      return a->values ().compare (b->values (), *mp_tag2tag, *mp_rev_tag2tag);
+      return a->values ().compare (b->values (), *mp_common_tags);
     }
 
   private:
-    const std::map<id_type, id_type> *mp_tag2tag;
-    const std::map<id_type, id_type> *mp_rev_tag2tag;
+    const std::set<id_type> *mp_common_tags;
   };
 
   class ValueMapEntry
   {
   public:
     ValueMapEntry ()
-      : mp_tag2tag (0), mp_rev_tag2tag (0)
+      : mp_common_tags (0)
     { }
 
-    void build (const rdb::Database &rdb, id_type cell_id, id_type cat_id, const std::map<id_type, id_type> &tag2tag, const std::map<id_type, id_type> &rev_tag2tag)
+    void build (const rdb::Database &rdb, id_type cell_id, id_type cat_id, const std::set<id_type> &common_tags)
     {
-      mp_tag2tag = &tag2tag;
-      mp_rev_tag2tag = &rev_tag2tag;
+      mp_common_tags = &common_tags;
 
       auto i2i = rdb.items_by_cell_and_category (cell_id, cat_id);
 
@@ -1853,13 +1904,13 @@ namespace
         m_items.push_back ((*i).operator-> ());
       }
 
-      ValueMapEntryCompare cmp (*mp_tag2tag, *mp_rev_tag2tag);
+      ValueMapEntryCompare cmp (*mp_common_tags);
       std::sort (m_items.begin (), m_items.end (), cmp);
     }
 
     const Item *find (const rdb::Item &item) const
     {
-      ValueMapEntryCompare cmp (*mp_tag2tag, *mp_rev_tag2tag);
+      ValueMapEntryCompare cmp (*mp_common_tags);
 
       auto i = std::lower_bound (m_items.begin (), m_items.end (), &item, cmp);
       if (i == m_items.end ()) {
@@ -1875,8 +1926,7 @@ namespace
 
   public:
     std::vector<const Item *> m_items;
-    const std::map<id_type, id_type> *mp_tag2tag;
-    const std::map<id_type, id_type> *mp_rev_tag2tag;
+    const std::set<id_type> *mp_common_tags;
   };
 }
 
@@ -1897,8 +1947,6 @@ Database::apply (const rdb::Database &other)
 {
   std::map<id_type, id_type> cell2cell;
   std::map<id_type, id_type> cat2cat;
-  std::map<id_type, id_type> tag2tag;
-  std::map<id_type, id_type> rev_tag2tag;
 
   for (auto c = other.cells ().begin (); c != other.cells ().end (); ++c) {
     //  TODO: do we have a consistent scheme of naming variants? What requirements
@@ -1913,16 +1961,15 @@ Database::apply (const rdb::Database &other)
     map_category (*c, *this, cat2cat);
   }
 
-  std::map<std::string, id_type> tags_by_name;
+  std::set<id_type> t1;
   for (auto c = tags ().begin_tags (); c != tags ().end_tags (); ++c) {
-    tags_by_name.insert (std::make_pair (c->name (), c->id ()));
+    t1.insert (c->id ());
   }
 
+  std::set<id_type> common_tags;
   for (auto c = other.tags ().begin_tags (); c != other.tags ().end_tags (); ++c) {
-    auto t = tags_by_name.find (c->name ());
-    if (t != tags_by_name.end ()) {
-      tag2tag.insert (std::make_pair (t->second, c->id ()));
-      rev_tag2tag.insert (std::make_pair (c->id (), t->second));
+    if (t1.find (c->id ()) != t1.end ()) {
+      common_tags.insert (c->id ());
     }
   }
 
@@ -1944,7 +1991,7 @@ Database::apply (const rdb::Database &other)
     auto vmap = value_map.find (std::make_pair (icell->second, icat->second));
     if (vmap == value_map.end ()) {
       vmap = value_map.insert (std::make_pair (std::make_pair (icell->second, icat->second), ValueMapEntry ())).first;
-      vmap->second.build (other, icell->second, icat->second, tag2tag, rev_tag2tag);
+      vmap->second.build (other, icell->second, icat->second, common_tags);
     }
 
     //  find a value in the reference DB

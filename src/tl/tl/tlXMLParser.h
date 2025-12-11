@@ -29,6 +29,8 @@
 #include <list>
 #include <vector>
 
+#include "tlXMLReader.h"
+#include "tlProtocolBuffer.h"
 #include "tlAssert.h"
 #include "tlInternational.h"
 #include "tlString.h"
@@ -40,339 +42,12 @@ namespace tl
 {
 
 /**
- *  @brief A basic XML parser error exception class
+ *  NOTE: This XML parser package also supports a ProtocolBuffer flavor.
+ *  This allows binding the same scheme to efficient binary PB format.
  */
 
-class TL_PUBLIC XMLException : public tl::Exception
-{
-public: 
-  XMLException (const char *msg)
-    : Exception (tl::to_string (tr ("XML parser error: %s")).c_str ()),
-      m_msg (msg)
-  {
-    //  .. nothing yet ..
-  }
-
-  XMLException (const std::string &msg)
-    : Exception (fmt (-1, -1).c_str (), msg.c_str ()),
-      m_msg (msg)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Raw (unprefixed) message of the XML parser
-   */
-  const std::string &
-  raw_msg () const
-  {
-    return m_msg;
-  }
-
-protected:
-  XMLException (const std::string &msg, int line, int column)
-    : Exception (fmt (line, column).c_str (), msg.c_str (), line, column),
-      m_msg (msg)
-  {
-    //  .. nothing yet ..
-  }
-
-private:
-  std::string m_msg;
-
-  static std::string fmt (int line, int /*column*/)
-  {
-    if (line < 0) {
-      return tl::to_string (tr ("XML parser error: %s")).c_str ();
-    } else {
-      return tl::to_string (tr ("XML parser error: %s in line %d, column %d")).c_str ();
-    }
-  }
-};
- 
-/**
- *  @brief A XML parser error exception class that additionally provides line and column information
- */
-
-class TL_PUBLIC XMLLocatedException : public XMLException
-{
-public: 
-  XMLLocatedException (const std::string &msg, int line, int column)
-    : XMLException (msg, line, column),
-      m_line (line), m_column (column)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Line number information of the exception
-   */
-  int line () const
-  {
-    return m_line;
-  }
-
-  /**
-   *  @brief Column number information of the exception
-   */
-  int column () const
-  {
-    return m_column;
-  }
-
-private:
-  int m_line;
-  int m_column;
-};
- 
-/**
- *  @brief An object wrapper base class for target object management
- *
- *  Implementations of this class through the XMLReaderProxy templates
- *  manage pointers to certain objects.
- */
-
-class TL_PUBLIC XMLReaderProxyBase
-{
-public:
-  XMLReaderProxyBase () { }
-  virtual ~XMLReaderProxyBase () { }
-  virtual void release () = 0;
-  virtual void detach () = 0;
-};
-
-/**
- *  @brief An object wrapper base class for target object management specialized to a certain class
- */
-
-template <class Obj>
-class TL_PUBLIC_TEMPLATE XMLReaderProxy
-  : public XMLReaderProxyBase
-{
-public:
-  XMLReaderProxy (Obj *obj, bool owns_obj) 
-    : mp_obj (obj), m_owns_obj (owns_obj) 
-  { }
-
-  virtual ~XMLReaderProxy () { }
-
-  virtual void release () 
-  {
-    if (m_owns_obj && mp_obj) {
-      delete mp_obj;
-    }
-    mp_obj = 0;
-  }
-
-  virtual void detach ()
-  {
-    m_owns_obj = false;
-  }
-
-  Obj *ptr () const 
-  {
-    return mp_obj;
-  }
-
-private:
-  Obj *mp_obj;
-  bool m_owns_obj;
-};
-
-/**
- *  @brief Helper class: A class tag
- */
-
-template <class Obj>
-struct XMLObjTag
-{
-  XMLObjTag() { }
-  typedef Obj obj;
-};
-
-/**
- *  @brief Helper class: The reader state
- * 
- *  The reader state mainly comprises of a stack of objects being parsed and
- *  a string in which to collect cdata.
- */
-
-class TL_PUBLIC XMLReaderState 
-{
-public:
-  /**
-   *  @brief Default constructor
-   */
-  XMLReaderState ();
-
-  /**
-   *  @brief Destructor
-   */
-  ~XMLReaderState ();
-
-  /**
-   *  @brief Push a new object on the stack
-   */
-  template <class Obj>
-  void push (XMLObjTag<Obj> /*tag*/)
-  {
-    m_objects.push_back (new XMLReaderProxy<Obj> (new Obj (), true));
-  }
-
-  /**
-   *  @brief Push an existing object on the stack
-   */
-  template <class Obj>
-  void push (Obj *obj)
-  {
-    m_objects.push_back (new XMLReaderProxy<Obj> (obj, false));
-  }
-
-  /**
-   *  @brief Push an existing object on the stack with the ownership flag
-   */
-  template <class Obj>
-  void push (Obj *obj, bool owner)
-  {
-    m_objects.push_back (new XMLReaderProxy<Obj> (obj, owner));
-  }
-
-  /**
-   *  @brief Get the top object
-   */
-  template <class Obj>
-  Obj *back (XMLObjTag<Obj> /*tag*/) 
-  {
-    tl_assert (! m_objects.empty ());
-    return (dynamic_cast <XMLReaderProxy<Obj> &> (*m_objects.back ())).ptr ();
-  }
-
-  /**
-   *  @brief Get the top object and release
-   */
-  template <class Obj>
-  Obj *detach_back (XMLObjTag<Obj> /*tag*/) 
-  {
-    tl_assert (! m_objects.empty ());
-    m_objects.back ()->detach ();
-    return (dynamic_cast <XMLReaderProxy<Obj> &> (*m_objects.back ())).ptr ();
-  }
-
-  /**
-   *  @brief Pop an object from the stack
-   */
-  template <class Obj>
-  void pop (XMLObjTag<Obj> /*tag*/) 
-  {
-    tl_assert (! m_objects.empty ());
-    m_objects.back ()->release ();
-    delete m_objects.back ();
-    m_objects.pop_back ();
-  }
-
-  /**
-   *  @brief Empty predicate: true, if no more object is on the stack
-   */
-  bool empty () const
-  {
-    return m_objects.empty ();
-  }
-
-  /**
-   *  @brief Obtain the parent object from the stack
-   */
-  template <class Obj>
-  Obj *parent (XMLObjTag<Obj> /*tag*/) 
-  {
-    tl_assert (m_objects.size () > 1);
-    return (dynamic_cast <XMLReaderProxy<Obj> &> (*m_objects.end () [-2])).ptr ();
-  }
-
-  /**
-   *  @brief The cdata string collected
-   */
-  std::string cdata;
-
-private:
-  std::vector <XMLReaderProxyBase *> m_objects;
-};
-
-//  The opaque source type
-class XMLSourcePrivateData;
-
-/**
- *  @brief A generic XML text source class
- *
- *  This class is the base class providing input for 
- *  the Qt XML parser and basically maps to a QXmlInputSource object
- *  for compatibility with the "libparsifal" branch.
- */
-
-class TL_PUBLIC XMLSource 
-{
-public:
-  XMLSource ();
-  ~XMLSource ();
-
-  XMLSourcePrivateData *source ()
-  {
-    return mp_source;
-  }
-
-  void reset ();
-
-protected:
-  void set_source (XMLSourcePrivateData *source)
-  {
-    mp_source = source;
-  }
-
-private:
-  XMLSourcePrivateData *mp_source;
-};
-
-/**
- *  @brief A specialization of XMLSource to receive a string
- */
-
-class TL_PUBLIC XMLStringSource : public XMLSource
-{
-public:
-  XMLStringSource (const std::string &string);
-  XMLStringSource (const char *cp);
-  XMLStringSource (const char *cp, size_t len);
-  ~XMLStringSource ();
-
-private:
-  std::string m_copy;
-};
-
-/**
- *  @brief A specialization of XMLSource to receive from a file
- */
-
-class TL_PUBLIC XMLFileSource : public XMLSource
-{
-public:
-  XMLFileSource (const std::string &path);
-  XMLFileSource (const std::string &path, const std::string &progress_message);
-  ~XMLFileSource ();
-};
-
-/**
- *  @brief A generic stream source class
- *
- *  This class implements a XML parser source from a tl::InputStream
- */
-
-class TL_PUBLIC XMLStreamSource : public XMLSource
-{
-public:
-  XMLStreamSource (tl::InputStream &stream);
-  XMLStreamSource (tl::InputStream &stream, const std::string &progress_message);
-  ~XMLStreamSource ();
-};
-
+class XMLReaderState;
+class XMLReaderState;
 
 // -----------------------------------------------------------------
 //  The C++ structure definition interface (for use cases see tlXMLParser.ut)
@@ -385,6 +60,18 @@ struct pass_by_value_tag {
 
 struct pass_by_ref_tag { 
   pass_by_ref_tag () { } 
+};
+
+struct zero_cardinality_tag {
+  zero_cardinality_tag () { }
+};
+
+struct single_cardinality_tag {
+  single_cardinality_tag () { }
+};
+
+struct many_cardinality_tag {
+  many_cardinality_tag () { }
 };
 
 /**
@@ -483,66 +170,208 @@ public:
   typedef std::list <XMLElementProxy> children_list;
   typedef children_list::const_iterator iterator;
 
-  XMLElementList ()
+  XMLElementList ();
+  XMLElementList (const XMLElementBase &e);
+  XMLElementList (XMLElementBase *e);
+  XMLElementList (const std::string &name, const XMLElementList &d);
+  XMLElementList (const XMLElementList &d);
+  XMLElementList (const XMLElementList &d, const XMLElementBase &e);
+  XMLElementList (const XMLElementList &d, XMLElementBase *e);
+
+  void append (const XMLElementBase &e);
+  void append (XMLElementBase *e);
+
+  iterator begin () const;
+  iterator end () const;
+
+  static XMLElementList empty ();
+
+  size_t oid () const
   {
-    //  .. nothing yet ..
+    return m_oid;
   }
 
-  XMLElementList (const XMLElementBase &e)
+  const std::string &name () const
   {
-    m_elements.push_back (XMLElementProxy (e));
-  }
-
-  XMLElementList (XMLElementBase *e)
-  {
-    if (e) {
-      m_elements.push_back (XMLElementProxy (e));
-    }
-  }
-
-  XMLElementList (const XMLElementList &d, const XMLElementBase &e)
-    : m_elements (d.m_elements)
-  {
-    m_elements.push_back (XMLElementProxy (e));
-  }
-
-  XMLElementList (const XMLElementList &d, XMLElementBase *e)
-    : m_elements (d.m_elements)
-  {
-    if (e) {
-      m_elements.push_back (XMLElementProxy (e));
-    }
-  }
-
-  void append (const XMLElementBase &e)
-  {
-    m_elements.push_back (XMLElementProxy (e));
-  }
-
-  void append (XMLElementBase *e)
-  {
-    if (e) {
-      m_elements.push_back (XMLElementProxy (e));
-    }
-  }
-
-  iterator begin () const
-  {
-    return m_elements.begin ();
-  }
-
-  iterator end () const
-  {
-    return m_elements.end ();
-  }
-
-  static XMLElementList empty () 
-  {
-    return XMLElementList ();
+    return m_name;
   }
 
 private:
   std::list <XMLElementProxy> m_elements; 
+  size_t m_oid;
+  std::string m_name;
+};
+
+/**
+ *  @brief An object wrapper base class for target object management
+ *
+ *  Implementations of this class through the XMLReaderProxy templates
+ *  manage pointers to certain objects.
+ */
+
+class TL_PUBLIC XMLReaderProxyBase
+{
+public:
+  XMLReaderProxyBase () { }
+  virtual ~XMLReaderProxyBase () { }
+  virtual void release () = 0;
+  virtual void detach () = 0;
+};
+
+/**
+ *  @brief An object wrapper base class for target object management specialized to a certain class
+ */
+
+template <class Obj>
+class TL_PUBLIC_TEMPLATE XMLReaderProxy
+  : public XMLReaderProxyBase
+{
+public:
+  XMLReaderProxy (Obj *obj, bool owns_obj)
+    : mp_obj (obj), m_owns_obj (owns_obj)
+  { }
+
+  virtual ~XMLReaderProxy () { }
+
+  virtual void release ()
+  {
+    if (m_owns_obj && mp_obj) {
+      delete mp_obj;
+    }
+    mp_obj = 0;
+  }
+
+  virtual void detach ()
+  {
+    m_owns_obj = false;
+  }
+
+  Obj *ptr () const
+  {
+    return mp_obj;
+  }
+
+private:
+  Obj *mp_obj;
+  bool m_owns_obj;
+};
+
+/**
+ *  @brief Helper class: A class tag
+ */
+
+template <class Obj>
+struct XMLObjTag
+{
+  XMLObjTag() { }
+  typedef Obj obj;
+};
+
+/**
+ *  @brief Helper class: The reader state
+ *
+ *  The reader state mainly comprises of a stack of objects being parsed and
+ *  a string in which to collect cdata.
+ */
+
+class TL_PUBLIC XMLReaderState
+{
+public:
+  /**
+   *  @brief Default constructor
+   */
+  XMLReaderState ();
+
+  /**
+   *  @brief Destructor
+   */
+  ~XMLReaderState ();
+
+  /**
+   *  @brief Push a new object on the stack
+   */
+  template <class Obj>
+  void push (XMLObjTag<Obj> /*tag*/)
+  {
+    m_objects.push_back (new XMLReaderProxy<Obj> (new Obj (), true));
+  }
+
+  /**
+   *  @brief Push an existing object on the stack
+   */
+  template <class Obj>
+  void push (Obj *obj)
+  {
+    m_objects.push_back (new XMLReaderProxy<Obj> (obj, false));
+  }
+
+  /**
+   *  @brief Push an existing object on the stack with the ownership flag
+   */
+  template <class Obj>
+  void push (Obj *obj, bool owner)
+  {
+    m_objects.push_back (new XMLReaderProxy<Obj> (obj, owner));
+  }
+
+  /**
+   *  @brief Get the top object
+   */
+  template <class Obj>
+  Obj *back (XMLObjTag<Obj> /*tag*/)
+  {
+    tl_assert (! m_objects.empty ());
+    return (dynamic_cast <XMLReaderProxy<Obj> &> (*m_objects.back ())).ptr ();
+  }
+
+  /**
+   *  @brief Get the top object and release
+   */
+  template <class Obj>
+  Obj *detach_back (XMLObjTag<Obj> /*tag*/)
+  {
+    tl_assert (! m_objects.empty ());
+    m_objects.back ()->detach ();
+    return (dynamic_cast <XMLReaderProxy<Obj> &> (*m_objects.back ())).ptr ();
+  }
+
+  /**
+   *  @brief Pop an object from the stack
+   */
+  template <class Obj>
+  void pop (XMLObjTag<Obj> /*tag*/)
+  {
+    tl_assert (! m_objects.empty ());
+    m_objects.back ()->release ();
+    delete m_objects.back ();
+    m_objects.pop_back ();
+  }
+
+  /**
+   *  @brief Empty predicate: true, if no more object is on the stack
+   */
+  bool empty () const
+  {
+    return m_objects.empty ();
+  }
+
+  /**
+   *  @brief Obtain the parent object from the stack
+   */
+  template <class Obj>
+  Obj *parent (XMLObjTag<Obj> /*tag*/)
+  {
+    tl_assert (m_objects.size () > 1);
+    return (dynamic_cast <XMLReaderProxy<Obj> &> (*m_objects.end () [-2])).ptr ();
+  }
+
+  /**
+   *  @brief The cdata string collected
+   */
+  std::string cdata;
+
+private:
+  std::vector <XMLReaderProxyBase *> m_objects;
 };
 
 /**
@@ -593,6 +422,78 @@ private:
 };
 
 /**
+ *  @brief The PB parser class
+ *  This is the main entry point. It will take a PB reader, the structure (in "root") and
+ *  a reader state initialized with the top level object.
+ */
+class TL_PUBLIC PBParser
+{
+public:
+  PBParser ();
+  ~PBParser ();
+
+  void parse (tl::ProtocolBufferReaderBase &reader, const XMLElementBase *root, XMLReaderState *reader_state);
+  void parse_element (const XMLElementBase *parent, tl::ProtocolBufferReaderBase &reader);
+
+  void expect_header (tl::ProtocolBufferReaderBase &reader, int name_tag, const std::string &name);
+
+  XMLReaderState &reader_state ()
+  {
+    return *mp_state;
+  }
+
+private:
+  XMLReaderState *mp_state;
+};
+
+/**
+ *  @brief Helper class: A stack of const objects being written (PB binding)
+ */
+
+class TL_PUBLIC PBWriterState
+{
+public:
+  /**
+   *  @brief Default constructor
+   */
+  PBWriterState ();
+
+  /**
+   *  @brief Push a new object on the stack
+   */
+  template <class Obj>
+  void push (const Obj *obj)
+  {
+    m_objects.push_back (obj);
+  }
+
+  /**
+   *  @brief Pop an object from the stack
+   */
+  template <class Obj>
+  const Obj *pop (XMLObjTag<Obj> /*tag*/)
+  {
+    tl_assert (! m_objects.empty ());
+    const Obj *obj = reinterpret_cast <const Obj *> (m_objects.back ());
+    m_objects.pop_back ();
+    return obj;
+  }
+
+  /**
+   *  @brief Obtain the parent object from the stack
+   */
+  template <class Obj>
+  const Obj *back (XMLObjTag<Obj> /*tag*/)
+  {
+    tl_assert (m_objects.size () > 0);
+    return reinterpret_cast <const Obj *> (m_objects.end () [-1]);
+  }
+
+private:
+  std::vector <const void *> m_objects;
+};
+
+/**
  *  @brief The XML element base object
  *
  *  This class is the base class for objects implementing
@@ -606,35 +507,14 @@ class TL_PUBLIC XMLElementBase
 public:
   typedef XMLElementList::iterator iterator;
 
-  XMLElementBase (const std::string &name, const XMLElementList &children)
-    : m_name (name), mp_children (new XMLElementList (children)), m_owns_child_list (true)
-  {
-    // .. nothing yet ..
-  }
+  enum Cardinality {
+    Zero, Single, Many
+  };
 
-  XMLElementBase (const std::string &name, const XMLElementList *children)
-    : m_name (name), mp_children (children), m_owns_child_list (false)
-  {
-    // .. nothing yet ..
-  }
-
-  XMLElementBase (const XMLElementBase &d)
-    : m_name (d.m_name), m_owns_child_list (d.m_owns_child_list)
-  {
-    if (m_owns_child_list) {
-      mp_children = new XMLElementList (*d.mp_children);
-    } else {
-      mp_children = d.mp_children;
-    }
-  }
-
-  virtual ~XMLElementBase ()
-  {
-    if (m_owns_child_list) {
-      delete const_cast <XMLElementList *> (mp_children);
-      mp_children = 0;
-    }
-  }
+  XMLElementBase (const std::string &name, const XMLElementList &children);
+  XMLElementBase (const std::string &name, const XMLElementList *children);
+  XMLElementBase (const XMLElementBase &d);
+  virtual ~XMLElementBase ();
 
   virtual XMLElementBase *clone () const = 0;
 
@@ -648,34 +528,233 @@ public:
   static void write_indent (tl::OutputStream &os, int indent);
   static void write_string (tl::OutputStream &os, const std::string &s);
 
+  virtual void pb_create (const XMLElementBase *parent, XMLReaderState &objs) const = 0;
+  virtual void pb_parse (PBParser *, tl::ProtocolBufferReaderBase &) const = 0;
+  virtual void pb_finish (const XMLElementBase *parent, XMLReaderState &objs) const = 0;
+
+  virtual void pb_write (const XMLElementBase *, tl::ProtocolBufferWriterBase &, PBWriterState &) const { }
+
+  virtual Cardinality cardinality () const;
+
+  size_t oid () const
+  {
+    return mp_children->oid ();
+  }
+
+  int tag () const
+  {
+    return m_tag;
+  }
+
   const std::string &name () const
   {
     return m_name;
   }
 
-  bool check_name (const std::string & /*uri*/, const std::string &lname, const std::string & /*qname*/) const
+  bool check_name (const std::string & /*uri*/, const std::string &lname, const std::string & /*qname*/) const;
+
+  /**
+   *  @brief Returns a name suitable for code
+   *  Specifically, hyphens are replaced by underscores.
+   */
+  std::string name4code () const;
+
+  iterator begin () const;
+  iterator end () const;
+
+  std::string create_def (std::map<size_t, std::pair <const XMLElementBase *, std::string> > &messages) const;
+
+protected:
+  virtual void collect_messages (std::map<size_t, std::pair <const XMLElementBase *, std::string> > &messages) const;
+  virtual std::string create_def_entry (std::map<size_t, std::pair <const XMLElementBase *, std::string> > &messages) const = 0;
+
+  std::string make_message_name () const;
+
+  static Cardinality get_cardinality (tl::zero_cardinality_tag)
   {
-    if (m_name == "*") {
-      return true;
-    } else {
-      return m_name == lname; // no namespace currently
-    }
+    return Zero;
   }
 
-  iterator begin () const
+  static Cardinality get_cardinality (tl::single_cardinality_tag)
   {
-    return mp_children->begin ();
+    return Single;
   }
 
-  iterator end () const
+  static Cardinality get_cardinality (tl::many_cardinality_tag)
   {
-    return mp_children->end ();
+    return Many;
   }
 
 private:
   std::string m_name;
+  int m_tag;
   const XMLElementList *mp_children;
   bool m_owns_child_list;
+};
+
+/**
+ *  @brief Basic implementation for XMLElement and XMLElementWithParentRef
+ */
+
+template <class Obj, class Parent, class Read, class Write>
+class TL_PUBLIC_TEMPLATE XMLElementImplBase
+  : public XMLElementBase
+{
+public:
+  XMLElementImplBase (const Read &r, const Write &w, const std::string &name, const XMLElementList &children)
+    : XMLElementBase (name, children), m_r (r), m_w (w)
+  {
+    // .. nothing yet ..
+  }
+
+  XMLElementImplBase (const Read &r, const Write &w, const std::string &name, const XMLElementList *children)
+    : XMLElementBase (name, children), m_r (r), m_w (w)
+  {
+    // .. nothing yet ..
+  }
+
+  XMLElementImplBase (const XMLElementImplBase<Obj, Parent, Read, Write> &d)
+    : XMLElementBase (d), m_r (d.m_r), m_w (d.m_w)
+  {
+    // .. nothing yet ..
+  }
+
+  virtual void cdata (const std::string & /*cdata*/, XMLReaderState & /*objs*/) const
+  {
+    // .. nothing yet ..
+  }
+
+  virtual void write (const XMLElementBase * /*parent*/, tl::OutputStream &os, int indent, XMLWriterState &objs) const
+  {
+    XMLObjTag<Parent> parent_tag;
+    Read r (m_r);
+    r.start (*objs.back (parent_tag));
+    while (! r.at_end ()) {
+      XMLElementBase::write_indent (os, indent);
+      os << "<" << this->name () << ">\n";
+      typedef typename Read::tag read_tag_type;
+      read_tag_type read_tag;
+      write_obj (r (), os, indent, read_tag, objs);
+      XMLElementBase::write_indent (os, indent);
+      os << "</" << this->name () << ">\n";
+      r.next ();
+    }
+  }
+
+  virtual bool has_any (XMLWriterState &objs) const
+  {
+    XMLObjTag<Parent> parent_tag;
+    Read r (m_r);
+    r.start (*objs.back (parent_tag));
+    return (! r.at_end ());
+  }
+
+  virtual void pb_parse (PBParser *parser, tl::ProtocolBufferReaderBase &reader) const
+  {
+    reader.open ();
+    parser->parse_element (this, reader);
+    reader.close ();
+  }
+
+  virtual void pb_write (const XMLElementBase * /*parent*/, tl::ProtocolBufferWriterBase &writer, PBWriterState &objs) const
+  {
+    XMLObjTag<Parent> parent_tag;
+
+    Read r (m_r);
+    r.start (*objs.back (parent_tag));
+    while (! r.at_end ()) {
+      typedef typename Read::tag read_tag_type;
+      pb_write_obj (r (), tag (), writer, read_tag_type (), objs);
+      r.next ();
+    }
+  }
+
+  virtual Cardinality cardinality () const
+  {
+    typedef typename Read::cardinality cardinality_type;
+    return get_cardinality (cardinality_type ());
+  }
+
+  virtual void collect_messages (std::map<size_t, std::pair <const XMLElementBase *, std::string> > &messages) const
+  {
+    if (messages.find (oid ()) == messages.end ()) {
+      messages [oid ()] = std::make_pair (this, make_message_name ());
+      XMLElementBase::collect_messages (messages);
+    }
+  }
+
+  virtual std::string create_def_entry (std::map<size_t, std::pair <const XMLElementBase *, std::string> > &messages) const
+  {
+    auto m = messages.find (oid ());
+    if (m != messages.end ()) {
+      return m->second.second + " " + name4code () + " = " + tl::to_string (tag ()) + ";";
+    } else {
+      return std::string ();
+    }
+  }
+
+protected:
+  Read m_r;
+  Write m_w;
+
+private:
+  //  this write helper is used if the reader delivers an object by value
+  void write_obj (Obj obj, tl::OutputStream &os, int indent, tl::pass_by_value_tag, XMLWriterState &objs) const
+  {
+    XMLObjTag<Obj> tag;
+    objs.push (&obj);
+    for (XMLElementBase::iterator c = this->begin (); c != this->end (); ++c) {
+      c->get ()->write (this, os, indent + 1, objs);
+    }
+    objs.pop (tag);
+  }
+
+  void write_obj (const Obj &obj, tl::OutputStream &os, int indent, tl::pass_by_ref_tag, XMLWriterState &objs) const
+  {
+    XMLObjTag<Obj> tag;
+    objs.push (&obj);
+    for (XMLElementBase::iterator c = this->begin (); c != this->end (); ++c) {
+      c->get ()->write (this, os, indent + 1, objs);
+    }
+    objs.pop (tag);
+  }
+
+  //  this write helper is used if the reader delivers an object by value
+  void pb_write_obj (Obj obj, int tag, tl::ProtocolBufferWriterBase &writer, tl::pass_by_value_tag, PBWriterState &objs) const
+  {
+    XMLObjTag<Obj> self_tag;
+
+    for (unsigned int pass = 0; pass < 2; ++pass) {
+      writer.begin_seq (tag, pass == 0);
+      objs.push (&obj);
+      for (XMLElementBase::iterator c = this->begin (); c != this->end (); ++c) {
+        c->get ()->pb_write (this, writer, objs);
+      }
+      objs.pop (self_tag);
+      writer.end_seq ();
+      if (! writer.is_counting ()) {
+        break;
+      }
+    }
+  }
+
+  void pb_write_obj (const Obj &obj, int tag, tl::ProtocolBufferWriterBase &writer, tl::pass_by_ref_tag, PBWriterState &objs) const
+  {
+    XMLObjTag<Obj> self_tag;
+
+    for (unsigned int pass = 0; pass < 2; ++pass) {
+      writer.begin_seq (tag, pass == 0);
+      objs.push (&obj);
+      for (XMLElementBase::iterator c = this->begin (); c != this->end (); ++c) {
+        c->get ()->pb_write (this, writer, objs);
+      }
+      objs.pop (self_tag);
+      writer.end_seq ();
+      if (writer.is_counting ()) {
+        break;
+      }
+    }
+  }
 };
 
 /**
@@ -697,23 +776,23 @@ private:
 
 template <class Obj, class Parent, class Read, class Write>
 class TL_PUBLIC_TEMPLATE XMLElement
-  : public XMLElementBase
+  : public XMLElementImplBase<Obj, Parent, Read, Write>
 {
 public:
   XMLElement (const Read &r, const Write &w, const std::string &name, const XMLElementList &children)
-    : XMLElementBase (name, children), m_r (r), m_w (w)
+    : XMLElementImplBase<Obj, Parent, Read, Write> (r, w, name, children)
   {
     // .. nothing yet ..
   }
 
   XMLElement (const Read &r, const Write &w, const std::string &name, const XMLElementList *children)
-    : XMLElementBase (name, children), m_r (r), m_w (w)
+    : XMLElementImplBase<Obj, Parent, Read, Write> (r, w, name, children)
   {
     // .. nothing yet ..
   }
 
   XMLElement (const XMLElement<Obj, Parent, Read, Write> &d)
-    : XMLElementBase (d), m_r (d.m_r), m_w (d.m_w)
+    : XMLElementImplBase<Obj, Parent, Read, Write> (d)
   {
     // .. nothing yet ..
   }
@@ -729,66 +808,25 @@ public:
     objs.push (tag);
   }
 
-  virtual void cdata (const std::string & /*cdata*/, XMLReaderState & /*objs*/) const
-  {
-    // .. nothing yet ..
-  }
-
   virtual void finish (const XMLElementBase * /*parent*/, XMLReaderState &objs, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
   {
     XMLObjTag<Obj> tag;
     XMLObjTag<Parent> parent_tag;
-    m_w (*objs.parent (parent_tag), objs);
+    this->m_w (*objs.parent (parent_tag), objs);
     objs.pop (tag);
   }
 
-  virtual void write (const XMLElementBase * /*parent*/, tl::OutputStream &os, int indent, XMLWriterState &objs) const
-  {
-    XMLObjTag<Parent> parent_tag;
-    Read r (m_r);
-    r.start (*objs.back (parent_tag));
-    while (! r.at_end ()) {
-      XMLElementBase::write_indent (os, indent);
-      os << "<" << this->name () << ">\n";
-      typedef typename Read::tag read_tag_type;
-      read_tag_type read_tag;
-      write_obj (r (), os, indent, read_tag, objs);
-      XMLElementBase::write_indent (os, indent);
-      os << "</" << this->name () << ">\n";
-      r.next ();
-    }
-  }
-
-  virtual bool has_any (XMLWriterState &objs) const 
-  {
-    XMLObjTag<Parent> parent_tag;
-    Read r (m_r);
-    r.start (*objs.back (parent_tag));
-    return (! r.at_end ());
-  }
-
-private:
-  Read m_r;
-  Write m_w;
-
-  //  this write helper is used if the reader delivers an object by value
-  void write_obj (Obj obj, tl::OutputStream &os, int indent, tl::pass_by_value_tag, XMLWriterState &objs) const
+  virtual void pb_create (const XMLElementBase *, XMLReaderState &objs) const
   {
     XMLObjTag<Obj> tag;
-    objs.push (&obj);
-    for (XMLElementBase::iterator c = this->begin (); c != this->end (); ++c) {
-      c->get ()->write (this, os, indent + 1, objs);
-    }
-    objs.pop (tag);
+    objs.push (tag);
   }
 
-  void write_obj (const Obj &obj, tl::OutputStream &os, int indent, tl::pass_by_ref_tag, XMLWriterState &objs) const
+  virtual void pb_finish (const XMLElementBase * /*parent*/, XMLReaderState &objs) const
   {
     XMLObjTag<Obj> tag;
-    objs.push (&obj);
-    for (XMLElementBase::iterator c = this->begin (); c != this->end (); ++c) {
-      c->get ()->write (this, os, indent + 1, objs);
-    }
+    XMLObjTag<Parent> parent_tag;
+    this->m_w (*objs.parent (parent_tag), objs);
     objs.pop (tag);
   }
 };
@@ -802,23 +840,23 @@ private:
 
 template <class Obj, class Parent, class Read, class Write>
 class TL_PUBLIC_TEMPLATE XMLElementWithParentRef
-  : public XMLElementBase
+  : public XMLElementImplBase<Obj, Parent, Read, Write>
 {
 public:
   XMLElementWithParentRef (const Read &r, const Write &w, const std::string &name, const XMLElementList &children)
-    : XMLElementBase (name, children), m_r (r), m_w (w)
+    : XMLElementImplBase<Obj, Parent, Read, Write> (r, w, name, children)
   {
     // .. nothing yet ..
   }
 
   XMLElementWithParentRef (const Read &r, const Write &w, const std::string &name, const XMLElementList *children)
-    : XMLElementBase (name, children), m_r (r), m_w (w)
+    : XMLElementImplBase<Obj, Parent, Read, Write> (r, w, name, children)
   {
     // .. nothing yet ..
   }
 
   XMLElementWithParentRef (const XMLElementWithParentRef<Obj, Parent, Read, Write> &d)
-    : XMLElementBase (d), m_r (d.m_r), m_w (d.m_w)
+    : XMLElementImplBase<Obj, Parent, Read, Write> (d)
   {
     // .. nothing yet ..
   }
@@ -835,66 +873,26 @@ public:
     objs.push (new Obj (objs.back (parent_tag)), true);
   }
 
-  virtual void cdata (const std::string & /*cdata*/, XMLReaderState & /*objs*/) const
-  {
-    // .. nothing yet ..
-  }
-
   virtual void finish (const XMLElementBase * /*parent*/, XMLReaderState &objs, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
   {
     XMLObjTag<Obj> tag;
     XMLObjTag<Parent> parent_tag;
-    m_w (*objs.parent (parent_tag), objs);
+    this->m_w (*objs.parent (parent_tag), objs);
     objs.pop (tag);
   }
 
-  virtual void write (const XMLElementBase * /*parent*/, tl::OutputStream &os, int indent, XMLWriterState &objs) const
-  {
-    XMLObjTag<Parent> parent_tag;
-    Read r (m_r);
-    r.start (*objs.back (parent_tag));
-    while (! r.at_end ()) {
-      XMLElementBase::write_indent (os, indent);
-      os << "<" << this->name () << ">\n";
-      typedef typename Read::tag read_tag_type;
-      read_tag_type read_tag;
-      write_obj (r (), os, indent, read_tag, objs);
-      XMLElementBase::write_indent (os, indent);
-      os << "</" << this->name () << ">\n";
-      r.next ();
-    }
-  }
-
-  virtual bool has_any (XMLWriterState &objs) const 
-  {
-    XMLObjTag<Parent> parent_tag;
-    Read r (m_r);
-    r.start (*objs.back (parent_tag));
-    return (! r.at_end ());
-  }
-
-private:
-  Read m_r;
-  Write m_w;
-
-  //  this write helper is used if the reader delivers an object by value
-  void write_obj (Obj obj, tl::OutputStream &os, int indent, tl::pass_by_value_tag, XMLWriterState &objs) const
+  virtual void pb_create (const XMLElementBase *, XMLReaderState &objs) const
   {
     XMLObjTag<Obj> tag;
-    objs.push (&obj);
-    for (XMLElementBase::iterator c = this->begin (); c != this->end (); ++c) {
-      c->get ()->write (this, os, indent + 1, objs);
-    }
-    objs.pop (tag);
+    XMLObjTag<Parent> parent_tag;
+    objs.push (new Obj (objs.back (parent_tag)), true);
   }
 
-  void write_obj (const Obj &obj, tl::OutputStream &os, int indent, tl::pass_by_ref_tag, XMLWriterState &objs) const
+  virtual void pb_finish (const XMLElementBase * /*parent*/, XMLReaderState &objs) const
   {
     XMLObjTag<Obj> tag;
-    objs.push (&obj);
-    for (XMLElementBase::iterator c = this->begin (); c != this->end (); ++c) {
-      c->get ()->write (this, os, indent + 1, objs);
-    }
+    XMLObjTag<Parent> parent_tag;
+    this->m_w (*objs.parent (parent_tag), objs);
     objs.pop (tag);
   }
 };
@@ -992,10 +990,278 @@ public:
     return (! r.at_end ());
   }
 
+  virtual void pb_create (const XMLElementBase *, XMLReaderState &) const
+  {
+    // .. nothing yet ..
+  }
+
+  virtual void pb_finish (const XMLElementBase *, XMLReaderState &) const
+  {
+    // .. nothing yet ..
+  }
+
+  virtual void pb_parse (PBParser *parser, tl::ProtocolBufferReaderBase &reader) const
+  {
+    XMLObjTag<Value> tag;
+    XMLObjTag<Parent> parent_tag;
+
+    XMLReaderState value_obj;
+    value_obj.push (tag);
+
+    read (reader, *value_obj.back (tag));
+    m_w (*parser->reader_state ().back (parent_tag), value_obj);
+
+    value_obj.pop (tag);
+  }
+
+  virtual void pb_write (const XMLElementBase * /*parent*/, tl::ProtocolBufferWriterBase &writer, PBWriterState &objs) const
+  {
+    XMLObjTag<Parent> parent_tag;
+    Read r (m_r);
+    r.start (* objs.back (parent_tag));
+    while (! r.at_end ()) {
+      write (writer, tag (), r ());
+      r.next ();
+    }
+  }
+
+  virtual Cardinality cardinality () const
+  {
+    typedef typename Read::cardinality cardinality_type;
+    return get_cardinality (cardinality_type ());
+  }
+
+  virtual void collect_messages (std::map<size_t, std::pair <const XMLElementBase *, std::string> > & /*messages*/) const
+  {
+    //  no messages here.
+  }
+
+  virtual std::string create_def_entry (std::map<size_t, std::pair <const XMLElementBase *, std::string> > & /*messages*/) const
+  {
+    const Value *v = 0;
+    return typestring (v) + " " + name4code () + " = " + tl::to_string (tag ()) + ";";
+  }
+
 private:
   Read m_r;
   Write m_w;
   Converter m_c;
+
+  //  write incarnations
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, float v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, double v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, uint8_t v) const
+  {
+    writer.write (tag, (uint32_t) v);
+  }
+
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, int8_t v) const
+  {
+    writer.write (tag, (int32_t) v);
+  }
+
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, uint16_t v) const
+  {
+    writer.write (tag, (uint32_t) v);
+  }
+
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, int16_t v) const
+  {
+    writer.write (tag, (int32_t) v);
+  }
+
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, uint32_t v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, int32_t v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, uint64_t v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, int64_t v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, bool v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, const std::string &v) const
+  {
+    writer.write (tag, v);
+  }
+
+  template <class T>
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, const T &v) const
+  {
+    writer.write (tag, m_c.pb_encode (v));
+  }
+
+  //  read incarnations
+  void read (tl::ProtocolBufferReaderBase &reader, float &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReaderBase &reader, double &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReaderBase &reader, uint8_t &v) const
+  {
+    uint32_t vv = 0;
+    reader.read (vv);
+    //  TODO: check for overflow?
+    v = vv;
+  }
+
+  void read (tl::ProtocolBufferReaderBase &reader, int8_t &v) const
+  {
+    int32_t vv = 0;
+    reader.read (vv);
+    //  TODO: check for overflow?
+    v = vv;
+  }
+
+  void read (tl::ProtocolBufferReaderBase &reader, uint16_t &v) const
+  {
+    uint32_t vv = 0;
+    reader.read (vv);
+    //  TODO: check for overflow?
+    v = vv;
+  }
+
+  void read (tl::ProtocolBufferReaderBase &reader, int16_t &v) const
+  {
+    int32_t vv = 0;
+    reader.read (vv);
+    //  TODO: check for overflow?
+    v = vv;
+  }
+
+  void read (tl::ProtocolBufferReaderBase &reader, uint32_t &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReaderBase &reader, int32_t &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReaderBase &reader, uint64_t &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReaderBase &reader, int64_t &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReaderBase &reader, bool &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReaderBase &reader, std::string &v) const
+  {
+    reader.read (v);
+  }
+
+  template <class T>
+  void read (tl::ProtocolBufferReaderBase &reader, T &v) const
+  {
+    typename Converter::pb_type vv;
+    reader.read (vv);
+    m_c.pb_decode (vv, v);
+  }
+
+  //  type strings
+  std::string typestring (const float *) const
+  {
+    return "float";
+  }
+
+  std::string typestring (const double *) const
+  {
+    return "double";
+  }
+
+  std::string typestring (const uint8_t *) const
+  {
+    return "uint32";
+  }
+
+  std::string typestring (const uint16_t *) const
+  {
+    return "uint32";
+  }
+
+  std::string typestring (const uint32_t *) const
+  {
+    return "uint32";
+  }
+
+  std::string typestring (const uint64_t *) const
+  {
+    return "uint64";
+  }
+
+  std::string typestring (const int8_t *) const
+  {
+    return "sint32";
+  }
+
+  std::string typestring (const int16_t *) const
+  {
+    return "sint32";
+  }
+
+  std::string typestring (const int32_t *) const
+  {
+    return "sint32";
+  }
+
+  std::string typestring (const int64_t *) const
+  {
+    return "sint64";
+  }
+
+  std::string typestring (const bool *) const
+  {
+    return "uint32";
+  }
+
+  std::string typestring (const std::string *) const
+  {
+    return "string";
+  }
+
+  template <class T>
+  std::string typestring (const T *) const
+  {
+    const typename Converter::pb_type *v = 0;
+    return typestring (v);
+  }
 };
 
 /**
@@ -1059,6 +1325,11 @@ public:
   {
     return false;
   }
+
+  virtual void pb_create (const XMLElementBase *, XMLReaderState &) const { }
+  virtual void pb_parse (PBParser *, tl::ProtocolBufferReaderBase &) const { }
+  virtual void pb_finish (const XMLElementBase *, XMLReaderState &) const { }
+  virtual std::string create_def_entry (std::map<size_t, std::pair<const XMLElementBase *, std::string> > &) const { return std::string (); }
 
 private:
   Write m_w;
@@ -1143,10 +1414,89 @@ public:
     tl_assert (rs.empty ());
   }
 
+  /**
+   *  @brief Serializes the given object (root) to the writer
+   */
+  void write (tl::ProtocolBufferWriterBase &writer, const Obj &root) const
+  {
+    PBWriterState writer_state;
+    writer_state.push (& root);
+
+    writer.write (tag (), name ());
+
+    for (XMLElementBase::iterator c = this->begin (); c != this->end (); ++c) {
+      c->get ()->pb_write (this, writer, writer_state);
+    }
+  }
+
+  /**
+   *  @brief Deserializes the given object (root) from the reader
+   */
+  void parse (tl::ProtocolBufferReaderBase &reader, Obj &root) const
+  {
+    XMLObjTag<Obj> self_tag;
+    XMLReaderState rs;
+    rs.push (&root);
+    PBParser h;
+    h.expect_header (reader, tag (), name ());
+    h.parse (reader, this, &rs);
+    rs.pop (self_tag);
+    tl_assert (rs.empty ());
+  }
+
+  /**
+   *  @brief Produces a definition for the protoc compiler
+   */
+  std::string create_def () const
+  {
+    std::map<size_t, std::pair <const XMLElementBase *, std::string> > msgs;
+    collect_messages (msgs);
+    msgs[oid ()] = std::make_pair (this, make_message_name ());
+
+    std::string res = "// created from KLayout proto definition '" + name () + "'\n\n";
+    res += "syntax = \"proto2\";";
+
+    for (auto i = msgs.begin (); i != msgs.end (); ++i) {
+      std::string entry = i->second.first->create_def (msgs);
+      if (! entry.empty ()) {
+        res += "\n";
+        res += "\n";
+        res += entry;
+      }
+    }
+
+    return res;
+  }
+
 private:
   virtual void write (const XMLElementBase*, tl::OutputStream &, int, XMLWriterState &) const
   {
     // .. see write (os)
+  }
+
+  virtual void pb_write (const XMLElementBase*, tl::ProtocolBufferWriterBase &, PBWriterState &) const
+  {
+    // disable base class implementation
+  }
+
+  virtual void pb_parse (PBParser *, tl::ProtocolBufferReaderBase &) const
+  {
+    // disable base class implementation
+  }
+
+  virtual void pb_create (const XMLElementBase *, XMLReaderState &) const
+  {
+    // disable base class implementation
+  }
+
+  virtual void pb_finish (const XMLElementBase *, XMLReaderState &) const
+  {
+    // disable base class implementation
+  }
+
+  virtual std::string create_def_entry (std::map<size_t, std::pair<const XMLElementBase *, std::string> > &) const
+  {
+    return std::string ();
   }
 };
 
@@ -1267,6 +1617,7 @@ template <class Value, class Parent>
 struct XMLMemberDummyReadAdaptor
 {
   typedef pass_by_ref_tag tag;
+  typedef zero_cardinality_tag cardinality;
 
   XMLMemberDummyReadAdaptor ()
   {
@@ -1298,6 +1649,7 @@ template <class Value, class Parent>
 struct XMLMemberReadAdaptor
 {
   typedef pass_by_ref_tag tag;
+  typedef single_cardinality_tag cardinality;
 
   XMLMemberReadAdaptor (Value Parent::*member)
     : mp_member (member), mp_owner (0), m_done (false)
@@ -1336,6 +1688,7 @@ template <class Value, class Parent>
 struct XMLMemberAccRefReadAdaptor
 {
   typedef pass_by_ref_tag tag;
+  typedef single_cardinality_tag cardinality;
 
   XMLMemberAccRefReadAdaptor (const Value &(Parent::*member) () const)
     : mp_member (member), mp_owner (0), m_done (false)
@@ -1374,6 +1727,7 @@ template <class Value, class Parent>
 struct XMLMemberAccReadAdaptor
 {
   typedef pass_by_value_tag tag;
+  typedef single_cardinality_tag cardinality;
 
   XMLMemberAccReadAdaptor (Value (Parent::*member) () const)
     : mp_member (member), mp_owner (0), m_done (false)
@@ -1412,6 +1766,7 @@ template <class Value, class Iter, class Parent>
 struct XMLMemberIterReadAdaptor
 {
   typedef pass_by_ref_tag tag;
+  typedef many_cardinality_tag cardinality;
 
   XMLMemberIterReadAdaptor (Iter (Parent::*begin) () const, Iter (Parent::*end) () const)
     : mp_begin (begin), mp_end (end)
@@ -1771,6 +2126,18 @@ make_element_with_parent_ref (Iter (Parent::*begin) () const, Iter (Parent::*end
 template <class Value>
 struct XMLStdConverter
 {
+  typedef std::string pb_type;
+
+  pb_type pb_encode (const Value &v) const
+  {
+    return tl::to_string (v);
+  }
+
+  void pb_decode (const pb_type &s, Value &v) const
+  {
+    tl::from_string (s, v);
+  }
+
   std::string to_string (const Value &v) const
   {
     return tl::to_string (v);
@@ -1779,6 +2146,26 @@ struct XMLStdConverter
   void from_string (const std::string &s, Value &v) const
   {
     tl::from_string (s, v);
+  }
+};
+
+/**
+ *  @brief A helper class to convert a string converter to a XML converter
+ */
+template <class StringConverter>
+struct XMLStringBasedConverter
+  : public StringConverter
+{
+  typedef std::string pb_type;
+
+  pb_type pb_encode (const typename StringConverter::value_type &v) const
+  {
+    return StringConverter::to_string (v);
+  }
+
+  void pb_decode (const pb_type &s, typename StringConverter::value_type &v) const
+  {
+    StringConverter::from_string (s, v);
   }
 };
 

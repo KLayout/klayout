@@ -33,6 +33,7 @@ SOURCES = \
   tlObjectTests.cc \
   tlOptionalTests.cc \
   tlPixelBufferTests.cc \
+  tlProtocolBufferTests.cc \
   tlResourcesTests.cc \
   tlReuseVectorTests.cc \
   tlStableVectorTests.cc \

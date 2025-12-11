@@ -816,7 +816,18 @@ TEST(13_ApplyIgnoreUnknownTag)
   i2->values ().clear ();
   i2->add_value (std::string ("xyz"), vtag22);
 
-  //  values with incompatible tags are ignored -> tag2 is applied
+  //  values with incompatible tags are ignored, but vtag1 is a common tag.
+  //  So far, nothing is applied as the we match abc[vtag1] vs. xyz[vtag2] which is both different value and tag-
+  db1.apply (db2);
+
+  EXPECT_EQ (i1->tag_str (), "");
+
+  //  NOTE: don't do this at home
+  const_cast<rdb::Tags &> (db2.tags ()).remove_tag (vtag21);
+
+  //  vtag1 is no longer a common tag -> we match abc[vtag1] vs. xyz[vtag2] where vtag1 is not known on the
+  //  other side and vtag2 is not known on the self side.
+  //  Hence, the values are ignored and the tag is applied.
   db1.apply (db2);
 
   EXPECT_EQ (i1->tag_str (), "tag2");

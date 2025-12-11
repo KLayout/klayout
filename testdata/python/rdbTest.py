@@ -569,7 +569,7 @@ class RDB_TestClass(unittest.TestCase):
     self.assertEqual(db.is_modified(), False)
 
     tag_id = db.tag_id("x")
-    self.assertEqual(tag_id, 1)
+    self.assertEqual(db.tag_name(tag_id), "x")
     db.set_tag_description(tag_id, "xdesc")
     self.assertEqual(db.tag_description(tag_id), "xdesc")
 

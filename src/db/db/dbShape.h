@@ -1099,6 +1099,26 @@ public:
   }
 
   /**
+   *  @brief Gets the index of layer the shape sits in
+   *
+   *  This getter only applies to shapes that are members of a cell
+   *  and a layout.
+   *  For other shapes this method returns -1.
+   */
+  int layer () const;
+
+  /**
+   *  @brief Changes the layer the shape sits in
+   *
+   *  This setter applies to shapes are are members of a cell
+   *  and a layout.
+   *  Changing the layer effectively moves the shape to a different
+   *  container. For invalid layer indexes or if the shape is
+   *  not member of a cell and layout, this method does nothing.
+   */
+  void set_layer (unsigned int layer_index);
+
+  /**
    *  @brief Get the properties Id associated with the shape
    */
   db::properties_id_type prop_id () const;

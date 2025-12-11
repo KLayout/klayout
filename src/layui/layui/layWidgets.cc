@@ -514,7 +514,7 @@ struct LayerSelectionComboBoxPrivateData
 };
 
 LayerSelectionComboBox::LayerSelectionComboBox (QWidget *parent)
-  : QComboBox (parent), dm_update_layer_list (this, &LayerSelectionComboBox::do_update_layer_list)
+  : QComboBox (parent), dm_update_layer_list (this, &LayerSelectionComboBox::do_update_layer_list), m_ignore_layer_list_changed (false)
 {
   mp_private = new LayerSelectionComboBoxPrivateData ();
   mp_private->no_layer_available = false;
@@ -608,8 +608,12 @@ BEGIN_PROTECTED
       //  NOTE: add_new_layers has triggered update_layer_list which already added the new layer
       set_current_layer (lp);
 
+      emit current_layer_changed ();
+
     }
 
+  } else {
+    emit current_layer_changed ();
   }
 
 END_PROTECTED;
@@ -647,7 +651,9 @@ LayerSelectionComboBox::set_view (lay::LayoutViewBase *view, int cv_index, bool 
 void
 LayerSelectionComboBox::on_layer_list_changed (int)
 {
-  update_layer_list ();
+  if (! m_ignore_layer_list_changed) {
+    update_layer_list ();
+  }
 }
 
 void 
@@ -698,13 +704,25 @@ LayerSelectionComboBox::do_update_layer_list ()
 
     } else {
 
+      int icon_width = iconSize ().width ();
+      int icon_height = iconSize ().height ();
+
+#if QT_VERSION >= 0x050000
+      double dpr = devicePixelRatio ();
+#else
+      double dpr = 1.0;
+#endif
+
       LPIPairCompareOp cmp_op;
-      std::map<std::pair <db::LayerProperties, int>, std::string, LPIPairCompareOp> name_for_layer (cmp_op);
+      std::map<std::pair<db::LayerProperties, int>, std::string, LPIPairCompareOp> name_for_layer (cmp_op);
+      std::map<std::pair<db::LayerProperties, int>, QIcon, LPIPairCompareOp> icon_for_layer;
       LayerPropertiesConstIterator lp = mp_private->view->begin_layers ();
       while (! lp.at_end ()) {
         if (lp->cellview_index () == mp_private->cv_index && ! lp->has_children () && (mp_private->all_layers || lp->layer_index () >= 0) && lp->source (true).layer_props () != db::LayerProperties ()) {
           std::pair <db::LayerProperties, int> k (lp->source (true).layer_props (), lp->layer_index ());
           name_for_layer.insert (std::make_pair (k, lp->display_string (mp_private->view, true, true /*always show source*/)));
+          QIcon icon = QIcon (QPixmap::fromImage (mp_private->view->icon_for_layer (lp, icon_width, icon_height, dpr, 0, true).to_image_copy ()));
+          icon_for_layer.insert (std::make_pair (k, icon));
           mp_private->layers.push_back (k);
         }
         ++lp;
@@ -724,11 +742,18 @@ LayerSelectionComboBox::do_update_layer_list ()
       std::sort (mp_private->layers.begin () + nk, mp_private->layers.end ());
 
       for (std::vector <std::pair <db::LayerProperties, int> >::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
-        std::map<std::pair <db::LayerProperties, int>, std::string, LPIPairCompareOp>::const_iterator ln = name_for_layer.find (*ll);
+        auto ln = name_for_layer.find (*ll);
+        QString text;
         if (ln != name_for_layer.end ()) {
-          addItem (tl::to_qstring (ln->second));
+          text = tl::to_qstring (ln->second);
         } else {
-          addItem (tl::to_qstring (ll->first.to_string ()));
+          text = tl::to_qstring (ll->first.to_string ());
+        }
+        auto li = icon_for_layer.find (*ll);
+        if (li != icon_for_layer.end ()) {
+          addItem (li->second, text);
+        } else {
+          addItem (text);
         }
       }
 
@@ -778,8 +803,8 @@ LayerSelectionComboBox::set_current_layer (const db::LayerProperties &props)
   setCurrentIndex (-1);
 }
 
-void 
-LayerSelectionComboBox::set_current_layer (int l)
+const db::Layout *
+LayerSelectionComboBox::layout () const
 {
   const db::Layout *layout = mp_private->layout;
   if (! layout && mp_private->view) {
@@ -788,9 +813,22 @@ LayerSelectionComboBox::set_current_layer (int l)
       layout = & cv->layout ();
     }
   }
+  return layout;
+}
 
-  if (l >= 0 && layout && layout->is_valid_layer ((unsigned int) l)) {
-    mp_private->last_props = layout->get_properties ((unsigned int) l);
+db::Layout *
+LayerSelectionComboBox::layout ()
+{
+  return const_cast<db::Layout *> (((const LayerSelectionComboBox *) this)->layout ());
+}
+
+void 
+LayerSelectionComboBox::set_current_layer (int l)
+{
+  const db::Layout *ly = layout ();
+
+  if (l >= 0 && ly && ly->is_valid_layer ((unsigned int) l)) {
+    mp_private->last_props = ly->get_properties ((unsigned int) l);
   }
 
   if (l < 0) {
@@ -804,6 +842,12 @@ LayerSelectionComboBox::set_current_layer (int l)
   }
 }
 
+bool
+LayerSelectionComboBox::is_no_layer_selected () const
+{
+  return currentIndex () < 0;
+}
+
 int 
 LayerSelectionComboBox::current_layer () const
 {
@@ -815,7 +859,40 @@ LayerSelectionComboBox::current_layer () const
   }
 }
 
-db::LayerProperties 
+int
+LayerSelectionComboBox::current_layer_ensure ()
+{
+  int i = currentIndex ();
+  if (i < 0 || i > int (mp_private->layers.size ())) {
+
+    return -1;
+
+  } else if (mp_private->layers [i].second < 0) {
+
+    db::Layout *ly = layout ();
+    if (! ly) {
+      return -1;
+    }
+
+    m_ignore_layer_list_changed = true;
+    try {
+      unsigned int l = ly->insert_layer (mp_private->layers [i].first);
+      mp_private->layers [i].second = l;
+      m_ignore_layer_list_changed = false;
+      return l;
+    } catch (...) {
+      m_ignore_layer_list_changed = false;
+      throw;
+    }
+
+  } else {
+
+    return mp_private->layers [i].second;
+
+  }
+}
+
+db::LayerProperties
 LayerSelectionComboBox::current_layer_props () const
 {
   int i = currentIndex ();

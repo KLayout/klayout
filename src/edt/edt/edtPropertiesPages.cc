@@ -63,12 +63,18 @@ ShapePropertiesPage::~ShapePropertiesPage ()
 void 
 ShapePropertiesPage::setup ()
 {
+  m_enable_cb_callback = false;
+
+  layer_selector ()->set_new_layer_enabled (false);
+  layer_selector ()->set_no_layer_available (false);
+
   connect (dbu_checkbox (), SIGNAL (toggled (bool)), this, SLOT (display_mode_changed (bool)));
   connect (abs_checkbox (), SIGNAL (toggled (bool)), this, SLOT (display_mode_changed (bool)));
+  connect (layer_selector (), SIGNAL (current_layer_changed ()), this, SLOT (current_layer_changed ()));
 
-  m_enable_cb_callback = false;
   dbu_checkbox ()->setChecked (mp_service->view ()->dbu_coordinates ());
   abs_checkbox ()->setChecked (mp_service->view ()->absolute_coordinates ());
+
   m_enable_cb_callback = true;
 }
 
@@ -131,7 +137,7 @@ ShapePropertiesPage::icon (size_t entry, int w, int h) const
   for (auto lp = view->begin_layers (view->current_layer_list ()); ! lp.at_end (); ++lp) {
     const lay::LayerPropertiesNode *ln = lp.operator-> ();
     if (ln->cellview_index () == cv_index && ln->layer_index () == layer) {
-      return QIcon (QPixmap::fromImage (view->icon_for_layer (lp, w, h).to_image ()));
+      return QIcon (QPixmap::fromImage (view->icon_for_layer (lp, w, h).to_image_copy ()));
     }
   }
 
@@ -206,6 +212,18 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
+void
+ShapePropertiesPage::current_layer_changed ()
+{
+  if (m_enable_cb_callback) {
+    try {
+      emit edited ();
+    } catch (tl::Exception &) {
+      //  ignore exceptions
+    }
+  }
+}
+
 void 
 ShapePropertiesPage::update ()
 {
@@ -243,6 +261,7 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
   }
 
   std::unique_ptr<ChangeApplicator> applicator;
+  std::unique_ptr<ChangeApplicator> other_applicator;
 
   unsigned int cv_index = m_selection_ptrs [m_indexes.front ()]->cv_index ();
 
@@ -259,10 +278,47 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
 
     if (m_prop_id != pos->shape ().prop_id ()) {
       applicator.reset (new CombinedChangeApplicator (applicator.release (), new ChangePropertiesApplicator (m_prop_id)));
+      if (! current_only) {
+        other_applicator.reset (new ChangePropertiesApplicator (m_prop_id));
+      }
+    }
+
+    int new_layer = layer_selector ()->current_layer_ensure ();
+    if (new_layer >= 0 && int (pos->layer ()) != new_layer) {
+      unsigned int gs_layer = cv->layout ().guiding_shape_layer ();
+      ChangeLayerApplicator *cla = new ChangeLayerApplicator (cv_index, (unsigned int) new_layer);
+      cla->skip_layer (gs_layer);
+      applicator.reset (new CombinedChangeApplicator (applicator.release (), cla));
+      if (! current_only) {
+        other_applicator.reset (new CombinedChangeApplicator (other_applicator.release (), new ChangeLayerApplicator (*cla)));
+      }
     }
   }
 
   if (! applicator.get ()) {
+    return;
+  }
+
+  apply_change (applicator.get (), cv_index, current_only, relative, commit);
+
+  if (other_applicator.get () && page_set ()) {
+
+    //  apply to other pages
+    auto pages = page_set ()->properties_pages ();
+    for (auto p = pages.begin (); p != pages.end (); ++p) {
+      ShapePropertiesPage *sp = dynamic_cast<ShapePropertiesPage *> (*p);
+      if (sp && sp != this) {
+        sp->apply_change (other_applicator.get (), cv_index, current_only, relative, commit);
+      }
+    }
+
+  }
+}
+
+void
+ShapePropertiesPage::apply_change (const ChangeApplicator *applicator, unsigned int cv_index, bool current_only, bool relative, bool commit)
+{
+  if (m_indexes.empty ()) {
     return;
   }
 
@@ -320,7 +376,7 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
         double dbu = layout.dbu ();
 
         if (!current_only || pos->shape () == current) {
-          new_shape = applicator->do_apply (shapes, pos->shape (), dbu, relative_mode);
+          new_shape = applicator->do_apply (shapes, pos->shape (), dbu, pos->cv_index (), pos->layer (), relative_mode);
         }
 
         shapes_seen.insert (std::make_pair (pos->shape (), new_shape));
@@ -333,9 +389,10 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
 
         //  change selection to new shape
         new_sel[index].set_shape (new_shape);
+        new_sel[index].set_layer (new_shape.layer ());
 
         mp_service->select (*pos, lay::Editable::Reset);
-        mp_service->select (new_sel [index], lay::Editable::Add);
+        mp_service->select (new_sel[index], lay::Editable::Add);
 
         update_required = true;
 
@@ -348,7 +405,7 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
         new_sel[index] = gs.second;
 
         mp_service->select (*pos, lay::Editable::Reset);
-        mp_service->select (new_sel [index], lay::Editable::Add);
+        mp_service->select (new_sel[index], lay::Editable::Add);
 
         update_required = true;
 
@@ -379,7 +436,7 @@ ShapePropertiesPage::apply (bool commit)
 bool
 ShapePropertiesPage::can_apply_to_all () const
 {
-  return m_selection_ptrs.size () > 1;
+  return true;
 }
 
 void 
@@ -397,31 +454,35 @@ ShapePropertiesPage::update_shape ()
 
   EditableSelectionIterator::pointer pos = m_selection_ptrs [m_indexes.front ()];
 
-  const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
-  double dbu = cv->layout ().dbu ();
-
   tl_assert (! pos->is_cell_inst ());
 
-  std::string layer (tl::to_string (QObject::tr ("Layer ")));
+  const lay::CellView &cv = view ()->cellview (pos->cv_index ());
+  double dbu = cv->layout ().dbu ();
+  unsigned int gs_layer = cv->layout ().guiding_shape_layer ();
 
-  std::string ln = cv->layout ().get_properties (pos->layer ()).to_string ();
-  for (lay::LayerPropertiesConstIterator lp = mp_service->view ()->begin_layers (); ! lp.at_end (); ++lp) {
-    if (lp->cellview_index () == int (pos->cv_index ()) && lp->layer_index () == int (pos->layer ())) {
-      ln = lp->display_string (mp_service->view (), true, true);
-      break;
-    }
+  m_enable_cb_callback = false;
+  layer_selector ()->set_view (view (), pos->cv_index (), true);
+  if (pos->layer () == gs_layer) {
+    layer_selector ()->setEnabled (false);
+    layer_selector ()->set_current_layer (-1);
+  } else {
+    layer_selector ()->setEnabled (true);
+    layer_selector ()->set_current_layer (pos->layer ());
   }
-  layer += ln;
+  m_enable_cb_callback = true;
 
-  layer += ", ";
-  layer += tl::to_string (QObject::tr ("Cell "));
-  layer += cv->layout ().cell_name (pos->cell_index ());
+  std::string cell_str;
+  if (pos->shape ().shapes () && pos->shape ().shapes ()->cell () && pos->shape ().shapes ()->cell ()->layout ()) {
+    auto ci = pos->shape ().shapes ()->cell ()->cell_index ();
+    cell_str = tl::to_string (tr ("Cell: ")) + pos->shape ().shapes ()->cell ()->layout ()->cell_name (ci);
+  }
+  cell_label ()->setText (tl::to_qstring (cell_str));
 
-  mp_service->view ()->set_current_layer (pos->cv_index (), cv->layout ().get_properties (pos->layer ()));
+  view ()->set_current_layer (pos->cv_index (), cv->layout ().get_properties (pos->layer ()));
 
   m_prop_id = pos->shape ().prop_id ();
 
-  do_update (pos->shape (), dbu, layer);
+  do_update (pos->shape (), dbu);
 }
 
 void
@@ -507,10 +568,8 @@ PolygonPropertiesPage::description (size_t entry) const
 }
 
 void
-PolygonPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
+PolygonPropertiesPage::do_update (const db::Shape &shape, double dbu)
 {
-  layer_lbl->setText (tl::to_qstring (lname));
-
   db::Polygon poly;
   shape.polygon (poly);
 
@@ -627,7 +686,6 @@ PolygonPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Sha
   db::Polygon org_poly;
   shape.polygon (org_poly);
 
-  //  shape changed - replace the old by the new one
   return new PolygonChangeApplicator (poly, org_poly);
 }
 
@@ -683,13 +741,11 @@ BoxPropertiesPage::description (size_t entry) const
 }
 
 void
-BoxPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
+BoxPropertiesPage::do_update (const db::Shape &shape, double dbu)
 {
   m_dbu = dbu;
   m_lr_swapped = false;
   m_tb_swapped = false;
-
-  layer_lbl->setText (tl::to_qstring (lname));
 
   db::Box box;
   shape.box (box);
@@ -913,11 +969,9 @@ PointPropertiesPage::description (size_t entry) const
 }
 
 void
-PointPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
+PointPropertiesPage::do_update (const db::Shape &shape, double dbu)
 {
   m_dbu = dbu;
-
-  layer_lbl->setText (tl::to_qstring (lname));
 
   db::Point point;
   shape.point (point);
@@ -1042,10 +1096,8 @@ TextPropertiesPage::description (size_t entry) const
 }
 
 void
-TextPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
+TextPropertiesPage::do_update (const db::Shape &shape, double dbu)
 {
-  layer_lbl->setText (tl::to_qstring (lname));
-
   db::Text text;
   shape.text (text);
 
@@ -1194,10 +1246,8 @@ PathPropertiesPage::description (size_t entry) const
 }
 
 void
-PathPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
+PathPropertiesPage::do_update (const db::Shape &shape, double dbu)
 {
-  layer_lbl->setText (tl::to_qstring (lname));
-
   db::Path path;
   shape.path (path);
 
@@ -1298,10 +1348,8 @@ EditablePathPropertiesPage::description (size_t entry) const
 }
 
 void
-EditablePathPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
+EditablePathPropertiesPage::do_update (const db::Shape &shape, double dbu)
 {
-  layer_lbl->setText (tl::to_qstring (lname));
-
   db::Path path;
   shape.path (path);
 

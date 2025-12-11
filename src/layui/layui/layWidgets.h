@@ -301,14 +301,45 @@ public:
   void set_current_layer (int l);
 
   /**
+   *  @brief Gets a valid indicating whether a layer is selected
+   *
+   *  This method returns true if "no layer" is selected
+   */
+  bool is_no_layer_selected () const;
+
+  /**
    *  @brief Get the current layer (index)
+   *
+   *  NOTE: this method returns -1 if no layer is selected or
+   *  the current layer does not exist. Use "is_no_layer_selected"
+   *  for a value telling whether no layer is selected (true)
+   *  or a not-yet-existing layer is selected (false).
    */
   int current_layer () const;
 
   /**
+   *  @brief Get the current layer (index) and makes sure it exists
+   *
+   *  This method ensures that the layer is created if it does not
+   *  exist yet. It returns -1 on "no layer" (if enabled).
+   */
+  int current_layer_ensure ();
+
+  /**
    *  @brief Get the current layer properties
+   *
+   *  If "no layer" is selected, this method returns the last properties set
+   *  with "set_current_layer". Use "is_no_layer_selected" to get
+   *  a value indicating whether the "no layer" entry is selected.
    */
   db::LayerProperties current_layer_props () const;
+
+signals:
+  /**
+   *  @brief Signal indicating that the user selected a new layer
+   *  This signal is emitted if the layer is edited. It is not emitted on programmatic changes.
+   */
+  void current_layer_changed ();
 
 protected slots:
   void item_selected (int index);
@@ -316,10 +347,13 @@ protected slots:
 private:
   LayerSelectionComboBoxPrivateData *mp_private;
   tl::DeferredMethod<LayerSelectionComboBox> dm_update_layer_list;
+  bool m_ignore_layer_list_changed;
 
   void on_layer_list_changed (int);
   void update_layer_list ();
   void do_update_layer_list ();
+  db::Layout *layout ();
+  const db::Layout *layout () const;
 };
 
 /**

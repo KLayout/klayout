@@ -76,12 +76,12 @@ bool CombinedChangeApplicator::supports_relative_mode () const
   return false; 
 }
 
-db::Shape CombinedChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const 
+db::Shape CombinedChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const
 {
   db::Shape s = shape;
   for (std::vector<ChangeApplicator *>::const_iterator a = m_appl.begin (); a != m_appl.end (); ++a) {
     if (*a) {
-      s = (*a)->do_apply (shapes, s, dbu, relative);
+      s = (*a)->do_apply (shapes, s, dbu, cv_index, layer, relative);
     }
   }
   return s;
@@ -107,7 +107,7 @@ ChangePropertiesApplicator::ChangePropertiesApplicator (db::properties_id_type p
   //  .. nothing yet ...
 }
 
-db::Shape ChangePropertiesApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool /*relative*/) const 
+db::Shape ChangePropertiesApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool /*relative*/) const
 {
   return shapes.replace_prop_id (shape, m_prop_id);
 }
@@ -115,6 +115,35 @@ db::Shape ChangePropertiesApplicator::do_apply (db::Shapes &shapes, const db::Sh
 db::Instance ChangePropertiesApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double /*dbu*/, bool /*relative*/) const 
 {
   return cell.replace_prop_id (instance, m_prop_id);
+}
+
+// -------------------------------------------------------------------------
+//  ChangeLayerApplicator implementation
+
+ChangeLayerApplicator::ChangeLayerApplicator (const ChangeLayerApplicator &other)
+  : ChangeApplicator (), m_cv_index (other.m_cv_index), m_new_layer (other.m_new_layer), m_skipped_layers (other.m_skipped_layers)
+{
+  //  .. nothing yet ...
+}
+
+ChangeLayerApplicator::ChangeLayerApplicator (unsigned int cv_index, unsigned int new_layer)
+  : m_cv_index (cv_index), m_new_layer (new_layer)
+{
+  //  .. nothing yet ...
+}
+
+db::Shape ChangeLayerApplicator::do_apply (db::Shapes & /*shapes*/, const db::Shape &shape, double /*dbu*/, unsigned int cv_index, unsigned int layer, bool /*relative*/) const
+{
+  db::Shape s = shape;
+  if (m_cv_index == cv_index && layer != m_new_layer && m_skipped_layers.find (layer) == m_skipped_layers.end ()) {
+    s.set_layer (m_new_layer);
+  }
+  return s;
+}
+
+void ChangeLayerApplicator::skip_layer (unsigned int l)
+{
+  m_skipped_layers.insert (l);
 }
 
 // -------------------------------------------------------------------------
@@ -126,7 +155,7 @@ BoxDimensionsChangeApplicator::BoxDimensionsChangeApplicator (db::Coord dl, db::
   //  .. nothing yet ..
 }
 
-db::Shape BoxDimensionsChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool relative) const
+db::Shape BoxDimensionsChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool relative) const
 {
   db::Box org_box;
   shape.box (org_box);
@@ -207,7 +236,7 @@ PointDimensionsChangeApplicator::PointDimensionsChangeApplicator (const db::Poin
   //  .. nothing yet ..
 }
 
-db::Shape PointDimensionsChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool relative) const
+db::Shape PointDimensionsChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool relative) const
 {
   db::Point org_point;
   shape.point (org_point);
@@ -243,8 +272,10 @@ PolygonChangeApplicator::PolygonChangeApplicator (const db::Polygon &poly, const
   //  .. nothing yet ..
 }
 
-db::Shape PolygonChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool relative) const
+db::Shape PolygonChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool relative) const
 {
+  db::Shape s = shape;
+
   db::Polygon org_poly;
   shape.polygon (org_poly);
 
@@ -254,19 +285,19 @@ db::Shape PolygonChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape
 
     if (new_poly != org_poly) {
       //  shape changed - replace the old by the new one
-      return shapes.replace (shape, new_poly);
+      s = shapes.replace (shape, new_poly);
     } else {
       //  shape did not change
-      return shape;
     }
 
   } else if (m_poly != org_poly) {
     //  shape changed - replace the old by the new one
-    return shapes.replace (shape, m_poly);
+    s = shapes.replace (shape, m_poly);
   } else {
     //  shape did not change
-    return shape;
   }
+
+  return s;
 }
 
 // -------------------------------------------------------------------------
@@ -278,7 +309,7 @@ TextOrientationChangeApplicator::TextOrientationChangeApplicator (const db::FTra
   //  .. nothing yet ..
 }
 
-db::Shape TextOrientationChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool /*relative*/) const
+db::Shape TextOrientationChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool /*relative*/) const
 {
   db::Text org_text;
   shape.text (org_text);
@@ -304,7 +335,7 @@ TextPositionChangeApplicator::TextPositionChangeApplicator (const db::Vector &di
   //  .. nothing yet ..
 }
 
-db::Shape TextPositionChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool relative) const
+db::Shape TextPositionChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool relative) const
 {
   db::Text org_text;
   shape.text (org_text);
@@ -341,7 +372,7 @@ TextHAlignChangeApplicator::TextHAlignChangeApplicator (db::HAlign halign)
   //  .. nothing yet ..
 }
 
-db::Shape TextHAlignChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool /*relative*/) const
+db::Shape TextHAlignChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool /*relative*/) const
 {
   db::Text org_text;
   shape.text (org_text);
@@ -367,7 +398,7 @@ TextVAlignChangeApplicator::TextVAlignChangeApplicator (db::VAlign valign)
   //  .. nothing yet ..
 }
 
-db::Shape TextVAlignChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool /*relative*/) const
+db::Shape TextVAlignChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool /*relative*/) const
 {
   db::Text org_text;
   shape.text (org_text);
@@ -393,7 +424,7 @@ TextSizeChangeApplicator::TextSizeChangeApplicator (db::Coord size)
   //  .. nothing yet ..
 }
 
-db::Shape TextSizeChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool /*relative*/) const
+db::Shape TextSizeChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool /*relative*/) const
 {
   db::Text org_text;
   shape.text (org_text);
@@ -419,7 +450,7 @@ TextStringChangeApplicator::TextStringChangeApplicator (const std::string &strin
   //  .. nothing yet ..
 }
 
-db::Shape TextStringChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool /*relative*/) const
+db::Shape TextStringChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool /*relative*/) const
 {
   db::Text org_text;
   shape.text (org_text);
@@ -445,7 +476,7 @@ PathPointsChangeApplicator::PathPointsChangeApplicator (const std::vector<db::Po
   //  .. nothing yet ..
 }
 
-db::Shape PathPointsChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool relative) const
+db::Shape PathPointsChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool relative) const
 {
   db::Path org_path;
   shape.path (org_path);
@@ -479,7 +510,7 @@ PathWidthChangeApplicator::PathWidthChangeApplicator (db::Coord w, db::Coord org
   //  .. nothing yet ..
 }
 
-db::Shape PathWidthChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool relative) const
+db::Shape PathWidthChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool relative) const
 {
   db::Path org_path;
   shape.path (org_path);
@@ -517,7 +548,7 @@ PathStartExtensionChangeApplicator::PathStartExtensionChangeApplicator (db::Coor
   //  .. nothing yet ..
 }
 
-db::Shape PathStartExtensionChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool /*relative*/) const
+db::Shape PathStartExtensionChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool /*relative*/) const
 {
   db::Path org_path;
   shape.path (org_path);
@@ -547,7 +578,7 @@ PathEndExtensionChangeApplicator::PathEndExtensionChangeApplicator (db::Coord e)
   //  .. nothing yet ..
 }
 
-db::Shape PathEndExtensionChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool /*relative*/) const
+db::Shape PathEndExtensionChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool /*relative*/) const
 {
   db::Path org_path;
   shape.path (org_path);
@@ -577,7 +608,7 @@ PathRoundEndChangeApplicator::PathRoundEndChangeApplicator (bool r)
   //  .. nothing yet ..
 }
 
-db::Shape PathRoundEndChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool /*relative*/) const
+db::Shape PathRoundEndChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool /*relative*/) const
 {
   db::Path org_path;
   shape.path (org_path);

@@ -1047,3 +1047,32 @@ TEST(10)
   si = s.begin (db::ShapeIterator::All);
   EXPECT_EQ (si->rectangle ().empty (), true);
 }
+
+//  layer index setter/getter
+TEST(20)
+{
+  db::Shape sh0;
+  EXPECT_EQ (sh0.layer (), -1);
+
+  db::Layout ly (true);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+  db::Shape sh = top.shapes (l1).insert (db::Box (0, 0, 1000, 2000));
+
+  EXPECT_EQ (top.shapes (l1).size (), size_t (1));
+  EXPECT_EQ (top.shapes (l2).size (), size_t (0));
+
+  EXPECT_EQ (sh.layer (), int (l1));
+  EXPECT_EQ (sh.to_string (), "box (0,0;1000,2000)");
+
+  sh.set_layer (l2);
+
+  EXPECT_EQ (sh.layer (), int (l2));
+  EXPECT_EQ (sh.to_string (), "box (0,0;1000,2000)");
+
+  EXPECT_EQ (top.shapes (l1).size (), size_t (0));
+  EXPECT_EQ (top.shapes (l2).size (), size_t (1));
+}

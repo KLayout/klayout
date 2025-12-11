@@ -73,6 +73,47 @@ static NO_RETURN void raise_invalid_hole_index_on_simple_polygon ()
 // -------------------------------------------------------------------------------
 //  Shape implementation
 
+int Shape::layer () const
+{
+  const db::Shapes *sh = shapes ();
+  if (! sh) {
+    return -1;
+  }
+  const db::Cell *cell = sh->cell ();
+  if (! cell) {
+    return -1;
+  }
+
+  unsigned int li = cell->index_of_shapes (sh);
+  return li < cell->layers () ? int (li) : -1;
+}
+
+void Shape::set_layer (unsigned int layer_index)
+{
+  db::Shapes *sh = shapes ();
+  if (! sh) {
+    return;
+  }
+  db::Cell *cell = sh->cell ();
+  if (! cell) {
+    return;
+  }
+  db::Layout *layout = cell->layout ();
+  if (! layout || ! layout->is_valid_layer (layer_index)) {
+    return;
+  }
+
+  db::Shapes *target_sh = &cell->shapes (layer_index);
+  if (target_sh != sh) {
+
+    //  move the shape inside the cell
+    db::Shape new_shape = target_sh->insert (*this);
+    sh->erase_shape (*this);
+    *this = new_shape;
+
+  }
+}
+
 db::properties_id_type Shape::prop_id () const
 {
   if (m_with_props) {

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>568</width>
-    <height>375</height>
+    <height>378</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -245,10 +245,10 @@ to show text objects scaled and rotated</string>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="layer_lbl">
+       <widget class="QLabel" name="cell_lbl">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
+         <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+          <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
@@ -257,6 +257,13 @@ to show text objects scaled and rotated</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="lay::LayerSelectionComboBox" name="layer_cbx">
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
         </property>
        </widget>
       </item>
@@ -413,6 +420,13 @@ to show text objects scaled and rotated</string>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>lay::LayerSelectionComboBox</class>
+   <extends>QComboBox</extends>
+   <header>layWidgets.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>text_le</tabstop>
   <tabstop>x_le</tabstop>

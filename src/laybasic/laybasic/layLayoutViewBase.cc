@@ -5608,7 +5608,7 @@ LayoutViewBase::paste ()
 
   db::DBox sel_bbox = selection_bbox ();
   if (! sel_bbox.empty ()) {
-    if (m_paste_display_mode == 1) {
+    if (m_paste_display_mode == 1 || (m_paste_display_mode == 2 && sel_bbox.is_point ())) {
       // just make selection visible, i.e. shift window somewhat
       pan_center (sel_bbox.center ());
     } else if (m_paste_display_mode == 2) {

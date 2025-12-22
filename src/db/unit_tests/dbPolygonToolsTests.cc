@@ -1366,6 +1366,65 @@ TEST(106)
   EXPECT_EQ (smooth (p, 100, true).to_string (),  "(0,0;0,73235;1200,90468;2300,114468;2800,138468;2800,154468;2000,186468;700,210468;0,219701;0,272971;126450,272971;126450,0)");
 }
 
+//  smoothing, small units
+TEST(107)
+{
+  db::Point pattern [] = {
+    db::Point (1, 1),
+    db::Point (1, 2),
+    db::Point (2, 2),
+    db::Point (2, 4),
+    db::Point (3, 4),
+    db::Point (3, 5),
+    db::Point (4, 5),
+    db::Point (4, 7),
+    db::Point (5, 7),
+    db::Point (5, 8),
+    db::Point (6, 8),
+    db::Point (6, 9),
+    db::Point (7, 9),
+    db::Point (7, 16),
+    db::Point (8, 16),
+    db::Point (8, 17),
+    db::Point (9, 17),
+    db::Point (9, 18),
+    db::Point (10, 18),
+    db::Point (10, 19),
+    db::Point (12, 19),
+    db::Point (12, 20),
+    db::Point (16, 20),
+    db::Point (16, 21),
+    db::Point (17, 21),
+    db::Point (17, 22),
+    db::Point (18, 22),
+    db::Point (18, 23),
+    db::Point (24, 23),
+    db::Point (24, 15),
+    db::Point (23, 15),
+    db::Point (23, 14),
+    db::Point (22, 14),
+    db::Point (22, 12),
+    db::Point (21, 12),
+    db::Point (21, 10),
+    db::Point (20, 10),
+    db::Point (20, 8),
+    db::Point (19, 8),
+    db::Point (19, 6),
+    db::Point (18, 6),
+    db::Point (18, 4),
+    db::Point (17, 4),
+    db::Point (17, 3),
+    db::Point (16, 3),
+    db::Point (16, 1)
+  };
+
+  db::Polygon p;
+  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+
+  EXPECT_EQ (smooth (p, 0, false).to_string (),  "(1,1;1,2;2,2;2,4;3,4;3,5;4,5;4,7;5,7;5,8;6,8;6,9;7,9;7,16;8,16;8,17;9,17;9,18;10,18;10,19;12,19;12,20;16,20;16,21;17,21;17,22;18,22;18,23;24,23;24,15;23,15;23,14;22,14;22,12;21,12;21,10;20,10;20,8;19,8;19,6;18,6;18,4;17,4;17,3;16,3;16,1)");
+  EXPECT_EQ (smooth (p, 1, false).to_string (),  "(1,1;2,4;4,5;4,7;7,9;7,16;10,18;18,22;24,23;24,15;22,14;18,4;17,4;16,1)");
+}
+
 //  rounding
 TEST(200) 
 {

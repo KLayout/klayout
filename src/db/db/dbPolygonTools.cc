@@ -814,7 +814,7 @@ smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon
 
       if (keep_hv && (p1.x () == p0.x () || p1.y () == p0.y () || p2.x () == p1.x () || p2.y () == p1.y ())) {
         //  keep points which participate in either a vertical or horizontal edge
-      } else if (db::Coord (p1.distance(p0)) <= d && db::sprod_sign (p2 - p1, p0 - pm1) > 0 && std::abs (db::vprod (p2 - p1, p0 - pm1)) < 0.8 * p2.distance (p1) * p0.distance (pm1)) {
+      } else if (p1.double_distance (p0) <= d * (1.0 + db::epsilon) && db::sprod_sign (p2 - p1, p0 - pm1) > 0 && std::abs (db::vprod (p2 - p1, p0 - pm1)) < 0.8 * p2.distance (p1) * p0.distance (pm1)) {
         //  jog configurations with small edges are candidates
         can_drop = true;
       } else if (db::vprod_sign (p2 - p1, p1 - p0) < 0) {
@@ -826,7 +826,7 @@ smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon
       }
 
       for (size_t j = pi0; can_drop; ) {
-        if (std::abs (db::Edge (p0, p2).distance (org_points [j])) > d) {
+        if (std::abs (db::DEdge (db::DPoint (p0), db::DPoint (p2)).distance (db::DPoint (org_points [j]))) > d * (1.0 + db::epsilon)) {
           can_drop = false;
         }
         if (j == pi2) {

@@ -1800,40 +1800,87 @@ LayoutToNetlist::compute_area_and_perimeter_of_net_shapes (db::cell_index_type c
 }
 
 db::Point
-LayoutToNetlist::get_merged_shapes_of_net (db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Shapes &shapes, db::properties_id_type prop_id) const
+LayoutToNetlist::get_shapes_of_net (db::cell_index_type ci, size_t cid, const std::vector<unsigned int> &layer_ids, bool merge, size_t max_polygons, db::Shapes &shapes, db::properties_id_type prop_id) const
 {
   const db::Layout *layout = &dss ().const_layout (m_layout_index);
 
-  db::Point ref;
+  //  count vertices and polygons and determine label reference point
+
+  size_t n = 0, npoly = 0;
   bool any_ref = false;
-  db::EdgeProcessor ep;
+  db::Point ref;
 
-  //  count vertices and reserve space
-  size_t n = 0;
-  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (m_net_clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
-    n += rci->polygon_ref ().vertices ();
-  }
-  ep.reserve (n);
+  for (auto l = layer_ids.begin (); l != layer_ids.end (); ++l) {
+    for (db::recursive_cluster_shape_iterator<db::NetShape> rci (m_net_clusters, *l, ci, cid); !rci.at_end (); ++rci) {
 
-  size_t p = 0;
-  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (m_net_clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
-    db::PolygonRef pr = rci->polygon_ref ();
-    db::PolygonRef::polygon_edge_iterator e = pr.begin_edge ();
-    if (! e.at_end ()) {
-      //  pick one reference point for the label
-      auto p1 = (rci.trans () * *e).p1 ();
-      if (! any_ref || p1 < ref) {
-        ref = p1;
-        any_ref = true;
+      db::PolygonRef pr = rci->polygon_ref ();
+
+      n += pr.vertices ();
+      ++npoly;
+
+      db::PolygonRef::polygon_edge_iterator e = pr.begin_edge ();
+      if (! e.at_end ()) {
+        //  pick one reference point for the label
+        auto p1 = (rci.trans () * *e).p1 ();
+        if (! any_ref || p1 < ref) {
+          ref = p1;
+          any_ref = true;
+        }
       }
-      ep.insert_with_trans (pr, rci.trans (), ++p);
+
     }
   }
 
-  db::PolygonRefToShapesGenerator sg (const_cast<db::Layout *> (layout), &shapes, prop_id);
-  db::PolygonGenerator pg (sg, false);
-  db::SimpleMerge op;
-  ep.process (pg, op);
+  if (npoly >= max_polygons) {
+
+    db::Box bbox;
+
+    for (auto l = layer_ids.begin (); l != layer_ids.end (); ++l) {
+      for (db::recursive_cluster_shape_iterator<db::NetShape> rci (m_net_clusters, *l, ci, cid); !rci.at_end (); ++rci) {
+        db::PolygonRef pr = rci->polygon_ref ();
+        bbox += rci.trans () * pr.box ();
+      }
+    }
+
+    if (prop_id != 0) {
+      shapes.insert (db::BoxWithProperties (bbox, prop_id));
+    } else {
+      shapes.insert (bbox);
+    }
+
+  } else if (merge) {
+
+    db::EdgeProcessor ep;
+    ep.reserve (n);
+
+    size_t p = 0;
+    for (auto l = layer_ids.begin (); l != layer_ids.end (); ++l) {
+      for (db::recursive_cluster_shape_iterator<db::NetShape> rci (m_net_clusters, *l, ci, cid); !rci.at_end (); ++rci) {
+        db::PolygonRef pr = rci->polygon_ref ();
+        db::PolygonRef::polygon_edge_iterator e = pr.begin_edge ();
+        if (! e.at_end ()) {
+          ep.insert_with_trans (pr, rci.trans (), ++p);
+        }
+      }
+    }
+
+    db::PolygonRefToShapesGenerator sg (const_cast<db::Layout *> (layout), &shapes, prop_id);
+    db::PolygonGenerator pg (sg, false);
+    db::SimpleMerge op;
+    ep.process (pg, op);
+
+  } else {
+
+    db::PolygonRefToShapesGenerator sg (const_cast<db::Layout *> (layout), &shapes, prop_id);
+
+    for (auto l = layer_ids.begin (); l != layer_ids.end (); ++l) {
+      for (db::recursive_cluster_shape_iterator<db::NetShape> rci (m_net_clusters, *l, ci, cid); !rci.at_end (); ++rci) {
+        db::PolygonRef pr = rci->polygon_ref ();
+        sg.put (pr.instantiate ().transformed (rci.trans ()));
+      }
+    }
+
+  }
 
   return ref;
 }
@@ -2017,7 +2064,9 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
               prop_id = db::properties_id (ps);
             }
 
-            db::Point ref = get_merged_shapes_of_net (*cid, *c, layer_of (metal), shapes, prop_id);
+            std::vector<unsigned int> layers;
+            layers.push_back (layer_of (metal));
+            db::Point ref = get_shapes_of_net (*cid, *c, layers, true, std::numeric_limits<size_t>::max (), shapes, prop_id);
 
             if (values) {
 
@@ -2074,7 +2123,9 @@ LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::str
     eval.set_var (v->first, v->second);
   }
 
-  eval.set_primary_layer (layer_of (primary));
+  unsigned int primary_layer = layer_of (primary);
+  eval.set_primary_layer (primary_layer);
+
   for (auto s = secondary.begin (); s != secondary.end (); ++s) {
     if (s->second) {
       eval.set_secondary_layer (s->first, layer_of (*s->second));
@@ -2088,7 +2139,6 @@ LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::str
   eval.parse (compiled_expr, ex);
 
   db::DeepLayer dl (&dss (), m_layout_index, ly.insert_layer ());
-  unsigned int primary_layer = layer_of (primary);
 
   for (db::Layout::bottom_up_const_iterator cid = ly.begin_bottom_up (); cid != ly.end_bottom_up (); ++cid) {
 
@@ -2113,9 +2163,9 @@ LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::str
         eval.reset (*cid, *c);
         compiled_expr.execute ();
 
-        if (! eval.skip ()) {
+        if (! eval.copy_layers ().empty ()) {
           db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
-          get_merged_shapes_of_net (*cid, *c, primary_layer, shapes, db::properties_id (eval.prop_set_out ()));
+          get_shapes_of_net (*cid, *c, eval.copy_layers (), eval.copy_merge (), eval.copy_max_polygons (), shapes, db::properties_id (eval.prop_set_out ()));
         }
 
       } catch (tl::Exception &ex) {

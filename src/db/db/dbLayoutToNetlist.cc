@@ -1831,7 +1831,11 @@ LayoutToNetlist::get_shapes_of_net (db::cell_index_type ci, size_t cid, const st
     }
   }
 
-  if (npoly >= max_polygons) {
+  if (n == 0) {
+
+    //  nothing to do ...
+
+  } else if (npoly >= max_polygons) {
 
     db::Box bbox;
 

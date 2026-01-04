@@ -708,11 +708,8 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Net &net, 
             outp.reset (new TokenizedOutput (stream, Keys::net_key));
 
             *outp << tl::to_string (id);
-            if (! net.name ().empty ()) {
-              TokenizedOutput (*outp, Keys::name_key, true) << tl::to_word_or_quoted_string (net.name ());
-            } else if (net.id () != id) {
-              TokenizedOutput (*outp, Keys::name_key, true) << tl::to_word_or_quoted_string (net.expanded_name ());
-            }
+            //  NOTE: we always write the expanded name, so we can refer to it in log entries
+            TokenizedOutput (*outp, Keys::name_key, true) << tl::to_word_or_quoted_string (net.expanded_name ());
 
             *outp << endl;
 
@@ -740,11 +737,10 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Net &net, 
   if (! outp) {
 
     outp.reset (new TokenizedOutput (stream, Keys::net_key));
-    *outp << tl::to_string (id);
 
-    if (! net.name ().empty ()) {
-      TokenizedOutput (*outp, Keys::name_key, true) << tl::to_word_or_quoted_string (net.name ());
-    }
+    *outp << tl::to_string (id);
+    //  NOTE: we always write the expanded name, so we can refer to it in log entries
+    TokenizedOutput (*outp, Keys::name_key, true) << tl::to_word_or_quoted_string (net.expanded_name ());
 
     if (net.begin_properties () != net.end_properties ()) {
       *outp << endl;

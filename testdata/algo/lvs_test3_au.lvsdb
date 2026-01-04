@@ -116,7 +116,7 @@ layout(
   rect((-1700 -2440) (3100 7820))
 
   # Nets with their geometries
-  net(1
+  net(1 name($1)
    rect(nwell (-1400 1800) (2800 3580))
    rect(diff_cont (-1510 -650) (220 220))
    rect(ntie (-510 -450) (800 680))
@@ -267,12 +267,12 @@ layout(
 
   # Nets with their geometries
   net(1 name(BULK))
-  net(2)
-  net(3)
-  net(4)
-  net(5)
-  net(6)
-  net(7)
+  net(2 name($2))
+  net(3 name($3))
+  net(4 name($4))
+  net(5 name($5))
+  net(6 name($6))
+  net(7 name($7))
 
   # Outgoing pins and their connections to nets
   pin(1 name(BULK))
@@ -346,14 +346,14 @@ layout(
    rect(metal1 (2280 -1120) (360 1120))
    rect(metal2_lbl (-23940 1100) (0 0))
   )
-  net(5)
-  net(6)
-  net(7)
-  net(8)
-  net(9)
-  net(10)
-  net(11)
-  net(12)
+  net(5 name($5))
+  net(6 name($6))
+  net(7 name($7))
+  net(8 name($8))
+  net(9 name($9))
+  net(10 name($10))
+  net(11 name($11))
+  net(12 name($12))
 
   # Outgoing pins and their connections to nets
   pin(1 name(FB))

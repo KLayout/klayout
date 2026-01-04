@@ -92,16 +92,16 @@ layout(
   rect((600 250) (25800 7750))
 
   # Nets with their geometries
-  net(1
+  net(1 name($1)
    rect(l11 (4040 2950) (610 300))
   )
-  net(2
+  net(2 name($2)
    rect(l11 (5550 2950) (900 300))
   )
-  net(3
+  net(3 name($3)
    rect(l11 (18150 2950) (900 300))
   )
-  net(4
+  net(4 name($4)
    rect(l11 (19950 2950) (900 300))
   )
   net(5 name(FB)

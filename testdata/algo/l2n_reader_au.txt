@@ -113,7 +113,7 @@ circuit(INV2
  rect((-1700 -1640) (3100 6220))
 
  # Nets with their geometries
- net(1
+ net(1 name($1)
   rect(nwell (-1400 1800) (2800 2780))
   rect(diff_cont (-1510 -650) (220 220))
   rect(ntie (-510 -450) (800 680))
@@ -126,7 +126,7 @@ circuit(INV2
   rect(poly_lbl (-526 -1801) (2 2))
   rect(poly_cont (-831 -111) (220 220))
  )
- net(3
+ net(3 name($3)
   rect(poly (275 -250) (250 2500))
   rect(poly (-305 -1430) (360 360))
   rect(poly (-305 820) (250 1600))
@@ -257,13 +257,13 @@ circuit(INV2PAIR
 
  # Nets with their geometries
  net(1 name(BULK))
- net(2
+ net(2 name($2)
   rect(diff_cont (3430 3290) (220 220))
   rect(diff_cont (-220 180) (220 220))
   rect(diff_cont (-220 -3420) (220 220))
   rect(diff_cont (-220 180) (220 220))
  )
- net(3
+ net(3 name($3)
   rect(diff_cont (4230 3290) (220 220))
   rect(diff_cont (-220 180) (220 220))
   rect(diff_cont (-220 -220) (220 220))
@@ -277,7 +277,7 @@ circuit(INV2PAIR
   rect(metal1 (-3000 -760) (360 760))
   rect(metal1 (-360 -760) (360 760))
  )
- net(4
+ net(4 name($4)
   rect(diff_cont (4230 490) (220 220))
   rect(diff_cont (-220 180) (220 220))
   rect(diff_cont (-220 -220) (220 220))
@@ -291,20 +291,20 @@ circuit(INV2PAIR
   rect(metal1 (-3000 -760) (360 760))
   rect(metal1 (-360 -760) (360 760))
  )
- net(5
+ net(5 name($5)
   rect(diff_cont (2390 3690) (220 220))
   rect(diff_cont (-220 -620) (220 220))
   rect(diff_cont (-220 -2620) (220 220))
   rect(diff_cont (-220 -620) (220 220))
  )
- net(6)
- net(7
+ net(6 name($6))
+ net(7 name($7)
   rect(diff_cont (5030 3690) (220 220))
   rect(diff_cont (-220 -620) (220 220))
   rect(diff_cont (-220 -2620) (220 220))
   rect(diff_cont (-220 -620) (220 220))
  )
- net(8)
+ net(8 name($8))
 
  # Outgoing pins and their connections to nets
  pin(1 name(BULK))
@@ -507,25 +507,25 @@ circuit(RINGO
   rect(metal1 (-360 -760) (360 760))
   rect(metal2_lbl (-21301 -381) (2 2))
  )
- net(5
+ net(5 name($5)
   rect(diff_cont (3330 2890) (220 220))
   rect(diff_cont (-220 -620) (220 220))
   rect(diff_cont (-220 -2620) (220 220))
   rect(diff_cont (-220 -620) (220 220))
  )
- net(6
+ net(6 name($6)
   rect(diff_cont (19170 2890) (220 220))
   rect(diff_cont (-220 -620) (220 220))
   rect(diff_cont (-220 -2620) (220 220))
   rect(diff_cont (-220 -620) (220 220))
  )
- net(7
+ net(7 name($7)
   rect(diff_cont (13890 2890) (220 220))
   rect(diff_cont (-220 -620) (220 220))
   rect(diff_cont (-220 -2620) (220 220))
   rect(diff_cont (-220 -620) (220 220))
  )
- net(8
+ net(8 name($8)
   rect(diff_cont (8610 2890) (220 220))
   rect(diff_cont (-220 -620) (220 220))
   rect(diff_cont (-220 -2620) (220 220))

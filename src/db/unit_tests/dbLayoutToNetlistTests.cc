@@ -3463,6 +3463,21 @@ TEST(15_MeasureNet)
   unsigned int l102 = ly.get_layer (db::LayerProperties (102, 0));
   l3_net_func.insert_into (&ly, tc.cell_index (), l102);
 
+  db::Region l4_net_func = l2n.measure_net (*rl1, secondary, "copy(merged=false, layers=[l2,l3,l4,l5])", std::map<std::string, tl::Variant> ());
+
+  unsigned int l103 = ly.get_layer (db::LayerProperties (103, 0));
+  l4_net_func.insert_into (&ly, tc.cell_index (), l103);
+
+  db::Region l5_net_func = l2n.measure_net (*rl1, secondary, "copy(net.name=='NET2', layer=l5)", std::map<std::string, tl::Variant> ());
+
+  unsigned int l104 = ly.get_layer (db::LayerProperties (104, 0));
+  l5_net_func.insert_into (&ly, tc.cell_index (), l104);
+
+  db::Region l6_net_func = l2n.measure_net (*rl1, secondary, "copy(net.name=='NET2', limit=0)", std::map<std::string, tl::Variant> ());
+
+  unsigned int l105 = ly.get_layer (db::LayerProperties (105, 0));
+  l6_net_func.insert_into (&ly, tc.cell_index (), l105);
+
   //  compare the collected test data
 
   std::string au = tl::testdata ();

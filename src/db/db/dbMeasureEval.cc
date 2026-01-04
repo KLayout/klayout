@@ -595,7 +595,9 @@ MeasureNetEval::reset (db::cell_index_type cell_index, size_t cluster_id) const
 {
   //  default action: copy primary layer, merged, no limit
   m_copy_layers.clear ();
-  m_copy_layers.push_back (0);
+  if (! m_layers.empty ()) {
+    m_copy_layers.push_back (m_layers.front ());
+  }
   m_copy_merge = true;
   m_copy_max_polygons = std::numeric_limits<size_t>::max ();
 
@@ -659,7 +661,14 @@ MeasureNetEval::perimeter_func (int layer_index) const
 void
 MeasureNetEval::copy_func (const std::vector<unsigned int> &layer_indexes, bool merge, size_t max_polygons) const
 {
-  m_copy_layers = layer_indexes;
+  m_copy_layers.clear ();
+  m_copy_layers.reserve (layer_indexes.size ());
+  for (auto l = layer_indexes.begin (); l != layer_indexes.end (); ++l) {
+    if (size_t (*l) < m_layers.size ()) {
+      m_copy_layers.push_back (m_layers [*l]);
+    }
+  }
+
   m_copy_merge = merge;
   m_copy_max_polygons = max_polygons;
 }

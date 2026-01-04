@@ -1236,7 +1236,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "placed by 'put' attached to them.\n"
     "\n"
     "It is possible to skip primary shapes of a specific net by calling the 'skip' function with a 'true'\n"
-    "value. It is also possible to configure the output in more detail, i.e. to skip other or all layers, to\n"
+    "value. It is also possible to configure the output in more detail, i.e. to copy other or all layers, to\n"
     "replace the output by the net's bounding box above a certain complexity, or to select merged polygons or "
     "unmerged ones, by using 'copy' instead of 'skip'. See below for more details.\n"
     "\n"

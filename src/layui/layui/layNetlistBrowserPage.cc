@@ -816,15 +816,31 @@ NetlistBrowserPage::log_selection_changed ()
 
   QModelIndexList selection = log_view->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
-    if (i->column () == 0) {
-      const db::LogEntryData *le = model->log_entry (*i);
-      if (le && le->geometry () != db::DPolygon () && ! le->cell_name ().empty ()) {
-        const db::Circuit *c = mp_database->netlist ()->circuit_by_name (le->cell_name ());
-        if (c) {
-          m_markers.push_back (std::make_pair (c, le->geometry ()));
-        }
+
+    if (i->column () != 0) {
+      continue;
+    }
+
+    const db::LogEntryData *le = model->log_entry (*i);
+
+    const db::Circuit *c = 0;
+    if (le && ! le->cell_name ().empty ()) {
+      c = mp_database->netlist ()->circuit_by_name (le->cell_name ());
+    }
+
+    //  highlight geometries
+    if (c && le->geometry () != db::DPolygon ()) {
+      m_markers.push_back (std::make_pair (c, le->geometry ()));
+    }
+
+    //  highlight nets
+    if (c && ! le->net_name ().empty ()) {
+      const db::Net *net = c->net_by_name (le->net_name ());
+      if (net) {
+        m_net_markers.push_back (std::make_pair (c, net));
       }
     }
+
   }
 
   update_highlights ();
@@ -1291,6 +1307,7 @@ NetlistBrowserPage::clear_highlights ()
   m_current_path = lay::NetlistObjectsPath ();
   m_selected_paths.clear ();
   m_markers.clear ();
+  m_net_markers.clear ();
 
   update_highlights ();
 }
@@ -1348,6 +1365,31 @@ bbox_for_circuit (const db::Layout *layout, const db::Circuit *circuit)
   }
 
   return layout->cell (circuit->cell_index ()).bbox ();
+}
+
+static db::Box
+bbox_for_net (const db::LayoutToNetlist *db, const db::Circuit *circuit, const db::Net *net)
+{
+  db::Box bbox;
+
+  db::cell_index_type cell_index = circuit->cell_index ();
+  size_t cluster_id = net->cluster_id ();
+
+  const db::Connectivity &conn = db->connectivity ();
+  for (db::Connectivity::all_layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+
+    db::Box layer_bbox;
+    db::recursive_cluster_shape_iterator<db::NetShape> shapes (db->net_clusters (), *layer, cell_index, cluster_id);
+    while (! shapes.at_end ()) {
+      layer_bbox += shapes->bbox ().transformed (shapes.trans ());
+      ++shapes;
+    }
+
+    bbox += layer_bbox;
+
+  }
+
+  return bbox;
 }
 
 void
@@ -1425,22 +1467,7 @@ NetlistBrowserPage::adjust_view ()
 
     } else if (net) {
 
-      db::cell_index_type cell_index = net->circuit ()->cell_index ();
-      size_t cluster_id = net->cluster_id ();
-
-      const db::Connectivity &conn = mp_database->connectivity ();
-      for (db::Connectivity::all_layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
-
-        db::Box layer_bbox;
-        db::recursive_cluster_shape_iterator<db::NetShape> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
-        while (! shapes.at_end ()) {
-          layer_bbox += shapes->bbox ().transformed (shapes.trans ());
-          ++shapes;
-        }
-
-        ebox += layer_bbox;
-
-      }
+      ebox += bbox_for_net (mp_database.get (), circuit, net);
 
     } else if (circuit) {
       ebox += bbox_for_circuit (layout, circuit);
@@ -1457,6 +1484,17 @@ NetlistBrowserPage::adjust_view ()
     std::pair<bool, db::DCplxTrans> tr = trans_for (marker->first, *layout, *cell, m_cell_context_cache, cv.context_dtrans ());
     if (tr.first) {
       bbox += (tr.second * marker->second).box ();
+    }
+
+  }
+
+  //  add net markers boxes
+
+  for (auto marker = m_net_markers.begin (); marker != m_net_markers.end (); ++marker) {
+
+    std::pair<bool, db::DCplxTrans> tr = trans_for (marker->first, *layout, *cell, m_cell_context_cache, cv.context_dtrans ());
+    if (tr.first) {
+      bbox += tr.second * db::CplxTrans (layout->dbu ()) * bbox_for_net (mp_database.get (), marker->first, marker->second);
     }
 
   }
@@ -1739,22 +1777,48 @@ NetlistBrowserPage::update_highlights ()
     //  a map of display properties vs. layer properties
 
     //  correct DBU differences between the storage layout and the original layout
-    for (std::vector<db::DCplxTrans>::iterator t = tv.begin (); t != tv.end (); ++t) {
+    std::vector<db::DCplxTrans> tvt = tv;
+    for (std::vector<db::DCplxTrans>::iterator t = tvt.begin (); t != tvt.end (); ++t) {
       *t = *t * trans * db::DCplxTrans (layout->dbu () / original_layout.dbu ());
     }
 
     if (path->net.first) {
-      if (produce_highlights_for_net (path->net.first, n_markers, display_by_lp, tv)) {
+      if (produce_highlights_for_net (path->net.first, n_markers, display_by_lp, tvt)) {
         not_all_shapes_are_shown = true;
       }
     } else if (path->device.first) {
-      if (produce_highlights_for_device (path->device.first, n_markers, tv)) {
+      if (produce_highlights_for_device (path->device.first, n_markers, tvt)) {
         not_all_shapes_are_shown = true;
       }
     } else if (circuit) {
-      if (produce_highlights_for_circuit (circuit, n_markers, tv)) {
+      if (produce_highlights_for_circuit (circuit, n_markers, tvt)) {
         not_all_shapes_are_shown = true;
       }
+    }
+
+  }
+
+  for (auto marker = m_net_markers.begin (); marker != m_net_markers.end (); ++marker) {
+
+    //  computes the transformation supplied by the path
+
+    std::pair<bool, db::DCplxTrans> tr = trans_for (marker->first, *layout, *cell, m_cell_context_cache, cv.context_dtrans ());
+    if (! tr.first) {
+      continue;
+    }
+
+    db::DCplxTrans trans = tr.second;
+
+    //  a map of display properties vs. layer properties
+
+    //  correct DBU differences between the storage layout and the original layout
+    std::vector<db::DCplxTrans> tvt = tv;
+    for (std::vector<db::DCplxTrans>::iterator t = tvt.begin (); t != tvt.end (); ++t) {
+      *t = *t * trans * db::DCplxTrans (layout->dbu () / original_layout.dbu ());
+    }
+
+    if (produce_highlights_for_net (marker->second, n_markers, display_by_lp, tvt)) {
+      not_all_shapes_are_shown = true;
     }
 
   }

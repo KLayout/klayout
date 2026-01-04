@@ -492,6 +492,28 @@ private:
   MeasureNetEval *mp_eval;
 };
 
+class NetDbFunction
+  : public tl::EvalFunction
+{
+public:
+  NetDbFunction (MeasureNetEval *eval)
+    : mp_eval (eval)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+  {
+    if (args.size () != 0) {
+      throw tl::EvalError (tl::to_string (tr ("'db' function does not take any argument")), context);
+    }
+    out = mp_eval->db_func ();
+  }
+
+private:
+  MeasureNetEval *mp_eval;
+};
+
 class NetFunction
   : public tl::EvalFunction
 {
@@ -558,7 +580,7 @@ private:
   MeasureNetEval *mp_eval;
 };
 
-MeasureNetEval::MeasureNetEval (const db::LayoutToNetlist *l2n, double dbu)
+MeasureNetEval::MeasureNetEval (LayoutToNetlist *l2n, double dbu)
   : tl::Eval (), mp_l2n (l2n), m_dbu (dbu)
 {
   m_copy_merge = false;
@@ -588,6 +610,7 @@ MeasureNetEval::init ()
   define_function ("area", new NetAreaFunction (this));
   define_function ("perimeter", new NetPerimeterFunction (this));
   define_function ("net", new NetFunction (this));
+  define_function ("db", new NetDbFunction (this));
 }
 
 void
@@ -699,6 +722,12 @@ MeasureNetEval::net_func () const
   } else {
     return tl::Variant ();
   }
+}
+
+tl::Variant
+MeasureNetEval::db_func () const
+{
+  return tl::Variant::make_variant_ref (mp_l2n);
 }
 
 }

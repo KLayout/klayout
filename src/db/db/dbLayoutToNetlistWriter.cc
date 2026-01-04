@@ -211,6 +211,10 @@ void std_writer_impl<Keys>::write_log_entry (TokenizedOutput &stream, const LogE
     TokenizedOutput (stream, Keys::cell_key, true) << tl::to_word_or_quoted_string (le.cell_name ());
   }
 
+  if (! le.net_name ().empty ()) {
+    TokenizedOutput (stream, Keys::net_key, true) << tl::to_word_or_quoted_string (le.net_name ());
+  }
+
   if (! le.category_name ().empty ()) {
     TokenizedOutput o (stream, Keys::cat_key, true);
     o << tl::to_word_or_quoted_string (le.category_name ());

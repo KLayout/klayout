@@ -1,0 +1,37 @@
+
+source $drc_test_source
+report_netlist $drc_test_target
+
+deep
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+l4 = input(4, 0)
+l5 = input(5, 0)
+
+connect(l1, l2)
+connect(l2, l3)
+connect(l3, l4)
+connect(l4, l5)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+l4.output(4, 0)
+l5.output(5, 0)
+
+netlist
+
+sec = { "l2" => l2, "l3" => l3, "l4" => l4, "l5" => l5 }
+
+script = <<"END"
+  skip;
+  var ar=area(l5)/area;
+  db.add_log_entry(LogEntryData.new(Severity.Info, net, 'AR='+to_s(ar)))
+END
+
+evaluate_nets(l1, sec, script, { "n" => "NET1" })
+
+netlist 
+

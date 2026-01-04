@@ -1251,6 +1251,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@li 'skip' or 'skip(flag)': will skip the primary shapes of that net when called with a true value or without one. See also 'copy'. @/li\n"
     "@li 'copy(...)': see below for details @/li\n"
     "@li 'net': the \\Net object of the current net @/li\n"
+    "@li 'db': the \\LayoutToDatabase object the netlist lives in @/li\n"
     "@/ul\n"
     "\n"
     "If given, the 'dbu' argument gives the database unit to use for converting shape dimensions into micrometer units. "
@@ -1294,7 +1295,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "where the second expression establishes 'skip' as the default and conditionally executes 'copy',\n"
     "overriding 'skip'.\n"
     "\n"
-    "The 'copy' function was added and the 'skip' argument was made optional in version 0.30.6."
+    "The 'copy' and 'db' functions were added and the 'skip' argument was made optional in version 0.30.6."
   ) +
   //  test API
   gsi::method ("make_soft_connection_diodes=", &db::LayoutToNetlist::set_make_soft_connection_diodes, gsi::arg ("flag"), "@hide") +

@@ -807,6 +807,7 @@ module DRC
     #
     # @ul
     # @li "net" - the RBA::Net object of the current net @/li
+    # @li "db" - the RBA::LayoutToNetlist object the netlist lives in @/li
     # @li "skip" or "skip(flag)" - if called with a 'true' argument (the default), the primary layer's shapes are not copied for this net @/li
     # @li "copy(...)" - configures polygon output in a more elaborate way than "skip" (see below) @/li
     # @li "put(name, value)" - places the value as a property with name 'name' (this must be a string) on the output shapes @/li

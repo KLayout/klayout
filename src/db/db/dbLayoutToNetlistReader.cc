@@ -225,6 +225,18 @@ bool LayoutToNetlistStandardReader::read_message_cell (std::string &cell_name)
   }
 }
 
+bool LayoutToNetlistStandardReader::read_message_net (std::string &net_name)
+{
+  if (test (skeys::net_key) || test (lkeys::net_key)) {
+    Brace br (this);
+    read_word_or_quoted (net_name);
+    br.done ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
 bool LayoutToNetlistStandardReader::read_message_geometry (db::DPolygon &polygon)
 {
   if (test (skeys::polygon_key) || test (lkeys::polygon_key)) {
@@ -258,7 +270,7 @@ bool LayoutToNetlistStandardReader::read_message_cat (std::string &category_name
 void LayoutToNetlistStandardReader::read_message_entry (db::LogEntryData &data)
 {
   Severity severity (db::NoSeverity);
-  std::string msg, cell_name, category_name, category_description;
+  std::string msg, cell_name, net_name, category_name, category_description;
   db::DPolygon geometry;
 
   Brace br (this);
@@ -268,6 +280,8 @@ void LayoutToNetlistStandardReader::read_message_entry (db::LogEntryData &data)
     } else if (read_message (msg)) {
       //  continue
     } else if (read_message_cell (cell_name)) {
+      //  continue
+    } else if (read_message_net (net_name)) {
       //  continue
     } else if (read_message_cat (category_name, category_description)) {
       //  continue
@@ -282,6 +296,7 @@ void LayoutToNetlistStandardReader::read_message_entry (db::LogEntryData &data)
   data.set_severity (severity);
   data.set_message (msg);
   data.set_cell_name (cell_name);
+  data.set_net_name (net_name);
   data.set_category_description (category_description);
   data.set_category_name (category_name);
   data.set_geometry (geometry);

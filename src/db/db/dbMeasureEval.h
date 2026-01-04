@@ -122,7 +122,7 @@ class DB_PUBLIC MeasureNetEval
   : public tl::Eval
 {
 public:
-  MeasureNetEval (const db::LayoutToNetlist *l2n, double dbu);
+  MeasureNetEval (db::LayoutToNetlist *l2n, double dbu);
 
   void set_primary_layer (unsigned int layer_index);
   void set_secondary_layer (const std::string &name, unsigned int layer_index);
@@ -144,6 +144,7 @@ private:
   friend class NetAreaFunction;
   friend class NetPerimeterFunction;
   friend class NetFunction;
+  friend class NetDbFunction;
   friend class NetSkipFunction;
   friend class NetCopyFunction;
 
@@ -153,7 +154,7 @@ private:
     double area, perimeter;
   };
 
-  const db::LayoutToNetlist *mp_l2n;
+  db::LayoutToNetlist *mp_l2n;
   double m_dbu;
   std::vector<unsigned int> m_layers;
   mutable std::vector<unsigned int> m_copy_layers;
@@ -173,6 +174,7 @@ private:
   tl::Variant perimeter_func (int layer_index) const;
   void copy_func (const std::vector<unsigned int> &layer_indexes, bool merge, size_t max_polygons) const;
   tl::Variant net_func () const;
+  tl::Variant db_func () const;
 };
 
 }

@@ -23,11 +23,53 @@
 #include "gsiDecl.h"
 #include "gsiEnums.h"
 #include "dbLog.h"
+#include "dbNet.h"
+#include "dbCircuit.h"
 
 namespace gsi
 {
 
+db::LogEntryData *new_le1 (db::Severity severity, const std::string &msg)
+{
+  return new db::LogEntryData (severity, msg);
+}
+
+db::LogEntryData *new_le2 (db::Severity severity, const std::string &cell_name, const std::string &msg)
+{
+  return new db::LogEntryData (severity, cell_name, msg);
+}
+
+db::LogEntryData *new_le3 (db::Severity severity, const std::string &cell_name, const std::string &net_name, const std::string &msg)
+{
+  return new db::LogEntryData (severity, cell_name, net_name, msg);
+}
+
+db::LogEntryData *new_le4 (db::Severity severity, const db::Net *net, const std::string &msg)
+{
+  if (! net || ! net->circuit ()) {
+    return new db::LogEntryData (severity, msg);
+  } else {
+    return new db::LogEntryData (severity, net->circuit ()->name (), net->expanded_name (), msg);
+  }
+}
+
 Class<db::LogEntryData> decl_dbNetlistDeviceExtractorError ("db", "LogEntryData",
+  gsi::constructor ("new", &new_le1, gsi::arg ("severity"), gsi::arg ("msg"),
+    "@brief Creates a new LogEntry object with the given severity and message\n"
+    "This convenience constructor has been added in version 0.30.6\n"
+  ) +
+  gsi::constructor ("new", &new_le2, gsi::arg ("severity"), gsi::arg ("cell_name"), gsi::arg ("msg"),
+    "@brief Creates a new LogEntry object with the given severity, cell or circuit name and message\n"
+    "This convenience constructor has been added in version 0.30.6\n"
+  ) +
+  gsi::constructor ("new", &new_le3, gsi::arg ("severity"), gsi::arg ("cell_name"), gsi::arg ("new_name"), gsi::arg ("msg"),
+    "@brief Creates a new LogEntry object with the given severity, cell or circuit name, net name and message\n"
+    "This convenience constructor has been added in version 0.30.6\n"
+  ) +
+  gsi::constructor ("new", &new_le4, gsi::arg ("severity"), gsi::arg ("net"), gsi::arg ("msg"),
+    "@brief Creates a new LogEntry object with the given severity and message and circuit and net name taken from the given \\Net object\n"
+    "This convenience constructor has been added in version 0.30.6\n"
+  ) +
   gsi::method ("severity", &db::LogEntryData::severity,
     "@brief Gets the severity attribute.\n"
   ) +
@@ -50,6 +92,21 @@ Class<db::LogEntryData> decl_dbNetlistDeviceExtractorError ("db", "LogEntryData"
     "log entry is related to. If the log entry is an error or "
     "warning generated during device extraction, the cell name is "
     "the circuit the device should have appeared in."
+  ) +
+  gsi::method ("net_name", &db::LogEntryData::net_name,
+    "@brief Gets the net name.\n"
+    "See \\net_name= for details about this attribute."
+    "\n"
+    "The net_name attribute has been introduced in version 0.30.6.\n"
+  ) +
+  gsi::method ("net_name=", &db::LogEntryData::set_net_name, gsi::arg ("net_name"),
+    "@brief Sets the net name.\n"
+    "The net (or circuit) name specifies the net the "
+    "log entry is related to.\n"
+    "\n"
+    "By convention, the net name is the expanded net name (see \\Net#expanded_name).\n"
+    "\n"
+    "The net_name attribute has been introduced in version 0.30.6.\n"
   ) +
   gsi::method ("geometry", &db::LogEntryData::geometry,
     "@brief Gets the geometry.\n"

@@ -218,6 +218,22 @@ void LayoutToNetlist::link_nets (const db::Net *net, const db::Net *with)
 
   connected_clusters<db::NetShape> &clusters = m_net_clusters.clusters_per_cell (net->circuit ()->cell_index ());
   clusters.join_cluster_with (net->cluster_id (), with->cluster_id ());
+
+  //  fix the connections from the parents
+
+  const db::Cell &cc = internal_layout ()->cell (net->circuit ()->cell_index ());
+
+  for (db::Cell::parent_inst_iterator p = cc.begin_parent_insts (); ! p.at_end (); ++p) {
+
+    connected_clusters<db::NetShape> &pclusters = m_net_clusters.clusters_per_cell (p->parent_cell_index ());
+
+    db::CellInstArray ci = p->child_inst ().cell_inst ();
+    for (db::CellInstArray::iterator ia = ci.begin (); ! ia.at_end(); ++ia) {
+      db::ClusterInstance cli (with->cluster_id (), ci.object ().cell_index (), ci.complex_trans (*ia), p->child_inst ().prop_id ());
+      pclusters.rename_connection (cli, net->cluster_id ());
+    }
+
+  }
 }
 
 size_t LayoutToNetlist::link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &dtrans)

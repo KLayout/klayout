@@ -1714,7 +1714,7 @@ CODE
           dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)
 
           @engine.run_timed("\\"#{f}\\" in: " + @engine.src_line, self.data) do
-            self.data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
+            self.data.send(self.data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
               insert_object_into(new_data, block.call(object.transformed(t)), dbu_trans)
             end
             new_data

@@ -105,8 +105,10 @@ a1.edges.collect_to_region { |p| p.length < 0.8 && p.bbox.enlarged(0.1, 0.1) }.o
 a1.edges.collect_to_region { |p| p.length < 0.8 && p.bbox.transformed(RBA::VCplxTrans::new(1000.0)).enlarged(100, 100) }.output(1123, 0)
 
 # edge pair collect
-a1.width(1.5).collect { |p| p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1120, 0)
-a1.width(1.5).collect_to_edge_pairs { |p| p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1121, 0)
+a1.width(1.5).collect { |p| p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1130, 0)
+a1.width(1.5).collect_to_edge_pairs { |p| p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1131, 0)
+a1.width(1.5).collect_to_edges { |p| p.transformed(RBA::VCplxTrans::new(1000.0)).first }.output(1132, 0)
+a1.width(1.5).collect_to_region { |p| p.polygon(0.0).transformed(RBA::VCplxTrans::new(1000.0)) }.output(1133, 0)
 
 expect_count(a1.edges, 9, 9, "a1.edges")
 expect_count(a1.width(1.5), 5, 5, "a1.width(1.5)")

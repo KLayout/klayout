@@ -203,13 +203,29 @@ public:
   }
  
   /**
-   *  @brief Iterates all subclasses (end)
+   *  @brief Iterates all child classes (end)
    */
   tl::weak_collection<ClassBase>::const_iterator end_child_classes () const
   {
     return m_child_classes.end ();
   }
  
+  /**
+   *  @brief Iterates all subclasses (begin)
+   */
+  tl::weak_collection<ClassBase>::const_iterator begin_subclasses () const
+  {
+    return m_subclasses.begin ();
+  }
+
+  /**
+   *  @brief Iterates all subclasses (end)
+   */
+  tl::weak_collection<ClassBase>::const_iterator end_subclasses () const
+  {
+    return m_subclasses.end ();
+  }
+
   /**
    *  @brief Iterates all classes present (begin)
    */

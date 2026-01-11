@@ -108,7 +108,10 @@ BoxService::do_mouse_move_inactive (const db::DPoint &p)
 void
 BoxService::do_mouse_move (const db::DPoint &p)
 {
-  lay::PointSnapToObjectResult snap_details = snap2_details (p);
+  //  snap to square if Ctrl button is pressed
+  bool snap_square = alt_ac () == lay::AC_Diagonal;
+
+  lay::PointSnapToObjectResult snap_details = snap2_details (p, m_p1, snap_square ? lay::AC_DiagonalOnly : lay::AC_Any);
   db::DPoint ps = snap_details.snapped_point;
 
   if (snap_details.object_snap == lay::PointSnapToObjectResult::NoObject) {
@@ -122,12 +125,22 @@ BoxService::do_mouse_move (const db::DPoint &p)
     lay::PointSnapToObjectResult snap_details_y = snap2_details (py);
 
     if (snap_details_x.object_snap != lay::PointSnapToObjectResult::NoObject) {
-      ps = db::DPoint (snap_details_x.snapped_point.x (), ps.y ());
+      if (snap_square) {
+        double dx = fabs (snap_details_x.snapped_point.x () - m_p1.x ());
+        ps = db::DPoint (snap_details_x.snapped_point.x (), m_p1.y () + (ps.y () < m_p1.y () ? -dx : dx));
+      } else {
+        ps = db::DPoint (snap_details_x.snapped_point.x (), ps.y ());
+      }
       mouse_cursor_from_snap_details (snap_details_x, true /*add*/);
     }
 
     if (snap_details_y.object_snap != lay::PointSnapToObjectResult::NoObject) {
-      ps = db::DPoint (ps.x (), snap_details_y.snapped_point.y ());
+      if (snap_square) {
+        double dy = fabs (snap_details_y.snapped_point.x () - m_p1.y ());
+        ps = db::DPoint (m_p1.x () + (ps.x () < m_p1.x () ? -dy : dy), snap_details_y.snapped_point.y ());
+      } else {
+        ps = db::DPoint (ps.x (), snap_details_y.snapped_point.y ());
+      }
       mouse_cursor_from_snap_details (snap_details_y, true /*add*/);
     }
 

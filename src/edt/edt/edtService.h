@@ -611,6 +611,7 @@ protected:
   db::DPoint snap2 (const db::DPoint &p, const db::DPoint &plast, bool connect = true) const;
 
 protected:
+  lay::angle_constraint_type alt_ac () const;
   lay::angle_constraint_type connect_ac () const;
   lay::angle_constraint_type move_ac () const;
 
@@ -653,6 +654,16 @@ protected:
    *  @brief Point snapping with detailed return value
    */
   lay::PointSnapToObjectResult snap2_details (const db::DPoint &p) const;
+
+  /**
+   *  @brief Point snapping with detailed return value
+   */
+  lay::PointSnapToObjectResult snap2_details (const db::DPoint &p, const db::DPoint &plast, bool connect) const;
+
+  /**
+   *  @brief Point snapping with detailed return value and specific angle constraint
+   */
+  lay::PointSnapToObjectResult snap2_details (const db::DPoint &p, const db::DPoint &plast, lay::angle_constraint_type ac) const;
 
 private:
   friend class EditableSelectionIterator;

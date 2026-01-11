@@ -103,14 +103,21 @@ Service::~Service ()
   clear_transient_selection ();
 }
 
-lay::angle_constraint_type 
+lay::angle_constraint_type
+Service::alt_ac () const
+{
+  //  fetch m_alt_ac (which is set from mouse buttons)
+  return m_alt_ac;
+}
+
+lay::angle_constraint_type
 Service::connect_ac () const
 {
   //  m_alt_ac (which is set from mouse buttons) can override the specified connect angle constraint
   return m_alt_ac != lay::AC_Global ? m_alt_ac : m_connect_ac;
 }
 
-lay::angle_constraint_type 
+lay::angle_constraint_type
 Service::move_ac () const
 {
   //  m_alt_ac (which is set from mouse buttons) can override the specified move angle constraint
@@ -290,11 +297,23 @@ Service::snap2 (const db::DPoint &p) const
   return snap2_details (p).snapped_point;
 }
 
+lay::PointSnapToObjectResult
+Service::snap2_details (const db::DPoint &p, const db::DPoint &plast, lay::angle_constraint_type ac) const
+{
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (lay::snap_range_pixels ());
+  return lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, ac, snap_range);
+}
+
+lay::PointSnapToObjectResult
+Service::snap2_details (const db::DPoint &p, const db::DPoint &plast, bool connect) const
+{
+  return snap2_details (p, plast, connect ? connect_ac () : move_ac ());
+}
+
 db::DPoint 
 Service::snap2 (const db::DPoint &p, const db::DPoint &plast, bool connect) const
 {
-  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (lay::snap_range_pixels ());
-  return lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, connect ? connect_ac () : move_ac (), snap_range).snapped_point;
+  return snap2_details (p, plast, connect ? connect_ac () : move_ac ()).snapped_point;
 }
 
 void

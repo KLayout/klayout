@@ -188,9 +188,11 @@ snap_angle (const db::DVector &in, lay::angle_constraint_type ac, db::DVector *s
   std::vector <db::DVector> ref_dir;
   if (ac != lay::AC_Any) {
     ref_dir.reserve (4);
-    ref_dir.push_back (db::DVector (1.0, 0));
-    ref_dir.push_back (db::DVector (0, 1.0));
-    if (ac == lay::AC_Diagonal) {
+    if (ac != lay::AC_DiagonalOnly) {
+      ref_dir.push_back (db::DVector (1.0, 0));
+      ref_dir.push_back (db::DVector (0, 1.0));
+    }
+    if (ac == lay::AC_Diagonal || ac == lay::AC_DiagonalOnly) {
       ref_dir.push_back (db::DVector (-1.0, 1.0));
       ref_dir.push_back (db::DVector (1.0, 1.0));
     }
@@ -961,6 +963,10 @@ make_cutlines (lay::angle_constraint_type snap_mode, const db::DPoint &p1, std::
     cutlines.reserve (4);
     cutlines.push_back (db::DEdge (p1, p1 + db::DVector (0.0, 1.0)));
     cutlines.push_back (db::DEdge (p1, p1 + db::DVector (1.0, 0.0)));
+    cutlines.push_back (db::DEdge (p1, p1 + db::DVector (1.0, 1.0)));
+    cutlines.push_back (db::DEdge (p1, p1 + db::DVector (1.0, -1.0)));
+  } else if (snap_mode == lay::AC_DiagonalOnly) {
+    cutlines.reserve (2);
     cutlines.push_back (db::DEdge (p1, p1 + db::DVector (1.0, 1.0)));
     cutlines.push_back (db::DEdge (p1, p1 + db::DVector (1.0, -1.0)));
   }

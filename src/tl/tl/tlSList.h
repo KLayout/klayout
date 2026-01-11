@@ -46,6 +46,8 @@ namespace tl
  *  - empty
  */
 
+template <class T> class slist;
+
 template <class T>
 struct slist_node_type
 {
@@ -87,6 +89,7 @@ public:
 
 private:
   friend class slist_const_iterator<T>;
+  friend class slist<T>;
   node_type *mp_p;
 };
 
@@ -119,6 +122,7 @@ public:
   bool operator!= (slist_const_iterator<T> other) const { return mp_p != other.mp_p; }
 
 private:
+  friend class slist<T>;
   const node_type *mp_p;
 };
 
@@ -302,6 +306,15 @@ public:
 
     other.mp_first = other.mp_last = 0;
     other.m_size = 0;
+  }
+
+  void erase_after (iterator at)
+  {
+    node_type *n = at.mp_p->next;
+    if (n) {
+      at.mp_p->next = n->next;
+      delete n;
+    }
   }
 
 private:

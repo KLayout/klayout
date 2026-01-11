@@ -212,7 +212,7 @@ void LayoutToNetlist::link_nets (const db::Net *net, const db::Net *with)
 {
   if (! net->circuit () || net->circuit () != with->circuit () || ! internal_layout ()
       || ! internal_layout ()->is_valid_cell_index (net->circuit ()->cell_index ())
-      || net->cluster_id () == 0 || with->cluster_id () == 0) {
+      || net->cluster_id () == 0 || with->cluster_id () == 0 || net == with) {
     return;
   }
 

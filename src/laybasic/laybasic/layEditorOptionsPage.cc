@@ -70,7 +70,9 @@ EditorOptionsPage::init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
 int
 EditorOptionsPage::show ()
 {
-  if (mp_owner && m_active) {
+  if (! m_active) {
+    return -1;
+  } else if (mp_owner) {
     if (! is_modal_page ()) {
       mp_owner->make_page_current (this);
       return -1;
@@ -78,6 +80,7 @@ EditorOptionsPage::show ()
       return mp_owner->exec_modal (this) ? 1 : 0;
     }
   } else {
+    set_focus ();
     return -1;
   }
 }
@@ -200,8 +203,10 @@ END_PROTECTED
 void
 EditorOptionsPageWidget::set_focus ()
 {
-  setFocus (Qt::TabFocusReason);
-  QWidget::focusNextPrevChild (true);
+  if (isVisible ()) {
+    setFocus (Qt::TabFocusReason);
+    QWidget::focusNextPrevChild (true);
+  }
 }
 
 void

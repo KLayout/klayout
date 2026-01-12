@@ -186,6 +186,11 @@ public:
   virtual bool key_event (unsigned int /*key*/, unsigned int /*buttons*/);
 
   /**
+   *  @brief Shortcut override event handler
+   */
+  virtual bool shortcut_override_event (unsigned int /*key*/, unsigned int /*buttons*/);
+
+  /**
    *  @brief Mouse press event handler
    */
   virtual bool mouse_press_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)

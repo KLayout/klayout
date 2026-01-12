@@ -416,6 +416,16 @@ PluginImpl::key_event (unsigned int key, unsigned int buttons)
 }
 
 bool
+PluginImpl::shortcut_override_event (unsigned int key, unsigned int buttons)
+{
+  if (f_shortcut_override_event.can_issue ()) {
+    return f_shortcut_override_event.issue<lay::ViewService, bool, unsigned int, unsigned int> (&lay::ViewService::shortcut_override_event, key, buttons);
+  } else {
+    return lay::EditorServiceBase::shortcut_override_event (key, buttons);
+  }
+}
+
+bool
 PluginImpl::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (f_mouse_press_event.can_issue ()) {
@@ -727,6 +737,17 @@ Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
     "@param key The Qt key code of the key that was pressed\n"
     "@param buttons A combination of the constants in the \\ButtonState class which codes both the mouse buttons and the key modifiers (.e. ShiftButton etc).\n"
     "@return True to terminate dispatcher\n"
+  ) +
+  callback ("shortcut_override_event", &gsi::PluginImpl::shortcut_override_event, &gsi::PluginImpl::f_shortcut_override_event, gsi::arg ("key"), gsi::arg ("buttons"),
+    "@brief Allows overriding keyboard shortcuts for this plugin\n"
+    "If the implementation returns true, the given key is not handled by the shortcut system, but rather\n"
+    "passed to 'key_event' the usual way.\n"
+    "\n"
+    "@param key The Qt key code of the key that was pressed\n"
+    "@param buttons A combination of the constants in the \\ButtonState class which codes both the mouse buttons and the key modifiers (.e. ShiftButton etc).\n"
+    "@return True to request 'key_event' handling\n"
+    "\n"
+    "This method has been introduced in version 0.30.5."
   ) +
   callback ("mouse_button_pressed_event", &gsi::PluginImpl::mouse_press_event_noref, &gsi::PluginImpl::f_mouse_press_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button pressed event\n"

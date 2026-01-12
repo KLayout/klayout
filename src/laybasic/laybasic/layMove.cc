@@ -30,6 +30,7 @@
 #if defined(HAVE_QT)
 #  include "layEditorOptionsPage.h"
 #  include <QWidget>
+#  include <QKeyEvent> // @@@
 #  include <QHBoxLayout>
 #  include <QLineEdit>
 #endif
@@ -140,16 +141,6 @@ MoveService::show_toolbox (bool visible)
   if (op) {
     op->set_visible (visible);
   }
-}
-
-int
-MoveService::focus_page_open ()
-{
-  //  This method is called on "Tab" by "key_event". "fp" is null as we don't have a focus page registered.
-  if (is_active () && dispatcher ()) {
-    dispatcher ()->menu_activated ("cm_sel_move");
-  }
-  return 0;
 }
 
 bool 
@@ -415,6 +406,8 @@ public:
     mp_layout->addStretch (1);
 
     hide ();
+
+    set_focus_page (true);
     set_toolbox_widget (true);
   }
 
@@ -436,6 +429,35 @@ public:
   virtual void deactivated ()
   {
     hide ();
+  }
+
+  virtual void keyPressEvent (QKeyEvent *event)
+  {
+    if (event->key () == Qt::Key_Escape) {
+      tl::info << "@@@ Escape!";
+      view ()->set_focus ();
+    } else if (event->key () == Qt::Key_Enter || event->key () == Qt::Key_Return) {
+      tl::info << "@@@ Accept!";
+      view ()->set_focus ();
+    }
+    QWidget::keyPressEvent (event);
+  }
+
+  virtual bool event (QEvent *event)
+  {
+    if (event->type () == QEvent::ShortcutOverride) {
+      QKeyEvent *ke = dynamic_cast<QKeyEvent *> (event);
+      if (ke->key () == Qt::Key_Escape ||
+          ke->key () == Qt::Key_Tab ||
+          ke->key () == Qt::Key_Enter ||
+          ke->key () == Qt::Key_Return ||
+          ke->key () == Qt::Key_Backtab) {
+        //  accept the shortcut override event for some keys, so we can handle
+        //  it in keyPressEvent
+        ke->accept ();
+      }
+    }
+    return QWidget::event (event);
   }
 
 private:

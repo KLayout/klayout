@@ -379,6 +379,12 @@ EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
   }
 }
 
+bool
+EditorServiceBase::shortcut_override_event (unsigned int key, unsigned int buttons)
+{
+  return is_active () && key == Qt::Key_Tab && buttons == 0 && focus_page ();
+}
+
 int
 EditorServiceBase::focus_page_open ()
 {

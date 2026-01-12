@@ -431,33 +431,14 @@ public:
     hide ();
   }
 
-  virtual void keyPressEvent (QKeyEvent *event)
+  virtual void apply (lay::Dispatcher * /*dispatcher*/)
   {
-    if (event->key () == Qt::Key_Escape) {
-      tl::info << "@@@ Escape!";
-      view ()->set_focus ();
-    } else if (event->key () == Qt::Key_Enter || event->key () == Qt::Key_Return) {
-      tl::info << "@@@ Accept!";
-      view ()->set_focus ();
-    }
-    QWidget::keyPressEvent (event);
+    tl::info << "@@@ Accept!";
   }
 
-  virtual bool event (QEvent *event)
+  virtual void cancel ()
   {
-    if (event->type () == QEvent::ShortcutOverride) {
-      QKeyEvent *ke = dynamic_cast<QKeyEvent *> (event);
-      if (ke->key () == Qt::Key_Escape ||
-          ke->key () == Qt::Key_Tab ||
-          ke->key () == Qt::Key_Enter ||
-          ke->key () == Qt::Key_Return ||
-          ke->key () == Qt::Key_Backtab) {
-        //  accept the shortcut override event for some keys, so we can handle
-        //  it in keyPressEvent
-        ke->accept ();
-      }
-    }
-    return QWidget::event (event);
+    tl::info << "@@@ Escape!";
   }
 
 private:

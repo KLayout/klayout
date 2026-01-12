@@ -83,12 +83,15 @@ public:
   virtual int order () const = 0;
   virtual const char *name () const { return 0; }
   virtual void apply (lay::Dispatcher * /*root*/) { }
+  virtual void cancel () { }
   virtual void setup (lay::Dispatcher * /*root*/) { }
   virtual void commit_recent (lay::Dispatcher * /*root*/) { }
   virtual void config_recent_for_layer (lay::Dispatcher * /*root*/, const db::LayerProperties & /*lp*/, int /*cv_index*/) { }
   virtual void set_focus () { }
-  virtual void set_visible (bool /*visible*/) { }
   virtual EditorOptionsPageWidget *widget () { return 0; }
+
+  virtual bool is_visible () const { return false; }
+  virtual void set_visible (bool /*visible*/) { }
 
   bool is_focus_page () const { return m_focus_page; }
   void set_focus_page (bool f) { m_focus_page = f; }
@@ -159,6 +162,7 @@ public:
   virtual ~EditorOptionsPageWidget ();
 
   virtual void set_focus ();
+  virtual bool is_visible () const;
   virtual void set_visible (bool visible);
   virtual EditorOptionsPageWidget *widget () { return this; }
 
@@ -168,6 +172,7 @@ protected slots:
 protected:
   virtual bool focusNextPrevChild (bool next);
   virtual void keyPressEvent (QKeyEvent *event);
+  virtual bool event (QEvent *event);
 };
 #endif  //  defined(HAVE_QT)
 

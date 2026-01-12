@@ -188,16 +188,41 @@ void
 EditorOptionsPageWidget::keyPressEvent (QKeyEvent *event)
 {
 BEGIN_PROTECTED
-  if (! is_modal_page () && event->modifiers () == Qt::NoModifier && event->key () == Qt::Key_Return) {
-    //  The Return key on a non-modal page commits the values and gives back the focus
-    //  to the view
-    apply (dispatcher ());
+  if (! is_modal_page () &&
+      event->modifiers () == Qt::NoModifier &&
+      (event->key () == Qt::Key_Return || event->key () == Qt::Key_Enter || event->key () == Qt::Key_Escape)) {
+    if (event->key () == Qt::Key_Escape) {
+      //  The Escape key creates a call to cancel()
+      cancel ();
+    } else {
+      //  The Return key on a non-modal page commits the values and gives back the focus
+      //  to the view
+      apply (dispatcher ());
+    }
     view ()->set_focus ();
     event->accept ();
   } else {
     QWidget::keyPressEvent (event);
   }
 END_PROTECTED
+}
+
+bool
+EditorOptionsPageWidget::event (QEvent *event)
+{
+  if (event->type () == QEvent::ShortcutOverride) {
+    QKeyEvent *ke = dynamic_cast<QKeyEvent *> (event);
+    if (ke->key () == Qt::Key_Escape ||
+        ke->key () == Qt::Key_Tab ||
+        ke->key () == Qt::Key_Enter ||
+        ke->key () == Qt::Key_Return ||
+        ke->key () == Qt::Key_Backtab) {
+      //  accept the shortcut override event for some keys, so we can handle
+      //  it in keyPressEvent
+      ke->accept ();
+    }
+  }
+  return QWidget::event (event);
 }
 
 void
@@ -213,6 +238,12 @@ void
 EditorOptionsPageWidget::set_visible (bool visible)
 {
   setVisible (visible);
+}
+
+bool
+EditorOptionsPageWidget::is_visible () const
+{
+  return isVisible ();
 }
 
 #endif

@@ -369,9 +369,9 @@ EditorServiceBase::focus_page ()
 }
 
 bool
-EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
+EditorServiceBase::key_event (unsigned int key, unsigned int /*buttons*/)
 {
-  if (is_active () && key == Qt::Key_Tab && buttons == 0) {
+  if (is_active () && (key == Qt::Key_Tab || key == Qt::Key_Backtab)) {
     focus_page_open ();
     return true;
   } else {
@@ -380,9 +380,13 @@ EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
 }
 
 bool
-EditorServiceBase::shortcut_override_event (unsigned int key, unsigned int buttons)
+EditorServiceBase::shortcut_override_event (unsigned int key, unsigned int /*buttons*/)
 {
-  return is_active () && key == Qt::Key_Tab && buttons == 0 && focus_page ();
+  auto fp = focus_page ();
+  return is_active ()
+      && (key == Qt::Key_Tab || key == Qt::Key_Backtab)
+      && fp
+      && (fp->is_modal_page () || fp->is_visible ());
 }
 
 int

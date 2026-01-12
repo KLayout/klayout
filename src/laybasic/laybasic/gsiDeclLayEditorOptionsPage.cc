@@ -73,6 +73,10 @@ Class<lay::EditorOptionsPage> decl_EditorOptionsPageBase (QT_EXTERNAL_BASE (QWid
   ) +
   method ("setup", &lay::EditorOptionsPage::setup, gsi::arg ("dispatcher"),
     "@brief Transfers data from the configuration to the page\n"
+  ) +
+  method ("cancel", &lay::EditorOptionsPage::cancel,
+    "@brief Gets called when the Escape key is pressed on a non-modal page\n"
+    "This method has been introduced in version 0.30.6."
   ),
   "@brief The plugin framework's editor options page base class\n"
   "\n"
@@ -111,6 +115,11 @@ static void setup_fb (EditorOptionsPageImpl *ep, lay::Dispatcher *root)
   ep->lay::EditorOptionsPage::setup (root);
 }
 
+static void cancel_fb (EditorOptionsPageImpl *ep)
+{
+  ep->lay::EditorOptionsPage::cancel ();
+}
+
 void
 EditorOptionsPageImpl::apply_impl (lay::Dispatcher *root)
 {
@@ -140,6 +149,22 @@ EditorOptionsPageImpl::setup (lay::Dispatcher *root)
     f_setup.issue<EditorOptionsPageImpl, lay::Dispatcher *> (&EditorOptionsPageImpl::setup_impl, root);
   } else {
     EditorOptionsPageImpl::setup_impl (root);
+  }
+}
+
+void
+EditorOptionsPageImpl::cancel_impl ()
+{
+  lay::EditorOptionsPage::cancel ();
+}
+
+void
+EditorOptionsPageImpl::cancel ()
+{
+  if (f_cancel.can_issue ()) {
+    f_cancel.issue<EditorOptionsPageImpl> (&EditorOptionsPageImpl::cancel_impl);
+  } else {
+    EditorOptionsPageImpl::cancel_impl ();
   }
 }
 
@@ -173,6 +198,12 @@ Class<EditorOptionsPageImpl> decl_EditorOptionsPage (decl_EditorOptionsPageBase,
     "In this method, you should transfer all configuration data to the widgets.\n"
     "Use \\Dispatcher#get_config on the dispatcher object ('dispatcher' argument) to get a configuration parameter "
     "and set the editing widget's state accordingly.\n"
+  ) +
+  //  prevents infinite recursion
+  method_ext ("cancel", &cancel_fb, "@hide") +
+  callback ("cancel", &EditorOptionsPageImpl::cancel, &EditorOptionsPageImpl::f_cancel,
+    "@brief Reimplement this method to receive Escape key events for the page\n"
+    "This method has been added in version 0.30.6.\n"
   ),
   "@brief The plugin framework's editor options page\n"
   "\n"

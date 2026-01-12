@@ -53,9 +53,11 @@ public:
   void call_edited ();
   virtual void apply (lay::Dispatcher *root);
   virtual void setup (lay::Dispatcher *root);
+  virtual void cancel ();
 
   gsi::Callback f_apply;
   gsi::Callback f_setup;
+  gsi::Callback f_cancel;
 
 private:
   tl::weak_ptr<lay::LayoutViewBase> mp_view;
@@ -65,6 +67,7 @@ private:
 
   void apply_impl (lay::Dispatcher *root);
   void setup_impl (lay::Dispatcher *root);
+  void cancel_impl ();
 };
 
 }

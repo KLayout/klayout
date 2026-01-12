@@ -20,11 +20,8 @@
 
 */
 
-#if defined(HAVE_QT)
-
 #include "tlInternational.h"
 #include "layEditorOptionsPage.h"
-#include "layEditorOptionsPages.h"
 #include "layLayoutViewBase.h"
 #include "tlExceptions.h"
 
@@ -38,13 +35,13 @@ namespace lay
 //  EditorOptionsPage implementation
 
 EditorOptionsPage::EditorOptionsPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-  : QWidget (0), mp_owner (0), m_active (true), m_focus_page (false), m_modal_page (false), mp_plugin_declaration (0), mp_dispatcher (dispatcher), mp_view (view)
+  : mp_owner (0), m_active (true), m_focus_page (false), m_modal_page (false), m_toolbox_widget (false), mp_plugin_declaration (0), mp_dispatcher (0), mp_view (0)
 {
-  attach_events ();
+  init (view, dispatcher);
 }
 
 EditorOptionsPage::EditorOptionsPage ()
-  : QWidget (0), mp_owner (0), m_active (true), m_focus_page (false), m_modal_page (false), mp_plugin_declaration (0), mp_dispatcher (0), mp_view (0)
+  : mp_owner (0), m_active (true), m_focus_page (false), m_modal_page (false), m_toolbox_widget (false), mp_plugin_declaration (0), mp_dispatcher (0), mp_view (0)
 {
   //  .. nothing yet ..
 }
@@ -60,57 +57,6 @@ EditorOptionsPage::init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
   mp_view = view;
   mp_dispatcher = dispatcher;
   attach_events ();
-}
-
-void
-EditorOptionsPage::edited ()
-{
-  apply (dispatcher ());
-}
-
-static bool is_parent_widget (QWidget *w, QWidget *parent)
-{
-  while (w && w != parent) {
-    w = dynamic_cast<QWidget *> (w->parent ());
-  }
-  return w == parent;
-}
-
-bool
-EditorOptionsPage::focusNextPrevChild (bool next)
-{
-  bool res = QWidget::focusNextPrevChild (next);
-
-  //  Stop making the focus leave the page - this way we can jump back to the
-  //  view on "enter"
-  if (res && ! is_modal_page () && ! is_parent_widget (QApplication::focusWidget (), this) && focusWidget ()) {
-    focusWidget ()->setFocus ();
-  }
-
-  return res;
-}
-
-void
-EditorOptionsPage::keyPressEvent (QKeyEvent *event)
-{
-BEGIN_PROTECTED
-  if (! is_modal_page () && event->modifiers () == Qt::NoModifier && event->key () == Qt::Key_Return) {
-    //  The Return key on a non-modal page commits the values and gives back the focus
-    //  to the view
-    apply (dispatcher ());
-    view ()->set_focus ();
-    event->accept ();
-  } else {
-    QWidget::keyPressEvent (event);
-  }
-END_PROTECTED
-}
-
-void
-EditorOptionsPage::set_focus ()
-{
-  setFocus (Qt::TabFocusReason);
-  QWidget::focusNextPrevChild (true);
 }
 
 int
@@ -153,7 +99,7 @@ EditorOptionsPage::on_technology_changed ()
 }
 
 void
-EditorOptionsPage::set_owner (EditorOptionsPages *owner)
+EditorOptionsPage::set_owner (EditorOptionsPageCollection *owner)
 {
   if (mp_owner) {
     mp_owner->unregister_page (this);
@@ -172,6 +118,80 @@ EditorOptionsPage::activate (bool active)
   }
 }
 
+#if defined(HAVE_QT)
+
+// ------------------------------------------------------------------
+//  EditorOptionsPage implementation
+
+EditorOptionsPageWidget::EditorOptionsPageWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+  : QWidget (0), EditorOptionsPage (view, dispatcher)
+{
+  init (view, dispatcher);
+}
+
+EditorOptionsPageWidget::EditorOptionsPageWidget ()
+  : QWidget (0), EditorOptionsPage ()
+{
+  //  .. nothing yet ..
+}
+
+EditorOptionsPageWidget::~EditorOptionsPageWidget ()
+{
+  set_owner (0);
+}
+
+void
+EditorOptionsPageWidget::edited ()
+{
+  apply (dispatcher ());
+}
+
+static bool is_parent_widget (QWidget *w, QWidget *parent)
+{
+  while (w && w != parent) {
+    w = dynamic_cast<QWidget *> (w->parent ());
+  }
+  return w == parent;
+}
+
+bool
+EditorOptionsPageWidget::focusNextPrevChild (bool next)
+{
+  bool res = QWidget::focusNextPrevChild (next);
+
+  //  Stop making the focus leave the page - this way we can jump back to the
+  //  view on "enter"
+  if (res && ! is_modal_page () && ! is_parent_widget (QApplication::focusWidget (), this) && focusWidget ()) {
+    focusWidget ()->setFocus ();
+  }
+
+  return res;
+}
+
+void
+EditorOptionsPageWidget::keyPressEvent (QKeyEvent *event)
+{
+BEGIN_PROTECTED
+  if (! is_modal_page () && event->modifiers () == Qt::NoModifier && event->key () == Qt::Key_Return) {
+    //  The Return key on a non-modal page commits the values and gives back the focus
+    //  to the view
+    apply (dispatcher ());
+    view ()->set_focus ();
+    event->accept ();
+  } else {
+    QWidget::keyPressEvent (event);
+  }
+END_PROTECTED
+}
+
+void
+EditorOptionsPageWidget::set_focus ()
+{
+  setFocus (Qt::TabFocusReason);
+  QWidget::focusNextPrevChild (true);
 }
 
 #endif
+
+}
+

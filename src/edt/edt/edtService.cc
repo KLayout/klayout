@@ -2024,18 +2024,17 @@ Service::handle_guiding_shape_changes (bool commit)
 void
 Service::commit_recent ()
 {
-#if defined(HAVE_QT)
-  lay::EditorOptionsPages *eo_pages = view ()->editor_options_pages ();
-  if (!eo_pages) {
+  lay::EditorOptionsPageCollection *eo_pages = view ()->editor_options_pages ();
+  if (! eo_pages) {
     return;
   }
 
-  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+  auto pages = eo_pages->editor_options_pages ();
+  for (auto op = pages.begin (); op != pages.end (); ++op) {
     if ((*op)->plugin_declaration () == plugin_declaration ()) {
       (*op)->commit_recent (view ());
     }
   }
-#endif
 }
 
 // -------------------------------------------------------------

@@ -21,13 +21,10 @@
 */
 
 
-#if defined(HAVE_QT)
-#  include "layTipDialog.h"
-#  include "layEditorOptionsPages.h"
-#endif
-
 #include "layDispatcher.h"
 #include "layLayoutViewBase.h"
+#include "layEditorOptionsPage.h"
+#include "layTipDialog.h"
 #include "edtPlugin.h"
 #include "edtConfig.h"
 #include "edtService.h"
@@ -40,10 +37,8 @@
 #include "edtMainService.h"
 #include "edtPartialService.h"
 #include "edtMoveTrackerService.h"
-#if defined(HAVE_QT)
-#  include "edtEditorOptionsPages.h"
-#  include "edtRecentConfigurationPage.h"
-#endif
+#include "edtEditorOptionsPages.h"
+#include "edtRecentConfigurationPage.h"
 
 #if defined(HAVE_QT)
 #  include <QApplication>
@@ -65,7 +60,7 @@ edt::RecentConfigurationPage::ConfigurationDescriptor shape_cfg_descriptors[] =
 static
 void get_shape_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
 {
-  ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-shape-param",
+  ret.push_back (new edt::RecentConfigurationPage (view, dispatcher, "edit-recent-shape-param",
                         &shape_cfg_descriptors[0], &shape_cfg_descriptors[sizeof (shape_cfg_descriptors) / sizeof (shape_cfg_descriptors[0])]));
 }
 #else
@@ -94,7 +89,7 @@ void get_text_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, 
     edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_valign, tl::to_string (tr ("Vert. align")), edt::RecentConfigurationPage::Text)
   };
 
-  ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-text-param",
+  ret.push_back (new edt::RecentConfigurationPage (view, dispatcher, "edit-recent-text-param",
                         &text_cfg_descriptors[0], &text_cfg_descriptors[sizeof (text_cfg_descriptors) / sizeof (text_cfg_descriptors[0])]));
   ret.push_back (new edt::EditorOptionsText (view, dispatcher));
 }

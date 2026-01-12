@@ -65,7 +65,7 @@ class PCellParametersPage;
  *  @brief The generic properties page
  */
 class EditorOptionsGeneric
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 Q_OBJECT
 
@@ -90,7 +90,7 @@ private:
  *  @brief The text properties page
  */
 class EditorOptionsText
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 public:
   EditorOptionsText (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
@@ -109,7 +109,7 @@ private:
  *  @brief The path properties page
  */
 class EditorOptionsPath
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 Q_OBJECT 
 
@@ -133,7 +133,7 @@ private:
  *  @brief The instance properties page
  */
 class EditorOptionsInst
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 Q_OBJECT 
 
@@ -165,7 +165,7 @@ private:
  *  @brief The instance properties page (PCell parameters)
  */
 class EditorOptionsInstPCellParam
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 Q_OBJECT
 

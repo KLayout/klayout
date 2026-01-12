@@ -20,12 +20,10 @@
 
 */
 
-#if defined(HAVE_QT)
-
 #ifndef HDR_layEditorOptionsFrame
 #define HDR_layEditorOptionsFrame
 
-#include "layuiCommon.h"
+#include "layviewCommon.h"
 #include <QFrame>
 
 namespace lay
@@ -34,7 +32,7 @@ namespace lay
 class EditorOptionsPages;
 class LayoutViewBase;
 
-class LAYUI_PUBLIC EditorOptionsFrame
+class LAYVIEW_PUBLIC EditorOptionsFrame
   : public QFrame
 {
 public:
@@ -55,5 +53,3 @@ public:
 }
 
 #endif
-
-#endif  //  defined(HAVE_QT)

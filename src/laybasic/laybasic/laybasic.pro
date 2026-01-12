@@ -42,7 +42,6 @@ SOURCES += \
   gsiDeclLayPluginFactory.cc \
   layAbstractMenu.cc \
   layEditorOptionsPage.cc \
-  layEditorOptionsPages.cc \
   layEditorUtils.cc \
   layLayoutViewConfig.cc \
   layMargin.cc \
@@ -100,7 +99,6 @@ HEADERS += \
   gsiDeclLayEditorOptionsPage.h \
   gsiDeclLayPlugin.h \
   layEditorOptionsPage.h \
-  layEditorOptionsPages.h \
   layEditorUtils.h \
   layMargin.h \
   laybasicConfig.h \

@@ -28,8 +28,6 @@
 #include "gsiDeclLayConfigPage.h"
 #include "gsiDeclLayPlugin.h"
 
-#include "layEditorOptionsPages.h"
-
 namespace gsi
 {
 

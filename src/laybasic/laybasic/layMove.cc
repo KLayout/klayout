@@ -27,6 +27,13 @@
 #include "laySelector.h"
 #include "laybasicConfig.h"
 
+#if defined(HAVE_QT)
+#  include "layEditorOptionsPage.h"
+#  include <QWidget>
+#  include <QHBoxLayout>
+#  include <QLineEdit>
+#endif
+
 namespace lay
 {
 
@@ -369,6 +376,47 @@ MoveService::finish ()
 
 // ----------------------------------------------------------------------------
 
+#if defined(HAVE_QT)
+namespace {
+
+class MoveToolboxPage
+  : public lay::EditorOptionsPageWidget
+{
+public:
+  MoveToolboxPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+    : lay::EditorOptionsPageWidget (view, dispatcher)
+  {
+    mp_layout = new QHBoxLayout (this);
+
+    mp_x_le = new QLineEdit (this);
+    mp_layout->addWidget (mp_x_le);
+    mp_y_le = new QLineEdit (this);
+    mp_layout->addWidget (mp_y_le);
+    mp_layout->addStretch (1);
+
+    // @@@
+
+    set_toolbox_widget (true);
+  }
+
+  virtual std::string title () const
+  {
+    return "Move Options";
+  }
+
+  virtual int order () const
+  {
+    return 0;
+  }
+
+private:
+  QHBoxLayout *mp_layout;
+  QLineEdit *mp_x_le, *mp_y_le;
+};
+
+}
+#endif
+
 class MoveServiceDeclaration
   : public lay::PluginDeclaration
 {
@@ -383,6 +431,13 @@ public:
   {
     return new MoveService (view);
   }
+
+#if defined(HAVE_QT)
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const
+  {
+    pages.push_back (new MoveToolboxPage (view, dispatcher));
+  }
+#endif
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> move_service_decl (new MoveServiceDeclaration (), -970, "laybasic::MoveServicePlugin");

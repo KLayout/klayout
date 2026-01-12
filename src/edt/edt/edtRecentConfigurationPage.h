@@ -48,13 +48,11 @@ namespace edt
 
 class PCellParametersPage;
 
-class EditorOptionsPages;
-
 /**
  *  @brief The base class for a object properties page
  */
 class EDT_PUBLIC RecentConfigurationPage
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 Q_OBJECT
 
@@ -86,7 +84,7 @@ public:
 
   template <class Iter>
   RecentConfigurationPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher, const std::string &recent_cfg_name, Iter begin_cfg, Iter end_cfg)
-    : EditorOptionsPage (view, dispatcher), m_recent_cfg_name (recent_cfg_name), m_cfg (begin_cfg, end_cfg), dm_update_list (this, &RecentConfigurationPage::update_list)
+    : EditorOptionsPageWidget (view, dispatcher), m_recent_cfg_name (recent_cfg_name), m_cfg (begin_cfg, end_cfg), dm_update_list (this, &RecentConfigurationPage::update_list)
   {
     init ();
   }

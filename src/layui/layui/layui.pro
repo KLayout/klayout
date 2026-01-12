@@ -103,7 +103,6 @@ SOURCES = \
   layEditLineStylesForm.cc \
   layEditStippleWidget.cc \
   layEditStipplesForm.cc \
-  layEditorOptionsFrame.cc \
   layFileDialog.cc \
   layGenericSyntaxHighlighter.cc \
   layHierarchyControlPanel.cc \
@@ -161,7 +160,6 @@ HEADERS = \
   layEditLineStylesForm.h \
   layEditStippleWidget.h \
   layEditStipplesForm.h \
-  layEditorOptionsFrame.h \
   layFileDialog.h \
   layGenericSyntaxHighlighter.h \
   layHierarchyControlPanel.h \

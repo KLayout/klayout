@@ -72,7 +72,7 @@ static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le
 //  EditorOptionsGeneric implementation
 
 EditorOptionsGeneric::EditorOptionsGeneric (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-  : EditorOptionsPage (view, dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsGeneric ();
   mp_ui->setupUi (this);
@@ -215,7 +215,7 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
 //  EditorOptionsText implementation
 
 EditorOptionsText::EditorOptionsText (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-  : lay::EditorOptionsPage (view, dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsText ();
   mp_ui->setupUi (this);
@@ -293,7 +293,7 @@ EditorOptionsText::setup (lay::Dispatcher *root)
 //  EditorOptionsPath implementation
 
 EditorOptionsPath::EditorOptionsPath (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-  : lay::EditorOptionsPage (view, dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsPath ();
   mp_ui->setupUi (this);
@@ -394,7 +394,7 @@ EditorOptionsPath::setup (lay::Dispatcher *root)
 //  EditorOptionsInst implementation
 
 EditorOptionsInst::EditorOptionsInst (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-  : lay::EditorOptionsPage (view, dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsInst ();
   mp_ui->setupUi (this);
@@ -687,7 +687,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
 //  EditorOptionsInstPCellParam implementation
 
 EditorOptionsInstPCellParam::EditorOptionsInstPCellParam (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-  : lay::EditorOptionsPage (view, dispatcher), mp_pcell_parameters (0), mp_placeholder_label (0)
+  : lay::EditorOptionsPageWidget (view, dispatcher), mp_pcell_parameters (0), mp_placeholder_label (0)
 {
   mp_ui = new Ui::EditorOptionsInstPCellParam ();
   mp_ui->setupUi (this);

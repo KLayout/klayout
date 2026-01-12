@@ -1722,7 +1722,7 @@ MainWindow::update_editor_options_dock ()
     eo_visible = pd_sel->editable_enabled ();
   }
   if (current_view () && eo_visible) {
-    lay::EditorOptionsPages *eo_pages = current_view ()->editor_options_pages ();
+    lay::EditorOptionsPageCollection *eo_pages = current_view ()->editor_options_pages ();
     if (! eo_pages || ! eo_pages->has_content ()) {
       eo_visible = false;
     }

@@ -20,8 +20,6 @@
 
 */
 
-#if defined(HAVE_QT)
-
 #include "layEditorOptionsFrame.h"
 #include "layEditorOptionsPage.h"
 #include "layEditorOptionsPages.h"
@@ -64,11 +62,10 @@ EditorOptionsFrame::populate (LayoutViewBase *view)
     delete mp_pages;
   }
 
-  mp_pages = new lay::EditorOptionsPages (this, prop_dialog_pages, view);
+  mp_pages = new lay::EditorOptionsPages (this, view, prop_dialog_pages);
   layout ()->addWidget (mp_pages);
   setFocusProxy (mp_pages);
 }
 
 }
 
-#endif

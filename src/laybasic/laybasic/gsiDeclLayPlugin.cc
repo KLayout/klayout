@@ -25,7 +25,6 @@
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
 #include "gsiEnums.h"
-#include "layEditorOptionsPages.h"
 #include "layCursor.h"
 #include "layEditorUtils.h"
 #include "layConverters.h"

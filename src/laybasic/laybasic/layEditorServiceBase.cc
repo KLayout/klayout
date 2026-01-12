@@ -22,7 +22,6 @@
 
 #include "layEditorServiceBase.h"
 #include "layEditorOptionsPage.h"
-#include "layEditorOptionsPages.h"
 #include "layViewport.h"
 #include "layLayoutViewBase.h"
 #include "laybasicConfig.h"
@@ -345,22 +344,14 @@ EditorServiceBase::activated ()
   m_active = true;
 }
 
-#if defined(HAVE_QT)
-
 std::vector<lay::EditorOptionsPage *>
 EditorServiceBase::editor_options_pages ()
 {
-  lay::EditorOptionsPages *eo_pages = mp_view->editor_options_pages ();
+  lay::EditorOptionsPageCollection *eo_pages = mp_view->editor_options_pages ();
   if (!eo_pages) {
     return std::vector<lay::EditorOptionsPage *> ();
   } else {
-    std::vector<lay::EditorOptionsPage *> pages;
-    for (auto p = eo_pages->pages ().begin (); p != eo_pages->pages ().end (); ++p) {
-      if ((*p)->plugin_declaration () == plugin_declaration ()) {
-        pages.push_back (*p);
-      }
-    }
-    return pages;
+    return eo_pages->editor_options_pages (plugin_declaration ());
   }
 }
 
@@ -401,27 +392,5 @@ EditorServiceBase::show_error (tl::Exception &ex)
   tl::error << ex.msg ();
   QMessageBox::critical (ui ()->widget (), tr ("Error"), tl::to_qstring (ex.msg ()));
 }
-
-#else
-
-bool
-EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
-{
-  return false;
-}
-
-void
-EditorServiceBase::show_error (tl::Exception &ex)
-{
-  tl::error << ex.msg ();
-}
-
-int
-EditorServiceBase::focus_page_open ()
-{
-  return 0;
-}
-
-#endif
 
 }

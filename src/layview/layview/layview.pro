@@ -10,11 +10,15 @@ RESOURCES = \
 
 SOURCES = \
   layGridNet.cc \
+  layEditorOptionsFrame.cc \
+  layEditorOptionsPages.cc \
   layviewForceLink.cc \
   gsiDeclLayAdditional.cc \
 
 HEADERS = \
   layGridNet.h \
+  layEditorOptionsFrame.h \
+  layEditorOptionsPages.h \
   layLayoutView.h \
   layviewForceLink.h \
 

@@ -32,6 +32,14 @@ namespace lay
 {
 
 // ------------------------------------------------------------------
+//  EditorOptionsPageCollection implementation
+
+EditorOptionsPageCollection::EditorOptionsPageCollection ()
+{
+  //  .. nothing yet ..
+}
+
+// ------------------------------------------------------------------
 //  EditorOptionsPage implementation
 
 EditorOptionsPage::EditorOptionsPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
@@ -115,6 +123,11 @@ EditorOptionsPage::activate (bool active)
     if (mp_owner) {
       mp_owner->activate_page (this);
     }
+    if (m_active) {
+      activated ();
+    } else {
+      deactivated ();
+    }
   }
 }
 
@@ -189,6 +202,12 @@ EditorOptionsPageWidget::set_focus ()
 {
   setFocus (Qt::TabFocusReason);
   QWidget::focusNextPrevChild (true);
+}
+
+void
+EditorOptionsPageWidget::set_visible (bool visible)
+{
+  setVisible (visible);
 }
 
 #endif

@@ -94,12 +94,6 @@ EditorOptionsPages::focusInEvent (QFocusEvent * /*event*/)
   }
 }
 
-const tl::weak_collection <lay::EditorOptionsPage> &
-EditorOptionsPages::pages () const
-{
-  return m_pages;
-}
-
 std::vector<lay::EditorOptionsPage *>
 EditorOptionsPages::editor_options_pages (const lay::PluginDeclaration *plugin_declaration)
 {
@@ -183,6 +177,17 @@ EditorOptionsPages::unregister_page (lay::EditorOptionsPage *page)
 {
   m_pages.erase (page);
   update (0);
+}
+
+lay::EditorOptionsPage *
+EditorOptionsPages::page_with_name (const std::string &name)
+{
+  for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
+    if (p->name () && name == p->name ()) {
+      return p.operator-> ();
+    }
+  }
+  return 0;
 }
 
 void

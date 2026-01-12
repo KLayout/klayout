@@ -57,6 +57,7 @@ private:
   virtual void drag_cancel ();
   virtual void deactivated ();
   int focus_page_open ();
+  void show_toolbox (bool visible);
 
   bool handle_click (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction);
 

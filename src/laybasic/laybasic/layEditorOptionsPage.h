@@ -53,6 +53,7 @@ class EditorOptionsPageWidget;
 class LAYBASIC_PUBLIC EditorOptionsPageCollection
 {
 public:
+  EditorOptionsPageCollection ();
   virtual ~EditorOptionsPageCollection () { }
 
   virtual void unregister_page (EditorOptionsPage *page) = 0;
@@ -64,6 +65,7 @@ public:
   virtual bool exec_modal (EditorOptionsPage *page) = 0;
   virtual std::vector<lay::EditorOptionsPage *> editor_options_pages (const lay::PluginDeclaration *plugin) = 0;
   virtual std::vector<lay::EditorOptionsPage *> editor_options_pages () = 0;
+  virtual lay::EditorOptionsPage *page_with_name (const std::string &name) = 0;
 };
 
 /**
@@ -79,11 +81,13 @@ public:
 
   virtual std::string title () const = 0;
   virtual int order () const = 0;
+  virtual const char *name () const { return 0; }
   virtual void apply (lay::Dispatcher * /*root*/) { }
   virtual void setup (lay::Dispatcher * /*root*/) { }
   virtual void commit_recent (lay::Dispatcher * /*root*/) { }
   virtual void config_recent_for_layer (lay::Dispatcher * /*root*/, const db::LayerProperties & /*lp*/, int /*cv_index*/) { }
   virtual void set_focus () { }
+  virtual void set_visible (bool /*visible*/) { }
   virtual EditorOptionsPageWidget *widget () { return 0; }
 
   bool is_focus_page () const { return m_focus_page; }
@@ -123,6 +127,8 @@ public:
 protected:
   virtual void active_cellview_changed () { }
   virtual void technology_changed (const std::string & /*tech*/) { }
+  virtual void activated () { }
+  virtual void deactivated () { }
 
 private:
   EditorOptionsPageCollection *mp_owner;
@@ -153,6 +159,7 @@ public:
   virtual ~EditorOptionsPageWidget ();
 
   virtual void set_focus ();
+  virtual void set_visible (bool visible);
   virtual EditorOptionsPageWidget *widget () { return this; }
 
 protected slots:

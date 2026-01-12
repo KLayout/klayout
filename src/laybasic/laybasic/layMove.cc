@@ -37,6 +37,8 @@
 namespace lay
 {
 
+const char *move_editor_options_name = "move-editor-options";
+
 // -------------------------------------------------------------
 //  MoveService implementation
 
@@ -62,7 +64,11 @@ MoveService::deactivated ()
   EditorServiceBase::deactivated ();
   m_shift = db::DPoint ();
   mp_editables->clear_transient_selection ();
-  drag_cancel ();
+
+  if (m_dragging) {
+    //  we don't just call drag_cancel() - this way avoids pending selections with the wrong coordinates
+    mp_view->edit_cancel ();
+  }
 }
 
 bool
@@ -124,6 +130,15 @@ MoveService::key_event (unsigned int key, unsigned int buttons)
 
   } else {
     return false;
+  }
+}
+
+void
+MoveService::show_toolbox (bool visible)
+{
+  lay::EditorOptionsPage *op = mp_view->editor_options_pages () ? mp_view->editor_options_pages ()->page_with_name (move_editor_options_name) : 0;
+  if (op) {
+    op->set_visible (visible);
   }
 }
 
@@ -320,6 +335,8 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
 
       m_dragging = true;
       m_dragging_transient = drag_transient;
+
+      show_toolbox (true);
       ui ()->grab_mouse (this, false);
 
       m_shift = db::DPoint ();
@@ -332,7 +349,9 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
 
     m_dragging = false;
 
+    show_toolbox (false);
     ui ()->ungrab_mouse (this);
+
     mp_editables->end_move (p, ac_from_buttons (buttons), mp_transaction.release ());
 
     if (m_dragging_transient) {
@@ -350,6 +369,7 @@ MoveService::drag_cancel ()
 {
   m_shift = db::DPoint ();
   if (m_dragging) {
+    show_toolbox (false);
     ui ()->ungrab_mouse (this);
     m_dragging = false;
   }
@@ -394,8 +414,7 @@ public:
     mp_layout->addWidget (mp_y_le);
     mp_layout->addStretch (1);
 
-    // @@@
-
+    hide ();
     set_toolbox_widget (true);
   }
 
@@ -404,9 +423,19 @@ public:
     return "Move Options";
   }
 
+  virtual const char *name () const
+  {
+    return move_editor_options_name;
+  }
+
   virtual int order () const
   {
     return 0;
+  }
+
+  virtual void deactivated ()
+  {
+    hide ();
   }
 
 private:
@@ -436,6 +465,7 @@ public:
   virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const
   {
     pages.push_back (new MoveToolboxPage (view, dispatcher));
+    pages.back ()->set_plugin_declaration (this);
   }
 #endif
 };

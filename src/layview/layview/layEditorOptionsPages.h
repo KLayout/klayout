@@ -68,8 +68,7 @@ public:
   virtual std::vector<lay::EditorOptionsPage *> editor_options_pages (const lay::PluginDeclaration *plugin_declaration);
   virtual std::vector<lay::EditorOptionsPage *> editor_options_pages ();
   virtual void activate (const lay::Plugin *plugin);
-
-  const tl::weak_collection <lay::EditorOptionsPage> &pages () const;
+  virtual lay::EditorOptionsPage *page_with_name (const std::string &name);
 
   void do_apply (bool modal);
 

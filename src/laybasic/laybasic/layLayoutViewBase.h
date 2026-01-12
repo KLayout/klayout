@@ -361,17 +361,6 @@ public:
   }
 
   /**
-   *  @brief Shows or hides a toolbox widget with the given name
-   *
-   *  Initially toolbox widgets are invisible. They are made visible
-   *  by using this method.
-   */
-  virtual void show_toolbox_widget (const std::string & /*name*/, bool /*visible*/)
-  {
-    //  the base implementation does nothing
-  }
-
-  /**
    *  @brief Adds an editor options page as a toolbox widget
    */
   virtual void add_toolbox_widget (lay::EditorOptionsPage * /*toolbox_widget*/)

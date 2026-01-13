@@ -601,16 +601,29 @@ Service::move_transform (const db::DPoint &pu, db::DFTrans tr, lay::angle_constr
   m_alt_ac = lay::AC_Global;
 }
 
-void  
-Service::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type ac)
+void
+Service::end_move (const db::DVector &v)
 {
-  m_alt_ac = ac;
+  if (view ()->is_editable () && m_moving) {
+    transform (db::DCplxTrans (db::DTrans (v) * db::DTrans (m_move_trans.fp_trans ())));
+    move_cancel (); // formally this functionality fits here
+    //  accept changes to guiding shapes
+    handle_guiding_shape_changes (true);
+  }
+
+  m_alt_ac = lay::AC_Global;
+}
+
+void
+Service::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
+{
   if (view ()->is_editable () && m_moving) {
     transform (db::DCplxTrans (m_move_trans));
     move_cancel (); // formally this functionality fits here
     //  accept changes to guiding shapes
     handle_guiding_shape_changes (true);
   }
+
   m_alt_ac = lay::AC_Global;
 }
 

@@ -327,6 +327,16 @@ public:
   }
 
   /**
+   *  @brief Terminate a "move" operation with compulsory shift vector
+   *
+   *  @param v The move distance to be applied
+   */
+  virtual void end_move (const db::DVector & /*v*/)
+  {
+    //  .. by default, nothing is implemented ..
+  }
+
+  /**
    *  @brief Cancel any pending operations
    *
    *  This event is sent whenever a pending operation such as 
@@ -609,6 +619,16 @@ public:
    *  The Editables object takes ownership over the Transaction object.
    */
   void end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Transaction *transaction = 0);
+
+  /**
+   *  @brief End "move" operation with given vector
+   *
+   *  If a transaction is given, the operation will be appended to this pending transaction
+   *  The Editables object takes ownership over the Transaction object.
+   *
+   *  The vector is supposed to be taken "as is" and no snapping shall be applied.
+   */
+  void end_move (const db::DVector &v, db::Transaction *transaction = 0);
 
   /**
    *  @brief Indicates how many objects are selected.

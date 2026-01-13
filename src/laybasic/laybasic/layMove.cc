@@ -91,12 +91,28 @@ void
 MoveService::function (const std::string &name, const std::string &value)
 {
   if (name == move_function_name) {
+
     try {
+
       db::DVector s;
       tl::from_string (value, s);
-      tl::info << "@@@ move " << s.to_string ();
+
+      m_dragging = false;
+
+      show_toolbox (false);
+      ui ()->ungrab_mouse (this);
+
+      mp_editables->end_move (s, mp_transaction.release ());
+
+      if (m_dragging_transient) {
+        mp_editables->clear_selection ();
+      }
+
+      drag_cancel ();
+
     } catch (...) {
     }
+
   }
 }
 
@@ -481,8 +497,6 @@ public:
 
   virtual void commit (lay::Dispatcher *dispatcher)
   {
-    tl::info << "@@@ Commit!";
-
     try {
 
       double dx = 0.0, dy = 0.0;
@@ -505,17 +519,12 @@ public:
         db::DVector mv;
         tl::from_string (value, mv);
 
-        mp_x_le->setText (tl::to_qstring (tl::to_string (mv.x ())));
-        mp_y_le->setText (tl::to_qstring (tl::to_string (mv.y ())));
+        mp_x_le->setText (tl::to_qstring (tl::micron_to_string (mv.x ())));
+        mp_y_le->setText (tl::to_qstring (tl::micron_to_string (mv.y ())));
 
       } catch (...) {
       }
     }
-  }
-
-  virtual void cancel ()
-  {
-    tl::info << "@@@ Escape!";
   }
 
 private:

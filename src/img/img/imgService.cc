@@ -872,7 +872,14 @@ Service::show_message ()
   */
 }
 
-void 
+void
+Service::end_move (const db::DVector &v)
+{
+  m_trans = db::DTrans (v) * db::DTrans (m_trans.fp_trans ());
+  end_move (db::DPoint (), lay::AC_Any);
+}
+
+void
 Service::end_move (const db::DPoint &, lay::angle_constraint_type)
 {
   if (! m_selected_image_views.empty () && ! m_selected.empty ()) {

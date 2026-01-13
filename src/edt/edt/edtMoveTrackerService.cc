@@ -134,6 +134,13 @@ MoveTrackerService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_ty
 }
 
 void
+MoveTrackerService::end_move (const db::DVector & /*v*/)
+{
+  call_editor_hooks (m_editor_hooks, &edt::EditorHooks::commit_edit);
+  move_cancel (); // formally this functionality fits here
+}
+
+void
 MoveTrackerService::edit_cancel ()
 {
   move_cancel ();

@@ -191,6 +191,11 @@ public:
   virtual void end_move (const db::DPoint &p, lay::angle_constraint_type ac);
 
   /**
+   *  @brief Terminate a "move" operation with compulsory move vector
+   */
+  virtual void end_move (const db::DVector &v);
+
+  /**
    *  @brief Indicates whether objects are selected
    */
   virtual bool has_selection ();

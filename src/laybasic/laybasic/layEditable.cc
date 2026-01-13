@@ -621,7 +621,38 @@ Editables::move_transform (const db::DPoint &p, db::DFTrans t, lay::angle_constr
   }
 }
 
-void 
+void
+Editables::end_move (const db::DVector &v, db::Transaction *transaction)
+{
+  std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (tr ("Move"))));
+
+  if (m_any_move_operation) {
+
+    trans_holder->open ();
+
+    //  this dummy operation will update the screen:
+    if (manager ()) {
+      manager ()->queue (this, new db::Op ());
+    }
+
+    for (iterator e = begin (); e != end (); ++e) {
+      e->end_move (v);
+    }
+
+    //  clear the selection that was set previously
+    if (m_move_selection) {
+      clear_selection ();
+    }
+
+  } else {
+
+    trans_holder->cancel ();
+    edit_cancel ();
+
+  }
+}
+
+void
 Editables::end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Transaction *transaction)
 {
   std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (tr ("Move"))));

@@ -2489,13 +2489,18 @@ PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
 }
 
 void
-PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type ac)
+PartialService::end_move (const db::DVector &v)
+{
+  m_current = m_start + v;
+  end_move (db::DPoint (), lay::AC_Any);
+}
+
+void
+PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
 {
   if (! m_dragging) {
     return;
   }
-
-  m_alt_ac = ac;
 
   if (m_current != m_start) {
 

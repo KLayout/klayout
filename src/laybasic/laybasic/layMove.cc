@@ -180,7 +180,26 @@ MoveService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool p
   if (m_dragging) {
 
     set_cursor (lay::Cursor::size_all);
-    mp_editables->move (p, ac_from_buttons (buttons));
+    auto pmv = mp_editables->move (p, ac_from_buttons (buttons));
+
+    //  display the proposed move transformation
+    if (pmv.first >= 0) {
+
+      std::string pos = std::string ("dx: ") + tl::micron_to_string (pmv.second.disp ().x ()) + "  dy: " + tl::micron_to_string (pmv.second.disp ().y ());
+      if (pmv.second.rot () != 0) {
+        pos += std::string ("  ") + ((const db::DFTrans &) pmv.second).to_string ();
+      }
+      mp_view->message (pos);
+
+      lay::EditorOptionsPage *toolbox_widget = 0;
+      if (mp_view->editor_options_pages ()) {
+        toolbox_widget = mp_view->editor_options_pages ()->page_with_name (move_editor_options_name);
+      }
+      if (toolbox_widget) {
+        toolbox_widget->configure (move_distance_setter_name, pmv.second.disp ().to_string ());
+      }
+
+    }
 
   } else if (prio) {
 
@@ -474,6 +493,23 @@ public:
       dispatcher->call_function (move_function_name, db::DVector (dx, dy).to_string ());
 
     } catch (...) {
+    }
+  }
+
+  virtual void configure (const std::string &name, const std::string &value)
+  {
+    if (name == move_distance_setter_name && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
+
+      try {
+
+        db::DVector mv;
+        tl::from_string (value, mv);
+
+        mp_x_le->setText (tl::to_qstring (tl::to_string (mv.x ())));
+        mp_y_le->setText (tl::to_qstring (tl::to_string (mv.y ())));
+
+      } catch (...) {
+      }
     }
   }
 

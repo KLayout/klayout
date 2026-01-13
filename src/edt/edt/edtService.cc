@@ -563,15 +563,20 @@ void
 Service::move (const db::DPoint &pu, lay::angle_constraint_type ac)
 {
   m_alt_ac = ac;
+
   if (view ()->is_editable () && m_moving) {
+
     db::DPoint ref = snap (m_move_start);
     bool snapped = false;
     db::DPoint p = ref + snap_marker_to_grid (pu - m_move_start, snapped);
     if (! snapped) {
       p = ref + snap (pu - m_move_start, false /*move*/);
     }
+
     move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - ref));
+
   }
+
   m_alt_ac = lay::AC_Global;
 }
 
@@ -579,15 +584,20 @@ void
 Service::move_transform (const db::DPoint &pu, db::DFTrans tr, lay::angle_constraint_type ac)
 {
   m_alt_ac = ac;
+
   if (view ()->is_editable () && m_moving) {
+
     db::DPoint ref = snap (m_move_start);
     bool snapped = false;
     db::DPoint p = ref + snap_marker_to_grid (pu - m_move_start, snapped);
     if (! snapped) {
       p = ref + snap (pu - m_move_start, false /*move*/);
     }
+
     move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (tr * m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - ref));
+
   }
+
   m_alt_ac = lay::AC_Global;
 }
 
@@ -1701,16 +1711,11 @@ Service::select (const lay::ObjectInstPath &obj, lay::Editable::SelectionMode mo
 void  
 Service::move_markers (const db::DTrans &t)
 {
-  if (m_move_trans != t) {
+  if (has_selection ()) {
+    propose_move_transformation (t, 0);
+  }
 
-    //  display current move vector
-    if (has_selection ()) {
-      std::string pos = std::string ("dx: ") + tl::micron_to_string (t.disp ().x ()) + "  dy: " + tl::micron_to_string (t.disp ().y ());
-      if (t.rot () != 0) {
-        pos += std::string ("  ") + ((const db::DFTrans &) t).to_string ();
-      }
-      view ()->message (pos);
-    }
+  if (m_move_trans != t) {
 
     for (auto r = m_markers.begin (); r != m_markers.end (); ++r) {
 

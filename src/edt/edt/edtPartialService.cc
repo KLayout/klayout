@@ -2481,6 +2481,8 @@ PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
 
   }
 
+  propose_move_transformation (db::DTrans (m_current - m_start), 0);
+
   selection_to_view ();
 
   m_alt_ac = lay::AC_Global;

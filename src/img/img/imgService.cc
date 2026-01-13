@@ -740,6 +740,7 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
     m_p1 = p;
 
     m_trans = db::DTrans (dp) * m_trans;
+    propose_move_transformation (m_trans, 2);
 
     for (std::vector<img::View *>::iterator r = m_selected_image_views.begin (); r != m_selected_image_views.end (); ++r) {
       (*r)->transform_by (db::DCplxTrans (m_trans));

@@ -1598,6 +1598,8 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
   auto ac_eff = ac == lay::AC_Global ? m_snap_mode : ac;
   clear_mouse_cursors ();
 
+  bool indicate_ruler_as_message = true;
+
   if (m_move_mode == MoveP1) {
     
     m_current.seg_p1 (m_seg_index, snap2_visual (m_p1, p, &m_current, ac));
@@ -1653,6 +1655,9 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
 
     m_trans = db::DTrans (dp + (m_p1 - db::DPoint ()) - m_trans.disp ()) * m_trans * db::DTrans (db::DPoint () - m_p1);
 
+    propose_move_transformation (m_trans, 1);
+    indicate_ruler_as_message = false;
+
     snap_rulers (ac_eff);
 
     for (std::vector<ant::View *>::iterator r = m_rulers.begin (); r != m_rulers.end (); ++r) {
@@ -1661,7 +1666,7 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
 
   }
 
-  if (m_move_mode != MoveSelected) {
+  if (indicate_ruler_as_message) {
     show_message ();
   }
 }

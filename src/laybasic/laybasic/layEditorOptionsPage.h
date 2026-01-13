@@ -27,10 +27,6 @@
 
 #include "tlObject.h"
 
-#if defined(HAVE_QT)
-#  include <QWidget>
-#endif
-
 namespace db
 {
   struct LayerProperties;
@@ -149,34 +145,48 @@ private:
   void attach_events ();
 };
 
-#if defined(HAVE_QT)
 /**
- *  @brief The base class for a object properties page
+ *  @brief A basic factory class for editor options pages
+ *
+ *  We will use it later to provide a registration-based specialized factory
+ *  for Qt-enabled option pages, which we should not link here.
  */
-class LAYBASIC_PUBLIC EditorOptionsPageWidget
-  : public QWidget, public EditorOptionsPage
+class LAYBASIC_PUBLIC EditorOptionsPageFactoryBase
 {
-Q_OBJECT
-
 public:
-  EditorOptionsPageWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
-  EditorOptionsPageWidget ();
-  virtual ~EditorOptionsPageWidget ();
+  EditorOptionsPageFactoryBase () { }
+  virtual ~EditorOptionsPageFactoryBase () { }
 
-  virtual void set_focus ();
-  virtual bool is_visible () const;
-  virtual void set_visible (bool visible);
-  virtual EditorOptionsPageWidget *widget () { return this; }
+  virtual lay::EditorOptionsPage *create_page (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) = 0;
 
-protected slots:
-  void edited ();
-
-protected:
-  virtual bool focusNextPrevChild (bool next);
-  virtual void keyPressEvent (QKeyEvent *event);
-  virtual bool event (QEvent *event);
+  static lay::EditorOptionsPage *create_page_by_name (const std::string &name, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
 };
-#endif  //  defined(HAVE_QT)
+
+/**
+ *  @brief A specialized editor options page factory class for a specific type
+ *
+ *  Register the factory using:
+ *
+ *  #include "tlClassRegistry.h"
+ *  static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory (new lay::EditorOptionsPageFactory<MyClass> (), 0, "MyClass");
+ *
+ *  Later you can create a page from "MyName" using
+ *
+ *  page = EditorOptionsPageFactoryBase::create_page_by_name ("MyClass", view, dispatcher);
+ */
+template <class T>
+class LAYBASIC_PUBLIC_TEMPLATE EditorOptionsPageFactory
+  : public EditorOptionsPageFactoryBase
+{
+public:
+  EditorOptionsPageFactory () { }
+  virtual ~EditorOptionsPageFactory () { }
+
+  virtual lay::EditorOptionsPage *create_page (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+  {
+    return new T (view, dispatcher);
+  }
+};
 
 }
 

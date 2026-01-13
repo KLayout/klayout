@@ -9,17 +9,21 @@ DEFINES += MAKE_LAYVIEW_LIBRARY
 RESOURCES = \
 
 SOURCES = \
+  layEditorOptionsPageWidget.cc \
   layGridNet.cc \
   layEditorOptionsFrame.cc \
   layEditorOptionsPages.cc \
+  layMoveEditorOptionsPage.cc \
   layviewForceLink.cc \
   gsiDeclLayAdditional.cc \
 
 HEADERS = \
+  layEditorOptionsPageWidget.h \
   layGridNet.h \
   layEditorOptionsFrame.h \
   layEditorOptionsPages.h \
   layLayoutView.h \
+  layMoveEditorOptionsPage.h \
   layviewForceLink.h \
 
 !equals(HAVE_QT, "0") {

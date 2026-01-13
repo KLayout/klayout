@@ -76,6 +76,7 @@
 #include "layBookmarksView.h"
 #include "layEditorOptionsFrame.h"
 #include "layEditorOptionsPages.h"
+#include "layEditorOptionsPageWidget.h"
 #include "layUtils.h"
 #include "layPropertiesDialog.h"
 #include "layQtTools.h"

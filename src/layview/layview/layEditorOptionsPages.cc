@@ -22,6 +22,7 @@
 
 #include "tlInternational.h"
 #include "layEditorOptionsPages.h"
+#include "layEditorOptionsPageWidget.h"
 #include "tlExceptions.h"
 #include "layPlugin.h"
 #include "layLayoutViewBase.h"

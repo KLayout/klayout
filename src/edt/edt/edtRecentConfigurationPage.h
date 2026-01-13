@@ -26,7 +26,7 @@
 #define HDR_edtRecentConfigurationPage
 
 #include "edtCommon.h"
-#include "layEditorOptionsPage.h"
+#include "layEditorOptionsPageWidget.h"
 #include "tlObject.h"
 #include "tlDeferredExecution.h"
 

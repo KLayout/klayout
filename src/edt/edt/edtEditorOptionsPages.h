@@ -26,6 +26,7 @@
 #define HDR_edtEditorOptionsPages
 
 #include "layEditorOptionsPage.h"
+#include "layEditorOptionsPageWidget.h"
 
 #include <tlVariant.h>
 

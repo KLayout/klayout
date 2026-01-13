@@ -37,9 +37,9 @@
 namespace lay
 {
 
-const std::string move_editor_options_name ("move-editor-options");
-const std::string move_function_name ("move-execute");
-const std::string move_distance_setter_name ("move-distance");
+LAYBASIC_PUBLIC std::string move_editor_options_name ("move-editor-options");
+LAYBASIC_PUBLIC std::string move_function_name ("move-execute");
+LAYBASIC_PUBLIC std::string move_distance_setter_name ("move-distance");
 
 // -------------------------------------------------------------
 //  MoveService implementation
@@ -451,90 +451,6 @@ MoveService::finish ()
 
 // ----------------------------------------------------------------------------
 
-#if defined(HAVE_QT)
-namespace {
-
-class MoveToolboxPage
-  : public lay::EditorOptionsPageWidget
-{
-public:
-  MoveToolboxPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-    : lay::EditorOptionsPageWidget (view, dispatcher)
-  {
-    mp_layout = new QHBoxLayout (this);
-
-    mp_x_le = new QLineEdit (this);
-    mp_layout->addWidget (mp_x_le);
-    mp_y_le = new QLineEdit (this);
-    mp_layout->addWidget (mp_y_le);
-    mp_layout->addStretch (1);
-
-    hide ();
-
-    set_focus_page (true);
-    set_toolbox_widget (true);
-  }
-
-  virtual std::string title () const
-  {
-    return "Move Options";
-  }
-
-  virtual const char *name () const
-  {
-    return move_editor_options_name.c_str ();
-  }
-
-  virtual int order () const
-  {
-    return 0;
-  }
-
-  virtual void deactivated ()
-  {
-    hide ();
-  }
-
-  virtual void commit (lay::Dispatcher *dispatcher)
-  {
-    try {
-
-      double dx = 0.0, dy = 0.0;
-
-      tl::from_string (tl::to_string (mp_x_le->text ()), dx);
-      tl::from_string (tl::to_string (mp_y_le->text ()), dy);
-
-      dispatcher->call_function (move_function_name, db::DVector (dx, dy).to_string ());
-
-    } catch (...) {
-    }
-  }
-
-  virtual void configure (const std::string &name, const std::string &value)
-  {
-    if (name == move_distance_setter_name && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
-
-      try {
-
-        db::DVector mv;
-        tl::from_string (value, mv);
-
-        mp_x_le->setText (tl::to_qstring (tl::micron_to_string (mv.x ())));
-        mp_y_le->setText (tl::to_qstring (tl::micron_to_string (mv.y ())));
-
-      } catch (...) {
-      }
-    }
-  }
-
-private:
-  QHBoxLayout *mp_layout;
-  QLineEdit *mp_x_le, *mp_y_le;
-};
-
-}
-#endif
-
 class MoveServiceDeclaration
   : public lay::PluginDeclaration
 {
@@ -550,13 +466,13 @@ public:
     return new MoveService (view);
   }
 
-#if defined(HAVE_QT)
   virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const
   {
-    pages.push_back (new MoveToolboxPage (view, dispatcher));
-    pages.back ()->set_plugin_declaration (this);
+    lay::EditorOptionsPage *page = lay::EditorOptionsPageFactoryBase::create_page_by_name (move_editor_options_name, view, dispatcher);
+    if (page) {
+      pages.push_back (page);
+    }
   }
-#endif
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> move_service_decl (new MoveServiceDeclaration (), -970, "laybasic::MoveServicePlugin");

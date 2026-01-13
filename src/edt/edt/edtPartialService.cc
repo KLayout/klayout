@@ -2430,7 +2430,7 @@ PartialService::snap_marker_to_grid (const db::DVector &v, bool &snapped) const
 
   if (snapped) {
     vr += vv;
-    return db::DVector (vr.x () * snapped_to.x (), vr.y () * snapped_to.y ());
+    return db::DVector (vr.x () * fabs (snapped_to.x ()), vr.y () * fabs (snapped_to.y ()));
   } else {
     return db::DVector ();
   }
@@ -3006,14 +3006,7 @@ PartialService::do_selection_to_view ()
   db::DTrans move_trans;
   if (m_dragging) {
 
-    //  heuristically, if there is just one edge selected: do not confine to the movement
-    //  angle constraint - the edge usually is confined enough
-    if (m_selection.size () == 1 && ! m_selection.begin ()->first.is_cell_inst () && m_selection.begin ()->second.size () == 3 /*p1,p2,edge*/) {
-      move_trans = db::DTrans (m_current - m_start);
-    } else {
-      //  TODO: DTrans should have a ctor that takes a vector
-      move_trans = db::DTrans (lay::snap_angle (m_current - m_start, move_ac ()));
-    }
+    move_trans = db::DTrans (m_current - m_start);
 
     //  display vector
     view ()->message (std::string ("dx: ") + tl::micron_to_string (move_trans.disp ().x ()) + 

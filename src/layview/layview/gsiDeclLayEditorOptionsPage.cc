@@ -30,7 +30,7 @@
 namespace gsi
 {
 
-Class<lay::EditorOptionsPage> decl_EditorOptionsPageBase (QT_EXTERNAL_BASE (QWidget) "lay", "EditorOptionsPageBase",
+Class<lay::EditorOptionsPageWidget> decl_EditorOptionsPageBase (QT_EXTERNAL_BASE (QWidget) "lay", "EditorOptionsPageBase",
   method ("view", &lay::EditorOptionsPage::view,
     "@brief Gets the view object this page is associated with\n"
   ) +

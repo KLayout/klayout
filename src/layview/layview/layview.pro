@@ -9,6 +9,8 @@ DEFINES += MAKE_LAYVIEW_LIBRARY
 RESOURCES = \
 
 SOURCES = \
+  gsiDeclLayEditorOptionsPage.cc \
+  gsiDeclLayConfigPage.cc \
   layEditorOptionsPageWidget.cc \
   layGridNet.cc \
   layEditorOptionsFrame.cc \
@@ -18,6 +20,8 @@ SOURCES = \
   gsiDeclLayAdditional.cc \
 
 HEADERS = \
+  gsiDeclLayEditorOptionsPage.h \
+  gsiDeclLayConfigPage.h \
   layEditorOptionsPageWidget.h \
   layGridNet.h \
   layEditorOptionsFrame.h \

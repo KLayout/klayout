@@ -98,7 +98,8 @@ EditorOptionsPages::editor_options_pages (const lay::PluginDeclaration *plugin_d
 {
   std::vector<lay::EditorOptionsPage *> pages;
   for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if (p->plugin_declaration () == plugin_declaration) {
+    if (p->plugin_declaration () == plugin_declaration ||
+        (p->plugin_declaration () == 0 && plugin_declaration->enable_catchall_editor_options_pages ())) {
       pages.push_back (const_cast<lay::EditorOptionsPage *> (p.operator-> ()));
     }
   }

@@ -28,14 +28,14 @@
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
 
-#include "layEditorOptionsPage.h"
+#include "layEditorOptionsPageWidget.h"
 #include "layLayoutViewBase.h"
 
 namespace gsi
 {
 
 class EditorOptionsPageImpl
-  : public lay::EditorOptionsPage, public gsi::ObjectBase
+  : public lay::EditorOptionsPageWidget, public gsi::ObjectBase
 {
 public:
   EditorOptionsPageImpl (const std::string &title, int index);

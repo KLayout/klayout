@@ -470,6 +470,7 @@ public:
   {
     lay::EditorOptionsPage *page = lay::EditorOptionsPageFactoryBase::create_page_by_name (move_editor_options_name, view, dispatcher);
     if (page) {
+      page->set_plugin_declaration (this);
       pages.push_back (page);
     }
   }

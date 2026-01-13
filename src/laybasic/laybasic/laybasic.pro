@@ -36,8 +36,6 @@ SOURCES += \
   gsiDeclLayTextInfo.cc \
   gsiDeclLayTlAdded.cc \
   gsiDeclLayRdbAdded.cc \
-  gsiDeclLayConfigPage.cc \
-  gsiDeclLayEditorOptionsPage.cc \
   gsiDeclLayPlugin.cc \
   gsiDeclLayPluginFactory.cc \
   layAbstractMenu.cc \
@@ -95,8 +93,6 @@ SOURCES += \
   layUtils.cc \
 
 HEADERS += \
-  gsiDeclLayConfigPage.h \
-  gsiDeclLayEditorOptionsPage.h \
   gsiDeclLayPlugin.h \
   layEditorOptionsPage.h \
   layEditorUtils.h \

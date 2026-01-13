@@ -148,6 +148,21 @@ MoveService::key_event (unsigned int key, unsigned int buttons)
   }
 }
 
+bool
+MoveService::shortcut_override_event (unsigned int key, unsigned int buttons)
+{
+  if (! m_dragging) {
+    if (int (key) == lay::KeyDown ||
+        int (key) == lay::KeyLeft ||
+        int (key) == lay::KeyUp ||
+        int (key) == lay::KeyRight) {
+      return true;
+    }
+  }
+
+  return lay::EditorServiceBase::shortcut_override_event (key, buttons);
+}
+
 void
 MoveService::show_toolbox (bool visible)
 {

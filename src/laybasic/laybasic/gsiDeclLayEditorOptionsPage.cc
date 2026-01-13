@@ -77,6 +77,10 @@ Class<lay::EditorOptionsPage> decl_EditorOptionsPageBase (QT_EXTERNAL_BASE (QWid
   method ("cancel", &lay::EditorOptionsPage::cancel,
     "@brief Gets called when the Escape key is pressed on a non-modal page\n"
     "This method has been introduced in version 0.30.6."
+  ) +
+  method ("commit", &lay::EditorOptionsPage::commit,
+    "@brief Gets called when the Enter key is pressed on a non-modal page\n"
+    "This method has been introduced in version 0.30.6."
   ),
   "@brief The plugin framework's editor options page base class\n"
   "\n"
@@ -168,6 +172,22 @@ EditorOptionsPageImpl::cancel ()
   }
 }
 
+void
+EditorOptionsPageImpl::commit_impl (lay::Dispatcher *root)
+{
+  lay::EditorOptionsPage::commit (root);
+}
+
+void
+EditorOptionsPageImpl::commit (lay::Dispatcher *root)
+{
+  if (f_commit.can_issue ()) {
+    f_commit.issue<EditorOptionsPageImpl, lay::Dispatcher *> (&EditorOptionsPageImpl::commit_impl, root);
+  } else {
+    EditorOptionsPageImpl::commit_impl (root);
+  }
+}
+
 EditorOptionsPageImpl *new_editor_options_page (const std::string &title, int index)
 {
   return new EditorOptionsPageImpl (title, index);
@@ -203,6 +223,12 @@ Class<EditorOptionsPageImpl> decl_EditorOptionsPage (decl_EditorOptionsPageBase,
   method_ext ("cancel", &cancel_fb, "@hide") +
   callback ("cancel", &EditorOptionsPageImpl::cancel, &EditorOptionsPageImpl::f_cancel,
     "@brief Reimplement this method to receive Escape key events for the page\n"
+    "This method has been added in version 0.30.6.\n"
+  ) +
+  //  prevents infinite recursion
+  method_ext ("commit", &commit_fb, gsi::arg ("dispatcher"), "@hide") +
+  callback ("commit", &EditorOptionsPageImpl::commit, &EditorOptionsPageImpl::f_commit, gsi::arg ("dispatcher"),
+    "@brief Reimplement this method to receive Enter key events for the page\n"
     "This method has been added in version 0.30.6.\n"
   ),
   "@brief The plugin framework's editor options page\n"

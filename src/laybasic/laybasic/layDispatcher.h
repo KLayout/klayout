@@ -88,6 +88,14 @@ public:
   }
 
   /**
+   *  @brief Generic function call
+   */
+  virtual void function (const std::string & /*symbol*/, const std::string & /*args*/)
+  {
+    // .. this implementation does nothing ..
+  }
+
+  /**
    *  @brief Receives configuration events
    */
   virtual bool configure (const std::string & /*name*/, const std::string & /*value*/)
@@ -250,6 +258,7 @@ protected:
   //  capture the configuration events so we can change the value of the configuration actions
   virtual bool configure (const std::string &name, const std::string &value);
   virtual void config_finalize ();
+  virtual void function (const std::string &symbol, const std::string &args);
 
 private:
   Dispatcher (const Dispatcher &);

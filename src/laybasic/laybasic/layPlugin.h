@@ -744,6 +744,13 @@ public:
     // .. this implementation does nothing ..
   }
 
+  /**
+   *  @brief Generic function call
+   *
+   *  This method calls "function" on this plugin and all the children.
+   */
+  virtual void call_function (const std::string &symbol, const std::string &args);
+
 #if defined(HAVE_QT)
   /**
    *  @brief Return the lay::Browser interface if this object has one
@@ -857,6 +864,17 @@ protected:
   virtual void config_finalize ()
   {
     //  .. the default implementation does nothing ..
+  }
+
+  /**
+   *  @brief Implements a generic function call
+   *
+   *  This method can be used to establish a communication between a properties page and
+   *  a plugin for example.
+   */
+  virtual void function (const std::string & /*symbol*/, const std::string & /*args*/)
+  {
+    // .. this implementation does nothing ..
   }
 
 private:

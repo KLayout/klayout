@@ -43,6 +43,7 @@ public:
   bool start_move (db::Transaction *transaction = 0, bool transient_selection = false);
 
   bool configure (const std::string &name, const std::string &value);
+  void function (const std::string &name, const std::string &value);
   void finish ();
   void cancel ();
 

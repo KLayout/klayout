@@ -30,7 +30,6 @@
 #if defined(HAVE_QT)
 #  include "layEditorOptionsPage.h"
 #  include <QWidget>
-#  include <QKeyEvent> // @@@
 #  include <QHBoxLayout>
 #  include <QLineEdit>
 #endif
@@ -38,7 +37,9 @@
 namespace lay
 {
 
-const char *move_editor_options_name = "move-editor-options";
+const std::string move_editor_options_name ("move-editor-options");
+const std::string move_function_name ("move-execute");
+const std::string move_distance_setter_name ("move-distance");
 
 // -------------------------------------------------------------
 //  MoveService implementation
@@ -84,6 +85,19 @@ MoveService::configure (const std::string &name, const std::string &value)
   }
 
   return false;  //  not taken
+}
+
+void
+MoveService::function (const std::string &name, const std::string &value)
+{
+  if (name == move_function_name) {
+    try {
+      db::DVector s;
+      tl::from_string (value, s);
+      tl::info << "@@@ move " << s.to_string ();
+    } catch (...) {
+    }
+  }
 }
 
 bool
@@ -418,7 +432,7 @@ public:
 
   virtual const char *name () const
   {
-    return move_editor_options_name;
+    return move_editor_options_name.c_str ();
   }
 
   virtual int order () const
@@ -431,9 +445,21 @@ public:
     hide ();
   }
 
-  virtual void apply (lay::Dispatcher * /*dispatcher*/)
+  virtual void commit (lay::Dispatcher *dispatcher)
   {
-    tl::info << "@@@ Accept!";
+    tl::info << "@@@ Commit!";
+
+    try {
+
+      double dx = 0.0, dy = 0.0;
+
+      tl::from_string (tl::to_string (mp_x_le->text ()), dx);
+      tl::from_string (tl::to_string (mp_y_le->text ()), dy);
+
+      dispatcher->call_function (move_function_name, db::DVector (dx, dy).to_string ());
+
+    } catch (...) {
+    }
   }
 
   virtual void cancel ()

@@ -523,6 +523,15 @@ Plugin::do_config_set (const std::string &name, const std::string &value, bool f
   return false;
 }
 
+void
+Plugin::call_function (const std::string &symbol, const std::string &args)
+{
+  function (symbol, args);
+  for (tl::weak_collection<Plugin>::iterator c = m_children.begin (); c != m_children.end (); ++c) {
+    c->call_function (symbol, args);
+  }
+}
+
 // ---------------------------------------------------------------------------------------------------
 //  Menu item generators
 

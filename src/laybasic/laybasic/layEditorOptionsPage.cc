@@ -72,6 +72,9 @@ EditorOptionsPage::show ()
 {
   if (! m_active) {
     return -1;
+  } else if (m_toolbox_widget) {
+    set_focus ();
+    return -1;
   } else if (mp_owner) {
     if (! is_modal_page ()) {
       mp_owner->make_page_current (this);
@@ -80,7 +83,6 @@ EditorOptionsPage::show ()
       return mp_owner->exec_modal (this) ? 1 : 0;
     }
   } else {
-    set_focus ();
     return -1;
   }
 }
@@ -123,10 +125,10 @@ EditorOptionsPage::activate (bool active)
 {
   if (m_active != active) {
     m_active = active;
-    if (mp_owner) {
-      mp_owner->activate_page (this);
-    }
     if (m_active) {
+      if (mp_owner) {
+        mp_owner->activate_page (this);
+      }
       activated ();
     } else {
       deactivated ();
@@ -197,7 +199,7 @@ BEGIN_PROTECTED
     } else {
       //  The Return key on a non-modal page commits the values and gives back the focus
       //  to the view
-      apply (dispatcher ());
+      commit (dispatcher ());
     }
     view ()->set_focus ();
     event->accept ();

@@ -84,7 +84,9 @@ public:
   virtual const char *name () const { return 0; }
   virtual void apply (lay::Dispatcher * /*root*/) { }
   virtual void cancel () { }
+  virtual void commit (lay::Dispatcher * /*root*/) { }
   virtual void setup (lay::Dispatcher * /*root*/) { }
+  virtual void configure (const std::string & /*name*/, const std::string & /*value*/) { }
   virtual void commit_recent (lay::Dispatcher * /*root*/) { }
   virtual void config_recent_for_layer (lay::Dispatcher * /*root*/, const db::LayerProperties & /*lp*/, int /*cv_index*/) { }
   virtual void set_focus () { }

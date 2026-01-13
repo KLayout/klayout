@@ -2027,8 +2027,6 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
         manager ()->transaction (tl::to_string (tr ("Partial move")));
       }
 
-      //  heuristically, if there is just one edge selected: do not confine to the movement
-      //  angle constraint - the edge usually is confined enough
       db::DTrans move_trans = db::DTrans (m_current - m_start);
 
       transform_selection (move_trans);
@@ -2506,8 +2504,6 @@ PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type a
       manager ()->transaction (tl::to_string (tr ("Partial move")));
     }
 
-    //  heuristically, if there is just one edge selected: do not confine to the movement
-    //  angle constraint - the edge usually is confined enough
     db::DTrans move_trans = db::DTrans (m_current - m_start);
 
     transform_selection (move_trans);

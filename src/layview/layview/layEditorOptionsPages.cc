@@ -66,9 +66,7 @@ EditorOptionsPages::EditorOptionsPages (QWidget *parent, lay::LayoutViewBase *vi
   }
 
   for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if (! p->is_toolbox_widget ()) {
-      p->set_owner (this);
-    }
+    p->set_owner (this);
   }
 
   update (0);

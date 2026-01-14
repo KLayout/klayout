@@ -898,6 +898,17 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
   }
 }
 
+// ------------------------------------------------------------------
+//  Registrations
+
+//  unspecific editor options - used for all plugins that want it
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_generic (new lay::EditorOptionsPageFactory<EditorOptionsGeneric> (), 0);
+
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_texts (new lay::EditorOptionsPageFactory<edt::EditorOptionsText> ("edt::Service(Texts)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_paths (new lay::EditorOptionsPageFactory<edt::EditorOptionsPath> ("edt::Service(Paths)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_insts (new lay::EditorOptionsPageFactory<edt::EditorOptionsInstPCellParam> ("edt::Service(CellInstances)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_insts_pcell (new lay::EditorOptionsPageFactory<edt::EditorOptionsInst> ("edt::Service(CellInstances)"), 0);
+
 }
 
 #endif

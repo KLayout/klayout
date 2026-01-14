@@ -53,6 +53,7 @@ EditorOptionsFrame::populate (LayoutViewBase *view)
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     cls->get_editor_options_pages (editor_options_pages, view, view->dispatcher ());
   }
+  lay::PluginDeclaration::get_catchall_editor_options_pages (editor_options_pages, view, view->dispatcher ());
 
   for (std::vector<lay::EditorOptionsPage *>::const_iterator op = editor_options_pages.begin (); op != editor_options_pages.end (); ++op) {
     (*op)->activate (false);

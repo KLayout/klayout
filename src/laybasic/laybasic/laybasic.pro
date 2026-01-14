@@ -36,8 +36,6 @@ SOURCES += \
   gsiDeclLayTextInfo.cc \
   gsiDeclLayTlAdded.cc \
   gsiDeclLayRdbAdded.cc \
-  gsiDeclLayPlugin.cc \
-  gsiDeclLayPluginFactory.cc \
   layAbstractMenu.cc \
   layEditorOptionsPage.cc \
   layEditorUtils.cc \

@@ -51,7 +51,7 @@ struct EOPCompareOp
 };
 
 EditorOptionsPages::EditorOptionsPages (QWidget *parent, lay::LayoutViewBase *view, const std::vector<lay::EditorOptionsPage *> &pages)
-  : QFrame (parent), mp_view (view)
+  : QFrame (parent), mp_view (view), m_update_enabled (true)
 {
   mp_modal_pages = new EditorOptionsModalPages (this);
 
@@ -161,15 +161,25 @@ EditorOptionsPages::exec_modal (EditorOptionsPage *page)
 void
 EditorOptionsPages::activate (const lay::Plugin *plugin)
 {
+  m_update_enabled = false;
+
   for (auto op = m_pages.begin (); op != m_pages.end (); ++op) {
+
     bool is_active = false;
     if (op->plugin_declaration () == 0) {
       is_active = (plugin && plugin->plugin_declaration ()->enable_catchall_editor_options_pages ());
     } else if (plugin && plugin->plugin_declaration () == op->plugin_declaration ()) {
       is_active = true;
     }
+
+    BEGIN_PROTECTED
     op->activate (is_active);
+    END_PROTECTED
+
   }
+
+  m_update_enabled = true;
+  update (0);
 }
 
 void  
@@ -220,6 +230,13 @@ EditorOptionsPages::activate_page (lay::EditorOptionsPage *page)
 void   
 EditorOptionsPages::update (lay::EditorOptionsPage *page)
 {
+  if (! m_update_enabled) {
+    return;
+  }
+
+  int index = mp_pages->currentIndex ();
+  int modal_index = -1;
+
   std::vector <lay::EditorOptionsPageWidget *> sorted_pages;
   for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
     if (p->widget ()) {
@@ -228,10 +245,6 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
   }
   std::sort (sorted_pages.begin (), sorted_pages.end (), EOPCompareOp ());
 
-  if (! page && m_pages.size () > 0) {
-    page = m_pages.back ();
-  }
-
   while (mp_pages->count () > 0) {
     mp_pages->removeTab (0);
   }
@@ -239,9 +252,6 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
   while (mp_modal_pages->count () > 0) {
     mp_modal_pages->remove_page (0);
   }
-
-  int index = -1;
-  int modal_index = -1;
 
   for (auto p = sorted_pages.begin (); p != sorted_pages.end (); ++p) {
     if ((*p)->active ()) {
@@ -264,7 +274,7 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
   }
 
   if (index < 0) {
-    index = mp_pages->currentIndex ();
+    index = 0;
   }
   if (index >= int (mp_pages->count ())) {
     index = mp_pages->count () - 1;

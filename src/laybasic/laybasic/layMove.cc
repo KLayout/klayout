@@ -465,15 +465,6 @@ public:
   {
     return new MoveService (view);
   }
-
-  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const
-  {
-    lay::EditorOptionsPage *page = lay::EditorOptionsPageFactoryBase::create_page_by_name (move_editor_options_name, view, dispatcher);
-    if (page) {
-      page->set_plugin_declaration (this);
-      pages.push_back (page);
-    }
-  }
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> move_service_decl (new MoveServiceDeclaration (), -970, "laybasic::MoveServicePlugin");

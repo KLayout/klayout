@@ -23,6 +23,7 @@
 #if defined(HAVE_QT)
 
 #include "edtRecentConfigurationPage.h"
+#include "edtConfig.h"
 #include "layDispatcher.h"
 #include "layLayoutViewBase.h"
 #include "layLayerTreeModel.h"
@@ -496,6 +497,92 @@ RecentConfigurationPage::config_recent_for_layer (lay::Dispatcher *root, const d
 
   }
 }
+
+// ------------------------------------------------------------------
+//  Configurations and registrations
+
+namespace {
+
+class RecentShapeConfigurationPage
+  : public edt::RecentConfigurationPage
+{
+public:
+  RecentShapeConfigurationPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+    : edt::RecentConfigurationPage (view, dispatcher, "edit-recent-shape-param")
+  {
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer));
+
+    init ();
+  }
+};
+
+class RecentTextConfigurationPage
+  : public edt::RecentConfigurationPage
+{
+public:
+  RecentTextConfigurationPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+    : edt::RecentConfigurationPage (view, dispatcher, "edit-recent-text-param")
+  {
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_string, tl::to_string (tr ("Text")), edt::RecentConfigurationPage::Text));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_size, tl::to_string (tr ("Size")), edt::RecentConfigurationPage::Double));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_halign, tl::to_string (tr ("Hor. align")), edt::RecentConfigurationPage::Text));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_valign, tl::to_string (tr ("Vert. align")), edt::RecentConfigurationPage::Text));
+
+    init ();
+  }
+};
+
+class RecentPathConfigurationPage
+  : public edt::RecentConfigurationPage
+{
+public:
+  RecentPathConfigurationPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+    : edt::RecentConfigurationPage (view, dispatcher, "edit-recent-path-param")
+  {
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_width, tl::to_string (tr ("Width")), edt::RecentConfigurationPage::Double));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_type, tl::to_string (tr ("Ends")), edt::RecentConfigurationPage::Int));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_var_begin, tl::to_string (tr ("Begin ext.")), edt::RecentConfigurationPage::Double));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_var_end, tl::to_string (tr ("End ext.")), edt::RecentConfigurationPage::Double));
+
+    init ();
+  }
+};
+
+class RecentInstConfigurationPage
+  : public edt::RecentConfigurationPage
+{
+public:
+  RecentInstConfigurationPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+    : edt::RecentConfigurationPage (view, dispatcher, "edit-recent-inst-param")
+  {
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_lib_name, tl::to_string (tr ("Library")), edt::RecentConfigurationPage::CellLibraryName));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_cell_name, tl::to_string (tr ("Cell")), edt::RecentConfigurationPage::CellDisplayName));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_angle, tl::to_string (tr ("Angle")), edt::RecentConfigurationPage::Double));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_mirror, tl::to_string (tr ("Mirror")), edt::RecentConfigurationPage::Bool));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_scale, tl::to_string (tr ("Scale")), edt::RecentConfigurationPage::Double));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_array, tl::to_string (tr ("Array")), edt::RecentConfigurationPage::ArrayFlag));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_rows, tl::to_string (tr ("Rows")), edt::RecentConfigurationPage::IntIfArray));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_row_x, tl::to_string (tr ("Row step (x)")), edt::RecentConfigurationPage::DoubleIfArray));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_row_y, tl::to_string (tr ("Row step (y)")), edt::RecentConfigurationPage::DoubleIfArray));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_columns, tl::to_string (tr ("Columns")), edt::RecentConfigurationPage::IntIfArray));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_column_x, tl::to_string (tr ("Column step (x)")), edt::RecentConfigurationPage::DoubleIfArray));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_column_y, tl::to_string (tr ("Column step (y)")), edt::RecentConfigurationPage::DoubleIfArray));
+    add (edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_pcell_parameters, tl::to_string (tr ("PCell parameters")), edt::RecentConfigurationPage::PCellParameters));
+
+    init ();
+  }
+};
+
+}
+
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_polygons (new lay::EditorOptionsPageFactory<RecentShapeConfigurationPage> ("edt::Service(Polygons)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_boxes (new lay::EditorOptionsPageFactory<RecentShapeConfigurationPage> ("edt::Service(Boxes)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_points (new lay::EditorOptionsPageFactory<RecentShapeConfigurationPage> ("edt::Service(Points)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_texts (new lay::EditorOptionsPageFactory<RecentTextConfigurationPage> ("edt::Service(Texts)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_paths (new lay::EditorOptionsPageFactory<RecentPathConfigurationPage> ("edt::Service(Paths)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_insts (new lay::EditorOptionsPageFactory<RecentInstConfigurationPage> ("edt::Service(CellInstances)"), 0);
 
 }
 

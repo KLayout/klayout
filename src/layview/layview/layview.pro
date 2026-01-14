@@ -11,13 +11,15 @@ RESOURCES = \
 SOURCES = \
   gsiDeclLayEditorOptionsPage.cc \
   gsiDeclLayConfigPage.cc \
+  gsiDeclLayPluginFactory.cc \
+  gsiDeclLayPlugin.cc \
+  gsiDeclLayAdditional.cc \
   layEditorOptionsPageWidget.cc \
   layGridNet.cc \
   layEditorOptionsFrame.cc \
   layEditorOptionsPages.cc \
   layMoveEditorOptionsPage.cc \
   layviewForceLink.cc \
-  gsiDeclLayAdditional.cc \
 
 HEADERS = \
   gsiDeclLayEditorOptionsPage.h \

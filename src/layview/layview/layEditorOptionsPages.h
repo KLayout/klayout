@@ -81,6 +81,7 @@ private:
   lay::LayoutViewBase *mp_view;
   QTabWidget *mp_pages;
   EditorOptionsModalPages *mp_modal_pages;
+  bool m_update_enabled;
 
   void update (lay::EditorOptionsPage *page);
   void focusInEvent (QFocusEvent *event);

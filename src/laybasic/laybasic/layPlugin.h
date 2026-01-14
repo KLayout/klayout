@@ -171,6 +171,14 @@ public:
   virtual ~PluginDeclaration ();
 
   /**
+   *  @brief Gets the name under which the declaration was registered
+   *
+   *  This is the name used in tl::RegisteredClass.
+   *  If the plugin declaration is not registered, an empty string is returned.
+   */
+  std::string name () const;
+
+  /**
    *  @brief This method is supposed to deliver the option names available
    *  
    *  @param options A vector of names and default value strings.
@@ -323,7 +331,6 @@ public:
     return false;
   }
 
-#if defined(HAVE_QT)
   /**
    *  @brief Gets the editor options pages
    *
@@ -331,11 +338,21 @@ public:
    *  and these will be shown in tabs inside this widget.
    *
    *  The new pages are returned in the "pages" vector. The layout view will take ownership of these pages.
+   *
+   *  The default implementation collects pages registered through editor options page factories.
    */
-  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> & /*pages*/, lay::LayoutViewBase * /*view*/, lay::Dispatcher * /*dispatcher*/) const
-  {
-    //  .. no pages in the default implementation ..
-  }
+  void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const;
+
+  /**
+   *  @brief Gets the "catchall" editor options pages
+   *
+   *  These are editor options pages not associated with a specific plugin.
+   *
+   *  The new pages are returned in the "pages" vector. The layout view will take ownership of these pages.
+   *
+   *  The implementation collects pages registered through editor options page factories.
+   */
+  static void get_catchall_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
 
   /**
    *  @brief Gets a value indicating whether "catchall" editor options pages shall be included
@@ -348,7 +365,6 @@ public:
   {
     return true;
   }
-#endif
 
   /**
    *  @brief Tells if the plugin implements a "lay::ViewService" active mouse mode

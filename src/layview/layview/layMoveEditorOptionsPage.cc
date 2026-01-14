@@ -111,7 +111,7 @@ MoveEditorOptionsPage::configure (const std::string &name, const std::string &va
   }
 }
 
-//  registers the factory for the move plugin
-static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory (new lay::EditorOptionsPageFactory<MoveEditorOptionsPage> (), 0, move_editor_options_name.c_str ());
+//  registers the factory for the move editor options page
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory (new lay::EditorOptionsPageFactory<MoveEditorOptionsPage> ("laybasic::MoveServicePlugin"), 0);
 
 }

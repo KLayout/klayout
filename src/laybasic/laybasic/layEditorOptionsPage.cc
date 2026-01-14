@@ -30,22 +30,6 @@ namespace lay
 {
 
 // ------------------------------------------------------------------
-//  EditorOptionsFactoryBase implementation
-
-lay::EditorOptionsPage *
-EditorOptionsPageFactoryBase::create_page_by_name (const std::string &name, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-{
-  auto reg = tl::Registrar<lay::EditorOptionsPageFactoryBase>::get_instance ();
-  for (auto i = reg->begin (); i != reg->end (); ++i) {
-    if (i.current_name () == name) {
-      return i->create_page (view, dispatcher);
-    }
-  }
-
-  return 0;
-}
-
-// ------------------------------------------------------------------
 //  EditorOptionsPageCollection implementation
 
 EditorOptionsPageCollection::EditorOptionsPageCollection ()

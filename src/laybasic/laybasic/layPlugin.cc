@@ -30,6 +30,7 @@
 
 #include "layPlugin.h"
 #include "layDispatcher.h"
+#include "layEditorOptionsPage.h"
 #include "tlExceptions.h"
 #include "tlClassRegistry.h"
 
@@ -314,6 +315,57 @@ PluginDeclaration::register_plugin ()
     Dispatcher::instance ()->plugin_registered (this);
     initialize (Dispatcher::instance ());
     Dispatcher::instance ()->config_setup ();
+  }
+}
+
+std::string
+PluginDeclaration::name () const
+{
+  auto plugin_reg = tl::Registrar<lay::PluginDeclaration>::get_instance ();
+  for (auto i = plugin_reg->begin (); i != plugin_reg->end (); ++i) {
+    if (i.operator-> () == this) {
+      return i.current_name ();
+    }
+  }
+
+  return std::string ();
+}
+
+void
+PluginDeclaration::get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const
+{
+  std::string n = name ();
+  if (n.empty ()) {
+    return;
+  }
+
+  auto reg = tl::Registrar<lay::EditorOptionsPageFactoryBase>::get_instance ();
+  for (auto i = reg->begin (); i != reg->end (); ++i) {
+    lay::EditorOptionsPage *page = 0;
+    if (i->plugin_name () == n) {
+      page = i->create_page (view, dispatcher);
+      if (page) {
+        page->set_plugin_declaration (this);
+      }
+    }
+    if (page) {
+      pages.push_back (page);
+    }
+  }
+}
+
+void
+PluginDeclaration::get_catchall_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+{
+  auto reg = tl::Registrar<lay::EditorOptionsPageFactoryBase>::get_instance ();
+  for (auto i = reg->begin (); i != reg->end (); ++i) {
+    lay::EditorOptionsPage *page = 0;
+    if (i->plugin_name ().empty ()) {
+      page = i->create_page (view, dispatcher);
+      if (page) {
+        pages.push_back (page);
+      }
+    }
   }
 }
 

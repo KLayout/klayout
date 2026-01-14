@@ -154,12 +154,29 @@ private:
 class LAYBASIC_PUBLIC EditorOptionsPageFactoryBase
 {
 public:
-  EditorOptionsPageFactoryBase () { }
+  EditorOptionsPageFactoryBase (const char *plugin_name)
+    : m_plugin_name (plugin_name)
+  {
+    //  .. nothing yet ..
+  }
+
+  EditorOptionsPageFactoryBase ()
+    : m_plugin_name ()
+  {
+    //  .. nothing yet ..
+  }
+
   virtual ~EditorOptionsPageFactoryBase () { }
+
+  const std::string &plugin_name () const
+  {
+    return m_plugin_name;
+  }
 
   virtual lay::EditorOptionsPage *create_page (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) = 0;
 
-  static lay::EditorOptionsPage *create_page_by_name (const std::string &name, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+private:
+  std::string m_plugin_name;
 };
 
 /**
@@ -179,7 +196,18 @@ class LAYBASIC_PUBLIC_TEMPLATE EditorOptionsPageFactory
   : public EditorOptionsPageFactoryBase
 {
 public:
-  EditorOptionsPageFactory () { }
+  EditorOptionsPageFactory (const char *plugin_name)
+    : EditorOptionsPageFactoryBase (plugin_name)
+  {
+    //  .. nothing yet ..
+  }
+
+  EditorOptionsPageFactory ()
+    : EditorOptionsPageFactoryBase ()
+  {
+    //  .. nothing yet ..
+  }
+
   virtual ~EditorOptionsPageFactory () { }
 
   virtual lay::EditorOptionsPage *create_page (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)

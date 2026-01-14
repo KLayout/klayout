@@ -102,7 +102,7 @@ PluginDeclaration::get_options (std::vector < std::pair<std::string, std::string
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_snap_range, "8"));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_color, lay::ColorConverter ().to_string (tl::Color ())));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_halo, "true"));
-  options.push_back (std::pair<std::string, std::string> (cfg_ruler_snap_mode, ACConverter ().to_string (lay::AC_Any)));
+  options.push_back (std::pair<std::string, std::string> (cfg_ruler_snap_mode, lay::ACConverter ().to_string (lay::AC_Any)));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_obj_snap, tl::to_string (true)));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_grid_snap, tl::to_string (false)));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_templates, std::string ()));

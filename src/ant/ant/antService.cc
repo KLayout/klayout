@@ -1134,7 +1134,7 @@ Service::configure (const std::string &name, const std::string &value)
   } else if (name == cfg_ruler_snap_mode) {
 
     lay::angle_constraint_type sm = lay::AC_Any;
-    ACConverter ().from_string (value, sm);
+    lay::ACConverter ().from_string (value, sm);
     m_snap_mode = sm;
 
   } else if (name == cfg_ruler_templates) {

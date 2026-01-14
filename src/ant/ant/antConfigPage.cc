@@ -159,10 +159,11 @@ ConfigPage3::setup (lay::Dispatcher *root)
 {
   //  snap mode
   lay::angle_constraint_type rm = lay::AC_Any;
-  root->config_get (cfg_ruler_snap_mode, rm, ACConverter ());
+  root->config_get (cfg_ruler_snap_mode, rm, lay::ACConverter ());
   mp_ui->ruler_any_angle_rb->setChecked (rm == lay::AC_Any);
   mp_ui->ruler_ortho_rb->setChecked (rm == lay::AC_Ortho);
   mp_ui->ruler_diag_rb->setChecked (rm == lay::AC_Diagonal);
+  mp_ui->ruler_diag_only_rb->setChecked (rm == lay::AC_DiagonalOnly);
   mp_ui->ruler_hor_rb->setChecked (rm == lay::AC_Horizontal);
   mp_ui->ruler_vert_rb->setChecked (rm == lay::AC_Vertical);
 }
@@ -180,13 +181,16 @@ ConfigPage3::commit (lay::Dispatcher *root)
   if (mp_ui->ruler_diag_rb->isChecked ()) {
     rm = lay::AC_Diagonal;
   }
+  if (mp_ui->ruler_diag_only_rb->isChecked ()) {
+    rm = lay::AC_DiagonalOnly;
+  }
   if (mp_ui->ruler_hor_rb->isChecked ()) {
     rm = lay::AC_Horizontal;
   }
   if (mp_ui->ruler_vert_rb->isChecked ()) {
     rm = lay::AC_Vertical;
   }
-  root->config_set (cfg_ruler_snap_mode, rm, ACConverter ());
+  root->config_set (cfg_ruler_snap_mode, rm, lay::ACConverter ());
 }
 
 // ------------------------------------------------------------

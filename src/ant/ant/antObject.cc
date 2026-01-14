@@ -24,6 +24,7 @@
 #include "antObject.h"
 #include "antTemplate.h"
 #include "antConfig.h"
+#include "layConverters.h"
 #include "tlString.h"
 #include "tlExpression.h"
 
@@ -713,7 +714,7 @@ Object::from_string (const char *s, const char * /*base_dir*/)
 
       std::string s;
       ex.read_word (s);
-      ant::ACConverter sc;
+      lay::ACConverter sc;
       lay::angle_constraint_type sm;
       sc.from_string (s, sm);
       angle_constraint (sm);
@@ -817,7 +818,7 @@ Object::to_string () const
   r += ",";
 
   r += "angle_constraint=";
-  ant::ACConverter acc;
+  lay::ACConverter acc;
   r += acc.to_string (angle_constraint ());
 
   return r;

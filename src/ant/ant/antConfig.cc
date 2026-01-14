@@ -30,47 +30,6 @@ namespace ant
 //  Helper functions to get and set the configuration
 
 std::string 
-ACConverter::to_string (const lay::angle_constraint_type &m)
-{
-  if (m == lay::AC_Any) {
-    return "any";
-  } else if (m == lay::AC_Diagonal) {
-    return "diagonal";
-  } else if (m == lay::AC_Ortho) {
-    return "ortho";
-  } else if (m == lay::AC_Horizontal) {
-    return "horizontal";
-  } else if (m == lay::AC_Vertical) {
-    return "vertical";
-  } else if (m == lay::AC_Global) {
-    return "global";
-  } else {
-    return "";
-  }
-}
-
-void 
-ACConverter::from_string (const std::string &tt, lay::angle_constraint_type &m)
-{
-  std::string t (tl::trim (tt));
-  if (t == "any") {
-    m = lay::AC_Any;
-  } else if (t == "diagonal") {
-    m = lay::AC_Diagonal;
-  } else if (t == "ortho") {
-    m = lay::AC_Ortho;
-  } else if (t == "horizontal") {
-    m = lay::AC_Horizontal;
-  } else if (t == "vertical") {
-    m = lay::AC_Vertical;
-  } else if (t == "global") {
-    m = lay::AC_Global;
-  } else {
-    m = lay::AC_Any;
-  }
-}
-
-std::string 
 StyleConverter::to_string (ant::Object::style_type s)
 {
   if (s == ant::Object::STY_ruler) {

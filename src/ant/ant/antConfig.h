@@ -51,12 +51,6 @@ extern ANT_PUBLIC const std::string cfg_current_ruler_template;
 // ------------------------------------------------------------
 //  Helper functions to get and set the configuration
 
-struct ACConverter 
-{
-  std::string to_string (const lay::angle_constraint_type &m);
-  void from_string (const std::string &s, lay::angle_constraint_type &m);
-};
-
 struct StyleConverter 
 {
   std::string to_string (ant::Object::style_type s);

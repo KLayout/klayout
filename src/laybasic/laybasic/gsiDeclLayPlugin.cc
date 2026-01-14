@@ -1092,6 +1092,10 @@ gsi::Enum<lay::angle_constraint_type> decl_AngleConstraintType ("lay", "AngleCon
   gsi::enum_const ("AC_Diagonal", lay::AC_Diagonal,
     "@brief Specifies to use multiples of 45 degree.\n"
   ) +
+  gsi::enum_const ("AC_DiagonalOnly", lay::AC_DiagonalOnly,
+    "@brief Specifies to use 45 degree or 135 degree only.\n"
+    "This variant has been introduced in version 0.30.6."
+  ) +
   gsi::enum_const ("AC_Ortho", lay::AC_Ortho,
     "@brief Specifies to use multiples of 90 degree.\n"
   ) +

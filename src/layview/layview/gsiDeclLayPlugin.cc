@@ -27,6 +27,7 @@
 #include "gsiEnums.h"
 #include "layCursor.h"
 #include "layEditorUtils.h"
+#include "layEditorOptionsPageWidget.h"
 #include "layConverters.h"
 
 namespace gsi
@@ -710,6 +711,30 @@ PluginImpl::move_ac (lay::angle_constraint_type ac) const
   return ac != lay::AC_Global ? ac : m_move_ac;
 }
 
+static std::vector<lay::EditorOptionsPageWidget *>
+get_editor_options_pages (PluginImpl *plugin)
+{
+  auto pages = plugin->editor_options_pages ();
+
+  std::vector<lay::EditorOptionsPageWidget *> result;
+  for (auto p = pages.begin (); p != pages.end (); ++p) {
+    lay::EditorOptionsPageWidget *w = (*p)->widget ();
+    if (w) {
+      result.push_back (w);
+    }
+  }
+
+  return result;
+}
+
+static lay::EditorOptionsPageWidget *
+get_focus_page (PluginImpl *plugin)
+{
+  auto fp = plugin->focus_page ();
+  return fp ? fp->widget () : 0;
+}
+
+
 Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
   callback ("menu_activated", &gsi::PluginImpl::menu_activated, &gsi::PluginImpl::f_menu_activated, gsi::arg ("symbol"),
     "@brief Gets called when a custom menu item is selected\n"
@@ -1032,14 +1057,14 @@ Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
     "This method has been added in version 0.30.4."
   ) +
 #if defined(HAVE_QTBINDINGS)
-  gsi::method ("editor_options_pages", &gsi::PluginImpl::editor_options_pages,
+  gsi::method_ext ("editor_options_pages", &get_editor_options_pages,
     "@brief Gets the editor options pages which are associated with the view\n"
     "The editor options pages are created by the plugin factory class and are associated with this plugin.\n"
     "This method allows locating them and using them for plugin-specific purposes.\n"
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  gsi::method ("focus_page", &gsi::PluginImpl::focus_page,
+  gsi::method_ext ("focus_page", &get_focus_page,
     "@brief Gets the (first) focus page\n"
     "Focus pages are editor options pages that have a true value for \\EditorOptionsPage#is_focus_page.\n"
     "The pages can be navigated to quickly or can be shown in a modal dialog from the editor function.\n"
@@ -1047,6 +1072,7 @@ Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
+#endif
   callback ("focus_page_open", &gsi::PluginImpl::focus_page_open, &gsi::PluginImpl::f_focus_page_open,
     "@brief Gets called when the focus page wants to be opened - i.e. if 'Tab' is pressed during editing\n"
     "The default implementation calls \\EditorOptionsPage#show on the focus page.\n"
@@ -1056,7 +1082,6 @@ Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-#endif
   gsi::method ("view", &gsi::PluginImpl::view,
     "@brief Gets the view object the plugin is associated with\n"
     "This method returns the view object that the plugin is associated with.\n"

@@ -30,34 +30,170 @@
 namespace gsi
 {
 
+static int show (lay::EditorOptionsPageWidget *page)
+{
+  return page->lay::EditorOptionsPage::show ();
+}
+
+static void hide (lay::EditorOptionsPageWidget *)
+{
+  //  overrides QWidget::hide without doing anything
+}
+
+static void setVisible (lay::EditorOptionsPageWidget *, bool)
+{
+  //  overrides QWidget::hide without doing anything
+}
+
+static lay::LayoutViewBase *view (lay::EditorOptionsPageWidget *page)
+{
+  return page->view ();
+}
+
+static std::string title (lay::EditorOptionsPageWidget *page)
+{
+  return page->title ();
+}
+
+static int order (lay::EditorOptionsPageWidget *page)
+{
+  return page->order ();
+}
+
+static bool is_focus_page (lay::EditorOptionsPageWidget *page)
+{
+  return page->is_focus_page ();
+}
+
+static void set_focus_page (lay::EditorOptionsPageWidget *page, bool f)
+{
+  page->set_focus_page (f);
+}
+
+static bool is_modal_page (lay::EditorOptionsPageWidget *page)
+{
+  return page->is_modal_page ();
+}
+
+static void set_modal_page (lay::EditorOptionsPageWidget *page, bool f)
+{
+  page->set_modal_page (f);
+}
+
+static bool is_toolbox_widget (lay::EditorOptionsPageWidget *page)
+{
+  return page->is_toolbox_widget ();
+}
+
+static void set_toolbox_widget (lay::EditorOptionsPageWidget *page, bool f)
+{
+  page->set_toolbox_widget (f);
+}
+
+static void apply (lay::EditorOptionsPageWidget *page, lay::Dispatcher *root)
+{
+  page->apply (root);
+}
+
+static void cancel (lay::EditorOptionsPageWidget *page)
+{
+  page->cancel ();
+}
+
+static void commit (lay::EditorOptionsPageWidget *page, lay::Dispatcher *root)
+{
+  page->commit (root);
+}
+
+static void setup (lay::EditorOptionsPageWidget *page, lay::Dispatcher *root)
+{
+  page->setup (root);
+}
+
 Class<lay::EditorOptionsPageWidget> decl_EditorOptionsPageBase (QT_EXTERNAL_BASE (QWidget) "lay", "EditorOptionsPageBase",
-  method ("view", &lay::EditorOptionsPage::view,
+  method_ext ("view", &view,
     "@brief Gets the view object this page is associated with\n"
   ) +
-  method ("title", &lay::EditorOptionsPage::title,
+  method_ext ("title", &title,
     "@brief Gets the title string of the page\n"
   ) +
-  method ("order", &lay::EditorOptionsPage::order,
+  method_ext ("order", &order,
     "@brief Gets the order index of the page\n"
   ) +
-  method ("is_focus_page?", &lay::EditorOptionsPage::is_focus_page,
+  method_ext ("is_focus_page?|focus_page", &is_focus_page,
     "@brief Gets a flag indicating whether the page is a focus page\n"
     "See \\focus_page= for a description is this attribute.\n"
+    "\n"
+    "The 'focus_page' getter was added in version 0.30.6."
   ) +
-  method ("focus_page=", &lay::EditorOptionsPage::set_focus_page, gsi::arg ("flag"),
+  method_ext ("focus_page=", &set_focus_page, gsi::arg ("flag"),
     "@brief Sets a flag indicating whether the page is a focus page\n"
     "The focus page is the page that is selected when the tab key is pressed during some plugin action.\n"
+    "\n"
+    "By default, this flag is not set.\n"
   ) +
-  method ("is_modal_page?", &lay::EditorOptionsPage::is_modal_page,
+  method_ext ("is_modal_page?|modal_page", &is_modal_page,
     "@brief Gets a flag indicating whether the page is a modal page\n"
     "See \\modal_page= for a description is this attribute.\n"
+    "\n"
+    "The 'modal_page' getter was added in version 0.30.6."
   ) +
-  method ("modal_page=", &lay::EditorOptionsPage::set_modal_page, gsi::arg ("flag"),
+  method_ext ("modal_page=", &set_modal_page, gsi::arg ("flag"),
     "@brief Sets a flag indicating whether the page is a modal page\n"
     "A modal page is shown in a modal dialog upon \\show. Non-modal pages are shown in the "
     "editor options dock.\n"
+    "\n"
+    "By default, this flag is not set.\n"
   ) +
-  method ("show", &lay::EditorOptionsPage::show,
+  method_ext ("is_toolbox_widget?|toolbox_widget", &is_toolbox_widget,
+    "@brief Gets a flag indicating whether the page is a toolbox widget\n"
+    "See \\toolbox_widget= for a description is this attribute.\n"
+    "\n"
+    "This attribute was added in version 0.30.6."
+  ) +
+  method_ext ("toolbox_widget=", &set_toolbox_widget, gsi::arg ("flag"),
+    "@brief Sets a flag indicating whether the page is a toolbox widget\n"
+    "A toolbox widget is shown at the top of the layout view. It can be made transparent, so the background shows the\n"
+    "layout canvas. See \\transparent= for details.\n"
+    "\n"
+    "A toolbox widget should also be the focus widget. This way, pressing the Tab key will enter the "
+    "toolbox widget and enables editing of the widgets there.\n"
+    "\n"
+    "By default, this flag is not set.\n"
+    "\n"
+    "This attribute was added in version 0.30.6."
+  ) +
+  method ("is_transparent?|transparent", &lay::EditorOptionsPageWidget::is_transparent,
+    "@brief Gets a flag indicating whether the widget is transparent\n"
+    "See \\transparent= for a description is this attribute.\n"
+    "\n"
+    "This attribute was added in version 0.30.6."
+  ) +
+  method ("transparent=", &lay::EditorOptionsPageWidget::set_transparent, gsi::arg ("flag"),
+    "@brief Sets a flag indicating whether the widget is transparent\n"
+    "A transparent widget is useful for toolbox widgets and makes the layout canvas become\n"
+    "visible in parts which are not covered by child widgets of the page.\n"
+    "\n"
+    "By default, the page is not transparent.\n"
+    "\n"
+    "This attribute was added in version 0.30.6."
+  ) +
+  method ("is_visible?|visible", &lay::EditorOptionsPageWidget::is_visible,
+    "@brief Gets a flag indicating whether the widget is visible\n"
+    "See \\visible= for a description is this attribute.\n"
+    "\n"
+    "This attribute was added in version 0.30.6."
+  ) +
+  method ("visible=", &lay::EditorOptionsPageWidget::set_visible, gsi::arg ("flag"),
+    "@brief Sets a flag indicating whether the widget is visible\n"
+    "Instead of using 'show' and 'hide' or 'isVisible', use this attribute to control whether the page is visible or not.\n"
+    "The visibility attribute is useful mainly for conditionally enabling editor option pages based on the status of the plugin.\n"
+    "\n"
+    "By default, the page is visible.\n"
+    "\n"
+    "This attribute was added in version 0.30.6."
+  ) +
+  method_ext ("show", &show,
     "@brief Shows the page\n"
     "@return A value indicating whether the page was opened non-modal (-1), accepted (1) or rejected (0)\n"
     "Provided the page is selected because the plugin is active, this method will "
@@ -68,17 +204,23 @@ Class<lay::EditorOptionsPageWidget> decl_EditorOptionsPageBase (QT_EXTERNAL_BASE
     "You can overload these methods to transfer data to and from the configuration space or to perform other "
     "actions, not related to configuration parameters."
   ) +
-  method ("apply", &lay::EditorOptionsPage::apply, gsi::arg ("dispatcher"),
+  method_ext ("hide", &hide,
+    "@hide\n"
+  ) +
+  method_ext ("setVisible", &setVisible,
+    "@hide\n"
+  ) +
+  method_ext ("apply", &apply, gsi::arg ("dispatcher"),
     "@brief Transfers data from the page to the configuration\n"
   ) +
-  method ("setup", &lay::EditorOptionsPage::setup, gsi::arg ("dispatcher"),
+  method_ext ("setup", &setup, gsi::arg ("dispatcher"),
     "@brief Transfers data from the configuration to the page\n"
   ) +
-  method ("cancel", &lay::EditorOptionsPage::cancel,
+  method_ext ("cancel", &cancel,
     "@brief Gets called when the Escape key is pressed on a non-modal page\n"
     "This method has been introduced in version 0.30.6."
   ) +
-  method ("commit", &lay::EditorOptionsPage::commit,
+  method_ext ("commit", &commit,
     "@brief Gets called when the Enter key is pressed on a non-modal page\n"
     "This method has been introduced in version 0.30.6."
   ),
@@ -98,7 +240,7 @@ Class<lay::EditorOptionsPageWidget> decl_EditorOptionsPageBase (QT_EXTERNAL_BASE
 );
 
 EditorOptionsPageImpl::EditorOptionsPageImpl (const std::string &title, int index)
-  : lay::EditorOptionsPage (), m_title (title), m_index (index)
+  : lay::EditorOptionsPageWidget (), m_title (title), m_index (index)
 {
   //  .. nothing yet ..
 }
@@ -106,22 +248,27 @@ EditorOptionsPageImpl::EditorOptionsPageImpl (const std::string &title, int inde
 void
 EditorOptionsPageImpl::call_edited ()
 {
-  lay::EditorOptionsPage::edited ();
+  lay::EditorOptionsPageWidget::edited ();
 }
 
 static void apply_fb (EditorOptionsPageImpl *ep, lay::Dispatcher *root)
 {
-  ep->lay::EditorOptionsPage::apply (root);
+  ep->lay::EditorOptionsPageWidget::apply (root);
 }
 
 static void setup_fb (EditorOptionsPageImpl *ep, lay::Dispatcher *root)
 {
-  ep->lay::EditorOptionsPage::setup (root);
+  ep->lay::EditorOptionsPageWidget::setup (root);
 }
 
 static void cancel_fb (EditorOptionsPageImpl *ep)
 {
-  ep->lay::EditorOptionsPage::cancel ();
+  ep->lay::EditorOptionsPageWidget::cancel ();
+}
+
+static void commit_fb (EditorOptionsPageImpl *ep, lay::Dispatcher *root)
+{
+  ep->lay::EditorOptionsPageWidget::commit (root);
 }
 
 void
@@ -159,7 +306,7 @@ EditorOptionsPageImpl::setup (lay::Dispatcher *root)
 void
 EditorOptionsPageImpl::cancel_impl ()
 {
-  lay::EditorOptionsPage::cancel ();
+  lay::EditorOptionsPageWidget::cancel ();
 }
 
 void
@@ -175,7 +322,7 @@ EditorOptionsPageImpl::cancel ()
 void
 EditorOptionsPageImpl::commit_impl (lay::Dispatcher *root)
 {
-  lay::EditorOptionsPage::commit (root);
+  lay::EditorOptionsPageWidget::commit (root);
 }
 
 void
@@ -203,6 +350,7 @@ Class<EditorOptionsPageImpl> decl_EditorOptionsPage (decl_EditorOptionsPageBase,
     "@brief Call this method when some entry widget has changed\n"
     "When some entry widget (for example 'editingFinished' slot of a QLineEdit), "
     "call this method to initiate a transfer of information from the page to the plugin.\n"
+    "After calling 'edited', the system will call 'apply' to transfer the information."
   ) +
   //  prevents infinite recursion
   method_ext ("apply", &apply_fb, gsi::arg ("dispatcher"), "@hide") +
@@ -210,6 +358,9 @@ Class<EditorOptionsPageImpl> decl_EditorOptionsPage (decl_EditorOptionsPageBase,
     "@brief Reimplement this method to transfer data from the page to the configuration\n"
     "In this method, you should transfer all widget data into corresponding configuration updates.\n"
     "Use \\Dispatcher#set_config on the dispatcher object ('dispatcher' argument) to set a configuration parameter.\n"
+    "\n"
+    "'apply' is called either when a modal dialog closes or after 'edited' has been called to signal "
+    "a change of information.\n"
   ) +
   //  prevents infinite recursion
   method_ext ("setup", &setup_fb, gsi::arg ("dispatcher"), "@hide") +
@@ -229,6 +380,11 @@ Class<EditorOptionsPageImpl> decl_EditorOptionsPage (decl_EditorOptionsPageBase,
   method_ext ("commit", &commit_fb, gsi::arg ("dispatcher"), "@hide") +
   callback ("commit", &EditorOptionsPageImpl::commit, &EditorOptionsPageImpl::f_commit, gsi::arg ("dispatcher"),
     "@brief Reimplement this method to receive Enter key events for the page\n"
+    "This method applies to toolbox widgets (see \\EditorOptionsPageBase#toolbox_widget=). "
+    "When the user presses the Enter key, the 'commit' method is called. You can reimplement "
+    "this method instead of 'apply' as a opportunity to perform additional actions such as "
+    "terminating some operation.\n"
+    "\n"
     "This method has been added in version 0.30.6.\n"
   ),
   "@brief The plugin framework's editor options page\n"

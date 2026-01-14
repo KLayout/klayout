@@ -40,7 +40,7 @@ EditorOptionsPageWidget::EditorOptionsPageWidget (lay::LayoutViewBase *view, lay
 }
 
 EditorOptionsPageWidget::EditorOptionsPageWidget ()
-  : QWidget (0), EditorOptionsPage ()
+  : QWidget (0), EditorOptionsPage (), m_is_transparent (false)
 {
   //  .. nothing yet ..
 }

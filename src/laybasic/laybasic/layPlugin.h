@@ -341,7 +341,7 @@ public:
    *
    *  The default implementation collects pages registered through editor options page factories.
    */
-  void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const;
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const;
 
   /**
    *  @brief Gets the "catchall" editor options pages

@@ -53,8 +53,8 @@ public:
   void call_edited ();
   virtual void apply (lay::Dispatcher *root);
   virtual void setup (lay::Dispatcher *root);
-  virtual void cancel (lay::Dispatcher *root);
-  virtual void commit ();
+  virtual void cancel ();
+  virtual void commit (lay::Dispatcher *root);
 
   gsi::Callback f_apply;
   gsi::Callback f_setup;
@@ -69,8 +69,8 @@ private:
 
   void apply_impl (lay::Dispatcher *root);
   void setup_impl (lay::Dispatcher *root);
-  void cancel_impl (lay::Dispatcher *root);
-  void commit_impl ();
+  void cancel_impl ();
+  void commit_impl (lay::Dispatcher *root);
 };
 
 }

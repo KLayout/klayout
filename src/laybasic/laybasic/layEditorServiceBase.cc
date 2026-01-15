@@ -371,7 +371,7 @@ EditorServiceBase::focus_page ()
 bool
 EditorServiceBase::key_event (unsigned int key, unsigned int /*buttons*/)
 {
-  if (is_active () && (key == Qt::Key_Tab || key == Qt::Key_Backtab)) {
+  if (is_active () && (key == lay::KeyTab || key == lay::KeyBacktab)) {
     focus_page_open ();
     return true;
   } else {
@@ -384,7 +384,7 @@ EditorServiceBase::shortcut_override_event (unsigned int key, unsigned int /*but
 {
   auto fp = focus_page ();
   return is_active ()
-      && (key == Qt::Key_Tab || key == Qt::Key_Backtab)
+      && (key == lay::KeyTab || key == lay::KeyBacktab)
       && fp
       && (fp->is_modal_page () || fp->is_visible ());
 }
@@ -400,7 +400,9 @@ void
 EditorServiceBase::show_error (tl::Exception &ex)
 {
   tl::error << ex.msg ();
+#if defined(HAVE_QT)
   QMessageBox::critical (ui ()->widget (), tr ("Error"), tl::to_qstring (ex.msg ()));
+#endif
 }
 
 }

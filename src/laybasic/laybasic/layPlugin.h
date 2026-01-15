@@ -51,9 +51,9 @@ class ViewService;
 class Editable;
 class Drawing;
 class TechnologyComponentProvider;
+class EditorOptionsPage;
 #if defined(HAVE_QT)
 class Browser;
-class EditorOptionsPage;
 class ConfigPage;
 #endif
 

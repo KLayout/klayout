@@ -711,6 +711,7 @@ PluginImpl::move_ac (lay::angle_constraint_type ac) const
   return ac != lay::AC_Global ? ac : m_move_ac;
 }
 
+#if defined(HAVE_QTBINDINGS)
 static std::vector<lay::EditorOptionsPageWidget *>
 get_editor_options_pages (PluginImpl *plugin)
 {
@@ -733,7 +734,7 @@ get_focus_page (PluginImpl *plugin)
   auto fp = plugin->focus_page ();
   return fp ? fp->widget () : 0;
 }
-
+#endif
 
 Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
   callback ("menu_activated", &gsi::PluginImpl::menu_activated, &gsi::PluginImpl::f_menu_activated, gsi::arg ("symbol"),

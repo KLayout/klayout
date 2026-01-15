@@ -32,7 +32,7 @@
 #include "layLayoutView.h"
 #include "laySnap.h"
 #include "layConverters.h"
-#include "layEditorOptionsPages.h"
+#include "layEditorOptionsPage.h"
 #include "tlProgress.h"
 #include "tlTimer.h"
 

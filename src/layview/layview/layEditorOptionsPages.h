@@ -23,6 +23,8 @@
 #ifndef HDR_layEditorOptionsPages
 #define HDR_layEditorOptionsPages
 
+#if defined(HAVE_QT)
+
 #include "layviewCommon.h"
 #include "layEditorOptionsPage.h"
 
@@ -122,6 +124,8 @@ private:
 };
 
 }
+
+#endif
 
 #endif
 

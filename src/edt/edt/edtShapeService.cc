@@ -26,9 +26,12 @@
 #include "edtPropertiesPages.h"
 #include "layLayoutView.h"
 #include "layEditorOptionsPage.h"
-#include "layTipDialog.h"
 #include "dbEdgeProcessor.h"
 #include "dbPolygonTools.h"
+
+#if defined(HAVE_QT)
+#  include "layTipDialog.h"
+#endif
 
 namespace edt
 {

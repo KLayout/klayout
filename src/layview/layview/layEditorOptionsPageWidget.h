@@ -23,6 +23,8 @@
 #ifndef HDR_layEditorOptionsPageWidget
 #define HDR_layEditorOptionsPageWidget
 
+#if defined(HAVE_QT)
+
 #include <QWidget>
 
 #include "layviewCommon.h"
@@ -65,6 +67,8 @@ protected:
 };
 
 }
+
+#endif
 
 #endif
 

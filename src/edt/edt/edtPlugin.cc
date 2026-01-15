@@ -24,7 +24,6 @@
 #include "layDispatcher.h"
 #include "layLayoutViewBase.h"
 #include "layEditorOptionsPage.h"
-#include "layTipDialog.h"
 #include "edtPlugin.h"
 #include "edtConfig.h"
 #include "edtService.h"
@@ -44,6 +43,7 @@
 #  include <QApplication>
 #  include <QLayout>
 #  include <QMessageBox>
+#  include "layTipDialog.h"
 #endif
 
 namespace edt

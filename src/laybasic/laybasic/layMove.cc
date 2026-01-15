@@ -24,15 +24,9 @@
 #include "layEditable.h"
 #include "layLayoutViewBase.h"
 #include "layEditorUtils.h"
+#include "layEditorOptionsPage.h"
 #include "laySelector.h"
 #include "laybasicConfig.h"
-
-#if defined(HAVE_QT)
-#  include "layEditorOptionsPage.h"
-#  include <QWidget>
-#  include <QHBoxLayout>
-#  include <QLineEdit>
-#endif
 
 namespace lay
 {

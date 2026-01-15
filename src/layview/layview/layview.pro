@@ -9,27 +9,15 @@ DEFINES += MAKE_LAYVIEW_LIBRARY
 RESOURCES = \
 
 SOURCES = \
-  gsiDeclLayEditorOptionsPage.cc \
-  gsiDeclLayConfigPage.cc \
   gsiDeclLayPluginFactory.cc \
   gsiDeclLayPlugin.cc \
   gsiDeclLayAdditional.cc \
-  layEditorOptionsPageWidget.cc \
   layGridNet.cc \
-  layEditorOptionsFrame.cc \
-  layEditorOptionsPages.cc \
-  layMoveEditorOptionsPage.cc \
   layviewForceLink.cc \
 
 HEADERS = \
-  gsiDeclLayEditorOptionsPage.h \
-  gsiDeclLayConfigPage.h \
-  layEditorOptionsPageWidget.h \
   layGridNet.h \
-  layEditorOptionsFrame.h \
-  layEditorOptionsPages.h \
   layLayoutView.h \
-  layMoveEditorOptionsPage.h \
   layviewForceLink.h \
 
 !equals(HAVE_QT, "0") {
@@ -38,12 +26,24 @@ HEADERS = \
     GridNetConfigPage.ui \
 
   SOURCES += \
+    gsiDeclLayEditorOptionsPage.cc \
+    gsiDeclLayConfigPage.cc \
     layGridNetConfigPage.cc \
-    layLayoutView_qt.cc \
+    layEditorOptionsPageWidget.cc \
+    layEditorOptionsFrame.cc \
+    layEditorOptionsPages.cc \
+    layMoveEditorOptionsPage.cc \
     gsiDeclLayLayoutView_qt.cc \
+    layLayoutView_qt.cc \
 
   HEADERS += \
+    gsiDeclLayEditorOptionsPage.h \
+    gsiDeclLayConfigPage.h \
     layGridNetConfigPage.h \
+    layEditorOptionsFrame.h \
+    layEditorOptionsPages.h \
+    layEditorOptionsPageWidget.h \
+    layMoveEditorOptionsPage.h \
     layLayoutView_qt.h \
 
 } else {

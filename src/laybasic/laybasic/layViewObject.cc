@@ -711,7 +711,7 @@ ViewObjectUI::send_shortcut_override_event(unsigned int key, unsigned int button
   }
 
   if (! done) {
-    key_event (key, buttons);
+    done = shortcut_override_event (key, buttons);
   }
 
   return done;

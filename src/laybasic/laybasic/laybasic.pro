@@ -91,7 +91,6 @@ SOURCES += \
   layUtils.cc \
 
 HEADERS += \
-  gsiDeclLayPlugin.h \
   layEditorOptionsPage.h \
   layEditorUtils.h \
   layMargin.h \

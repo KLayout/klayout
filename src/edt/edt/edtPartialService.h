@@ -340,7 +340,7 @@ private:
   //  The layout view that this service is attached to
   lay::LayoutViewBase *mp_view;
   lay::Dispatcher *mp_root;
-  bool m_dragging;
+  bool m_moving;
   bool m_keep_selection;
   db::DPoint m_start, m_current;
   db::DPoint m_p1, m_p2;

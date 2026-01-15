@@ -372,8 +372,7 @@ bool
 EditorServiceBase::key_event (unsigned int key, unsigned int /*buttons*/)
 {
   if (is_active () && (key == lay::KeyTab || key == lay::KeyBacktab)) {
-    focus_page_open ();
-    return true;
+    return focus_page_open () >= 0;
   } else {
     return false;
   }
@@ -393,7 +392,7 @@ int
 EditorServiceBase::focus_page_open ()
 {
   auto fp = focus_page ();
-  return fp ? fp->show () : 0;
+  return fp ? fp->show () : -1;
 }
 
 void

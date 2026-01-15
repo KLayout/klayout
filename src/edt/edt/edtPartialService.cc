@@ -26,6 +26,7 @@
 #include "laySnap.h"
 #include "layFinder.h"
 #include "layConverters.h"
+#include "layMove.h"
 #include "tlProgress.h"
 #include "edtPartialService.h"
 #include "edtService.h"
@@ -1096,7 +1097,7 @@ PartialService::PartialService (db::Manager *manager, lay::LayoutViewBase *view,
     db::Object (manager),
     mp_view (view),
     mp_root (root),
-    m_dragging (false),
+    m_moving (false),
     m_keep_selection (true),
     mp_box (0),
     m_color (0),
@@ -1760,7 +1761,7 @@ void
 PartialService::edit_cancel ()
 {
   //  stop dragging, clear selection
-  m_dragging = false;
+  m_moving = false;
 
   if (mp_box) {
     delete mp_box;
@@ -1853,24 +1854,13 @@ PartialService::move_impl (const db::DPoint &p)
   selection_to_view ();
 }
 
-bool  
+bool
 PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
-  clear_mouse_cursors ();
+  if (m_moving) {
 
-  if (m_dragging) {
-
-    set_cursor (lay::Cursor::size_all);
-
-    m_alt_ac = lay::ac_from_buttons (buttons);
-
-    move_impl (p);
-
-    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::begin_edits);
-    issue_editor_hook_calls (m_editor_hooks);
-    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_edits);
-
-    m_alt_ac = lay::AC_Global;
+    //  event is handled by the move service
+    return false;
 
   } else if (prio) {
     
@@ -1929,9 +1919,9 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
     return false;
   }
 
-  if (m_dragging) {
+  if (m_moving) {
 
-    //  eat events if already dragging
+    //  eat events if moving -> handled by move service
     return true;
 
   } else if (! mp_box) {
@@ -1977,25 +1967,8 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
 
     } else {
 
-      //  something was selected: start dragging this ..
-      m_dragging = true;
-      m_keep_selection = true;
-
-      if (is_single_point_selection ()) {
-        //  for a single selected point we use the original point as the start location which 
-        //  allows bringing it to grid
-        m_current = m_start = single_selected_point ();
-      } else if (is_single_edge_selection ()) {
-        //  for an edge selection use the point projected to edge as the start location which
-        //  allows bringing it to grid
-        m_current = m_start = projected_to_edge (single_selected_edge (), p);
-      } else {
-        m_current = m_start = p;
-      }
-
-      ui ()->grab_mouse (this, true);
-
-      open_editor_hooks ();
+      //  delegate further actions to move service, which will start a move operation
+      mp_view->move_service ()->start_move ();
 
     }
 
@@ -2027,41 +2000,9 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
     return false;
   }
 
-  if (m_dragging) {
+  if (m_moving) {
 
-    m_alt_ac = lay::ac_from_buttons (buttons);
-
-    if (m_current != m_start) {
-
-      //  stop dragging
-      ui ()->ungrab_mouse (this);
-      
-      if (manager ()) {
-        manager ()->transaction (tl::to_string (tr ("Partial move")));
-      }
-
-      db::DTrans move_trans = db::DTrans (m_current - m_start);
-
-      transform_selection (move_trans);
-
-      if (manager ()) {
-        manager ()->commit ();
-      }
-
-    }
-
-    if (! m_keep_selection) {
-      m_selection.clear ();
-    }
-
-    m_dragging = false;
-    selection_to_view ();
-
-    close_editor_hooks (true);
-
-    m_alt_ac = lay::AC_Global;
-
-    return true;
+    return false;
 
   } else if (ui ()->mouse_event_viewport ().contains (p)) { 
 
@@ -2154,25 +2095,15 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
 
       }
       
-      //  start dragging with that single selection
+      //  start dragging with the selection
       if (mode == lay::Editable::Replace && ! m_selection.empty ()) {
 
-        m_dragging = true;
+        //  delegate further actions to move service, which will start a move operation
+        mp_view->move_service ()->start_move ();
+
+        //  modify the decision to keep the selection (needs to come after the
+        //  move service called begin_move)
         m_keep_selection = ! new_selection;
-
-        if (is_single_point_selection ()) {
-          //  for a single selected point we use the original point as the start location which 
-          //  allows bringing it to grid
-          m_current = m_start = single_selected_point ();
-        } else if (is_single_edge_selection ()) {
-          //  for an edge selection use the point projected to edge as the start location which
-          //  allows bringing it to grid
-          m_current = m_start = projected_to_edge (single_selected_edge (), p);
-        } else {
-          m_current = m_start = p;
-        }
-
-        open_editor_hooks ();
 
       }
 
@@ -2208,10 +2139,6 @@ PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int butt
 
     close_editor_hooks (false);
 
-    //  stop dragging
-    ui ()->ungrab_mouse (this);
-    m_dragging = false;
-      
     partial_select (db::DBox (p, p), lay::Editable::Replace);
 
     if (! m_selection.empty ()) {
@@ -2363,7 +2290,7 @@ PartialService::begin_move (MoveMode mode, const db::DPoint &p, lay::angle_const
 
     m_alt_ac = ac;
 
-    m_dragging = true;
+    m_moving = true;
     m_keep_selection = true;
 
     if (is_single_point_selection ()) {
@@ -2463,7 +2390,7 @@ PartialService::snap_move (const db::DVector &v) const
 void
 PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
 {
-  if (! m_dragging) {
+  if (! m_moving) {
     return;
   }
 
@@ -2489,14 +2416,11 @@ PartialService::end_move (const db::DVector &v)
 void
 PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
 {
-  if (! m_dragging) {
+  if (! m_moving) {
     return;
   }
 
   if (m_current != m_start) {
-
-    //  stop dragging
-    ui ()->ungrab_mouse (this);
 
     if (manager ()) {
       manager ()->transaction (tl::to_string (tr ("Partial move")));
@@ -2516,7 +2440,7 @@ PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /
     m_selection.clear ();
   }
 
-  m_dragging = false;
+  m_moving = false;
   selection_to_view ();
 
   clear_mouse_cursors ();
@@ -2602,9 +2526,6 @@ PartialService::del ()
 {
   std::set<db::Layout *> needs_cleanup;
 
-  //  stop dragging
-  ui ()->ungrab_mouse (this);
-  
   std::map <std::pair <db::cell_index_type, std::pair <unsigned int, unsigned int> >, std::vector <partial_objects::const_iterator> > shapes_to_delete_by_cell;
 
   for (partial_objects::iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
@@ -2697,7 +2618,6 @@ PartialService::del ()
   handle_guiding_shape_changes ();
 
   m_selection.clear ();
-  m_dragging = false;
   selection_to_view ();
 
   close_editor_hooks (false);
@@ -3002,15 +2922,8 @@ PartialService::do_selection_to_view ()
 {
   //  if dragging, establish the current displacement
   db::DTrans move_trans;
-  if (m_dragging) {
-
+  if (m_moving) {
     move_trans = db::DTrans (m_current - m_start);
-
-    //  display vector
-    view ()->message (std::string ("dx: ") + tl::micron_to_string (move_trans.disp ().x ()) + 
-                      std::string ("  dy: ") + tl::micron_to_string (move_trans.disp ().y ()) + 
-                      std::string ("  d: ") + tl::micron_to_string (move_trans.disp ().length ()));
-
   }
 
   size_t n_marker = 0;
@@ -3052,7 +2965,7 @@ PartialService::do_selection_to_view ()
           std::map <EdgeWithIndex, db::Edge> new_edges;
           std::map <PointWithIndex, db::Point> new_points;
 
-          if (m_dragging) {
+          if (m_moving) {
             create_shift_sets (r->first.shape (), r->second, new_points, new_edges, move_vector);
           }
 

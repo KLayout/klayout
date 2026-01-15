@@ -72,11 +72,11 @@ EditorOptionsPage::show ()
     return -1;
   } else if (m_toolbox_widget) {
     set_focus ();
-    return -1;
+    return 1;
   } else if (mp_owner) {
     if (! is_modal_page ()) {
       mp_owner->make_page_current (this);
-      return -1;
+      return 1;
     } else {
       return mp_owner->exec_modal (this) ? 1 : 0;
     }

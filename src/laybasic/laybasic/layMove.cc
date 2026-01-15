@@ -425,7 +425,7 @@ MoveService::drag_cancel ()
 }
 
 void
-MoveService::cancel ()
+MoveService::cancel_transaction ()
 { 
   if (m_dragging) {
     if (mp_transaction.get ()) {
@@ -436,7 +436,7 @@ MoveService::cancel ()
 }
 
 void
-MoveService::finish ()
+MoveService::finish_transaction ()
 {
   if (m_dragging) {
     mp_transaction.reset (0);

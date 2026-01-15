@@ -852,6 +852,14 @@ public:
    */
   virtual void key_event (unsigned int /*key*/, unsigned int /*buttons*/) { }
 
+  /**
+   *  @brief Handler for remaining shortcut override events
+   *
+   *  This event handler is called if no ViewObject requested handling
+   *  of this event.
+   */
+  virtual bool shortcut_override_event (unsigned int /*key*/, unsigned int /*buttons*/) { return false; }
+
 #if defined(HAVE_QT)
   /**
    *  @brief The drag enter event

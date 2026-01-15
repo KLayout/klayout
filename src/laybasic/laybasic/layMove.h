@@ -48,8 +48,8 @@ public:
 
   bool configure (const std::string &name, const std::string &value);
   void function (const std::string &name, const std::string &value);
-  void finish ();
-  void cancel ();
+  void finish_transaction ();
+  void cancel_transaction ();
 
 private:
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio);

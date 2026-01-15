@@ -47,7 +47,6 @@ MoveEditorOptionsPage::MoveEditorOptionsPage (lay::LayoutViewBase *view, lay::Di
 
   hide ();
 
-  set_focus_page (true);
   set_toolbox_widget (true);
   set_transparent (true);
 }
@@ -112,6 +111,6 @@ MoveEditorOptionsPage::configure (const std::string &name, const std::string &va
 }
 
 //  registers the factory for the move editor options page
-static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory (new lay::EditorOptionsPageFactory<MoveEditorOptionsPage> ("laybasic::MoveServicePlugin"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory (new lay::EditorOptionsPageFactory<MoveEditorOptionsPage> (), 0);
 
 }

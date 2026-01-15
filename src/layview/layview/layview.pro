@@ -16,6 +16,7 @@ SOURCES = \
   layviewForceLink.cc \
 
 HEADERS = \
+  gsiDeclLayPlugin.h \
   layGridNet.h \
   layLayoutView.h \
   layviewForceLink.h \

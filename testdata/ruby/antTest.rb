@@ -100,6 +100,8 @@ class RBA::Annotation
       "any"
     elsif s == AngleDiagonal
       "diagonal"
+    elsif s == AngleDiagonalOnly
+      "diagonal_only"
     elsif s == AngleOrtho
       "ortho"
     elsif s == AngleHorizontal
@@ -662,15 +664,15 @@ class Ant_TestClass < TestBase
   # multi-segment rulers
   def test_6
 
-    a = annot_obj2( [ RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ) ], "a", "b", "c", 1, 2, false, 3)
+    a = annot_obj2( [ RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ) ], "a", "b", "c", 1, 2, false, 4)
     assert_equal(a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal")
     assert_equal(a.to_s, "id=-1,x1=1,y1=2,x2=3,y2=4,category='',fmt=a,fmt_x=b,fmt_y=c,position=auto,xalign=auto,yalign=auto,xlabel_xalign=auto,xlabel_yalign=auto,ylabel_xalign=auto,ylabel_yalign=auto,style=arrow_end,outline=diag_xy,snap=false,angle_constraint=horizontal")
     aa = RBA::Annotation::from_s(a.to_s)
     assert_equal(aa.to_s, a. to_s)
 
     a = annot_obj2( [ RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 1.5, 2.5 ), RBA::DPoint::new( 3.0, 4.0 ) ], "a", "b", "c", 1, 2, false, 3)
-    assert_equal(a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal")
-    assert_equal(a.to_s, "id=-1,pt=1:2,pt=1.5:2.5,pt=3:4,category='',fmt=a,fmt_x=b,fmt_y=c,position=auto,xalign=auto,yalign=auto,xlabel_xalign=auto,xlabel_yalign=auto,ylabel_xalign=auto,ylabel_yalign=auto,style=arrow_end,outline=diag_xy,snap=false,angle_constraint=horizontal")
+    assert_equal(a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=diagonal_only")
+    assert_equal(a.to_s, "id=-1,pt=1:2,pt=1.5:2.5,pt=3:4,category='',fmt=a,fmt_x=b,fmt_y=c,position=auto,xalign=auto,yalign=auto,xlabel_xalign=auto,xlabel_yalign=auto,ylabel_xalign=auto,ylabel_yalign=auto,style=arrow_end,outline=diag_xy,snap=false,angle_constraint=diagonal_only")
     assert_equal(a.segments, 2)
     assert_equal(a.seg_p1(0).to_s, "1,2")
     assert_equal(a.seg_p2(0).to_s, "1.5,2.5")

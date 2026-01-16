@@ -36,6 +36,7 @@
 
 class QTabWidget;
 class QLabel;
+class QHBoxLayout;
 
 namespace Ui
 {
@@ -55,6 +56,7 @@ namespace lay
   class Dispatcher;
   class LayoutViewBase;
   class Plugin;
+  class DecoratedLineEdit;
 }
 
 namespace edt
@@ -191,6 +193,29 @@ private:
 
   void update_pcell_parameters (const std::vector <tl::Variant> &parameters);
   virtual void technology_changed (const std::string &);
+};
+
+/**
+ *  @brief The toolbox widget for boxes
+ */
+class BoxToolkitWidget
+  : public lay::EditorOptionsPageWidget
+{
+Q_OBJECT
+
+public:
+  BoxToolkitWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  ~BoxToolkitWidget ();
+
+  virtual std::string title () const;
+  virtual int order () const { return 0; }
+  virtual void configure (const std::string &name, const std::string &value);
+  virtual void commit (lay::Dispatcher *root);
+  virtual void deactivated ();
+
+private:
+  QHBoxLayout *mp_layout;
+  lay::DecoratedLineEdit *mp_x_le, *mp_y_le;
 };
 
 }

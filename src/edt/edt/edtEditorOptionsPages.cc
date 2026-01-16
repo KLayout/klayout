@@ -29,6 +29,7 @@
 #include "edtPCellParametersPage.h"
 #include "edtConfig.h"
 #include "edtService.h"
+#include "edtBoxService.h"
 #include "edtEditorOptionsPages.h"
 #include "edtPropertiesPageUtils.h"
 #include "tlExceptions.h"
@@ -899,6 +900,82 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
 }
 
 // ------------------------------------------------------------------
+//  Box Toolbox widget
+
+BoxToolkitWidget::BoxToolkitWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher)
+{
+  mp_layout = new QHBoxLayout (this);
+
+  mp_x_le = new lay::DecoratedLineEdit (this);
+  mp_x_le->set_label ("w:");
+  mp_layout->addWidget (mp_x_le);
+
+  mp_y_le = new lay::DecoratedLineEdit (this);
+  mp_y_le->set_label ("h:");
+  mp_layout->addWidget (mp_y_le);
+
+  mp_layout->addStretch (1);
+
+  hide ();
+
+  set_toolbox_widget (true);
+  set_transparent (true);
+}
+
+BoxToolkitWidget::~BoxToolkitWidget ()
+{
+  //  .. nothing yet ..
+}
+
+std::string
+BoxToolkitWidget::title () const
+{
+  return "Box Options";
+}
+
+void
+BoxToolkitWidget::deactivated ()
+{
+  hide ();
+}
+
+void
+BoxToolkitWidget::commit (lay::Dispatcher *dispatcher)
+{
+  try {
+
+    double dx = 0.0, dy = 0.0;
+
+    tl::from_string (tl::to_string (mp_x_le->text ()), dx);
+    tl::from_string (tl::to_string (mp_y_le->text ()), dy);
+
+    dispatcher->call_function (BoxService::function_name (), db::DVector (dx, dy).to_string ());
+
+  } catch (...) {
+  }
+}
+
+void
+BoxToolkitWidget::configure (const std::string &name, const std::string &value)
+{
+  if (name == BoxService::configure_name () && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
+
+    try {
+
+      db::DVector mv;
+      tl::from_string (value, mv);
+
+      mp_x_le->setText (tl::to_qstring (tl::micron_to_string (mv.x ())));
+      mp_y_le->setText (tl::to_qstring (tl::micron_to_string (mv.y ())));
+
+    } catch (...) {
+    }
+
+  }
+}
+
+// ------------------------------------------------------------------
 //  Registrations
 
 //  unspecific editor options - used for all plugins that want it
@@ -908,6 +985,9 @@ static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_texts (n
 static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_paths (new lay::EditorOptionsPageFactory<edt::EditorOptionsPath> ("edt::Service(Paths)"), 0);
 static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_insts (new lay::EditorOptionsPageFactory<edt::EditorOptionsInstPCellParam> ("edt::Service(CellInstances)"), 0);
 static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_insts_pcell (new lay::EditorOptionsPageFactory<edt::EditorOptionsInst> ("edt::Service(CellInstances)"), 0);
+
+//  toolkit widgets
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_box_tookit_widget_factory (new lay::EditorOptionsPageFactory<BoxToolkitWidget> (), 0);
 
 }
 

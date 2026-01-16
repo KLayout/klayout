@@ -650,10 +650,32 @@ protected:
     return m_mouse_pos;
   }
 
+  int mouse_buttons () const
+  {
+    return m_mouse_buttons;
+  }
+
   /**
    *  @brief Commits the current configuration to the recent attributes list
    */
   void commit_recent ();
+
+  /**
+   *  @brief Shows the toolbox widget in case one is registered for this plugin
+   */
+  void show_toolbox (bool visible);
+
+  /**
+   *  @brief Finishes the edit operation
+   *
+   *  Calls do_finish_edit() and terminates the editing operation.
+   */
+  void finish_editing ();
+
+  /**
+   *  @brief Gets the toolbox widget or 0 if none is registered
+   */
+  lay::EditorOptionsPage *toolbox_widget ();
 
   /**
    *  @brief Point snapping with detailed return value
@@ -685,8 +707,11 @@ private:
   //  The marker representing the object to be edited
   std::vector<lay::ViewObject *> m_edit_markers;
 
-  //  The last mouse position
+  //  The last mouse position of the current mouse move/press/click event
   db::DPoint m_mouse_pos;
+
+  //  The buttons flag of the current mouse move/press/click event
+  int m_mouse_buttons;
 
   //  A flag indicating whether the mouse is inside the view
   bool m_mouse_in_view;

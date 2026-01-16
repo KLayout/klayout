@@ -36,6 +36,9 @@ class BoxService
   : public ShapeEditService
 {
 public:
+  static const char *configure_name ();
+  static const char *function_name ();
+
   BoxService (db::Manager *manager, lay::LayoutViewBase *view);
   
 #if defined(HAVE_QT)
@@ -48,9 +51,11 @@ public:
   virtual void do_finish_edit ();
   virtual void do_cancel_edit ();
   virtual bool selection_applies (const lay::ObjectInstPath &sel) const;
+  virtual void function (const std::string &name, const std::string &value);
 
 private:
   db::DPoint m_p1, m_p2;
+  bool m_centered;
 
   void update_marker ();
   db::Box get_box () const;

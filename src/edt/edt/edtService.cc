@@ -46,7 +46,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     db::Object (manager),
     mp_view (view),
     mp_transient_marker (0), 
-    m_mouse_in_view (false), m_editing (false), m_immediate (false),
+    m_mouse_buttons (0), m_mouse_in_view (false), m_editing (false), m_immediate (false),
     m_selection_maybe_invalid (false),
     m_cell_inst_service (false),
     m_flags (flags),
@@ -70,7 +70,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     db::Object (manager),
     mp_view (view),
     mp_transient_marker (0), 
-    m_mouse_in_view (false), m_editing (false), m_immediate (false),
+    m_mouse_buttons (0), m_mouse_in_view (false), m_editing (false), m_immediate (false),
     m_selection_maybe_invalid (false),
     m_cell_inst_service (true),
     m_flags (db::ShapeIterator::Nothing),
@@ -902,6 +902,7 @@ bool
 Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   m_mouse_pos = p;
+  m_mouse_buttons = buttons;
 
   if (view ()->is_editable () && prio) {
 
@@ -938,6 +939,9 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 bool   
 Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
+  m_mouse_pos = p;
+  m_mouse_buttons = buttons;
+
   if (view ()->is_editable () && prio) {
     
     if ((buttons & lay::LeftButton) != 0) {
@@ -952,9 +956,7 @@ Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       } else {
         if (do_mouse_click (p)) {
-          m_editing = false;
-          set_edit_marker (0);
-          do_finish_edit ();
+          finish_editing ();
         }
       }
 
@@ -984,14 +986,14 @@ Service::enter_event (bool /*prio*/)
 }
 
 bool   
-Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int buttons, bool prio)
+Service::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
+  m_mouse_pos = p;
+  m_mouse_buttons = buttons;
+
   if (m_editing && prio && (buttons & lay::LeftButton) != 0) {
     m_alt_ac = lay::ac_from_buttons (buttons);
-    do_finish_edit ();
-    m_editing = false;
-    set_edit_marker (0);
-    m_alt_ac = lay::AC_Global;
+    finish_editing ();
     return true;
   } else {
     return false;
@@ -1001,6 +1003,9 @@ Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int button
 bool   
 Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
+  m_mouse_pos = p;
+  m_mouse_buttons = buttons;
+
   if (view ()->is_editable () && prio && (buttons & lay::RightButton) != 0 && m_editing) {
     m_alt_ac = lay::ac_from_buttons (buttons);
     do_mouse_transform (p, db::DFTrans (db::DFTrans::r90));
@@ -1020,6 +1025,17 @@ Service::key_event (unsigned int key, unsigned int buttons)
   } else {
     return false;
   }
+}
+
+void
+Service::finish_editing ()
+{
+  do_finish_edit ();
+
+  m_editing = false;
+  show_toolbox (false);
+  set_edit_marker (0);
+  m_alt_ac = lay::AC_Global;
 }
 
 void
@@ -1749,6 +1765,7 @@ void
 Service::begin_edit (const db::DPoint &p)
 {
   do_begin_edit (p);
+  show_toolbox (true);
   m_editing = true;
 }
 
@@ -2053,6 +2070,33 @@ Service::commit_recent ()
       (*op)->commit_recent (view ());
     }
   }
+}
+
+void
+Service::show_toolbox (bool visible)
+{
+  auto p = toolbox_widget ();
+  if (p) {
+    p->set_visible (visible);
+  }
+}
+
+lay::EditorOptionsPage *
+Service::toolbox_widget ()
+{
+  lay::EditorOptionsPageCollection *eo_pages = view ()->editor_options_pages ();
+  if (! eo_pages) {
+    return 0;
+  }
+
+  auto pages = eo_pages->editor_options_pages (plugin_declaration ());
+  for (auto op = pages.begin (); op != pages.end (); ++op) {
+    if ((*op)->is_toolbox_widget ()) {
+      return *op;
+    }
+  }
+
+  return 0;
 }
 
 // -------------------------------------------------------------

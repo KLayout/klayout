@@ -197,6 +197,11 @@ Q_OBJECT
 public:
   typedef lay::AnnotationShapes::iterator obj_iterator;
 
+  //  for communicating with the toolbox widget
+  static const char *editor_options_name ();
+  static const char *configure_name ();
+  static const char *function_name ();
+
   /**
    *  The current move mode:
    *    MoveNone - not moving
@@ -503,9 +508,14 @@ public:
   }
 
   /**
-   *  @brief Implement the menu response function
+   *  @brief Implements the menu response function
    */
   void menu_activated (const  std::string &symbol);
+
+  /**
+   *  @brief Implements the toolbox widget response function
+   */
+  void function (const std::string &name, const std::string &value);
 
   /**
    *  @brief Return the annotation iterator that delivers the annotations (and only these)
@@ -610,6 +620,9 @@ private:
   lay::TwoPointSnapToObjectResult auto_measure (const db::DPoint &p, lay::angle_constraint_type ac, const ant::Template &tpl);
 
   const ant::Template &current_template () const;
+
+  void show_toolbox (bool visible);
+  lay::EditorOptionsPage *toolbox_widget ();
 
   void show_message ();
 

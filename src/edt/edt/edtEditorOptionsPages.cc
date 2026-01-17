@@ -987,7 +987,7 @@ static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_insts (n
 static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_insts_pcell (new lay::EditorOptionsPageFactory<edt::EditorOptionsInst> ("edt::Service(CellInstances)"), 0);
 
 //  toolkit widgets
-static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_box_tookit_widget_factory (new lay::EditorOptionsPageFactory<BoxToolkitWidget> (), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_box_tookit_widget_factory (new lay::EditorOptionsPageFactory<BoxToolkitWidget> ("edt::Service(Boxes)"), 0);
 
 }
 

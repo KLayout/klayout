@@ -31,6 +31,7 @@ SOURCES = \
 
 HEADERS += \
   antConfig.h \
+  antEditorOptionsPages.h \
   antObject.h \
   antPlugin.h \
   antService.h \
@@ -40,6 +41,7 @@ HEADERS += \
 
 SOURCES += \
   antConfig.cc \
+  antEditorOptionsPages.cc \
   antObject.cc \
   antPlugin.cc \
   antService.cc \

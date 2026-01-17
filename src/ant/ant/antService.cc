@@ -33,6 +33,7 @@
 #include "layConverters.h"
 #include "layLayoutCanvas.h"
 #include "layFixedFont.h"
+#include "layEditorOptionsPage.h"
 #if defined(HAVE_QT)
 #  include "layProperties.h"
 #endif
@@ -1041,6 +1042,10 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 // -------------------------------------------------------------
 //  ant::Service implementation
 
+const char *Service::editor_options_name () { return "ant-toolkit-widget-name"; }
+const char *Service::configure_name () { return "ant-toolkit-widget-value"; }
+const char *Service::function_name () { return "ant-toolkit-widget-commit"; }
+
 Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
   : lay::EditorServiceBase (view),
     lay::Drawing (1/*number of planes*/, view->drawings ()),
@@ -1170,6 +1175,21 @@ Service::config_finalize ()
 }
 
 void
+Service::show_toolbox (bool visible)
+{
+  lay::EditorOptionsPage *tb = toolbox_widget ();
+  if (tb) {
+    tb->set_visible (visible);
+  }
+}
+
+lay::EditorOptionsPage *
+Service::toolbox_widget ()
+{
+  return mp_view->editor_options_pages () ? mp_view->editor_options_pages ()->page_with_name (editor_options_name ()) : 0;
+}
+
+void
 Service::annotations_changed ()
 {
   //  NOTE: right now, we don't differentiate: every annotation change may be a change in an image too.
@@ -1244,6 +1264,7 @@ void
 Service::drag_cancel () 
 {
   if (m_drawing) {
+    show_toolbox (false);
     ui ()->ungrab_mouse (this);
     m_drawing = false;
   }
@@ -1981,6 +2002,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
         mp_active_ruler->thaw ();
         m_drawing = true;
 
+        show_toolbox (true);
         ui ()->grab_mouse (this, false);
 
       }
@@ -2033,6 +2055,63 @@ Service::create_measure_ruler (const db::DPoint &pt, lay::angle_constraint_type 
   }
 }
 
+void
+Service::function (const std::string &name, const std::string &value)
+{
+  if (name == function_name ()) {
+
+    try {
+
+      db::DVector s;
+      tl::from_string (value, s);
+
+      if (m_drawing) {
+
+        ant::Object::point_list pts = m_current.points ();
+        if (pts.size () >= 2) {
+
+          db::DVector d = pts.back () - pts [pts.size () - 2];
+
+          //  Adjust the direction so positive coordinates are in the current drag direction
+          s = db::DVector (s.x () * (d.x () < 0 ? -1.0 : 1.0), s.y () * (d.y () < 0 ? -1.0 : 1.0));
+
+          pts.back () = pts [pts.size () - 2] + s;
+          m_current.set_points_exact (pts);
+
+        }
+
+        const ant::Template &tpl = current_template ();
+
+        if (tpl.mode () == ant::Template::RulerMultiSegment || tpl.mode () == ant::Template::RulerThreeClicks) {
+
+          if (tpl.mode () == ant::Template::RulerThreeClicks && pts.size () == 3) {
+
+            finish_drawing ();
+
+          } else {
+
+            //  add a new point
+            m_p1 = pts.back ();
+
+            pts.push_back (m_p1);
+            m_current.set_points_exact (pts);
+
+          }
+
+        } else {
+
+          finish_drawing ();
+
+        }
+
+      }
+
+    } catch (...) {
+    }
+
+  }
+}
+
 bool
 Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio) 
 {
@@ -2073,6 +2152,17 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
       pts.back () = snap_details.snapped_point;
     }
     m_current.set_points_exact (pts);
+
+    db::DVector delta;
+    if (pts.size () >= 2) {
+      delta = pts.back () - pts[pts.size () - 2];
+      delta = db::DVector (fabs (delta.x ()), fabs (delta.y ()));
+    }
+
+    lay::EditorOptionsPage *tb = toolbox_widget ();
+    if (tb) {
+      tb->configure (configure_name (), delta.to_string ());
+    }
 
     mp_active_ruler->redraw ();
     show_message ();

@@ -20,17 +20,24 @@
 
 */
 
-#include "layMoveEditorOptionsPage.h"
+#if defined(HAVE_QT)
+
+#include "antService.h"
+#include "antEditorOptionsPages.h"
+
 #include "layWidgets.h"
 #include "layDispatcher.h"
+#include "tlInternational.h"
 
 #include <QHBoxLayout>
-#include <QLineEdit>
 
-namespace lay
+namespace ant
 {
 
-MoveEditorOptionsPage::MoveEditorOptionsPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+// ------------------------------------------------------------------
+//  Annotations Toolbox widget
+
+ToolkitWidget::ToolkitWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
   : lay::EditorOptionsPageWidget (view, dispatcher)
 {
   mp_layout = new QHBoxLayout (this);
@@ -51,32 +58,31 @@ MoveEditorOptionsPage::MoveEditorOptionsPage (lay::LayoutViewBase *view, lay::Di
   set_transparent (true);
 }
 
-std::string
-MoveEditorOptionsPage::title () const
+ToolkitWidget::~ToolkitWidget ()
 {
-  return "Move Options";
+  //  .. nothing yet ..
+}
+
+std::string
+ToolkitWidget::title () const
+{
+  return "Box Options";
 }
 
 const char *
-MoveEditorOptionsPage::name () const
+ToolkitWidget::name () const
 {
-  return move_editor_options_name.c_str ();
-}
-
-int
-MoveEditorOptionsPage::order () const
-{
-  return 0;
+  return ant::Service::editor_options_name ();
 }
 
 void
-MoveEditorOptionsPage::deactivated ()
+ToolkitWidget::deactivated ()
 {
   hide ();
 }
 
 void
-MoveEditorOptionsPage::commit (lay::Dispatcher *dispatcher)
+ToolkitWidget::commit (lay::Dispatcher *dispatcher)
 {
   try {
 
@@ -85,16 +91,16 @@ MoveEditorOptionsPage::commit (lay::Dispatcher *dispatcher)
     tl::from_string (tl::to_string (mp_x_le->text ()), dx);
     tl::from_string (tl::to_string (mp_y_le->text ()), dy);
 
-    dispatcher->call_function (move_function_name, db::DVector (dx, dy).to_string ());
+    dispatcher->call_function (ant::Service::function_name (), db::DVector (dx, dy).to_string ());
 
   } catch (...) {
   }
 }
 
 void
-MoveEditorOptionsPage::configure (const std::string &name, const std::string &value)
+ToolkitWidget::configure (const std::string &name, const std::string &value)
 {
-  if (name == move_distance_setter_name && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
+  if (name == ant::Service::configure_name () && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
 
     try {
 
@@ -110,7 +116,12 @@ MoveEditorOptionsPage::configure (const std::string &name, const std::string &va
   }
 }
 
-//  registers the factory for the move editor options page
-static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory (new lay::EditorOptionsPageFactory<MoveEditorOptionsPage> ("laybasic::MoveServicePlugin"), 0);
+// ------------------------------------------------------------------
+//  Registrations
+
+//  toolkit widgets
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_tookit_widget_factory (new lay::EditorOptionsPageFactory<ToolkitWidget> ("ant::Plugin"), 0);
 
 }
+
+#endif

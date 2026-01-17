@@ -63,6 +63,7 @@ private:
   virtual void drag_cancel ();
   virtual void deactivated ();
   void show_toolbox (bool visible);
+  lay::EditorOptionsPage *toolbox_widget ();
 
   bool handle_click (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction);
 

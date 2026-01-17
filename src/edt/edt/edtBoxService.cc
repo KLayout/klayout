@@ -80,13 +80,9 @@ BoxService::function (const std::string &name, const std::string &value)
       tl::from_string (value, dim);
 
       if (! m_centered) {
-        //  Adjust the direction so it reflects the current
-        if (m_p2.x () < m_p1.x ()) {
-          dim.set_x (-fabs (dim.x ()));
-        }
-        if (m_p2.y () < m_p1.y ()) {
-          dim.set_y (-fabs (dim.y ()));
-        }
+        //  Adjust the direction so positive coordinates are in the current drag direction
+        db::DVector d = m_p2 - m_p1;
+        dim = db::DVector (dim.x () * (d.x () < 0 ? -1.0 : 1.0), dim.y () * (d.y () < 0 ? -1.0 : 1.0));
       } else {
         dim = db::DVector (fabs (dim.x ()) * 0.5, fabs (dim.y ()) * 0.5);
       }

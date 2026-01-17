@@ -176,10 +176,16 @@ MoveService::shortcut_override_event (unsigned int key, unsigned int buttons)
 void
 MoveService::show_toolbox (bool visible)
 {
-  lay::EditorOptionsPage *op = mp_view->editor_options_pages () ? mp_view->editor_options_pages ()->page_with_name (move_editor_options_name) : 0;
-  if (op) {
-    op->set_visible (visible);
+  lay::EditorOptionsPage *tb = toolbox_widget ();
+  if (tb) {
+    tb->set_visible (visible);
   }
+}
+
+lay::EditorOptionsPage *
+MoveService::toolbox_widget ()
+{
+  return mp_view->editor_options_pages () ? mp_view->editor_options_pages ()->page_with_name (move_editor_options_name) : 0;
 }
 
 bool 
@@ -201,12 +207,9 @@ MoveService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool p
       }
       mp_view->message (pos);
 
-      lay::EditorOptionsPage *toolbox_widget = 0;
-      if (mp_view->editor_options_pages ()) {
-        toolbox_widget = mp_view->editor_options_pages ()->page_with_name (move_editor_options_name);
-      }
-      if (toolbox_widget) {
-        toolbox_widget->configure (move_distance_setter_name, pmv.second.disp ().to_string ());
+      lay::EditorOptionsPage *tb = toolbox_widget ();
+      if (tb) {
+        tb->configure (move_distance_setter_name, pmv.second.disp ().to_string ());
       }
 
     }

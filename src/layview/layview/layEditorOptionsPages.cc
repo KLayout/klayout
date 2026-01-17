@@ -254,10 +254,22 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
   }
 
   for (auto p = sorted_pages.begin (); p != sorted_pages.end (); ++p) {
-    if ((*p)->active ()) {
-      if ((*p)->is_toolbox_widget ()) {
-        mp_view->add_toolbox_widget (*p);
-      } else if (! (*p)->is_modal_page ()) {
+
+    if ((*p)->is_toolbox_widget ()) {
+
+      //  NOTE: toolbox widgets are always created, but hidden if the
+      //  page is not active. However, even inactive pages can become
+      //  visible, if needed. The "move" plugin does that if used from
+      //  externally.
+      if (! (*p)->active ()) {
+        (*p)->set_visible (false);
+      }
+
+      mp_view->add_toolbox_widget (*p);
+
+    } else if ((*p)->active ()) {
+
+      if (! (*p)->is_modal_page ()) {
         if ((*p) == page) {
           index = mp_pages->count ();
         }
@@ -268,9 +280,11 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
         }
         mp_modal_pages->add_page (*p);
       }
+
     } else {
       (*p)->setParent (0);
     }
+
   }
 
   if (index < 0) {

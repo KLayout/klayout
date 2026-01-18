@@ -2146,7 +2146,7 @@ Service::confine_length (ant::Object::point_list &pts)
   if (m_length_confined && pts.size () >= 2) {
 
     const ant::Template &tpl = current_template ();
-    bool is_box_style = (tpl.outline () == ant::Object::OL_box || tpl.outline () == ant::Object::OL_ellipse);
+    bool is_box_style = tpl.mode () == ant::Template::RulerNormal && (tpl.outline () == ant::Object::OL_box || tpl.outline () == ant::Object::OL_ellipse);
 
     db::DPoint p1 = m_centered ? m_p1 : pts [pts.size () - 2];
     db::DVector s = pts.back () - p1;
@@ -2195,14 +2195,9 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 
   //  for normal rulers with box or ellipse rendering we use a different button scheme:
   //  Shift will keep the center, Ctrl will confine the box to a square/ellipse to a circle
-  bool snap_square = false;
-  bool is_box_style = (tpl.outline () == ant::Object::OL_box || tpl.outline () == ant::Object::OL_ellipse);
-  if (tpl.mode () == ant::Template::RulerNormal && is_box_style) {
-    snap_square = (buttons & lay::ControlButton) != 0;
-    m_centered = (buttons  & lay::ShiftButton) != 0;
-  } else {
-    m_centered = false;
-  }
+  bool is_box_style = tpl.mode () == ant::Template::RulerNormal && (tpl.outline () == ant::Object::OL_box || tpl.outline () == ant::Object::OL_ellipse);
+  bool snap_square = is_box_style && (buttons & lay::ControlButton) != 0;
+  m_centered = is_box_style && (buttons & lay::ShiftButton) != 0;
 
   lay::PointSnapToObjectResult snap_details;
   if (m_drawing) {
@@ -2234,10 +2229,12 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 
       confine_length (pts);
 
-      if (m_centered) {
-        pts.front () = m_p1 - (pts.back () - m_p1);
-      } else {
-        pts.front () = m_p1;
+      if (is_box_style) {
+        if (m_centered) {
+          pts.front () = m_p1 - (pts.back () - m_p1);
+        } else {
+          pts.front () = m_p1;
+        }
       }
 
     }

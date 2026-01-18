@@ -194,8 +194,22 @@ LayoutViewWidget::~LayoutViewWidget ()
 void
 LayoutViewWidget::add_toolbox_widget (lay::EditorOptionsPageWidget *toolbox_widget)
 {
-  toolbox_widget->setParent (this);
-  mp_layout->insertWidget (0, toolbox_widget);
+  if (toolbox_widget->parent () != this) {
+
+    toolbox_widget->setParent (this);
+
+    //  insert after the last notification widget
+    int index = 0;
+    for (int i = 0; i < mp_layout->count (); ++i) {
+      QLayoutItem *item = mp_layout->itemAt (i);
+      if (dynamic_cast<LayoutViewNotificationWidget *> (item)) {
+        index = i + 1;
+      }
+    }
+
+    mp_layout->insertWidget (index, toolbox_widget);
+
+  }
 }
 
 void

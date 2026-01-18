@@ -199,8 +199,10 @@ public:
 
   //  for communicating with the toolbox widget
   static const char *editor_options_name ();
-  static const char *configure_name ();
-  static const char *function_name ();
+  static const char *xy_configure_name ();
+  static const char *d_configure_name ();
+  static const char *xy_function_name ();
+  static const char *d_function_name ();
 
   /**
    *  The current move mode:
@@ -598,6 +600,11 @@ private:
   MoveMode m_move_mode;
   //  The currently moving segment
   size_t m_seg_index;
+  //  When set to true, the length is confined to the value given by m_length
+  bool m_length_confined;
+  double m_length;
+  //  When set to true, the last point was established in centered fashion
+  bool m_centered;
   //  The ruler template
   std::vector<ant::Template> m_ruler_templates;
   unsigned int m_current_template;
@@ -618,6 +625,7 @@ private:
   db::DPoint snap2_visual (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac);
   lay::PointSnapToObjectResult snap2_details (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac);
   lay::TwoPointSnapToObjectResult auto_measure (const db::DPoint &p, lay::angle_constraint_type ac, const ant::Template &tpl);
+  void confine_length (ant::Object::point_list &pts);
 
   const ant::Template &current_template () const;
 

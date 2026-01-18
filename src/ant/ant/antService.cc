@@ -1043,8 +1043,10 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 //  ant::Service implementation
 
 const char *Service::editor_options_name () { return "ant-toolkit-widget-name"; }
-const char *Service::configure_name () { return "ant-toolkit-widget-value"; }
-const char *Service::function_name () { return "ant-toolkit-widget-commit"; }
+const char *Service::xy_configure_name () { return "ant-toolkit-widget-xy-value"; }
+const char *Service::d_configure_name () { return "ant-toolkit-widget-d-value"; }
+const char *Service::xy_function_name () { return "ant-toolkit-widget-xy-commit"; }
+const char *Service::d_function_name () { return "ant-toolkit-widget-d-commit"; }
 
 Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
   : lay::EditorServiceBase (view),
@@ -1061,6 +1063,9 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     m_drawing (false), m_current (),
     m_move_mode (MoveNone),
     m_seg_index (0),
+    m_length_confined (false),
+    m_length (0.0),
+    m_centered (false),
     m_current_template (0),
     m_hover (false),
     m_hover_wait (false),
@@ -1906,6 +1911,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       //  cancel any edit operations so far
       m_move_mode = MoveNone;
+      m_length_confined = false;
 
       //  reset selection
       clear_selection ();
@@ -2023,6 +2029,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
         pts.push_back (m_p1);
         m_current.set_points_exact (pts);
+        m_length_confined = false;
 
       }
 
@@ -2058,7 +2065,7 @@ Service::create_measure_ruler (const db::DPoint &pt, lay::angle_constraint_type 
 void
 Service::function (const std::string &name, const std::string &value)
 {
-  if (name == function_name ()) {
+  if (name == xy_function_name ()) {
 
     try {
 
@@ -2109,6 +2116,59 @@ Service::function (const std::string &name, const std::string &value)
     } catch (...) {
     }
 
+  } else if (name == d_function_name ()) {
+
+    try {
+
+      double s = 0.0;
+      tl::from_string (value, s);
+
+      if (m_drawing) {
+
+        m_length_confined = true;
+        m_length = s;
+
+        ant::Object::point_list pts = m_current.points ();
+        confine_length (pts);
+        m_current.set_points_exact (pts);
+
+      }
+
+    } catch (...) {
+    }
+
+  }
+}
+
+void
+Service::confine_length (ant::Object::point_list &pts)
+{
+  if (m_length_confined && pts.size () >= 2) {
+
+    const ant::Template &tpl = current_template ();
+    bool is_box_style = (tpl.outline () == ant::Object::OL_box || tpl.outline () == ant::Object::OL_ellipse);
+
+    db::DPoint p1 = m_centered ? m_p1 : pts [pts.size () - 2];
+    db::DVector s = pts.back () - p1;
+    if (is_box_style) {
+      db::DVector snew = s;
+      double l = m_centered ? m_length * 0.5 : m_length;
+      if (fabs (s.x ()) < fabs (s.y ()) + db::epsilon) {
+        snew.set_y (l * (s.y () < 0 ? -1.0 : 1.0));
+      }
+      if (fabs (s.y ()) < fabs (s.x ()) + db::epsilon) {
+        snew.set_x (l * (s.x () < 0 ? -1.0 : 1.0));
+      }
+      s = snew;
+    } else {
+      double l = s.double_length ();
+      if (l > db::epsilon) {
+        s *= m_length / l;
+      }
+    }
+
+    pts.back () = p1 + s;
+
   }
 }
 
@@ -2131,11 +2191,31 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 
   }
 
+  const ant::Template &tpl = current_template ();
+
+  //  for normal rulers with box or ellipse rendering we use a different button scheme:
+  //  Shift will keep the center, Ctrl will confine the box to a square/ellipse to a circle
+  bool snap_square = false;
+  bool is_box_style = (tpl.outline () == ant::Object::OL_box || tpl.outline () == ant::Object::OL_ellipse);
+  if (tpl.mode () == ant::Template::RulerNormal && is_box_style) {
+    snap_square = (buttons & lay::ControlButton) != 0;
+    m_centered = (buttons  & lay::ShiftButton) != 0;
+  } else {
+    m_centered = false;
+  }
+
   lay::PointSnapToObjectResult snap_details;
   if (m_drawing) {
-    snap_details = snap2_details (m_p1, p, mp_active_ruler->ruler (), ac_from_buttons (buttons));
+    lay::angle_constraint_type ac;
+    if (snap_square) {
+      ac = lay::AC_DiagonalOnly;
+    } else if (is_box_style) {
+      ac = lay::AC_Any;
+    } else {
+      ac = ac_from_buttons (buttons);
+    }
+    snap_details = snap2_details (m_p1, p, mp_active_ruler->ruler (), ac);
   } else {
-    const ant::Template &tpl = current_template ();
     snap_details = snap1_details (p, m_obj_snap && tpl.snap () && (tpl.mode () != ant::Template::RulerAutoMetricEdge || ! view ()->transient_selection_mode ()));
   }
 
@@ -2149,8 +2229,19 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
     //  otherwise we risk manipulating p1 too.
     ant::Object::point_list pts = m_current.points ();
     if (! pts.empty ()) {
+
       pts.back () = snap_details.snapped_point;
+
+      confine_length (pts);
+
+      if (m_centered) {
+        pts.front () = m_p1 - (pts.back () - m_p1);
+      } else {
+        pts.front () = m_p1;
+      }
+
     }
+
     m_current.set_points_exact (pts);
 
     db::DVector delta;
@@ -2161,7 +2252,9 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 
     lay::EditorOptionsPage *tb = toolbox_widget ();
     if (tb) {
-      tb->configure (configure_name (), delta.to_string ());
+      double d = is_box_style ? std::min (fabs (delta.x ()), fabs (delta.y ())) : delta.length ();
+      tb->configure (xy_configure_name (), delta.to_string ());
+      tb->configure (d_configure_name (), tl::to_string (d));
     }
 
     mp_active_ruler->redraw ();

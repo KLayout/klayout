@@ -58,7 +58,7 @@ public:
 
 private:
   QHBoxLayout *mp_layout;
-  lay::DecoratedLineEdit *mp_x_le, *mp_y_le;
+  lay::DecoratedLineEdit *mp_x_le, *mp_y_le, *mp_d_le;
 };
 
 }

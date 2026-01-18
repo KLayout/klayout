@@ -50,6 +50,10 @@ ToolkitWidget::ToolkitWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispat
   mp_y_le->set_label ("dy:");
   mp_layout->addWidget (mp_y_le);
 
+  mp_d_le = new lay::DecoratedLineEdit (this);
+  mp_d_le->set_label ("d:");
+  mp_layout->addWidget (mp_d_le);
+
   mp_layout->addStretch (1);
 
   hide ();
@@ -86,12 +90,24 @@ ToolkitWidget::commit (lay::Dispatcher *dispatcher)
 {
   try {
 
-    double dx = 0.0, dy = 0.0;
+    if (mp_d_le->hasFocus ()) {
 
-    tl::from_string (tl::to_string (mp_x_le->text ()), dx);
-    tl::from_string (tl::to_string (mp_y_le->text ()), dy);
+      double d = 0.0;
 
-    dispatcher->call_function (ant::Service::function_name (), db::DVector (dx, dy).to_string ());
+      tl::from_string (tl::to_string (mp_d_le->text ()), d);
+
+      dispatcher->call_function (ant::Service::d_function_name (), tl::to_string (d));
+
+    } else {
+
+      double dx = 0.0, dy = 0.0;
+
+      tl::from_string (tl::to_string (mp_x_le->text ()), dx);
+      tl::from_string (tl::to_string (mp_y_le->text ()), dy);
+
+      dispatcher->call_function (ant::Service::xy_function_name (), db::DVector (dx, dy).to_string ());
+
+    }
 
   } catch (...) {
   }
@@ -100,7 +116,7 @@ ToolkitWidget::commit (lay::Dispatcher *dispatcher)
 void
 ToolkitWidget::configure (const std::string &name, const std::string &value)
 {
-  if (name == ant::Service::configure_name () && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
+  if (name == ant::Service::xy_configure_name () && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
 
     try {
 
@@ -109,6 +125,18 @@ ToolkitWidget::configure (const std::string &name, const std::string &value)
 
       mp_x_le->setText (tl::to_qstring (tl::micron_to_string (mv.x ())));
       mp_y_le->setText (tl::to_qstring (tl::micron_to_string (mv.y ())));
+
+    } catch (...) {
+    }
+
+  } else if (name == ant::Service::d_configure_name () && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
+
+    try {
+
+      double d;
+      tl::from_string (value, d);
+
+      mp_d_le->setText (tl::to_qstring (tl::micron_to_string (d)));
 
     } catch (...) {
     }

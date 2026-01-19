@@ -155,7 +155,7 @@ TextService::get_text () const
 }
 
 void 
-TextService::do_finish_edit ()
+TextService::do_finish_edit (bool /*accept*/)
 {
   {
     db::Transaction transaction (manager (), tl::to_string (tr ("Create text")));

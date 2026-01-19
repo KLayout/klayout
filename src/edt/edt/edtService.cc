@@ -956,7 +956,7 @@ Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       } else {
         if (do_mouse_click (p)) {
-          finish_editing ();
+          finish_editing (false);
         }
       }
 
@@ -993,7 +993,7 @@ Service::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bo
 
   if (m_editing && prio && (buttons & lay::LeftButton) != 0) {
     m_alt_ac = lay::ac_from_buttons (buttons);
-    finish_editing ();
+    finish_editing (false);
     return true;
   } else {
     return false;
@@ -1022,15 +1022,19 @@ Service::key_event (unsigned int key, unsigned int buttons)
   if (view ()->is_editable () && m_editing && buttons == 0 && key == lay::KeyBackspace) {
     do_delete ();
     return true;
+  } else if (view ()->is_editable () && m_editing && buttons == 0 && (key == lay::KeyEnter || key == lay::KeyReturn)) {
+    m_alt_ac = lay::AC_Global;
+    finish_editing (true);
+    return true;
   } else {
     return false;
   }
 }
 
 void
-Service::finish_editing ()
+Service::finish_editing (bool accept)
 {
-  do_finish_edit ();
+  do_finish_edit (accept);
 
   m_editing = false;
   show_toolbox (false);

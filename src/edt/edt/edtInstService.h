@@ -53,7 +53,7 @@ public:
   virtual void do_mouse_move (const db::DPoint &p);
   virtual bool do_mouse_click (const db::DPoint &p);
   virtual void do_mouse_transform (const db::DPoint &p, db::DFTrans trans);
-  virtual void do_finish_edit ();
+  virtual void do_finish_edit (bool accept);
   virtual void do_cancel_edit ();
   virtual bool do_activated ();
 #if defined(HAVE_QT)

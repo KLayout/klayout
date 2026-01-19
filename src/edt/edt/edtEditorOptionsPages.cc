@@ -900,9 +900,9 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
 }
 
 // ------------------------------------------------------------------
-//  Box Toolbox widget
+//  Box toolbox widget
 
-BoxToolkitWidget::BoxToolkitWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+BoxToolboxWidget::BoxToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
   : lay::EditorOptionsPageWidget (view, dispatcher)
 {
   mp_layout = new QHBoxLayout (this);
@@ -923,25 +923,25 @@ BoxToolkitWidget::BoxToolkitWidget (lay::LayoutViewBase *view, lay::Dispatcher *
   set_transparent (true);
 }
 
-BoxToolkitWidget::~BoxToolkitWidget ()
+BoxToolboxWidget::~BoxToolboxWidget ()
 {
   //  .. nothing yet ..
 }
 
 std::string
-BoxToolkitWidget::title () const
+BoxToolboxWidget::title () const
 {
   return "Box Options";
 }
 
 void
-BoxToolkitWidget::deactivated ()
+BoxToolboxWidget::deactivated ()
 {
   hide ();
 }
 
 void
-BoxToolkitWidget::commit (lay::Dispatcher *dispatcher)
+BoxToolboxWidget::commit (lay::Dispatcher *dispatcher)
 {
   try {
 
@@ -957,9 +957,90 @@ BoxToolkitWidget::commit (lay::Dispatcher *dispatcher)
 }
 
 void
-BoxToolkitWidget::configure (const std::string &name, const std::string &value)
+BoxToolboxWidget::configure (const std::string &name, const std::string &value)
 {
   if (name == BoxService::configure_name () && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
+
+    try {
+
+      db::DVector mv;
+      tl::from_string (value, mv);
+
+      mp_x_le->setText (tl::to_qstring (tl::micron_to_string (mv.x ())));
+      mp_y_le->setText (tl::to_qstring (tl::micron_to_string (mv.y ())));
+
+    } catch (...) {
+    }
+
+  }
+}
+
+// ------------------------------------------------------------------
+//  Connections toolbox widget (for paths and polygons)
+
+ConnectionToolboxWidget::ConnectionToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher), m_in_commit (false)
+{
+  mp_layout = new QHBoxLayout (this);
+
+  mp_x_le = new lay::DecoratedLineEdit (this);
+  mp_x_le->set_label ("dx:");
+  mp_layout->addWidget (mp_x_le);
+
+  mp_y_le = new lay::DecoratedLineEdit (this);
+  mp_y_le->set_label ("dy:");
+  mp_layout->addWidget (mp_y_le);
+
+  mp_layout->addStretch (1);
+
+  hide ();
+
+  set_toolbox_widget (true);
+  set_transparent (true);
+}
+
+ConnectionToolboxWidget::~ConnectionToolboxWidget ()
+{
+  //  .. nothing yet ..
+}
+
+std::string
+ConnectionToolboxWidget::title () const
+{
+  return "Connection Options";
+}
+
+void
+ConnectionToolboxWidget::deactivated ()
+{
+  hide ();
+}
+
+void
+ConnectionToolboxWidget::commit (lay::Dispatcher *dispatcher)
+{
+  m_in_commit = true;
+
+  try {
+
+    double dx = 0.0, dy = 0.0;
+
+    tl::from_string (tl::to_string (mp_x_le->text ()), dx);
+    tl::from_string (tl::to_string (mp_y_le->text ()), dy);
+
+    dispatcher->call_function (ShapeEditService::connection_function_name (), db::DVector (dx, dy).to_string ());
+
+  } catch (...) {
+  }
+
+  m_in_commit = false;
+}
+
+void
+ConnectionToolboxWidget::configure (const std::string &name, const std::string &value)
+{
+  if (name == ShapeEditService::connection_configure_name () &&
+      ((! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) || m_in_commit)) {
 
     try {
 
@@ -987,7 +1068,9 @@ static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_insts (n
 static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_insts_pcell (new lay::EditorOptionsPageFactory<edt::EditorOptionsInst> ("edt::Service(CellInstances)"), 0);
 
 //  toolkit widgets
-static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_box_tookit_widget_factory (new lay::EditorOptionsPageFactory<BoxToolkitWidget> ("edt::Service(Boxes)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_box_tookit_widget_factory (new lay::EditorOptionsPageFactory<BoxToolboxWidget> ("edt::Service(Boxes)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_connection_tookit_widget_factory_paths (new lay::EditorOptionsPageFactory<ConnectionToolboxWidget> ("edt::Service(Paths)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_connection_tookit_widget_factory_polygons (new lay::EditorOptionsPageFactory<ConnectionToolboxWidget> ("edt::Service(Polygons)"), 0);
 
 }
 

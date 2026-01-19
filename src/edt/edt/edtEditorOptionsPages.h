@@ -198,14 +198,14 @@ private:
 /**
  *  @brief The toolbox widget for boxes
  */
-class BoxToolkitWidget
+class BoxToolboxWidget
   : public lay::EditorOptionsPageWidget
 {
 Q_OBJECT
 
 public:
-  BoxToolkitWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
-  ~BoxToolkitWidget ();
+  BoxToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  ~BoxToolboxWidget ();
 
   virtual std::string title () const;
   virtual int order () const { return 0; }
@@ -216,6 +216,30 @@ public:
 private:
   QHBoxLayout *mp_layout;
   lay::DecoratedLineEdit *mp_x_le, *mp_y_le;
+};
+
+/**
+ *  @brief The toolbox widget for connections (path, polygon edges)
+ */
+class ConnectionToolboxWidget
+  : public lay::EditorOptionsPageWidget
+{
+Q_OBJECT
+
+public:
+  ConnectionToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  ~ConnectionToolboxWidget ();
+
+  virtual std::string title () const;
+  virtual int order () const { return 0; }
+  virtual void configure (const std::string &name, const std::string &value);
+  virtual void commit (lay::Dispatcher *root);
+  virtual void deactivated ();
+
+private:
+  QHBoxLayout *mp_layout;
+  lay::DecoratedLineEdit *mp_x_le, *mp_y_le;
+  bool m_in_commit;
 };
 
 }

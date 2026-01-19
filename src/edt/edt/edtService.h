@@ -518,9 +518,12 @@ protected:
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors
    *
-   *  This method is called when the object is finished
+   *  This method is called when the object is finished.
+   *
+   *  'accept' is set to true if triggered by the Enter/Return key, false if triggered by a mouse click.
+   *  In the latter case, first the mouse click is delivered and then "do_finish_edit" is called.
    */
-  virtual void do_finish_edit () { }
+  virtual void do_finish_edit (bool /*accept*/) { }
 
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors
@@ -669,8 +672,9 @@ protected:
    *  @brief Finishes the edit operation
    *
    *  Calls do_finish_edit() and terminates the editing operation.
+   *  See "do_finish_edit" for an explanation of the "accept" parameter.
    */
-  void finish_editing ();
+  void finish_editing (bool accept);
 
   /**
    *  @brief Gets the toolbox widget or 0 if none is registered

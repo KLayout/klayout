@@ -24,6 +24,7 @@
 #include "edtPolygonService.h"
 
 #include "layLayoutViewBase.h"
+#include "layEditorOptionsPage.h"
 
 #if defined(HAVE_QT)
 #  include "edtPropertiesPages.h"
@@ -135,11 +136,42 @@ PolygonService::do_mouse_click (const db::DPoint &p)
 }
 
 void 
-PolygonService::do_finish_edit ()
+PolygonService::do_finish_edit (bool accept)
 {
+  if (accept) {
+    //  add a dummy point in this case for the current one
+    m_last = m_points.back ();
+    m_points.push_back (db::DPoint ());
+  }
+
   deliver_shape (get_polygon (false));
   commit_recent ();
   close_editor_hooks (true);
+}
+
+void
+PolygonService::function (const std::string &name, const std::string &value)
+{
+  if (name == ShapeEditService::connection_function_name ()) {
+
+    try {
+
+      db::DVector dim;
+      tl::from_string (value, dim);
+
+      if (m_points.size () >= 2) {
+
+        m_last = m_points.back () = m_points.end () [-2] + dim;
+        m_points.push_back (m_last);
+
+        update_marker ();
+
+      }
+
+    } catch (...) {
+    }
+
+  }
 }
 
 db::Polygon
@@ -363,12 +395,17 @@ PolygonService::update_marker ()
   }
 
   if (m_points.size () >= 2) {
+    db::DVector dim = m_points.back () - m_points [m_points.size () - 2];
     view ()->message (std::string ("lx: ") +
-                      tl::micron_to_string (m_points.back ().x () - m_points.end () [-2].x ()) + 
+                      tl::micron_to_string (dim.x ()) +
                       std::string ("  ly: ") +
-                      tl::micron_to_string (m_points.back ().y () - m_points.end () [-2].y ()) + 
+                      tl::micron_to_string (dim.y ()) +
                       std::string ("  l: ") +
-                      tl::micron_to_string (m_points.back ().distance (m_points.end () [-2])));
+                      tl::micron_to_string (dim.length ()));
+    auto tb = toolbox_widget ();
+    if (tb) {
+      tb->configure (ShapeEditService::connection_configure_name (), dim.to_string ());
+    }
   }
 
   //  call hooks with new shape

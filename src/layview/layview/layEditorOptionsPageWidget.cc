@@ -82,9 +82,11 @@ void
 EditorOptionsPageWidget::keyPressEvent (QKeyEvent *event)
 {
 BEGIN_PROTECTED
+
   if (! is_modal_page () &&
       event->modifiers () == Qt::NoModifier &&
       (event->key () == Qt::Key_Return || event->key () == Qt::Key_Enter || event->key () == Qt::Key_Escape)) {
+
     if (event->key () == Qt::Key_Escape) {
       //  The Escape key creates a call to cancel()
       cancel ();
@@ -93,11 +95,15 @@ BEGIN_PROTECTED
       //  to the view
       commit (dispatcher ());
     }
+
     view ()->set_focus ();
+
     event->accept ();
+
   } else {
     QWidget::keyPressEvent (event);
   }
+
 END_PROTECTED
 }
 
@@ -105,6 +111,7 @@ bool
 EditorOptionsPageWidget::event (QEvent *event)
 {
   if (event->type () == QEvent::ShortcutOverride) {
+
     QKeyEvent *ke = dynamic_cast<QKeyEvent *> (event);
     if (ke->key () == Qt::Key_Escape ||
         ke->key () == Qt::Key_Tab ||
@@ -115,7 +122,9 @@ EditorOptionsPageWidget::event (QEvent *event)
       //  it in keyPressEvent
       ke->accept ();
     }
+
   }
+
   return QWidget::event (event);
 }
 

@@ -88,7 +88,7 @@ BoxService::function (const std::string &name, const std::string &value)
       }
       m_p2 = m_p1 + dim;
 
-      finish_editing ();
+      finish_editing (true);
 
     } catch (...) {
     }
@@ -209,7 +209,7 @@ BoxService::do_mouse_click (const db::DPoint &p)
 }
 
 void 
-BoxService::do_finish_edit ()
+BoxService::do_finish_edit (bool /*accept*/)
 {
   deliver_shape (get_box ());
   commit_recent ();

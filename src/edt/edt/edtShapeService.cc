@@ -39,6 +39,9 @@ namespace edt
 // -----------------------------------------------------------------------------
 //  ShapeEditService implementation
 
+const char *ShapeEditService::connection_configure_name () { return "connection-toolkit-widget-value"; }
+const char *ShapeEditService::connection_function_name () { return "connection-toolkit-widget-commit"; }
+
 ShapeEditService::ShapeEditService (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types)
   : edt::Service (manager, view, shape_types), 
     m_layer (0), m_cv_index (0), mp_cell (0), mp_layout (0), m_combine_mode (CM_Add), m_update_edit_layer_enabled (true)

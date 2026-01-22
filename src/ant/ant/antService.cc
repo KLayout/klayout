@@ -1624,57 +1624,7 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
   auto ac_eff = ac == lay::AC_Global ? m_snap_mode : ac;
   clear_mouse_cursors ();
 
-  bool indicate_ruler_as_message = true;
-
-  if (m_move_mode == MoveP1) {
-    
-    m_current.seg_p1 (m_seg_index, snap2_visual (m_p1, p, &m_current, ac));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP2) {
-    
-    m_current.seg_p2 (m_seg_index, snap2_visual (m_p1, p, &m_current, ac));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP12) {
-    
-    db::DPoint p12 = snap2_visual (m_p1, p, &m_current, ac);
-    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x(), p12.y ()));
-    m_current.seg_p2 (m_seg_index, db::DPoint (p12.x (), m_current.seg_p2 (m_seg_index).y ()));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP21) {
-    
-    db::DPoint p21 = snap2_visual (m_p1, p, &m_current, ac);
-    m_current.seg_p1 (m_seg_index, db::DPoint (p21.x (), m_current.seg_p1 (m_seg_index).y ()));
-    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x(), p21.y ()));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP1X) {
-    
-    db::DPoint pc = snap2_visual (m_p1, p, &m_current, ac);
-    m_current.seg_p1 (m_seg_index, db::DPoint (pc.x (), m_current.seg_p1 (m_seg_index).y ()));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP2X) {
-    
-    db::DPoint pc = snap2_visual (m_p1, p, &m_current, ac);
-    m_current.seg_p2 (m_seg_index, db::DPoint (pc.x (), m_current.seg_p2 (m_seg_index).y ()));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP1Y) {
-    
-    db::DPoint pc = snap2_visual (m_p1, p, &m_current, ac);
-    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x (), pc.y ()));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP2Y) {
-    
-    db::DPoint pc = snap2_visual (m_p1, p, &m_current, ac);
-    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x (), pc.y ()));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveSelected) {
+  if (m_move_mode == MoveSelected) {
 
     db::DVector dp = p - m_p1;
     dp = lay::snap_angle (dp, ac_eff);
@@ -1682,7 +1632,6 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
     m_trans = db::DTrans (dp + (m_p1 - db::DPoint ()) - m_trans.disp ()) * m_trans * db::DTrans (db::DPoint () - m_p1);
 
     propose_move_transformation (m_trans, 1);
-    indicate_ruler_as_message = false;
 
     snap_rulers (ac_eff);
 
@@ -1690,11 +1639,69 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
       (*r)->transform_by (db::DCplxTrans (m_trans));
     }
 
+    show_message ();
+
+  } else if (m_move_mode != MoveNone) {
+
+    db::DPoint ps = snap2_visual (m_p1, p, &m_current, ac);
+    m_trans = db::DTrans (ps - m_p1);
+
+    apply_partial_move (ps);
+
+    propose_move_transformation (db::DTrans (ps - m_p1), 1);
+
+    //  display current move distance
+    std::string pos = std::string ("dx: ") + tl::micron_to_string (ps.x () - m_p1.x ()) + "  "
+                                 + "dy: "  + tl::micron_to_string (ps.y () - m_p1.y ());
+    view ()->message (pos);
+
+  }
+}
+
+void
+Service::apply_partial_move (db::DPoint &ps)
+{
+  if (m_move_mode == MoveP1) {
+
+    m_current.seg_p1 (m_seg_index, ps);
+
+  } else if (m_move_mode == MoveP2) {
+
+    m_current.seg_p2 (m_seg_index, ps);
+
+  } else if (m_move_mode == MoveP12) {
+
+    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x(), ps.y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (ps.x (), m_current.seg_p2 (m_seg_index).y ()));
+
+  } else if (m_move_mode == MoveP21) {
+
+    m_current.seg_p1 (m_seg_index, db::DPoint (ps.x (), m_current.seg_p1 (m_seg_index).y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x(), ps.y ()));
+
+  } else if (m_move_mode == MoveP1X) {
+
+    ps.set_y (m_p1.y ());
+    m_current.seg_p1 (m_seg_index, db::DPoint (ps.x (), m_current.seg_p1 (m_seg_index).y ()));
+
+  } else if (m_move_mode == MoveP2X) {
+
+    ps.set_y (m_p1.y ());
+    m_current.seg_p2 (m_seg_index, db::DPoint (ps.x (), m_current.seg_p2 (m_seg_index).y ()));
+
+  } else if (m_move_mode == MoveP1Y) {
+
+    ps.set_x (m_p1.x ());
+    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x (), ps.y ()));
+
+  } else if (m_move_mode == MoveP2Y) {
+
+    ps.set_x (m_p1.x ());
+    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x (), ps.y ()));
+
   }
 
-  if (indicate_ruler_as_message) {
-    show_message ();
-  }
+  m_rulers [0]->redraw ();
 }
 
 void 
@@ -1742,6 +1749,9 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
       selection_to_view ();
 
     } else if (m_move_mode != MoveNone) {
+
+      db::DPoint ps = m_trans * m_p1;
+      apply_partial_move (ps);
 
       //  replace the ruler that was moved
       m_current.clean_points ();

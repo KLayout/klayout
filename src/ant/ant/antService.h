@@ -633,6 +633,7 @@ private:
   lay::EditorOptionsPage *toolbox_widget ();
 
   void show_message ();
+  void apply_partial_move (db::DPoint &ps);
 
   /**
    *  @brief A handler for the shape container's changed event

@@ -14,7 +14,15 @@
   the second point. Press the ESC key to cancel the operation.
   </p>
 
-  <p><b>Hint:</b> A box, once created, will remain a box. For example, it is not possible to delete one vertex 
+  <p>
+  While you drag the box, two edit boxes are shown at the top of the layout view.
+  Press the Tab key to enter these edit boxes.
+  Use the Tab and Shift+Tab keys to navigate between the boxes.
+  You can specify numerical values for the box width and height here. Pressing the Enter key will apply these
+  dimensions. Pressing the Escape key will leave the edit fields.
+  </p>
+
+  <p><b>Note:</b> A box, once created, will remain a box. For example, it is not possible to delete one vertex 
   of it, thus forming a triangle. This is only possible for polygons.
   </p>
 

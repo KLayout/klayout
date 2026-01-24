@@ -35,7 +35,9 @@
   Simply clicking at an item immediately enters "move" mode. In this mode, you can position the element at the desired
   target location and place it there by left-clicking at the position. Press "ESC" to cancel the operation.
   When a complex selection is made, move mode is entered by clicking at one of the selected items (the edges
-  or vertices, not the shape to which they belong). 
+  or vertices, not the shape to which they belong). While you move, two edit boxes are shown at the top of 
+  the layout view. Press the Tab key to enter these edit fields. You can specify explicit move distances there.
+  Press the Enter key to apply them or the Escape key to leave these edit fields.
   </p>
 
   <p>

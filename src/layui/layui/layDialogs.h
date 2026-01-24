@@ -45,6 +45,7 @@ namespace Ui
   class NewLayoutPropertiesDialog;
   class NewLayerPropertiesDialog;
   class NewCellPropertiesDialog;
+  class LayoutViewFunctionDialog;
   class MoveOptionsDialog;
   class MoveToOptionsDialog;
   class DeleteCellModeDialog;
@@ -129,10 +130,40 @@ private:
 };
 
 /**
+ *  @brief The generic layout view functions dialog
+ *
+ *  This dialog replaces QInputDialog and offers
+ *  an "apply" callback.
+ */
+class LAYUI_PUBLIC LayoutViewFunctionDialog
+  : public QDialog, public tl::Object
+{
+Q_OBJECT
+
+public:
+  LayoutViewFunctionDialog (QWidget *parent, const QString &title, const QString &label);
+  virtual ~LayoutViewFunctionDialog ();
+
+  bool exec_dialog (QString &value);
+
+  tl::event<std::string> apply_event;
+  tl::event<std::string> accept_event;
+
+private slots:
+  void apply_clicked ();
+
+private:
+  virtual void accept ();
+
+  Ui::LayoutViewFunctionDialog *mp_ui;
+};
+
+
+/**
  *  @brief The move options dialog
  */
 class LAYUI_PUBLIC MoveOptionsDialog 
-  : public QDialog
+  : public QDialog, public tl::Object
 {
 Q_OBJECT
 
@@ -142,8 +173,15 @@ public:
 
   bool exec_dialog (db::DVector &disp);
 
+  tl::event<db::DVector> apply_event;
+  tl::event<db::DVector> accept_event;
+
+private slots:
+  void apply_clicked ();
+
 private:
   virtual void accept ();
+  db::DVector vector ();
 
   Ui::MoveOptionsDialog *mp_ui;
 };

@@ -41,6 +41,7 @@ FORMS = \
   LayoutViewConfigPage7.ui \
   LayoutViewConfigPage.ui \
   LayoutViewConfigPage8.ui \
+  LayoutViewFunctionDialog.ui \
   LibraryCellSelectionForm.ui \
   LoadLayoutOptionsDialog.ui \
   MarkerBrowserConfigPage2.ui \

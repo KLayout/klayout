@@ -213,6 +213,11 @@ protected:
    */
   virtual void checkpoint () = 0;
 
+  /**
+   *  @brief Is called to reset a try counter that stops on "checkpoint"
+   */
+  virtual void reset_counter () = 0;
+
 private:
   void do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, const db::ICplxTrans &t);
 
@@ -317,6 +322,7 @@ protected:
   }
 
   virtual void checkpoint ();
+  virtual void reset_counter ();
 
 private:
   virtual void visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level);
@@ -338,7 +344,7 @@ private:
   const lay::TextInfo *mp_text_info;
   const std::set<db::properties_id_type> *mp_prop_sel;
   bool m_inv_prop_sel;
-  int m_tries;
+  int m_tries, m_try_counter;
   tl::AbsoluteProgress *mp_progress;
   std::vector<int> m_context_layers;
   std::map<db::cell_index_type, bool> m_cells_with_context;
@@ -385,6 +391,7 @@ public:
   }
 
   virtual void checkpoint ();
+  virtual void reset_counter ();
 
 private:
   virtual void visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level);
@@ -396,7 +403,7 @@ private:
   db::cell_index_type m_topcell;
   const std::set<lay::ObjectInstPath> *mp_excludes;
   std::vector<lay::ObjectInstPath> m_founds;
-  int m_tries;
+  int m_tries, m_try_counter;
   bool m_full_arrays;
   bool m_enclose_insts;
   bool m_visible_layers;

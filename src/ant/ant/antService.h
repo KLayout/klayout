@@ -644,6 +644,7 @@ private:
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
+  virtual bool key_event (unsigned int key, unsigned int buttons);
   virtual void deactivated ();
 
   void snap_rulers (lay::angle_constraint_type ac);

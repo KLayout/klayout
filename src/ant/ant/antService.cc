@@ -1878,9 +1878,23 @@ Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int button
     finish_drawing ();
     return true;
 
+  } else {
+    return false;
   }
+}
 
-  return false;
+bool
+Service::key_event (unsigned int key, unsigned int buttons)
+{
+  if (m_drawing && buttons == 0 && (key == lay::KeyEnter || key == lay::KeyReturn)) {
+
+    //  ends the current ruler (specifically in multi-segment mode)
+    finish_drawing ();
+    return true;
+
+  } else {
+    return false;
+  }
 }
 
 lay::TwoPointSnapToObjectResult

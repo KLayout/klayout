@@ -26,15 +26,22 @@
 #include "dbWriter.h"
 #include "dbMAGWriter.h"
 #include "tlUnitTest.h"
+#include "tlEnv.h"
+#include "tlFileUtils.h"
 
 #include <stdlib.h>
 
-static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double lambda = 0.1, double dbu = 0.001, const std::vector<std::string> *lib_paths = 0)
+static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double lambda = 0.1, double write_lambda = 0.0, double dbu = 0.001, const std::vector<std::string> *lib_paths = 0)
 {
   db::MAGReaderOptions *opt = new db::MAGReaderOptions();
   opt->dbu = dbu;
+  opt->lambda = lambda;
   if (lib_paths) {
     opt->lib_paths = *lib_paths;
+  }
+
+  if (write_lambda == 0) {
+    write_lambda = lambda;
   }
 
   db::LayerMap lm;
@@ -71,7 +78,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
 
   std::string tc_name = layout.cell_name (*layout.begin_top_down ());
 
-  //  normalize the layout by writing to GDS and reading from ..
+  //  normalize the layout by writing to CIF and reading from ..
 
   std::string tmp_cif_file = _this->tmp_file (tl::sprintf ("%s.cif", tc_name));
   std::string tmp_mag_file = _this->tmp_file (tl::sprintf ("%s.mag", tc_name));
@@ -96,7 +103,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
     tl::OutputStream stream (tmp_mag_file);
 
     db::MAGWriterOptions *opt = new db::MAGWriterOptions();
-    opt->lambda = lambda;
+    opt->lambda = write_lambda;
 
     db::MAGWriter writer;
     db::SaveLayoutOptions options;
@@ -109,7 +116,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
 
     db::MAGReaderOptions *opt = new db::MAGReaderOptions();
     opt->dbu = dbu;
-    opt->lambda = lambda;
+    opt->lambda = write_lambda;
     db::LoadLayoutOptions reread_options;
     reread_options.set_options (opt);
 
@@ -141,23 +148,29 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
 
 TEST(1)
 {
-  run_test (_this, tl::testdata (), "MAG_TEST.mag.gz", "mag_test_au.cif.gz");
+  run_test (_this, tl::testdata (), "MAG_TEST.mag.gz", "mag_test_au.cif.gz", 0, 1.0, 0.1);
 }
 
 TEST(2)
 {
   std::vector<std::string> lp;
   lp.push_back (std::string ("../.."));
-  run_test (_this, tl::testdata (), "PearlRiver/Layout/magic/PearlRiver_die.mag", "PearlRiver_au.cif.gz", 0, 1.0, 0.001, &lp);
+  run_test (_this, tl::testdata (), "PearlRiver/Layout/magic/PearlRiver_die.mag", "PearlRiver_au.cif.gz", 0, 1.0, 0.0, 0.001, &lp);
 }
 
 TEST(3)
 {
-  run_test (_this, tl::testdata (), "ringo/RINGO.mag", "ringo_au.cif.gz");
+  run_test (_this, tl::testdata (), "ringo/RINGO.mag", "ringo_au.cif.gz", 0, 1.0, 0.1);
 }
 
 TEST(4)
 {
-  run_test (_this, tl::testdata (), "issue_1925/redux.mag", "redux_au.cif.gz");
+  run_test (_this, tl::testdata (), "issue_1925/redux.mag", "redux_au.cif.gz", 0, 1.0, 0.1);
+}
+
+TEST(5)
+{
+  tl::set_env ("__TESTSRC_ABSPATH", tl::absolute_file_path (tl::testsrc ()));
+  run_test (_this, tl::testdata (), "gf180mcu_ocd_sram_test/gf180mcu_ocd_sram_top.mag.gz", "gf180mcu_ocd_sram_test.cif.gz", 0, 0.05, 0.005);
 }
 

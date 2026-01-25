@@ -41,6 +41,12 @@ namespace db
 // ---------------------------------------------------------------------------------
 //  MAGWriter implementation
 
+//  A function to produce a zero-area box instead of an empty one
+static db::Box safe_box (const db::Box &bx)
+{
+  return bx.empty () ? db::Box (0, 0, 0, 0) : bx;
+}
+
 MAGWriter::MAGWriter ()
   : mp_stream (0),
     m_progress (tl::to_string (tr ("Writing Magic file")), 10000)
@@ -120,6 +126,8 @@ MAGWriter::filename_for_cell (db::cell_index_type ci, db::Layout &layout)
 void
 MAGWriter::write_dummy_top (const std::set<db::cell_index_type> &cell_set, const db::Layout &layout, tl::OutputStream &os)
 {
+  m_cellname = "<TOP>";
+
   os.set_as_text (true);
   os << "magic\n";
 
@@ -144,7 +152,7 @@ MAGWriter::write_dummy_top (const std::set<db::cell_index_type> &cell_set, const
   cell_instances.reserve (cells_by_name.size ());
   for (std::map<std::string, db::cell_index_type>::const_iterator c = cells_by_name.begin (); c != cells_by_name.end (); ++c) {
     //  instances are arrayed as stack
-    db::Box bx = layout.cell (c->second).bbox ();
+    db::Box bx = safe_box (layout.cell (c->second).bbox ());
     cell_instances.push_back (db::CellInstArray (db::CellInst (c->second), db::Trans (db::Vector (0, y) + (db::Point () - bx.p1 ()))));
     y += bx.height ();
     w = std::max (w, db::Coord (bx.width ()));
@@ -191,7 +199,7 @@ MAGWriter::do_write_cell (db::cell_index_type ci, const std::vector <std::pair <
   db::Cell &cell = layout.cell (ci);
 
   os << "<< checkpaint >>\n";
-  write_polygon (db::Polygon (cell.bbox ()), layout, os);
+  write_polygon (db::Polygon (safe_box (cell.bbox ())), layout, os);
 
   bool any;
 
@@ -292,18 +300,25 @@ namespace {
 void
 MAGWriter::write_polygon (const db::Polygon &poly, const db::Layout & /*layout*/, tl::OutputStream &os)
 {
-  db::EdgeProcessor ep;
-  ep.insert (scaled (poly));
-  db::MergeOp op;
   TrapezoidWriter writer (os);
-  db::TrapezoidGenerator tpgen (writer);
-  ep.process (tpgen, op);
+
+  if (poly.is_empty ()) {
+    //  ignore empty polygons
+  } else if (poly.is_box ()) {
+    writer.put (db::SimplePolygon (scaled (poly.box ())));
+  } else {
+    db::EdgeProcessor ep;
+    ep.insert (scaled (poly));
+    db::MergeOp op;
+    db::TrapezoidGenerator tpgen (writer);
+    ep.process (tpgen, op);
+  }
 }
 
 void
 MAGWriter::write_label (const std::string &layer, const db::Text &text, const db::Layout & /*layout*/, tl::OutputStream &os)
 {
-  db::DVector v = db::DVector (text.trans ().disp ()) * m_sf;
+  db::Vector v = scaled (text.trans ().disp ());
 
   std::string s = text.string ();
   if (s.find ("\n") != std::string::npos) {
@@ -372,7 +387,7 @@ MAGWriter::write_single_instance (db::cell_index_type ci, db::ICplxTrans trans, 
   db::Vector d = scaled (trans.disp ());
   os << "transform " << m.m11 () << " " << m.m12 () << " " << d.x () << " " << m.m21 () << " " << m.m22 () << " " << d.y () << "\n";
 
-  db::Box bx = scaled (layout.cell (ci).bbox ());
+  db::Box bx = scaled (safe_box (layout.cell (ci).bbox ()));
   os << "box " << bx.left () << " " << bx.bottom () << " " << bx.right () << " " << bx.top () << "\n";
 }
 
@@ -410,7 +425,7 @@ MAGWriter::scaled (const db::Vector &v) const
 {
   db::Vector res (db::DVector (v) * m_sf);
   if (! db::DVector (res).equal (db::DVector (v) * m_sf)) {
-    tl::warn << tl::sprintf (tl::to_string (tr ("Vector rounding occurred at %s in cell %s - not a multiple of lambda (%.12g)")), v.to_string (), m_cellname, m_options.lambda);
+    tl::warn << tl::sprintf (tl::to_string (tr ("Vector rounding occurred at %s in cell %s - not a multiple of lambda (%.12g)")), (db::DVector (v) * m_sf).to_string (), m_cellname, m_options.lambda);
   }
   return res;
 }
@@ -420,7 +435,7 @@ MAGWriter::scaled (const db::Point &p) const
 {
   db::Point res (db::DPoint (p) * m_sf);
   if (! db::DPoint (res).equal (db::DPoint (p) * m_sf)) {
-    tl::warn << tl::sprintf (tl::to_string (tr ("Coordinate rounding occurred at %s in cell %s - not a multiple of lambda (%.12g)")), p.to_string (), m_cellname, m_options.lambda);
+    tl::warn << tl::sprintf (tl::to_string (tr ("Coordinate rounding occurred at %s in cell %s - not a multiple of lambda (%.12g)")), (db::DPoint (p) * m_sf).to_string (), m_cellname, m_options.lambda);
   }
   return res;
 }

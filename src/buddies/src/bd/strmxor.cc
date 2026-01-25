@@ -604,7 +604,8 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
       const char *line_format = "  %-10s %-12s %s";
 
-      std::string headline = tl::sprintf (line_format, tl::to_string (tr ("Layer")), tl::to_string (tr ("Output")), tl::to_string (tr ("Differences (shape count)")));
+      std::string headline = tl::sprintf (line_format, tl::to_string (tr ("Layer")), tl::to_string (tr ("Output")),
+                                                       deep ? tl::to_string (tr ("Differences (hierarchical/flat count)")) : tl::to_string (tr ("Differences (shape count)")));
 
       const char *sep = "  ----------------------------------------------------------------";
 
@@ -633,7 +634,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
             out = r->second.layout->get_properties (r->second.layer_output).to_string ();
           }
           if (deep) {
-            value = tl::sprintf (tl::to_string (tr ("%lu (hierarchical) %lu (flat)")), r->second.count (), r->second.flat_count ());
+            value = tl::sprintf (tl::to_string (tr ("%-6lu / %-6lu")), r->second.count (), r->second.flat_count ());
           } else {
             value = tl::to_string (r->second.count ());
           }

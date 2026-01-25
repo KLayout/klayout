@@ -35,6 +35,7 @@
 #include "tlThreads.h"
 #include "tlThreadedWorkers.h"
 #include "tlTimer.h"
+#include "tlOptional.h"
 
 namespace {
 
@@ -284,6 +285,7 @@ struct ResultDescriptor
   int layer_output;
   db::Layout *layout;
   db::cell_index_type top_cell;
+  tl::optional<db::Region> results;
 
   size_t count () const
   {
@@ -782,8 +784,15 @@ bool run_tiled_xor (const XORData &xor_data)
     proc.execute ("Running XOR");
   }
 
+  //  no stored results currently
+  for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = xor_data.results->begin (); r != xor_data.results->end (); ++r) {
+    tl_assert (! r->second.results.has_value ());
+  }
+
   //  Determines the output status
   for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = xor_data.results->begin (); r != xor_data.results->end () && result; ++r) {
+    //  no stored results currently
+    tl_assert (! r->second.results.has_value ());
     result = r->second.is_empty ();
   }
 
@@ -922,7 +931,9 @@ public:
 
           if (mp_xor_data->output_layout) {
             result.layer_output = result.layout->insert_layer (lp);
-            xor_res.insert_into (mp_xor_data->output_layout, mp_xor_data->output_cell, result.layer_output);
+            if (! xor_res.empty ()) {
+              result.results = xor_res;
+            }
           } else {
             result.shape_count = xor_res.hier_count ();
             result.flat_shape_count = xor_res.count ();
@@ -990,6 +1001,22 @@ bool run_deep_xor (const XORData &xor_data)
 
   job.start ();
   job.wait ();
+
+  //  Deliver the outputs
+  //  NOTE: this is done single-threaded and in a delayed fashion as it is not efficient during
+  //  computation and shifting hierarchy of the working layout
+
+  if (xor_data.output_layout) {
+
+    tl::SelfTimer timer (tl::verbosity () >= 11, "Result delivery");
+
+    for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = xor_data.results->begin (); r != xor_data.results->end (); ++r) {
+      if (r->second.results.has_value ()) {
+        r->second.results.value ().insert_into (xor_data.output_layout, xor_data.output_cell, r->second.layer_output);
+      }
+    }
+
+  }
 
   //  Determine the output status
 

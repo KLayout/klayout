@@ -522,21 +522,6 @@ public:
    */
   bool is_shape_bbox_dirty () const;
 
-  /** 
-   *  @brief Updates the bbox
-   *
-   *  This will update the bbox from the shapes and instances.
-   *  This requires the bboxes of the child cells to be computed
-   *  before. Practically this will be done by computing the
-   *  bboxes bottom-up in the hierarchy.
-   *  In addition, the number of hierarchy levels below is also
-   *  updated.
-   *
-   *  @param layers The max. number of layers in the child cells
-   *  @return true, if the bounding box has changed.
-   */
-  bool update_bbox (unsigned int layers);
-
   /**
    *  @brief Sorts the shapes lists
    *
@@ -1110,6 +1095,23 @@ public:
    */
   void move_shapes (db::Cell &source_cell, const db::LayerMapping &layer_mapping);
 
+  /**
+   *  @brief Gets the current bounding box (with empty) without calling Layout::update
+   *
+   *  This method is intended for internal purposes only.
+   */
+  const box_type &bbox_with_empty_no_update () const
+  {
+    return m_bbox_with_empty;
+  }
+
+  /**
+   *  @brief Gets the current per-layer bounding box without calling Layout::update
+   *
+   *  This method is intended for internal purposes only.
+   */
+  const box_type &bbox_no_update (unsigned int l) const;
+
 protected:
   /**
    *  @brief Standard constructor: create an empty cell object
@@ -1135,6 +1137,7 @@ protected:
   virtual Cell *clone (db::Layout &layout) const;
 
 private:
+  friend class db::Layout;
   cell_index_type m_cell_index;
   mutable db::Layout *mp_layout;
   shapes_map m_shapes_map;
@@ -1170,9 +1173,9 @@ private:
   }
 
   /**
-   *  @brief Return a reference to the instances object 
+   *  @brief Return a reference to the instances object
    */
-  instances_type &instances ()
+  const instances_type &instances () const
   {
     return m_instances;
   }
@@ -1180,7 +1183,7 @@ private:
   /**
    *  @brief Return a reference to the instances object 
    */
-  const instances_type &instances () const
+  instances_type &instances ()
   {
     return m_instances;
   }
@@ -1219,6 +1222,21 @@ private:
    *  @param force Force sorting, even if not strictly needed
    */
   void sort_inst_tree (bool force);
+
+  /**
+   *  @brief Updates the bbox
+   *
+   *  This will update the bbox from the shapes and instances.
+   *  This requires the bboxes of the child cells to be computed
+   *  before. Practically this will be done by computing the
+   *  bboxes bottom-up in the hierarchy.
+   *  In addition, the number of hierarchy levels below is also
+   *  updated.
+   *
+   *  @param layers The max. number of layers in the child cells
+   *  @return true, if the bounding box has changed.
+   */
+  bool update_bbox (unsigned int layers);
 };
 
 /**

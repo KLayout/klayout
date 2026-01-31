@@ -981,9 +981,10 @@ public:
    *  Only after sorting the query iterators are available.
    *  Sorting complexity is approx O(N*log(N)).
    */
-  void sort (const BoxConv &conv)
+  template <class BC>
+  void sort (const BC &conv)
   {
-    typename BoxConv::complexity complexity_tag;
+    typename BC::complexity complexity_tag;
     sort (conv, complexity_tag);
   }
 
@@ -1192,7 +1193,8 @@ private:
   box_tree_node *mp_root;
 
   /// Sort implementation for simple bboxes - no caching
-  void sort (const BoxConv &conv, const db::simple_bbox_tag &/*complexity*/)
+  template <class BC>
+  void sort (const BC &conv, const db::simple_bbox_tag &/*complexity*/)
   {
     m_elements.clear ();
     m_elements.reserve (m_objects.size ());
@@ -1204,7 +1206,7 @@ private:
 
     if (! m_objects.empty ()) {
 
-      box_tree_picker_type picker (conv);
+      box_tree_picker<Box, Obj, BC, obj_vector_type> picker (conv);
 
       box_type bbox;
       for (typename obj_vector_type::const_iterator o = m_objects.begin (); o != m_objects.end (); ++o) {
@@ -1221,7 +1223,8 @@ private:
   }
 
   /// Sort implementation for complex bboxes - with caching
-  void sort (const box_conv_type &conv, const db::complex_bbox_tag &/*complexity*/)
+  template <class BC>
+  void sort (const BC &conv, const db::complex_bbox_tag &/*complexity*/)
   {
     m_elements.clear ();
     m_elements.reserve (m_objects.size ());
@@ -1233,7 +1236,7 @@ private:
 
     if (! m_objects.empty ()) {
 
-      box_tree_cached_picker<object_type, box_type, box_conv_type, obj_vector_type> picker (conv, m_objects.begin (), m_objects.end ());
+      box_tree_cached_picker<object_type, box_type, BC, obj_vector_type> picker (conv, m_objects.begin (), m_objects.end ());
 
       for (typename obj_vector_type::const_iterator o = m_objects.begin (); o != m_objects.end (); ++o) {
         m_elements.push_back (o.index ());
@@ -1997,9 +2000,10 @@ public:
    *  Only after sorting the query iterators are available.
    *  Sorting complexity is approx O(N*log(N)).
    */
-  void sort (const BoxConv &conv)
+  template <class BC>
+  void sort (const BC &conv)
   {
-    typename BoxConv::complexity complexity_tag;
+    typename BC::complexity complexity_tag;
     sort (conv, complexity_tag);
   }
 
@@ -2159,13 +2163,14 @@ private:
   box_tree_node *mp_root;
 
   /// Sort implementation for simple bboxes - no caching
-  void sort (const BoxConv &conv, const db::simple_bbox_tag &/*complexity*/)
+  template <class BC>
+  void sort (const BC &conv, const db::simple_bbox_tag &/*complexity*/)
   {
     if (m_objects.empty ()) {
       return;
     }
 
-    box_tree_picker_type picker (conv);
+    box_tree_picker<box_type, object_type, BC, obj_vector_type> picker (conv);
 
     if (mp_root) {
       delete mp_root;
@@ -2184,13 +2189,14 @@ private:
   }
 
   /// Sort implementation for complex bboxes - with caching
-  void sort (const box_conv_type &conv, const db::complex_bbox_tag &/*complexity*/)
+  template <class BC>
+  void sort (const BC &conv, const db::complex_bbox_tag &/*complexity*/)
   {
     if (m_objects.empty ()) {
       return;
     }
 
-    box_tree_cached_picker<object_type, box_type, box_conv_type, obj_vector_type> picker (conv, m_objects.begin (), m_objects.end ());
+    box_tree_cached_picker<object_type, box_type, BC, obj_vector_type> picker (conv, m_objects.begin (), m_objects.end ());
 
     if (mp_root) {
       delete mp_root;

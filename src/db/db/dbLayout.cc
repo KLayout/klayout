@@ -1532,6 +1532,8 @@ Layout::rename_cell (cell_index_type id, const char *name)
 bool 
 Layout::topological_sort ()
 {
+  //  NOTE: using cell.instances methods instead of the corresponding cell methods avoids a recursive update call
+
   m_top_cells = 0;
   m_top_down_list.clear ();
 
@@ -1559,7 +1561,7 @@ Layout::topological_sort ()
     //  child cells.
 
     for (const_iterator c = begin (); c != end (); ++c) {
-      if (c->parent_cells () == num_parents [c->cell_index ()]) {
+      if (c->instances ().parent_cells () == num_parents [c->cell_index ()]) {
         m_top_down_list.push_back (c->cell_index ());
         num_parents [c->cell_index ()] = std::numeric_limits<cell_index_type>::max ();
       }
@@ -1568,7 +1570,7 @@ Layout::topological_sort ()
     //  For all these a cells, increment the reported parent instance 
     //  count in all the child cells.
     for (cell_index_vector::const_iterator ii = m_top_down_list.begin () + n_top_down_cells; ii != m_top_down_list.end (); ++ii) {
-      for (cell_type::child_cell_iterator cc = cell (*ii).begin_child_cells (); ! cc.at_end (); ++cc) {
+      for (cell_type::child_cell_iterator cc = cell (*ii).instances ().begin_child_cells (); ! cc.at_end (); ++cc) {
         tl_assert (num_parents [*cc] != std::numeric_limits<cell_index_type>::max ());
         num_parents [*cc] += 1;
       }
@@ -1583,7 +1585,7 @@ Layout::topological_sort ()
   }
 
   //  Determine the number of top cells
-  for (top_down_iterator e = m_top_down_list.begin (); e != m_top_down_list.end () && cell (*e).is_top (); ++e) {
+  for (top_down_iterator e = m_top_down_list.begin (); e != m_top_down_list.end () && cell (*e).instances ().is_top (); ++e) {
     ++m_top_cells;
   }
 
@@ -1815,14 +1817,14 @@ Layout::force_update_no_lock () const
 void 
 Layout::update () const
 {
+  tl::MutexLocker locker (&lock ());
+
   //  NOTE: the assumption is that either one thread is writing or
   //  multiple threads are reading. Hence, we do not need to lock hier_dirty() or bboxes_dirty().
   //  We still do double checking as another thread might do the update as well.
   if (under_construction () || (! hier_dirty () && ! bboxes_dirty () && ! prop_ids_dirty ())) {
     return;
   }
-
-  tl::MutexLocker locker (&lock ());
 
   if (! under_construction ()) {
     force_update_no_lock ();
@@ -1886,13 +1888,14 @@ Layout::do_update ()
         unsigned int layers = 0;
         pr->set (0);
         pr->set_desc (tl::to_string (tr ("Updating bounding boxes")));
-        for (bottom_up_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
+        for (bottom_up_iterator c = m_top_down_list.rbegin (); c != m_top_down_list.rend (); ++c) {
           ++*pr;
           cell_type &cp (cell (*c));
           if (cp.is_shape_bbox_dirty () || dirty_parents.find (*c) != dirty_parents.end ()) {
             if (cp.update_bbox (layers)) {
               //  the bounding box has changed - need to insert parents into "dirty parents" list
-              for (cell_type::parent_cell_iterator p = cp.begin_parent_cells (); p != cp.end_parent_cells (); ++p) {
+              //  NOTE: using "instances" instead of the cell directly avoids a recursive update call
+              for (cell_type::parent_cell_iterator p = cp.instances ().begin_parent_cells (); p != cp.instances ().end_parent_cells (); ++p) {
                 dirty_parents.insert (*p);
               }
             } 
@@ -1907,7 +1910,7 @@ Layout::do_update ()
         tl::SelfTimer timer (tl::verbosity () > layout_base_verbosity + 10, "Sorting shapes");
         pr->set (0);
         pr->set_desc (tl::to_string (tr ("Sorting shapes")));
-        for (bottom_up_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
+        for (bottom_up_iterator c = m_top_down_list.rbegin (); c != m_top_down_list.rend (); ++c) {
           ++*pr;
           cell_type &cp (cell (*c));
           cp.sort_shapes ();
@@ -1922,7 +1925,7 @@ Layout::do_update ()
       size_t layers = 0;
       pr->set (0);
       pr->set_desc (tl::to_string (tr ("Sorting instances")));
-      for (bottom_up_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
+      for (bottom_up_iterator c = m_top_down_list.rbegin (); c != m_top_down_list.rend (); ++c) {
         ++*pr;
         cell_type &cp (cell (*c));
         bool force_sort_inst_tree = dirty_parents.find (*c) != dirty_parents.end ();

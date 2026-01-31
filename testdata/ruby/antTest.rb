@@ -219,10 +219,10 @@ class Ant_TestClass < TestBase
     a.style = RBA::Annotation::StyleRuler
     assert_equal( a.to_s_debug, "p1=0,0, p2=0,0, fmt=$D, fmt_x=$X, fmt_y=$Y, style=ruler, outline=diag, snap=true, ac=global" )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
 
-    a = annot_obj2( [ RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ) ], "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj2( [ RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ) ], "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
 
     b = a.dup
@@ -232,7 +232,7 @@ class Ant_TestClass < TestBase
     assert_equal( a == b, false )
     assert_equal( a != b, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a == b, true )
     assert_equal( a != b, false )
 
@@ -249,15 +249,15 @@ class Ant_TestClass < TestBase
     assert_equal( a.text_y, "c" )
 
     a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
-    assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
+    assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=diagonal_only" )
     aa = a.dup
     aa.category = "abc"
-    assert_equal( aa.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal, category=abc" )
+    assert_equal( aa.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=diagonal_only, category=abc" )
     assert_equal( a == aa, false )
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.main_position = RBA::Annotation::PositionP1
@@ -266,7 +266,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.main_position = RBA::Annotation::PositionP2
@@ -275,7 +275,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.main_position = RBA::Annotation::PositionCenter
@@ -284,7 +284,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.main_xalign = RBA::Annotation::AlignCenter
@@ -293,7 +293,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.main_xalign = RBA::Annotation::AlignLeft
@@ -302,7 +302,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.main_xalign = RBA::Annotation::AlignRight
@@ -311,7 +311,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.main_yalign = RBA::Annotation::AlignCenter
@@ -320,7 +320,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.main_yalign = RBA::Annotation::AlignLeft
@@ -329,7 +329,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.main_yalign = RBA::Annotation::AlignRight
@@ -338,7 +338,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.xlabel_xalign = RBA::Annotation::AlignCenter
@@ -347,7 +347,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.xlabel_xalign = RBA::Annotation::AlignLeft
@@ -356,7 +356,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.xlabel_xalign = RBA::Annotation::AlignRight
@@ -365,7 +365,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.xlabel_yalign = RBA::Annotation::AlignCenter
@@ -374,7 +374,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.xlabel_yalign = RBA::Annotation::AlignLeft
@@ -383,7 +383,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.xlabel_yalign = RBA::Annotation::AlignRight
@@ -392,7 +392,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.ylabel_xalign = RBA::Annotation::AlignCenter
@@ -401,7 +401,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.ylabel_xalign = RBA::Annotation::AlignLeft
@@ -410,7 +410,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.ylabel_xalign = RBA::Annotation::AlignRight
@@ -419,7 +419,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.ylabel_yalign = RBA::Annotation::AlignCenter
@@ -428,7 +428,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.ylabel_yalign = RBA::Annotation::AlignLeft
@@ -437,7 +437,7 @@ class Ant_TestClass < TestBase
     a = aa.dup
     assert_equal( a == aa, true )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.to_s_debug, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal" )
     aa = a.dup
     aa.ylabel_yalign = RBA::Annotation::AlignRight
@@ -472,7 +472,7 @@ class Ant_TestClass < TestBase
     assert_equal( ac, [] )
     assert_equal( asc, 0 )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.is_valid?, false )
     lv.insert_annotation( a )
     assert_equal( aac, 2 )
@@ -539,7 +539,7 @@ class Ant_TestClass < TestBase
     a0 = RBA::Annotation::new
     lv.insert_annotation( a0 )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     lv.insert_annotation( a )
 
     arr = []
@@ -567,7 +567,7 @@ class Ant_TestClass < TestBase
     a0 = RBA::Annotation::new
     lv.insert_annotation( a0 )
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     lv.insert_annotation( a )
 
     arr = []
@@ -602,7 +602,7 @@ class Ant_TestClass < TestBase
     mw.create_layout( 0 )
     lv = mw.current_view
 
-    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 4 )
     assert_equal( a.is_valid?, false )
     lv.insert_annotation( a )
 

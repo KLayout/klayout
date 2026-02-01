@@ -142,6 +142,13 @@ public:
     }
   }
 
+  virtual std::vector<std::string> additional_editor_options_pages () const
+  {
+    std::vector<std::string> names;
+    names.push_back ("GenericEditorOptions");
+    return names;
+  }
+
 private:
   std::string m_title;
   std::string m_mouse_mode;
@@ -406,6 +413,13 @@ public:
   {
     title = m_mouse_mode;
     return true;
+  }
+
+  virtual std::vector<std::string> additional_editor_options_pages () const
+  {
+    std::vector<std::string> names;
+    names.push_back ("GenericEditorOptions");
+    return names;
   }
 
 private:

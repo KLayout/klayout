@@ -147,11 +147,6 @@ public:
   {
     return new MouseTracker (view);
   }
-
-  virtual bool enable_catchall_editor_options_pages () const
-  {
-    return false;
-  }
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> tracker_decl (new MouseTrackerDeclaration (), -1000, "laybasic::MouseTrackerPlugin");

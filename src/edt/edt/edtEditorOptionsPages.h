@@ -52,7 +52,6 @@ namespace Ui
 
 namespace lay
 {
-  class PluginDeclaration;
   class Dispatcher;
   class LayoutViewBase;
   class Plugin;

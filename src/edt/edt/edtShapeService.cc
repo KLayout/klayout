@@ -85,7 +85,7 @@ ShapeEditService::config_recent_for_layer (const db::LayerProperties &lp, int cv
 
   auto pages = eo_pages->editor_options_pages ();
   for (auto op = pages.begin (); op != pages.end (); ++op) {
-    if ((*op)->plugin_declaration () == plugin_declaration ()) {
+    if ((*op)->for_plugin_declaration (plugin_declaration ())) {
       (*op)->config_recent_for_layer (dispatcher (), lp, cv_index);
     }
   }

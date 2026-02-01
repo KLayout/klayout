@@ -400,7 +400,7 @@ LayoutViewBase::init (db::Manager *mgr)
 
   mp_canvas = new lay::LayoutCanvas (this);
 
-  create_plugins ();
+  LayoutViewBase::create_plugins ();
 }
 
 void

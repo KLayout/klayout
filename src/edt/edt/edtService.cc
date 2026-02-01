@@ -2070,7 +2070,7 @@ Service::commit_recent ()
 
   auto pages = eo_pages->editor_options_pages ();
   for (auto op = pages.begin (); op != pages.end (); ++op) {
-    if ((*op)->plugin_declaration () == plugin_declaration ()) {
+    if ((*op)->for_plugin_declaration (plugin_declaration ())) {
       (*op)->commit_recent (view ());
     }
   }

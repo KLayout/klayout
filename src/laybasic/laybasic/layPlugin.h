@@ -344,26 +344,19 @@ public:
   virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const;
 
   /**
-   *  @brief Gets the "catchall" editor options pages
-   *
-   *  These are editor options pages not associated with a specific plugin.
-   *
-   *  The new pages are returned in the "pages" vector. The layout view will take ownership of these pages.
-   *
-   *  The implementation collects pages registered through editor options page factories.
+   *  @brief Gets pages created from registered factories by name
    */
-  static void get_catchall_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  static void get_additional_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher, const std::map<std::string, std::vector<const lay::PluginDeclaration *> > &names);
 
   /**
-   *  @brief Gets a value indicating whether "catchall" editor options pages shall be included
+   *  @brief Returns a list of editor options pages that the plugin wants to inherit
    *
-   *  "catchall" editor options pages are ones that are unspecific and render a null "plugin_declaration".
-   *  A plugin can choose to include these pages if it listens to global configuration events.
-   *  Otherwise it should return false here to suppress these pages.
+   *  In addition to providing pages through "get_editor_options_pages", the plugin can request pages
+   *  from globally registered factories by name.
    */
-  virtual bool enable_catchall_editor_options_pages () const
+  virtual std::vector<std::string> additional_editor_options_pages () const
   {
-    return true;
+    return std::vector<std::string> ();
   }
 
   /**

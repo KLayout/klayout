@@ -98,8 +98,7 @@ EditorOptionsPages::editor_options_pages (const lay::PluginDeclaration *plugin_d
 {
   std::vector<lay::EditorOptionsPage *> pages;
   for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if (p->plugin_declaration () == plugin_declaration ||
-        (p->plugin_declaration () == 0 && plugin_declaration->enable_catchall_editor_options_pages ())) {
+    if (p->for_plugin_declaration (plugin_declaration)) {
       pages.push_back (const_cast<lay::EditorOptionsPage *> (p.operator-> ()));
     }
   }
@@ -164,18 +163,9 @@ EditorOptionsPages::activate (const lay::Plugin *plugin)
   m_update_enabled = false;
 
   for (auto op = m_pages.begin (); op != m_pages.end (); ++op) {
-
-    bool is_active = false;
-    if (op->plugin_declaration () == 0) {
-      is_active = (plugin && plugin->plugin_declaration ()->enable_catchall_editor_options_pages ());
-    } else if (plugin && plugin->plugin_declaration () == op->plugin_declaration ()) {
-      is_active = true;
-    }
-
     BEGIN_PROTECTED
-    op->activate (is_active);
+    op->activate (plugin && op->for_plugin_declaration (plugin->plugin_declaration ()));
     END_PROTECTED
-
   }
 
   m_update_enabled = true;

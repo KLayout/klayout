@@ -1060,7 +1060,7 @@ ConnectionToolboxWidget::configure (const std::string &name, const std::string &
 //  Registrations
 
 //  unspecific editor options - used for all plugins that want it
-static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_generic (new lay::EditorOptionsPageFactory<EditorOptionsGeneric> (), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_generic (new lay::EditorOptionsPageFactory<EditorOptionsGeneric> ("GenericEditorOptions"), 0);
 
 static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_texts (new lay::EditorOptionsPageFactory<edt::EditorOptionsText> ("edt::Service(Texts)"), 0);
 static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_paths (new lay::EditorOptionsPageFactory<edt::EditorOptionsPath> ("edt::Service(Paths)"), 0);

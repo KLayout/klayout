@@ -27,6 +27,8 @@
 
 #include "tlObject.h"
 
+#include <set>
+
 namespace db
 {
   struct LayerProperties;
@@ -110,8 +112,22 @@ public:
    */
   int show ();
 
-  const lay::PluginDeclaration *plugin_declaration () const { return mp_plugin_declaration; }
-  void set_plugin_declaration (const lay::PluginDeclaration *pd) { mp_plugin_declaration = pd; }
+  bool for_plugin_declaration (const lay::PluginDeclaration *pd)
+  {
+    return m_plugin_declarations.find (pd) != m_plugin_declarations.end ();
+  }
+
+  void set_plugin_declaration (const lay::PluginDeclaration *pd)
+  {
+    m_plugin_declarations.clear ();
+    m_plugin_declarations.insert (pd);
+  }
+
+  void set_plugin_declarations (const std::vector<const lay::PluginDeclaration *> &pd)
+  {
+    m_plugin_declarations.clear ();
+    m_plugin_declarations.insert (pd.begin (), pd.end ());
+  }
 
   void init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
 
@@ -136,7 +152,7 @@ private:
   bool m_active;
   bool m_focus_page;
   bool m_modal_page, m_toolbox_widget;
-  const lay::PluginDeclaration *mp_plugin_declaration;
+  std::set<const lay::PluginDeclaration *> m_plugin_declarations;
   lay::Dispatcher *mp_dispatcher;
   lay::LayoutViewBase *mp_view;
 
@@ -150,33 +166,42 @@ private:
  *
  *  We will use it later to provide a registration-based specialized factory
  *  for Qt-enabled option pages, which we should not link here.
+ *
+ *  A factory has a name - if the name matches a plugin name,
+ *  the factory is automatically requested to create a page for
+ *  that plugin.
+ *
+ *  Otherwise, plugins can request additional pages through
+ *  "additional_editor_options_pages". This is a list of names
+ *  (not plugin names) of page factories. These factories will
+ *  be called to provide additional pages then.
  */
 class LAYBASIC_PUBLIC EditorOptionsPageFactoryBase
 {
 public:
-  EditorOptionsPageFactoryBase (const char *plugin_name)
-    : m_plugin_name (plugin_name)
+  EditorOptionsPageFactoryBase (const char *name)
+    : m_name (name)
   {
     //  .. nothing yet ..
   }
 
   EditorOptionsPageFactoryBase ()
-    : m_plugin_name ()
+    : m_name ()
   {
     //  .. nothing yet ..
   }
 
   virtual ~EditorOptionsPageFactoryBase () { }
 
-  const std::string &plugin_name () const
+  const std::string &name () const
   {
-    return m_plugin_name;
+    return m_name;
   }
 
   virtual lay::EditorOptionsPage *create_page (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) = 0;
 
 private:
-  std::string m_plugin_name;
+  std::string m_name;
 };
 
 /**

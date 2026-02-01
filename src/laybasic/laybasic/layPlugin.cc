@@ -342,7 +342,7 @@ PluginDeclaration::get_editor_options_pages (std::vector<lay::EditorOptionsPage 
   auto reg = tl::Registrar<lay::EditorOptionsPageFactoryBase>::get_instance ();
   for (auto i = reg->begin (); i != reg->end (); ++i) {
     lay::EditorOptionsPage *page = 0;
-    if (i->plugin_name () == n) {
+    if (i->name () == n) {
       page = i->create_page (view, dispatcher);
       if (page) {
         page->set_plugin_declaration (this);
@@ -355,16 +355,26 @@ PluginDeclaration::get_editor_options_pages (std::vector<lay::EditorOptionsPage 
 }
 
 void
-PluginDeclaration::get_catchall_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+PluginDeclaration::get_additional_editor_options_pages (std::vector<EditorOptionsPage *> &pages, LayoutViewBase *view, Dispatcher *dispatcher, const std::map<std::string, std::vector<const lay::PluginDeclaration *> > &names)
 {
+  std::set<std::string> names_seen;
+
   auto reg = tl::Registrar<lay::EditorOptionsPageFactoryBase>::get_instance ();
   for (auto i = reg->begin (); i != reg->end (); ++i) {
-    lay::EditorOptionsPage *page = 0;
-    if (i->plugin_name ().empty ()) {
-      page = i->create_page (view, dispatcher);
+    auto n = names.find (i->name ());
+    if (n != names.end ()) {
+      names_seen.insert (i->name ());
+      lay::EditorOptionsPage *page = i->create_page (view, dispatcher);
       if (page) {
+        page->set_plugin_declarations (n->second);
         pages.push_back (page);
       }
+    }
+  }
+
+  for (auto i = names.begin (); i != names.end (); ++i) {
+    if (names_seen.find (i->first) == names_seen.end ()) {
+      tl::warn << tl::to_string (tr ("Cannot find additional editor options page: ")) << i->first;
     }
   }
 }

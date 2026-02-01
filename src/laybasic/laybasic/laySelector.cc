@@ -332,11 +332,6 @@ public:
   {
     return new SelectionService (view);
   }
-
-  virtual bool enable_catchall_editor_options_pages () const
-  {
-    return false;
-  }
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> selection_service_decl (new SelectionServiceDeclaration (), -980, "laybasic::SelectionServicePlugin");

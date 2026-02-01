@@ -54,6 +54,8 @@ public:
   virtual void uninitialize (lay::Dispatcher *);
   virtual bool menu_activated (const std::string &symbol) const;
 
+  virtual std::vector<std::string> additional_editor_options_pages () const;
+
   void register_annotation_template (const ant::Template &t, lay::Plugin *plugin = 0);
   void unregister_annotation_template (const std::string &category, lay::Plugin *plugin = 0);
 

@@ -867,6 +867,11 @@ LayoutView *LayoutView::current ()
 void LayoutView::create_plugins (const lay::PluginDeclaration *except_this)
 {
   LayoutViewBase::create_plugins (except_this);
+
+  if (mp_editor_options_frame) {
+    mp_editor_options_frame->populate (this);
+  }
+
   dm_setup_editor_option_pages ();
 }
 

@@ -462,6 +462,14 @@ public:
   {
     return new MoveService (view);
   }
+
+  virtual std::vector<std::string> additional_editor_options_pages () const
+  {
+    std::vector<std::string> names;
+    //  TODO: provide in a central place instead of borrowing from the edt module
+    names.push_back ("GenericEditorOptions");
+    return names;
+  }
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> move_service_decl (new MoveServiceDeclaration (), -970, "laybasic::MoveServicePlugin");

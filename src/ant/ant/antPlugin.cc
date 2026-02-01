@@ -138,6 +138,15 @@ PluginDeclaration::create_plugin (db::Manager *manager, lay::Dispatcher *, lay::
   return new ant::Service (manager, view);
 }
 
+std::vector<std::string>
+PluginDeclaration::additional_editor_options_pages () const
+{
+  std::vector<std::string> names;
+  //  TODO: provide in a central place instead of borrowing from the edt module
+  names.push_back ("GenericEditorOptions");
+  return names;
+}
+
 bool 
 PluginDeclaration::menu_activated (const std::string &symbol) const
 {

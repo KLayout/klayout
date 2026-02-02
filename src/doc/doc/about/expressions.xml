@@ -4,8 +4,8 @@
 <doc>
 
   <title>About Expressions</title>
-  <keyword>Expressions</keyword>
-  <keyword>Expression Syntax</keyword>
+  <keyword name="Expressions"/>
+  <keyword name="Expression Syntax"/>
 
   <p>
   Beside a ruby and Python programming API, KLayout provides support for simple expressions in some places.

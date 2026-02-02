@@ -4,8 +4,8 @@
 <doc>
 
   <title>About Libraries</title>
-  <keyword>Library</keyword>
-  <keyword>Libraries</keyword>
+  <keyword name="Library"/>
+  <keyword name="Libraries"/>
 
   <p>
   Starting with version 0.22, KLayout offers a library concept. 

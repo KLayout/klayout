@@ -162,14 +162,28 @@ EditorOptionsPages::activate (const lay::Plugin *plugin)
 {
   m_update_enabled = false;
 
+  lay::EditorOptionsPage *page = 0;
+
   for (auto op = m_pages.begin (); op != m_pages.end (); ++op) {
+
     BEGIN_PROTECTED
-    op->activate (plugin && op->for_plugin_declaration (plugin->plugin_declaration ()));
+
+    bool is_active = plugin && op->for_plugin_declaration (plugin->plugin_declaration ());
+
+    //  The zero order page is picked as the initial one
+    if (is_active && ! op->active () && op->order () == 0 && page == 0) {
+      page = op.operator-> ();
+    }
+
+    op->activate (is_active);
+
     END_PROTECTED
+
   }
 
   m_update_enabled = true;
-  update (0);
+
+  update (page);
 }
 
 void  

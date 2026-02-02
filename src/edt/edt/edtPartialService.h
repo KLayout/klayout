@@ -235,6 +235,11 @@ public:
   virtual bool mouse_release_event (const db::DPoint &p, unsigned int buttons, bool prio);
 
   /**
+   *  @brief Key handling event
+   */
+  virtual bool key_event (unsigned int key, unsigned int buttons);
+
+  /**
    *  @brief Transforms the selection
    *
    *  Currently only displacements are allowed which basically moves the partial selection 

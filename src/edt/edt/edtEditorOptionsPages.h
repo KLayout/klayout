@@ -76,7 +76,7 @@ public:
   ~EditorOptionsGeneric ();
 
   virtual std::string title () const;
-  virtual int order () const { return 0; }
+  virtual int order () const { return -10; }
   void apply (lay::Dispatcher *root);
   void setup (lay::Dispatcher *root);
 
@@ -99,7 +99,7 @@ public:
   ~EditorOptionsText ();
 
   virtual std::string title () const;
-  virtual int order () const { return 10; }
+  virtual int order () const { return 0; }
   void apply (lay::Dispatcher *root);
   void setup (lay::Dispatcher *root);
 
@@ -120,7 +120,7 @@ public:
   ~EditorOptionsPath ();
 
   virtual std::string title () const;
-  virtual int order () const { return 30; }
+  virtual int order () const { return 0; }
   void apply (lay::Dispatcher *root);
   void setup (lay::Dispatcher *root);
 
@@ -144,7 +144,7 @@ public:
   ~EditorOptionsInst ();
 
   virtual std::string title () const;
-  virtual int order () const { return 20; }
+  virtual int order () const { return 0; }
   void apply (lay::Dispatcher *root);
   void setup (lay::Dispatcher *root);
 
@@ -176,7 +176,7 @@ public:
   ~EditorOptionsInstPCellParam ();
 
   virtual std::string title () const;
-  virtual int order () const { return 21; }
+  virtual int order () const { return 1; }
   void apply (lay::Dispatcher *root);
   void setup (lay::Dispatcher *root);
 
@@ -207,7 +207,7 @@ public:
   ~BoxToolboxWidget ();
 
   virtual std::string title () const;
-  virtual int order () const { return 0; }
+  virtual int order () const { return 200; }
   virtual void configure (const std::string &name, const std::string &value);
   virtual void commit (lay::Dispatcher *root);
   virtual void deactivated ();
@@ -218,7 +218,7 @@ private:
 };
 
 /**
- *  @brief The toolbox widget for connections (path, polygon edges)
+ *  @brief The toolbox widget for connections (polygon edges)
  */
 class ConnectionToolboxWidget
   : public lay::EditorOptionsPageWidget
@@ -230,7 +230,7 @@ public:
   ~ConnectionToolboxWidget ();
 
   virtual std::string title () const;
-  virtual int order () const { return 0; }
+  virtual int order () const { return 200; }
   virtual void configure (const std::string &name, const std::string &value);
   virtual void commit (lay::Dispatcher *root);
   virtual void deactivated ();
@@ -238,6 +238,54 @@ public:
 private:
   QHBoxLayout *mp_layout;
   lay::DecoratedLineEdit *mp_x_le, *mp_y_le;
+  bool m_in_commit;
+};
+
+/**
+ *  @brief The toolbox widget for connections (path segments)
+ */
+class PathConnectionToolboxWidget
+  : public lay::EditorOptionsPageWidget
+{
+Q_OBJECT
+
+public:
+  PathConnectionToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  ~PathConnectionToolboxWidget ();
+
+  virtual std::string title () const;
+  virtual int order () const { return 200; }
+  virtual void configure (const std::string &name, const std::string &value);
+  virtual void commit (lay::Dispatcher *root);
+  virtual void deactivated ();
+
+private:
+  QHBoxLayout *mp_layout;
+  lay::DecoratedLineEdit *mp_x_le, *mp_y_le, *mp_width;
+  bool m_in_commit;
+};
+
+/**
+ *  @brief The toolbox widget for texts
+ */
+class TextToolboxWidget
+  : public lay::EditorOptionsPageWidget
+{
+Q_OBJECT
+
+public:
+  TextToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  ~TextToolboxWidget ();
+
+  virtual std::string title () const;
+  virtual int order () const { return 200; }
+  virtual void configure (const std::string &name, const std::string &value);
+  virtual void commit (lay::Dispatcher *root);
+  virtual void deactivated ();
+
+private:
+  QHBoxLayout *mp_layout;
+  lay::DecoratedLineEdit *mp_text;
   bool m_in_commit;
 };
 

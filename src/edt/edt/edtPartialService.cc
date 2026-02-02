@@ -2284,6 +2284,17 @@ PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, 
 }
 
 bool
+PartialService::key_event (unsigned int key, unsigned int buttons)
+{
+  if (m_moving && buttons == 0 && (key == lay::KeyEnter || key == lay::KeyReturn)) {
+    mp_view->move_service ()->end_move ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool
 PartialService::begin_move (MoveMode mode, const db::DPoint &p, lay::angle_constraint_type ac)
 {
   if (has_selection () && mode == lay::Editable::Selected) {

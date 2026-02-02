@@ -729,6 +729,11 @@ PathService::pop_segment ()
 bool 
 PathService::configure (const std::string &name, const std::string &value)
 {
+  auto tb = toolbox_widget ();
+  if (tb) {
+    tb->configure (name, value);
+  }
+
   if (name == cfg_edit_path_width) {
     tl::from_string (value, m_width);
     m_needs_update = true;

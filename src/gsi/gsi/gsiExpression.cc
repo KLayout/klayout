@@ -553,8 +553,12 @@ VariantUserClassImpl::execute (const tl::ExpressionParserContext &context, tl::V
     bool ret = false;
     if (args [0].is_user ()) {
       const tl::VariantUserClassBase *ub = args [0].user_cls ();
-      if (ub && ub->gsi_cls () == mp_cls) {
-        ret = true;
+      if (ub) {
+        const gsi::ClassBase *ub_gsi = ub->gsi_cls ();
+        const gsi::ClassBase *cls = mp_cls;
+        while (cls && ! (ret = (ub_gsi == cls))) {
+          cls = cls->base ();
+        }
       }
     }
 

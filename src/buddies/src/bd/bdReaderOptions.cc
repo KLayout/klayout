@@ -121,7 +121,17 @@ GenericReaderOptions::GenericReaderOptions ()
   m_lefdef_read_lef_with_def = load_options.get_option_by_name ("lefdef_config.read_lef_with_def").to_bool ();
   m_lefdef_separate_groups = load_options.get_option_by_name ("lefdef_config.separate_groups").to_bool ();
   m_lefdef_joined_paths = load_options.get_option_by_name ("lefdef_config.joined_paths").to_bool ();
-  m_lefdef_map_file = load_options.get_option_by_name ("lefdef_config.map_file").to_string ();
+
+  tl::Variant map_files = load_options.get_option_by_name ("lefdef_config.map_file").to_string ();
+  m_lefdef_map_files.clear ();
+  if (map_files.is_list ()) {
+    for (tl::Variant::const_iterator i = map_files.begin (); i != map_files.end (); ++i) {
+      m_lefdef_map_files.push_back (i->to_string ());
+    }
+  } else if (! map_files.is_nil ()) {
+    m_lefdef_map_files.push_back (map_files.to_string ());
+  }
+
   //  Don't take the default, as in practice, it's more common to substitute LEF macros by layouts
   //  m_lefdef_macro_resolution_mode = load_options.get_option_by_name ("lefdef_config.macro_resolution_mode").to_int ();
   m_lefdef_macro_resolution_mode = 2;  // "assume FOREIGN always"
@@ -613,7 +623,7 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
                    )
         << tl::arg (group +
-                    "--" + m_long_prefix + "lefdef-map", &m_lefdef_map_file, "Specifies to use a layer map file",
+                    "--" + m_long_prefix + "lefdef-map", &m_lefdef_map_files, "Specifies to use a layer map file",
                     "Use this option to turn off pattern-based layer mapping and to use an explicit mapping file instead. "
                     "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the pattern-based mapping scheme.\n"
                     "\n"
@@ -642,7 +652,7 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "\n"
                     "If a map file is used, only the layers present in the map file are generated. No other layers are produced.\n"
                     "\n"
-                    "Multiple map files can be given, separated by '+' or ','. In that case, these files are concatenated."
+                    "This option can be given multiple times. The corresponing map files are merged."
                    )
         << tl::arg (group +
                     "!--" + m_long_prefix + "lefdef-macro-resolution-mode", &m_lefdef_macro_resolution_mode, "Specify how to generate layout from LEF macros",
@@ -807,7 +817,7 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
   load_options.set_option_by_name ("lefdef_config.read_lef_with_def", m_lefdef_read_lef_with_def);
   load_options.set_option_by_name ("lefdef_config.separate_groups", m_lefdef_separate_groups);
   load_options.set_option_by_name ("lefdef_config.joined_paths", m_lefdef_joined_paths);
-  load_options.set_option_by_name ("lefdef_config.map_file", m_lefdef_map_file);
+  load_options.set_option_by_name ("lefdef_config.map_file", m_lefdef_map_files);
   load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_macro_resolution_mode);
   load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_macro_resolution_mode);
   load_options.set_option_by_name ("lefdef_config.paths_relative_to_cwd", true);

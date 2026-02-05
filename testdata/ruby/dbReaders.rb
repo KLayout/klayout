@@ -370,9 +370,15 @@ class DBReaders_TestClass < TestBase
     conf.separate_groups = true
     assert_equal(conf.separate_groups, true)
 
-    assert_equal(conf.map_file, "")
+    assert_equal(conf.map_file, nil)
     conf.map_file = "xyz.map"
     assert_equal(conf.map_file, "xyz.map")
+    conf.map_file = nil
+    assert_equal(conf.map_file, nil)
+    conf.map_file = ""
+    assert_equal(conf.map_file, nil)
+    conf.map_file = [ "abc.map", "uvw.map" ]
+    assert_equal(conf.map_file, [ "abc.map", "uvw.map" ])
 
     assert_equal(conf.lef_files.join(","), "")
     conf.lef_files = [ "u.lef", "v.lef" ]

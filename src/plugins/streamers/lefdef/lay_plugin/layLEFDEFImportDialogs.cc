@@ -523,7 +523,7 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_separate_groups (separate_groups->isChecked ());
   data->set_joined_paths (joined_paths->isChecked ());
   data->set_read_lef_with_def (read_lef_with_def->isChecked ());
-  data->set_map_file (tl::to_string (mapfile_path->text ()));
+  data->set_single_map_file (tl::to_string (mapfile_path->text ()));
   data->set_macro_resolution_mode (macro_resolution_mode->currentIndex ());
 
   data->clear_lef_files ();
@@ -598,8 +598,8 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   separate_groups->setChecked (data->separate_groups ());
   joined_paths->setChecked (data->joined_paths ());
   read_lef_with_def->setChecked (data->read_lef_with_def ());
-  mapfile_path->setText (tl::to_qstring (data->map_file ()));
-  layer_map_mode->setCurrentIndex (data->map_file ().empty () ? 1 : 0);
+  mapfile_path->setText (tl::to_qstring (data->single_map_file ()));
+  layer_map_mode->setCurrentIndex (data->single_map_file ().empty () ? 1 : 0);
   macro_resolution_mode->setCurrentIndex (data->macro_resolution_mode ());
 
   checkbox_changed ();

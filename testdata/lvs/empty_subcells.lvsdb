@@ -68,12 +68,12 @@ layout(
   rect((100 10) (340 80))
 
   # Nets with their geometries
-  net(1
+  net(1 name($1)
    rect(l1 (180 60) (90 30))
    rect(l2 (-160 -20) (90 10))
    rect(l2 (40 -10) (180 10))
   )
-  net(2
+  net(2 name($2)
    rect(l1 (180 10) (90 30))
    rect(l2 (-160 -20) (90 10))
    rect(l2 (40 -10) (180 10))

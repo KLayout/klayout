@@ -105,6 +105,16 @@ TEST(1_Basic)
     EXPECT_EQ (l2s (l2), "17,42");
     l2.pop_front ();
     EXPECT_EQ (l2s (l2), "42");
+    l2.push_front (MyClass1 (11));
+    EXPECT_EQ (l2s (l2), "11,42");
+    l2.erase_after (l2.begin ());
+    EXPECT_EQ (l2s (l2), "11");
+    l2.erase_after (l2.begin ());  //  ignored
+    EXPECT_EQ (l2s (l2), "11");
+    l2.pop_front ();
+    EXPECT_EQ (l2s (l2), "");
+    EXPECT_EQ (l2.empty (), true);
+    l2.push_front (MyClass1 (42));
 
     l3.push_back (MyClass1 (2));
     l3.push_front (MyClass1 (1));

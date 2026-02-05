@@ -11,7 +11,7 @@ trigger:
 jobs:
 - job: Build
   pool:
-    vmImage: 'windows-2019' # other options: 'macOS-10.13', 'ubuntu-16.04'
+    vmImage: 'windows-2022' # other options: 'macOS-10.13', 'ubuntu-16.04'
   strategy:
     matrix:
       cp36-cp36m-win_amd64.whl:
@@ -38,6 +38,9 @@ jobs:
       cp313-cp313-win_amd64.whl:
         python.version: '3.13'
         python.architecture: 'x64'
+      cp314-cp314-win_amd64.whl:
+        python.version: '3.14'
+        python.architecture: 'x64'
       cp36-cp36m-win32.whl:
         python.version: '3.6'
         python.architecture: 'x86'
@@ -61,6 +64,9 @@ jobs:
         python.architecture: 'x86'
       cp313-cp313-win32.whl:
         python.version: '3.13'
+        python.architecture: 'x86'
+      cp314-cp314-win32.whl:
+        python.version: '3.14'
         python.architecture: 'x86'
     maxParallel: 6
 

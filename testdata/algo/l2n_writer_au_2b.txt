@@ -113,7 +113,7 @@ circuit(INV2
  rect((-1700 -1640) (3100 6220))
 
  # Nets with their geometries
- net(1
+ net(1 name($1)
   rect(nwell (-1400 1800) (2800 2780))
   rect(diff_cont (-1510 -650) (220 220))
   rect(ntie (-510 -450) (800 680))
@@ -126,7 +126,7 @@ circuit(INV2
   rect(poly_lbl (-525 -1800) (0 0))
   rect(poly_cont (-830 -110) (220 220))
  )
- net(3
+ net(3 name($3)
   rect(poly (275 -250) (250 2500))
   rect(poly (-305 -1430) (360 360))
   rect(poly (-305 820) (250 1600))
@@ -257,14 +257,14 @@ circuit(INV2PAIR
 
  # Nets with their geometries
  net(1 name(BULK))
- net(2)
- net(3)
- net(4)
- net(5)
- net(6)
- net(7)
- net(8)
- net(9)
+ net(2 name($I8))
+ net(3 name($I7))
+ net(4 name($I6))
+ net(5 name($I5))
+ net(6 name($I4))
+ net(7 name($I3))
+ net(8 name($I2))
+ net(9 name($I1))
 
  # Outgoing pins and their connections to nets
  pin(1 name(BULK))
@@ -340,14 +340,14 @@ circuit(RINGO
   rect(metal1 (2280 -1120) (360 1120))
   rect(metal2_lbl (-23940 300) (0 0))
  )
- net(5)
- net(6)
- net(7)
- net(8)
- net(9)
- net(10)
- net(11)
- net(12)
+ net(5 name($I25))
+ net(6 name($I24))
+ net(7 name($I23))
+ net(8 name($I22))
+ net(9 name($I17))
+ net(10 name($I11))
+ net(11 name($I10))
+ net(12 name($I9))
 
  # Outgoing pins and their connections to nets
  pin(1 name(FB))

@@ -385,10 +385,129 @@ public:
 
   virtual void execute (const tl::ExpressionParserContext &context, tl::Variant & /*out*/, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
-    if (args.size () != 1) {
-      throw tl::EvalError (tl::to_string (tr ("'skip' function takes one argument (flag)")), context);
+    bool flag = true;
+    if (args.size () > 1) {
+      throw tl::EvalError (tl::to_string (tr ("'skip' function takes one optional argument (flag)")), context);
+    } else if (args.size () == 1) {
+      flag = args [0].to_bool ();
     }
-    mp_eval->skip_func (args [0].to_bool ());
+
+    std::vector<unsigned int> layers;
+    if (! flag && ! mp_eval->layer_indexes ().empty ()) {
+      layers.push_back (0);
+    }
+    mp_eval->copy_func (layers, true, std::numeric_limits<size_t>::max ());
+  }
+
+private:
+  MeasureNetEval *mp_eval;
+};
+
+/**
+ *  @brief A function to specify the copy behaviour
+ *
+ *  With the copy behavior, the polygons emitted by the "evaluate_nets" method
+ *  are specified. The function accepts up to one positional argument and
+ *  three optional keyword arguments (limit, layers and merged).
+ *  Together with "skip", it maps to the following behavior:
+ *
+ *  skip()                    -> copy(layers=[])
+ *  skip(true)                -> copy(layers=[])
+ *  skip(false)               -> copy(layers=[primary], merged=true, limit=unlimited)
+ *  copy()                    -> copy(layers=[all], merged=true, limit=unlimited)
+ *  copy(false)               -> copy(layers=[])
+ *  copy(true)                -> copy(layers=[all], merged=true, limit=unlimited)
+ *  copy(true, merged=m)      -> copy(layers=[all], merged=m, limit=unlimited)
+ *  copy(layers=l)            -> copy(layers=[l], merged=true, limit=unlimited)  (l is a layer symbol)
+ *  copy(layers=[l])          -> copy(layers=[l], merged=true, limit=unlimited)  ([l] is an array of layer symbols)
+ *  copy(layers=.., merged=m) -> copy(layers=.., merged=m, limit=unlimited)
+ *  copy(layers=.., merged=.., limit=n) -> copy(layers=.., merged=.., limit=n)
+ *
+ *  The primary layer is "0", so "skip(false)" is identical to "copy(layer=0)"
+ */
+
+class NetCopyFunction
+  : public tl::EvalFunction
+{
+public:
+  NetCopyFunction (MeasureNetEval *eval)
+    : mp_eval (eval)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual bool supports_keyword_parameters () const { return true; }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant & /*out*/, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
+  {
+    bool flag = true;
+    size_t limit = std::numeric_limits<size_t>::max ();
+    std::vector<unsigned int> layers;
+    bool merged = true;
+
+    if (args.size () > 1) {
+      throw tl::EvalError (tl::to_string (tr ("'copy' function takes one optional argument (flag) and the following keyword arguments: 'limit', 'layers', 'layer' or 'merged'")), context);
+    } else if (args.size () == 1) {
+      flag = args [0].to_bool ();
+    }
+
+    //  default for "layers" is 'all'
+    for (unsigned int i = 0; i < (unsigned int) mp_eval->layer_indexes ().size (); ++i) {
+      layers.push_back (i);
+    }
+
+    if (kwargs) {
+      for (auto k = kwargs->begin (); k != kwargs->end (); ++k) {
+        if (k->first == "limit") {
+          limit = k->second.to<size_t> ();
+        } else if (k->first == "merged") {
+          merged = k->second.to_bool ();
+        } else if (k->first == "layers") {
+          const tl::Variant &v = k->second;
+          if (! v.is_list ()) {
+            throw tl::EvalError (tl::to_string (tr ("'copy' function's 'layers' keyword argument expects an array of layer symbols")), context);
+          }
+          layers.clear ();
+          for (auto l = v.begin (); l != v.end (); ++l) {
+            layers.push_back (l->to_uint ());
+          }
+        } else if (k->first == "layer") {
+          layers.clear ();
+          layers.push_back (k->second.to_uint ());
+        } else {
+          throw tl::EvalError (tl::to_string (tr ("'copy' function takes one optional argument (flag) and the following keyword arguments: 'limit', 'layers', 'layer' or 'merged'")), context);
+        }
+      }
+    }
+
+    if (! flag) {
+      //  clear layers to indicate we don't want to copy
+      layers.clear ();
+    }
+
+    mp_eval->copy_func (layers, merged, limit);
+  }
+
+private:
+  MeasureNetEval *mp_eval;
+};
+
+class NetDbFunction
+  : public tl::EvalFunction
+{
+public:
+  NetDbFunction (MeasureNetEval *eval)
+    : mp_eval (eval)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+  {
+    if (args.size () != 0) {
+      throw tl::EvalError (tl::to_string (tr ("'db' function does not take any argument")), context);
+    }
+    out = mp_eval->db_func ();
   }
 
 private:
@@ -461,10 +580,11 @@ private:
   MeasureNetEval *mp_eval;
 };
 
-MeasureNetEval::MeasureNetEval (const db::LayoutToNetlist *l2n, double dbu)
+MeasureNetEval::MeasureNetEval (LayoutToNetlist *l2n, double dbu)
   : tl::Eval (), mp_l2n (l2n), m_dbu (dbu)
 {
-  //  .. nothing yet ..
+  m_copy_merge = false;
+  m_copy_max_polygons = std::numeric_limits<size_t>::max ();
 }
 
 void
@@ -486,15 +606,24 @@ MeasureNetEval::init ()
 {
   define_function ("put", new NetPutFunction (this));
   define_function ("skip", new NetSkipFunction (this));
+  define_function ("copy", new NetCopyFunction (this));
   define_function ("area", new NetAreaFunction (this));
   define_function ("perimeter", new NetPerimeterFunction (this));
   define_function ("net", new NetFunction (this));
+  define_function ("db", new NetDbFunction (this));
 }
 
 void
 MeasureNetEval::reset (db::cell_index_type cell_index, size_t cluster_id) const
 {
-  m_skip = false;
+  //  default action: copy primary layer, merged, no limit
+  m_copy_layers.clear ();
+  if (! m_layers.empty ()) {
+    m_copy_layers.push_back (m_layers.front ());
+  }
+  m_copy_merge = true;
+  m_copy_max_polygons = std::numeric_limits<size_t>::max ();
+
   m_cell_index = cell_index;
   m_cluster_id = cluster_id;
   m_area_and_perimeter_cache.clear ();
@@ -553,9 +682,18 @@ MeasureNetEval::perimeter_func (int layer_index) const
 }
 
 void
-MeasureNetEval::skip_func (bool f) const
+MeasureNetEval::copy_func (const std::vector<unsigned int> &layer_indexes, bool merge, size_t max_polygons) const
 {
-  m_skip = f;
+  m_copy_layers.clear ();
+  m_copy_layers.reserve (layer_indexes.size ());
+  for (auto l = layer_indexes.begin (); l != layer_indexes.end (); ++l) {
+    if (size_t (*l) < m_layers.size ()) {
+      m_copy_layers.push_back (m_layers [*l]);
+    }
+  }
+
+  m_copy_merge = merge;
+  m_copy_max_polygons = max_polygons;
 }
 
 tl::Variant
@@ -584,6 +722,12 @@ MeasureNetEval::net_func () const
   } else {
     return tl::Variant ();
   }
+}
+
+tl::Variant
+MeasureNetEval::db_func () const
+{
+  return tl::Variant::make_variant_ref (mp_l2n);
 }
 
 }

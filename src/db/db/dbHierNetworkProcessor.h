@@ -844,6 +844,12 @@ public:
     //  .. nothing yet ..
   }
 
+  ClusterInstance (size_t id, const db::ClusterInstElement &inst_element)
+    : ClusterInstElement (inst_element), m_id (id)
+  {
+    //  .. nothing yet ..
+  }
+
   ClusterInstance (size_t id)
     : ClusterInstElement (), m_id (id)
   {
@@ -1254,6 +1260,11 @@ public:
    *  @brief Adds a connection between a local cluster and one from a child instance
    */
   void add_connection (typename local_cluster<T>::id_type, const ClusterInstance &inst);
+
+  /**
+   *  @brief Changes the cluster ID of the connection
+   */
+  void rename_connection (const ClusterInstance &inst, typename local_cluster<T>::id_type to_id);
 
   /**
    *  @brief Joins the cluster id with the cluster with_id

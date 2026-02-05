@@ -216,7 +216,7 @@ layout(
   rect((-100 400) (5600 7600))
 
   # Nets with their geometries
-  net(1
+  net(1 name($1)
    rect(l11 (3100 2950) (950 300))
   )
   net(2 name(A)
@@ -226,8 +226,8 @@ layout(
    rect(l11 (2400 3100) (0 0))
   )
   net(4 name(SUBSTRATE))
-  net(5)
-  net(6)
+  net(5 name($I3))
+  net(6 name($I1))
 
   # Outgoing pins and their connections to nets
   pin(2 name(A))

@@ -355,8 +355,14 @@ It visits each net and evaluates the given expression on the net.
 The expression needs to be written in KLayout expression notations.
 </p><p>
 The default action is to copy the shapes of the primary layer to the
-output. This action can be modified in some ways: skip shapes of
-certain nets or attach properties to the shapes during the evaluation.
+output. It is possible to customize the output further: you can 
+conditionally skip the output or copy all shapes of the net from
+all layers the output. You can choose to emit individual polygons
+or merge all polygons from a net (all layers or a subset) into
+a single polygon. The latter is the default.
+</p><p>
+You can also choose to emit the bounding box of the net if the number of polygons
+on the net exceeds a certain limit.
 </p><p>
 Using the "put" function inside the expression, properties can be 
 attached to the output shapes. The properties can be computed using
@@ -365,9 +371,6 @@ a number of net attributes - area and perimeter for example.
 Also the <class_doc href="Net">Net</class_doc> object representing the net is available through the
 'net' function. This allows implementing a more elaborate
 antenna check for example.
-</p><p>
-Also, the expression can choose to drop shapes and not copy them to 
-the output by calling the "skip" function with a "true" argument.
 </p><p>
 Arbitrary values can be passed as variables, which removes the need
 to encode variable values into the expression. For this, use the 
@@ -379,7 +382,8 @@ The following functions are available inside the expressions:
 </p><p>
 <ul>
 <li>"net" - the <class_doc href="Net">Net</class_doc> object of the current net </li>
-<li>"skip(flag)" - if called with a 'true' argument, the primary layer's shapes are not copied for this net </li>
+<li>"skip" or "skip(flag)" - if called with a 'true' argument (the default), the primary layer's shapes are not copied for this net </li>
+<li>"copy(...)" - configures polygon output in a more elaborate way than "skip" (see below) </li>
 <li>"put(name, value)" - places the value as a property with name 'name' (this must be a string) on the output shapes </li>
 <li>"area" - the combined area of the primary layer's shapes on the net in square micrometer units </li>
 <li>"area(symbol)" - the combined area of the secondary layer's shapes on the net in square micrometer units </li>
@@ -389,6 +393,46 @@ The following functions are available inside the expressions:
 </p><p>
 Here, 'symbol' is the name given to the secondary layer in the secondary layer
 dictionary.
+</p><p>
+"copy" and "skip" control the polygon output. Here are the options:
+</p><p>
+<ul>
+<li>"skip" or "skip(true): skip output, identical to "copy(layers=[])" </li>
+<li>"skip(false)": copy the shapes from the primary layer, identical to "copy(layer=0)" </li>
+<li>"copy" or "copy(true)": copy all shapes from the net, merged into a single polygon.
+Note: this is not equivalent to "skip(false)", as in the latter case, only the primary layer's
+shapes are copied </li>
+<li>"copy(false)": equivalent to "skip(true)" </li>
+<li>"copy(merged=false)": copies all shapes from all layers of the net, without merging.
+"merged" is a keyword argument that can be combined with other arguments. </li>
+<li>"copy(limit=number)": if the net has less than "number" polygons on the selected layers, 
+copy them to the output. For more polygons, emit the bounding box of the net for the 
+given layers.
+"limit" is a keyword argument that can be combined with other arguments. </li>
+<li>"copy(layer=symbol)": copies all shapes from the layer denoted by the symbol.
+The primary layer has value zero (0), so "copy(layer=0)" copies the shapes from the primary layer.
+"layer" is a keyword argument that can be combined with other arguments, except "layers". </li>
+<li>"copy(layers=[symbol, symbol, ...])": copies all shapes from the layers denoted by the symbols.
+"layers" is a keyword argument that can be combined with other arguments, except "layer". </li>
+</ul>
+</p><p>
+When mixing "skip" and "copy", the last active specification controls the output. The following
+expressions are equivalent:
+</p><p>
+<pre>
+copy(net.name == "VDD")
+</pre>
+</p><p>
+and
+</p><p>
+<pre>
+skip ; net.name == "VDD" &amp;&amp; copy
+</pre>
+</p><p>
+where the second expression establishes "skip" as the default and conditionally executes "copy", 
+overriding "skip".
+</p><p>
+<h4>Antenna check example </h4>
 </p><p>
 The following example emulates an antenna check. It computes the area ratio of metal vs. gate area and 
 attaches the value as a property with name 'AR' to the shapes, copied from the 'gate' layer:

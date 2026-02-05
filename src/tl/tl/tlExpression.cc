@@ -3993,9 +3993,20 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> 
 
           do {
 
-            std::unique_ptr<ExpressionNode> v;
-            eval_top (ex, v);
-            n->add_child (v.release ());
+            tl::Extractor exn = ex;
+            std::string name;
+            if (exn.try_read_word (name, "_") && exn.test ("=")) {
+              //  keyword parameter -> read name again to skip it
+              ex.read_word (name, "_");
+              ex.expect ("=");
+            } else {
+              name.clear ();
+            }
+
+            std::unique_ptr<ExpressionNode> a;
+            eval_assign (ex, a);
+            a->set_name (name);
+            n->add_child (a.release ());
 
             if (ex.test (")")) {
               break;

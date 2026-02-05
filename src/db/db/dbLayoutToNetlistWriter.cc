@@ -211,6 +211,10 @@ void std_writer_impl<Keys>::write_log_entry (TokenizedOutput &stream, const LogE
     TokenizedOutput (stream, Keys::cell_key, true) << tl::to_word_or_quoted_string (le.cell_name ());
   }
 
+  if (! le.net_name ().empty ()) {
+    TokenizedOutput (stream, Keys::net_key, true) << tl::to_word_or_quoted_string (le.net_name ());
+  }
+
   if (! le.category_name ().empty ()) {
     TokenizedOutput o (stream, Keys::cat_key, true);
     o << tl::to_word_or_quoted_string (le.category_name ());
@@ -708,11 +712,8 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Net &net, 
             outp.reset (new TokenizedOutput (stream, Keys::net_key));
 
             *outp << tl::to_string (id);
-            if (! net.name ().empty ()) {
-              TokenizedOutput (*outp, Keys::name_key, true) << tl::to_word_or_quoted_string (net.name ());
-            } else if (net.id () != id) {
-              TokenizedOutput (*outp, Keys::name_key, true) << tl::to_word_or_quoted_string (net.expanded_name ());
-            }
+            //  NOTE: we always write the expanded name, so we can refer to it in log entries
+            TokenizedOutput (*outp, Keys::name_key, true) << tl::to_word_or_quoted_string (net.expanded_name ());
 
             *outp << endl;
 
@@ -740,11 +741,10 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Net &net, 
   if (! outp) {
 
     outp.reset (new TokenizedOutput (stream, Keys::net_key));
-    *outp << tl::to_string (id);
 
-    if (! net.name ().empty ()) {
-      TokenizedOutput (*outp, Keys::name_key, true) << tl::to_word_or_quoted_string (net.name ());
-    }
+    *outp << tl::to_string (id);
+    //  NOTE: we always write the expanded name, so we can refer to it in log entries
+    TokenizedOutput (*outp, Keys::name_key, true) << tl::to_word_or_quoted_string (net.expanded_name ());
 
     if (net.begin_properties () != net.end_properties ()) {
       *outp << endl;

@@ -780,9 +780,15 @@ module DRC
     # The expression needs to be written in KLayout expression notations.
     #
     # The default action is to copy the shapes of the primary layer to the
-    # output. This action can be modified in some ways: skip shapes of
-    # certain nets or attach properties to the shapes during the evaluation.
-    #
+    # output. It is possible to customize the output further: you can 
+    # conditionally skip the output or copy all shapes of the net from
+    # all layers the output. You can choose to emit individual polygons
+    # or merge all polygons from a net (all layers or a subset) into
+    # a single polygon. The latter is the default.
+    # 
+    # You can also choose to emit the bounding box of the net if the number of polygons
+    # on the net exceeds a certain limit.
+    # 
     # Using the "put" function inside the expression, properties can be 
     # attached to the output shapes. The properties can be computed using
     # a number of net attributes - area and perimeter for example.
@@ -790,9 +796,6 @@ module DRC
     # Also the RBA::Net object representing the net is available through the
     # 'net' function. This allows implementing a more elaborate
     # antenna check for example.
-    #
-    # Also, the expression can choose to drop shapes and not copy them to 
-    # the output by calling the "skip" function with a "true" argument.
     #
     # Arbitrary values can be passed as variables, which removes the need
     # to encode variable values into the expression. For this, use the 
@@ -804,7 +807,9 @@ module DRC
     #
     # @ul
     # @li "net" - the RBA::Net object of the current net @/li
-    # @li "skip(flag)" - if called with a 'true' argument, the primary layer's shapes are not copied for this net @/li
+    # @li "db" - the RBA::LayoutToNetlist object the netlist lives in @/li
+    # @li "skip" or "skip(flag)" - if called with a 'true' argument (the default), the primary layer's shapes are not copied for this net @/li
+    # @li "copy(...)" - configures polygon output in a more elaborate way than "skip" (see below) @/li
     # @li "put(name, value)" - places the value as a property with name 'name' (this must be a string) on the output shapes @/li
     # @li "area" - the combined area of the primary layer's shapes on the net in square micrometer units @/li
     # @li "area(symbol)" - the combined area of the secondary layer's shapes on the net in square micrometer units @/li
@@ -814,6 +819,46 @@ module DRC
     #
     # Here, 'symbol' is the name given to the secondary layer in the secondary layer
     # dictionary.
+    #
+    # "copy" and "skip" control the polygon output. Here are the options:
+    #
+    # @ul
+    # @li "skip" or "skip(true): skip output, identical to "copy(layers=[])" @/li
+    # @li "skip(false)": copy the shapes from the primary layer, identical to "copy(layer=0)" @/li
+    # @li "copy" or "copy(true)": copy all shapes from the net, merged into a single polygon.
+    #     Note: this is not equivalent to "skip(false)", as in the latter case, only the primary layer's
+    #     shapes are copied @/li
+    # @li "copy(false)": equivalent to "skip(true)" @/li
+    # @li "copy(merged=false)": copies all shapes from all layers of the net, without merging.
+    #     "merged" is a keyword argument that can be combined with other arguments. @/li
+    # @li "copy(limit=number)": if the net has less than "number" polygons on the selected layers, 
+    #     copy them to the output. For more polygons, emit the bounding box of the net for the 
+    #     given layers.
+    #     "limit" is a keyword argument that can be combined with other arguments. @/li
+    # @li "copy(layer=symbol)": copies all shapes from the layer denoted by the symbol.
+    #     The primary layer has value zero (0), so "copy(layer=0)" copies the shapes from the primary layer.
+    #     "layer" is a keyword argument that can be combined with other arguments, except "layers". @/li
+    # @li "copy(layers=[symbol, symbol, ...])": copies all shapes from the layers denoted by the symbols.
+    #     "layers" is a keyword argument that can be combined with other arguments, except "layer". @/li
+    # @/ul
+    #
+    # When mixing "skip" and "copy", the last active specification controls the output. The following
+    # expressions are equivalent:
+    #
+    # @code
+    # copy(net.name == "VDD")
+    # @/code
+    #
+    # and
+    #
+    # @code
+    # skip ; net.name == "VDD" && copy
+    # @/code
+    # 
+    # where the second expression establishes "skip" as the default and conditionally executes "copy", 
+    # overriding "skip".
+    #
+    # @h4 Antenna check example @/h4
     #
     # The following example emulates an antenna check. It computes the area ratio of metal vs. gate area and 
     # attaches the value as a property with name 'AR' to the shapes, copied from the 'gate' layer:

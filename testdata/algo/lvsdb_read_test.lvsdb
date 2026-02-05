@@ -116,7 +116,7 @@ layout(
   rect((-1700 -2440) (3100 7820))
 
   # Nets with their geometries
-  net(1
+  net(1 name($1)
    rect(nwell (-1400 1800) (2800 3580))
    rect(diff_cont (-1510 -650) (220 220))
    rect(ntie (-510 -450) (800 680))
@@ -267,7 +267,7 @@ layout(
 
   # Nets with their geometries
   net(1 name(BULK))
-  net(2
+  net(2 name($2)
    rect(diff_cont (4230 3290) (220 220))
    rect(diff_cont (-220 180) (220 220))
    rect(diff_cont (-220 180) (220 220))
@@ -289,7 +289,7 @@ layout(
    rect(metal1 (-3000 -1560) (360 1560))
    rect(metal1 (-360 -1560) (360 1560))
   )
-  net(3
+  net(3 name($3)
    rect(diff_cont (4230 890) (220 220))
    rect(diff_cont (-220 -620) (220 220))
    rect(diff_cont (-220 -620) (220 220))
@@ -311,7 +311,7 @@ layout(
    rect(metal1 (-3000 -1560) (360 1560))
    rect(metal1 (-360 -1560) (360 1560))
   )
-  net(4
+  net(4 name($4)
    rect(diff_cont (790 890) (220 220))
    rect(diff_cont (-220 -620) (220 220))
    rect(diff_cont (-220 -620) (220 220))
@@ -329,8 +329,8 @@ layout(
    rect(diff_cont (-220 180) (220 220))
    rect(diff_cont (-220 180) (220 220))
   )
-  net(5)
-  net(6
+  net(5 name($5))
+  net(6 name($6)
    rect(diff_cont (3430 890) (220 220))
    rect(diff_cont (-220 -620) (220 220))
    rect(diff_cont (-220 -620) (220 220))
@@ -348,7 +348,7 @@ layout(
    rect(diff_cont (-220 180) (220 220))
    rect(diff_cont (-220 180) (220 220))
   )
-  net(7)
+  net(7 name($7))
 
   # Outgoing pins and their connections to nets
   pin(1 name(BULK))
@@ -654,7 +654,7 @@ layout(
    rect(metal1 (-360 -1560) (360 1560))
    rect(metal2_lbl (-21300 -380) (0 0))
   )
-  net(5
+  net(5 name($5)
    rect(diff_cont (1730 90) (220 220))
    rect(diff_cont (-220 -620) (220 220))
    rect(diff_cont (-220 -620) (220 220))
@@ -672,7 +672,7 @@ layout(
    rect(diff_cont (-220 180) (220 220))
    rect(diff_cont (-220 180) (220 220))
   )
-  net(6
+  net(6 name($6)
    rect(diff_cont (17570 90) (220 220))
    rect(diff_cont (-220 -620) (220 220))
    rect(diff_cont (-220 -620) (220 220))
@@ -690,7 +690,7 @@ layout(
    rect(diff_cont (-220 180) (220 220))
    rect(diff_cont (-220 180) (220 220))
   )
-  net(7
+  net(7 name($7)
    rect(diff_cont (12290 90) (220 220))
    rect(diff_cont (-220 -620) (220 220))
    rect(diff_cont (-220 -620) (220 220))
@@ -708,7 +708,7 @@ layout(
    rect(diff_cont (-220 180) (220 220))
    rect(diff_cont (-220 180) (220 220))
   )
-  net(8
+  net(8 name($8)
    rect(diff_cont (7010 90) (220 220))
    rect(diff_cont (-220 -620) (220 220))
    rect(diff_cont (-220 -620) (220 220))

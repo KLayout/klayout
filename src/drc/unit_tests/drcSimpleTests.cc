@@ -2076,3 +2076,35 @@ TEST(146d_edges_and_corners)
   run_test (_this, "146", true);
 }
 
+TEST(147_MeasureNetsWithL2N)
+{
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_147.drc";
+
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_147.gds";
+
+  std::string au_output = tl::testdata ();
+  au_output += "/drc/drcSimpleTests_au147.l2n";
+
+  std::string output = this->tmp_file ("tmp.l2n");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  compare_text_files (output, au_output);
+}
+

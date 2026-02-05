@@ -122,15 +122,8 @@ GenericReaderOptions::GenericReaderOptions ()
   m_lefdef_separate_groups = load_options.get_option_by_name ("lefdef_config.separate_groups").to_bool ();
   m_lefdef_joined_paths = load_options.get_option_by_name ("lefdef_config.joined_paths").to_bool ();
 
-  tl::Variant map_files = load_options.get_option_by_name ("lefdef_config.map_file").to_string ();
+  //  Default is simply an empty list
   m_lefdef_map_files.clear ();
-  if (map_files.is_list ()) {
-    for (tl::Variant::const_iterator i = map_files.begin (); i != map_files.end (); ++i) {
-      m_lefdef_map_files.push_back (i->to_string ());
-    }
-  } else if (! map_files.is_nil ()) {
-    m_lefdef_map_files.push_back (map_files.to_string ());
-  }
 
   //  Don't take the default, as in practice, it's more common to substitute LEF macros by layouts
   //  m_lefdef_macro_resolution_mode = load_options.get_option_by_name ("lefdef_config.macro_resolution_mode").to_int ();

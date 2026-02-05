@@ -11,7 +11,7 @@ trigger:
 jobs:
 - job: Build
   pool:
-    vmImage: 'windows-2019' # other options: 'macOS-10.13', 'ubuntu-16.04'
+    vmImage: 'windows-2022' # other options: 'macOS-10.13', 'ubuntu-16.04'
   strategy:
     matrix:
       cp36-cp36m-win_amd64.whl:

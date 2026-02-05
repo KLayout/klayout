@@ -35,6 +35,7 @@
 #include "tlClassRegistry.h"
 #include "tlFileUtils.h"
 #include "tlUri.h"
+#include "tlEnv.h"
 
 #include <cctype>
 #include <string>
@@ -183,7 +184,7 @@ MAGReader::cell_from_path (const std::string &path, db::Layout &layout)
   std::string cell_file;
   if (! resolve_path (path, layout, cell_file)) {
     //  skip with a warning if the file can't be opened (TODO: better to raise an error?)
-    tl::warn << tl::to_string (tr ("Unable to find a layout file for cell - skipping this cell: ")) << path;
+    warn (tl::sprintf (tl::to_string (tr ("Unable to find a layout file for cell %s - skipping this file: %s")), cellname, path));
     layout.cell (ci).set_ghost_cell (true);
   } else {
     m_cells_to_read.insert (std::make_pair (cellname, std::make_pair (cell_file, ci)));
@@ -249,12 +250,49 @@ static bool find_and_normalize_file (const tl::URI &uri, std::string &path)
   return false;
 }
 
+namespace
+{
+
+//  TODO: this may be useful somewhere else
+class EnvInterpolator
+  : public tl::Eval
+{
+public:
+  EnvInterpolator ()
+    : tl::Eval (0, 0, false)  //  safe mode
+  {
+    //  .. nothing yet ..
+  }
+
+  void resolve_name (const std::string &name, const tl::EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var)
+  {
+    tl::Eval::resolve_name (name, function, value, var);
+
+    if (! value && ! function && ! var) {
+      auto i = m_values.find (name);
+      if (i != m_values.end ()) {
+        value = &i->second;
+      } else {
+        std::string v = tl::get_env (name);
+        tl::Variant *vv = &m_values[name];
+        *vv = v;
+        value = vv;
+      }
+    }
+  }
+
+private:
+  std::map<std::string, tl::Variant> m_values;
+};
+
+}
+
 bool
 MAGReader::resolve_path (const std::string &path, const db::Layout & /*layout*/, std::string &real_path)
 {
-  tl::Eval expr;
+  EnvInterpolator expr;
 
-  //  the variables supported for evaluation are
+  //  the variables supported for lib path evaluation are
   //   "tech_name": the name of the KLayout technology this file is loaded for (this may be the Magic technology name)
   //   "tech_dir": the path to KLayout's technology folder for "tech_name" or the default technology's folder path
   //   "magic_tech": the technology name from the Magic file currently read
@@ -268,11 +306,20 @@ MAGReader::resolve_path (const std::string &path, const db::Layout & /*layout*/,
   }
   expr.set_var ("magic_tech", m_tech);
 
-  tl::URI path_uri (path);
+  tl::URI path_uri (expr.interpolate (path));
 
   //  absolute URIs are kept - we just try to figure out the suffix
   if (tl::is_absolute (path_uri.path ())) {
-    return find_and_normalize_file (path_uri, real_path);
+
+    if (! find_and_normalize_file (path_uri, real_path)) {
+      if (tl::verbosity () >= 20) {
+        tl::log << "Unable to locate file with expanded path: " << path_uri.to_string ();
+      }
+      return false;
+    } else {
+      return true;
+    }
+
   }
 
   tl::URI source_uri (mp_current_stream->source ());
@@ -289,6 +336,10 @@ MAGReader::resolve_path (const std::string &path, const db::Layout & /*layout*/,
     if (find_and_normalize_file (source_uri.resolved (tl::URI (lib_path).resolved (tl::URI (path))), real_path)) {
       return true;
     }
+  }
+
+  if (tl::verbosity () >= 20) {
+    tl::log << "Unable to locate file with expanded path: " << path_uri.to_string ();
   }
 
   return false;
@@ -330,6 +381,7 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
   bool valid_layer = false;
   unsigned int current_layer = 0;
   bool in_labels = false;
+  double scale = m_lambda;
 
   while (! stream.at_end ()) {
 
@@ -359,6 +411,22 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
 
       ex.expect_end ();
 
+    } else if (ex.test ("magscale")) {
+
+      int n = 1, d = 1;
+      ex.read (n);
+      ex.read (d);
+
+      if (d <= 0) {
+        error (tl::to_string (tr ("'magscale' denominator must not be negative or zero")));
+      }
+      if (n <= 0) {
+        error (tl::to_string (tr ("'magscale' nominator must not be negative or zero")));
+      }
+      scale = m_lambda * double (n) / double (d);
+
+      ex.expect_end ();
+
     } else if (ex.test ("timestamp")) {
 
       size_t ts = 0;
@@ -385,6 +453,10 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
         //  ignore "checkpaint" internal layer
         in_labels = false;
         valid_layer = false;
+      } else if (lname == "properties") {
+        //  ignore "properties" section as of now
+        in_labels = false;
+        valid_layer = false;
       } else {
         in_labels = false;
         std::pair<bool, unsigned int> ll = open_layer (layout, lname);
@@ -400,7 +472,7 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
       if (in_labels) {
         error (tl::to_string (tr ("'rect' statement inside labels section")));
       } else if (valid_layer) {
-        read_rect (ex, layout, cell_index, current_layer);
+        read_rect (ex, layout, cell_index, current_layer, scale);
       }
 
     } else if (ex.test ("tri")) {
@@ -408,7 +480,7 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
       if (in_labels) {
         error (tl::to_string (tr ("'rect' statement inside labels section")));
       } else if (valid_layer) {
-        read_tri (ex, layout, cell_index, current_layer);
+        read_tri (ex, layout, cell_index, current_layer, scale);
       }
 
     } else if (ex.test ("rlabel")) {
@@ -416,12 +488,12 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
       if (! in_labels) {
         error (tl::to_string (tr ("'rlabel' statement outside labels section")));
       } else {
-        read_rlabel (ex, layout, cell_index);
+        read_rlabel (ex, layout, cell_index, scale);
       }
 
     } else if (ex.test ("use")) {
 
-      read_cell_instance (ex, stream, layout, cell_index);
+      read_cell_instance (ex, stream, layout, cell_index, scale);
 
     }
 
@@ -467,7 +539,7 @@ MAGReader::do_merge_part (Layout &layout, cell_index_type cell_index)
 }
 
 void
-MAGReader::read_rect (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer)
+MAGReader::read_rect (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer, double scale)
 {
   double l, b, r, t;
   ex.read (l);
@@ -477,11 +549,11 @@ MAGReader::read_rect (tl::Extractor &ex, Layout &layout, cell_index_type cell_in
   ex.expect_end ();
 
   db::DBox box (l, b, r, t);
-  layout.cell (cell_index).shapes (layer).insert ((box * m_lambda).transformed (m_dbu_trans_inv));
+  layout.cell (cell_index).shapes (layer).insert ((box * scale).transformed (m_dbu_trans_inv));
 }
 
 void
-MAGReader::read_tri (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer)
+MAGReader::read_tri (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer, double scale)
 {
   double l, b, r, t;
   ex.read (l);
@@ -489,6 +561,8 @@ MAGReader::read_tri (tl::Extractor &ex, Layout &layout, cell_index_type cell_ind
   ex.read (r);
   ex.read (t);
 
+  //  NOTE: that scheme is compatible with MAGIC's reader code (as of version 8.3) -
+  //  we just skip unknown characters
   bool s = false, e = false;
   while (! ex.at_end ()) {
     if (ex.test ("s")) {
@@ -496,10 +570,9 @@ MAGReader::read_tri (tl::Extractor &ex, Layout &layout, cell_index_type cell_ind
     } else if (ex.test ("e")) {
       e = true;
     } else {
-      break;
+      ++ex;
     }
   }
-  ex.expect_end ();
 
   std::vector<db::Point> pts;
 
@@ -523,11 +596,11 @@ MAGReader::read_tri (tl::Extractor &ex, Layout &layout, cell_index_type cell_ind
 
   db::SimplePolygon poly;
   poly.assign_hull (pts.begin (), pts.end ());
-  layout.cell (cell_index).shapes (layer).insert ((poly * m_lambda).transformed (m_dbu_trans_inv));
+  layout.cell (cell_index).shapes (layer).insert ((poly * scale).transformed (m_dbu_trans_inv));
 }
 
 void
-MAGReader::read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_index)
+MAGReader::read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, double scale)
 {
   std::string lname;
   ex.read (lname);
@@ -573,13 +646,13 @@ MAGReader::read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_
   if (true || lname != "space") {   //  really? "space"? ignore it?
     std::pair<bool, unsigned int> ll = open_layer (layout, lname);
     if (ll.first) {
-      layout.cell (cell_index).shapes (ll.second).insert ((text * m_lambda).transformed (m_dbu_trans_inv));
+      layout.cell (cell_index).shapes (ll.second).insert ((text * scale).transformed (m_dbu_trans_inv));
     }
   }
 }
 
 void
-MAGReader::read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, Layout &layout, cell_index_type cell_index)
+MAGReader::read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, Layout &layout, cell_index_type cell_index, double scale)
 {
   const char *include_chars_in_files = "$_,.-$+#:;[]()<>|/\\";
 
@@ -637,9 +710,9 @@ MAGReader::read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, L
       ex2.read (ysep);
 
       na = (unsigned long) std::max (0, xhi - xlo + 1);
-      a = db::DVector (xsep, 0) * m_lambda;
+      a = db::DVector (xsep, 0) * scale;
       nb = (unsigned long) std::max (0, yhi - ylo + 1);
-      b = db::DVector (0, ysep) * m_lambda;
+      b = db::DVector (0, ysep) * scale;
 
     } else if (ex2.test ("timestamp")) {
       //  ignored
@@ -655,7 +728,7 @@ MAGReader::read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, L
       ex2.read (m22);
       ex2.read (dy);
 
-      trans = db::DCplxTrans (db::Matrix2d (m11, m12, m21, m22), db::DVector (dx, dy) * m_lambda);
+      trans = db::DCplxTrans (db::Matrix2d (m11, m12, m21, m22), db::DVector (dx, dy) * scale);
 
     } else if (ex2.test ("box")) {
       //  ignored

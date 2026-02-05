@@ -1,0 +1,19 @@
+magic
+tech gf180mcuD
+magscale 1 5
+timestamp 1654634570
+<< metal5 >>
+rect 72 504 324 540
+rect 36 468 324 504
+rect 0 432 324 468
+rect 0 324 144 432
+rect 0 288 252 324
+rect 36 252 288 288
+rect 72 216 324 252
+rect 180 108 324 216
+rect 0 72 324 108
+rect 0 36 288 72
+rect 0 0 252 36
+<< properties >>
+string FIXED_BBOX 0 -216 432 756
+<< end >>

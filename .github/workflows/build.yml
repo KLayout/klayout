@@ -98,7 +98,7 @@ jobs:
           mv ./wheelhouse/.ccache $HOST_CCACHE_DIR
           ls -la $HOST_CCACHE_DIR
           ccache -s
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: artifact-${{ matrix.os }}-${{ matrix.cibw_arch }}-${{ strategy.job-index }}
           path: ./wheelhouse/*.whl
@@ -113,7 +113,7 @@ jobs:
     - name: Build SDist
       run: pipx run build --sdist
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
         name: artifact-sdist
         path: dist/*.tar.gz

@@ -46,7 +46,7 @@ namespace db
 class DB_PUBLIC CellInstanceSetHasher
 {
 public:
-  class MatrixHash
+  class DB_PUBLIC MatrixHash
     : public IMatrix3d
   {
   public:

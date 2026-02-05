@@ -48,7 +48,7 @@ jobs:
           large-packages: true
       - uses: hmarr/debug-action@v3
       - name: Cancel Workflow Action
-        uses: styfle/cancel-workflow-action@0.12.1
+        uses: styfle/cancel-workflow-action@0.13.0
       - uses: actions/checkout@v6
       - name: ccache
         if: matrix.os != 'ubuntu-24.04-arm'

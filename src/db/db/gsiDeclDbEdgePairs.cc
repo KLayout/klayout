@@ -536,7 +536,7 @@ namespace {
 
 //  a combined processor that implements db::RelativeExtents on the edge bounding boxes
 
-class DB_PUBLIC EdgePairsRelativeExtents
+class EdgePairsRelativeExtents
   : virtual public db::EdgePairToPolygonProcessorBase,
     virtual public db::RelativeExtents
 {
@@ -559,7 +559,7 @@ public:
   }
 };
 
-class DB_PUBLIC EdgePairsRelativeExtentsAsEdges
+class EdgePairsRelativeExtentsAsEdges
   : virtual public db::EdgePairToEdgeProcessorBase,
     virtual public db::RelativeExtentsAsEdges
 {

@@ -46,78 +46,94 @@ namespace tl
  *  - empty
  */
 
+template <class T> class slist;
+
+template <class T>
+struct slist_node_type
+{
+  slist_node_type (const T &_t) : next (0), t (_t) { }
+  slist_node_type (T &&_t) : next (0), t (_t) { }
+  slist_node_type *next;
+  T t;
+};
+
+template <class T>
+class slist_const_iterator;
+
+template <class T>
+class slist_iterator
+{
+public:
+  typedef slist_node_type<T> node_type;
+  typedef std::forward_iterator_tag iterator_category;
+  typedef T value_type;
+  typedef T &reference;
+  typedef T *pointer;
+  typedef void difference_type;
+
+  slist_iterator (node_type *p = 0) : mp_p (p) { }
+  slist_iterator operator++ () { mp_p = mp_p->next; return *this; }
+
+  T *operator-> () const
+  {
+    return &mp_p->t;
+  }
+
+  T &operator* () const
+  {
+    return mp_p->t;
+  }
+
+  bool operator== (slist_iterator<T> other) const { return mp_p == other.mp_p; }
+  bool operator!= (slist_iterator<T> other) const { return mp_p != other.mp_p; }
+
+private:
+  friend class slist_const_iterator<T>;
+  friend class slist<T>;
+  node_type *mp_p;
+};
+
+template <class T>
+class slist_const_iterator
+{
+public:
+  typedef slist_node_type<T> node_type;
+  typedef std::forward_iterator_tag iterator_category;
+  typedef const T value_type;
+  typedef const T &reference;
+  typedef const T *pointer;
+  typedef void difference_type;
+
+  slist_const_iterator (slist_iterator<T> i) : mp_p (i.mp_p) { }
+  slist_const_iterator (const node_type *p = 0) : mp_p (p) { }
+  slist_const_iterator operator++ () { mp_p = mp_p->next; return *this; }
+
+  const T *operator-> () const
+  {
+    return &mp_p->t;
+  }
+
+  const T &operator* () const
+  {
+    return mp_p->t;
+  }
+
+  bool operator== (slist_const_iterator<T> other) const { return mp_p == other.mp_p; }
+  bool operator!= (slist_const_iterator<T> other) const { return mp_p != other.mp_p; }
+
+private:
+  friend class slist<T>;
+  const node_type *mp_p;
+};
+
 template <class T>
 class slist
 {
-private:
-  struct node_type
-  {
-    node_type (const T &_t) : next (0), t (_t) { }
-    node_type (T &&_t) : next (0), t (_t) { }
-    node_type *next;
-    T t;
-  };
-
 public:
-  class const_iterator;
-
-  class iterator
-  {
-  public:
-    typedef std::forward_iterator_tag category;
-    typedef T value_type;
-    typedef T &reference;
-    typedef T *pointer;
-
-    iterator (node_type *p = 0) : mp_p (p) { }
-    iterator operator++ () { mp_p = mp_p->next; return *this; }
-
-    T *operator-> () const
-    {
-      return &mp_p->t;
-    }
-
-    T &operator* () const
-    {
-      return mp_p->t;
-    }
-
-    bool operator== (iterator other) const { return mp_p == other.mp_p; }
-    bool operator!= (iterator other) const { return mp_p != other.mp_p; }
-
-  private:
-    friend class slist<T>::const_iterator;
-    node_type *mp_p;
-  };
-
-  class const_iterator
-  {
-  public:
-    typedef std::forward_iterator_tag category;
-    typedef const T value_type;
-    typedef const T &reference;
-    typedef const T *pointer;
-
-    const_iterator (iterator i) : mp_p (i.mp_p) { }
-    const_iterator (const node_type *p = 0) : mp_p (p) { }
-    const_iterator operator++ () { mp_p = mp_p->next; return *this; }
-
-    const T *operator-> () const
-    {
-      return &mp_p->t;
-    }
-
-    const T &operator* () const
-    {
-      return mp_p->t;
-    }
-
-    bool operator== (const_iterator other) const { return mp_p == other.mp_p; }
-    bool operator!= (const_iterator other) const { return mp_p != other.mp_p; }
-
-  private:
-    const node_type *mp_p;
-  };
+  typedef slist_node_type<T> node_type;
+  typedef T value_type;
+  typedef slist_const_iterator<T> const_iterator;
+  typedef slist_iterator<T> iterator;
 
   slist ()
     : mp_first (0), mp_last (0), m_size (0)
@@ -290,6 +306,15 @@ public:
 
     other.mp_first = other.mp_last = 0;
     other.m_size = 0;
+  }
+
+  void erase_after (iterator at)
+  {
+    node_type *n = at.mp_p->next;
+    if (n) {
+      at.mp_p->next = n->next;
+      delete n;
+    }
   }
 
 private:

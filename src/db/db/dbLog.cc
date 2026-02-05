@@ -81,19 +81,25 @@ static LogEntryStringRepository s_strings;
 //  LogEntryData implementation
 
 LogEntryData::LogEntryData ()
-  : m_severity (NoSeverity), m_cell_name (0), m_message (0), m_category_name (0), m_category_description (0)
+  : m_severity (NoSeverity), m_cell_name (0), m_net_name (0), m_message (0), m_category_name (0), m_category_description (0)
 {
   //  .. nothing yet ..
 }
 
 LogEntryData::LogEntryData (Severity s, const std::string &msg)
-  : m_severity (s), m_cell_name (0), m_message (s_strings.id_for_string (msg)), m_category_name (0), m_category_description (0)
+  : m_severity (s), m_cell_name (0), m_net_name (0), m_message (s_strings.id_for_string (msg)), m_category_name (0), m_category_description (0)
 {
   //  .. nothing yet ..
 }
 
 LogEntryData::LogEntryData (Severity s, const std::string &cell_name, const std::string &msg)
-  : m_severity (s), m_cell_name (s_strings.id_for_string (cell_name)), m_message (s_strings.id_for_string (msg)), m_category_name (0), m_category_description (0)
+  : m_severity (s), m_cell_name (s_strings.id_for_string (cell_name)), m_net_name (0), m_message (s_strings.id_for_string (msg)), m_category_name (0), m_category_description (0)
+{
+  //  .. nothing yet ..
+}
+
+LogEntryData::LogEntryData (Severity s, const std::string &cell_name, const std::string &net_name, const std::string &msg)
+  : m_severity (s), m_cell_name (s_strings.id_for_string (cell_name)), m_net_name (s_strings.id_for_string (net_name)), m_message (s_strings.id_for_string (msg)), m_category_name (0), m_category_description (0)
 {
   //  .. nothing yet ..
 }
@@ -104,6 +110,7 @@ LogEntryData::operator== (const LogEntryData &other) const
   return m_severity == other.m_severity &&
          m_message == other.m_message &&
          m_cell_name == other.m_cell_name &&
+         m_net_name == other.m_net_name &&
          m_geometry == other.m_geometry &&
          m_category_name == other.m_category_name &&
          m_category_description == other.m_category_description;
@@ -157,6 +164,18 @@ LogEntryData::set_cell_name (const std::string &n)
   m_cell_name = s_strings.id_for_string (n);
 }
 
+const std::string &
+LogEntryData::net_name () const
+{
+  return s_strings.string_for_id (m_net_name);
+}
+
+void
+LogEntryData::set_net_name (const std::string &n)
+{
+  m_net_name = s_strings.id_for_string (n);
+}
+
 std::string
 LogEntryData::to_string (bool with_geometry) const
 {
@@ -179,10 +198,24 @@ LogEntryData::to_string (bool with_geometry) const
       }
     }
 
-    if (m_cell_name != 0) {
-      res += tl::to_string (tr ("In cell "));
-      res += cell_name ();
-      res += ": ";
+    if (m_net_name != 0) {
+      if (m_cell_name != 0) {
+        res += tl::to_string (tr ("In net "));
+        res += net_name ();
+        res += tl::to_string (tr (" in circuit "));
+        res += cell_name ();
+        res += ": ";
+      } else {
+        res += tl::to_string (tr ("In net "));
+        res += net_name ();
+        res += ": ";
+      }
+    } else {
+      if (m_cell_name != 0) {
+        res += tl::to_string (tr ("In cell "));
+        res += cell_name ();
+        res += ": ";
+      }
     }
 
     res += msg;

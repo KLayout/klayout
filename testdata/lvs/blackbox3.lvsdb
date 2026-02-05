@@ -44,7 +44,7 @@ layout(
   rect((-18500 -14000) (44500 28000))
 
   # Nets with their geometries
-  net(1
+  net(1 name($1)
    rect(l1 (6000 -6000) (7000 1000))
    rect(l1 (-1000 0) (1000 12000))
    rect(l1 (-1000 0) (5160 1000))

@@ -1579,6 +1579,66 @@ connected_clusters<T>::add_connection (typename local_cluster<T>::id_type id, co
 
 template <class T>
 void
+connected_clusters<T>::rename_connection (const ClusterInstance &inst, typename local_cluster<T>::id_type to_id)
+{
+  if (inst.id () == to_id) {
+    return;  //  nothing to do
+  }
+
+  ClusterInstance new_inst (to_id, inst);
+
+  auto rc = m_rev_connections.find (inst);
+  if (rc == m_rev_connections.end ()) {
+    return;  //  TODO: assert?
+  }
+
+  auto id = rc->second;
+  m_rev_connections.erase (rc);
+
+  auto &connections = m_connections [id];
+
+  auto rc_exists = m_rev_connections.find (new_inst);
+  if (rc_exists != m_rev_connections.end ()) {
+
+    //  NOTE: possibly a different connection to the new cluster already exists (i.e.
+    //  rc_exists->second != id).
+    //  This may mean we are connecting two clusters here on parent level. In the netlist, this
+    //  is reflected by having multiple upward pins. Right now, we cannot reflect this case
+    //  in the reverse connection structures and keep the existing one only in the reverse
+    //  lookup.
+
+    //  Remove to original connections downwards
+    //  TODO: this linear search may be slow
+    for (auto i = connections.begin (), ii = connections.begin (); i != connections.end (); ii = i, ++i) {
+      if (*i == inst) {
+        if (ii == i) {
+          connections.pop_front ();
+        } else {
+          connections.erase_after (ii);
+        }
+        break;
+      }
+    }
+
+  } else {
+
+    m_rev_connections.insert (std::make_pair (new_inst, id));
+
+    //  Replace connections downwards
+    //  TODO: this linear search may be slow
+    for (auto i = connections.begin (); i != connections.end (); ++i) {
+      if (*i == inst) {
+        *i = new_inst;
+        break;
+      }
+    }
+
+  }
+
+}
+
+template <class T>
+void
 connected_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id)
 {
   if (id == with_id) {
@@ -1599,10 +1659,30 @@ connected_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id,
     }
 
     connections_type &target = m_connections [id];
-    target.splice (to_join);
+
+    if (target.empty ()) {
+
+      target.swap (to_join);
+
+    } else if (! to_join.empty ()) {
+
+      //  Join while removing duplicates
+      std::set<connections_type::value_type> in_target (target.begin (), target.end ());
+      for (auto j = to_join.begin (); j != to_join.end (); ++j) {
+        if (in_target.find (*j) == in_target.end ()) {
+          target.push_back (*j);
+        }
+      }
+
+    }
 
     m_connections.erase (tc);
 
+  }
+
+  if (m_connected_clusters.find (with_id) != m_connected_clusters.end ()) {
+    m_connected_clusters.insert (id);
+    m_connected_clusters.erase (with_id);
   }
 }
 

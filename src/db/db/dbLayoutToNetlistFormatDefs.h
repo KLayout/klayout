@@ -188,7 +188,7 @@ namespace db
  *    scale(<mag>)                  - magnification (default is 1) [short key: S]
  *
  *  [message-entry]:
- *    message([severity] [message|message-geometry|message-cell|message-category|any]*) - message entry [short key: H]
+ *    message([severity] [message|message-geometry|message-cell|message-category|message-net|any]*) - message entry [short key: H]
  *
  *  [message]:
  *    description(<name>)           - message text [short key: B]
@@ -198,6 +198,9 @@ namespace db
  *
  *  [message-cell]:
  *    cell(<name>)                  - message cell [short key: C]
+ *
+ *  [message-net]:
+ *    net(<name>)                   - message net name [short key: N]
  *
  *  [message-category]:
  *    cat(<name> <name>?)           - message category with optional description [short key: X]

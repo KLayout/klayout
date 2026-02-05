@@ -35,6 +35,11 @@ class DBLog_TestClass < TestBase
 
     le = RBA::LogEntryData::new
 
+    le.severity = RBA::LogEntryData::Error
+    assert_equal(le.severity.to_s, "Error")
+    le.severity = RBA::LogEntryData::NoSeverity
+    assert_equal(le.severity.to_s, "NoSeverity")
+
     le.message = "message"
     assert_equal(le.message, "message")
     
@@ -51,6 +56,44 @@ class DBLog_TestClass < TestBase
     assert_equal(le.cell_name, "TOP")
     
     assert_equal(le.to_s, "[the answer] In cell TOP: message, shape: (1,2;1,4;3,4;3,2)")
+
+    le.net_name = "NET"
+    assert_equal(le.net_name, "NET")
+    
+    assert_equal(le.to_s, "[the answer] In net NET in circuit TOP: message, shape: (1,2;1,4;3,4;3,2)")
+
+  end
+
+  def test_2_LogConstructors
+
+    le = RBA::LogEntryData::new(RBA::LogEntryData::Error, "a message")
+    assert_equal(le.to_s, "a message")
+
+    assert_equal(le.severity.to_s, "Error")
+
+    le = RBA::LogEntryData::new(RBA::LogEntryData::Info, "CELL", "a message")
+    assert_equal(le.to_s, "In cell CELL: a message")
+
+    assert_equal(le.severity.to_s, "Info")
+
+    le = RBA::LogEntryData::new(RBA::LogEntryData::Warning, "CELL", "NET", "a message")
+    assert_equal(le.to_s, "In net NET in circuit CELL: a message")
+
+    assert_equal(le.severity.to_s, "Warning")
+
+    # Create a LogEntry from a Net object:
+
+    nl = RBA::Netlist::new
+    c = RBA::Circuit::new
+    c.name = "CIRCUIT"
+    nl.add(c)
+    # NOTE: no explicit name, but ID 0
+    net = c.create_net
+
+    le = RBA::LogEntryData::new(RBA::LogEntryData::Error, net, "a message")
+    assert_equal(le.to_s, "In net $0 in circuit CIRCUIT: a message")
+
+    assert_equal(le.severity.to_s, "Error")
 
   end
 

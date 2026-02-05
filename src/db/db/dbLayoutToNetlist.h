@@ -1200,9 +1200,14 @@ public:
   void compute_area_and_perimeter_of_net_shapes (db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Polygon::area_type &area, db::Polygon::perimeter_type &perimeter) const;
 
   /**
-   *  @brief Utility: computes the merged shapes of a net
+   *  @brief Utility: computes the shapes of a net
+   *
+   *  If 'merged' is true, all polygons will be merged.
+   *
+   *  If 'max_polygons' is set to a value less that std::numeric_limits<size_t>::max,
+   *  the polygons will be replaced by a bounding box if the number of polygons exceeds the number given by the limit
    */
-  db::Point get_merged_shapes_of_net (db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Shapes &shapes, db::properties_id_type prop_id) const;
+  db::Point get_shapes_of_net (db::cell_index_type ci, size_t cid, const std::vector<unsigned int> &layer_ids, bool merged, size_t max_polygons, db::Shapes &shapes, db::properties_id_type prop_id) const;
 
 private:
   //  no copying

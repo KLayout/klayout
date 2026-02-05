@@ -3388,7 +3388,112 @@ TEST(14_JoinNets)
   db::compare_layouts (_this, ly, au);
 }
 
-TEST(15_MeasureNet)
+TEST(15_JoinNetsAfterExtraction)
+{
+  db::Layout ly;
+  TestRig test_rig (ly);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = test_rig.lmap ();
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testdata ());
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "device_extract_l15.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  std::unique_ptr<db::LayoutToNetlist> l2n (test_rig.make_l2n ());
+
+  l2n->extract_netlist ();
+
+  db::Netlist *nl = l2n->netlist ();
+
+  EXPECT_EQ (nl->to_string (),
+    "circuit TOP ();\n"
+    "  subcircuit A $1 (NET1=A,NET2=B);\n"
+    "end;\n"
+    "circuit A (NET1=NET1,NET2=NET2);\n"
+    "end;\n"
+  );
+
+  db::Circuit *top_circuit = nl->circuit_by_name ("TOP");
+  db::Circuit *a_circuit = nl->circuit_by_name ("A");
+
+  auto &top_cc = l2n->net_clusters ().clusters_per_cell (top_circuit->cell_index ());
+  auto &a_cc = l2n->net_clusters ().clusters_per_cell (a_circuit->cell_index ());
+
+  db::Net *a_net1 = a_circuit->net_by_name ("NET1");
+  db::Net *a_net2 = a_circuit->net_by_name ("NET2");
+  db::Net *a_net3 = a_circuit->net_by_name ("NET3");
+  tl_assert (a_net1 != 0);
+  tl_assert (a_net2 != 0);
+  tl_assert (a_net3 != 0);
+
+  db::Net *top_neta = top_circuit->net_by_name ("A");
+  db::Net *top_netb = top_circuit->net_by_name ("B");
+  tl_assert (top_neta != 0);
+  tl_assert (top_netb != 0);
+
+  auto cid1 = a_net1->cluster_id ();
+  auto cid2 = a_net2->cluster_id ();
+  auto cid3 = a_net3->cluster_id ();
+
+  EXPECT_EQ (a_cc.is_root (cid1), false);
+  EXPECT_EQ (a_cc.is_root (cid2), false);
+  EXPECT_EQ (a_cc.is_root (cid3), true);
+
+  //  Join local NET3 and NET2 which has upward connections
+
+  a_circuit->join_nets (a_net3, a_net2);
+
+  EXPECT_EQ (nl->to_string (),
+    "circuit TOP ();\n"
+    "  subcircuit A $1 (NET1=A,NET2=B);\n"
+    "end;\n"
+    "circuit A (NET1=NET1,NET2='NET2,NET3');\n"
+    "end;\n"
+  );
+
+  EXPECT_EQ (a_cc.is_root (cid3), false);
+
+  //  B net from top circuit has connections to NET2 which must have changed to NET3
+
+  const auto &b_conn = top_cc.connections_for_cluster (top_netb->cluster_id ());
+  tl_assert (b_conn.size () == size_t (1));
+  EXPECT_EQ (b_conn.front ().inst_trans ().to_string (), "r0 *1 -8000,3000");
+  EXPECT_EQ (b_conn.front ().inst_cell_index (), a_circuit->cell_index ());
+  EXPECT_EQ (b_conn.front ().id (), a_net3->cluster_id ());
+  EXPECT_EQ (top_cc.find_cluster_with_connection (b_conn.front ()), top_netb->cluster_id ());
+
+  //  Now join NET1 and NET3 in circuit A which effectively shortens A and B in TOP
+
+  a_circuit->join_nets (a_net3, a_net1);
+
+  EXPECT_EQ (nl->to_string (),
+    "circuit TOP ();\n"
+    "  subcircuit A $1 ('NET1,NET2'='A,B');\n"
+    "end;\n"
+    "circuit A ('NET1,NET2'='NET1,NET2,NET3');\n"
+    "end;\n"
+  );
+
+  const db::Net *top_netab = top_circuit->net_by_name ("A,B");
+  tl_assert (top_netab != 0);
+
+  const auto &ab_conn = top_cc.connections_for_cluster (top_netab->cluster_id ());
+  tl_assert (ab_conn.size () == size_t (1));
+  EXPECT_EQ (ab_conn.front ().inst_trans ().to_string (), "r0 *1 -8000,3000");
+  EXPECT_EQ (ab_conn.front ().inst_cell_index (), a_circuit->cell_index ());
+  EXPECT_EQ (ab_conn.front ().id (), a_net3->cluster_id ());
+  EXPECT_EQ (top_cc.find_cluster_with_connection (ab_conn.front ()), top_netab->cluster_id ());
+}
+
+TEST(20_MeasureNet)
 {
   db::Layout ly;
   db::LayerMap lmap;
@@ -3463,6 +3568,21 @@ TEST(15_MeasureNet)
   unsigned int l102 = ly.get_layer (db::LayerProperties (102, 0));
   l3_net_func.insert_into (&ly, tc.cell_index (), l102);
 
+  db::Region l4_net_func = l2n.measure_net (*rl1, secondary, "copy(merged=false, layers=[l2,l3,l4,l5])", std::map<std::string, tl::Variant> ());
+
+  unsigned int l103 = ly.get_layer (db::LayerProperties (103, 0));
+  l4_net_func.insert_into (&ly, tc.cell_index (), l103);
+
+  db::Region l5_net_func = l2n.measure_net (*rl1, secondary, "copy(net.name=='NET2', layer=l5)", std::map<std::string, tl::Variant> ());
+
+  unsigned int l104 = ly.get_layer (db::LayerProperties (104, 0));
+  l5_net_func.insert_into (&ly, tc.cell_index (), l104);
+
+  db::Region l6_net_func = l2n.measure_net (*rl1, secondary, "copy(net.name=='NET2', limit=0)", std::map<std::string, tl::Variant> ());
+
+  unsigned int l105 = ly.get_layer (db::LayerProperties (105, 0));
+  l6_net_func.insert_into (&ly, tc.cell_index (), l105);
+
   //  compare the collected test data
 
   std::string au = tl::testdata ();
@@ -3471,4 +3591,5 @@ TEST(15_MeasureNet)
 
   db::compare_layouts (_this, ly, au, db::NoNormalization);
 }
+
 

@@ -122,7 +122,7 @@ class DB_PUBLIC MeasureNetEval
   : public tl::Eval
 {
 public:
-  MeasureNetEval (const db::LayoutToNetlist *l2n, double dbu);
+  MeasureNetEval (db::LayoutToNetlist *l2n, double dbu);
 
   void set_primary_layer (unsigned int layer_index);
   void set_secondary_layer (const std::string &name, unsigned int layer_index);
@@ -130,10 +130,9 @@ public:
 
   void reset (db::cell_index_type cell_index, size_t cluster_id) const;
 
-  bool skip () const
-  {
-    return m_skip;
-  }
+  const std::vector<unsigned int> copy_layers () const { return m_copy_layers; }
+  size_t copy_max_polygons () const { return m_copy_max_polygons; }
+  bool copy_merge () const { return m_copy_merge; }
 
   db::PropertiesSet &prop_set_out () const
   {
@@ -145,7 +144,9 @@ private:
   friend class NetAreaFunction;
   friend class NetPerimeterFunction;
   friend class NetFunction;
+  friend class NetDbFunction;
   friend class NetSkipFunction;
+  friend class NetCopyFunction;
 
   struct AreaAndPerimeter
   {
@@ -153,10 +154,12 @@ private:
     double area, perimeter;
   };
 
-  const db::LayoutToNetlist *mp_l2n;
+  db::LayoutToNetlist *mp_l2n;
   double m_dbu;
   std::vector<unsigned int> m_layers;
-  mutable bool m_skip;
+  mutable std::vector<unsigned int> m_copy_layers;
+  mutable bool m_copy_merge;
+  mutable size_t m_copy_max_polygons;
   mutable db::PropertiesSet m_prop_set_out;
   mutable db::cell_index_type m_cell_index;
   mutable size_t m_cluster_id;
@@ -164,12 +167,14 @@ private:
   mutable std::unique_ptr<std::map<std::pair<db::cell_index_type, size_t>, const db::Net *> > m_nets_per_cell_and_cluster_id;
 
   AreaAndPerimeter compute_area_and_perimeter (int layer_index) const;
+  const std::vector<unsigned int> &layer_indexes () const { return m_layers; }
 
   void put_func (const tl::Variant &name, const tl::Variant &value) const;
   tl::Variant area_func (int layer_index) const;
   tl::Variant perimeter_func (int layer_index) const;
-  void skip_func (bool f) const;
+  void copy_func (const std::vector<unsigned int> &layer_indexes, bool merge, size_t max_polygons) const;
   tl::Variant net_func () const;
+  tl::Variant db_func () const;
 };
 
 }

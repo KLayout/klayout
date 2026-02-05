@@ -157,14 +157,9 @@ TextService::get_text () const
 void 
 TextService::do_finish_edit ()
 {
-  get_edit_layer ();
-
-  if (manager ()) {
-    manager ()->transaction (tl::to_string (tr ("Create text")));
-  }
-  cell ().shapes (layer ()).insert (get_text ());
-  if (manager ()) {
-    manager ()->commit ();
+  {
+    db::Transaction transaction (manager (), tl::to_string (tr ("Create text")));
+    cell ().shapes (layer ()).insert (get_text ());
   }
 
   commit_recent ();

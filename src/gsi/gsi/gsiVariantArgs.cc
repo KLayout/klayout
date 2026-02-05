@@ -76,6 +76,24 @@ struct test_arg_func<gsi::VariantType>
 };
 
 template <>
+struct test_arg_func<gsi::StringType>
+{
+  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
+  {
+    *ret = arg.is_a_string ();
+  }
+};
+
+template <>
+struct test_arg_func<gsi::ByteArrayType>
+{
+  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
+  {
+    *ret = arg.is_a_bytearray ();
+  }
+};
+
+template <>
 struct test_arg_func<gsi::ObjectType>
 {
   void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose, bool object_substitution)

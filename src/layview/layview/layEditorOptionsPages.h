@@ -92,7 +92,7 @@ private:
 /**
  *  @brief The object properties modal page dialog
  */
-class LAYBASIC_PUBLIC EditorOptionsModalPages
+class LAYVIEW_PUBLIC EditorOptionsModalPages
   : public QDialog
 {
 Q_OBJECT

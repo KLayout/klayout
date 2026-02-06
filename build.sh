@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 #
 # KLayout Layout Viewer
@@ -604,10 +604,10 @@ mkdir -p $BUILD
 . $(dirname $(which $0))/version.sh
 
 # qmake needs absolute paths, so we get them now:
-#   OSX does not have `readlink -f` command. Use equivalent Perl script.
+#   OSX does not have `realpath --canonicalize-existing` command. Use equivalent Perl script.
 if [ "$IS_MAC" = "no" ]; then
-  BUILD=`readlink -f $BUILD`
-  BIN=`readlink -f $BIN`
+  BUILD=`realpath --canonicalize-existing $BUILD`
+  BIN=`realpath --canonicalize-existing $BIN`
 else
   BUILD=`perl -MCwd -le 'print Cwd::abs_path(shift)' $BUILD`
   BIN=`perl -MCwd -le 'print Cwd::abs_path(shift)' $BIN`

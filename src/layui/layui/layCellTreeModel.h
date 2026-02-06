@@ -69,7 +69,8 @@ public:
     BasicCells = 16,    //  show basic cells (PCells included, no proxies)
     WithVariants = 32,  //  show PCell variants below PCells
     WithIcons = 64,     //  show icons for the top level cell type
-    NoPadding = 128     //  disable padding of display string with a blank at the beginning and end
+    NoPadding = 128,    //  disable padding of display string with a blank at the beginning and end
+    HidePrivate = 256   //  hide cells whose name starts with an underscore
   };
 
   enum Sorting {
@@ -273,6 +274,7 @@ private:
   void clear_top_level ();
   bool search_children (const tl::GlobPattern &pattern, CellTreeItem *item);
   void do_configure (db::Layout *layout, db::Library *library, LayoutViewBase *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting);
+  bool name_selected (const std::string &name) const;
 };
 
 /**

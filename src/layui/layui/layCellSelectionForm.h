@@ -122,18 +122,22 @@ public:
    *
    *  This version does not provide library selection. \get_current_library will
    *  always return 0.
-   *  If all_cells is true, all cells (not just top cells and basic cells) are shown.
-   *  If top_cells_only is false, child cells are shown as well.
+   *
+   *  If all_cells is true, all cells are shown. That includes proxies.
+   *  If all_cells is false, proxies are not shown, but PCells are included.
+   *  If all_cells is false, then also:
+   *    Only top cells are shown if top_cells_only is true. PCells are always shown.
+   *    Private cells (names start with underscore) or private PCells are not shown if hide_private is false
+   *  top_cells_only and hide_private have no effect if all_cells is true.
    */
-  LibraryCellSelectionForm (QWidget *parent, db::Layout *layout, const char *name, bool all_cells = false, bool top_cells_only = true);
+  LibraryCellSelectionForm (QWidget *parent, db::Layout *layout, const char *name, bool all_cells = false, bool top_cells_only = true, bool hide_private = false);
 
   /**
    *  @brief Create a selection form for cells plus the library
    *
-   *  If all_cells is true, all cells (not only top cells and basic cells) are shown.
-   *  If top_cells_only is false, child cells are shown as well.
+   *  See above for the description of "all_cells", "top_cells_only" and "hide_private".
    */
-  LibraryCellSelectionForm (QWidget *parent, const char *name, bool all_cells = false, bool top_cells_only = true);
+  LibraryCellSelectionForm (QWidget *parent, const char *name, bool all_cells = false, bool top_cells_only = true, bool hide_private = false);
 
   /**
    *  @brief Set the selected library
@@ -200,6 +204,7 @@ private:
   bool m_is_pcell;
   bool m_all_cells;
   bool m_top_cells_only;
+  bool m_hide_private;
 
   void select_entry (db::cell_index_type n);
   void select_pcell_entry (db::pcell_id_type n);

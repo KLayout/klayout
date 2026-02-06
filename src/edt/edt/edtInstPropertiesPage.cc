@@ -226,7 +226,7 @@ BEGIN_PROTECTED
     layout = &cv->layout ();
   }
 
-  lay::LibraryCellSelectionForm form (this, layout, "browse_lib_cell", false, lib != 0 /*for libs show top cells only*/);
+  lay::LibraryCellSelectionForm form (this, layout, "browse_lib_cell", false, lib != 0 /*for libs show top cells only*/, lib != 0 /*for libs hide private cells*/);
   if (lib) {
     form.setWindowTitle (tl::to_qstring (tl::to_string (QObject::tr ("Select Cell - Library: ")) + lib->get_description ()));
   }

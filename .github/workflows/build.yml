@@ -24,7 +24,7 @@ jobs:
             cibuild: "*macosx*"
             cibw_arch: "macos_x86_64"
             macos-arch: "x86_64"
-          - os: "macos-latest"  # M1 runner
+          - os: "macos-14"  # M1 runner
             cibuild: "*macosx*"
             cibw_arch: "macos_arm64"
             macos-arch: "arm64"

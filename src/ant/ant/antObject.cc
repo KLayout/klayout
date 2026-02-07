@@ -24,6 +24,7 @@
 #include "antObject.h"
 #include "antTemplate.h"
 #include "antConfig.h"
+#include "layConverters.h"
 #include "tlString.h"
 #include "tlExpression.h"
 
@@ -425,7 +426,24 @@ class AnnotationEvalFunction
   : public tl::EvalFunction
 {
 public:
-  AnnotationEvalFunction (char function, const AnnotationEval *eval, size_t index)
+  enum FunctionType {
+    ManhattanLength,                // L
+    ManhattanLengthIncremental,     // LL
+    EuclidianDistance,              // D
+    EuclidianDistanceIncremental,   // DD
+    XDelta,                         // X
+    XDeltaIncremental,              // XX
+    YDelta,                         // Y
+    YDeltaIncremental,              // YY
+    P1X,                            // U
+    P1Y,                            // V
+    P2X,                            // P
+    P2Y,                            // Q
+    Area,                           // A
+    Angle                           // G
+  };
+
+  AnnotationEvalFunction (FunctionType function, const AnnotationEval *eval, size_t index)
     : m_function (function), mp_eval (eval), m_index (index)
   {
     // .. nothing yet ..
@@ -440,25 +458,53 @@ public:
     const Object &obj = mp_eval->obj ();
     const db::DFTrans &trans = mp_eval->trans ();
 
-    if (m_function == 'L') {
-      out = fabs (delta_x (obj, trans)) + fabs (delta_y (obj, trans));
-    } else if (m_function == 'D') {
-      out = sqrt (delta_x (obj, trans) * delta_x (obj, trans) + delta_y (obj, trans) * delta_y (obj, trans));
-    } else if (m_function == 'A') {
-      out = delta_x (obj, trans) * delta_y (obj, trans) * 1e-6;
-    } else if (m_function == 'X') {
-      out = delta_x (obj, trans);
-    } else if (m_function == 'Y') {
-      out = delta_y (obj, trans);
-    } else if (m_function == 'U') {
-      out = (trans * p1 (obj)).x ();
-    } else if (m_function == 'V') {
-      out = (trans * p1 (obj)).y ();
-    } else if (m_function == 'P') {
-      out = (trans * p2 (obj)).x ();
-    } else if (m_function == 'Q') {
-      out = (trans * p2 (obj)).y ();
-    } else if (m_function == 'G') {
+    if (m_function == ManhattanLength) {
+      out = fabs (delta_x (obj, trans, m_index)) + fabs (delta_y (obj, trans, m_index));
+    } else if (m_function == ManhattanLengthIncremental) {
+      double res = 0.0;
+      for (size_t index = 0; index <= m_index; ++index) {
+        res += fabs (delta_x (obj, trans, index)) + fabs (delta_y (obj, trans, index));
+      }
+      out = res;
+    } else if (m_function == EuclidianDistance) {
+      auto dx = delta_x (obj, trans, m_index);
+      auto dy = delta_y (obj, trans, m_index);
+      out = sqrt (dx * dx + dy * dy);
+    } else if (m_function == EuclidianDistanceIncremental) {
+      double res = 0.0;
+      for (size_t index = 0; index <= m_index; ++index) {
+        auto dx = delta_x (obj, trans, index);
+        auto dy = delta_y (obj, trans, index);
+        res += sqrt (dx * dx + dy * dy);
+      }
+      out = res;
+    } else if (m_function == Area) {
+      out = delta_x (obj, trans, m_index) * delta_y (obj, trans, m_index) * 1e-6;
+    } else if (m_function == XDelta) {
+      out = delta_x (obj, trans, m_index);
+    } else if (m_function == XDeltaIncremental) {
+      double res = 0.0;
+      for (size_t index = 0; index <= m_index; ++index) {
+        res += delta_x (obj, trans, index);
+      }
+      out = res;
+    } else if (m_function == YDelta) {
+      out = delta_y (obj, trans, m_index);
+    } else if (m_function == YDeltaIncremental) {
+      double res = 0.0;
+      for (size_t index = 0; index <= m_index; ++index) {
+        res += delta_y (obj, trans, index);
+      }
+      out = res;
+    } else if (m_function == P1X) {
+      out = (trans * p1 (obj, m_index)).x ();
+    } else if (m_function == P1Y) {
+      out = (trans * p1 (obj, m_index)).y ();
+    } else if (m_function == P2X) {
+      out = (trans * p2 (obj, m_index)).x ();
+    } else if (m_function == P2Y) {
+      out = (trans * p2 (obj, m_index)).y ();
+    } else if (m_function == Angle) {
       double r, a1, a2;
       db::DPoint c;
       if (obj.compute_angle_parameters (r, c, a1, a2)) {
@@ -471,20 +517,20 @@ public:
     }
   }
 
-  db::DPoint p1 (const Object &obj) const
+  db::DPoint p1 (const Object &obj, size_t index) const
   {
-    return obj.seg_p1 (m_index);
+    return obj.seg_p1 (index);
   }
 
-  db::DPoint p2 (const Object &obj) const
+  db::DPoint p2 (const Object &obj, size_t index) const
   {
-    return obj.seg_p2 (m_index);
+    return obj.seg_p2 (index);
   }
 
   double
-  delta_x (const Object &obj, const db::DFTrans &t) const
+  delta_x (const Object &obj, const db::DFTrans &t, size_t index) const
   {
-    double dx = ((t * p2 (obj)).x () - (t * p1 (obj)).x ());
+    double dx = ((t * p2 (obj, index)).x () - (t * p1 (obj, index)).x ());
 
     //  avoid "almost 0" outputs
     if (fabs (dx) < 1e-5 /*micron*/) {
@@ -495,9 +541,9 @@ public:
   }
 
   double
-  delta_y (const Object &obj, const db::DFTrans &t) const
+  delta_y (const Object &obj, const db::DFTrans &t, size_t index) const
   {
-    double dy = ((t * p2 (obj)).y () - (t * p1 (obj)).y ());
+    double dy = ((t * p2 (obj, index)).y () - (t * p1 (obj, index)).y ());
 
     //  avoid "almost 0" outputs
     if (fabs (dy) < 1e-5 /*micron*/) {
@@ -508,7 +554,7 @@ public:
   }
 
 private:
-  char m_function;
+  FunctionType m_function;
   const AnnotationEval *mp_eval;
   size_t m_index;
 };
@@ -517,16 +563,20 @@ std::string
 Object::formatted (const std::string &fmt, const db::DFTrans &t, size_t index) const
 {
   AnnotationEval eval (*this, t);
-  eval.define_function ("L", new AnnotationEvalFunction('L', &eval, index)); // manhattan length
-  eval.define_function ("D", new AnnotationEvalFunction('D', &eval, index)); // euclidian distance
-  eval.define_function ("X", new AnnotationEvalFunction('X', &eval, index)); // x delta
-  eval.define_function ("Y", new AnnotationEvalFunction('Y', &eval, index)); // y delta
-  eval.define_function ("U", new AnnotationEvalFunction('U', &eval, index)); // p1.x
-  eval.define_function ("V", new AnnotationEvalFunction('V', &eval, index)); // p1.y
-  eval.define_function ("P", new AnnotationEvalFunction('P', &eval, index)); // p2.x
-  eval.define_function ("Q", new AnnotationEvalFunction('Q', &eval, index)); // p2.y
-  eval.define_function ("A", new AnnotationEvalFunction('A', &eval, index)); // area mm2
-  eval.define_function ("G", new AnnotationEvalFunction('G', &eval, index)); // angle (if applicable)
+  eval.define_function ("L", new AnnotationEvalFunction (AnnotationEvalFunction::ManhattanLength, &eval, index));               // manhattan length
+  eval.define_function ("LL", new AnnotationEvalFunction (AnnotationEvalFunction::ManhattanLengthIncremental, &eval, index));   // manhattan length
+  eval.define_function ("D", new AnnotationEvalFunction (AnnotationEvalFunction::EuclidianDistance, &eval, index));             // euclidian distance
+  eval.define_function ("DD", new AnnotationEvalFunction (AnnotationEvalFunction::EuclidianDistanceIncremental, &eval, index)); // euclidian distance (incremental, for multi-rulers)
+  eval.define_function ("X", new AnnotationEvalFunction (AnnotationEvalFunction::XDelta, &eval, index));                        // x delta
+  eval.define_function ("XX", new AnnotationEvalFunction (AnnotationEvalFunction::XDeltaIncremental, &eval, index));            // x delta (incremental, for multi-rulers)
+  eval.define_function ("Y", new AnnotationEvalFunction (AnnotationEvalFunction::YDelta, &eval, index));                        // y delta
+  eval.define_function ("YY", new AnnotationEvalFunction (AnnotationEvalFunction::YDeltaIncremental, &eval, index));            // y delta (incremental, for multi-rulers)
+  eval.define_function ("U", new AnnotationEvalFunction (AnnotationEvalFunction::P1X, &eval, index));                           // p1.x
+  eval.define_function ("V", new AnnotationEvalFunction (AnnotationEvalFunction::P1Y, &eval, index));                           // p1.y
+  eval.define_function ("P", new AnnotationEvalFunction (AnnotationEvalFunction::P2X, &eval, index));                           // p2.x
+  eval.define_function ("Q", new AnnotationEvalFunction (AnnotationEvalFunction::P2Y, &eval, index));                           // p2.y
+  eval.define_function ("A", new AnnotationEvalFunction (AnnotationEvalFunction::Area, &eval, index));                          // area mm2
+  eval.define_function ("G", new AnnotationEvalFunction (AnnotationEvalFunction::Angle, &eval, index));                         // angle (if applicable)
   return eval.interpolate (fmt);
 }
 
@@ -713,7 +763,7 @@ Object::from_string (const char *s, const char * /*base_dir*/)
 
       std::string s;
       ex.read_word (s);
-      ant::ACConverter sc;
+      lay::ACConverter sc;
       lay::angle_constraint_type sm;
       sc.from_string (s, sm);
       angle_constraint (sm);
@@ -817,7 +867,7 @@ Object::to_string () const
   r += ",";
 
   r += "angle_constraint=";
-  ant::ACConverter acc;
+  lay::ACConverter acc;
   r += acc.to_string (angle_constraint ());
 
   return r;

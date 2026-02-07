@@ -33,6 +33,7 @@
 #include "layLayoutCanvas.h"
 #include "layRedrawThread.h"
 #include "layLayoutViewBase.h"
+#include "layEditorOptionsPage.h"
 #include "layMarker.h"
 #if defined(HAVE_QT)
 #  include "gtf.h"
@@ -238,7 +239,12 @@ LayoutCanvas::init_ui (QWidget *parent)
 void
 LayoutCanvas::key_event (unsigned int key, unsigned int buttons)
 {
-  if (! (buttons & lay::ShiftButton)) {
+  if (int (key) == lay::KeyTab || int (key) == lay::KeyBacktab) {
+    auto page = first_toolbox_widget ();
+    if (page) {
+      page->set_focus ();
+    }
+  } else if (! (buttons & lay::ShiftButton)) {
     if (int (key) == lay::KeyDown) {
       down_arrow_key_pressed ();
     } else if (int (key) == lay::KeyUp) {
@@ -259,6 +265,33 @@ LayoutCanvas::key_event (unsigned int key, unsigned int buttons)
       right_arrow_key_pressed_with_shift ();
     }
   }
+}
+
+bool
+LayoutCanvas::shortcut_override_event (unsigned int key, unsigned int /*buttons*/)
+{
+  if (int (key) == lay::KeyTab || int (key) == lay::KeyBacktab) {
+    return first_toolbox_widget () != 0;
+  } else {
+    return false;
+  }
+}
+
+lay::EditorOptionsPage *
+LayoutCanvas::first_toolbox_widget ()
+{
+  auto pages = mp_view->editor_options_pages ();
+  if (! pages) {
+    return 0;
+  }
+
+  auto pv = pages->editor_options_pages ();
+  for (auto p = pv.begin (); p != pv.end (); ++p) {
+    if ((*p)->is_toolbox_widget () && (*p)->is_visible ()) {
+      return *p;
+    }
+  }
+  return 0;
 }
 
 void

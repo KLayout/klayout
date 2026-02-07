@@ -10,18 +10,47 @@
   <p>
   A measurement can be performed by clicking on the ruler icon in the 
   toolbar and selecting "Ruler" from the drop-down options.
-  Left-click on a point in the layout and then left-click again to 
-  specify the second point. A ruler will be shown that indicates
-  the distance measured. 
+  Left-click on a point in the layout and then left-click again
+  or press the Enter key to set the second point. 
+  A ruler will be shown that indicates the distance measured. 
   </p>
 
   <p>
-  A more convenient way is provided with the single-click measurement
+  While you move the endpoint, you can hold the Shift or Ctrl key
+  or both. With only the Shift key pressed, the ruler's direction 
+  will be limited to horizontal or vertical only. With only the Ctrl
+  key pressed, the direction is limited to horizontal, vertical or
+  diagonal. With Ctrl and Shift pressed together, no limitation
+  of direction applies.
+  </p>
+
+  <p>
+  While the ruler is dragged, the current drag distance is indicated
+  in three edit fields at the top of the layout view. By pressing the
+  Tab key, the input focus changes to these edit fields. You can 
+  specify a numerical value for the distances here. Use Tab and
+  Shift+Tab to jump between the fields. Press the Escape key to
+  leave the edit fields. Pressing the Enter key while
+  the cursor is on the "dx" or "dy" field will
+  accept the values and apply them to the ruler.
+  If you specify a value in the last field labelled "d" and press
+  Enter, the ruler will enter "fixed length" mode - in that mode you
+  can still define the ruler's direction with the mouse, but the 
+  length is fixed to the given value.
+  </p>
+
+  <p>
+  A convenient way to measure a distance is the single-click measurement
   ruler. Select "Measure" from the drop-down options of the ruler symbol.
   In this mode, a single click will set a ruler to the specified 
   position. This feature will look for edges in the vicinity of the 
   ruler and set the ruler to connect the neighboring edges. The ruler
   is attached perpendicular to the edge next to the initial point.
+  </p>
+
+  <p>
+  The "Measure Edge" ruler type is also a single-click measurement
+  ruler, but measures the length of an edge at the click position.
   </p>
 
   <p>
@@ -35,7 +64,12 @@
   object. Click and the first point to start such a ruler. Then click
   on more points to add new segments to the ruler. Each segment is shown
   as an individual ruler with tick marks and a length. Finish the sequence
-  with a double-click.
+  with a double-click or by pressing the Enter key.
+  Note that the lengths indicated by the ruler labels are the lengths
+  of the individual segments. To get an incremental length (the sum
+  of all segment length), change the ruler's label format from "$D" to "$DD" ("DD"
+  is variable giving the incremental length).
+  See the description of ruler templates below, about how to make this change permanent.
   </p>
 
   <p>

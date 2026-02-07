@@ -41,6 +41,7 @@ FORMS = \
   LayoutViewConfigPage7.ui \
   LayoutViewConfigPage.ui \
   LayoutViewConfigPage8.ui \
+  LayoutViewFunctionDialog.ui \
   LibraryCellSelectionForm.ui \
   LoadLayoutOptionsDialog.ui \
   MarkerBrowserConfigPage2.ui \
@@ -103,7 +104,6 @@ SOURCES = \
   layEditLineStylesForm.cc \
   layEditStippleWidget.cc \
   layEditStipplesForm.cc \
-  layEditorOptionsFrame.cc \
   layFileDialog.cc \
   layGenericSyntaxHighlighter.cc \
   layHierarchyControlPanel.cc \
@@ -161,7 +161,6 @@ HEADERS = \
   layEditLineStylesForm.h \
   layEditStippleWidget.h \
   layEditStipplesForm.h \
-  layEditorOptionsFrame.h \
   layFileDialog.h \
   layGenericSyntaxHighlighter.h \
   layHierarchyControlPanel.h \

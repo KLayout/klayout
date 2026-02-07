@@ -37,6 +37,9 @@ class ShapeEditService
   : public edt::Service
 {
 public:
+  static const char *connection_configure_name ();
+  static const char *connection_function_name ();
+
   ShapeEditService (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types);
   
 protected:

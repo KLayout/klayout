@@ -4,6 +4,7 @@
 <doc>
 
   <title>Connectivity</title>
+  <keyword name="Connectivity"/>
 
   <p>
   Use the connectivity page to specify the conductor layers and their connections.

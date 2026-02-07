@@ -64,6 +64,12 @@ a1.extent_refs(:lc).sized(0.05).output(1051, 1)
 a1.extent_refs(:right_center).sized(0.05).output(1052, 0)
 a1.extent_refs(:rc).sized(0.05).output(1052, 1)
 a1.extent_refs(0.25, 0.5, 0.5, 0.75).output(1053, 0)
+a1.extent_refs(0.5, 0.5, 0.25, 0.75, as_edges).output(1054, 0)
+a1.extent_refs(0.5, 0.5, 0.25, 0.75, as_boxes).output(1055, 0)
+a1.extents.width(0.8.um).extent_refs(0.5, 0.5, 0.25, 0.75, as_edges).output(1056, 0)
+a1.extents.width(0.8.um).extent_refs(0.5, 0.5, 0.25, 0.75, as_boxes).output(1057, 0)
+a1.extents.width(0.8.um).first_edges.extent_refs(:center, as_edges).output(1058, 0)
+a1.extents.width(0.8.um).first_edges.extent_refs(:center, as_boxes).output(1059, 0)
 
 a1.corners.sized(0.05).output(1060, 0)
 a1.corners(-90.0, as_boxes).sized(0.05).output(1061, 0)
@@ -105,8 +111,10 @@ a1.edges.collect_to_region { |p| p.length < 0.8 && p.bbox.enlarged(0.1, 0.1) }.o
 a1.edges.collect_to_region { |p| p.length < 0.8 && p.bbox.transformed(RBA::VCplxTrans::new(1000.0)).enlarged(100, 100) }.output(1123, 0)
 
 # edge pair collect
-a1.width(1.5).collect { |p| p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1120, 0)
-a1.width(1.5).collect_to_edge_pairs { |p| p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1121, 0)
+a1.width(1.5).collect { |p| p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1130, 0)
+a1.width(1.5).collect_to_edge_pairs { |p| p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1131, 0)
+a1.width(1.5).collect_to_edges { |p| p.transformed(RBA::VCplxTrans::new(1000.0)).first }.output(1132, 0)
+a1.width(1.5).collect_to_region { |p| p.polygon(0.0).transformed(RBA::VCplxTrans::new(1000.0)) }.output(1133, 0)
 
 expect_count(a1.edges, 9, 9, "a1.edges")
 expect_count(a1.width(1.5), 5, 5, "a1.width(1.5)")

@@ -327,6 +327,16 @@ public:
   }
 
   /**
+   *  @brief Terminate a "move" operation with compulsory shift vector
+   *
+   *  @param v The move distance to be applied
+   */
+  virtual void end_move (const db::DVector & /*v*/)
+  {
+    //  .. by default, nothing is implemented ..
+  }
+
+  /**
    *  @brief Cancel any pending operations
    *
    *  This event is sent whenever a pending operation such as 
@@ -405,13 +415,48 @@ public:
   }
 
 protected:
+  friend class lay::Editables;
+
   Editables *editables ()
   {
     return mp_editables;
   }
 
+  /**
+   *  @brief Resets the proposed move transformation
+   *
+   *  You should not need to call this method from an Editable implementation.
+   */
+  void reset_proposed_move_transformation ();
+
+  /**
+   *  @brief Proposes a move transformation
+   *
+   *  On "move", the Editable can propose an actual move transformation that
+   *  may differ from the actual move distance due to implementation-specific
+   *  snapping.
+   *
+   *  This method proposes a move transformation with a given priority. The
+   *  Editable with the lowest priority value wins.
+   */
+  void propose_move_transformation (const db::DTrans &mv, unsigned int priority);
+
+  /**
+   *  @brief Gets the proposed move transformation and priority
+   *
+   *  @return A pair with (priority, transformation)
+   *
+   *  The returned priority is negative if not priority was set.
+   */
+  std::pair<int, db::DTrans> proposed_move_transformation () const
+  {
+    return std::make_pair (m_move_transformation_priority, m_move_transformation);
+  }
+
 private:
   Editables *mp_editables;
+  int m_move_transformation_priority;
+  db::DTrans m_move_transformation;
 };
 
 /**
@@ -551,8 +596,16 @@ public:
 
   /**
    *  @brief Continue "move" operation
+   *
+   *  The return value is the "proposed move transformation", i.e. a representative
+   *  one used for the actual move. As every interface may decide about the
+   *  actual move transformation (due to specific snapping to objects etc.), the
+   *  return value many be ambiguous and should be used for information purposes
+   *  only.
+   *
+   *  @return A pair (priority, transformation) where priority is negative if no vector was proposed
    */
-  void move (const db::DPoint &p, lay::angle_constraint_type ac);
+  std::pair<int, db::DTrans> move (const db::DPoint &p, lay::angle_constraint_type ac);
 
   /**
    *  @brief Transform during a move operation
@@ -566,6 +619,16 @@ public:
    *  The Editables object takes ownership over the Transaction object.
    */
   void end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Transaction *transaction = 0);
+
+  /**
+   *  @brief End "move" operation with given vector
+   *
+   *  If a transaction is given, the operation will be appended to this pending transaction
+   *  The Editables object takes ownership over the Transaction object.
+   *
+   *  The vector is supposed to be taken "as is" and no snapping shall be applied.
+   */
+  void end_move (const db::DVector &v, db::Transaction *transaction = 0);
 
   /**
    *  @brief Indicates how many objects are selected.
@@ -678,6 +741,8 @@ private:
 
   tl::shared_collection<lay::Editable> m_editables;
   std::set<lay::Editable *> m_enabled;
+  db::DPoint m_move_start;
+  db::DFTrans m_move_transform;
   bool m_move_selection;
   bool m_any_move_operation;
   db::DBox m_last_selected_point;

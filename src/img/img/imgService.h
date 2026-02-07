@@ -360,6 +360,11 @@ public:
   virtual void end_move (const db::DPoint &p, lay::angle_constraint_type ac);
 
   /**
+   *  @brief Terminate a "move" operation with compulsory move vector
+   */
+  virtual void end_move (const db::DVector &v);
+
+  /**
    *  @brief Return the bbox of the selection (reimplementation of lay::Editable interface)
    */
   virtual db::DBox selection_bbox ();
@@ -500,8 +505,10 @@ private:
   std::set<obj_iterator> m_selected;
   //  The previous selection
   std::set<obj_iterator> m_previous_selection;
-  //  The reference point in move mode
+  //  The starting point in move mode
   db::DPoint m_p1;
+  //  The last reference point in move mode
+  db::DPoint m_plast;
   //  The image object representing the image being moved as it was before it was moved
   img::Object m_initial;
   //  The image object representing the image being moved
@@ -514,6 +521,8 @@ private:
   MoveMode m_move_mode;
   //  The index of the landmark being moved
   size_t m_moved_landmark;
+  //  The last "angle constraint" (button combination) used in move
+  lay::angle_constraint_type m_ac;
   //  Flag indicating that we want to keep the selection after the landmark was moved
   bool m_keep_selection_for_move;
   //  Flag indicating whether images are visible
@@ -523,6 +532,8 @@ private:
   std::map<const img::Object *, bool> m_visibility_cache;
 
   void show_message ();
+  void do_move (const db::DPoint &p, lay::angle_constraint_type ac);
+
 
   /**
    *  @brief Select a certain image

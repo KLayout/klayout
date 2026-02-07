@@ -17,19 +17,27 @@
   <p>
   While moving, the whole selection can be rotated by 90 degree counterclockwise with a right mouse 
   button click. 
-  The ESC key will cancel the operation.
+  The Escape key will cancel the operation.
   </p>
 
   <p>
   For movements, the movement direction constraint apply. 
   See <link href="/manual/editor_options.xml"/> for details about the modes
-  available. For example, in manhattan mode, only horizontal and vertical movements are allowed.
+  available. For example, in Manhattan mode, only horizontal and vertical movements are allowed.
   The global movement constraint can be overridden by pressing Shift (orthogonal), Ctrl (diagonal) or 
   both Shift and Ctrl (any angle) while moving the mouse.
   </p>
 
   <p>
-  If a move distance and direction is known numerically, "Move By" from the "Edit/Selection" menu can be used. 
+  While you move the selection, two edit boxes are shown at the top of the layout view.
+  Press the Tab key to enter these edit boxes.
+  Use the Tab and Shift+Tab keys to navigate between the boxes.
+  You can specify a numerical shift value here. Pressing the Enter key will apply these
+  shifts. Pressing the Escape key will leave the edit fields.
+  </p>
+
+  <p>
+  To apply a specific shift, you can also use "Move By" from the "Edit/Selection" menu.
   A dialog will open that allows specification of the horizontal and vertical move distance in micrometers.
   Positive values move to the top or right and negative ones to the bottom or left.
   This dialog also applies to partial mode, so that edges or parts of a layout can be 

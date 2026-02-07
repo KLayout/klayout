@@ -25,6 +25,7 @@
 
 #include "layLayoutViewBase.h"
 #include "layConverters.h"
+#include "layEditorOptionsPage.h"
 
 #if defined(HAVE_QT)
 #  include "edtPropertiesPages.h"
@@ -155,7 +156,7 @@ TextService::get_text () const
 }
 
 void 
-TextService::do_finish_edit ()
+TextService::do_finish_edit (bool /*accept*/)
 {
   {
     db::Transaction transaction (manager (), tl::to_string (tr ("Create text")));
@@ -199,6 +200,11 @@ TextService::selection_applies (const lay::ObjectInstPath &sel) const
 bool 
 TextService::configure (const std::string &name, const std::string &value)
 {
+  auto tb = toolbox_widget ();
+  if (tb) {
+    tb->configure (name, value);
+  }
+
   if (name == cfg_edit_text_size) {
     double size (0);
     tl::from_string (value, size);

@@ -20,29 +20,49 @@
 
 */
 
+#if defined(HAVE_QT)
 
-#ifndef HDR_imgPlugin
-#define HDR_imgPlugin
+#ifndef HDR_antEditorOptionsPages
+#define HDR_antEditorOptionsPages
 
-#include "layPlugin.h"
+#include "layEditorOptionsPageWidget.h"
 
-namespace img
+class QHBoxLayout;
+
+namespace lay
+{
+  class DecoratedLineEdit;
+}
+
+namespace ant
 {
 
-extern const std::string cfg_images_visible;
-
-class PluginDeclaration
-  : public lay::PluginDeclaration
+/**
+ *  @brief The toolbox widget for annotations
+ */
+class ToolkitWidget
+  : public lay::EditorOptionsPageWidget
 {
+Q_OBJECT
+
 public:
-  virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const;
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutViewBase *view) const;
-  virtual bool implements_editable (std::string &title) const;
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
-  virtual std::vector<std::string> additional_editor_options_pages () const;
+  ToolkitWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  ~ToolkitWidget ();
+
+  virtual std::string title () const;
+  virtual const char *name () const;
+  virtual int order () const { return 0; }
+  virtual void configure (const std::string &name, const std::string &value);
+  virtual void commit (lay::Dispatcher *root);
+  virtual void deactivated ();
+
+private:
+  QHBoxLayout *mp_layout;
+  lay::DecoratedLineEdit *mp_x_le, *mp_y_le, *mp_d_le;
 };
 
 }
 
 #endif
 
+#endif

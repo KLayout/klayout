@@ -419,6 +419,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     mp_transient_view (0),
     m_move_mode (Service::move_none),
     m_moved_landmark (0),
+    m_ac (lay::AC_Global),
     m_keep_selection_for_move (false),
     m_images_visible (true),
     m_visibility_cache_valid (false)
@@ -608,12 +609,14 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
   double l = catch_distance ();
   db::DBox search_dbox = db::DBox (p, p).enlarged (db::DVector (l, l));
 
+  m_plast = m_p1 = p;
+  m_trans = db::DTrans ();
+  m_ac = lay::AC_Global;
+
   //  choose move mode
   if (mode == lay::Editable::Selected) {
 
     m_move_mode = move_selected;
-    m_p1 = p;
-    m_trans = db::DTrans ();
 
     selection_to_view ();
     for (std::vector <img::View *>::iterator r = m_selected_image_views.begin (); r != m_selected_image_views.end (); ++r) {
@@ -657,7 +660,6 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
   } else if (mode == lay::Editable::Any) {
   
     m_move_mode = move_none;
-    m_p1 = p;
     double dmin = std::numeric_limits <double>::max ();
 
     const db::DUserObject *robj = find_image (p, search_dbox, l, dmin);
@@ -705,11 +707,14 @@ Service::move_transform (const db::DPoint &p, db::DFTrans tr, lay::angle_constra
     return;
   }
 
+  db::DTrans tr_new = db::DTrans (p - db::DPoint ()) * db::DTrans (tr) * db::DTrans (m_trans.fp_trans ()) * db::DTrans (db::DPoint () - m_p1);
+
   if (m_move_mode == move_all) {
 
-    db::DVector dp = p - db::DPoint ();
+    db::DTrans dt = tr_new * m_trans.inverted ();
 
-    m_current.transform (db::DTrans (dp) * db::DTrans (tr) * db::DTrans (-dp));
+    m_current.transform (dt);
+    m_trans = dt * m_trans;
 
     //  display current images' parameters
     show_message ();
@@ -718,7 +723,7 @@ Service::move_transform (const db::DPoint &p, db::DFTrans tr, lay::angle_constra
 
   } else if (m_move_mode == move_selected) {
 
-    m_trans *= db::DTrans (m_p1 - db::DPoint ()) * db::DTrans (tr) * db::DTrans (db::DPoint () - m_p1);
+    m_trans = tr_new;
 
     for (std::vector<img::View *>::iterator r = m_selected_image_views.begin (); r != m_selected_image_views.end (); ++r) {
       (*r)->transform_by (db::DCplxTrans (m_trans));
@@ -734,10 +739,25 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
     return;
   }
 
+  m_ac = ac;
+
+  do_move (p, ac);
+
+  if (m_move_mode != move_selected) {
+    m_selected_image_views [0]->redraw ();
+    show_message ();
+  }
+
+  propose_move_transformation (m_trans, 2);
+}
+
+void
+Service::do_move (const db::DPoint &p, lay::angle_constraint_type ac)
+{
   if (m_move_mode == move_selected) {
 
-    db::DVector dp = p - m_p1;
-    m_p1 = p;
+    db::DVector dp = p - m_plast;
+    m_plast = p;
 
     m_trans = db::DTrans (dp) * m_trans;
 
@@ -746,6 +766,8 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
     }
 
   } else if (m_move_mode == move_landmark) {
+
+    m_trans = db::DTrans (p - m_p1);
 
     std::vector <db::DPoint> li = m_initial.landmarks ();
     for (std::vector <db::DPoint>::iterator l = li.begin (); l != li.end (); ++l) {
@@ -770,20 +792,20 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
     db::adjust_matrix (m, li, lm, adjust, int (m_moved_landmark));
     m_current.set_matrix (m * m_initial.matrix ());
 
-    m_selected_image_views [0]->redraw ();
-
   } else {
 
     if (m_move_mode == move_all) {
 
-      db::DVector dp = p - m_p1;
-      m_p1 = p;
+      db::DVector dp = p - m_plast;
+      m_plast = p;
 
+      m_trans = db::DTrans (dp) * m_trans;
       m_current.transform (db::DTrans (dp));
 
     } else {
 
       m_current = m_initial;
+      m_trans = db::DTrans (p - m_p1);
 
       db::DVector dx (0.5 * m_current.width (), 0.5 * m_current.height ());
       db::Matrix3d it = (m_current.matrix () * db::Matrix3d::disp (-dx)).inverted ();
@@ -847,15 +869,6 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
 
     }
 
-    //  display current images' parameters
-    show_message ();
-
-    m_selected_image_views [0]->redraw ();
-
-  }
-
-  if (m_move_mode != move_selected) {
-    show_message ();
   }
 }
 
@@ -871,7 +884,14 @@ Service::show_message ()
   */
 }
 
-void 
+void
+Service::end_move (const db::DVector &v)
+{
+  do_move (m_p1 + v, m_ac);
+  end_move (db::DPoint (), lay::AC_Any);
+}
+
+void
 Service::end_move (const db::DPoint &, lay::angle_constraint_type)
 {
   if (! m_selected_image_views.empty () && ! m_selected.empty ()) {

@@ -566,6 +566,19 @@ public:
     return m_tab_signal_enabled;
   }
 
+  /**
+   *  @brief Sets a label in front of the line edit
+   */
+  void set_label (const std::string &label);
+
+  /**
+   *  @brief Gets the label
+   */
+  const std::string &label () const
+  {
+    return m_label;
+  }
+
 signals:
   void options_button_clicked ();
   void esc_pressed ();
@@ -588,8 +601,12 @@ private:
   bool m_tab_signal_enabled;
   QLabel *mp_options_label;
   QLabel *mp_clear_label;
+  QLabel *mp_front_label;
   QMenu *mp_options_menu;
   int m_default_left_margin, m_default_right_margin;
+  std::string m_label;
+
+  void set_margins ();
 };
 
 /**

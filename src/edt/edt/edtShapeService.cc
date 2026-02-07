@@ -25,20 +25,22 @@
 #include "edtPathService.h"
 #include "edtPropertiesPages.h"
 #include "layLayoutView.h"
+#include "layEditorOptionsPage.h"
 #include "dbEdgeProcessor.h"
 #include "dbPolygonTools.h"
 
 #if defined(HAVE_QT)
-#   include "layTipDialog.h"
+#  include "layTipDialog.h"
 #endif
-
-#include "layEditorOptionsPages.h"
 
 namespace edt
 {
 
 // -----------------------------------------------------------------------------
 //  ShapeEditService implementation
+
+const char *ShapeEditService::connection_configure_name () { return "connection-toolkit-widget-value"; }
+const char *ShapeEditService::connection_function_name () { return "connection-toolkit-widget-commit"; }
 
 ShapeEditService::ShapeEditService (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types)
   : edt::Service (manager, view, shape_types), 
@@ -76,20 +78,18 @@ ShapeEditService::config_recent_for_layer (const db::LayerProperties &lp, int cv
     return;
   }
 
-#if defined(HAVE_QT)
-  lay::EditorOptionsPages *eo_pages = view ()->editor_options_pages ();
-  if (!eo_pages) {
+  lay::EditorOptionsPageCollection *eo_pages = view ()->editor_options_pages ();
+  if (! eo_pages) {
     return;
   }
 
-  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
-    if ((*op)->plugin_declaration () == plugin_declaration ()) {
+  auto pages = eo_pages->editor_options_pages ();
+  for (auto op = pages.begin (); op != pages.end (); ++op) {
+    if ((*op)->for_plugin_declaration (plugin_declaration ())) {
       (*op)->config_recent_for_layer (dispatcher (), lp, cv_index);
     }
   }
-#endif
 }
-
 
 void
 ShapeEditService::get_edit_layer ()

@@ -91,6 +91,8 @@ Finder::start (lay::LayoutViewBase *view, unsigned int cv_index, const std::vect
 {
   const lay::CellView &cv = view->cellview (cv_index);
 
+  reset_counter ();
+
   m_layers = layers;
   mp_layout = &cv->layout ();
   mp_view = view;
@@ -265,7 +267,7 @@ ShapeFinder::ShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator
     mp_prop_sel (0), m_inv_prop_sel (false), mp_progress (0),
     m_capture_all_shapes (capture_all_shapes)
 {
-  m_tries = point_sel_tests;
+  m_try_counter = m_tries = point_sel_tests;
 }
 
 struct LPContextEqualOp
@@ -440,19 +442,28 @@ ShapeFinder::find_internal (lay::LayoutViewBase *view, unsigned int cv_index, co
 
   auto flags_saved = m_flags;
 
-  try {
+  if ((m_flags & db::ShapeIterator::Texts) != 0 && mp_text_info && ! mp_text_info->point_mode ()) {
 
-    if ((m_flags & db::ShapeIterator::Texts) != 0 && mp_text_info && ! mp_text_info->point_mode ()) {
+    m_flags = db::ShapeIterator::Texts;
 
-      m_flags = db::ShapeIterator::Texts;
+    try {
 
       //  for catching all labels we search the whole view area
       db::DBox scan_region_mu = view->viewport ().box ();
       start (view, m_cv_index, trans_mu, region_mu, scan_region_mu, min_level, max_level, layers);
 
-      m_flags = db::ShapeIterator::flags_type (flags_saved - db::ShapeIterator::Texts);
-
+    } catch (StopException) {
+      //  ...
+    } catch (...) {
+      m_flags = flags_saved;
+      throw;
     }
+
+    m_flags = db::ShapeIterator::flags_type (flags_saved - db::ShapeIterator::Texts);
+
+  }
+
+  try {
 
     //  another pass with tight search box and without texts
     start (view, m_cv_index, trans_mu, region_mu, region_mu, min_level, max_level, layers);
@@ -476,10 +487,16 @@ ShapeFinder::checkpoint ()
   if (! point_mode ()) {
     ++*mp_progress;
   } else {
-    if (--m_tries < 0) {
+    if (--m_try_counter < 0) {
       throw StopException ();
     }
   }
+}
+
+void
+ShapeFinder::reset_counter ()
+{
+  m_try_counter = m_tries;
 }
 
 void 
@@ -814,10 +831,16 @@ InstFinder::checkpoint ()
   if (! point_mode ()) {
     ++*mp_progress;
   } else {
-    if (--m_tries < 0) {
+    if (--m_try_counter < 0) {
       throw StopException ();
     }
   }
+}
+
+void
+InstFinder::reset_counter ()
+{
+  m_try_counter = m_tries;
 }
 
 bool

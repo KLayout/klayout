@@ -103,6 +103,14 @@ Dispatcher::config_finalize ()
   }
 }
 
+void
+Dispatcher::function (const std::string &symbol, const std::string &args)
+{
+  if (mp_delegate) {
+    mp_delegate->function (symbol, args);
+  }
+}
+
 
 //  Writing and Reading of configuration
 

@@ -62,6 +62,15 @@ PluginDeclaration::get_options (std::vector < std::pair<std::string, std::string
   options.push_back (std::pair<std::string, std::string> (cfg_images_visible, "true"));
 }
 
+std::vector<std::string>
+PluginDeclaration::additional_editor_options_pages () const
+{
+  std::vector<std::string> names;
+  //  TODO: provide in a central place instead of borrowing from the edt module
+  names.push_back ("GenericEditorOptions");
+  return names;
+}
+
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new img::PluginDeclaration (), 4000, "img::Plugin");
 
 }

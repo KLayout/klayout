@@ -62,6 +62,7 @@ public:
   virtual void config_finalize_impl ();
   virtual void config_finalize ();
   virtual bool key_event (unsigned int key, unsigned int buttons);
+  virtual bool shortcut_override_event (unsigned int key, unsigned int buttons);
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio) ;
   bool mouse_press_event_noref (db::DPoint p, unsigned int buttons, bool prio);
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
@@ -116,6 +117,7 @@ public:
   gsi::Callback f_configure;
   gsi::Callback f_config_finalize;
   gsi::Callback f_key_event;
+  gsi::Callback f_shortcut_override_event;
   gsi::Callback f_mouse_press_event;
   gsi::Callback f_mouse_click_event;
   gsi::Callback f_mouse_double_click_event;

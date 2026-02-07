@@ -550,7 +550,7 @@ CellSelectionForm::hide_cell ()
 
 // ------------------------------------------------------------
 
-LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, db::Layout *layout, const char *name, bool all_cells, bool top_cells_only)
+LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, db::Layout *layout, const char *name, bool all_cells, bool top_cells_only, bool hide_private)
   : QDialog (parent),
     mp_lib (0), mp_layout (layout),
     m_name_cb_enabled (true),
@@ -559,7 +559,8 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, db::Layout 
     m_pcell_id (-1),
     m_is_pcell (false),
     m_all_cells (all_cells),
-    m_top_cells_only (top_cells_only)
+    m_top_cells_only (top_cells_only),
+    m_hide_private (hide_private)
 {
   mp_ui = new Ui::LibraryCellSelectionForm ();
   setObjectName (QString::fromUtf8 (name));
@@ -586,7 +587,7 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, db::Layout 
   update_cell_list ();  
 }
 
-LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, const char *name, bool all_cells, bool top_cells_only)
+LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, const char *name, bool all_cells, bool top_cells_only, bool hide_private)
   : QDialog (parent),
     mp_lib (0), mp_layout (0),
     m_name_cb_enabled (true),
@@ -595,7 +596,8 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, const char 
     m_pcell_id (-1),
     m_is_pcell (false),
     m_all_cells (all_cells),
-    m_top_cells_only (top_cells_only)
+    m_top_cells_only (top_cells_only),
+    m_hide_private (hide_private)
 {
   mp_ui = new Ui::LibraryCellSelectionForm ();
 
@@ -703,6 +705,9 @@ LibraryCellSelectionForm::update_cell_list ()
       flags |= lay::CellTreeModel::BasicCells;
       if (m_top_cells_only) {
         flags |= lay::CellTreeModel::TopCells;
+      }
+      if (m_hide_private) {
+        flags |= lay::CellTreeModel::HidePrivate;
       }
     }
 

@@ -28,8 +28,6 @@
 #include "gsiDeclLayConfigPage.h"
 #include "gsiDeclLayPlugin.h"
 
-#include "layEditorOptionsPages.h"
-
 namespace gsi
 {
 
@@ -315,6 +313,16 @@ public:
     m_options.push_back (std::make_pair (name, default_value));
   }
 
+  void add_editor_options_page_by_name (const std::string &name)
+  {
+    m_additional_editor_options_pages.push_back (name);
+  }
+
+  virtual std::vector<std::string> additional_editor_options_pages () const
+  {
+    return m_additional_editor_options_pages;
+  }
+
   void has_tool_entry (bool f)
   {
     m_implements_mouse_mode = f;
@@ -337,6 +345,7 @@ public:
 
 private:
   std::vector<std::pair<std::string, std::string> > m_options;
+  std::vector<std::string> m_additional_editor_options_pages;
   std::vector<lay::MenuEntry> m_menu_entries;
   bool m_implements_mouse_mode;
   std::string m_mouse_mode_title;
@@ -475,6 +484,21 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "\\MainWindow or listening to \\configure callbacks (either in the factory or the plugin instance). Configuration variables can "
     "be set using \"set_config\" from \\MainWindow. This scheme also works without registering the configuration options, but "
     "doing so has the advantage that it is guaranteed that a variable with this keys exists and has the given default value initially."
+  ) +
+  method ("add_editor_options_page_by_name", &gsi::PluginFactoryBase::add_editor_options_page_by_name, gsi::arg ("name"),
+    "@brief Requests an additional editor options page from the standard pool.\n"
+    "This method needs to be called in the initializer of the plugin factory class and before the 'register' call."
+    "It requests an additional editor options page from the standard pool. 'name' specifies which page is added.\n"
+    "\n"
+    "As of now, only 'GenericEditorOptions' is available to provide the basic grid and angle constraints settings. If you "
+    "wish to enable that page for the plugin, use:\n"
+    "\n"
+    "@code\n"
+    "add_editor_options_page_by_name(\"GenericEditorOptions\")\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.30.6. Before this method was introduced, the generic editor options were "
+    "always added."
   ) +
 #if defined(HAVE_QTBINDINGS)
   method ("add_editor_options_page", &PluginFactoryBase::add_editor_options_page, gsi::arg ("page"),

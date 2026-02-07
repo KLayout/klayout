@@ -32,6 +32,7 @@
 #include "dbOriginalLayerRegion.h"
 #include "dbLayoutUtils.h"
 #include "dbPropertiesFilter.h"
+#include "dbRegionProcessors.h"
 
 #include "gsiDeclDbContainerHelpers.h"
 #include "gsiDeclDbMeasureHelpers.h"
@@ -939,6 +940,69 @@ static std::vector<db::Edges> split_interacting_with_edges (const db::Edges *r, 
 static std::vector<db::Edges> split_interacting_with_region (const db::Edges *r, const db::Region &other, size_t min_count, size_t max_count)
 {
   return as_2edges_vector (r->selected_interacting_differential (other, min_count, max_count));
+}
+
+namespace {
+
+//  a combined processor that implements db::RelativeExtents on the edge bounding boxes
+
+class EdgesRelativeExtents
+  : virtual public db::EdgeToPolygonProcessorBase,
+    virtual public db::RelativeExtents
+{
+public:
+  EdgesRelativeExtents (double fx1, double fy1, double fx2, double fy2, db::Coord dx, db::Coord dy)
+    : db::RelativeExtents (fx1, fy1, fx2, fy2, dx, dy)
+  {
+    //  .. nothing yet ..
+  }
+
+  //  not needed, but mutes
+  void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
+  {
+    db::RelativeExtents::process (poly, result);
+  }
+
+  void process (const db::EdgeWithProperties &edge, std::vector<db::PolygonWithProperties> &result) const
+  {
+    db::RelativeExtents::process (db::Polygon (edge.bbox ()), result);
+  }
+};
+
+class EdgesRelativeExtentsAsEdges
+  : virtual public db::EdgeProcessorBase,
+    virtual public db::RelativeExtentsAsEdges
+{
+public:
+  EdgesRelativeExtentsAsEdges (double fx1, double fy1, double fx2, double fy2)
+    : db::RelativeExtentsAsEdges (fx1, fy1, fx2, fy2)
+  {
+    //  .. nothing yet ..
+  }
+
+  void process (const db::PolygonWithProperties &poly, std::vector<db::EdgeWithProperties> &result) const
+  {
+    db::RelativeExtentsAsEdges::process (poly, result);
+  }
+
+  void process (const db::EdgeWithProperties &edge, std::vector<db::EdgeWithProperties> &result) const
+  {
+    db::RelativeExtentsAsEdges::process (db::Polygon (edge.bbox ()), result);
+  }
+};
+
+}
+
+static db::Region extent_refs (const db::Edges *r, double fx1, double fy1, double fx2, double fy2, db::Coord dx, db::Coord dy)
+{
+  db::Region result;
+  r->processed (result, EdgesRelativeExtents (fx1, fy1, fx2, fy2, dx, dy));
+  return result;
+}
+
+static db::Edges extent_refs_edges (const db::Edges *r, double fx1, double fy1, double fx2, double fy2)
+{
+  return r->processed (EdgesRelativeExtentsAsEdges (fx1, fy1, fx2, fy2));
 }
 
 static tl::Variant nth (const db::Edges *edges, size_t n)
@@ -2372,6 +2436,14 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
   ) + 
+  method_ext ("extent_refs", &extent_refs,
+    "@hide\n"
+    "This method is provided for DRC implementation.\n"
+  ) +
+  method_ext ("extent_refs_edges", &extent_refs_edges,
+    "@hide\n"
+    "This method is provided for DRC implementation.\n"
+  ) +
   method_ext ("extended_in", &extended_in, gsi::arg ("e"),
     "@brief Returns a region with shapes representing the edges with the given width\n"
     "@param e The extension width\n"

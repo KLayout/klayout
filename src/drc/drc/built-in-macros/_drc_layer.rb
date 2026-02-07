@@ -1463,19 +1463,18 @@ CODE
     #   @li @b :right @/b or @b :r @/b: the right line @/li
     # @/ul
     #
-    # Dots are represented by small (2x2 DBU) boxes or point-like
+    # The following additional option controls the output format:
+    #
+    # @ul
+    #   @li @b as_boxes @/b: with this option, boxes (rectangular polygons) will be produced on output @/li  
+    #   @li @b as_dots @/b or @b as_edges @/b: with this option, edges will be produced on output @/li
+    # @/ul
+    #
+    # Dots on  are represented by small (2x2 DBU) boxes or point-like
     # edges with edge output. Lines are represented by narrow or 
     # flat (2 DBU) boxes or edges for edge output. Edges will follow
     # the orientation convention for the corresponding edges - i.e.
     # "inside" of the bounding box is on the right side of the edge.
-    #
-    # The following additional option controls the output format:
-    #
-    # @ul
-    #   @li @b as_boxes @/b: with this option, small boxes will be produced as markers @/li  
-    #   @li @b as_dots @/b or @b as_edges @/b: with this option, point-like edges will be produced for dots
-    #                         and edges will be produced for line-like selections @/li  
-    # @/ul
     #
     # The following table shows a few applications:
     #
@@ -1511,7 +1510,7 @@ CODE
 
         @engine._context("#{f}") do
 
-          requires_region
+          requires_edges_edge_pairs_or_region
 
           f = []
           as_edges = false
@@ -1714,7 +1713,7 @@ CODE
           dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)
 
           @engine.run_timed("\\"#{f}\\" in: " + @engine.src_line, self.data) do
-            self.data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
+            self.data.send(self.data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
               insert_object_into(new_data, block.call(object.transformed(t)), dbu_trans)
             end
             new_data
@@ -6103,6 +6102,10 @@ END
     
     def requires_edges_or_region(name = nil)
       self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || raise(name ? "#{name} requires an edge or polygon layer" : "Requires an edge or polygon layer")
+    end
+    
+    def requires_edges_edge_pairs_or_region(name = nil)
+      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::EdgePairs) || raise(name ? "#{name} requires an edge, edge pair or polygon layer" : "Requires an edge, edge pair or polygon layer")
     end
     
     def requires_edges_texts_or_region(name = nil)

@@ -197,6 +197,13 @@ Q_OBJECT
 public:
   typedef lay::AnnotationShapes::iterator obj_iterator;
 
+  //  for communicating with the toolbox widget
+  static const char *editor_options_name ();
+  static const char *xy_configure_name ();
+  static const char *d_configure_name ();
+  static const char *xy_function_name ();
+  static const char *d_function_name ();
+
   /**
    *  The current move mode:
    *    MoveNone - not moving
@@ -346,6 +353,11 @@ public:
    *  @brief Terminate a "move" operation
    */
   virtual void end_move (const db::DPoint &p, lay::angle_constraint_type ac);
+
+  /**
+   *  @brief Terminate a "move" operation with compulsory move vector
+   */
+  virtual void end_move (const db::DVector &v);
 
   /**
    *  @brief Return the bbox of the selection (reimplementation of lay::Editable interface)
@@ -498,9 +510,14 @@ public:
   }
 
   /**
-   *  @brief Implement the menu response function
+   *  @brief Implements the menu response function
    */
   void menu_activated (const  std::string &symbol);
+
+  /**
+   *  @brief Implements the toolbox widget response function
+   */
+  void function (const std::string &name, const std::string &value);
 
   /**
    *  @brief Return the annotation iterator that delivers the annotations (and only these)
@@ -583,6 +600,11 @@ private:
   MoveMode m_move_mode;
   //  The currently moving segment
   size_t m_seg_index;
+  //  When set to true, the length is confined to the value given by m_length
+  bool m_length_confined;
+  double m_length;
+  //  When set to true, the last point was established in centered fashion
+  bool m_centered;
   //  The ruler template
   std::vector<ant::Template> m_ruler_templates;
   unsigned int m_current_template;
@@ -603,10 +625,15 @@ private:
   db::DPoint snap2_visual (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac);
   lay::PointSnapToObjectResult snap2_details (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac);
   lay::TwoPointSnapToObjectResult auto_measure (const db::DPoint &p, lay::angle_constraint_type ac, const ant::Template &tpl);
+  void confine_length (ant::Object::point_list &pts);
 
   const ant::Template &current_template () const;
 
+  void show_toolbox (bool visible);
+  lay::EditorOptionsPage *toolbox_widget ();
+
   void show_message ();
+  void apply_partial_move (db::DPoint &ps);
 
   /**
    *  @brief A handler for the shape container's changed event
@@ -617,6 +644,7 @@ private:
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
+  virtual bool key_event (unsigned int key, unsigned int buttons);
   virtual void deactivated ();
 
   void snap_rulers (lay::angle_constraint_type ac);

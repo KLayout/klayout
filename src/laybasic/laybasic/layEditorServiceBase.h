@@ -186,6 +186,11 @@ public:
   virtual bool key_event (unsigned int /*key*/, unsigned int /*buttons*/);
 
   /**
+   *  @brief Shortcut override event handler
+   */
+  virtual bool shortcut_override_event (unsigned int /*key*/, unsigned int /*buttons*/);
+
+  /**
    *  @brief Mouse press event handler
    */
   virtual bool mouse_press_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
@@ -272,7 +277,6 @@ public:
    */
   virtual int focus_page_open ();
 
-#if defined(HAVE_QT)
   /**
    *  @brief Gets the editor options pages associated with this plugin
    */
@@ -282,7 +286,6 @@ public:
    *  @brief Gets the focus page or 0 if there is none
    */
   lay::EditorOptionsPage *focus_page ();
-#endif
 
 private:
   //  The marker representing the mouse cursor

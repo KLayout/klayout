@@ -89,6 +89,7 @@ class Browser;
 class ColorButton;
 class ConfigureAction;
 class EditorOptionsPages;
+class EditorOptionsPageWidget;
 class PropertiesDialog;
 
 /**
@@ -153,6 +154,19 @@ public:
    *  @brief Adds a notification
    */
   virtual void add_notification (const LayoutViewNotification &notification);
+
+  /**
+   *  @brief Removes a notification
+   */
+  virtual void remove_notification (const LayoutViewNotification &notification);
+
+  /**
+   *  @brief Adds a toolbox widget
+   *
+   *  This will take ownership over the EditorOptionsPage object until
+   *  it is re-parented.
+   */
+  virtual void add_toolbox_widget (EditorOptionsPage *toolbox_widget);
 
   /**
    *  @brief Gets the widget object that view is embedded in
@@ -376,7 +390,7 @@ public:
   /**
    *  @brief Gets the editor options pages
    */
-  virtual lay::EditorOptionsPages *editor_options_pages ();
+  virtual lay::EditorOptionsPageCollection *editor_options_pages ();
 
   /**
    *  @brief Gets the layer control panel
@@ -750,6 +764,8 @@ public:
 
   /**
    *  @brief Adds a notification
+   *
+   *  Notifications are banners that pop up at the top of the view canvas.
    */
   void add_notification (const LayoutViewNotification &notification);
 
@@ -757,6 +773,15 @@ public:
    *  @brief Removes a notification
    */
   void remove_notification (const LayoutViewNotification &notification);
+
+  /**
+   *  @brief Adds a tool box widget
+   *
+   *  Toolbox widgets are EditorOptionsPage widgets that are placed
+   *  at the top of the view canvas instead of being put into
+   *  the editor options panel.
+   */
+  void add_toolbox_widget (lay::EditorOptionsPageWidget *toolbox_widget);
 
   /**
    *  @brief Gets the LayoutView embedded into this widget

@@ -14,11 +14,28 @@
   with a left mouse button click. Move to the next vertex. Depending on the connection mode, the edges
   created are confined to certain directions. See <link href="/manual/editor_options.xml"/>
   for a detailed description of the modes. Use the "editor options" dialog (F3 shortcut) to change the mode, 
-  even during editing.
+  even during editing. 
   </p>
 
   <p>
-  Double-click at the final point to finish the polygon. Press the ESC key to cancel the operation.
+  To temporarily constrain the segment direction, press the Shift or Ctrl key or both while dragging
+  the segment. Shift will apply Manhattan 
+  constraints (vertical and horizontal only), Ctrl will allow diagonal directions in addition and 
+  pressing Shift+Ctrl will allow all directions.
+  </p>
+
+  <p>
+  Double-click at the final point or press the Enter key to finish the polygon. 
+  Press the Escape key to cancel the operation. Use the Backspace key to delete the
+  last segment.
+  </p>
+
+  <p>
+  While you drag a polygon segment, two edit boxes are shown at the top of the layout view.
+  Press the Tab key to enter these edit boxes.
+  Use the Tab and Shift+Tab keys to navigate between the boxes.
+  You can specify a numerical values for the segment vector here. Pressing the Enter key will apply these
+  relative coordinates and enter a new segment. Pressing the Escape key will leave the edit fields.
   </p>
 
   <p>

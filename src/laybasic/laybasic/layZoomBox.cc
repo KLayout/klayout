@@ -297,11 +297,6 @@ public:
   {
     return new ZoomService (view);
   }
-
-  virtual bool enable_catchall_editor_options_pages () const
-  {
-    return false;
-  }
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> zoom_service_decl (new ZoomServiceDeclaration (), -990, "laybasic::ZoomServicePlugin");

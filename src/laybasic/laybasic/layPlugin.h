@@ -51,9 +51,9 @@ class ViewService;
 class Editable;
 class Drawing;
 class TechnologyComponentProvider;
+class EditorOptionsPage;
 #if defined(HAVE_QT)
 class Browser;
-class EditorOptionsPage;
 class ConfigPage;
 #endif
 
@@ -169,6 +169,14 @@ public:
    *  @brief Destructor
    */
   virtual ~PluginDeclaration ();
+
+  /**
+   *  @brief Gets the name under which the declaration was registered
+   *
+   *  This is the name used in tl::RegisteredClass.
+   *  If the plugin declaration is not registered, an empty string is returned.
+   */
+  std::string name () const;
 
   /**
    *  @brief This method is supposed to deliver the option names available
@@ -323,7 +331,6 @@ public:
     return false;
   }
 
-#if defined(HAVE_QT)
   /**
    *  @brief Gets the editor options pages
    *
@@ -331,24 +338,26 @@ public:
    *  and these will be shown in tabs inside this widget.
    *
    *  The new pages are returned in the "pages" vector. The layout view will take ownership of these pages.
+   *
+   *  The default implementation collects pages registered through editor options page factories.
    */
-  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> & /*pages*/, lay::LayoutViewBase * /*view*/, lay::Dispatcher * /*dispatcher*/) const
-  {
-    //  .. no pages in the default implementation ..
-  }
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const;
 
   /**
-   *  @brief Gets a value indicating whether "catchall" editor options pages shall be included
-   *
-   *  "catchall" editor options pages are ones that are unspecific and render a null "plugin_declaration".
-   *  A plugin can choose to include these pages if it listens to global configuration events.
-   *  Otherwise it should return false here to suppress these pages.
+   *  @brief Gets pages created from registered factories by name
    */
-  virtual bool enable_catchall_editor_options_pages () const
+  static void get_additional_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher, const std::map<std::string, std::vector<const lay::PluginDeclaration *> > &names);
+
+  /**
+   *  @brief Returns a list of editor options pages that the plugin wants to inherit
+   *
+   *  In addition to providing pages through "get_editor_options_pages", the plugin can request pages
+   *  from globally registered factories by name.
+   */
+  virtual std::vector<std::string> additional_editor_options_pages () const
   {
-    return true;
+    return std::vector<std::string> ();
   }
-#endif
 
   /**
    *  @brief Tells if the plugin implements a "lay::ViewService" active mouse mode
@@ -744,6 +753,13 @@ public:
     // .. this implementation does nothing ..
   }
 
+  /**
+   *  @brief Generic function call
+   *
+   *  This method calls "function" on this plugin and all the children.
+   */
+  virtual void call_function (const std::string &symbol, const std::string &args);
+
 #if defined(HAVE_QT)
   /**
    *  @brief Return the lay::Browser interface if this object has one
@@ -857,6 +873,17 @@ protected:
   virtual void config_finalize ()
   {
     //  .. the default implementation does nothing ..
+  }
+
+  /**
+   *  @brief Implements a generic function call
+   *
+   *  This method can be used to establish a communication between a properties page and
+   *  a plugin for example.
+   */
+  virtual void function (const std::string & /*symbol*/, const std::string & /*args*/)
+  {
+    // .. this implementation does nothing ..
   }
 
 private:

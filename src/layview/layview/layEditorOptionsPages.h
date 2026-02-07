@@ -20,13 +20,15 @@
 
 */
 
-#if defined(HAVE_QT)
-
 #ifndef HDR_layEditorOptionsPages
 #define HDR_layEditorOptionsPages
 
-#include "laybasicCommon.h"
+#if defined(HAVE_QT)
+
+#include "layviewCommon.h"
 #include "layEditorOptionsPage.h"
+
+#include "tlObjectCollection.h"
 
 #include <QFrame>
 #include <QDialog>
@@ -50,29 +52,26 @@ class EditorOptionsModalPages;
 /**
  *  @brief The object properties tab widget
  */
-class LAYBASIC_PUBLIC EditorOptionsPages
-  : public QFrame
+class LAYVIEW_PUBLIC EditorOptionsPages
+  : public QFrame, public lay::EditorOptionsPageCollection
 {
 Q_OBJECT
 
 public:
-  EditorOptionsPages (QWidget *parent, const std::vector<lay::EditorOptionsPage *> &pages, lay::Dispatcher *root);
+  EditorOptionsPages (QWidget *parent, lay::LayoutViewBase *view, const std::vector<lay::EditorOptionsPage *> &pages);
   ~EditorOptionsPages ();
 
-  void unregister_page (lay::EditorOptionsPage *page);
-  void activate_page (lay::EditorOptionsPage *page);
-  void activate (const lay::Plugin *plugin);
-  void focusInEvent (QFocusEvent *event);
-  void make_page_current (lay::EditorOptionsPage *page);
-  bool exec_modal (lay::EditorOptionsPage *page);
+  virtual void unregister_page (lay::EditorOptionsPage *page);
+  virtual bool has_content () const;
+  virtual bool has_modal_content () const;
+  virtual void activate_page (lay::EditorOptionsPage *page);
+  virtual void make_page_current (lay::EditorOptionsPage *page);
+  virtual bool exec_modal (lay::EditorOptionsPage *page);
+  virtual std::vector<lay::EditorOptionsPage *> editor_options_pages (const lay::PluginDeclaration *plugin_declaration);
+  virtual std::vector<lay::EditorOptionsPage *> editor_options_pages ();
+  virtual void activate (const lay::Plugin *plugin);
+  virtual lay::EditorOptionsPage *page_with_name (const std::string &name);
 
-  const std::vector <lay::EditorOptionsPage *> &pages () const
-  {
-    return m_pages;
-  }
-
-  bool has_content () const;
-  bool has_modal_content () const;
   void do_apply (bool modal);
 
 public slots:
@@ -80,18 +79,20 @@ public slots:
   void setup ();
 
 private:
-  std::vector <lay::EditorOptionsPage *> m_pages;
-  lay::Dispatcher *mp_dispatcher;
+  tl::weak_collection <lay::EditorOptionsPage> m_pages;
+  lay::LayoutViewBase *mp_view;
   QTabWidget *mp_pages;
   EditorOptionsModalPages *mp_modal_pages;
+  bool m_update_enabled;
 
   void update (lay::EditorOptionsPage *page);
+  void focusInEvent (QFocusEvent *event);
 };
 
 /**
  *  @brief The object properties modal page dialog
  */
-class LAYBASIC_PUBLIC EditorOptionsModalPages
+class LAYVIEW_PUBLIC EditorOptionsModalPages
   : public QDialog
 {
 Q_OBJECT
@@ -103,7 +104,7 @@ public:
   int count ();
   int current_index ();
   void set_current_index (int index);
-  void add_page (EditorOptionsPage *page);
+  void add_page (EditorOptionsPageWidget *page);
   void remove_page (int index);
   EditorOptionsPage *widget (int index);
 
@@ -116,7 +117,7 @@ private:
   EditorOptionsPages *mp_parent;
   QTabWidget *mp_pages;
   QFrame *mp_single_page_frame;
-  EditorOptionsPage *mp_single_page;
+  EditorOptionsPageWidget *mp_single_page;
   QDialogButtonBox *mp_button_box;
 
   void update_title ();
@@ -126,4 +127,5 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif
+

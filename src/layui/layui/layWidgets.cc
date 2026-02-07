@@ -1473,6 +1473,9 @@ DecoratedLineEdit::DecoratedLineEdit (QWidget *parent)
   mp_clear_label->setCursor (Qt::ArrowCursor);
   mp_clear_label->setPixmap (QString::fromUtf8 (":/clear_edit_16px@2x.png"));
 
+  mp_front_label = new QLabel (this);
+  mp_front_label->hide ();
+
   QMargins margins = textMargins ();
   m_default_left_margin = margins.left ();
   m_default_right_margin = margins.right ();
@@ -1535,43 +1538,57 @@ bool DecoratedLineEdit::focusNextPrevChild (bool next)
   return QLineEdit::focusNextPrevChild (next);
 }
 
+void DecoratedLineEdit::set_margins ()
+{
+  int right_margin = m_default_right_margin;
+  int left_margin = m_default_left_margin;
+
+  //  right parts
+  if (m_clear_button_enabled) {
+    right_margin += mp_clear_label->sizeHint ().width () + le_decoration_space;
+  }
+
+  //  left parts
+  if (! m_label.empty ()) {
+    left_margin += mp_front_label->sizeHint ().width () + le_decoration_space;
+  }
+  if (m_options_button_enabled) {
+    left_margin += mp_options_label->sizeHint ().width () + le_decoration_space;
+  }
+
+  QMargins margins = textMargins ();
+  margins.setRight (right_margin);
+  margins.setLeft (left_margin);
+  setTextMargins (margins);
+
+  resizeEvent (0);
+}
+
 void DecoratedLineEdit::set_clear_button_enabled (bool en)
 {
   if (en != m_clear_button_enabled) {
-
     m_clear_button_enabled = en;
     mp_clear_label->setVisible (en);
-
-    QMargins margins = textMargins ();
-    if (! en) {
-      margins.setRight (m_default_right_margin);
-    } else {
-      margins.setRight (m_default_right_margin + mp_clear_label->sizeHint ().width () + le_decoration_space);
-    }
-    setTextMargins (margins);
-
-    resizeEvent (0);
-
+    set_margins ();
   }
 }
 
 void DecoratedLineEdit::set_options_button_enabled (bool en)
 {
   if (en != m_options_button_enabled) {
-
     m_options_button_enabled = en;
     mp_options_label->setVisible (en);
+    set_margins ();
+  }
+}
 
-    QMargins margins = textMargins ();
-    if (! en) {
-      margins.setLeft (m_default_left_margin);
-    } else {
-      margins.setLeft (m_default_left_margin + mp_options_label->sizeHint ().width () + le_decoration_space);
-    }
-    setTextMargins (margins);
-
-    resizeEvent (0);
-
+void DecoratedLineEdit::set_label (const std::string &label)
+{
+  if (label != m_label) {
+    m_label = label;
+    mp_front_label->setVisible (! label.empty ());
+    mp_front_label->setText (tl::to_qstring (label));
+    set_margins ();
   }
 }
 
@@ -1621,17 +1638,27 @@ void DecoratedLineEdit::mousePressEvent (QMouseEvent *event)
 void DecoratedLineEdit::resizeEvent (QResizeEvent *event)
 {
   int fw = hasFrame () ? le_frame_width : 0;
+  QRect r = geometry ();
 
-  if (m_clear_button_enabled) {
-    QSize label_size = mp_clear_label->sizeHint ();
-    QRect r = geometry ();
-    mp_clear_label->setGeometry (r.width () - fw - label_size.width (), 0, label_size.width (), r.height ());
-  }
+  int left = fw, right = r.width () - fw;
 
   if (m_options_button_enabled) {
     QSize label_size = mp_options_label->sizeHint ();
-    QRect r = geometry ();
-    mp_options_label->setGeometry (fw, 0, label_size.width (), r.height ());
+    mp_options_label->setGeometry (left, 0, label_size.width (), r.height ());
+    left += label_size.width () + le_decoration_space;
+  }
+
+  if (! m_label.empty ()) {
+    QSize label_size = mp_front_label->sizeHint ();
+    mp_front_label->setGeometry (left, 0, label_size.width (), r.height ());
+    left += label_size.width () + le_decoration_space;
+  }
+
+  if (m_clear_button_enabled) {
+    QSize label_size = mp_clear_label->sizeHint ();
+    right -= label_size.width ();
+    mp_clear_label->setGeometry (right, 0, label_size.width (), r.height ());
+    right -= le_decoration_space;
   }
 
   QLineEdit::resizeEvent (event);

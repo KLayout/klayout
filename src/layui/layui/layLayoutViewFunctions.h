@@ -166,6 +166,13 @@ private:
   bool m_clear_before;
   int m_copy_cva, m_copy_cvr;
   int m_copy_layera, m_copy_layerr;
+
+  void on_lay_free_rot (std::string text);
+  void on_lay_scale (std::string text);
+  void on_lay_move (db::DVector disp);
+  void on_sel_free_rot (std::string text);
+  void on_sel_scale (std::string text);
+  void on_sel_move (db::DVector disp);
 };
 
 }

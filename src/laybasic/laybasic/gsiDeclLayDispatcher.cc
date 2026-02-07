@@ -41,13 +41,13 @@ static lay::Dispatcher *dispatcher_instance ()
   return lay::Dispatcher::instance ();
 }
 
-static tl::Variant get_config (lay::Dispatcher *dispatcher, const std::string &name)
+static tl::Variant get_config (lay::Dispatcher *dispatcher, const std::string &name, const tl::Variant &default_value)
 {
   std::string value;
   if (dispatcher->config_get (name, value)) {
     return tl::Variant (value);
   } else {
-    return tl::Variant ();
+    return default_value;
   }
 }
 
@@ -86,12 +86,14 @@ Class<lay::Dispatcher> decl_Dispatcher ("lay", "Dispatcher",
     "exist. If it does and an error occurred, the error message is printed\n"
     "on stderr. In both cases, false is returned.\n"
   ) +
-  method_ext ("get_config", &get_config, gsi::arg ("name"),
+  method_ext ("get_config", &get_config, gsi::arg ("name"), gsi::arg ("default", tl::Variant (), "nil"),
     "@brief Gets the value of a local configuration parameter\n"
     "\n"
     "@param name The name of the configuration parameter whose value shall be obtained (a string)\n"
     "\n"
-    "@return The value of the parameter or nil if there is no such parameter\n"
+    "@return The value of the parameter or the default value if there is no such parameter\n"
+    "\n"
+    "The default value has been added in version 0.30.6."
   ) +
   method ("set_config", (void (lay::Dispatcher::*) (const std::string &, const std::string &)) &lay::Dispatcher::config_set, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Set a local configuration parameter with the given name to the given value\n"

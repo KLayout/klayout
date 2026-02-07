@@ -12,9 +12,15 @@
   All selected shapes are moved to the layer that is the current one (marked with a rectangle) in the layer list.
   The shapes will not be moved across the hierarchy but just inside their cell.
   </p>
+
   <p>
   All layers (source and target) must be located in the same layout. To move shapes to a 
   different layout, use copy &amp; paste.
+  </p>
+
+  <p>
+  You can also change the layer in the shape properties. This will effectively
+  move shapes to other layers too.
   </p>
 
 </doc>

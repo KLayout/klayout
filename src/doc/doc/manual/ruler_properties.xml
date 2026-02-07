@@ -53,9 +53,14 @@
 
   <ul>
     <li><b>$X</b>: The value of the X variable (the horizontal distance, see below for a complete list of variables).</li>
-    <li><b>$(sprintf('%.2f',X))</b>: The value of the 'X' variable formatted as two digit fixed precision value.</li>
-    <li><b>$(abs(X)+abs(Y))</b>: The manhattan distance of the ruler.</li>
+    <li><b>$(sprintf('%.2f',X))</b>: The value of the 'X' variable formatted as two digit fixed precision value.
+      The "sprintf" function follows the conventions of the same standard C function.</li>
+    <li><b>$(abs(X)+abs(Y))</b>: The Manhattan distance of the ruler.</li>
     <li><b>$min(X,Y)</b>: The minimum of X and Y.</li>
+    <li><b>$(X) ($Y)</b>: the value of the X variable, followed by the value of the Y variables in brackets. 
+      This will give a string like "2.5 (-0.5)". Note 
+      that you cannot simply write "$X ($Y)" because the expression evaluation reads that as an attempt to call a 
+      function named "X".</li>
   </ul>
 
   <p>
@@ -68,7 +73,7 @@
 
   <ul>
     <li><b>D:</b> The length of the ruler in micron units.</li>
-    <li><b>L:</b> The manhattan length of the ruler in micron units.</li>
+    <li><b>L:</b> The Manhattan length of the ruler in micron units.</li>
     <li><b>U:</b> The x-position of the ruler's first point in micron units.</li>
     <li><b>V:</b> The y-position of the ruler's first point in micron units.</li>
     <li><b>P:</b> The x-position of the ruler's second point in micron units.</li>
@@ -77,6 +82,18 @@
     <li><b>Y:</b> The vertical extension of the ruler in micron units.</li>
     <li><b>A:</b> The area enclosed by the ruler (if it was a box) in square millimeters.</li>
     <li><b>G:</b> The angle enclosed by the first and last segment of the ruler (used for angle measurement rulers).</li>
+  </ul>
+
+  <p>
+  For multi-rulers additional variables are provided for "incremental" values.
+  These are the sums of the respective values up to the given part:
+  </p>
+
+  <ul>
+    <li><b>DD:</b> The sum of all lengths up to the labelled segment.</li>
+    <li><b>LL:</b> The sum of all Manhattan up to the labelled segment.</li>
+    <li><b>XX:</b> The horizontal distance between first and current point.</li>
+    <li><b>YY:</b> The vertical distance between first and current point.</li>
   </ul>
 
 </doc>

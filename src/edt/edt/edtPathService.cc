@@ -26,6 +26,7 @@
 #include "edtPropertiesPages.h"
 
 #include "layLayoutViewBase.h"
+#include "layEditorOptionsPage.h"
 #include "layFinder.h"
 
 namespace edt
@@ -160,19 +161,47 @@ PathService::do_delete ()
 }
 
 void
-PathService::do_finish_edit ()
+PathService::do_finish_edit (bool accept)
 {
-  //  one point is reserved for the "current one"
-  if (m_points.size () < 3) {
+  //  one point is reserved for the "current one" if accept is false
+  if (! accept && ! m_points.empty ()) {
+    m_points.pop_back ();
+  }
+  if (m_points.size () < 2) {
     throw tl::Exception (tl::to_string (tr ("A path must have at least 2 points")));
   }
-  m_points.pop_back ();
 
   deliver_shape (get_path ());
 
   commit_recent ();
 
   close_editor_hooks (true);
+}
+
+void
+PathService::function (const std::string &name, const std::string &value)
+{
+  if (name == ShapeEditService::connection_function_name ()) {
+
+    try {
+
+      db::DVector dim;
+      tl::from_string (value, dim);
+
+      if (m_points.size () >= 2) {
+
+        m_last = m_points.back () = m_points.end () [-2] + dim;
+        m_points.push_back (m_last);
+
+        update_marker ();
+        update_via ();
+
+      }
+
+    } catch (...) {
+    }
+
+  }
 }
 
 void
@@ -185,12 +214,17 @@ PathService::update_marker ()
     marker->set (path, db::VCplxTrans (1.0 / layout ().dbu ()) * trans ().inverted ());
 
     if (m_points.size () >= 2) {
+      db::DVector dim = m_points.back () - m_points.end () [-2];
       view ()->message (std::string ("lx: ") +
-                        tl::micron_to_string (m_points.back ().x () - m_points.end () [-2].x ()) + 
+                        tl::micron_to_string (dim.x ()) +
                         std::string ("  ly: ") +
-                        tl::micron_to_string (m_points.back ().y () - m_points.end () [-2].y ()) + 
+                        tl::micron_to_string (dim.y ()) +
                         std::string ("  l: ") +
-                        tl::micron_to_string (m_points.back ().distance (m_points.end () [-2])));
+                        tl::micron_to_string (dim.length ()));
+      auto tb = toolbox_widget ();
+      if (tb) {
+        tb->configure (ShapeEditService::connection_configure_name (), dim.to_string ());
+      }
     }
 
   }
@@ -695,6 +729,11 @@ PathService::pop_segment ()
 bool 
 PathService::configure (const std::string &name, const std::string &value)
 {
+  auto tb = toolbox_widget ();
+  if (tb) {
+    tb->configure (name, value);
+  }
+
   if (name == cfg_edit_path_width) {
     tl::from_string (value, m_width);
     m_needs_update = true;

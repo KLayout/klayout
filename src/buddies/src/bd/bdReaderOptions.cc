@@ -475,7 +475,7 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "For example, a datatype specification of \"6,1:61,2:62\" will use datatype 6 for via geometry without a mask assignment, "
                     "datatype 61 for via geometry assigned to MASK 1 and datatype 62 for via geometry assigned to MASK 2.\n"
                     "\n"
-                    "An alternative way to provide a layer mapping is through a map file (see '--" + m_long_prefix + "lefdef-map-file')."
+                    "An alternative way to provide a layer mapping is through a map file (see '--" + m_long_prefix + "lefdef-map')."
                    )
         << tl::arg (group +
                     "#--" + m_long_prefix + "lefdef-via-geometry-datatype", &m_lefdef_via_geometry_datatype, "Specifies the via geometry layer datatype in pattern-based mode",

@@ -32,7 +32,7 @@
 #include "layLayoutView.h"
 #include "laySnap.h"
 #include "layConverters.h"
-#include "layEditorOptionsPages.h"
+#include "layEditorOptionsPage.h"
 #include "tlProgress.h"
 #include "tlTimer.h"
 
@@ -46,7 +46,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     db::Object (manager),
     mp_view (view),
     mp_transient_marker (0), 
-    m_mouse_in_view (false), m_editing (false), m_immediate (false),
+    m_mouse_buttons (0), m_mouse_in_view (false), m_editing (false), m_immediate (false),
     m_selection_maybe_invalid (false),
     m_cell_inst_service (false),
     m_flags (flags),
@@ -70,7 +70,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     db::Object (manager),
     mp_view (view),
     mp_transient_marker (0), 
-    m_mouse_in_view (false), m_editing (false), m_immediate (false),
+    m_mouse_buttons (0), m_mouse_in_view (false), m_editing (false), m_immediate (false),
     m_selection_maybe_invalid (false),
     m_cell_inst_service (true),
     m_flags (db::ShapeIterator::Nothing),
@@ -103,14 +103,21 @@ Service::~Service ()
   clear_transient_selection ();
 }
 
-lay::angle_constraint_type 
+lay::angle_constraint_type
+Service::alt_ac () const
+{
+  //  fetch m_alt_ac (which is set from mouse buttons)
+  return m_alt_ac;
+}
+
+lay::angle_constraint_type
 Service::connect_ac () const
 {
   //  m_alt_ac (which is set from mouse buttons) can override the specified connect angle constraint
   return m_alt_ac != lay::AC_Global ? m_alt_ac : m_connect_ac;
 }
 
-lay::angle_constraint_type 
+lay::angle_constraint_type
 Service::move_ac () const
 {
   //  m_alt_ac (which is set from mouse buttons) can override the specified move angle constraint
@@ -290,11 +297,23 @@ Service::snap2 (const db::DPoint &p) const
   return snap2_details (p).snapped_point;
 }
 
+lay::PointSnapToObjectResult
+Service::snap2_details (const db::DPoint &p, const db::DPoint &plast, lay::angle_constraint_type ac) const
+{
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (lay::snap_range_pixels ());
+  return lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, ac, snap_range);
+}
+
+lay::PointSnapToObjectResult
+Service::snap2_details (const db::DPoint &p, const db::DPoint &plast, bool connect) const
+{
+  return snap2_details (p, plast, connect ? connect_ac () : move_ac ());
+}
+
 db::DPoint 
 Service::snap2 (const db::DPoint &p, const db::DPoint &plast, bool connect) const
 {
-  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (lay::snap_range_pixels ());
-  return lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, connect ? connect_ac () : move_ac (), snap_range).snapped_point;
+  return snap2_details (p, plast, connect ? connect_ac () : move_ac ()).snapped_point;
 }
 
 void
@@ -544,15 +563,20 @@ void
 Service::move (const db::DPoint &pu, lay::angle_constraint_type ac)
 {
   m_alt_ac = ac;
+
   if (view ()->is_editable () && m_moving) {
+
     db::DPoint ref = snap (m_move_start);
     bool snapped = false;
     db::DPoint p = ref + snap_marker_to_grid (pu - m_move_start, snapped);
     if (! snapped) {
       p = ref + snap (pu - m_move_start, false /*move*/);
     }
+
     move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - ref));
+
   }
+
   m_alt_ac = lay::AC_Global;
 }
 
@@ -560,28 +584,46 @@ void
 Service::move_transform (const db::DPoint &pu, db::DFTrans tr, lay::angle_constraint_type ac)
 {
   m_alt_ac = ac;
+
   if (view ()->is_editable () && m_moving) {
+
     db::DPoint ref = snap (m_move_start);
     bool snapped = false;
     db::DPoint p = ref + snap_marker_to_grid (pu - m_move_start, snapped);
     if (! snapped) {
       p = ref + snap (pu - m_move_start, false /*move*/);
     }
+
     move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (tr * m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - ref));
+
   }
+
   m_alt_ac = lay::AC_Global;
 }
 
-void  
-Service::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type ac)
+void
+Service::end_move (const db::DVector &v)
 {
-  m_alt_ac = ac;
+  if (view ()->is_editable () && m_moving) {
+    transform (db::DCplxTrans (db::DTrans (v) * db::DTrans (m_move_trans.fp_trans ())));
+    move_cancel (); // formally this functionality fits here
+    //  accept changes to guiding shapes
+    handle_guiding_shape_changes (true);
+  }
+
+  m_alt_ac = lay::AC_Global;
+}
+
+void
+Service::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
+{
   if (view ()->is_editable () && m_moving) {
     transform (db::DCplxTrans (m_move_trans));
     move_cancel (); // formally this functionality fits here
     //  accept changes to guiding shapes
     handle_guiding_shape_changes (true);
   }
+
   m_alt_ac = lay::AC_Global;
 }
 
@@ -860,6 +902,7 @@ bool
 Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   m_mouse_pos = p;
+  m_mouse_buttons = buttons;
 
   if (view ()->is_editable () && prio) {
 
@@ -896,6 +939,9 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 bool   
 Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
+  m_mouse_pos = p;
+  m_mouse_buttons = buttons;
+
   if (view ()->is_editable () && prio) {
     
     if ((buttons & lay::LeftButton) != 0) {
@@ -910,9 +956,7 @@ Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       } else {
         if (do_mouse_click (p)) {
-          m_editing = false;
-          set_edit_marker (0);
-          do_finish_edit ();
+          finish_editing (false);
         }
       }
 
@@ -942,14 +986,14 @@ Service::enter_event (bool /*prio*/)
 }
 
 bool   
-Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int buttons, bool prio)
+Service::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
+  m_mouse_pos = p;
+  m_mouse_buttons = buttons;
+
   if (m_editing && prio && (buttons & lay::LeftButton) != 0) {
     m_alt_ac = lay::ac_from_buttons (buttons);
-    do_finish_edit ();
-    m_editing = false;
-    set_edit_marker (0);
-    m_alt_ac = lay::AC_Global;
+    finish_editing (false);
     return true;
   } else {
     return false;
@@ -959,6 +1003,9 @@ Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int button
 bool   
 Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
+  m_mouse_pos = p;
+  m_mouse_buttons = buttons;
+
   if (view ()->is_editable () && prio && (buttons & lay::RightButton) != 0 && m_editing) {
     m_alt_ac = lay::ac_from_buttons (buttons);
     do_mouse_transform (p, db::DFTrans (db::DFTrans::r90));
@@ -975,9 +1022,24 @@ Service::key_event (unsigned int key, unsigned int buttons)
   if (view ()->is_editable () && m_editing && buttons == 0 && key == lay::KeyBackspace) {
     do_delete ();
     return true;
+  } else if (view ()->is_editable () && m_editing && buttons == 0 && (key == lay::KeyEnter || key == lay::KeyReturn)) {
+    m_alt_ac = lay::AC_Global;
+    finish_editing (true);
+    return true;
   } else {
     return false;
   }
+}
+
+void
+Service::finish_editing (bool accept)
+{
+  do_finish_edit (accept);
+
+  m_editing = false;
+  show_toolbox (false);
+  set_edit_marker (0);
+  m_alt_ac = lay::AC_Global;
 }
 
 void
@@ -1682,16 +1744,11 @@ Service::select (const lay::ObjectInstPath &obj, lay::Editable::SelectionMode mo
 void  
 Service::move_markers (const db::DTrans &t)
 {
-  if (m_move_trans != t) {
+  if (has_selection ()) {
+    propose_move_transformation (t, 0);
+  }
 
-    //  display current move vector
-    if (has_selection ()) {
-      std::string pos = std::string ("dx: ") + tl::micron_to_string (t.disp ().x ()) + "  dy: " + tl::micron_to_string (t.disp ().y ());
-      if (t.rot () != 0) {
-        pos += std::string ("  ") + ((const db::DFTrans &) t).to_string ();
-      }
-      view ()->message (pos);
-    }
+  if (m_move_trans != t) {
 
     for (auto r = m_markers.begin (); r != m_markers.end (); ++r) {
 
@@ -1712,6 +1769,7 @@ void
 Service::begin_edit (const db::DPoint &p)
 {
   do_begin_edit (p);
+  show_toolbox (true);
   m_editing = true;
 }
 
@@ -2005,18 +2063,44 @@ Service::handle_guiding_shape_changes (bool commit)
 void
 Service::commit_recent ()
 {
-#if defined(HAVE_QT)
-  lay::EditorOptionsPages *eo_pages = view ()->editor_options_pages ();
-  if (!eo_pages) {
+  lay::EditorOptionsPageCollection *eo_pages = view ()->editor_options_pages ();
+  if (! eo_pages) {
     return;
   }
 
-  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
-    if ((*op)->plugin_declaration () == plugin_declaration ()) {
+  auto pages = eo_pages->editor_options_pages ();
+  for (auto op = pages.begin (); op != pages.end (); ++op) {
+    if ((*op)->for_plugin_declaration (plugin_declaration ())) {
       (*op)->commit_recent (view ());
     }
   }
-#endif
+}
+
+void
+Service::show_toolbox (bool visible)
+{
+  auto p = toolbox_widget ();
+  if (p) {
+    p->set_visible (visible);
+  }
+}
+
+lay::EditorOptionsPage *
+Service::toolbox_widget ()
+{
+  lay::EditorOptionsPageCollection *eo_pages = view ()->editor_options_pages ();
+  if (! eo_pages) {
+    return 0;
+  }
+
+  auto pages = eo_pages->editor_options_pages (plugin_declaration ());
+  for (auto op = pages.begin (); op != pages.end (); ++op) {
+    if ((*op)->is_toolbox_widget ()) {
+      return *op;
+    }
+  }
+
+  return 0;
 }
 
 // -------------------------------------------------------------

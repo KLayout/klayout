@@ -22,7 +22,6 @@
 
 #include "layEditorServiceBase.h"
 #include "layEditorOptionsPage.h"
-#include "layEditorOptionsPages.h"
 #include "layViewport.h"
 #include "layLayoutViewBase.h"
 #include "laybasicConfig.h"
@@ -345,22 +344,14 @@ EditorServiceBase::activated ()
   m_active = true;
 }
 
-#if defined(HAVE_QT)
-
 std::vector<lay::EditorOptionsPage *>
 EditorServiceBase::editor_options_pages ()
 {
-  lay::EditorOptionsPages *eo_pages = mp_view->editor_options_pages ();
+  lay::EditorOptionsPageCollection *eo_pages = mp_view->editor_options_pages ();
   if (!eo_pages) {
     return std::vector<lay::EditorOptionsPage *> ();
   } else {
-    std::vector<lay::EditorOptionsPage *> pages;
-    for (auto p = eo_pages->pages ().begin (); p != eo_pages->pages ().end (); ++p) {
-      if ((*p)->plugin_declaration () == plugin_declaration ()) {
-        pages.push_back (*p);
-      }
-    }
-    return pages;
+    return eo_pages->editor_options_pages (plugin_declaration ());
   }
 }
 
@@ -378,50 +369,39 @@ EditorServiceBase::focus_page ()
 }
 
 bool
-EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
+EditorServiceBase::key_event (unsigned int key, unsigned int /*buttons*/)
 {
-  if (is_active () && key == Qt::Key_Tab && buttons == 0) {
-    focus_page_open ();
-    return true;
+  if (is_active () && (key == lay::KeyTab || key == lay::KeyBacktab)) {
+    return focus_page_open () >= 0;
   } else {
     return false;
   }
+}
+
+bool
+EditorServiceBase::shortcut_override_event (unsigned int key, unsigned int /*buttons*/)
+{
+  auto fp = focus_page ();
+  return is_active ()
+      && (key == lay::KeyTab || key == lay::KeyBacktab)
+      && fp
+      && (fp->is_modal_page () || fp->is_visible ());
 }
 
 int
 EditorServiceBase::focus_page_open ()
 {
   auto fp = focus_page ();
-  return fp ? fp->show () : 0;
+  return fp ? fp->show () : -1;
 }
 
 void
 EditorServiceBase::show_error (tl::Exception &ex)
 {
   tl::error << ex.msg ();
+#if defined(HAVE_QT)
   QMessageBox::critical (ui ()->widget (), tr ("Error"), tl::to_qstring (ex.msg ()));
-}
-
-#else
-
-bool
-EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
-{
-  return false;
-}
-
-void
-EditorServiceBase::show_error (tl::Exception &ex)
-{
-  tl::error << ex.msg ();
-}
-
-int
-EditorServiceBase::focus_page_open ()
-{
-  return 0;
-}
-
 #endif
+}
 
 }

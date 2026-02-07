@@ -47,7 +47,7 @@ struct first_of_pair_cmp_f
 //  Editable implementation
 
 Editable::Editable (lay::Editables *editables)
-  : mp_editables (editables)
+  : mp_editables (editables), m_move_transformation_priority (-1)
 {
   if (editables) {
     editables->m_editables.push_back (this);
@@ -73,6 +73,20 @@ Editable::~Editable ()
   if (mp_editables) {
     mp_editables->enable (this, false);
   }
+}
+
+void
+Editable::reset_proposed_move_transformation ()
+{
+  m_move_transformation = db::DTrans ();
+  m_move_transformation_priority = -1;
+}
+
+void
+Editable::propose_move_transformation (const db::DTrans &t, unsigned int priority)
+{
+  m_move_transformation = t;
+  m_move_transformation_priority = priority;
 }
 
 // ----------------------------------------------------------------
@@ -490,6 +504,9 @@ Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
   cancel_edits ();
   clear_previous_selection ();
 
+  m_move_start = p;
+  m_move_transform = db::DFTrans ();
+
   m_move_selection = false;
   m_any_move_operation = false;
 
@@ -567,25 +584,75 @@ Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
   }
 }
 
-void 
+std::pair<int, db::DTrans>
 Editables::move (const db::DPoint &p, lay::angle_constraint_type ac)
 {
+  int move_transformation_priority = -1;
+  db::DTrans move_transformation (p - m_move_start);
+  move_transformation *= db::DTrans (m_move_transform);
+
   m_any_move_operation = true;
+
   for (iterator e = begin (); e != end (); ++e) {
+
+    e->reset_proposed_move_transformation ();
+
     e->move (p, ac);
+
+    auto pmv = e->proposed_move_transformation ();
+    if (move_transformation_priority < 0 || (pmv.first >= 0 && pmv.first <= move_transformation_priority)) {
+      move_transformation_priority = pmv.first;
+      move_transformation = pmv.second;
+    }
+
   }
+
+  return std::make_pair (move_transformation_priority, move_transformation);
 }
 
 void 
 Editables::move_transform (const db::DPoint &p, db::DFTrans t, lay::angle_constraint_type ac)
 {
   m_any_move_operation = true;
+  m_move_transform *= t;
+
   for (iterator e = begin (); e != end (); ++e) {
     e->move_transform (p, t, ac);
   }
 }
 
-void 
+void
+Editables::end_move (const db::DVector &v, db::Transaction *transaction)
+{
+  std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (tr ("Move"))));
+
+  if (m_any_move_operation) {
+
+    trans_holder->open ();
+
+    //  this dummy operation will update the screen:
+    if (manager ()) {
+      manager ()->queue (this, new db::Op ());
+    }
+
+    for (iterator e = begin (); e != end (); ++e) {
+      e->end_move (v);
+    }
+
+    //  clear the selection that was set previously
+    if (m_move_selection) {
+      clear_selection ();
+    }
+
+  } else {
+
+    trans_holder->cancel ();
+    edit_cancel ();
+
+  }
+}
+
+void
 Editables::end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Transaction *transaction)
 {
   std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (tr ("Move"))));

@@ -33,6 +33,7 @@
 #include "layConverters.h"
 #include "layLayoutCanvas.h"
 #include "layFixedFont.h"
+#include "layEditorOptionsPage.h"
 #if defined(HAVE_QT)
 #  include "layProperties.h"
 #endif
@@ -1041,6 +1042,12 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 // -------------------------------------------------------------
 //  ant::Service implementation
 
+const char *Service::editor_options_name () { return "ant-toolkit-widget-name"; }
+const char *Service::xy_configure_name () { return "ant-toolkit-widget-xy-value"; }
+const char *Service::d_configure_name () { return "ant-toolkit-widget-d-value"; }
+const char *Service::xy_function_name () { return "ant-toolkit-widget-xy-commit"; }
+const char *Service::d_function_name () { return "ant-toolkit-widget-d-commit"; }
+
 Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
   : lay::EditorServiceBase (view),
     lay::Drawing (1/*number of planes*/, view->drawings ()),
@@ -1056,6 +1063,9 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     m_drawing (false), m_current (),
     m_move_mode (MoveNone),
     m_seg_index (0),
+    m_length_confined (false),
+    m_length (0.0),
+    m_centered (false),
     m_current_template (0),
     m_hover (false),
     m_hover_wait (false),
@@ -1134,7 +1144,7 @@ Service::configure (const std::string &name, const std::string &value)
   } else if (name == cfg_ruler_snap_mode) {
 
     lay::angle_constraint_type sm = lay::AC_Any;
-    ACConverter ().from_string (value, sm);
+    lay::ACConverter ().from_string (value, sm);
     m_snap_mode = sm;
 
   } else if (name == cfg_ruler_templates) {
@@ -1167,6 +1177,21 @@ Service::current_template () const
 void 
 Service::config_finalize ()
 {
+}
+
+void
+Service::show_toolbox (bool visible)
+{
+  lay::EditorOptionsPage *tb = toolbox_widget ();
+  if (tb) {
+    tb->set_visible (visible);
+  }
+}
+
+lay::EditorOptionsPage *
+Service::toolbox_widget ()
+{
+  return mp_view->editor_options_pages () ? mp_view->editor_options_pages ()->page_with_name (editor_options_name ()) : 0;
 }
 
 void
@@ -1244,6 +1269,7 @@ void
 Service::drag_cancel () 
 {
   if (m_drawing) {
+    show_toolbox (false);
     ui ()->ungrab_mouse (this);
     m_drawing = false;
   }
@@ -1598,60 +1624,14 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
   auto ac_eff = ac == lay::AC_Global ? m_snap_mode : ac;
   clear_mouse_cursors ();
 
-  if (m_move_mode == MoveP1) {
-    
-    m_current.seg_p1 (m_seg_index, snap2_visual (m_p1, p, &m_current, ac));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP2) {
-    
-    m_current.seg_p2 (m_seg_index, snap2_visual (m_p1, p, &m_current, ac));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP12) {
-    
-    db::DPoint p12 = snap2_visual (m_p1, p, &m_current, ac);
-    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x(), p12.y ()));
-    m_current.seg_p2 (m_seg_index, db::DPoint (p12.x (), m_current.seg_p2 (m_seg_index).y ()));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP21) {
-    
-    db::DPoint p21 = snap2_visual (m_p1, p, &m_current, ac);
-    m_current.seg_p1 (m_seg_index, db::DPoint (p21.x (), m_current.seg_p1 (m_seg_index).y ()));
-    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x(), p21.y ()));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP1X) {
-    
-    db::DPoint pc = snap2_visual (m_p1, p, &m_current, ac);
-    m_current.seg_p1 (m_seg_index, db::DPoint (pc.x (), m_current.seg_p1 (m_seg_index).y ()));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP2X) {
-    
-    db::DPoint pc = snap2_visual (m_p1, p, &m_current, ac);
-    m_current.seg_p2 (m_seg_index, db::DPoint (pc.x (), m_current.seg_p2 (m_seg_index).y ()));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP1Y) {
-    
-    db::DPoint pc = snap2_visual (m_p1, p, &m_current, ac);
-    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x (), pc.y ()));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveP2Y) {
-    
-    db::DPoint pc = snap2_visual (m_p1, p, &m_current, ac);
-    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x (), pc.y ()));
-    m_rulers [0]->redraw ();
-
-  } else if (m_move_mode == MoveSelected) {
+  if (m_move_mode == MoveSelected) {
 
     db::DVector dp = p - m_p1;
     dp = lay::snap_angle (dp, ac_eff);
 
     m_trans = db::DTrans (dp + (m_p1 - db::DPoint ()) - m_trans.disp ()) * m_trans * db::DTrans (db::DPoint () - m_p1);
+
+    propose_move_transformation (m_trans, 1);
 
     snap_rulers (ac_eff);
 
@@ -1659,11 +1639,69 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
       (*r)->transform_by (db::DCplxTrans (m_trans));
     }
 
+    show_message ();
+
+  } else if (m_move_mode != MoveNone) {
+
+    db::DPoint ps = snap2_visual (m_p1, p, &m_current, ac);
+    m_trans = db::DTrans (ps - m_p1);
+
+    apply_partial_move (ps);
+
+    propose_move_transformation (db::DTrans (ps - m_p1), 1);
+
+    //  display current move distance
+    std::string pos = std::string ("dx: ") + tl::micron_to_string (ps.x () - m_p1.x ()) + "  "
+                                 + "dy: "  + tl::micron_to_string (ps.y () - m_p1.y ());
+    view ()->message (pos);
+
+  }
+}
+
+void
+Service::apply_partial_move (db::DPoint &ps)
+{
+  if (m_move_mode == MoveP1) {
+
+    m_current.seg_p1 (m_seg_index, ps);
+
+  } else if (m_move_mode == MoveP2) {
+
+    m_current.seg_p2 (m_seg_index, ps);
+
+  } else if (m_move_mode == MoveP12) {
+
+    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x(), ps.y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (ps.x (), m_current.seg_p2 (m_seg_index).y ()));
+
+  } else if (m_move_mode == MoveP21) {
+
+    m_current.seg_p1 (m_seg_index, db::DPoint (ps.x (), m_current.seg_p1 (m_seg_index).y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x(), ps.y ()));
+
+  } else if (m_move_mode == MoveP1X) {
+
+    ps.set_y (m_p1.y ());
+    m_current.seg_p1 (m_seg_index, db::DPoint (ps.x (), m_current.seg_p1 (m_seg_index).y ()));
+
+  } else if (m_move_mode == MoveP2X) {
+
+    ps.set_y (m_p1.y ());
+    m_current.seg_p2 (m_seg_index, db::DPoint (ps.x (), m_current.seg_p2 (m_seg_index).y ()));
+
+  } else if (m_move_mode == MoveP1Y) {
+
+    ps.set_x (m_p1.x ());
+    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x (), ps.y ()));
+
+  } else if (m_move_mode == MoveP2Y) {
+
+    ps.set_x (m_p1.x ());
+    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x (), ps.y ()));
+
   }
 
-  if (m_move_mode != MoveSelected) {
-    show_message ();
-  }
+  m_rulers [0]->redraw ();
 }
 
 void 
@@ -1674,6 +1712,13 @@ Service::show_message ()
                       + "  ly: " + tl::micron_to_string (m_current.p2 ().y () - m_current.p1 ().y ()) 
                       + "  l: " + tl::micron_to_string (m_current.p2 ().distance (m_current.p1 ()));
   view ()->message (pos);
+}
+
+void
+Service::end_move (const db::DVector &v)
+{
+  m_trans = db::DTrans (v) * db::DTrans (m_trans.fp_trans ());
+  end_move (db::DPoint (), lay::AC_Any);
 }
 
 void 
@@ -1704,6 +1749,9 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
       selection_to_view ();
 
     } else if (m_move_mode != MoveNone) {
+
+      db::DPoint ps = m_trans * m_p1;
+      apply_partial_move (ps);
 
       //  replace the ruler that was moved
       m_current.clean_points ();
@@ -1830,9 +1878,23 @@ Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int button
     finish_drawing ();
     return true;
 
+  } else {
+    return false;
   }
+}
 
-  return false;
+bool
+Service::key_event (unsigned int key, unsigned int buttons)
+{
+  if (m_drawing && buttons == 0 && (key == lay::KeyEnter || key == lay::KeyReturn)) {
+
+    //  ends the current ruler (specifically in multi-segment mode)
+    finish_drawing ();
+    return true;
+
+  } else {
+    return false;
+  }
 }
 
 lay::TwoPointSnapToObjectResult
@@ -1873,6 +1935,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       //  cancel any edit operations so far
       m_move_mode = MoveNone;
+      m_length_confined = false;
 
       //  reset selection
       clear_selection ();
@@ -1969,6 +2032,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
         mp_active_ruler->thaw ();
         m_drawing = true;
 
+        show_toolbox (true);
         ui ()->grab_mouse (this, false);
 
       }
@@ -1989,6 +2053,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
         pts.push_back (m_p1);
         m_current.set_points_exact (pts);
+        m_length_confined = false;
 
       }
 
@@ -2021,6 +2086,116 @@ Service::create_measure_ruler (const db::DPoint &pt, lay::angle_constraint_type 
   }
 }
 
+void
+Service::function (const std::string &name, const std::string &value)
+{
+  if (name == xy_function_name ()) {
+
+    try {
+
+      db::DVector s;
+      tl::from_string (value, s);
+
+      if (m_drawing) {
+
+        ant::Object::point_list pts = m_current.points ();
+        if (pts.size () >= 2) {
+
+          db::DVector d = pts.back () - pts [pts.size () - 2];
+
+          //  Adjust the direction so positive coordinates are in the current drag direction
+          s = db::DVector (s.x () * (d.x () < 0 ? -1.0 : 1.0), s.y () * (d.y () < 0 ? -1.0 : 1.0));
+
+          pts.back () = pts [pts.size () - 2] + s;
+          m_current.set_points_exact (pts);
+
+        }
+
+        const ant::Template &tpl = current_template ();
+
+        if (tpl.mode () == ant::Template::RulerMultiSegment || tpl.mode () == ant::Template::RulerThreeClicks) {
+
+          if (tpl.mode () == ant::Template::RulerThreeClicks && pts.size () == 3) {
+
+            finish_drawing ();
+
+          } else {
+
+            //  add a new point
+            m_p1 = pts.back ();
+
+            pts.push_back (m_p1);
+            m_current.set_points_exact (pts);
+
+          }
+
+        } else {
+
+          finish_drawing ();
+
+        }
+
+      }
+
+    } catch (...) {
+    }
+
+  } else if (name == d_function_name ()) {
+
+    try {
+
+      double s = 0.0;
+      tl::from_string (value, s);
+
+      if (m_drawing) {
+
+        m_length_confined = true;
+        m_length = s;
+
+        ant::Object::point_list pts = m_current.points ();
+        confine_length (pts);
+        m_current.set_points_exact (pts);
+
+      }
+
+    } catch (...) {
+    }
+
+  }
+}
+
+void
+Service::confine_length (ant::Object::point_list &pts)
+{
+  if (m_length_confined && pts.size () >= 2) {
+
+    const ant::Template &tpl = current_template ();
+    bool is_box_style = tpl.mode () == ant::Template::RulerNormal && (tpl.outline () == ant::Object::OL_box || tpl.outline () == ant::Object::OL_ellipse);
+
+    db::DPoint p1 = m_centered ? m_p1 : pts [pts.size () - 2];
+    db::DVector s = pts.back () - p1;
+    if (is_box_style) {
+      db::DVector snew = s;
+      double l = m_centered ? m_length * 0.5 : m_length;
+      if (fabs (s.x ()) < fabs (s.y ()) + db::epsilon) {
+        snew.set_y (l * (s.y () < 0 ? -1.0 : 1.0));
+      }
+      if (fabs (s.y ()) < fabs (s.x ()) + db::epsilon) {
+        snew.set_x (l * (s.x () < 0 ? -1.0 : 1.0));
+      }
+      s = snew;
+    } else {
+      double l = s.double_length ();
+      if (l > db::epsilon) {
+        s *= m_length / l;
+      }
+    }
+
+    pts.back () = p1 + s;
+
+  }
+}
+
 bool
 Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio) 
 {
@@ -2040,11 +2215,26 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 
   }
 
+  const ant::Template &tpl = current_template ();
+
+  //  for normal rulers with box or ellipse rendering we use a different button scheme:
+  //  Shift will keep the center, Ctrl will confine the box to a square/ellipse to a circle
+  bool is_box_style = tpl.mode () == ant::Template::RulerNormal && (tpl.outline () == ant::Object::OL_box || tpl.outline () == ant::Object::OL_ellipse);
+  bool snap_square = is_box_style && (buttons & lay::ControlButton) != 0;
+  m_centered = is_box_style && (buttons & lay::ShiftButton) != 0;
+
   lay::PointSnapToObjectResult snap_details;
   if (m_drawing) {
-    snap_details = snap2_details (m_p1, p, mp_active_ruler->ruler (), ac_from_buttons (buttons));
+    lay::angle_constraint_type ac;
+    if (snap_square) {
+      ac = lay::AC_DiagonalOnly;
+    } else if (is_box_style) {
+      ac = lay::AC_Any;
+    } else {
+      ac = ac_from_buttons (buttons);
+    }
+    snap_details = snap2_details (m_p1, p, mp_active_ruler->ruler (), ac);
   } else {
-    const ant::Template &tpl = current_template ();
     snap_details = snap1_details (p, m_obj_snap && tpl.snap () && (tpl.mode () != ant::Template::RulerAutoMetricEdge || ! view ()->transient_selection_mode ()));
   }
 
@@ -2058,9 +2248,35 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
     //  otherwise we risk manipulating p1 too.
     ant::Object::point_list pts = m_current.points ();
     if (! pts.empty ()) {
+
       pts.back () = snap_details.snapped_point;
+
+      confine_length (pts);
+
+      if (is_box_style) {
+        if (m_centered) {
+          pts.front () = m_p1 - (pts.back () - m_p1);
+        } else {
+          pts.front () = m_p1;
+        }
+      }
+
     }
+
     m_current.set_points_exact (pts);
+
+    db::DVector delta;
+    if (pts.size () >= 2) {
+      delta = pts.back () - pts[pts.size () - 2];
+      delta = db::DVector (fabs (delta.x ()), fabs (delta.y ()));
+    }
+
+    lay::EditorOptionsPage *tb = toolbox_widget ();
+    if (tb) {
+      double d = is_box_style ? std::min (fabs (delta.x ()), fabs (delta.y ())) : delta.length ();
+      tb->configure (xy_configure_name (), delta.to_string ());
+      tb->configure (d_configure_name (), tl::to_string (d));
+    }
 
     mp_active_ruler->redraw ();
     show_message ();

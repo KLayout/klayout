@@ -400,7 +400,7 @@ LayoutViewBase::init (db::Manager *mgr)
 
   mp_canvas = new lay::LayoutCanvas (this);
 
-  create_plugins ();
+  LayoutViewBase::create_plugins ();
 }
 
 void
@@ -4169,7 +4169,7 @@ LayoutViewBase::cancel_edits ()
   //  the move service takes a special role here as it manages the
   //  transaction for the collective move operation.
   if (mp_move_service) {
-    mp_move_service->cancel ();
+    mp_move_service->cancel_transaction ();
   }
 
   //  cancel all drag and pending edit operations such as move operations.
@@ -4186,7 +4186,7 @@ LayoutViewBase::finish_edits ()
   //  the move service takes a special role here as it manages the
   //  transaction for the collective move operation.
   if (mp_move_service) {
-    mp_move_service->finish ();
+    mp_move_service->finish_transaction ();
   }
 
   //  cancel all drag operations

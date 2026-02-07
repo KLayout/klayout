@@ -36,13 +36,8 @@ SOURCES += \
   gsiDeclLayTextInfo.cc \
   gsiDeclLayTlAdded.cc \
   gsiDeclLayRdbAdded.cc \
-  gsiDeclLayConfigPage.cc \
-  gsiDeclLayEditorOptionsPage.cc \
-  gsiDeclLayPlugin.cc \
-  gsiDeclLayPluginFactory.cc \
   layAbstractMenu.cc \
   layEditorOptionsPage.cc \
-  layEditorOptionsPages.cc \
   layEditorUtils.cc \
   layLayoutViewConfig.cc \
   layMargin.cc \
@@ -96,11 +91,7 @@ SOURCES += \
   layUtils.cc \
 
 HEADERS += \
-  gsiDeclLayConfigPage.h \
-  gsiDeclLayEditorOptionsPage.h \
-  gsiDeclLayPlugin.h \
   layEditorOptionsPage.h \
-  layEditorOptionsPages.h \
   layEditorUtils.h \
   layMargin.h \
   laybasicConfig.h \

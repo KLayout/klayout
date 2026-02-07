@@ -569,8 +569,10 @@ CellTreeModel::build_top_level ()
     if (mp_base) {
       m_toplevel.reserve (mp_base->child_cells ());
       for (db::Cell::child_cell_iterator child = mp_base->begin_child_cells (); ! child.at_end (); ++child) {
-        CellTreeItem *item = new CellTreeItem (mp_layout, false, *child, true, m_sorting);
-        m_toplevel.push_back (item);
+        if (name_selected (mp_layout->cell_name (*child))) {
+          CellTreeItem *item = new CellTreeItem (mp_layout, false, *child, true, m_sorting);
+          m_toplevel.push_back (item);
+        }
       }
     }
 
@@ -581,8 +583,10 @@ CellTreeModel::build_top_level ()
     if (mp_base) {
       m_toplevel.reserve (mp_base->parent_cells ());
       for (db::Cell::parent_cell_iterator parent = mp_base->begin_parent_cells (); parent != mp_base->end_parent_cells (); ++parent) {
-        CellTreeItem *item = new CellTreeItem (mp_layout, false, *parent, true, m_sorting);
-        m_toplevel.push_back (item);
+        if (name_selected (mp_layout->cell_name (*parent))) {
+          CellTreeItem *item = new CellTreeItem (mp_layout, false, *parent, true, m_sorting);
+          m_toplevel.push_back (item);
+        }
       }
     }
 
@@ -595,7 +599,9 @@ CellTreeModel::build_top_level ()
     db::Layout::top_down_const_iterator top = mp_layout->begin_top_down ();
     while (top != mp_layout->end_top_down ()) {
 
-      if (m_flat) {
+      if (! name_selected (mp_layout->cell_name (*top))) {
+        //  ignore cell
+      } else if (m_flat) {
         if ((m_flags & BasicCells) == 0 || ! mp_layout->cell (*top).is_proxy ()) {
           CellTreeItem *item = new CellTreeItem (mp_layout, false, *top, true, m_sorting);
           m_toplevel.push_back (item);
@@ -617,22 +623,28 @@ CellTreeModel::build_top_level ()
 
       for (db::Layout::pcell_iterator pc = mp_layout->begin_pcells (); pc != mp_layout->end_pcells (); ++pc) {
 
-        CellTreeItem *item = new CellTreeItem (mp_layout, true, pc->second, true, m_sorting);
-        m_toplevel.push_back (item);
+        const auto *pcell_decl = mp_layout->pcell_declaration (pc->second);
+        if (name_selected (pcell_decl->name ())) {
 
-        if ((m_flags & WithVariants) != 0) {
+          CellTreeItem *item = new CellTreeItem (mp_layout, true, pc->second, true, m_sorting);
+          m_toplevel.push_back (item);
 
-          const db::PCellHeader *pcell_header = mp_layout->pcell_header (pc->second);
-          for (db::PCellHeader::variant_iterator v = pcell_header->begin (); v != pcell_header->end (); ++v) {
-            if (mp_library && mp_library->is_retired (v->second->cell_index ())) {
-              //  skip retired cells - this means we won't show variants which are just kept
-              //  as shadow variants for the transactions.
-            } else {
-              item->add_child (new CellTreeItem (mp_layout, false, v->second->cell_index (), true, m_sorting));
+          if ((m_flags & WithVariants) != 0) {
+
+            const auto *pcell_header = mp_layout->pcell_header (pc->second);
+
+            for (db::PCellHeader::variant_iterator v = pcell_header->begin (); v != pcell_header->end (); ++v) {
+              if (mp_library && mp_library->is_retired (v->second->cell_index ())) {
+                //  skip retired cells - this means we won't show variants which are just kept
+                //  as shadow variants for the transactions.
+              } else {
+                item->add_child (new CellTreeItem (mp_layout, false, v->second->cell_index (), true, m_sorting));
+              }
             }
-          }
 
-          item->finish_children ();
+            item->finish_children ();
+
+          }
 
         }
 
@@ -647,6 +659,12 @@ CellTreeModel::build_top_level ()
   for (size_t i = 0; i < m_toplevel.size (); ++i) {
     m_toplevel [i]->set_index (i);
   }
+}
+
+bool
+CellTreeModel::name_selected (const std::string &name) const
+{
+  return ((m_flags & HidePrivate) == 0 || (! name.empty () && *name.begin () != '_'));
 }
 
 Qt::ItemFlags 

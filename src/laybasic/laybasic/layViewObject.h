@@ -125,6 +125,17 @@ public:
    */
   virtual bool key_event (unsigned int /*key*/, unsigned int /*buttons*/) { return false; }
 
+  /**
+   *  @brief Handler for the shortcut override event
+   *
+   *  This method will be called by the ViewObjectWidget object to
+   *  ask if a plugin wants to consume a key event.
+   *
+   *  If the implementation returns true, the key is passed through "key_event". Otherwise
+   *  it is handled by the shortcut system.
+   */
+  virtual bool shortcut_override_event (unsigned int /*key*/, unsigned int /*buttons*/) { return false; }
+
 #if defined(HAVE_QT)
   /**
    *  @brief The drag enter event
@@ -841,6 +852,14 @@ public:
    */
   virtual void key_event (unsigned int /*key*/, unsigned int /*buttons*/) { }
 
+  /**
+   *  @brief Handler for remaining shortcut override events
+   *
+   *  This event handler is called if no ViewObject requested handling
+   *  of this event.
+   */
+  virtual bool shortcut_override_event (unsigned int /*key*/, unsigned int /*buttons*/) { return false; }
+
 #if defined(HAVE_QT)
   /**
    *  @brief The drag enter event
@@ -1023,7 +1042,15 @@ public:
   /**
    *  @brief External entry point for key press event generation
    */
-  void send_key_press_event (unsigned int key, unsigned int buttons);
+  bool send_key_press_event(unsigned int key, unsigned int buttons);
+
+  /**
+   *  @brief External entry point for ShortcutOverride event handling
+   *
+   *  Editables may return true to indicate that they want to consume the given key
+   *  sequence through "key_pressed" instead of being handled by Qt's shortcut system.
+   */
+  bool send_shortcut_override_event(unsigned int key, unsigned int buttons);
 
   /**
    *  @brief External entry point for mouse move event generation

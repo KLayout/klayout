@@ -87,8 +87,16 @@ ACConverter::to_string (const lay::angle_constraint_type &m)
     return "any";
   } else if (m == lay::AC_Diagonal) {
     return "diagonal";
+  } else if (m == lay::AC_DiagonalOnly) {
+    return "diagonal_only";
   } else if (m == lay::AC_Ortho) {
     return "ortho";
+  } else if (m == lay::AC_Horizontal) {
+    return "horizontal";
+  } else if (m == lay::AC_Vertical) {
+    return "vertical";
+  } else if (m == lay::AC_Global) {
+    return "global";
   } else {
     return "";
   }
@@ -102,8 +110,16 @@ ACConverter::from_string (const std::string &tt, lay::angle_constraint_type &m)
     m = lay::AC_Any;
   } else if (t == "diagonal") {
     m = lay::AC_Diagonal;
+  } else if (t == "diagonal_only") {
+    m = lay::AC_DiagonalOnly;
   } else if (t == "ortho") {
     m = lay::AC_Ortho;
+  } else if (t == "horizontal") {
+    m = lay::AC_Horizontal;
+  } else if (t == "vertical") {
+    m = lay::AC_Vertical;
+  } else if (t == "global") {
+    m = lay::AC_Global;
   } else {
     m = lay::AC_Any;
   }

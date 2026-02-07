@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>665</width>
-    <height>103</height>
+    <height>108</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -56,6 +56,13 @@
       <property name="spacing">
        <number>0</number>
       </property>
+      <item row="1" column="1">
+       <widget class="QRadioButton" name="ruler_diag_rb">
+        <property name="text">
+         <string>Diagonal</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="2">
        <widget class="QRadioButton" name="ruler_hor_rb">
         <property name="text">
@@ -77,17 +84,17 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QRadioButton" name="ruler_diag_rb">
+      <item row="0" column="3">
+       <widget class="QRadioButton" name="ruler_vert_rb">
         <property name="text">
-         <string>Diagonal</string>
+         <string>Vertical only</string>
         </property>
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QRadioButton" name="ruler_vert_rb">
+       <widget class="QRadioButton" name="ruler_diag_only_rb">
         <property name="text">
-         <string>Vertical only</string>
+         <string>Diagonal only</string>
         </property>
        </widget>
       </item>
@@ -102,7 +109,6 @@
   <tabstop>ruler_ortho_rb</tabstop>
   <tabstop>ruler_diag_rb</tabstop>
   <tabstop>ruler_hor_rb</tabstop>
-  <tabstop>ruler_vert_rb</tabstop>
  </tabstops>
  <resources/>
  <connections/>

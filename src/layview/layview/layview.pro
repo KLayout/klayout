@@ -9,11 +9,14 @@ DEFINES += MAKE_LAYVIEW_LIBRARY
 RESOURCES = \
 
 SOURCES = \
+  gsiDeclLayPluginFactory.cc \
+  gsiDeclLayPlugin.cc \
+  gsiDeclLayAdditional.cc \
   layGridNet.cc \
   layviewForceLink.cc \
-  gsiDeclLayAdditional.cc \
 
 HEADERS = \
+  gsiDeclLayPlugin.h \
   layGridNet.h \
   layLayoutView.h \
   layviewForceLink.h \
@@ -24,12 +27,24 @@ HEADERS = \
     GridNetConfigPage.ui \
 
   SOURCES += \
+    gsiDeclLayEditorOptionsPage.cc \
+    gsiDeclLayConfigPage.cc \
     layGridNetConfigPage.cc \
-    layLayoutView_qt.cc \
+    layEditorOptionsPageWidget.cc \
+    layEditorOptionsFrame.cc \
+    layEditorOptionsPages.cc \
+    layMoveEditorOptionsPage.cc \
     gsiDeclLayLayoutView_qt.cc \
+    layLayoutView_qt.cc \
 
   HEADERS += \
+    gsiDeclLayEditorOptionsPage.h \
+    gsiDeclLayConfigPage.h \
     layGridNetConfigPage.h \
+    layEditorOptionsFrame.h \
+    layEditorOptionsPages.h \
+    layEditorOptionsPageWidget.h \
+    layMoveEditorOptionsPage.h \
     layLayoutView_qt.h \
 
 } else {

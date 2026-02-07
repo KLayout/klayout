@@ -191,6 +191,11 @@ public:
   virtual void end_move (const db::DPoint &p, lay::angle_constraint_type ac);
 
   /**
+   *  @brief Terminate a "move" operation with compulsory move vector
+   */
+  virtual void end_move (const db::DVector &v);
+
+  /**
    *  @brief Indicates whether objects are selected
    */
   virtual bool has_selection ();
@@ -513,9 +518,12 @@ protected:
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors
    *
-   *  This method is called when the object is finished
+   *  This method is called when the object is finished.
+   *
+   *  'accept' is set to true if triggered by the Enter/Return key, false if triggered by a mouse click.
+   *  In the latter case, first the mouse click is delivered and then "do_finish_edit" is called.
    */
-  virtual void do_finish_edit () { }
+  virtual void do_finish_edit (bool /*accept*/) { }
 
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors
@@ -611,6 +619,7 @@ protected:
   db::DPoint snap2 (const db::DPoint &p, const db::DPoint &plast, bool connect = true) const;
 
 protected:
+  lay::angle_constraint_type alt_ac () const;
   lay::angle_constraint_type connect_ac () const;
   lay::angle_constraint_type move_ac () const;
 
@@ -644,15 +653,48 @@ protected:
     return m_mouse_pos;
   }
 
+  int mouse_buttons () const
+  {
+    return m_mouse_buttons;
+  }
+
   /**
    *  @brief Commits the current configuration to the recent attributes list
    */
   void commit_recent ();
 
   /**
+   *  @brief Shows the toolbox widget in case one is registered for this plugin
+   */
+  void show_toolbox (bool visible);
+
+  /**
+   *  @brief Finishes the edit operation
+   *
+   *  Calls do_finish_edit() and terminates the editing operation.
+   *  See "do_finish_edit" for an explanation of the "accept" parameter.
+   */
+  void finish_editing (bool accept);
+
+  /**
+   *  @brief Gets the toolbox widget or 0 if none is registered
+   */
+  lay::EditorOptionsPage *toolbox_widget ();
+
+  /**
    *  @brief Point snapping with detailed return value
    */
   lay::PointSnapToObjectResult snap2_details (const db::DPoint &p) const;
+
+  /**
+   *  @brief Point snapping with detailed return value
+   */
+  lay::PointSnapToObjectResult snap2_details (const db::DPoint &p, const db::DPoint &plast, bool connect) const;
+
+  /**
+   *  @brief Point snapping with detailed return value and specific angle constraint
+   */
+  lay::PointSnapToObjectResult snap2_details (const db::DPoint &p, const db::DPoint &plast, lay::angle_constraint_type ac) const;
 
 private:
   friend class EditableSelectionIterator;
@@ -669,8 +711,11 @@ private:
   //  The marker representing the object to be edited
   std::vector<lay::ViewObject *> m_edit_markers;
 
-  //  The last mouse position
+  //  The last mouse position of the current mouse move/press/click event
   db::DPoint m_mouse_pos;
+
+  //  The buttons flag of the current mouse move/press/click event
+  int m_mouse_buttons;
 
   //  A flag indicating whether the mouse is inside the view
   bool m_mouse_in_view;

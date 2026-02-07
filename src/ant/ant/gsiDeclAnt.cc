@@ -53,6 +53,7 @@ static int outline_radius ()    { return int (ant::Object::OL_radius); }
 
 static int angle_any ()         { return int (lay::AC_Any); }
 static int angle_diagonal ()    { return int (lay::AC_Diagonal); }
+static int angle_diagonal_only () { return int (lay::AC_DiagonalOnly); }
 static int angle_ortho ()       { return int (lay::AC_Ortho); }
 static int angle_horizontal ()  { return int (lay::AC_Horizontal); }
 static int angle_vertical ()    { return int (lay::AC_Vertical); }
@@ -652,6 +653,11 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
   gsi::method ("AngleDiagonal", &gsi::angle_diagonal,
     "@brief Gets the diagonal angle code for use with the \\angle_constraint method\n"
     "If this value is specified for the angle constraint, only multiples of 45 degree are allowed."
+  ) +
+  gsi::method ("AngleDiagonalOnly", &gsi::angle_diagonal_only,
+    "@brief Gets the diagonal angle code for use with the \\angle_constraint method\n"
+    "If this value is specified for the angle constraint, only 45 degree or 135 degree are allowed.\n"
+    "This constant has been introduced in version 0.30.6."
   ) +
   gsi::method ("AngleOrtho", &gsi::angle_ortho,
     "@brief Gets the ortho angle code for use with the \\angle_constraint method\n"

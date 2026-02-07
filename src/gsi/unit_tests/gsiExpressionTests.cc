@@ -898,3 +898,19 @@ TEST(17)
                "it.add_value(17.5)").execute ();
 }
 
+//  is_a
+TEST(18)
+{
+  tl::Eval e;
+  tl::Variant v;
+  v = e.parse ("var b=B.new(); b.is_a(C)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("false"));
+  v = e.parse ("var x=X.new(); x.is_a(X)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("true"));
+  //  Y is not a base class of X
+  v = e.parse ("var x=X.new(); x.is_a(Y)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("false"));
+  //  X is a base class of Y
+  v = e.parse ("var y=Y.new(); y.is_a(X)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("true"));
+}

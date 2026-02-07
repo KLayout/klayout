@@ -24,6 +24,7 @@
 
 #include "tlInternational.h"
 #include "layEditorOptionsPages.h"
+#include "layEditorOptionsPageWidget.h"
 #include "tlExceptions.h"
 #include "layPlugin.h"
 #include "layLayoutViewBase.h"
@@ -51,8 +52,8 @@ struct EOPCompareOp
   }
 };
 
-EditorOptionsPages::EditorOptionsPages (QWidget *parent, const std::vector<lay::EditorOptionsPage *> &pages, lay::Dispatcher *dispatcher)
-  : QFrame (parent), mp_dispatcher (dispatcher)
+EditorOptionsPages::EditorOptionsPages (QWidget *parent, lay::LayoutViewBase *view, const std::vector<lay::EditorOptionsPage *> &pages)
+  : QFrame (parent), mp_view (view), m_update_enabled (true)
 {
   mp_modal_pages = new EditorOptionsModalPages (this);
 
@@ -63,9 +64,12 @@ EditorOptionsPages::EditorOptionsPages (QWidget *parent, const std::vector<lay::
   mp_pages->setSizePolicy (QSizePolicy (QSizePolicy::Ignored, QSizePolicy::Ignored));
   ly1->addWidget (mp_pages);
 
-  m_pages = pages;
-  for (std::vector <lay::EditorOptionsPage *>::const_iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-    (*p)->set_owner (this);
+  for (auto p = pages.begin (); p != pages.end (); ++p) {
+    m_pages.push_back (*p);
+  }
+
+  for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
+    p->set_owner (this);
   }
 
   update (0);
@@ -91,11 +95,33 @@ EditorOptionsPages::focusInEvent (QFocusEvent * /*event*/)
   }
 }
 
+std::vector<lay::EditorOptionsPage *>
+EditorOptionsPages::editor_options_pages (const lay::PluginDeclaration *plugin_declaration)
+{
+  std::vector<lay::EditorOptionsPage *> pages;
+  for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
+    if (p->for_plugin_declaration (plugin_declaration)) {
+      pages.push_back (const_cast<lay::EditorOptionsPage *> (p.operator-> ()));
+    }
+  }
+  return pages;
+}
+
+std::vector<lay::EditorOptionsPage *>
+EditorOptionsPages::editor_options_pages ()
+{
+  std::vector<lay::EditorOptionsPage *> pages;
+  for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
+    pages.push_back (const_cast<lay::EditorOptionsPage *> (p.operator-> ()));
+  }
+  return pages;
+}
+
 bool
 EditorOptionsPages::has_content () const
 {
-  for (std::vector <lay::EditorOptionsPage *>::const_iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if ((*p)->active () && ! (*p)->is_modal_page ()) {
+  for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
+    if (p->active () && ! p->is_modal_page () && ! p->is_toolbox_widget ()) {
       return true;
     }
   }
@@ -105,8 +131,8 @@ EditorOptionsPages::has_content () const
 bool
 EditorOptionsPages::has_modal_content () const
 {
-  for (std::vector <lay::EditorOptionsPage *>::const_iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if ((*p)->active () && (*p)->is_modal_page ()) {
+  for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
+    if (p->active () && p->is_modal_page () && ! p->is_toolbox_widget ()) {
       return true;
     }
   }
@@ -122,7 +148,7 @@ EditorOptionsPages::exec_modal (EditorOptionsPage *page)
 
       //  found the page - make it current and show the dialog
       mp_modal_pages->set_current_index (i);
-      page->setup (mp_dispatcher);
+      page->setup (mp_view);
       page->set_focus ();
       return mp_modal_pages->exec () != 0;
 
@@ -136,37 +162,57 @@ EditorOptionsPages::exec_modal (EditorOptionsPage *page)
 void
 EditorOptionsPages::activate (const lay::Plugin *plugin)
 {
+  m_update_enabled = false;
+
+  lay::EditorOptionsPage *page = 0;
+
   for (auto op = m_pages.begin (); op != m_pages.end (); ++op) {
-    bool is_active = false;
-    if ((*op)->plugin_declaration () == 0) {
-      is_active = (plugin && plugin->plugin_declaration ()->enable_catchall_editor_options_pages ());
-    } else if (plugin && plugin->plugin_declaration () == (*op)->plugin_declaration ()) {
-      is_active = true;
+
+    BEGIN_PROTECTED
+
+    bool is_active = plugin && op->for_plugin_declaration (plugin->plugin_declaration ());
+
+    //  The zero order page is picked as the initial one
+    if (is_active && ! op->active () && op->order () == 0 && page == 0) {
+      page = op.operator-> ();
     }
-    (*op)->activate (is_active);
+
+    op->activate (is_active);
+
+    END_PROTECTED
+
   }
+
+  m_update_enabled = true;
+
+  update (page);
 }
 
 void  
 EditorOptionsPages::unregister_page (lay::EditorOptionsPage *page)
 {
-  std::vector <lay::EditorOptionsPage *> pages;
-  for (std::vector <lay::EditorOptionsPage *>::const_iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if (*p != page) {
-      pages.push_back (*p);
+  m_pages.erase (page);
+  update (0);
+}
+
+lay::EditorOptionsPage *
+EditorOptionsPages::page_with_name (const std::string &name)
+{
+  for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
+    if (p->name () && name == p->name ()) {
+      return p.operator-> ();
     }
   }
-  m_pages = pages;
-  update (0);
+  return 0;
 }
 
 void
 EditorOptionsPages::make_page_current (lay::EditorOptionsPage *page)
 {
   for (int i = 0; i < mp_pages->count (); ++i) {
-    if (mp_pages->widget (i) == page) {
+    if (mp_pages->widget (i) == page->widget ()) {
       mp_pages->setCurrentIndex (i);
-      page->setup (mp_dispatcher);
+      page->setup (mp_view);
       page->set_focus ();
       break;
     }
@@ -178,7 +224,7 @@ EditorOptionsPages::activate_page (lay::EditorOptionsPage *page)
 {
   try {
     if (page->active ()) {
-      page->setup (mp_dispatcher);
+      page->setup (mp_view);
     }
   } catch (...) {
     //  catch any errors related to configuration file errors etc.
@@ -190,12 +236,20 @@ EditorOptionsPages::activate_page (lay::EditorOptionsPage *page)
 void   
 EditorOptionsPages::update (lay::EditorOptionsPage *page)
 {
-  std::vector <lay::EditorOptionsPage *> sorted_pages = m_pages;
-  std::sort (sorted_pages.begin (), sorted_pages.end (), EOPCompareOp ());
-
-  if (! page && m_pages.size () > 0) {
-    page = m_pages.back ();
+  if (! m_update_enabled) {
+    return;
   }
+
+  int index = mp_pages->currentIndex ();
+  int modal_index = -1;
+
+  std::vector <lay::EditorOptionsPageWidget *> sorted_pages;
+  for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
+    if (p->widget ()) {
+      sorted_pages.push_back (p->widget ());
+    }
+  }
+  std::sort (sorted_pages.begin (), sorted_pages.end (), EOPCompareOp ());
 
   while (mp_pages->count () > 0) {
     mp_pages->removeTab (0);
@@ -205,11 +259,22 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
     mp_modal_pages->remove_page (0);
   }
 
-  int index = -1;
-  int modal_index = -1;
+  for (auto p = sorted_pages.begin (); p != sorted_pages.end (); ++p) {
 
-  for (std::vector <lay::EditorOptionsPage *>::iterator p = sorted_pages.begin (); p != sorted_pages.end (); ++p) {
-    if ((*p)->active ()) {
+    if ((*p)->is_toolbox_widget ()) {
+
+      //  NOTE: toolbox widgets are always created, but hidden if the
+      //  page is not active. However, even inactive pages can become
+      //  visible, if needed. The "move" plugin does that if used from
+      //  externally.
+      if (! (*p)->active ()) {
+        (*p)->set_visible (false);
+      }
+
+      mp_view->add_toolbox_widget (*p);
+
+    } else if ((*p)->active ()) {
+
       if (! (*p)->is_modal_page ()) {
         if ((*p) == page) {
           index = mp_pages->count ();
@@ -221,13 +286,15 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
         }
         mp_modal_pages->add_page (*p);
       }
+
     } else {
       (*p)->setParent (0);
     }
+
   }
 
   if (index < 0) {
-    index = mp_pages->currentIndex ();
+    index = 0;
   }
   if (index >= int (mp_pages->count ())) {
     index = mp_pages->count () - 1;
@@ -250,9 +317,9 @@ EditorOptionsPages::setup ()
 {
 BEGIN_PROTECTED
 
-  for (std::vector <lay::EditorOptionsPage *>::iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if ((*p)->active ()) {
-      (*p)->setup (mp_dispatcher);
+  for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
+    if (p->active ()) {
+      p->setup (mp_view);
     }
   }
 
@@ -267,10 +334,10 @@ END_PROTECTED_W (this)
 void 
 EditorOptionsPages::do_apply (bool modal)
 {
-  for (std::vector <lay::EditorOptionsPage *>::iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if ((*p)->active () && modal == (*p)->is_modal_page ()) {
+  for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
+    if (p->active () && modal == p->is_modal_page ()) {
       //  NOTE: we apply to the root dispatcher, so other dispatchers (views) get informed too.
-      (*p)->apply (mp_dispatcher->dispatcher ());
+      p->apply (mp_view->dispatcher ());
     }
   }
 }
@@ -349,7 +416,7 @@ EditorOptionsModalPages::set_current_index (int index)
 }
 
 void
-EditorOptionsModalPages::add_page (EditorOptionsPage *page)
+EditorOptionsModalPages::add_page (EditorOptionsPageWidget *page)
 {
   if (! mp_single_page) {
     if (mp_pages->count () == 0) {
@@ -388,7 +455,7 @@ EditorOptionsModalPages::remove_page (int index)
     mp_pages->removeTab (index);
     if (mp_pages->count () == 1) {
       mp_pages->hide ();
-      mp_single_page = dynamic_cast<EditorOptionsPage *> (mp_pages->widget (0));
+      mp_single_page = dynamic_cast<EditorOptionsPageWidget *> (mp_pages->widget (0));
       mp_pages->removeTab (0);
       mp_single_page->setParent (mp_single_page_frame);
       mp_single_page_frame->layout ()->addWidget (mp_single_page);

@@ -1399,53 +1399,69 @@ LayoutViewFunctions::cm_lay_rot_cw ()
 void 
 LayoutViewFunctions::cm_lay_free_rot ()
 {
-  bool ok = false;
-  QString s = QInputDialog::getText (QApplication::activeWindow (), 
-                                     tr ("Free rotation"),
-                                     tr ("Rotation angle in degree (counterclockwise)"),
-                                     QLineEdit::Normal, QString::fromUtf8 ("0.0"), 
-                                     &ok);
+  static QString s_angle_value = QString::fromUtf8 ("0.0");
 
-  if (ok) {
+  lay::LayoutViewFunctionDialog dialog (QApplication::activeWindow (),
+                                        tr ("Free rotation"),
+                                        tr ("Rotation angle in degree (counterclockwise)"));
 
-    double angle = 0.0;
-    tl::from_string_ext (tl::to_string (s), angle);
+  dialog.accept_event.add (this, &LayoutViewFunctions::on_lay_free_rot);
+  dialog.apply_event.add (this, &LayoutViewFunctions::on_lay_free_rot);
 
-    transform_layout (db::DCplxTrans (1.0, angle, false, db::DVector ()));
+  dialog.exec_dialog (s_angle_value);
+}
 
-  }
+void
+LayoutViewFunctions::on_lay_free_rot (std::string text)
+{
+  double angle = 0.0;
+  tl::from_string_ext (text, angle);
+
+  transform_layout (db::DCplxTrans (1.0, angle, false, db::DVector ()));
 }
 
 void 
 LayoutViewFunctions::cm_lay_scale ()
 {
-  bool ok = false;
-  QString s = QInputDialog::getText (QApplication::activeWindow (), 
-                                     tr ("Scaling"),
-                                     tr ("Scaling factor"),
-                                     QLineEdit::Normal, QString::fromUtf8 ("1.0"), 
-                                     &ok);
+  static QString s_scale_value = QString::fromUtf8 ("1.0");
 
-  if (ok) {
+  lay::LayoutViewFunctionDialog dialog (QApplication::activeWindow (),
+                                        tr ("Scaling"),
+                                        tr ("Scaling factor"));
 
-    double scale = 0.0;
-    tl::from_string_ext (tl::to_string (s), scale);
+  dialog.accept_event.add (this, &LayoutViewFunctions::on_lay_scale);
+  dialog.apply_event.add (this, &LayoutViewFunctions::on_lay_scale);
 
-    transform_layout (db::DCplxTrans (scale));
+  dialog.exec_dialog (s_scale_value);
+}
 
-  }
+void
+LayoutViewFunctions::on_lay_scale (std::string text)
+{
+  double scale = 0.0;
+  tl::from_string_ext (text, scale);
+
+  transform_layout (db::DCplxTrans (scale));
 }
 
 void 
 LayoutViewFunctions::cm_lay_move ()
 {
   lay::MoveOptionsDialog options (parent_widget ());
-  if (options.exec_dialog (m_move_dist)) {
-    transform_layout (db::DCplxTrans (m_move_dist));
-  }
+
+  options.accept_event.add (this, &LayoutViewFunctions::on_lay_move);
+  options.apply_event.add (this, &LayoutViewFunctions::on_lay_move);
+
+  options.exec_dialog (m_move_dist);
 }
 
-void 
+void
+LayoutViewFunctions::on_lay_move (db::DVector dist)
+{
+  transform_layout (db::DCplxTrans (dist));
+}
+
+void
 LayoutViewFunctions::cm_sel_flip_x ()
 {
   db::DCplxTrans tr (db::DFTrans::m90);
@@ -1492,51 +1508,59 @@ LayoutViewFunctions::cm_sel_rot_cw ()
 void 
 LayoutViewFunctions::cm_sel_free_rot ()
 {
-  bool ok = false;
-  QString s = QInputDialog::getText (QApplication::activeWindow (), 
-                                     tr ("Free rotation"),
-                                     tr ("Rotation angle in degree (counterclockwise)"),
-                                     QLineEdit::Normal, QString::fromUtf8 ("0.0"), 
-                                     &ok);
+  static QString s_angle_value = QString::fromUtf8 ("0.0");
 
-  if (ok) {
+  lay::LayoutViewFunctionDialog dialog (QApplication::activeWindow (),
+                                        tr ("Free rotation"),
+                                        tr ("Rotation angle in degree (counterclockwise)"));
 
-    double angle = 0.0;
-    tl::from_string_ext (tl::to_string (s), angle);
+  dialog.accept_event.add (this, &LayoutViewFunctions::on_sel_free_rot);
+  dialog.apply_event.add (this, &LayoutViewFunctions::on_sel_free_rot);
 
-    db::DCplxTrans tr = db::DCplxTrans (1.0, angle, false, db::DVector ());
-    db::DBox sel_bbox (view ()->lay::Editables::selection_bbox ());
-    if (! sel_bbox.empty ()) {
-      tr = db::DCplxTrans (sel_bbox.center () - db::DPoint ()) * tr * db::DCplxTrans (db::DPoint () - sel_bbox.center ());
-    }
-    do_transform (tr);
-
-  }
+  dialog.exec_dialog (s_angle_value);
 }
 
-void 
+void
+LayoutViewFunctions::on_sel_free_rot (std::string text)
+{
+  double angle = 0.0;
+  tl::from_string_ext (text, angle);
+
+  db::DCplxTrans tr = db::DCplxTrans (1.0, angle, false, db::DVector ());
+  db::DBox sel_bbox (view ()->lay::Editables::selection_bbox ());
+  if (! sel_bbox.empty ()) {
+    tr = db::DCplxTrans (sel_bbox.center () - db::DPoint ()) * tr * db::DCplxTrans (db::DPoint () - sel_bbox.center ());
+  }
+  do_transform (tr);
+}
+
+void
 LayoutViewFunctions::cm_sel_scale ()
 {
-  bool ok = false;
-  QString s = QInputDialog::getText (QApplication::activeWindow (), 
-                                     tr ("Scaling"),
-                                     tr ("Scaling factor"),
-                                     QLineEdit::Normal, QString::fromUtf8 ("1.0"), 
-                                     &ok);
+  static QString s_scale_value = QString::fromUtf8 ("1.0");
 
-  if (ok) {
+  lay::LayoutViewFunctionDialog dialog (QApplication::activeWindow (),
+                                        tr ("Scaling"),
+                                        tr ("Scaling factor"));
 
-    double scale = 0.0;
-    tl::from_string_ext (tl::to_string (s), scale);
+  dialog.accept_event.add (this, &LayoutViewFunctions::on_sel_scale);
+  dialog.apply_event.add (this, &LayoutViewFunctions::on_sel_scale);
 
-    db::DCplxTrans tr = db::DCplxTrans (scale);
-    db::DBox sel_bbox (view ()->lay::Editables::selection_bbox ());
-    if (! sel_bbox.empty ()) {
-      tr = db::DCplxTrans (sel_bbox.center () - db::DPoint ()) * tr * db::DCplxTrans (db::DPoint () - sel_bbox.center ());
-    }
-    do_transform (tr);
+  dialog.exec_dialog (s_scale_value);
+}
 
+void
+LayoutViewFunctions::on_sel_scale (std::string text)
+{
+  double scale = 0.0;
+  tl::from_string_ext (text, scale);
+
+  db::DCplxTrans tr = db::DCplxTrans (scale);
+  db::DBox sel_bbox (view ()->lay::Editables::selection_bbox ());
+  if (! sel_bbox.empty ()) {
+    tr = db::DCplxTrans (sel_bbox.center () - db::DPoint ()) * tr * db::DCplxTrans (db::DPoint () - sel_bbox.center ());
   }
+  do_transform (tr);
 }
 
 void
@@ -1575,9 +1599,17 @@ void
 LayoutViewFunctions::cm_sel_move ()
 {
   lay::MoveOptionsDialog options (parent_widget ());
-  if (options.exec_dialog (m_move_dist)) {
-    do_transform (db::DCplxTrans (m_move_dist));
-  }
+
+  options.apply_event.add (this, &LayoutViewFunctions::on_sel_move);
+  options.accept_event.add (this, &LayoutViewFunctions::on_sel_move);
+
+  options.exec_dialog (m_move_dist);
+}
+
+void
+LayoutViewFunctions::on_sel_move(db::DVector disp)
+{
+  do_transform (db::DCplxTrans (disp));
 }
 
 void

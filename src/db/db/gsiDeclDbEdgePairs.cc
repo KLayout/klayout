@@ -31,6 +31,7 @@
 #include "dbEdgesUtils.h"
 #include "dbEdgePairFilters.h"
 #include "dbPropertiesFilter.h"
+#include "dbRegionProcessors.h"
 
 #include "gsiDeclDbContainerHelpers.h"
 #include "gsiDeclDbMeasureHelpers.h"
@@ -529,6 +530,71 @@ static db::Region extents1 (const db::EdgePairs *r, db::Coord d)
 static db::Region extents0 (const db::EdgePairs *r)
 {
   return extents2 (r, 0, 0);
+}
+
+namespace {
+
+//  a combined processor that implements db::RelativeExtents on the edge bounding boxes
+
+class EdgePairsRelativeExtents
+  : virtual public db::EdgePairToPolygonProcessorBase,
+    virtual public db::RelativeExtents
+{
+public:
+  EdgePairsRelativeExtents (double fx1, double fy1, double fx2, double fy2, db::Coord dx, db::Coord dy)
+    : db::RelativeExtents (fx1, fy1, fx2, fy2, dx, dy)
+  {
+    //  .. nothing yet ..
+  }
+
+  //  not needed, but mutes
+  void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
+  {
+    db::RelativeExtents::process (poly, result);
+  }
+
+  void process (const db::EdgePairWithProperties &ep, std::vector<db::PolygonWithProperties> &result) const
+  {
+    db::RelativeExtents::process (db::Polygon (ep.bbox ()), result);
+  }
+};
+
+class EdgePairsRelativeExtentsAsEdges
+  : virtual public db::EdgePairToEdgeProcessorBase,
+    virtual public db::RelativeExtentsAsEdges
+{
+public:
+  EdgePairsRelativeExtentsAsEdges (double fx1, double fy1, double fx2, double fy2)
+    : db::RelativeExtentsAsEdges (fx1, fy1, fx2, fy2)
+  {
+    //  .. nothing yet ..
+  }
+
+  void process (const db::PolygonWithProperties &poly, std::vector<db::EdgeWithProperties> &result) const
+  {
+    db::RelativeExtentsAsEdges::process (poly, result);
+  }
+
+  void process (const db::EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &result) const
+  {
+    db::RelativeExtentsAsEdges::process (db::Polygon (ep.bbox ()), result);
+  }
+};
+
+}
+
+static db::Region extent_refs (const db::EdgePairs *r, double fx1, double fy1, double fx2, double fy2, db::Coord dx, db::Coord dy)
+{
+  db::Region result;
+  r->processed (result, EdgePairsRelativeExtents (fx1, fy1, fx2, fy2, dx, dy));
+  return result;
+}
+
+static db::Edges extent_refs_edges (const db::EdgePairs *r, double fx1, double fy1, double fx2, double fy2)
+{
+  db::Edges result;
+  r->processed (result, EdgePairsRelativeExtentsAsEdges (fx1, fy1, fx2, fy2));
+  return result;
 }
 
 static db::Edges edges (const db::EdgePairs *ep)
@@ -1247,7 +1313,15 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
   ) + 
-  method_ext ("filter", &filter, gsi::arg ("filter"),
+  method_ext ("extent_refs", &extent_refs,
+    "@hide\n"
+    "This method is provided for DRC implementation.\n"
+  ) +
+  method_ext ("extent_refs_edges", &extent_refs_edges,
+    "@hide\n"
+    "This method is provided for DRC implementation.\n"
+  ) +
+ method_ext ("filter", &filter, gsi::arg ("filter"),
     "@brief Applies a generic filter in place (replacing the edge pairs from the EdgePair collection)\n"
     "See \\EdgePairFilter for a description of this feature.\n"
     "\n"

@@ -646,6 +646,11 @@
            </item>
            <item>
             <property name="text">
+             <string>Diagonal only</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
              <string>Horizontal only</string>
             </property>
            </item>

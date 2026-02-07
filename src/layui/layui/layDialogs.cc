@@ -42,6 +42,7 @@
 #include "ui_NewLayoutPropertiesDialog.h"
 #include "ui_NewLayerPropertiesDialog.h"
 #include "ui_NewCellPropertiesDialog.h"
+#include "ui_LayoutViewFunctionDialog.h"
 #include "ui_MoveOptionsDialog.h"
 #include "ui_MoveToOptionsDialog.h"
 #include "ui_DeleteCellModeDialog.h"
@@ -378,6 +379,58 @@ END_PROTECTED;
 }
 
 // --------------------------------------------------------------------------------
+//  LayoutViewFunctionDialog implementation
+
+LayoutViewFunctionDialog::LayoutViewFunctionDialog (QWidget *parent, const QString &title, const QString &label)
+  : QDialog (parent)
+{
+  setObjectName (QString::fromUtf8 ("layout_view_function_dialog"));
+  setWindowTitle (title);
+
+  mp_ui = new Ui::LayoutViewFunctionDialog ();
+  mp_ui->setupUi (this);
+
+  mp_ui->label->setText (label);
+
+  connect (mp_ui->buttonBox->button (QDialogButtonBox::Apply), SIGNAL (pressed ()), this, SLOT (apply_clicked ()));
+}
+
+LayoutViewFunctionDialog::~LayoutViewFunctionDialog ()
+{
+  delete mp_ui;
+  mp_ui = 0;
+}
+
+bool
+LayoutViewFunctionDialog::exec_dialog (QString &text)
+{
+  mp_ui->edit->setText (text);
+  if (QDialog::exec ()) {
+    text = mp_ui->edit->text ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void
+LayoutViewFunctionDialog::apply_clicked ()
+{
+BEGIN_PROTECTED;
+  apply_event (tl::to_string (mp_ui->edit->text ()));
+END_PROTECTED;
+}
+
+void
+LayoutViewFunctionDialog::accept ()
+{
+BEGIN_PROTECTED;
+  accept_event (tl::to_string (mp_ui->edit->text ()));
+  QDialog::accept ();
+END_PROTECTED;
+}
+
+// --------------------------------------------------------------------------------
 //  MoveOptionsDialog implementation
 
 MoveOptionsDialog::MoveOptionsDialog (QWidget *parent)
@@ -387,6 +440,8 @@ MoveOptionsDialog::MoveOptionsDialog (QWidget *parent)
 
   mp_ui = new Ui::MoveOptionsDialog ();
   mp_ui->setupUi (this);
+
+  connect (mp_ui->buttonBox->button (QDialogButtonBox::Apply), SIGNAL (pressed ()), this, SLOT (apply_clicked ()));
 }
 
 MoveOptionsDialog::~MoveOptionsDialog ()
@@ -402,27 +457,35 @@ MoveOptionsDialog::exec_dialog (db::DVector &disp)
   mp_ui->disp_y_le->setText (tl::to_qstring (tl::to_string (disp.y ())));
 
   if (QDialog::exec ()) {
-
-    double x = 0.0, y = 0.0;
-    tl::from_string_ext (tl::to_string (mp_ui->disp_x_le->text ()), x);
-    tl::from_string_ext (tl::to_string (mp_ui->disp_y_le->text ()), y);
-
-    disp = db::DVector (x, y);
-
+    disp = vector ();
     return true;
-
   } else {
     return false;
   }
 }
 
-void 
+db::DVector
+MoveOptionsDialog::vector ()
+{
+  double x = 0.0, y = 0.0;
+  tl::from_string_ext (tl::to_string (mp_ui->disp_x_le->text ()), x);
+  tl::from_string_ext (tl::to_string (mp_ui->disp_y_le->text ()), y);
+  return db::DVector (x, y);
+}
+
+void
+MoveOptionsDialog::apply_clicked ()
+{
+BEGIN_PROTECTED;
+  apply_event (vector ());
+END_PROTECTED;
+}
+
+void
 MoveOptionsDialog::accept ()
 {
 BEGIN_PROTECTED;
-  double x = 0.0;
-  tl::from_string_ext (tl::to_string (mp_ui->disp_x_le->text ()), x);
-  tl::from_string_ext (tl::to_string (mp_ui->disp_y_le->text ()), x);
+  accept_event (vector ());
   QDialog::accept ();
 END_PROTECTED;
 }

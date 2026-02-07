@@ -76,6 +76,7 @@
 #include "layBookmarksView.h"
 #include "layEditorOptionsFrame.h"
 #include "layEditorOptionsPages.h"
+#include "layEditorOptionsPageWidget.h"
 #include "layUtils.h"
 #include "layPropertiesDialog.h"
 #include "layQtTools.h"
@@ -188,6 +189,27 @@ LayoutViewWidget::~LayoutViewWidget ()
   lay::LayoutView *view = mp_view;
   mp_view = 0;
   delete view;
+}
+
+void
+LayoutViewWidget::add_toolbox_widget (lay::EditorOptionsPageWidget *toolbox_widget)
+{
+  if (toolbox_widget->parent () != this) {
+
+    toolbox_widget->setParent (this);
+
+    //  insert after the last notification widget
+    int index = 0;
+    for (int i = 0; i < mp_layout->count (); ++i) {
+      QLayoutItem *item = mp_layout->itemAt (i);
+      if (dynamic_cast<LayoutViewNotificationWidget *> (item)) {
+        index = i + 1;
+      }
+    }
+
+    mp_layout->insertWidget (index, toolbox_widget);
+
+  }
 }
 
 void
@@ -461,6 +483,22 @@ LayoutView::add_notification (const LayoutViewNotification &notification)
   }
 }
 
+void
+LayoutView::remove_notification (const LayoutViewNotification &notification)
+{
+  if (mp_widget) {
+    mp_widget->remove_notification (notification);
+  }
+}
+
+void
+LayoutView::add_toolbox_widget (lay::EditorOptionsPage *toolbox_widget)
+{
+  if (mp_widget && toolbox_widget->widget ()) {
+    mp_widget->add_toolbox_widget (toolbox_widget->widget ());
+  }
+}
+
 bool
 LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
 {
@@ -655,7 +693,7 @@ QWidget *LayoutView::widget ()
   return mp_widget;
 }
 
-void LayoutView::close()
+void LayoutView::close ()
 {
   close_event ();
   close_event.clear ();
@@ -758,7 +796,7 @@ LayoutView::do_change_active_cellview ()
   dm_setup_editor_option_pages ();
 }
 
-lay::EditorOptionsPages *LayoutView::editor_options_pages ()
+lay::EditorOptionsPageCollection *LayoutView::editor_options_pages ()
 {
   if (! mp_editor_options_frame) {
     return 0;
@@ -770,9 +808,10 @@ lay::EditorOptionsPages *LayoutView::editor_options_pages ()
 void LayoutView::do_setup_editor_options_pages ()
 {
   //  initialize the editor option pages
-  lay::EditorOptionsPages *eo_pages = editor_options_pages ();
+  lay::EditorOptionsPageCollection *eo_pages = editor_options_pages ();
   if (eo_pages) {
-    for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+    auto pages = eo_pages->editor_options_pages ();
+    for (auto op = pages.begin (); op != pages.end (); ++op) {
       (*op)->setup (this);
     }
   }
@@ -828,6 +867,11 @@ LayoutView *LayoutView::current ()
 void LayoutView::create_plugins (const lay::PluginDeclaration *except_this)
 {
   LayoutViewBase::create_plugins (except_this);
+
+  if (mp_editor_options_frame) {
+    mp_editor_options_frame->populate (this);
+  }
+
   dm_setup_editor_option_pages ();
 }
 
@@ -1613,7 +1657,7 @@ LayoutView::mode (int m)
 void
 LayoutView::activate_editor_option_pages ()
 {
-  lay::EditorOptionsPages *eo_pages = editor_options_pages ();
+  lay::EditorOptionsPageCollection *eo_pages = editor_options_pages ();
   if (eo_pages) {
     eo_pages->activate (active_plugin ());
   }

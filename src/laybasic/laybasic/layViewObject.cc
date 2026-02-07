@@ -257,6 +257,37 @@ public:
   END_PROTECTED
   }
 
+  bool event (QEvent *e)
+  {
+    if (e->type () == QEvent::MaxUser) {
+
+      //  GTF probe event
+      //  record the contents (the screenshot) as ASCII text
+      mp_view->gtf_probe ();
+
+      e->accept ();
+      return true;
+
+    } else if (e->type () == QEvent::ShortcutOverride) {
+
+    BEGIN_PROTECTED
+      QKeyEvent *ke = dynamic_cast<QKeyEvent *> (e);
+      if (ke) {
+        unsigned int buttons = qt_to_buttons (Qt::MouseButtons (), ke->modifiers ());
+        if (mp_view->send_shortcut_override_event ((unsigned int) ke->key (), buttons)) {
+          e->accept ();
+          return true;
+        }
+      }
+    END_PROTECTED
+
+      return false;
+
+    } else {
+      return QWidget::event (e);
+    }
+  }
+
   DragDropDataBase *get_drag_drop_data (const QMimeData *data)
   {
     if (! data || ! data->hasFormat (QString::fromUtf8 (drag_drop_mime_type ()))) {
@@ -481,24 +512,6 @@ public:
     END_PROTECTED
   }
 
-#if defined(HAVE_QT)
-  bool event (QEvent *e)
-  {
-    if (e->type () == QEvent::MaxUser) {
-
-      //  GTF probe event
-      //  record the contents (the screenshot) as ASCII text
-      mp_view->gtf_probe ();
-
-      e->accept ();
-      return true;
-
-    } else {
-      return QWidget::event (e);
-    }
-  }
-#endif
-
 private:
   ViewObjectUI *mp_view;
 };
@@ -674,7 +687,7 @@ ViewObjectUI::realize_cursor ()
 #endif
 }
 
-void
+bool
 ViewObjectUI::send_key_press_event (unsigned int key, unsigned int buttons)
 {
   bool done = false;
@@ -685,6 +698,23 @@ ViewObjectUI::send_key_press_event (unsigned int key, unsigned int buttons)
   if (! done) {
     key_event (key, buttons);
   }
+
+  return done;
+}
+
+bool
+ViewObjectUI::send_shortcut_override_event(unsigned int key, unsigned int buttons)
+{
+  bool done = false;
+  if (mp_active_service) {
+    done = (mp_active_service->enabled () && mp_active_service->shortcut_override_event (key, buttons));
+  }
+
+  if (! done) {
+    done = shortcut_override_event (key, buttons);
+  }
+
+  return done;
 }
 
 void

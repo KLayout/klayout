@@ -124,7 +124,7 @@ PointService::do_mouse_click (const db::DPoint &p)
 }
 
 void
-PointService::do_finish_edit ()
+PointService::do_finish_edit (bool /*accept*/)
 {
   deliver_shape (get_point ());
   commit_recent ();

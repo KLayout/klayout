@@ -4,6 +4,7 @@
 <doc>
 
   <title>About PCells</title>
+  <keyword name="PCells"/>
 
   <p>
   Starting with version 0.22, KLayout offers parametrized cells (PCells).

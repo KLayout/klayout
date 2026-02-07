@@ -31,6 +31,10 @@
 
 namespace lay {
 
+LAYBASIC_PUBLIC extern std::string move_editor_options_name;
+LAYBASIC_PUBLIC extern std::string move_function_name;
+LAYBASIC_PUBLIC extern std::string move_distance_setter_name;
+
 class LayoutViewBase;
 
 class LAYBASIC_PUBLIC MoveService :
@@ -41,10 +45,12 @@ public:
   ~MoveService ();
 
   bool start_move (db::Transaction *transaction = 0, bool transient_selection = false);
+  void end_move ();
 
   bool configure (const std::string &name, const std::string &value);
-  void finish ();
-  void cancel ();
+  void function (const std::string &name, const std::string &value);
+  void finish_transaction ();
+  void cancel_transaction ();
 
 private:
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio);
@@ -54,9 +60,11 @@ private:
   virtual bool mouse_release_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio);
   virtual bool wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool key_event (unsigned int key, unsigned int buttons);
+  virtual bool shortcut_override_event (unsigned int key, unsigned int buttons);
   virtual void drag_cancel ();
   virtual void deactivated ();
-  int focus_page_open ();
+  void show_toolbox (bool visible);
+  lay::EditorOptionsPage *toolbox_widget ();
 
   bool handle_click (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction);
 

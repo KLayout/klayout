@@ -417,7 +417,7 @@ InstService::do_mouse_click (const db::DPoint &p)
 }
 
 void 
-InstService::do_finish_edit ()
+InstService::do_finish_edit (bool /*accept*/)
 {
   try {
 

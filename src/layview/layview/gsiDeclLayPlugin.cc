@@ -25,9 +25,9 @@
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
 #include "gsiEnums.h"
-#include "layEditorOptionsPages.h"
 #include "layCursor.h"
 #include "layEditorUtils.h"
+#include "layEditorOptionsPageWidget.h"
 #include "layConverters.h"
 
 namespace gsi
@@ -417,6 +417,16 @@ PluginImpl::key_event (unsigned int key, unsigned int buttons)
 }
 
 bool
+PluginImpl::shortcut_override_event (unsigned int key, unsigned int buttons)
+{
+  if (f_shortcut_override_event.can_issue ()) {
+    return f_shortcut_override_event.issue<lay::ViewService, bool, unsigned int, unsigned int> (&lay::ViewService::shortcut_override_event, key, buttons);
+  } else {
+    return lay::EditorServiceBase::shortcut_override_event (key, buttons);
+  }
+}
+
+bool
 PluginImpl::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (f_mouse_press_event.can_issue ()) {
@@ -701,6 +711,31 @@ PluginImpl::move_ac (lay::angle_constraint_type ac) const
   return ac != lay::AC_Global ? ac : m_move_ac;
 }
 
+#if defined(HAVE_QTBINDINGS)
+static std::vector<lay::EditorOptionsPageWidget *>
+get_editor_options_pages (PluginImpl *plugin)
+{
+  auto pages = plugin->editor_options_pages ();
+
+  std::vector<lay::EditorOptionsPageWidget *> result;
+  for (auto p = pages.begin (); p != pages.end (); ++p) {
+    lay::EditorOptionsPageWidget *w = (*p)->widget ();
+    if (w) {
+      result.push_back (w);
+    }
+  }
+
+  return result;
+}
+
+static lay::EditorOptionsPageWidget *
+get_focus_page (PluginImpl *plugin)
+{
+  auto fp = plugin->focus_page ();
+  return fp ? fp->widget () : 0;
+}
+#endif
+
 Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
   callback ("menu_activated", &gsi::PluginImpl::menu_activated, &gsi::PluginImpl::f_menu_activated, gsi::arg ("symbol"),
     "@brief Gets called when a custom menu item is selected\n"
@@ -728,6 +763,17 @@ Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
     "@param key The Qt key code of the key that was pressed\n"
     "@param buttons A combination of the constants in the \\ButtonState class which codes both the mouse buttons and the key modifiers (.e. ShiftButton etc).\n"
     "@return True to terminate dispatcher\n"
+  ) +
+  callback ("shortcut_override_event", &gsi::PluginImpl::shortcut_override_event, &gsi::PluginImpl::f_shortcut_override_event, gsi::arg ("key"), gsi::arg ("buttons"),
+    "@brief Allows overriding keyboard shortcuts for this plugin\n"
+    "If the implementation returns true, the given key is not handled by the shortcut system, but rather\n"
+    "passed to 'key_event' the usual way.\n"
+    "\n"
+    "@param key The Qt key code of the key that was pressed\n"
+    "@param buttons A combination of the constants in the \\ButtonState class which codes both the mouse buttons and the key modifiers (.e. ShiftButton etc).\n"
+    "@return True to request 'key_event' handling\n"
+    "\n"
+    "This method has been introduced in version 0.30.5."
   ) +
   callback ("mouse_button_pressed_event", &gsi::PluginImpl::mouse_press_event_noref, &gsi::PluginImpl::f_mouse_press_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button pressed event\n"
@@ -1012,14 +1058,14 @@ Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
     "This method has been added in version 0.30.4."
   ) +
 #if defined(HAVE_QTBINDINGS)
-  gsi::method ("editor_options_pages", &gsi::PluginImpl::editor_options_pages,
+  gsi::method_ext ("editor_options_pages", &get_editor_options_pages,
     "@brief Gets the editor options pages which are associated with the view\n"
     "The editor options pages are created by the plugin factory class and are associated with this plugin.\n"
     "This method allows locating them and using them for plugin-specific purposes.\n"
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  gsi::method ("focus_page", &gsi::PluginImpl::focus_page,
+  gsi::method_ext ("focus_page", &get_focus_page,
     "@brief Gets the (first) focus page\n"
     "Focus pages are editor options pages that have a true value for \\EditorOptionsPage#is_focus_page.\n"
     "The pages can be navigated to quickly or can be shown in a modal dialog from the editor function.\n"
@@ -1027,6 +1073,7 @@ Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
+#endif
   callback ("focus_page_open", &gsi::PluginImpl::focus_page_open, &gsi::PluginImpl::f_focus_page_open,
     "@brief Gets called when the focus page wants to be opened - i.e. if 'Tab' is pressed during editing\n"
     "The default implementation calls \\EditorOptionsPage#show on the focus page.\n"
@@ -1036,7 +1083,6 @@ Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-#endif
   gsi::method ("view", &gsi::PluginImpl::view,
     "@brief Gets the view object the plugin is associated with\n"
     "This method returns the view object that the plugin is associated with.\n"
@@ -1071,6 +1117,10 @@ gsi::Enum<lay::angle_constraint_type> decl_AngleConstraintType ("lay", "AngleCon
   ) +
   gsi::enum_const ("AC_Diagonal", lay::AC_Diagonal,
     "@brief Specifies to use multiples of 45 degree.\n"
+  ) +
+  gsi::enum_const ("AC_DiagonalOnly", lay::AC_DiagonalOnly,
+    "@brief Specifies to use 45 degree or 135 degree only.\n"
+    "This variant has been introduced in version 0.30.6."
   ) +
   gsi::enum_const ("AC_Ortho", lay::AC_Ortho,
     "@brief Specifies to use multiples of 90 degree.\n"

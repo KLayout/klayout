@@ -20,26 +20,37 @@
 
 */
 
+#ifndef HDR_layMoveEditorOptionsPage
+#define HDR_layMoveEditorOptionsPage
 
-#ifndef HDR_imgPlugin
-#define HDR_imgPlugin
+#include "layviewCommon.h"
+#include "layEditorOptionsPageWidget.h"
+#include "layMove.h"
 
-#include "layPlugin.h"
+class QHBoxLayout;
 
-namespace img
-{
+namespace lay {
+  class DecoratedLineEdit;
+}
 
-extern const std::string cfg_images_visible;
+namespace lay {
 
-class PluginDeclaration
-  : public lay::PluginDeclaration
+class MoveEditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 public:
-  virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const;
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutViewBase *view) const;
-  virtual bool implements_editable (std::string &title) const;
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
-  virtual std::vector<std::string> additional_editor_options_pages () const;
+  MoveEditorOptionsPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+
+  virtual std::string title () const;
+  virtual const char *name () const;
+  virtual int order () const;
+  virtual void deactivated ();
+  virtual void commit (lay::Dispatcher *dispatcher);
+  virtual void configure (const std::string &name, const std::string &value);
+
+private:
+  QHBoxLayout *mp_layout;
+  lay::DecoratedLineEdit *mp_x_le, *mp_y_le;
 };
 
 }

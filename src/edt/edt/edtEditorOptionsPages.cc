@@ -29,6 +29,7 @@
 #include "edtPCellParametersPage.h"
 #include "edtConfig.h"
 #include "edtService.h"
+#include "edtBoxService.h"
 #include "edtEditorOptionsPages.h"
 #include "edtPropertiesPageUtils.h"
 #include "tlExceptions.h"
@@ -72,7 +73,7 @@ static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le
 //  EditorOptionsGeneric implementation
 
 EditorOptionsGeneric::EditorOptionsGeneric (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-  : EditorOptionsPage (view, dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsGeneric ();
   mp_ui->setupUi (this);
@@ -215,7 +216,7 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
 //  EditorOptionsText implementation
 
 EditorOptionsText::EditorOptionsText (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-  : lay::EditorOptionsPage (view, dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsText ();
   mp_ui->setupUi (this);
@@ -293,7 +294,7 @@ EditorOptionsText::setup (lay::Dispatcher *root)
 //  EditorOptionsPath implementation
 
 EditorOptionsPath::EditorOptionsPath (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-  : lay::EditorOptionsPage (view, dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsPath ();
   mp_ui->setupUi (this);
@@ -394,7 +395,7 @@ EditorOptionsPath::setup (lay::Dispatcher *root)
 //  EditorOptionsInst implementation
 
 EditorOptionsInst::EditorOptionsInst (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-  : lay::EditorOptionsPage (view, dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsInst ();
   mp_ui->setupUi (this);
@@ -687,7 +688,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
 //  EditorOptionsInstPCellParam implementation
 
 EditorOptionsInstPCellParam::EditorOptionsInstPCellParam (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-  : lay::EditorOptionsPage (view, dispatcher), mp_pcell_parameters (0), mp_placeholder_label (0)
+  : lay::EditorOptionsPageWidget (view, dispatcher), mp_pcell_parameters (0), mp_placeholder_label (0)
 {
   mp_ui = new Ui::EditorOptionsInstPCellParam ();
   mp_ui->setupUi (this);
@@ -897,6 +898,348 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
 
   }
 }
+
+// ------------------------------------------------------------------
+//  Box toolbox widget
+
+BoxToolboxWidget::BoxToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher)
+{
+  mp_layout = new QHBoxLayout (this);
+
+  mp_x_le = new lay::DecoratedLineEdit (this);
+  mp_x_le->set_label ("w:");
+  mp_layout->addWidget (mp_x_le);
+
+  mp_y_le = new lay::DecoratedLineEdit (this);
+  mp_y_le->set_label ("h:");
+  mp_layout->addWidget (mp_y_le);
+
+  mp_layout->addStretch (1);
+
+  hide ();
+
+  set_toolbox_widget (true);
+  set_transparent (true);
+}
+
+BoxToolboxWidget::~BoxToolboxWidget ()
+{
+  //  .. nothing yet ..
+}
+
+std::string
+BoxToolboxWidget::title () const
+{
+  return "Box Options";
+}
+
+void
+BoxToolboxWidget::deactivated ()
+{
+  hide ();
+}
+
+void
+BoxToolboxWidget::commit (lay::Dispatcher *dispatcher)
+{
+  try {
+
+    double dx = 0.0, dy = 0.0;
+
+    tl::from_string (tl::to_string (mp_x_le->text ()), dx);
+    tl::from_string (tl::to_string (mp_y_le->text ()), dy);
+
+    dispatcher->call_function (BoxService::function_name (), db::DVector (dx, dy).to_string ());
+
+  } catch (...) {
+  }
+}
+
+void
+BoxToolboxWidget::configure (const std::string &name, const std::string &value)
+{
+  if (name == BoxService::configure_name () && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
+
+    try {
+
+      db::DVector mv;
+      tl::from_string (value, mv);
+
+      mp_x_le->setText (tl::to_qstring (tl::micron_to_string (mv.x ())));
+      mp_y_le->setText (tl::to_qstring (tl::micron_to_string (mv.y ())));
+
+    } catch (...) {
+    }
+
+  }
+}
+
+// ------------------------------------------------------------------
+//  Connections toolbox widget (for polygons)
+
+ConnectionToolboxWidget::ConnectionToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher), m_in_commit (false)
+{
+  mp_layout = new QHBoxLayout (this);
+
+  mp_x_le = new lay::DecoratedLineEdit (this);
+  mp_x_le->set_label ("dx:");
+  mp_layout->addWidget (mp_x_le);
+
+  mp_y_le = new lay::DecoratedLineEdit (this);
+  mp_y_le->set_label ("dy:");
+  mp_layout->addWidget (mp_y_le);
+
+  mp_layout->addStretch (1);
+
+  hide ();
+
+  set_toolbox_widget (true);
+  set_transparent (true);
+}
+
+ConnectionToolboxWidget::~ConnectionToolboxWidget ()
+{
+  //  .. nothing yet ..
+}
+
+std::string
+ConnectionToolboxWidget::title () const
+{
+  return "Connection Options";
+}
+
+void
+ConnectionToolboxWidget::deactivated ()
+{
+  hide ();
+}
+
+void
+ConnectionToolboxWidget::commit (lay::Dispatcher *dispatcher)
+{
+  m_in_commit = true;
+
+  try {
+
+    double dx = 0.0, dy = 0.0;
+
+    tl::from_string (tl::to_string (mp_x_le->text ()), dx);
+    tl::from_string (tl::to_string (mp_y_le->text ()), dy);
+
+    dispatcher->call_function (ShapeEditService::connection_function_name (), db::DVector (dx, dy).to_string ());
+
+  } catch (...) {
+  }
+
+  m_in_commit = false;
+}
+
+void
+ConnectionToolboxWidget::configure (const std::string &name, const std::string &value)
+{
+  if (name == ShapeEditService::connection_configure_name () &&
+      ((! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) || m_in_commit)) {
+
+    try {
+
+      db::DVector mv;
+      tl::from_string (value, mv);
+
+      mp_x_le->setText (tl::to_qstring (tl::micron_to_string (mv.x ())));
+      mp_y_le->setText (tl::to_qstring (tl::micron_to_string (mv.y ())));
+
+    } catch (...) {
+    }
+
+  }
+}
+
+// ------------------------------------------------------------------
+//  Connections toolbox widget (for paths)
+
+PathConnectionToolboxWidget::PathConnectionToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher), m_in_commit (false)
+{
+  mp_layout = new QHBoxLayout (this);
+
+  mp_x_le = new lay::DecoratedLineEdit (this);
+  mp_x_le->set_label ("dx:");
+  mp_layout->addWidget (mp_x_le);
+
+  mp_y_le = new lay::DecoratedLineEdit (this);
+  mp_y_le->set_label ("dy:");
+  mp_layout->addWidget (mp_y_le);
+
+  mp_width = new lay::DecoratedLineEdit (this);
+  mp_width->set_label ("w:");
+  mp_layout->addWidget (mp_width);
+
+  mp_layout->addStretch (1);
+
+  hide ();
+
+  set_toolbox_widget (true);
+  set_transparent (true);
+}
+
+PathConnectionToolboxWidget::~PathConnectionToolboxWidget ()
+{
+  //  .. nothing yet ..
+}
+
+std::string
+PathConnectionToolboxWidget::title () const
+{
+  return "Path Connection Options";
+}
+
+void
+PathConnectionToolboxWidget::deactivated ()
+{
+  hide ();
+}
+
+void
+PathConnectionToolboxWidget::commit (lay::Dispatcher *dispatcher)
+{
+  m_in_commit = true;
+
+  try {
+
+    if (mp_x_le->hasFocus () || mp_y_le->hasFocus ()) {
+
+      double dx = 0.0, dy = 0.0;
+
+      tl::from_string (tl::to_string (mp_x_le->text ()), dx);
+      tl::from_string (tl::to_string (mp_y_le->text ()), dy);
+
+      dispatcher->call_function (ShapeEditService::connection_function_name (), db::DVector (dx, dy).to_string ());
+
+    } else if (mp_width->hasFocus ()) {
+
+      double w = 0.0;
+      tl::from_string (tl::to_string (mp_width->text ()), w);
+
+      //  NOTE: going the way through "configure" makes the width part of the recent path configuration
+      dispatcher->config_set (cfg_edit_path_width, tl::to_string (w));
+
+    }
+
+  } catch (...) {
+  }
+
+  m_in_commit = false;
+}
+
+void
+PathConnectionToolboxWidget::configure (const std::string &name, const std::string &value)
+{
+  if (name == ShapeEditService::connection_configure_name () &&
+      ((! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) || m_in_commit)) {
+
+    try {
+
+      db::DVector mv;
+      tl::from_string (value, mv);
+
+      mp_x_le->setText (tl::to_qstring (tl::micron_to_string (mv.x ())));
+      mp_y_le->setText (tl::to_qstring (tl::micron_to_string (mv.y ())));
+
+    } catch (...) {
+    }
+
+  } else if (name == cfg_edit_path_width &&
+      (! mp_width->hasFocus () || m_in_commit)) {
+
+    try {
+
+      double w = 0.0;
+      tl::from_string (value, w);
+
+      mp_width->setText (tl::to_qstring (tl::micron_to_string (w)));
+
+    } catch (...) {
+    }
+
+  }
+}
+
+// ------------------------------------------------------------------
+//  Connections toolbox widget (for texts)
+
+TextToolboxWidget::TextToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+  : lay::EditorOptionsPageWidget (view, dispatcher), m_in_commit (false)
+{
+  mp_layout = new QHBoxLayout (this);
+
+  mp_text = new lay::DecoratedLineEdit (this);
+  mp_text->set_label ("l:");
+  mp_layout->addWidget (mp_text);
+
+  mp_layout->addStretch (1);
+
+  hide ();
+
+  set_toolbox_widget (true);
+  set_transparent (true);
+}
+
+TextToolboxWidget::~TextToolboxWidget ()
+{
+  //  .. nothing yet ..
+}
+
+std::string
+TextToolboxWidget::title () const
+{
+  return "Text Options";
+}
+
+void
+TextToolboxWidget::deactivated ()
+{
+  hide ();
+}
+
+void
+TextToolboxWidget::commit (lay::Dispatcher *dispatcher)
+{
+  m_in_commit = true;
+
+  try {
+    dispatcher->config_set (cfg_edit_text_string, tl::to_string (mp_text->text ()));
+  } catch (...) {
+  }
+
+  m_in_commit = false;
+}
+
+void
+TextToolboxWidget::configure (const std::string &name, const std::string &value)
+{
+  if (name == cfg_edit_text_string && (! mp_text->hasFocus () || m_in_commit)) {
+    mp_text->setText (tl::to_qstring (value));
+  }
+}
+
+// ------------------------------------------------------------------
+//  Registrations
+
+//  unspecific editor options - used for all plugins that want it
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_generic (new lay::EditorOptionsPageFactory<EditorOptionsGeneric> ("GenericEditorOptions"), 0);
+
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_texts (new lay::EditorOptionsPageFactory<edt::EditorOptionsText> ("edt::Service(Texts)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_paths (new lay::EditorOptionsPageFactory<edt::EditorOptionsPath> ("edt::Service(Paths)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_insts (new lay::EditorOptionsPageFactory<edt::EditorOptionsInstPCellParam> ("edt::Service(CellInstances)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_insts_pcell (new lay::EditorOptionsPageFactory<edt::EditorOptionsInst> ("edt::Service(CellInstances)"), 0);
+
+//  toolkit widgets
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_box_tookit_widget_factory (new lay::EditorOptionsPageFactory<BoxToolboxWidget> ("edt::Service(Boxes)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_path_connection_tookit_widget_factory (new lay::EditorOptionsPageFactory<PathConnectionToolboxWidget> ("edt::Service(Paths)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_connection_tookit_widget_factory_polygons (new lay::EditorOptionsPageFactory<ConnectionToolboxWidget> ("edt::Service(Polygons)"), 0);
+static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_text_tookit_widget_factory (new lay::EditorOptionsPageFactory<TextToolboxWidget> ("edt::Service(Texts)"), 0);
 
 }
 

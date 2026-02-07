@@ -24,11 +24,16 @@
 #include "layEditable.h"
 #include "layLayoutViewBase.h"
 #include "layEditorUtils.h"
+#include "layEditorOptionsPage.h"
 #include "laySelector.h"
 #include "laybasicConfig.h"
 
 namespace lay
 {
+
+LAYBASIC_PUBLIC std::string move_editor_options_name ("move-editor-options");
+LAYBASIC_PUBLIC std::string move_function_name ("move-execute");
+LAYBASIC_PUBLIC std::string move_distance_setter_name ("move-distance");
 
 // -------------------------------------------------------------
 //  MoveService implementation
@@ -55,7 +60,11 @@ MoveService::deactivated ()
   EditorServiceBase::deactivated ();
   m_shift = db::DPoint ();
   mp_editables->clear_transient_selection ();
-  drag_cancel ();
+
+  if (m_dragging) {
+    //  we don't just call drag_cancel() - this way avoids pending selections with the wrong coordinates
+    mp_view->edit_cancel ();
+  }
 }
 
 bool
@@ -72,10 +81,44 @@ MoveService::configure (const std::string &name, const std::string &value)
   return false;  //  not taken
 }
 
+void
+MoveService::function (const std::string &name, const std::string &value)
+{
+  if (name == move_function_name) {
+
+    try {
+
+      db::DVector s;
+      tl::from_string (value, s);
+
+      m_dragging = false;
+
+      show_toolbox (false);
+      ui ()->ungrab_mouse (this);
+
+      mp_editables->end_move (s, mp_transaction.release ());
+
+      if (m_dragging_transient) {
+        mp_editables->clear_selection ();
+      }
+
+      drag_cancel ();
+
+    } catch (...) {
+    }
+
+  }
+}
+
 bool
 MoveService::key_event (unsigned int key, unsigned int buttons)
 {
   if (lay::EditorServiceBase::key_event (key, buttons)) {
+    return true;
+  }
+
+  if (buttons == 0 && (key == lay::KeyEnter || key == lay::KeyReturn)) {
+    end_move ();
     return true;
   }
 
@@ -120,14 +163,34 @@ MoveService::key_event (unsigned int key, unsigned int buttons)
   }
 }
 
-int
-MoveService::focus_page_open ()
+bool
+MoveService::shortcut_override_event (unsigned int key, unsigned int buttons)
 {
-  //  This method is called on "Tab" by "key_event". "fp" is null as we don't have a focus page registered.
-  if (is_active () && dispatcher ()) {
-    dispatcher ()->menu_activated ("cm_sel_move");
+  if (! m_dragging) {
+    if (int (key) == lay::KeyDown ||
+        int (key) == lay::KeyLeft ||
+        int (key) == lay::KeyUp ||
+        int (key) == lay::KeyRight) {
+      return true;
+    }
   }
-  return 0;
+
+  return lay::EditorServiceBase::shortcut_override_event (key, buttons);
+}
+
+void
+MoveService::show_toolbox (bool visible)
+{
+  lay::EditorOptionsPage *tb = toolbox_widget ();
+  if (tb) {
+    tb->set_visible (visible);
+  }
+}
+
+lay::EditorOptionsPage *
+MoveService::toolbox_widget ()
+{
+  return mp_view->editor_options_pages () ? mp_view->editor_options_pages ()->page_with_name (move_editor_options_name) : 0;
 }
 
 bool 
@@ -138,7 +201,23 @@ MoveService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool p
   if (m_dragging) {
 
     set_cursor (lay::Cursor::size_all);
-    mp_editables->move (p, ac_from_buttons (buttons));
+    auto pmv = mp_editables->move (p, ac_from_buttons (buttons));
+
+    //  display the proposed move transformation
+    if (pmv.first >= 0) {
+
+      std::string pos = std::string ("dx: ") + tl::micron_to_string (pmv.second.disp ().x ()) + "  dy: " + tl::micron_to_string (pmv.second.disp ().y ());
+      if (pmv.second.rot () != 0) {
+        pos += std::string ("  ") + ((const db::DFTrans &) pmv.second).to_string ();
+      }
+      mp_view->message (pos);
+
+      lay::EditorOptionsPage *tb = toolbox_widget ();
+      if (tb) {
+        tb->configure (move_distance_setter_name, pmv.second.disp ().to_string ());
+      }
+
+    }
 
   } else if (prio) {
 
@@ -295,6 +374,14 @@ MoveService::start_move (db::Transaction *transaction, bool transient_selection)
   return handle_click (pstart, 0, drag_transient, trans_holder.release ());
 }
 
+void
+MoveService::end_move ()
+{
+  if (m_dragging) {
+    handle_click (m_mouse_pos, 0, false, 0);
+  }
+}
+
 bool 
 MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction)
 {
@@ -313,6 +400,8 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
 
       m_dragging = true;
       m_dragging_transient = drag_transient;
+
+      show_toolbox (true);
       ui ()->grab_mouse (this, false);
 
       m_shift = db::DPoint ();
@@ -325,7 +414,9 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
 
     m_dragging = false;
 
+    show_toolbox (false);
     ui ()->ungrab_mouse (this);
+
     mp_editables->end_move (p, ac_from_buttons (buttons), mp_transaction.release ());
 
     if (m_dragging_transient) {
@@ -343,13 +434,14 @@ MoveService::drag_cancel ()
 {
   m_shift = db::DPoint ();
   if (m_dragging) {
+    show_toolbox (false);
     ui ()->ungrab_mouse (this);
     m_dragging = false;
   }
 }
 
 void
-MoveService::cancel ()
+MoveService::cancel_transaction ()
 { 
   if (m_dragging) {
     if (mp_transaction.get ()) {
@@ -360,7 +452,7 @@ MoveService::cancel ()
 }
 
 void
-MoveService::finish ()
+MoveService::finish_transaction ()
 {
   if (m_dragging) {
     mp_transaction.reset (0);
@@ -382,6 +474,14 @@ public:
   virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher * /*dispatcher*/, lay::LayoutViewBase *view) const
   {
     return new MoveService (view);
+  }
+
+  virtual std::vector<std::string> additional_editor_options_pages () const
+  {
+    std::vector<std::string> names;
+    //  TODO: provide in a central place instead of borrowing from the edt module
+    names.push_back ("GenericEditorOptions");
+    return names;
   }
 };
 

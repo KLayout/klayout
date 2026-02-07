@@ -69,6 +69,11 @@ public:
   virtual void end_move (const db::DPoint &p, lay::angle_constraint_type ac);
 
   /**
+   *  @brief Terminate a "move" operation with compulsory move vector
+   */
+  virtual void end_move (const db::DVector &v);
+
+  /**
    *  @brief Access to the view object
    */
   lay::LayoutViewBase *view () const

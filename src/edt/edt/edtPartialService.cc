@@ -26,6 +26,7 @@
 #include "laySnap.h"
 #include "layFinder.h"
 #include "layConverters.h"
+#include "layMove.h"
 #include "tlProgress.h"
 #include "edtPartialService.h"
 #include "edtService.h"
@@ -1096,7 +1097,7 @@ PartialService::PartialService (db::Manager *manager, lay::LayoutViewBase *view,
     db::Object (manager),
     mp_view (view),
     mp_root (root),
-    m_dragging (false),
+    m_moving (false),
     m_keep_selection (true),
     mp_box (0),
     m_color (0),
@@ -1404,15 +1405,6 @@ PartialService::snap (const db::DVector &v_org) const
   } else {
     return v;
   }
-}
-
-const int sr_pixels = 8; //  TODO: make variable
-
-lay::PointSnapToObjectResult
-PartialService::snap2 (const db::DPoint &p) const
-{
-  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
-  return lay::obj_snap (m_snap_to_objects ? view () : 0, m_start, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, move_ac (), snap_range);
 }
 
 void
@@ -1769,7 +1761,7 @@ void
 PartialService::edit_cancel ()
 {
   //  stop dragging, clear selection
-  m_dragging = false;
+  m_moving = false;
 
   if (mp_box) {
     delete mp_box;
@@ -1790,74 +1782,85 @@ PartialService::wheel_event (int /*delta*/, bool /*horizontal*/, const db::DPoin
   return false;
 }
 
-bool  
-PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
+const int sr_pixels = 8; //  TODO: make variable
+
+void
+PartialService::move_impl (const db::DPoint &p)
 {
-  clear_mouse_cursors ();
+  //  drag the vertex or edge/segment
+  if (is_single_point_selection () || is_single_edge_selection ()) {
 
-  if (m_dragging) {
+    lay::PointSnapToObjectResult snap_details;
 
-    set_cursor (lay::Cursor::size_all);
+    //  for a single selected point or edge, m_start is the original position and we snap the target -
+    //  thus, we can bring the point on grid or to an object's edge or vertex
+    double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
+    snap_details = lay::obj_snap (m_snap_to_objects ? view () : 0, m_start, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, lay::AC_Any, snap_range);;
 
-    m_alt_ac = lay::ac_from_buttons (buttons);
+    if (snap_details.object_snap == lay::PointSnapToObjectResult::NoObject) {
 
-    //  drag the vertex or edge/segment
-    if (is_single_point_selection () || is_single_edge_selection ()) {
-
-      lay::PointSnapToObjectResult snap_details;
-
-      //  for a single selected point or edge, m_start is the original position and we snap the target -
-      //  thus, we can bring the point on grid or to an object's edge or vertex
-      snap_details = snap2 (p);
-
-      if (snap_details.object_snap == lay::PointSnapToObjectResult::NoObject) {
-
-        m_current = m_start + snap_move (p - m_start);
-
-      } else {
-
-        auto snapped_to_object = snap_details.snapped_point;
-        m_current = snapped_to_object;
-
-        if (snap_details.object_snap != lay::PointSnapToObjectResult::ObjectVertex) {
-          //  snap to grid on longer side of reference edge and to object on shorter
-          auto snapped_to_object_and_grid = m_start + snap_move (snapped_to_object - m_start);
-          if (std::abs (snap_details.object_ref.dx ()) > std::abs (snap_details.object_ref.dy ())) {
-            m_current.set_x (snapped_to_object_and_grid.x ());
-            //  project to edge, so we always hit it
-            auto cp = snap_details.object_ref.cut_point (db::DEdge (m_current, m_current + db::DVector (0, 1.0)));
-            if (cp.first) {
-              m_current.set_y (cp.second.y ());
-            }
-          } else if (std::abs (snap_details.object_ref.dy ()) > std::abs (snap_details.object_ref.dx ())) {
-            m_current.set_y (snapped_to_object_and_grid.y ());
-            //  project to edge, so we always hit it
-            auto cp = snap_details.object_ref.cut_point (db::DEdge (m_current, m_current + db::DVector (1.0, 0)));
-            if (cp.first) {
-              m_current.set_x (cp.second.x ());
-            }
-          }
-        }
-
-        mouse_cursor_from_snap_details (snap_details);
-
-      }
+      m_current = m_start + snap_move (p - m_start);
 
     } else {
 
-      //  snap movement to angle and grid without object
-      m_current = m_start + snap_move (p - m_start);
-      clear_mouse_cursors ();
+      auto snapped_to_object = snap_details.snapped_point;
+      m_current = snapped_to_object;
+
+      if (snap_details.object_snap != lay::PointSnapToObjectResult::ObjectVertex) {
+
+        //  snap to grid on longer side of reference edge and to object on shorter
+        auto snapped_to_object_and_grid = m_start + snap_move (snapped_to_object - m_start);
+        if (std::abs (snap_details.object_ref.dx ()) > std::abs (snap_details.object_ref.dy ())) {
+          m_current.set_x (snapped_to_object_and_grid.x ());
+          //  project to edge, so we always hit it
+          auto cp = snap_details.object_ref.cut_point (db::DEdge (m_current, m_current + db::DVector (0, 1.0)));
+          if (cp.first) {
+            m_current.set_y (cp.second.y ());
+          }
+        } else if (std::abs (snap_details.object_ref.dy ()) > std::abs (snap_details.object_ref.dx ())) {
+          m_current.set_y (snapped_to_object_and_grid.y ());
+          //  project to edge, so we always hit it
+          auto cp = snap_details.object_ref.cut_point (db::DEdge (m_current, m_current + db::DVector (1.0, 0)));
+          if (cp.first) {
+            m_current.set_x (cp.second.x ());
+          }
+        }
+
+      }
+
+      mouse_cursor_from_snap_details (snap_details);
 
     }
 
-    selection_to_view ();
+    if (is_single_edge_selection ()) {
 
-    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::begin_edits);
-    issue_editor_hook_calls (m_editor_hooks);
-    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_edits);
+      //  in case of edge movement, project the move vector to the edge normal -
+      //  that is cosmetic, so we don't imply a lateral shift
+      auto e = single_selected_edge ().d ();
+      if (e.double_length () > db::epsilon) {
+        db::DVector n = db::DVector (e.y (), -e.x ()) * (1.0 / e.double_length ());
+        m_current = m_start + n * db::sprod (m_current - m_start, n);
+      }
 
-    m_alt_ac = lay::AC_Global;
+    }
+
+  } else {
+
+    //  snap movement to angle and grid without object
+    m_current = m_start + snap_move (p - m_start);
+
+  }
+
+  selection_to_view ();
+}
+
+bool
+PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
+{
+  if (m_moving) {
+
+    //  event is handled by the move service
+    return false;
 
   } else if (prio) {
     
@@ -1916,9 +1919,9 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
     return false;
   }
 
-  if (m_dragging) {
+  if (m_moving) {
 
-    //  eat events if already dragging
+    //  eat events if moving -> handled by move service
     return true;
 
   } else if (! mp_box) {
@@ -1964,25 +1967,8 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
 
     } else {
 
-      //  something was selected: start dragging this ..
-      m_dragging = true;
-      m_keep_selection = true;
-
-      if (is_single_point_selection ()) {
-        //  for a single selected point we use the original point as the start location which 
-        //  allows bringing it to grid
-        m_current = m_start = single_selected_point ();
-      } else if (is_single_edge_selection ()) {
-        //  for an edge selection use the point projected to edge as the start location which
-        //  allows bringing it to grid
-        m_current = m_start = projected_to_edge (single_selected_edge (), p);
-      } else {
-        m_current = m_start = p;
-      }
-
-      ui ()->grab_mouse (this, true);
-
-      open_editor_hooks ();
+      //  delegate further actions to move service, which will start a move operation
+      mp_view->move_service ()->start_move ();
 
     }
 
@@ -2014,43 +2000,9 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
     return false;
   }
 
-  if (m_dragging) {
+  if (m_moving) {
 
-    m_alt_ac = lay::ac_from_buttons (buttons);
-
-    if (m_current != m_start) {
-
-      //  stop dragging
-      ui ()->ungrab_mouse (this);
-      
-      if (manager ()) {
-        manager ()->transaction (tl::to_string (tr ("Partial move")));
-      }
-
-      //  heuristically, if there is just one edge selected: do not confine to the movement
-      //  angle constraint - the edge usually is confined enough
-      db::DTrans move_trans = db::DTrans (m_current - m_start);
-
-      transform_selection (move_trans);
-
-      if (manager ()) {
-        manager ()->commit ();
-      }
-
-    }
-
-    if (! m_keep_selection) {
-      m_selection.clear ();
-    }
-
-    m_dragging = false;
-    selection_to_view ();
-
-    close_editor_hooks (true);
-
-    m_alt_ac = lay::AC_Global;
-
-    return true;
+    return false;
 
   } else if (ui ()->mouse_event_viewport ().contains (p)) { 
 
@@ -2143,25 +2095,15 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
 
       }
       
-      //  start dragging with that single selection
+      //  start dragging with the selection
       if (mode == lay::Editable::Replace && ! m_selection.empty ()) {
 
-        m_dragging = true;
+        //  delegate further actions to move service, which will start a move operation
+        mp_view->move_service ()->start_move ();
+
+        //  modify the decision to keep the selection (needs to come after the
+        //  move service called begin_move)
         m_keep_selection = ! new_selection;
-
-        if (is_single_point_selection ()) {
-          //  for a single selected point we use the original point as the start location which 
-          //  allows bringing it to grid
-          m_current = m_start = single_selected_point ();
-        } else if (is_single_edge_selection ()) {
-          //  for an edge selection use the point projected to edge as the start location which
-          //  allows bringing it to grid
-          m_current = m_start = projected_to_edge (single_selected_edge (), p);
-        } else {
-          m_current = m_start = p;
-        }
-
-        open_editor_hooks ();
 
       }
 
@@ -2197,10 +2139,6 @@ PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int butt
 
     close_editor_hooks (false);
 
-    //  stop dragging
-    ui ()->ungrab_mouse (this);
-    m_dragging = false;
-      
     partial_select (db::DBox (p, p), lay::Editable::Replace);
 
     if (! m_selection.empty ()) {
@@ -2346,13 +2284,24 @@ PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, 
 }
 
 bool
+PartialService::key_event (unsigned int key, unsigned int buttons)
+{
+  if (m_moving && buttons == 0 && (key == lay::KeyEnter || key == lay::KeyReturn)) {
+    mp_view->move_service ()->end_move ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool
 PartialService::begin_move (MoveMode mode, const db::DPoint &p, lay::angle_constraint_type ac)
 {
   if (has_selection () && mode == lay::Editable::Selected) {
 
     m_alt_ac = ac;
 
-    m_dragging = true;
+    m_moving = true;
     m_keep_selection = true;
 
     if (is_single_point_selection ()) {
@@ -2432,7 +2381,7 @@ PartialService::snap_marker_to_grid (const db::DVector &v, bool &snapped) const
 
   if (snapped) {
     vr += vv;
-    return db::DVector (vr.x () * snapped_to.x (), vr.y () * snapped_to.y ());
+    return db::DVector (vr.x () * fabs (snapped_to.x ()), vr.y () * fabs (snapped_to.y ()));
   } else {
     return db::DVector ();
   }
@@ -2452,62 +2401,42 @@ PartialService::snap_move (const db::DVector &v) const
 void
 PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
 {
-  if (! m_dragging) {
+  if (! m_moving) {
     return;
   }
 
   m_alt_ac = ac;
 
   set_cursor (lay::Cursor::size_all);
+  clear_mouse_cursors ();
 
-  //  drag the vertex or edge/segment
-  if (is_single_point_selection () || is_single_edge_selection ()) {
+  move_impl (p);
 
-    lay::PointSnapToObjectResult snap_details;
-
-    //  for a single selected point or edge, m_start is the original position and we snap the target -
-    //  thus, we can bring the point on grid or to an object's edge or vertex
-    snap_details = snap2 (p);
-    if (snap_details.object_snap == lay::PointSnapToObjectResult::NoObject) {
-      m_current = m_start + snap_move (p - m_start);
-    } else {
-      m_current = snap_details.snapped_point;
-      mouse_cursor_from_snap_details (snap_details);
-    }
-
-  } else {
-
-    //  snap movement to angle and grid without object
-    m_current = m_start + snap_move (p - m_start);
-    clear_mouse_cursors ();
-
-  }
-
-  selection_to_view ();
+  propose_move_transformation (db::DTrans (m_current - m_start), 0);
 
   m_alt_ac = lay::AC_Global;
 }
 
 void
-PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type ac)
+PartialService::end_move (const db::DVector &v)
 {
-  if (! m_dragging) {
+  m_current = m_start + v;
+  end_move (db::DPoint (), lay::AC_Any);
+}
+
+void
+PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
+{
+  if (! m_moving) {
     return;
   }
 
-  m_alt_ac = ac;
-
   if (m_current != m_start) {
-
-    //  stop dragging
-    ui ()->ungrab_mouse (this);
 
     if (manager ()) {
       manager ()->transaction (tl::to_string (tr ("Partial move")));
     }
 
-    //  heuristically, if there is just one edge selected: do not confine to the movement
-    //  angle constraint - the edge usually is confined enough
     db::DTrans move_trans = db::DTrans (m_current - m_start);
 
     transform_selection (move_trans);
@@ -2522,7 +2451,7 @@ PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type a
     m_selection.clear ();
   }
 
-  m_dragging = false;
+  m_moving = false;
   selection_to_view ();
 
   clear_mouse_cursors ();
@@ -2608,9 +2537,6 @@ PartialService::del ()
 {
   std::set<db::Layout *> needs_cleanup;
 
-  //  stop dragging
-  ui ()->ungrab_mouse (this);
-  
   std::map <std::pair <db::cell_index_type, std::pair <unsigned int, unsigned int> >, std::vector <partial_objects::const_iterator> > shapes_to_delete_by_cell;
 
   for (partial_objects::iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
@@ -2703,7 +2629,6 @@ PartialService::del ()
   handle_guiding_shape_changes ();
 
   m_selection.clear ();
-  m_dragging = false;
   selection_to_view ();
 
   close_editor_hooks (false);
@@ -3008,22 +2933,8 @@ PartialService::do_selection_to_view ()
 {
   //  if dragging, establish the current displacement
   db::DTrans move_trans;
-  if (m_dragging) {
-
-    //  heuristically, if there is just one edge selected: do not confine to the movement
-    //  angle constraint - the edge usually is confined enough
-    if (m_selection.size () == 1 && ! m_selection.begin ()->first.is_cell_inst () && m_selection.begin ()->second.size () == 3 /*p1,p2,edge*/) {
-      move_trans = db::DTrans (m_current - m_start);
-    } else {
-      //  TODO: DTrans should have a ctor that takes a vector
-      move_trans = db::DTrans (lay::snap_angle (m_current - m_start, move_ac ()));
-    }
-
-    //  display vector
-    view ()->message (std::string ("dx: ") + tl::micron_to_string (move_trans.disp ().x ()) + 
-                      std::string ("  dy: ") + tl::micron_to_string (move_trans.disp ().y ()) + 
-                      std::string ("  d: ") + tl::micron_to_string (move_trans.disp ().length ()));
-
+  if (m_moving) {
+    move_trans = db::DTrans (m_current - m_start);
   }
 
   size_t n_marker = 0;
@@ -3065,7 +2976,7 @@ PartialService::do_selection_to_view ()
           std::map <EdgeWithIndex, db::Edge> new_edges;
           std::map <PointWithIndex, db::Point> new_points;
 
-          if (m_dragging) {
+          if (m_moving) {
             create_shift_sets (r->first.shape (), r->second, new_points, new_edges, move_vector);
           }
 

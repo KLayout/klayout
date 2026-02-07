@@ -20,11 +20,11 @@ jobs:
       max-parallel: 12
       matrix:
         include:
-          - os: "macos-13"  # intel runner
+          - os: "macos-15-intel"  # intel runner
             cibuild: "*macosx*"
             cibw_arch: "macos_x86_64"
             macos-arch: "x86_64"
-          - os: "macos-14"  # M1 runner
+          - os: "macos-latest"  # M1 runner
             cibuild: "*macosx*"
             cibw_arch: "macos_arm64"
             macos-arch: "arm64"

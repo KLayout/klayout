@@ -26,6 +26,7 @@
 #define HDR_edtEditorOptionsPages
 
 #include "layEditorOptionsPage.h"
+#include "layEditorOptionsPageWidget.h"
 
 #include <tlVariant.h>
 
@@ -35,6 +36,7 @@
 
 class QTabWidget;
 class QLabel;
+class QHBoxLayout;
 
 namespace Ui
 {
@@ -50,10 +52,10 @@ namespace Ui
 
 namespace lay
 {
-  class PluginDeclaration;
   class Dispatcher;
   class LayoutViewBase;
   class Plugin;
+  class DecoratedLineEdit;
 }
 
 namespace edt
@@ -65,7 +67,7 @@ class PCellParametersPage;
  *  @brief The generic properties page
  */
 class EditorOptionsGeneric
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 Q_OBJECT
 
@@ -74,7 +76,7 @@ public:
   ~EditorOptionsGeneric ();
 
   virtual std::string title () const;
-  virtual int order () const { return 0; }
+  virtual int order () const { return -10; }
   void apply (lay::Dispatcher *root);
   void setup (lay::Dispatcher *root);
 
@@ -90,14 +92,14 @@ private:
  *  @brief The text properties page
  */
 class EditorOptionsText
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 public:
   EditorOptionsText (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
   ~EditorOptionsText ();
 
   virtual std::string title () const;
-  virtual int order () const { return 10; }
+  virtual int order () const { return 0; }
   void apply (lay::Dispatcher *root);
   void setup (lay::Dispatcher *root);
 
@@ -109,7 +111,7 @@ private:
  *  @brief The path properties page
  */
 class EditorOptionsPath
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 Q_OBJECT 
 
@@ -118,7 +120,7 @@ public:
   ~EditorOptionsPath ();
 
   virtual std::string title () const;
-  virtual int order () const { return 30; }
+  virtual int order () const { return 0; }
   void apply (lay::Dispatcher *root);
   void setup (lay::Dispatcher *root);
 
@@ -133,7 +135,7 @@ private:
  *  @brief The instance properties page
  */
 class EditorOptionsInst
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 Q_OBJECT 
 
@@ -142,7 +144,7 @@ public:
   ~EditorOptionsInst ();
 
   virtual std::string title () const;
-  virtual int order () const { return 20; }
+  virtual int order () const { return 0; }
   void apply (lay::Dispatcher *root);
   void setup (lay::Dispatcher *root);
 
@@ -165,7 +167,7 @@ private:
  *  @brief The instance properties page (PCell parameters)
  */
 class EditorOptionsInstPCellParam
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 Q_OBJECT
 
@@ -174,7 +176,7 @@ public:
   ~EditorOptionsInstPCellParam ();
 
   virtual std::string title () const;
-  virtual int order () const { return 21; }
+  virtual int order () const { return 1; }
   void apply (lay::Dispatcher *root);
   void setup (lay::Dispatcher *root);
 
@@ -190,6 +192,101 @@ private:
 
   void update_pcell_parameters (const std::vector <tl::Variant> &parameters);
   virtual void technology_changed (const std::string &);
+};
+
+/**
+ *  @brief The toolbox widget for boxes
+ */
+class BoxToolboxWidget
+  : public lay::EditorOptionsPageWidget
+{
+Q_OBJECT
+
+public:
+  BoxToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  ~BoxToolboxWidget ();
+
+  virtual std::string title () const;
+  virtual int order () const { return 200; }
+  virtual void configure (const std::string &name, const std::string &value);
+  virtual void commit (lay::Dispatcher *root);
+  virtual void deactivated ();
+
+private:
+  QHBoxLayout *mp_layout;
+  lay::DecoratedLineEdit *mp_x_le, *mp_y_le;
+};
+
+/**
+ *  @brief The toolbox widget for connections (polygon edges)
+ */
+class ConnectionToolboxWidget
+  : public lay::EditorOptionsPageWidget
+{
+Q_OBJECT
+
+public:
+  ConnectionToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  ~ConnectionToolboxWidget ();
+
+  virtual std::string title () const;
+  virtual int order () const { return 200; }
+  virtual void configure (const std::string &name, const std::string &value);
+  virtual void commit (lay::Dispatcher *root);
+  virtual void deactivated ();
+
+private:
+  QHBoxLayout *mp_layout;
+  lay::DecoratedLineEdit *mp_x_le, *mp_y_le;
+  bool m_in_commit;
+};
+
+/**
+ *  @brief The toolbox widget for connections (path segments)
+ */
+class PathConnectionToolboxWidget
+  : public lay::EditorOptionsPageWidget
+{
+Q_OBJECT
+
+public:
+  PathConnectionToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  ~PathConnectionToolboxWidget ();
+
+  virtual std::string title () const;
+  virtual int order () const { return 200; }
+  virtual void configure (const std::string &name, const std::string &value);
+  virtual void commit (lay::Dispatcher *root);
+  virtual void deactivated ();
+
+private:
+  QHBoxLayout *mp_layout;
+  lay::DecoratedLineEdit *mp_x_le, *mp_y_le, *mp_width;
+  bool m_in_commit;
+};
+
+/**
+ *  @brief The toolbox widget for texts
+ */
+class TextToolboxWidget
+  : public lay::EditorOptionsPageWidget
+{
+Q_OBJECT
+
+public:
+  TextToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  ~TextToolboxWidget ();
+
+  virtual std::string title () const;
+  virtual int order () const { return 200; }
+  virtual void configure (const std::string &name, const std::string &value);
+  virtual void commit (lay::Dispatcher *root);
+  virtual void deactivated ();
+
+private:
+  QHBoxLayout *mp_layout;
+  lay::DecoratedLineEdit *mp_text;
+  bool m_in_commit;
 };
 
 }

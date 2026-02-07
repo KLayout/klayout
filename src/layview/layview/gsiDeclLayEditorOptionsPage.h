@@ -28,14 +28,14 @@
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
 
-#include "layEditorOptionsPage.h"
+#include "layEditorOptionsPageWidget.h"
 #include "layLayoutViewBase.h"
 
 namespace gsi
 {
 
 class EditorOptionsPageImpl
-  : public lay::EditorOptionsPage, public gsi::ObjectBase
+  : public lay::EditorOptionsPageWidget, public gsi::ObjectBase
 {
 public:
   EditorOptionsPageImpl (const std::string &title, int index);
@@ -53,9 +53,13 @@ public:
   void call_edited ();
   virtual void apply (lay::Dispatcher *root);
   virtual void setup (lay::Dispatcher *root);
+  virtual void cancel ();
+  virtual void commit (lay::Dispatcher *root);
 
   gsi::Callback f_apply;
   gsi::Callback f_setup;
+  gsi::Callback f_cancel;
+  gsi::Callback f_commit;
 
 private:
   tl::weak_ptr<lay::LayoutViewBase> mp_view;
@@ -65,6 +69,8 @@ private:
 
   void apply_impl (lay::Dispatcher *root);
   void setup_impl (lay::Dispatcher *root);
+  void cancel_impl ();
+  void commit_impl (lay::Dispatcher *root);
 };
 
 }

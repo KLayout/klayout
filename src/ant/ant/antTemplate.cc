@@ -23,6 +23,7 @@
 
 #include "antTemplate.h"
 #include "antConfig.h"
+#include "layConverters.h"
 #include "tlInternational.h"
 #include "tlException.h"
 #include "tlLog.h"
@@ -263,7 +264,7 @@ Template::from_string (const std::string &s)
 
         } else if (key == "angle_constraint") {
 
-          ant::ACConverter sc;
+          lay::ACConverter sc;
           lay::angle_constraint_type sm;
           sc.from_string (s, sm);
           r.back ().angle_constraint (sm);
@@ -373,7 +374,7 @@ Template::to_string (const std::vector<Template> &v)
     r += ",";
 
     r += "angle_constraint=";
-    ant::ACConverter acc;
+    lay::ACConverter acc;
     r += acc.to_string (t->angle_constraint ());
 
   }

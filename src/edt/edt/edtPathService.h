@@ -47,11 +47,12 @@ public:
   virtual bool do_mouse_click (const db::DPoint &p);
   virtual void do_mouse_move_inactive (const db::DPoint &p);
   virtual void do_delete ();
-  virtual void do_finish_edit ();
+  virtual void do_finish_edit (bool accept);
   virtual void do_cancel_edit ();
   virtual bool do_activated ();
   virtual void via (int dir);
   virtual bool selection_applies (const lay::ObjectInstPath &sel) const;
+  virtual void function (const std::string &name, const std::string &value);
 
 protected:
   bool configure (const std::string &name, const std::string &value);

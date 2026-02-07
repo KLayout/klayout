@@ -18,8 +18,24 @@
   To actually draw a path, 
   choose a layer from the layer panel in which to create a new path. 
   Left click at the first vertex, move the mouse to the second vertex, click to place this one and continue 
-  to the last vertex. Double-click at the last vertex to finish the path. Press the ESC key to cancel the operation.
-  Use the backspace key to remove the current segment and go back to the previous segment.
+  to the last vertex. Double-click at the last vertex or press the Enter key to finish the path. 
+  Press the Escape key to cancel the operation.
+  Use the Backspace key to remove the current segment and go back to the previous segment.
+  </p>
+
+  <p>
+  To temporarily constrain the segment direction, press the Shift or Ctrl key or both while dragging
+  the segment. Shift will apply Manhattan 
+  constraints (vertical and horizontal only), Ctrl will allow diagonal directions in addition and 
+  pressing Shift+Ctrl will allow all directions.
+  </p>
+
+  <p>
+  While you drag a path segment, two edit boxes are shown at the top of the layout view.
+  Press the Tab key to enter these edit boxes.
+  Use the Tab and Shift+Tab keys to navigate between the boxes.
+  You can specify a numerical values for the segment vector here. Pressing the Enter key will apply these
+  relative coordinates and enter a new segment. Pressing the Escape key will leave the edit fields.
   </p>
 
   <p>

@@ -49,11 +49,12 @@ namespace lay
    *  Any: no angle constraint
    *  Diagonal: vertical, horizontal and 45 degree diagonals
    *  Ortho: vertical and horizontal
+   *  DiagonalOnly: 45 degree diagonals, not vertically or horizontally
    *  Horizontal: horizontal only
    *  Vertical: vertical only
    *  Global: use global setting (templates and ruler specific setting only)
    */
-  enum angle_constraint_type { AC_Any = 0, AC_Diagonal, AC_Ortho, AC_Horizontal, AC_Vertical, AC_Global, AC_NumModes };
+  enum angle_constraint_type { AC_Any = 0, AC_Diagonal, AC_Ortho, AC_DiagonalOnly, AC_Horizontal, AC_Vertical, AC_Global, AC_NumModes };
 
   /**
    *  @brief snap a coordinate value to a unit grid

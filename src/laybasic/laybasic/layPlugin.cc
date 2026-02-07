@@ -30,6 +30,7 @@
 
 #include "layPlugin.h"
 #include "layDispatcher.h"
+#include "layEditorOptionsPage.h"
 #include "tlExceptions.h"
 #include "tlClassRegistry.h"
 
@@ -317,6 +318,67 @@ PluginDeclaration::register_plugin ()
   }
 }
 
+std::string
+PluginDeclaration::name () const
+{
+  auto plugin_reg = tl::Registrar<lay::PluginDeclaration>::get_instance ();
+  for (auto i = plugin_reg->begin (); i != plugin_reg->end (); ++i) {
+    if (i.operator-> () == this) {
+      return i.current_name ();
+    }
+  }
+
+  return std::string ();
+}
+
+void
+PluginDeclaration::get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const
+{
+  std::string n = name ();
+  if (n.empty ()) {
+    return;
+  }
+
+  auto reg = tl::Registrar<lay::EditorOptionsPageFactoryBase>::get_instance ();
+  for (auto i = reg->begin (); i != reg->end (); ++i) {
+    lay::EditorOptionsPage *page = 0;
+    if (i->name () == n) {
+      page = i->create_page (view, dispatcher);
+      if (page) {
+        page->set_plugin_declaration (this);
+      }
+    }
+    if (page) {
+      pages.push_back (page);
+    }
+  }
+}
+
+void
+PluginDeclaration::get_additional_editor_options_pages (std::vector<EditorOptionsPage *> &pages, LayoutViewBase *view, Dispatcher *dispatcher, const std::map<std::string, std::vector<const lay::PluginDeclaration *> > &names)
+{
+  std::set<std::string> names_seen;
+
+  auto reg = tl::Registrar<lay::EditorOptionsPageFactoryBase>::get_instance ();
+  for (auto i = reg->begin (); i != reg->end (); ++i) {
+    auto n = names.find (i->name ());
+    if (n != names.end ()) {
+      names_seen.insert (i->name ());
+      lay::EditorOptionsPage *page = i->create_page (view, dispatcher);
+      if (page) {
+        page->set_plugin_declarations (n->second);
+        pages.push_back (page);
+      }
+    }
+  }
+
+  for (auto i = names.begin (); i != names.end (); ++i) {
+    if (names_seen.find (i->first) == names_seen.end ()) {
+      tl::warn << tl::to_string (tr ("Cannot find additional editor options page: ")) << i->first;
+    }
+  }
+}
+
 // ----------------------------------------------------------------
 //  Plugin implementation
 
@@ -521,6 +583,15 @@ Plugin::do_config_set (const std::string &name, const std::string &value, bool f
   }
 
   return false;
+}
+
+void
+Plugin::call_function (const std::string &symbol, const std::string &args)
+{
+  function (symbol, args);
+  for (tl::weak_collection<Plugin>::iterator c = m_children.begin (); c != m_children.end (); ++c) {
+    c->call_function (symbol, args);
+  }
 }
 
 // ---------------------------------------------------------------------------------------------------

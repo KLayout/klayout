@@ -77,11 +77,12 @@ class MouseTracker;
 class ZoomService;
 class SelectionService;
 class MoveService;
+class EditorOptionsPage;
+class EditorOptionsPageCollection;
 
 #if defined(HAVE_QT)
 class LayerControlPanel;
 class HierarchyControlPanel;
-class EditorOptionsPages;
 #endif
 
 /**
@@ -347,6 +348,22 @@ public:
    *  @brief Adds a notification
    */
   virtual void add_notification (const LayoutViewNotification & /*notification*/)
+  {
+    //  the base implementation does nothing
+  }
+
+  /**
+   *  @brief Removes a notification
+   */
+  virtual void remove_notification (const LayoutViewNotification & /*notification*/)
+  {
+    //  the base implementation does nothing
+  }
+
+  /**
+   *  @brief Adds an editor options page as a toolbox widget
+   */
+  virtual void add_toolbox_widget (lay::EditorOptionsPage * /*toolbox_widget*/)
   {
     //  the base implementation does nothing
   }
@@ -1899,15 +1916,15 @@ public:
   {
     return 0;
   }
+#endif
 
   /**
    *  @brief Gets the editor options page
    */
-  virtual lay::EditorOptionsPages *editor_options_pages ()
+  virtual lay::EditorOptionsPageCollection *editor_options_pages ()
   {
     return 0;
   }
-#endif
 
   /**
    *  @brief Get the current viewport 

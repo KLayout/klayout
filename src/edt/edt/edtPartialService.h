@@ -235,6 +235,11 @@ public:
   virtual bool mouse_release_event (const db::DPoint &p, unsigned int buttons, bool prio);
 
   /**
+   *  @brief Key handling event
+   */
+  virtual bool key_event (unsigned int key, unsigned int buttons);
+
+  /**
    *  @brief Transforms the selection
    *
    *  Currently only displacements are allowed which basically moves the partial selection 
@@ -288,6 +293,11 @@ public:
   virtual void end_move (const db::DPoint &p, lay::angle_constraint_type ac);
 
   /**
+   *  @brief Terminate a "move" operation with compulsory move vector
+   */
+  virtual void end_move (const db::DVector &v);
+
+  /**
    *  @brief Implement the "select" method at least to clear the selection
    */
   virtual bool select (const db::DBox &box, SelectionMode mode);
@@ -335,7 +345,7 @@ private:
   //  The layout view that this service is attached to
   lay::LayoutViewBase *mp_view;
   lay::Dispatcher *mp_root;
-  bool m_dragging;
+  bool m_moving;
   bool m_keep_selection;
   db::DPoint m_start, m_current;
   db::DPoint m_p1, m_p2;
@@ -381,10 +391,10 @@ private:
 
   db::DPoint snap (const db::DPoint &p) const;
   db::DVector snap (const db::DVector &p) const;
-  lay::PointSnapToObjectResult snap2 (const db::DPoint &p) const;
   void update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, bool &result_set) const;
   db::DVector snap_marker_to_grid (const db::DVector &v, bool &snapped) const;
   db::DVector snap_move(const db::DVector &p) const;
+  void move_impl (const db::DPoint &p);
 
   void enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_objects::const_iterator sel, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient);
   void enter_vertices (size_t &nmarker, partial_objects::const_iterator sel, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient);

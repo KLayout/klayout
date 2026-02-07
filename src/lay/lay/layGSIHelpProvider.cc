@@ -993,7 +993,11 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
      << "<!DOCTYPE language SYSTEM \"klayout_doc.dtd\">" << std::endl
      << std::endl;
 
-  os << "<doc><title>" << tl::to_string (QObject::tr ("API reference - Class")) << " " << escape_xml (cls) << "</title>" << std::endl;
+  os << "<doc><title>" << tl::to_string (QObject::tr ("API reference - Class")) << " " << escape_xml (cls);
+  if (class_doc.hidden) {
+    os << " " << tl::to_string (QObject::tr ("[internal]"));
+  }
+  os << "</title>" << std::endl;
   os << "<property name=\"module\" value=\"" << escape_xml (cls_obj->module ()) << "\"/>" << std::endl;
 
   os << "<keyword name=\"" << escape_xml (cls) << "\"/>" << std::endl;
@@ -1006,13 +1010,15 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
 
   os << "<p><b>" << tl::to_string (QObject::tr ("Description")) << "</b>: " << escape_xml (class_doc.brief_doc) << "</p>" << std::endl;
 
-  std::vector<const gsi::ClassBase *> classes;
-  classes.push_back (real_class (cls_obj));
+  const gsi::ClassBase *act_cls_obj = real_class (cls_obj);
 
-  const gsi::ClassBase *base = real_class (cls_obj)->base ();
+  std::vector<const gsi::ClassBase *> classes;
+  classes.push_back (act_cls_obj);
+
+  const gsi::ClassBase *base = act_cls_obj->base ();
   if (base) {
 
-    const gsi::ClassBase *last_cls = real_class (cls_obj);
+    const gsi::ClassBase *last_cls = act_cls_obj;
     bool all_collected = false;
 
     os << "<p><b>" << tl::to_string (QObject::tr ("Class hierarchy")) << "</b>: " << make_qualified_name (cls_obj);
@@ -1032,6 +1038,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
         all_collected = true;
       } else if (! all_collected) {
         //  class needs to be mixed into the parent
+        os << " &#187; <a href=\"" << escape_xml (class_doc_url (base->name ())) << "\">" << escape_xml (base->name ()) << " " << tl::to_string (QObject::tr ("[internal]")) << "</a>";
         classes.push_back (base);
       }
 
@@ -1051,33 +1058,89 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     os << "</p>" << std::endl;
   }
 
+  //  Produce child classes
+
   bool any = false;
 
   for (std::vector<const gsi::ClassBase *>::const_iterator c = classes.begin (); c != classes.end (); ++c) {
+
     for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = (*c)->begin_child_classes (); cc != (*c)->end_child_classes (); ++cc) {
 
       DocumentationParser &cdoc = cls_documentation (cc.operator-> ());
-      if (! cdoc.hidden || ! cdoc.alias.empty ()) {
 
-        if (any) {
-          os << ", ";
-        } else {
-          os << "<p><b>" << tl::to_string (QObject::tr ("Sub-classes")) << "</b>: ";
-          any = true;
-        }
-
-        os << "<a href=\"" << escape_xml (class_doc_url (make_qualified_name (cc.operator-> ()))) << "\">" << escape_xml (cc->name ()) << "</a>";
-
+      if (any) {
+        os << ", ";
+      } else {
+        os << "<p><b>" << tl::to_string (QObject::tr ("Child classes")) << "</b>: ";
+        any = true;
       }
 
+      os << "<a href=\""
+         << escape_xml (class_doc_url (make_qualified_name (cc.operator-> ())))
+         << "\">"
+         << escape_xml (cc->name ());
+      if (cdoc.hidden && cdoc.alias.empty ()) {
+        os << " " << tl::to_string (QObject::tr ("[internal]"));
+      }
+      os << "</a>";
+
     }
+
   }
 
   if (any) {
     os << "</p>" << std::endl;
   }
 
+  //  Produce subclasses (parent classes)
+
+  any = false;
+
+  for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = act_cls_obj->begin_subclasses (); cc != act_cls_obj->end_subclasses (); ++cc) {
+
+    DocumentationParser &cdoc = cls_documentation (cc.operator-> ());
+
+    if (any) {
+      os << ", ";
+    } else {
+      os << "<p><b>" << tl::to_string (QObject::tr ("Subclasses")) << "</b>: ";
+      any = true;
+    }
+
+    os << "<a href=\""
+       << escape_xml (class_doc_url (make_qualified_name (cc.operator-> ())))
+       << "\">"
+       << escape_xml (cc->name ());
+    if (cdoc.hidden && cdoc.alias.empty ()) {
+      os << " " << tl::to_string (QObject::tr ("[internal]"));
+    }
+    os << "</a>";
+
+  }
+
+  if (any) {
+    os << "</p>" << std::endl;
+  }
+
+  //  Inserts an index
+
   os << "<h2-index/>" << std::endl;
+
+  //  Produce class doc body
+
+  if (class_doc.hidden && class_doc.alias.empty ()) {
+    os << "<p><b>"
+       << tl::to_string (QObject::tr ("Note"))
+       << "</b>: "
+       << tl::to_string (QObject::tr (
+                           "This class is an internal class provided for technical reasons - i.e. "
+                           "as a placeholder class for argument binding or as an abstract interface. "
+                           "You should not instantiate objects of this class directly. "
+                           "Instead, use the subclasses listed above. "
+                           "Also see there for more documentation and actual incarnations of this class."
+                        ))
+       << "</p>" << std::endl;
+  }
 
   os << replace_references (class_doc.doc_html (), cls_obj) << std::endl;
 
@@ -1116,6 +1179,8 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     os << "</doc>" << std::endl;
     return os.str ();
   }
+
+  //  Produce methods brief descriptions
   
   int n = 0;
   int row = 0;
@@ -1190,6 +1255,8 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     os << "</table>" << std::endl;
   }
 
+  //  Produce static methods brief descriptions
+
   any = false;
 
   n = 0;
@@ -1229,6 +1296,8 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
   if (any) {
     os << "</table>" << std::endl;
   }
+
+  //  Produce protected methods brief descriptions
 
   any = false;
 
@@ -1271,6 +1340,8 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
   if (any) {
     os << "</table>" << std::endl;
   }
+
+  //  Produce deprecated methods brief descriptions
 
   any = false;
 
@@ -1322,6 +1393,8 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
   if (any) {
     os << "</table>" << std::endl;
   }
+
+  //  Produce method details
 
   n = 0;
 

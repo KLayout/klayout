@@ -26,7 +26,7 @@
 #define HDR_edtRecentConfigurationPage
 
 #include "edtCommon.h"
-#include "layEditorOptionsPage.h"
+#include "layEditorOptionsPageWidget.h"
 #include "tlObject.h"
 #include "tlDeferredExecution.h"
 
@@ -48,13 +48,11 @@ namespace edt
 
 class PCellParametersPage;
 
-class EditorOptionsPages;
-
 /**
  *  @brief The base class for a object properties page
  */
 class EDT_PUBLIC RecentConfigurationPage
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
 Q_OBJECT
 
@@ -84,11 +82,10 @@ public:
     ConfigurationRendering rendering;
   };
 
-  template <class Iter>
-  RecentConfigurationPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher, const std::string &recent_cfg_name, Iter begin_cfg, Iter end_cfg)
-    : EditorOptionsPage (view, dispatcher), m_recent_cfg_name (recent_cfg_name), m_cfg (begin_cfg, end_cfg), dm_update_list (this, &RecentConfigurationPage::update_list)
+  RecentConfigurationPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher, const std::string &recent_cfg_name)
+    : EditorOptionsPageWidget (view, dispatcher), m_recent_cfg_name (recent_cfg_name), dm_update_list (this, &RecentConfigurationPage::update_list)
   {
-    init ();
+    //  .. nothing yet ..
   }
 
   virtual ~RecentConfigurationPage ();
@@ -100,6 +97,21 @@ public:
   virtual void commit_recent (lay::Dispatcher *root);
   virtual void config_recent_for_layer (lay::Dispatcher *root, const db::LayerProperties &lp, int cv_index);
 
+protected:
+  /**
+   *  @brief Adds a configuration descriptors
+   *  Use this method in the constructor to add descriptors.
+   */
+  void add (const ConfigurationDescriptor &cfg)
+  {
+    m_cfg.push_back (cfg);
+  }
+
+  /**
+   *  @brief Initializes the widget after the configuration items have been added
+   */
+  void init ();
+
 private slots:
   void item_clicked (QTreeWidgetItem *item);
 
@@ -109,7 +121,6 @@ private:
   QTreeWidget *mp_tree_widget;
   tl::DeferredMethod<RecentConfigurationPage> dm_update_list;
 
-  void init ();
   void update_list (const std::list<std::vector<std::string> > &stored_values);
   void update_list ();
   std::list<std::vector<std::string> > get_stored_values () const;

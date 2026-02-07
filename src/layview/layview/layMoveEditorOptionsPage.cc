@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "layMoveEditorOptionsPage.h"
 #include "layWidgets.h"
 #include "layDispatcher.h"
@@ -114,3 +116,5 @@ MoveEditorOptionsPage::configure (const std::string &name, const std::string &va
 static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory (new lay::EditorOptionsPageFactory<MoveEditorOptionsPage> ("laybasic::MoveServicePlugin"), 0);
 
 }
+
+#endif

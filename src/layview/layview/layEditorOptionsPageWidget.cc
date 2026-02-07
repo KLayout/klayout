@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "layEditorOptionsPageWidget.h"
 #include "layLayoutViewBase.h"
 #include "tlExceptions.h"
@@ -178,3 +180,5 @@ EditorOptionsPageWidget::is_visible () const
 }
 
 }
+
+#endif

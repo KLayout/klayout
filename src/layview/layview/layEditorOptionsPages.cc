@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "tlInternational.h"
 #include "layEditorOptionsPages.h"
 #include "layEditorOptionsPageWidget.h"
@@ -510,3 +512,5 @@ END_PROTECTED
 }
 
 }
+
+#endif

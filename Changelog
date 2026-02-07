@@ -1,3 +1,39 @@
+0.30.6           (2026-02-07):
+* Bugfix: %GITHUB%/issues/2210 LayoutView::create_measure_ruler() creates incorrect rulers
+* Enhancement: %GITHUB%/issues/2214 Take selection modifer into account on release rather than on click
+* Bugfix: %GITHUB%/issues/2220 Select fails to select from 2nd layout when two are loaded in same panel
+* Bugfix: %GITHUB%/issues/2221 "save all" doesn't use the "generic options" in "save as"
+* Enhancement: %GITHUB%/issues/2224 Object Properties should allow layer change
+* Bugfix: %GITHUB%/issues/2229 Compilation error when building with the -without-qt and -with-64bit-coord flags together
+* Bugfix: %GITHUB%/issues/2234 Trace net / trace path still not working 
+* Bugfix: %GITHUB%/issues/2252 db::NetlistCompare: internal error when comparing schematic and netlist
+* Bugfix: %GITHUB%/issues/2262 strmxor -u -l wrongly reports differences on identical layers 
+* Bugfix: %GITHUB%/issues/2263 klayout throws an ERROR reading a magic file with "tri ... sw"
+* Bugfix: %GITHUB%/issues/2267 LoadLayoutOptions.lefdef_config.map_file fails when path contains '+' character
+* Bugfix: Using floats for Polygon::smooth distance checks, so that precise measurements are taken
+* Enhancement: Point-like objects use pan-to-selection instead of zoom-to-selection when pasting
+* Bugfix: No duplicate warning message box when drawing texts on a hidden layer
+* Enhancement: More options on 'evaluate_nets' expressions, i.e. 'copy'. See documentation for details
+* Enhancement: L2N format now will always include the expanded net name, so referring to a net in a log entry is possible
+* Bugfix: DRC collect* functions did not work on edge pair layers
+* Enhancement: Documentation now will also list hidden/internal classes to avoid confusing references to invisible classes
+* Enhancement: DRC extend_refs function is now also available for edge and edge pair layers
+* Enhancement: Pressing Ctrl key while drawing a box enforces a square, pressing Shift while drawing a box makes it centered at first location
+* Enhancement: Pressing Ctrl and Shift keys does the same for box-style rulers (box, ellipse)
+* Bugfix: Fixing strange snapping behavior on partial move at 45 degree directions
+* Enhancement: Many operations now display edit boxes with current distances or dimensions. 
+  Press "Tab" to navigate to these boxes and specify distances or dimensions numerically.
+  Press "Enter" to commit these changes and "Escape" to leave the boxes.
+  For example: move distance, edge length during drawing of polygon or paths, box dimensions,
+  text strings.
+* Enhancement: New ruler mode "diagonal only"
+* Bugfix: selecting a recent configuration in the editor options did not select the layer if it was freshly created
+* Enhancement: Multi-Rulers can now be configured to display incremental lengths
+  (use "DD", "LL", "XX" and "YY" variables - see documentation)
+* Enhancement: "Move By", "Scale" and "Rotate by Angle" dialogs now have an "Apply" button and values are persisted
+* Bugfix: Finding of objects at the mouse location (e.g. for net probing) did not work properly for dense layouts
+* Enhancement: The Library view does not list cells starting with an underscore. That is a way to hide cells only used internally.
+
 0.30.5           (2025-11-09):
 * Enhancement: %GITHUB%/issues/2147 Feature request: collect multiple files into a single library if the library name is identical
 * Bugfix: %GITHUB%/issues/2156 Crash when loading library with mabrains klayout_lib_manager

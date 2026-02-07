@@ -538,10 +538,9 @@ class Config(object):
             if is_library:
                 args += [
                     "-Wl,-dylib",
-                    "-Wl,-headerpad_max_install_names",
                     "-Wl,-install_name,@rpath/%s" % self.libname_of(mod, is_lib=True),
                 ]
-            args += ["-Wl,-rpath,@loader_path/"]
+            args += ["-Wl,-rpath,@loader_path/", "-Wl,-headerpad_max_install_names"]
             args += options.get("ldflags-gcc", [])
             args += options.get("ldflags-darwin", [])
         else:

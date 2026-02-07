@@ -740,6 +740,11 @@ class AngleConstraintType:
     r"""
     @brief Specifies to use multiples of 45 degree.
     """
+    AC_DiagonalOnly: ClassVar[AngleConstraintType]
+    r"""
+    @brief Specifies to use 45 degree or 135 degree only.
+    This variant has been introduced in version 0.30.6.
+    """
     AC_Global: ClassVar[AngleConstraintType]
     r"""
     @brief Specifies to use the global angle constraint.
@@ -1071,6 +1076,12 @@ class Annotation(BasicAnnotation):
     r"""
     @brief Gets the diagonal angle code for use with the \angle_constraint method
     If this value is specified for the angle constraint, only multiples of 45 degree are allowed.
+    """
+    AngleDiagonalOnly: ClassVar[int]
+    r"""
+    @brief Gets the diagonal angle code for use with the \angle_constraint method
+    If this value is specified for the angle constraint, only 45 degree or 135 degree are allowed.
+    This constant has been introduced in version 0.30.6.
     """
     AngleGlobal: ClassVar[int]
     r"""
@@ -2217,6 +2228,16 @@ class ButtonState:
     @brief Indicates that the middle mouse button is pressed
     This constant is combined with other constants within \ButtonState
     """
+    ModifierMask: ClassVar[int]
+    r"""
+    @brief A bit mask that selects all keyboard modifiers in the button state mask
+    This constant has been introduced in version 0.30.6.
+    """
+    MouseButtonMask: ClassVar[int]
+    r"""
+    @brief A bit mask that selects all mouse buttons in the button state mask
+    This constant has been introduced in version 0.30.6.
+    """
     RightButton: ClassVar[int]
     r"""
     @brief Indicates that the right mouse button is pressed
@@ -3093,13 +3114,15 @@ class Dispatcher:
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
         ...
-    def get_config(self, name: str) -> Any:
+    def get_config(self, name: str, default: Optional[Any] = ...) -> Any:
         r"""
         @brief Gets the value of a local configuration parameter
 
         @param name The name of the configuration parameter whose value shall be obtained (a string)
 
-        @return The value of the parameter or nil if there is no such parameter
+        @return The value of the parameter or the default value if there is no such parameter
+
+        The default value has been added in version 0.30.6.
         """
         ...
     def get_config_names(self) -> List[str]:
@@ -10890,6 +10913,11 @@ class Plugin(PluginBase):
     r"""
     @brief Specifies to use multiples of 45 degree.
     """
+    AC_DiagonalOnly: ClassVar[AngleConstraintType]
+    r"""
+    @brief Specifies to use 45 degree or 135 degree only.
+    This variant has been introduced in version 0.30.6.
+    """
     AC_Global: ClassVar[AngleConstraintType]
     r"""
     @brief Specifies to use the global angle constraint.
@@ -11282,16 +11310,19 @@ class PluginBase:
     def activated(self) -> None:
         r"""
         @brief Gets called when the plugin is activated (base class implementation)
+        See \Plugin#activated for details.
         """
         ...
     def config_finalize(self) -> None:
         r"""
         @brief Sends the post-configuration request to the plugin (base class implementation)
+        See \Plugin#config_finalize for details.
         """
         ...
     def configure(self, name: str, value: str) -> bool:
         r"""
         @brief Sends configuration requests to the plugin (base class implementation)
+        See \Plugin#configure for details.
         """
         ...
     def create(self) -> None:
@@ -11303,6 +11334,7 @@ class PluginBase:
     def deactivated(self) -> None:
         r"""
         @brief Gets called when the plugin is deactivated and another plugin is activated (base class implementation)
+        See \Plugin#deactivated for details.
         """
         ...
     def destroy(self) -> None:
@@ -11322,16 +11354,19 @@ class PluginBase:
     def drag_cancel(self) -> None:
         r"""
         @brief This method is called when some mouse dragging operation should be cancelled (base class implementation)
+        See \Plugin#drag_cancel for details.
         """
         ...
     def enter_event(self, prio: bool) -> bool:
         r"""
         @brief Handles the enter event (base class implementation)
+        See \Plugin#enter_event for details.
         """
         ...
     def has_tracking_position(self) -> bool:
         r"""
         @brief Gets a value indicating whether the plugin provides a tracking position (base class implementation)
+        See \Plugin#has_tracking_position for details.
         """
         ...
     def is_const_object(self) -> bool:
@@ -11344,56 +11379,67 @@ class PluginBase:
     def key_event(self, key: int, buttons: int) -> bool:
         r"""
         @brief Handles the key pressed event (base class implementation)
+        See \Plugin#key_event for details.
         """
         ...
     def leave_event(self, prio: bool) -> bool:
         r"""
         @brief Handles the leave event (base class implementation)
+        See \Plugin#leave_event for details.
         """
         ...
     def menu_activated(self, symbol: str) -> None:
         r"""
         @brief Gets called when a custom menu item is selected (base class implementation)
+        See \Plugin#menu_activated for details.
         """
         ...
     def mouse_button_pressed_event(self, p: db.DPoint, buttons: int, prio: bool) -> bool:
         r"""
         @brief Handles the mouse button pressed event (base class implementation)
+        See \Plugin#mouse_button_pressed_event for details.
         """
         ...
     def mouse_button_released_event(self, p: db.DPoint, buttons: int, prio: bool) -> bool:
         r"""
         @brief Handles the mouse button release event (base class implementation)
+        See \Plugin#mouse_button_released_event for details.
         """
         ...
     def mouse_click_event(self, p: db.DPoint, buttons: int, prio: bool) -> bool:
         r"""
         @brief Handles the mouse button click event after the button has been released (base class implementation)
+        See \Plugin#mouse_click_event for details.
         """
         ...
     def mouse_double_click_event(self, p: db.DPoint, buttons: int, prio: bool) -> bool:
         r"""
         @brief Handles the mouse button double-click event (base class implementation)
+        See \Plugin#mouse_double_click_event for details.
         """
         ...
     def mouse_moved_event(self, p: db.DPoint, buttons: int, prio: bool) -> bool:
         r"""
         @brief Handles the mouse move event (base class implementation)
+        See \Plugin#mouse_moved_event for details.
         """
         ...
     def tracking_position(self) -> db.DPoint:
         r"""
         @brief Gets the tracking position (base class implementation)
+        See \Plugin#tracking_position for details.
         """
         ...
     def update(self) -> None:
         r"""
         @brief Gets called when the view has changed (base class implementation)
+        See \Plugin#update for details.
         """
         ...
     def wheel_event(self, delta: int, horizontal: bool, p: db.DPoint, buttons: int, prio: bool) -> bool:
         r"""
         @brief Handles the mouse wheel event (base class implementation)
+        See \Plugin#wheel_event for details.
         """
         ...
     ...
@@ -11560,6 +11606,20 @@ class PluginFactory:
         If 'cvalue' is a string with a single question mark ("?"), the item is a check box that reflects the boolean value of the configuration item.
 
         This method has been introduced in version 0.27.
+        """
+        ...
+    def add_editor_options_page_by_name(self, name: str) -> None:
+        r"""
+        @brief Requests an additional editor options page from the standard pool.
+        This method needs to be called in the initializer of the plugin factory class and before the 'register' call.It requests an additional editor options page from the standard pool. 'name' specifies which page is added.
+
+        As of now, only 'GenericEditorOptions' is available to provide the basic grid and angle constraints settings. If you wish to enable that page for the plugin, use:
+
+        @code
+        add_editor_options_page_by_name("GenericEditorOptions")
+        @/code
+
+        This method has been introduced in version 0.30.6. Before this method was introduced, the generic editor options were always added.
         """
         ...
     @overload

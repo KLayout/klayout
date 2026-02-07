@@ -15727,7 +15727,8 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: float
     r"""
@@ -26154,6 +26155,18 @@ class EdgePairs(ShapeCollection):
         This method has been introduced in version 0.28.4.
         """
         ...
+    def extent_refs(self, arg0: float, arg1: float, arg2: float, arg3: float, arg4: int, arg5: int) -> Region:
+        r"""
+        @hide
+        This method is provided for DRC implementation.
+        """
+        ...
+    def extent_refs_edges(self, arg0: float, arg1: float, arg2: float, arg3: float) -> Edges:
+        r"""
+        @hide
+        This method is provided for DRC implementation.
+        """
+        ...
     @overload
     def extents(self) -> Region:
         r"""
@@ -30833,6 +30846,18 @@ class Edges(ShapeCollection):
         The edges are extended to the "outside" by the given distance "e". The distance will be applied to the left side as seen in the direction of the edge. By definition, this is the side pointing to the outside of the polygon if the edge was derived from a polygon.
 
         Other versions of this feature are \extended_in and \extended.
+        """
+        ...
+    def extent_refs(self, arg0: float, arg1: float, arg2: float, arg3: float, arg4: int, arg5: int) -> Region:
+        r"""
+        @hide
+        This method is provided for DRC implementation.
+        """
+        ...
+    def extent_refs_edges(self, arg0: float, arg1: float, arg2: float, arg3: float) -> Edges:
+        r"""
+        @hide
+        This method is provided for DRC implementation.
         """
         ...
     @overload
@@ -36870,20 +36895,43 @@ class LEFDEFReaderConfiguration:
 
     This property has been added in version 0.27.
     """
-    map_file: str
+    map_file: Any
     r"""
     Getter:
-    @brief Gets the layer map file to use.
+    @brief Gets the layer map file or the map files to use.
     If a layer map file is given, the reader will pull the layer mapping from this file. The layer mapping rules specified in the reader options are ignored in this case. These are the name suffix rules for vias, blockages, routing, special routing, pins etc. and the corresponding datatype rules. The \layer_map attribute will also be ignored. 
     The layer map file path will be resolved relative to the technology base path if the LEF/DEF reader options are used in the context of a technology.
 
-    This property has been added in version 0.27.
+    The mapping file is one layer mapping entry per line. Each line is a layer name, followed by a list of purposes (VIA, PIN ...) and a layer and datatype number. In addition, 'DIEAREA', 'REGION' and 'BLOCKAGE' can be used to map the design outline, regions and blockages to a layer. 'REGION' can have a detailed specifier which is 'FENCE', 'GUIDE' or 'NONE' for fence, guide or other type regions (e.g. 'REGION FENCE 99/0').
+
+    'NAME' in place of the layer name and using layer/purpose in the purpose column allows mapping labels to specific layers.
+
+    This is an example for a layer map file:
+
+    @code
+    DIEAREA ALL                       100      0
+    M1      LEFPIN                    12       0
+    M1      PIN                       12       2
+    M1      NET                       12       3
+    M1      SPNET                     12       4
+    M1      VIA                       12       5
+    M1      BLOCKAGE                  12       10
+    NAME    M1/PIN                    12       10
+    VIA1    LEFPIN,VIA,PIN,NET,SPNET  13       0
+    M2      LEFPIN,PIN,NET,SPNET,VIA  14       0
+    @/code
+
+    If a map file is used, only the layers present in the map file are generated. No other layers are produced.
+
+    The 'map_file' attribute can either be a single file name, or a list of file names. If a list is given, the corresponding files are merged. If the attribute is nil, no map file is used.
+
+    This property has been added in version 0.27. The ability to supply multiple files has been added in version 0.30.6.
 
     Setter:
     @brief Sets the layer map file to use.
     See \map_file for details about this property.
 
-    This property has been added in version 0.27.
+    This property has been added in version 0.27. The ability to supply multiple files has been added in version 0.30.6.
     """
     net_property_name: Any
     r"""
@@ -42972,11 +43020,12 @@ class LayoutToNetlist:
         It also accepts variables which become available as variables inside the expression. This allows passing arbitrary values without having to encode them into the expression string.
 
         It will look at nets connecting to shapes on the primary layer and execute the expression for each
-        of those nets. After that it will copy the primary shapes of the net to the output with the properties
+        of those nets. After that it will copy the merged primary shapes of the net to the output with the properties
         placed by 'put' attached to them.
 
         It is possible to skip primary shapes of a specific net by calling the 'skip' function with a 'true'
-        value.
+        value. It is also possible to configure the output in more detail, i.e. to copy other or all layers, to
+        replace the output by the net's bounding box above a certain complexity, or to select merged polygons or unmerged ones, by using 'copy' instead of 'skip'. See below for more details.
 
         The expression may use the following functions:
 
@@ -42986,11 +43035,52 @@ class LayoutToNetlist:
         @li 'perimeter': the perimeter of the primary-layer shapes on the net in um @/li
         @li 'perimeter(name)': the perimeter of the secondary-layer shapes. 'name' is a symbol with the name given in the secondary-layer map @/li
         @li 'put(name, value)': places the value as property 'name' on the output shapes @/li
-        @li 'skip(flag)': will skip the primary shapes of that net when called with a true value @/li
+        @li 'skip' or 'skip(flag)': will skip the primary shapes of that net when called with a true value or without one. See also 'copy'. @/li
+        @li 'copy(...)': see below for details @/li
         @li 'net': the \Net object of the current net @/li
+        @li 'db': the \LayoutToDatabase object the netlist lives in @/li
         @/ul
 
         If given, the 'dbu' argument gives the database unit to use for converting shape dimensions into micrometer units. If this value is 0, the area and perimeters are calculated in database units. If no DBU is specified, the value is determined automatically.
+        'copy' and 'skip' control the polygon output. Here are the options:
+
+        @ul
+        @li 'skip' or 'skip(true)': skip output, identical to 'copy(layers=[])' @/li
+        @li 'skip(false)': copy the shapes from the primary layer, identical to 'copy(layer=0)' @/li
+        @li 'copy' or 'copy(true)': copy all shapes from the net, merged into a single polygon.
+            Note: this is not equivalent to 'skip(false)', as in the latter case, only the primary layer's
+            shapes are copied @/li
+        @li 'copy(false)': equivalent to 'skip(true)' @/li
+        @li 'copy(merged=false)': copies all shapes from all layers of the net, without merging.
+            'merged' is a keyword argument that can be combined with other arguments. @/li
+        @li 'copy(limit=number)': if the net has less than 'number' polygons on the selected layers, 
+            copy them to the output. For more polygons, emit the bounding box of the net for the 
+            given layers.
+            'limit' is a keyword argument that can be combined with other arguments. @/li
+        @li 'copy(layer=symbol)': copies all shapes from the layer denoted by the symbol.
+            The primary layer has value zero (0), so 'copy(layer=0)' copies the shapes from the primary layer.
+            'layer' is a keyword argument that can be combined with other arguments, except 'layers'. @/li
+        @li 'copy(layers=[symbol, symbol, ...])': copies all shapes from the layers denoted by the symbols.
+            'layers' is a keyword argument that can be combined with other arguments, except 'layer'. @/li
+        @/ul
+
+        When mixing 'skip' and 'copy', the last active specification controls the output. The following
+        expressions are equivalent:
+
+        @code
+        copy(net.name == 'VDD')
+        @/code
+
+        and
+
+        @code
+        skip ; net.name == 'VDD' && copy
+        @/code
+
+        where the second expression establishes 'skip' as the default and conditionally executes 'copy',
+        overriding 'skip'.
+
+        The 'copy' and 'db' functions were added and the 'skip' argument was made optional in version 0.30.6.
         """
         ...
     def extract_devices(self, extractor: DeviceExtractorBase, layers: Dict[str, ShapeCollection]) -> None:
@@ -45502,6 +45592,21 @@ class LogEntryData:
     Setter:
     @brief Sets the message text.
     """
+    net_name: str
+    r"""
+    Getter:
+    @brief Gets the net name.
+    See \net_name= for details about this attribute.
+    The net_name attribute has been introduced in version 0.30.6.
+
+    Setter:
+    @brief Sets the net name.
+    The net (or circuit) name specifies the net the log entry is related to.
+
+    By convention, the net name is the expanded net name (see \Net#expanded_name).
+
+    The net_name attribute has been introduced in version 0.30.6.
+    """
     severity: Severity
     r"""
     Getter:
@@ -45510,10 +45615,36 @@ class LogEntryData:
     Setter:
     @brief Sets the severity attribute.
     """
+    @overload
     @classmethod
-    def new(cls) -> LogEntryData:
+    def new(cls, severity: Severity, cell_name: str, msg: str) -> LogEntryData:
         r"""
-        @brief Creates a new object of this class
+        @brief Creates a new LogEntry object with the given severity, cell or circuit name and message
+        This convenience constructor has been added in version 0.30.6
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, severity: Severity, cell_name: str, new_name: str, msg: str) -> LogEntryData:
+        r"""
+        @brief Creates a new LogEntry object with the given severity, cell or circuit name, net name and message
+        This convenience constructor has been added in version 0.30.6
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, severity: Severity, msg: str) -> LogEntryData:
+        r"""
+        @brief Creates a new LogEntry object with the given severity and message
+        This convenience constructor has been added in version 0.30.6
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, severity: Severity, net: Net, msg: str) -> LogEntryData:
+        r"""
+        @brief Creates a new LogEntry object with the given severity and message and circuit and net name taken from the given \Net object
+        This convenience constructor has been added in version 0.30.6
         """
         ...
     def __copy__(self) -> LogEntryData:
@@ -45526,9 +45657,32 @@ class LogEntryData:
         @brief Creates a copy of self
         """
         ...
-    def __init__(self) -> None:
+    @overload
+    def __init__(self, severity: Severity, cell_name: str, msg: str) -> None:
         r"""
-        @brief Creates a new object of this class
+        @brief Creates a new LogEntry object with the given severity, cell or circuit name and message
+        This convenience constructor has been added in version 0.30.6
+        """
+        ...
+    @overload
+    def __init__(self, severity: Severity, cell_name: str, new_name: str, msg: str) -> None:
+        r"""
+        @brief Creates a new LogEntry object with the given severity, cell or circuit name, net name and message
+        This convenience constructor has been added in version 0.30.6
+        """
+        ...
+    @overload
+    def __init__(self, severity: Severity, msg: str) -> None:
+        r"""
+        @brief Creates a new LogEntry object with the given severity and message
+        This convenience constructor has been added in version 0.30.6
+        """
+        ...
+    @overload
+    def __init__(self, severity: Severity, net: Net, msg: str) -> None:
+        r"""
+        @brief Creates a new LogEntry object with the given severity and message and circuit and net name taken from the given \Net object
+        This convenience constructor has been added in version 0.30.6
         """
         ...
     def __repr__(self, with_geometry: Optional[bool] = ...) -> str:
@@ -48912,17 +49066,17 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
+        @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
+        @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -65173,9 +65327,8 @@ class Shape:
     This method has been introduced in version 0.28.
 
     Setter:
-    @brief Replaces the shape by the given point
-    This method replaces the shape by the given point. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given point (in micrometer units)
+    This method replaces the shape by the given point, like \point= with a \Point argument does. This version translates the point from micrometer units to database units internally.
 
     This method has been introduced in version 0.28.
     """
@@ -65245,10 +65398,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a text.
     Setter:
-    @brief Replaces the shape by the given text (in micrometer units)
-    This method replaces the shape by the given text, like \text= with a \Text argument does. This version translates the text from micrometer units to database units internally.
+    @brief Replaces the shape by the given text object
+    This method replaces the shape by the given text object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     text_dpos: DVector
     r"""
@@ -70143,8 +70297,7 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: int
     r"""

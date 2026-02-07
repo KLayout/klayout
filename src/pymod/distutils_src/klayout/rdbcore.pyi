@@ -1270,17 +1270,17 @@ class RdbReference:
     @overload
     def database(self) -> ReportDatabase:
         r"""
-        @brief Gets the database object that category is associated with
+        @brief Gets the database object that category is associated with (non-const version)
 
-        This method has been introduced in version 0.23.
+        This method has been introduced in version 0.29.
         """
         ...
     @overload
     def database(self) -> ReportDatabase:
         r"""
-        @brief Gets the database object that category is associated with (non-const version)
+        @brief Gets the database object that category is associated with
 
-        This method has been introduced in version 0.29.
+        This method has been introduced in version 0.23.
         """
         ...
     def destroy(self) -> None:

@@ -274,11 +274,67 @@ Cell::is_shape_bbox_dirty () const
   return false;
 }
 
+namespace
+{
+
+/**
+ *  @brief An alternative box converter for CellInst which does not call layout.update
+ *
+ *  Using this converter in cell.update_bbox() prevents recursive calls to layout.update.
+ */
+class InternalCellInstBoxConverter
+{
+public:
+  typedef db::Cell::box_type box_type;
+  typedef db::simple_bbox_tag complexity;
+
+  InternalCellInstBoxConverter (const db::Layout *layout)
+    : mp_layout (layout)
+  {
+    //  .. nothing yet ..
+  }
+
+  box_type operator() (const db::CellInst &cell_inst) const
+  {
+    return mp_layout->cell (cell_inst.cell_index ()).bbox_with_empty_no_update ();
+  }
+
+private:
+  const db::Layout *mp_layout;
+};
+
+/**
+ *  @brief An alternative box converter for CellInst and layer which does not call layout.update
+ *
+ *  Using this converter in cell.update_bbox() prevents recursive calls to layout.update.
+ */
+class InternalPerLayerCellInstBoxConverter
+{
+public:
+  typedef db::Cell::box_type box_type;
+  typedef db::simple_bbox_tag complexity;
+
+  InternalPerLayerCellInstBoxConverter (const db::Layout *layout, unsigned int layer)
+    : mp_layout (layout), m_layer (layer)
+  {
+    //  .. nothing yet ..
+  }
+
+  box_type operator() (const db::CellInst &cell_inst) const
+  {
+    return mp_layout->cell (cell_inst.cell_index ()).bbox_no_update (m_layer);
+  }
+
+private:
+  const db::Layout *mp_layout;
+  unsigned int m_layer;
+};
+
+}
+
 bool 
 Cell::update_bbox (unsigned int layers)
 {
-  unsigned int l;
-
   //  determine the bounding box
   box_type org_bbox = m_bbox;
   m_bbox = box_type ();
@@ -308,10 +364,10 @@ Cell::update_bbox (unsigned int layers)
       ++o;
     }
 
-    for (l = 0; l < layers; ++l) {
+    for (unsigned int l = 0; l < layers; ++l) {
 
       //  the per-layer bounding boxes
-      db::box_convert <cell_inst_type> bc (*mp_layout, l);
+      InternalPerLayerCellInstBoxConverter bc (mp_layout, l);
       box_type lbox = o1_inst->bbox_from_raw_bbox (raw_box, bc);
 
       if (! lbox.empty ()) {
@@ -326,7 +382,7 @@ Cell::update_bbox (unsigned int layers)
 
     }
 
-    db::box_convert <cell_inst_type, false> bc_we (*mp_layout);
+    InternalCellInstBoxConverter bc_we (mp_layout);
     m_bbox_with_empty += o1_inst->bbox_from_raw_bbox (raw_box, bc_we);
     
   }
@@ -478,6 +534,17 @@ const Cell::box_type &
 Cell::bbox (unsigned int l) const
 {
   mp_layout->update ();
+  box_map::const_iterator b = m_bboxes.find (l);
+  if (b != m_bboxes.end ()) {
+    return b->second;
+  } else {
+    return ms_empty_box;
+  }
+}
+
+const Cell::box_type &
+Cell::bbox_no_update (unsigned int l) const
+{
   box_map::const_iterator b = m_bboxes.find (l);
   if (b != m_bboxes.end ()) {
     return b->second;
@@ -725,7 +792,7 @@ Cell::count_hier_levels () const
 {
   unsigned int l = 0;
 
-  for (const_iterator c = begin (); !c.at_end (); ++c) {
+  for (const_iterator c = m_instances.begin (); !c.at_end (); ++c) {
     l = std::max (l, (unsigned int) mp_layout->cell (c->cell_index ()).m_hier_levels + 1);
   }
 

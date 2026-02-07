@@ -29,11 +29,13 @@
 #include "dbSaveLayoutOptions.h"
 #include "dbRegion.h"
 #include "dbDeepShapeStore.h"
+#include "dbCellGraphUtils.h"
 #include "gsiExpression.h"
 #include "tlCommandLineParser.h"
 #include "tlThreads.h"
 #include "tlThreadedWorkers.h"
 #include "tlTimer.h"
+#include "tlOptional.h"
 
 namespace {
 
@@ -271,17 +273,19 @@ HealingTileLayoutOutputReceiver::output (const db::Box &box)
 struct ResultDescriptor
 {
   ResultDescriptor ()
-    : shape_count (0), layer_a (-1), layer_b (-1), layer_output (-1), layout (0), top_cell (0)
+    : shape_count (0), flat_shape_count (0), layer_a (-1), layer_b (-1), layer_output (-1), layout (0), top_cell (0)
   {
     //  .. nothing yet ..
   }
 
   size_t shape_count;
+  size_t flat_shape_count;
   int layer_a;
   int layer_b;
   int layer_output;
   db::Layout *layout;
   db::cell_index_type top_cell;
+  tl::optional<db::Region> results;
 
   size_t count () const
   {
@@ -293,6 +297,20 @@ struct ResultDescriptor
       return res;
     } else {
       return shape_count;
+    }
+  }
+
+  size_t flat_count () const
+  {
+    if (layout && layer_output >= 0) {
+      size_t res = 0;
+      db::CellCounter counter (layout, top_cell);
+      for (db::Layout::const_iterator c = layout->begin (); c != layout->end (); ++c) {
+        res += c->shapes (layer_output).size () * counter.weight (c->cell_index ());
+      }
+      return res;
+    } else {
+      return flat_shape_count;
     }
   }
 
@@ -586,12 +604,8 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
       const char *line_format = "  %-10s %-12s %s";
 
-      std::string headline;
-      if (deep) {
-        headline = tl::sprintf (line_format, tl::to_string (tr ("Layer")), tl::to_string (tr ("Output")), tl::to_string (tr ("Differences (hierarchical shape count)")));
-      } else {
-        headline = tl::sprintf (line_format, tl::to_string (tr ("Layer")), tl::to_string (tr ("Output")), tl::to_string (tr ("Differences (shape count)")));
-      }
+      std::string headline = tl::sprintf (line_format, tl::to_string (tr ("Layer")), tl::to_string (tr ("Output")),
+                                                       deep ? tl::to_string (tr ("Differences (hierarchical/flat count)")) : tl::to_string (tr ("Differences (shape count)")));
 
       const char *sep = "  ----------------------------------------------------------------";
 
@@ -619,7 +633,11 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
           if (r->second.layer_output >= 0 && r->second.layout) {
             out = r->second.layout->get_properties (r->second.layer_output).to_string ();
           }
-          value = tl::to_string (r->second.count ());
+          if (deep) {
+            value = tl::sprintf (tl::to_string (tr ("%-6lu / %-6lu")), r->second.count (), r->second.flat_count ());
+          } else {
+            value = tl::to_string (r->second.count ());
+          }
         }
         if (! value.empty ()) {
           tl::info << tl::sprintf (line_format, r->first.second.to_string (), out, value);
@@ -767,8 +785,15 @@ bool run_tiled_xor (const XORData &xor_data)
     proc.execute ("Running XOR");
   }
 
+  //  no stored results currently
+  for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = xor_data.results->begin (); r != xor_data.results->end (); ++r) {
+    tl_assert (! r->second.results.has_value ());
+  }
+
   //  Determines the output status
   for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = xor_data.results->begin (); r != xor_data.results->end () && result; ++r) {
+    //  no stored results currently
+    tl_assert (! r->second.results.has_value ());
     result = r->second.is_empty ();
   }
 
@@ -846,29 +871,40 @@ public:
 
       tl::SelfTimer timer (tl::verbosity () >= 11, "XOR on layer " + m_layer_props.to_string ());
 
-      db::RecursiveShapeIterator ri_a, ri_b;
-
-      if (m_la >= 0) {
-        ri_a = db::RecursiveShapeIterator (*mp_xor_data->layout_a, mp_xor_data->layout_a->cell (mp_xor_data->cell_a), m_la);
-      } else {
-        ri_a = db::RecursiveShapeIterator (*mp_xor_data->layout_a, mp_xor_data->layout_a->cell (mp_xor_data->cell_a), std::vector<unsigned int> ());
-      }
-      ri_a.set_for_merged_input (true);
-
-      if (m_lb >= 0) {
-        ri_b = db::RecursiveShapeIterator (*mp_xor_data->layout_b, mp_xor_data->layout_b->cell (mp_xor_data->cell_b), m_lb);
-      } else {
-        ri_b = db::RecursiveShapeIterator (*mp_xor_data->layout_b, mp_xor_data->layout_b->cell (mp_xor_data->cell_b), std::vector<unsigned int> ());
-      }
-      ri_b.set_for_merged_input (true);
-
-      db::Region in_a (ri_a, worker->dss (), db::ICplxTrans (mp_xor_data->layout_a->dbu () / m_dbu));
-      db::Region in_b (ri_b, worker->dss (), db::ICplxTrans (mp_xor_data->layout_b->dbu () / m_dbu));
-
       db::Region xor_res;
-      {
-        tl::SelfTimer timer (tl::verbosity () >= 21, "Basic XOR on layer " + m_layer_props.to_string ());
-        xor_res = in_a ^ in_b;
+
+      if (m_la < 0) {
+
+        tl_assert (m_lb >= 0);
+
+        db::RecursiveShapeIterator ri_b (*mp_xor_data->layout_b, mp_xor_data->layout_b->cell (mp_xor_data->cell_b), m_lb);
+        xor_res = db::Region (ri_b, worker->dss (), db::ICplxTrans (mp_xor_data->layout_b->dbu () / m_dbu));
+
+      } else if (m_lb < 0) {
+
+        db::RecursiveShapeIterator ri_a (*mp_xor_data->layout_a, mp_xor_data->layout_a->cell (mp_xor_data->cell_a), m_la);
+        xor_res = db::Region (ri_a, worker->dss (), db::ICplxTrans (mp_xor_data->layout_a->dbu () / m_dbu));
+
+      } else {
+
+        db::RecursiveShapeIterator ri_a (*mp_xor_data->layout_a, mp_xor_data->layout_a->cell (mp_xor_data->cell_a), m_la);
+        db::RecursiveShapeIterator ri_b (*mp_xor_data->layout_b, mp_xor_data->layout_b->cell (mp_xor_data->cell_b), m_lb);
+
+        db::Region in_a (ri_a, worker->dss (), db::ICplxTrans (mp_xor_data->layout_a->dbu () / m_dbu));
+        db::Region in_b (ri_b, worker->dss (), db::ICplxTrans (mp_xor_data->layout_b->dbu () / m_dbu));
+
+        bool a_empty = in_a.empty ();
+        bool b_empty = in_b.empty ();
+
+        if (a_empty && ! b_empty) {
+          xor_res = in_b;
+        } else if (! a_empty && b_empty) {
+          xor_res = in_a;
+        } else if (! a_empty && ! b_empty) {
+          tl::SelfTimer timer (tl::verbosity () >= 21, "Basic XOR on layer " + m_layer_props.to_string ());
+          xor_res = in_a ^ in_b;
+        }
+
       }
 
       int tol_index = 0;
@@ -896,9 +932,12 @@ public:
 
           if (mp_xor_data->output_layout) {
             result.layer_output = result.layout->insert_layer (lp);
-            xor_res.insert_into (mp_xor_data->output_layout, mp_xor_data->output_cell, result.layer_output);
+            if (! xor_res.empty ()) {
+              result.results = xor_res;
+            }
           } else {
             result.shape_count = xor_res.hier_count ();
+            result.flat_shape_count = xor_res.count ();
           }
         }
 
@@ -963,6 +1002,22 @@ bool run_deep_xor (const XORData &xor_data)
 
   job.start ();
   job.wait ();
+
+  //  Deliver the outputs
+  //  NOTE: this is done single-threaded and in a delayed fashion as it is not efficient during
+  //  computation and shifting hierarchy of the working layout
+
+  if (xor_data.output_layout) {
+
+    tl::SelfTimer timer (tl::verbosity () >= 11, "Result delivery");
+
+    for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = xor_data.results->begin (); r != xor_data.results->end (); ++r) {
+      if (r->second.results.has_value ()) {
+        r->second.results.value ().insert_into (xor_data.output_layout, xor_data.output_cell, r->second.layer_output);
+      }
+    }
+
+  }
 
   //  Determine the output status
 

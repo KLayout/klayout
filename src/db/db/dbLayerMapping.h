@@ -97,7 +97,7 @@ public:
   /**
    *  @brief Add a layer mapping
    *
-   *  @param layer_b The index of the layer in layout_a (the source of the mapping)
+   *  @param layer_b The index of the layer in layout_b (the source of the mapping)
    *  @param layer_a The index of the layer in layout_a (the target of the mapping)
    */
   void map (unsigned int layer_b, unsigned int layer_a)

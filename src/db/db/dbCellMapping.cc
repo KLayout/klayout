@@ -25,6 +25,8 @@
 #include "dbCellGraphUtils.h"
 #include "dbCellMapping.h"
 #include "dbLayoutUtils.h"
+#include "dbCellInstanceSetHasher.h"
+#include "dbHash.h"
 #include "tlLog.h"
 #include "tlTimer.h"
 
@@ -122,28 +124,30 @@ private:
 //  Some utility class: a compare function for a instance set of two cells in the context
 //  of two layouts and two initial cells.
 
-class InstanceSetCompareFunction 
+#if 1
+
+class InstanceSetCompareFunction
 {
 public:
-  typedef std::multiset<db::ICplxTrans, db::trans_less_func<db::ICplxTrans> > trans_set_t;
+  typedef std::unordered_multiset<db::ICplxTrans> trans_set_t;
 
-  InstanceSetCompareFunction (const db::Layout &layout_a, db::cell_index_type initial_cell_a, const db::Layout &layout_b, db::cell_index_type initial_cell_b)
-    : m_layout_a (layout_a), m_initial_cell_a (initial_cell_a),
-      m_layout_b (layout_b), m_initial_cell_b (initial_cell_b),
+  InstanceSetCompareFunction (const db::Layout &layout_a, db::cell_index_type initial_cell_a, const std::set<db::cell_index_type> *selection_cone_a, const db::Layout &layout_b, db::cell_index_type initial_cell_b, const std::set<db::cell_index_type> *selection_cone_b)
+    : m_layout_a (layout_a), m_initial_cell_a (initial_cell_a), m_selection_cone_a (selection_cone_a),
+      m_layout_b (layout_b), m_initial_cell_b (initial_cell_b), m_selection_cone_b (selection_cone_b),
       m_cell_a (std::numeric_limits<db::cell_index_type>::max ()),
       m_repr_set (false)
   {
     // ..
   }
 
-  bool compare (db::cell_index_type cell_a, const std::set<db::cell_index_type> &selection_cone_a, db::cell_index_type cell_b, const std::set<db::cell_index_type> &selection_cone_b)
+  bool compare (db::cell_index_type cell_a, db::cell_index_type cell_b)
   {
     if (cell_a != m_cell_a) {
 
       m_cell_a = cell_a;
 
       m_callers_a.clear ();
-      m_layout_a.cell (cell_a).collect_caller_cells (m_callers_a, selection_cone_a, -1);
+      m_layout_a.cell (cell_a).collect_caller_cells (m_callers_a, *m_selection_cone_a, -1);
       m_callers_a.insert (cell_a);
 
       m_trans.clear ();
@@ -162,7 +166,7 @@ public:
     }
 
     std::set<db::cell_index_type> callers_b;
-    m_layout_b.cell (cell_b).collect_caller_cells (callers_b, selection_cone_b, -1);
+    m_layout_b.cell (cell_b).collect_caller_cells (callers_b, *m_selection_cone_b, -1);
     callers_b.insert (cell_b);
 
     trans_set_t trans (m_trans);
@@ -175,11 +179,18 @@ public:
     return trans.empty ();
   }
 
+  void make_endpoint (db::cell_index_type /*cell_a*/, db::cell_index_type /*cell_b*/) 
+  {
+    //  not supported by this version
+  }
+
 private:
   const db::Layout &m_layout_a;
   db::cell_index_type m_initial_cell_a;
+  const std::set<db::cell_index_type> *m_selection_cone_a;
   const db::Layout &m_layout_b;
   db::cell_index_type m_initial_cell_b;
+  const std::set<db::cell_index_type> *m_selection_cone_b;
   db::cell_index_type m_cell_a;
   std::set<db::cell_index_type> m_callers_a;
   trans_set_t m_trans;
@@ -255,6 +266,146 @@ private:
     }
   }
 };
+
+#else
+
+/*
+ *  An alternative implementation of the InstanceSetCompareFunction
+ *
+ *  This allows setting "endpoints" which are basically known cell identities
+ *  and allow shortcutting the instance set comparison. They act as additional
+ *  top cells.
+ *
+ *  This implementation has a potential for higher performance, but
+ *  in general it requires somewhat more memory and is not fully optimized yet.
+ */
+
+namespace {
+
+struct InstanceSetCompareFunctionHash
+{
+  std::size_t operator () (const std::pair<unsigned int, db::ICplxTrans> &p) const
+  {
+    return tl::hcombine (p.first, tl::hfunc (p.second));
+  }
+};
+
+}
+
+class InstanceSetCompareFunction
+{
+public:
+  typedef std::unordered_multiset<std::pair<unsigned int, db::ICplxTrans>, InstanceSetCompareFunctionHash> trans_set_t;
+
+  InstanceSetCompareFunction (const db::Layout &layout_a, db::cell_index_type initial_cell_a, const std::set<db::cell_index_type> *selection_cone_a, const db::Layout &layout_b, db::cell_index_type initial_cell_b, const std::set<db::cell_index_type> *selection_cone_b)
+    : m_layout_a (layout_a), m_selection_cone_a (selection_cone_a),
+      m_layout_b (layout_b), m_selection_cone_b (selection_cone_b),
+      m_cell_a (std::numeric_limits<db::cell_index_type>::max ()),
+      m_ep_index (0)
+  {
+    m_endpoints_a.insert (std::make_pair (initial_cell_a, m_ep_index));
+    m_endpoints_b.insert (std::make_pair (initial_cell_b, m_ep_index));
+    ++m_ep_index;
+  }
+
+  bool compare (db::cell_index_type cell_a, db::cell_index_type cell_b)
+  {
+    if (cell_a != m_cell_a) {
+      m_cell_a = cell_a;
+      m_trans.clear ();
+      collect_or_compare_trans_set (true, m_trans, m_endpoints_a, m_layout_a, *m_selection_cone_a, m_cell_a, db::ICplxTrans ());
+    }
+
+    trans_set_t trans (m_trans);
+
+    double mag = m_layout_b.dbu () / m_layout_a.dbu ();
+    if (! collect_or_compare_trans_set (false, trans, m_endpoints_b, m_layout_b, *m_selection_cone_b, cell_b, db::ICplxTrans (mag))) {
+      return false;
+    } else {
+      return trans.empty ();
+    }
+  }
+
+  void make_endpoint (db::cell_index_type cell_a, db::cell_index_type cell_b)
+  {
+    m_cell_a = std::numeric_limits<db::cell_index_type>::max ();
+    m_trans.clear ();
+
+    m_endpoints_a.insert (std::make_pair (cell_a, m_ep_index));
+    m_endpoints_b.insert (std::make_pair (cell_b, m_ep_index));
+    ++m_ep_index;
+  }
+
+private:
+  const db::Layout &m_layout_a;
+  const std::set<db::cell_index_type> *m_selection_cone_a;
+  const db::Layout &m_layout_b;
+  const std::set<db::cell_index_type> *m_selection_cone_b;
+  db::cell_index_type m_cell_a;
+  std::set<db::cell_index_type> m_callers_a;
+  trans_set_t m_trans;
+  std::map<db::cell_index_type, unsigned int> m_endpoints_a, m_endpoints_b;
+  unsigned int m_ep_index;
+
+  bool collect_or_compare_trans_set (bool collect,
+                                     trans_set_t &ts,
+                                     const std::map<db::cell_index_type, unsigned int> &endpoints,
+                                     const db::Layout &layout,
+                                     const std::set<db::cell_index_type> &selection,
+                                     db::cell_index_type for_cell,
+                                     const db::ICplxTrans &child_trans)
+  {
+    auto ep = endpoints.find (for_cell);
+    if (ep != endpoints.end ()) {
+
+      auto key = std::make_pair (ep->second, child_trans);
+
+      if (collect) {
+        ts.insert (key);
+        return true;
+      } else {
+        auto i = ts.find (key);
+        if (i == ts.end () || *i != key) {
+          return false;
+        } else {
+          ts.erase (i);
+          return true;
+        }
+      }
+
+    }
+
+    const db::Cell &fc = layout.cell (for_cell);
+
+    std::set<db::cell_index_type> selected_parents;
+    for (auto p = fc.begin_parent_cells (); p != fc.end_parent_cells (); ++p) {
+      if (selection.find (*p) != selection.end ()) {
+        selected_parents.insert (*p);
+      }
+    }
+
+    for (auto p = fc.begin_parent_insts (); ! p.at_end (); ++p) {
+
+      db::cell_index_type parent_cell = p->parent_cell_index ();
+      if (selected_parents.find (parent_cell) != selected_parents.end ()) {
+
+        const db::CellInstArray &inst = *p->basic_child_inst ();
+        for (auto a = inst.begin (); ! a.at_end (); ++a) {
+          auto ta = inst.complex_trans (*a);
+          if (! collect_or_compare_trans_set (collect, ts, endpoints, layout, selection, parent_cell, ta * child_trans)) {
+            return false;
+          }
+        }
+
+      }
+
+    }
+
+    return true;
+  }
+};
+
+#endif
 
 // -------------------------------------------------------------------------------------
 //  CellMapping implementation
@@ -438,18 +589,18 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
   db::CellCounter cc_b (&layout_b, cell_index_b);
 
   std::multimap<size_t, db::cell_index_type> cm_b;
-  for (db::CellCounter::selection_iterator c = cc_b.begin (); c != cc_b.end (); ++c) {
+  for (auto c = cc_b.begin (); c != cc_b.end (); ++c) {
     cm_b.insert (std::make_pair (*c == cell_index_b ? 0 : cc_b.weight (*c), *c));
   }
 
   std::multimap<size_t, db::cell_index_type> cm_a;
-  for (db::CellCounter::selection_iterator c = cc_a.begin (); c != cc_a.end (); ++c) {
+  for (auto c = cc_a.begin (); c != cc_a.end (); ++c) {
     cm_a.insert (std::make_pair (*c == cell_index_a ? 0 : cc_a.weight (*c), *c));
   }
 
   std::map <db::cell_index_type, std::vector<db::cell_index_type> > candidates; // key = index(a), value = indices(b)
 
-  InstanceSetCompareFunction cmp (layout_a, cell_index_a, layout_b, cell_index_b);
+  InstanceSetCompareFunction cmp (layout_a, cell_index_a, &cc_a.selection (), layout_b, cell_index_b, &cc_b.selection ());
 
   std::multimap<size_t, db::cell_index_type>::const_iterator a = cm_a.begin (), b = cm_b.begin ();
   while (a != cm_a.end () && b != cm_b.end ()) {
@@ -480,10 +631,11 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
       unsigned int g = 0;
       std::map <unsigned int, std::vector <db::cell_index_type> > b_group;
       std::map <db::cell_index_type, unsigned int> b_group_of_cell;
+      std::map <db::cell_index_type, std::vector<db::cell_index_type> > new_candidates;
 
       while (a != cm_a.end () && a->first == w) {
 
-        candidates.insert (std::make_pair (a->second, std::vector <db::cell_index_type> ()));
+        new_candidates.insert (std::make_pair (a->second, std::vector <db::cell_index_type> ()));
 
         std::set <unsigned int> groups_taken;
 
@@ -494,16 +646,16 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
           if (bg != b_group_of_cell.end ()) {
 
             if (groups_taken.find (bg->second) == groups_taken.end ()) {
-              if (cmp.compare (a->second, cc_a.selection (), bb->second, cc_b.selection ())) {
-                candidates [a->second] = b_group [bg->second];
+              if (cmp.compare (a->second, bb->second)) {
+                new_candidates [a->second] = b_group [bg->second];
                 groups_taken.insert (bg->second);
               }
             }
 
           } else {
 
-            if (cmp.compare (a->second, cc_a.selection (), bb->second, cc_b.selection ())) {
-              candidates [a->second].push_back (bb->second);
+            if (cmp.compare (a->second, bb->second)) {
+              new_candidates [a->second].push_back (bb->second);
               b_group_of_cell.insert (std::make_pair (bb->second, g));
               b_group.insert (std::make_pair (g, std::vector <db::cell_index_type> ())).first->second.push_back (bb->second);
             }
@@ -526,6 +678,15 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
       while (b != cm_b.end () && b->second == w) {
         ++b;
       }
+
+      for (auto c = new_candidates.begin (); c != new_candidates.end (); ++c) {
+        if (c->second.size () == 1) {
+          //  a single candidate: establish as new endpoint for the comparer
+          cmp.make_endpoint (c->first, c->second.front ());
+        }
+      }
+
+      candidates.insert (new_candidates.begin (), new_candidates.end ());
 
     }
 

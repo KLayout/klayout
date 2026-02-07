@@ -390,10 +390,12 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
   if (all) {
 
     CellMapKey key (inst.object ().cell_index (), iter->is_child_inactive (inst.object ().cell_index ()), std::set<db::Box> ());
+
+    //  NOTE: this will set m_cm_new_entry
     db::cell_index_type new_cell = make_cell_variant (key, iter->layout ()->cell_name (inst.object ().cell_index ()));
 
     //  for new cells, create this instance
-    if (m_cell_stack.back ().first) {
+    if (m_cell_stack.back ().first || m_cm_new_entry) {
       db::CellInstArray new_inst (inst, &mp_target->array_repository ());
       new_inst.object () = db::CellInst (new_cell);
       new_inst.transform (always_apply);
@@ -432,10 +434,12 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
     }
 
     CellMapKey key (inst.object ().cell_index (), iter->is_child_inactive (inst_cell), clip_variant.second);
+
+    //  NOTE: this will set m_cm_new_entry
     db::cell_index_type new_cell = make_cell_variant (key, iter->layout ()->cell_name (inst_cell));
 
     //  for a new cell, create this instance
-    if (m_cell_stack.back ().first) {
+    if (m_cell_stack.back ().first || m_cm_new_entry) {
       db::CellInstArray new_inst (db::CellInst (new_cell), always_apply * trans);
       new_inst.transform_into (m_trans);
       for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {

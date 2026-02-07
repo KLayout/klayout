@@ -1524,6 +1524,84 @@ Instances::sort_child_insts (bool force)
   std::sort (m_insts_by_cell_index.begin (), m_insts_by_cell_index.end (), cell_inst_compare_f<basic_inst_type> ());
 }
 
+namespace {
+
+/**
+ *  @brief An alternative box converter for CellInst which does not call layout.update
+ *
+ *  Using this converter in cell.update_bbox() prevents recursive calls to layout.update.
+ */
+class InternalCellInstBoxConverter
+{
+public:
+  typedef db::Cell::box_type box_type;
+  typedef db::simple_bbox_tag complexity;
+
+  InternalCellInstBoxConverter (const db::Layout *layout)
+    : mp_layout (layout)
+  {
+    //  .. nothing yet ..
+  }
+
+  db::Cell::box_type operator() (const db::Cell::cell_inst_type &cell_inst) const
+  {
+    return mp_layout->cell (cell_inst.cell_index ()).bbox_with_empty_no_update ();
+  }
+
+private:
+  const db::Layout *mp_layout;
+};
+
+/**
+ *  @brief An alternative box converter for CellInstArray with properties which does not call layout.update
+ *
+ *  Using this converter in cell.update_bbox() prevents recursive calls to layout.update.
+ */
+struct InternalCellInstArrayWithPropertiesBoxConverter
+{
+  typedef db::Cell::cell_inst_array_type cell_inst_array;
+  typedef db::Cell::box_type box_type;
+  typedef db::complex_bbox_tag complexity;
+
+  InternalCellInstArrayWithPropertiesBoxConverter (const db::Layout *layout)
+    : m_bc (layout)
+  { }
+
+  box_type operator() (const db::object_with_properties<cell_inst_array> &array) const
+  {
+    return array.bbox (m_bc);
+  }
+
+private:
+  InternalCellInstBoxConverter m_bc;
+};
+
+/**
+ *  @brief An alternative box converter for CellInstArray which does not call layout.update
+ *
+ *  Using this converter in cell.update_bbox() prevents recursive calls to layout.update.
+ */
+struct InternalCellInstArrayBoxConverter
+{
+  typedef db::Cell::cell_inst_array_type cell_inst_array;
+  typedef db::Cell::box_type box_type;
+  typedef db::complex_bbox_tag complexity;
+
+  InternalCellInstArrayBoxConverter (const db::Layout *layout)
+    : m_bc (layout)
+  { }
+
+  box_type operator() (const cell_inst_array &array) const
+  {
+    return array.bbox (m_bc);
+  }
+
+private:
+  InternalCellInstBoxConverter m_bc;
+};
+
+}
+
 void 
 Instances::sort_inst_tree (const Layout *g, bool force)
 {
@@ -1534,18 +1612,18 @@ Instances::sort_inst_tree (const Layout *g, bool force)
 
   if (m_generic.any) {
     if (is_editable ()) {
-      m_generic.stable_tree->sort (cell_inst_array_box_converter (*g));
+      m_generic.stable_tree->sort (InternalCellInstArrayBoxConverter (g));
     } else {
-      m_generic.unstable_tree->sort (cell_inst_array_box_converter (*g));
+      m_generic.unstable_tree->sort (InternalCellInstArrayBoxConverter (g));
       //  since we use unstable instance trees in non-editable mode, we need to resort the child instances in this case
       sort_child_insts (true);
     }
   }
   if (m_generic_wp.any) {
     if (is_editable ()) {
-      m_generic_wp.stable_tree->sort (cell_inst_wp_array_box_converter (*g));
+      m_generic_wp.stable_tree->sort (InternalCellInstArrayWithPropertiesBoxConverter (g));
     } else {
-      m_generic_wp.unstable_tree->sort (cell_inst_wp_array_box_converter (*g));
+      m_generic_wp.unstable_tree->sort (InternalCellInstArrayWithPropertiesBoxConverter (g));
       //  since we use unstable instance trees in non-editable mode, we need to resort the child instances in this case
       sort_child_insts (true);
     }

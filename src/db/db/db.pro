@@ -15,6 +15,7 @@ SOURCES = \
   dbCellGraphUtils.cc \
   dbCellHullGenerator.cc \
   dbCellInst.cc \
+  dbCellInstanceSetHasher.cc \
   dbCellMapping.cc \
   dbClipboard.cc \
   dbClipboardData.cc \
@@ -253,6 +254,7 @@ HEADERS = \
   dbCell.h \
   dbCellHullGenerator.h \
   dbCellInst.h \
+  dbCellInstanceSetHasher.h \
   dbCellMapping.h \
   dbClipboardData.h \
   dbClipboard.h \

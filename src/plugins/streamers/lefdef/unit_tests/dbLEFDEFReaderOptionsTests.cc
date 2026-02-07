@@ -317,8 +317,8 @@ TEST(1)
   EXPECT_EQ (options.read_lef_with_def (), false);
 
 
-  options.set_map_file ("ABC.map");
-  EXPECT_EQ (options.map_file (), "ABC.map");
+  options.set_single_map_file ("ABC.map");
+  EXPECT_EQ (options.single_map_file (), "ABC.map");
 
 
   options.set_macro_resolution_mode (2);

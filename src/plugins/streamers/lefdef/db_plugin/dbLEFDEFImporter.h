@@ -886,14 +886,27 @@ public:
     m_joined_paths = f;
   }
 
-  const std::string &map_file () const
+  const std::vector<std::string> &map_files () const
   {
-    return m_map_file;
+    return m_map_files;
   }
 
-  void set_map_file (const std::string &f)
+  void set_map_files (const std::vector<std::string> &f)
   {
-    m_map_file = f;
+    m_map_files = f;
+  }
+
+  std::string single_map_file () const
+  {
+    return m_map_files.empty () ? std::string () : m_map_files.front ();
+  }
+
+  void set_single_map_file (const std::string &f)
+  {
+    m_map_files.clear ();
+    if (! f.empty ()) {
+      m_map_files.push_back (f);
+    }
   }
 
   /**
@@ -1041,7 +1054,7 @@ private:
   std::map<unsigned int, int> m_special_routing_datatypes;
   bool m_separate_groups;
   bool m_joined_paths;
-  std::string m_map_file;
+  std::vector<std::string> m_map_files;
   unsigned int m_macro_resolution_mode;
   bool m_read_lef_with_def;
   std::vector<std::string> m_lef_files;
@@ -1292,13 +1305,11 @@ public:
   }
 
   /**
-   *  @brief Reads the given map file
+   *  @brief Reads the given list of map files
    *
-   *  Usually this file is read by the constructor. This method is provided for test purposes.
-   *  The filename can be a list of files, separated by "+" or ",". They are loaded together into
-   *  the same map like they were concatenated.
+   *  If multiple files are given, they are concatenated.
    */
-  void read_map_file (const std::string &filename, db::Layout &layout, const std::string &base_path);
+  void read_map_files (const std::vector<std::string> &filename, db::Layout &layout, const std::string &base_path);
 
   /**
    *  @brief Gets the layer map

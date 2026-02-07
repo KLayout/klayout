@@ -597,7 +597,6 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_special_routing_datatype (0),
     m_separate_groups (false),
     m_joined_paths (false),
-    m_map_file (),
     m_macro_resolution_mode (0),
     m_read_lef_with_def (true),
     m_paths_relative_to_cwd (false),
@@ -677,7 +676,7 @@ LEFDEFReaderOptions &LEFDEFReaderOptions::operator= (const LEFDEFReaderOptions &
     m_special_routing_datatypes = d.m_special_routing_datatypes;
     m_separate_groups = d.m_separate_groups;
     m_joined_paths = d.m_joined_paths;
-    m_map_file = d.m_map_file;
+    m_map_files = d.m_map_files;
     m_macro_resolution_mode = d.m_macro_resolution_mode;
     m_lef_files = d.m_lef_files;
     m_macro_layout_files = d.m_macro_layout_files;
@@ -1006,9 +1005,9 @@ LEFDEFReaderState::init (Layout &layout, const std::string &base_path, const Loa
 
     //  use default options
 
-  } else if (! mp_tech_comp->map_file ().empty ()) {
+  } else if (! mp_tech_comp->map_files ().empty ()) {
 
-    read_map_file (mp_tech_comp->map_file (), layout, base_path);
+    read_map_files (mp_tech_comp->map_files (), layout, base_path);
 
   } else {
 
@@ -1123,39 +1122,10 @@ static bool try_read_layers (tl::Extractor &ex, std::vector<int> &layers)
   return true;
 }
 
-static std::string::size_type find_file_sep (const std::string &s, std::string::size_type from)
-{
-  std::string::size_type p1 = s.find ("+", from);
-  std::string::size_type p2 = s.find (",", from);
-
-  if (p1 == std::string::npos) {
-    return p2;
-  } else if (p2 == std::string::npos) {
-    return p1;
-  } else {
-    return p1 < p2 ? p1 : p2;
-  }
-}
-
-static std::vector<std::string> split_file_list (const std::string &infile)
-{
-  std::vector<std::string> files;
-
-  size_t p = 0;
-  for (size_t pp = 0; (pp = find_file_sep (infile, p)) != std::string::npos; p = pp + 1) {
-    files.push_back (std::string (infile, p, pp - p));
-  }
-  files.push_back (std::string (infile, p));
-
-  return files;
-}
-
 void
-LEFDEFReaderState::read_map_file (const std::string &filename, db::Layout &layout, const std::string &base_path)
+LEFDEFReaderState::read_map_files (const std::vector<std::string> &paths, db::Layout &layout, const std::string &base_path)
 {
   m_has_explicit_layer_mapping = true;
-
-  std::vector<std::string> paths = split_file_list (filename);
 
   std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > layer_map;
 

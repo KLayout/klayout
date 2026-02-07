@@ -106,6 +106,36 @@ static void set_pin_property_name (db::LEFDEFReaderOptions *config, const tl::Va
   config->set_pin_property_name (name);
 }
 
+static tl::Variant get_map_files (const db::LEFDEFReaderOptions *config)
+{
+  const auto &mf = config->map_files ();
+  if (mf.empty ()) {
+    return tl::Variant ();
+  } else if (mf.size () == 1) {
+    return tl::Variant (mf.front ());
+  } else {
+    return tl::Variant (mf.begin (), mf.end ());
+  }
+}
+
+static void set_map_files (db::LEFDEFReaderOptions *config, tl::Variant &value)
+{
+  std::vector<std::string> mf;
+  if (value.is_nil ()) {
+    //  empty list
+  } else if (value.is_list ()) {
+    for (auto i = value.begin (); i != value.end (); ++i) {
+      mf.push_back (i->to_string ());
+    }
+  } else {
+    std::string s = value.to_string ();
+    if (! s.empty ()) {
+      mf.push_back (s);
+    }
+  }
+  config->set_map_files (mf);
+}
+
 static
 gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfiguration",
   gsi::method ("paths_relative_to_cwd=", &db::LEFDEFReaderOptions::set_paths_relative_to_cwd, gsi::arg ("f"),
@@ -894,8 +924,8 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n"
     "This property has been added in version 0.28.8.\n"
   ) +
-  gsi::method ("map_file", &db::LEFDEFReaderOptions::map_file,
-    "@brief Gets the layer map file to use.\n"
+  gsi::method_ext ("map_file", &get_map_files,
+    "@brief Gets the layer map file or the map files to use.\n"
     "If a layer map file is given, the reader will pull the layer mapping from this file. The layer mapping rules "
     "specified in the reader options are ignored in this case. These are the name suffix rules for vias, blockages, routing, "
     "special routing, pins etc. and the corresponding datatype rules. The \\layer_map attribute will also be ignored. "
@@ -903,13 +933,39 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "The layer map file path will be resolved relative to the technology base path if the LEF/DEF reader options are "
     "used in the context of a technology.\n"
     "\n"
-    "This property has been added in version 0.27.\n"
+    "The mapping file is one layer mapping entry per line. Each line is a layer name, followed by a list of purposes (VIA, PIN ...) "
+    "and a layer and datatype number. In addition, 'DIEAREA', 'REGION' and 'BLOCKAGE' can be used to map the design outline, regions and blockages to a layer. "
+    "'REGION' can have a detailed specifier which is 'FENCE', 'GUIDE' or 'NONE' for fence, guide or other type regions (e.g. 'REGION FENCE 99/0').\n"
+    "\n"
+    "'NAME' in place of the layer name and using layer/purpose in the purpose column allows mapping labels to specific layers.\n"
+    "\n"
+    "This is an example for a layer map file:\n"
+    "\n"
+    "@code\n"
+    "DIEAREA ALL                       100      0\n"
+    "M1      LEFPIN                    12       0\n"
+    "M1      PIN                       12       2\n"
+    "M1      NET                       12       3\n"
+    "M1      SPNET                     12       4\n"
+    "M1      VIA                       12       5\n"
+    "M1      BLOCKAGE                  12       10\n"
+    "NAME    M1/PIN                    12       10\n"
+    "VIA1    LEFPIN,VIA,PIN,NET,SPNET  13       0\n"
+    "M2      LEFPIN,PIN,NET,SPNET,VIA  14       0\n"
+    "@/code\n"
+    "\n"
+    "If a map file is used, only the layers present in the map file are generated. No other layers are produced.\n"
+    "\n"
+    "The 'map_file' attribute can either be a single file name, or a list of file names. If a list is given, the "
+    "corresponding files are merged. If the attribute is nil, no map file is used.\n"
+    "\n"
+    "This property has been added in version 0.27. The ability to supply multiple files has been added in version 0.30.6.\n"
   ) +
-  gsi::method ("map_file=", &db::LEFDEFReaderOptions::set_map_file, gsi::arg ("file"),
+  gsi::method_ext ("map_file=", &set_map_files, gsi::arg ("file"),
     "@brief Sets the layer map file to use.\n"
     "See \\map_file for details about this property.\n"
     "\n"
-    "This property has been added in version 0.27.\n"
+    "This property has been added in version 0.27. The ability to supply multiple files has been added in version 0.30.6.\n"
   ) +
   gsi::method ("macro_resolution_mode", &db::LEFDEFReaderOptions::macro_resolution_mode,
     "@brief Gets the macro resolution mode (LEF macros into DEF).\n"

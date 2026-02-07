@@ -77,7 +77,7 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
       std::string f;
       ex.read_word_or_quoted (f);
 
-      ld.read_map_file (f, layout, fn_path);
+      ld.read_map_files (tl::split (f, ","), layout, fn_path);
 
     } else if (ex.test ("def:")) {
 
@@ -278,6 +278,33 @@ static void run_test2 (tl::TestBase *_this, const char *lef_dir, const char *fil
     }
 
   }
+}
+
+TEST(reader_options)
+{
+  db::LEFDEFReaderOptions tc;
+
+  tc.set_single_map_file (std::string ());
+  EXPECT_EQ (tc.single_map_file (), "");
+  EXPECT_EQ (tc.map_files ().empty (), true);
+
+  tc.set_single_map_file ("abc");
+  EXPECT_EQ (tc.single_map_file (), "abc");
+  EXPECT_EQ (tc.map_files ().size (), size_t (1));
+
+  tc.set_map_files (std::vector<std::string> ());
+  EXPECT_EQ (tc.single_map_file (), "");
+  EXPECT_EQ (tc.map_files ().empty (), true);
+
+  std::vector<std::string> mf;
+  mf.push_back ("abc");
+  mf.push_back ("xyz");
+  tc.set_map_files (mf);
+
+  EXPECT_EQ (tc.single_map_file (), "abc");
+  EXPECT_EQ (tc.map_files ().size (), size_t (2));
+  EXPECT_EQ (tc.map_files ().front (), "abc");
+  EXPECT_EQ (tc.map_files ().back (), "xyz");
 }
 
 TEST(lef1)
@@ -543,11 +570,11 @@ TEST(110_lefpins)
 TEST(111_mapfile)
 {
   db::LEFDEFReaderOptions options = default_options ();
-  options.set_map_file ("test.map");
+  options.set_single_map_file ("test.map");
 
   run_test (_this, "mapfile", "read:in.def", "au.oas.gz", options, false);
 
-  options.set_map_file ("test-nonames.map");
+  options.set_single_map_file ("test-nonames.map");
 
   run_test (_this, "mapfile", "read:in.def", "au.oas.gz", options, false);
 }
@@ -658,7 +685,7 @@ TEST(114_lef_skips_end_library)
 TEST(115_componentmaskshift)
 {
   db::LEFDEFReaderOptions options = default_options ();
-  options.set_map_file ("in.map");
+  options.set_single_map_file ("in.map");
 
   run_test (_this, "masks-2", "lef:in_tech.lef+lef:in.lef+def:in.def", "au.oas.gz", options, false);
 }
@@ -924,7 +951,7 @@ TEST(200_lefdef_plugin)
   fn_path += "/lefdef/masks-1/";
 
   db::LEFDEFReaderOptions lefdef_opt = default_options ();
-  lefdef_opt.set_map_file ("in.map");
+  lefdef_opt.set_single_map_file ("in.map");
   db::LoadLayoutOptions opt;
   opt.set_options (lefdef_opt);
 
@@ -945,7 +972,7 @@ TEST(201_lefdef_plugin_explicit_lef)
   fn_path += "/lefdef/masks-1/";
 
   db::LEFDEFReaderOptions lefdef_opt = default_options ();
-  lefdef_opt.set_map_file ("in.map");
+  lefdef_opt.set_single_map_file ("in.map");
   std::vector<std::string> lf;
   lf.push_back ("hidden/in_tech.lef");
   lefdef_opt.set_lef_files (lf);
@@ -1047,7 +1074,7 @@ TEST(211_symlinks)
   fn_path += "/lefdef/issue-1531/";
 
   db::LEFDEFReaderOptions lefdef_opt = default_options ();
-  lefdef_opt.set_map_file ("tech.map");
+  lefdef_opt.set_single_map_file ("tech.map");
   std::vector<std::string> lf;
   lf.push_back ("tech.lef");
   lf.push_back ("blocks.lef");
@@ -1080,7 +1107,7 @@ TEST(213_no_duplicate_LEF)
   fn_path += "/lefdef/issue-1724/";
 
   db::LEFDEFReaderOptions lefdef_opt = default_options ();
-  lefdef_opt.set_map_file ("tech.map");
+  lefdef_opt.set_single_map_file ("tech.map");
   std::vector<std::string> lf;
   lf.push_back ("d/tech.lef");
   lf.push_back ("blocks.lef");
@@ -1107,7 +1134,7 @@ TEST(214_issue1877)
   fn_path += "/lefdef/issue-1877/";
 
   db::LEFDEFReaderOptions lefdef_opt = default_options ();
-  lefdef_opt.set_map_file ("tech.map");
+  lefdef_opt.set_single_map_file ("tech.map");
   lefdef_opt.set_read_lef_with_def (true);
   db::LoadLayoutOptions opt;
   opt.set_options (lefdef_opt);

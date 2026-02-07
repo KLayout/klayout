@@ -406,7 +406,8 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::macro_resolution_mode, &LEFDEFReaderOptions::set_macro_resolution_mode, "macro-resolution-mode", MacroResolutionModeConverter ()) +
       tl::make_member (&LEFDEFReaderOptions::separate_groups, &LEFDEFReaderOptions::set_separate_groups, "separate-groups") +
       tl::make_member (&LEFDEFReaderOptions::joined_paths, &LEFDEFReaderOptions::set_joined_paths, "joined-paths") +
-      tl::make_member (&LEFDEFReaderOptions::map_file, &LEFDEFReaderOptions::set_map_file, "map-file")
+      //  NOTE: technology options do not support multiple files currently
+      tl::make_member (&LEFDEFReaderOptions::single_map_file, &LEFDEFReaderOptions::set_single_map_file, "map-file")
     );
   }
 };

@@ -1,22 +1,21 @@
-recursive-include src/ant/ant *.cc *.h
-recursive-include src/db/db *.cc *.cc_gen *.h
-recursive-include src/edt/edt *.cc *.h
-recursive-include src/gsi/gsi *.cc *.h
-recursive-include src/img/img *.cc *.h
-recursive-include src/laybasic/laybasic *.cc *.h
-recursive-include src/layview/layview *.cc *.h
-recursive-include src/lib/lib *.cc *.h
-recursive-include src/lym/lym *.cc *.h
-recursive-include src/pya/pya *.cc *.h
-recursive-include src/pymod *.cc *.h
-recursive-include src/rbastub *.cc *.h
-recursive-include src/rdb/rdb *.cc *.h
-recursive-include src/tl/tl *.cc *.h
-recursive-include src/pex/pex *.cc *.h
+recursive-include src/ant/ant *.cc *.h pysetup.toml
+recursive-include src/db/db *.cc *.cc_gen *.h pysetup.toml
+recursive-include src/edt/edt *.cc *.h pysetup.toml
+recursive-include src/gsi/gsi *.cc *.h pysetup.toml
+recursive-include src/img/img *.cc *.h pysetup.toml
+recursive-include src/laybasic/laybasic *.cc *.h pysetup.toml
+recursive-include src/layview/layview *.cc *.h pysetup.toml
+recursive-include src/lib/lib *.cc *.h pysetup.toml
+recursive-include src/lym/lym *.cc *.h pysetup.toml
+recursive-include src/pex/pex *.cc *.h pysetup.toml
+recursive-include src/pya/pya *.cc *.h pysetup.toml
+recursive-include src/pymod *.cc *.h *.pyi pysetup.toml
+recursive-include src/rbastub *.cc *.h pysetup.toml
+recursive-include src/rdb/rdb *.cc *.h pysetup.toml
+recursive-include src/tl/tl *.cc *.h pysetup.toml
 recursive-include src/version *.cc *.h
-recursive-include src/pymod *.pyi
-recursive-include src/plugins/*/db_plugin *.cc *.h
-recursive-include src/plugins/*/*/db_plugin *.cc *.h
+recursive-include src/plugins/*/db_plugin *.cc *.h pysetup.toml
+recursive-include src/plugins/*/*/db_plugin *.cc *.h pysetup.toml
 recursive-include src/plugins/common *.h
 include version.sh
 include src/py.typed

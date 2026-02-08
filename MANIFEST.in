@@ -16,6 +16,8 @@ recursive-include src/tl/tl *.cc *.h pysetup.toml
 recursive-include src/version *.cc *.h
 recursive-include src/plugins/*/db_plugin *.cc *.h pysetup.toml
 recursive-include src/plugins/*/*/db_plugin *.cc *.h pysetup.toml
+recursive-include src/plugins/*/*/runtime *.cc *.h
+recursive-include src/plugins/*/*/db_plugin/* *.cc *.h pysetup.toml
 recursive-include src/plugins/common *.h
 include version.sh
 include src/py.typed

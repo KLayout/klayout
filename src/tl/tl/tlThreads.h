@@ -57,13 +57,12 @@ public:
 
 #else
 
-//  The non-Qt version is a dummy implementation as threading is not supported (yet)
 class TL_PUBLIC Mutex
 {
 public:
   Mutex () : m_spinlock () { }
-  void lock() { m_spinlock.lock(); }
-  void unlock() { m_spinlock.unlock(); }
+  void lock () { m_spinlock.lock (); }
+  void unlock () { m_spinlock.unlock (); }
 private:
   atomic::spinlock m_spinlock;
 };
@@ -91,7 +90,6 @@ public:
 
 class WaitConditionPrivate;
 
-//  The non-Qt version is a dummy implementation as threading is not supported (yet)
 class TL_PUBLIC WaitCondition
 {
 public:

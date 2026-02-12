@@ -75,6 +75,7 @@ static void _call_f_addItem_1740 (const qt_gsi::GenericMethod * /*decl*/, void *
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QLayoutItem *arg1 = gsi::arg_reader<QLayoutItem * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addItem (arg1);
 }

@@ -480,7 +480,7 @@ static void _init_f_replaceWidget_5361 (qt_gsi::GenericMethod *decl)
   decl->add_arg<QWidget * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("options", true, "Qt::FindChildrenRecursively");
   decl->add_arg<QFlags<Qt::FindChildOption> > (argspec_2);
-  decl->set_return<QLayoutItem * > ();
+  decl->set_return_new<QLayoutItem * > ();
 }
 
 static void _call_f_replaceWidget_5361 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 

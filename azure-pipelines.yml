@@ -195,6 +195,11 @@ jobs:
         artifactName: 'wheel-3.6.x64'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts wheel-3.14.x86'
+      inputs:
+        artifactName: 'wheel-3.14.x86'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: DownloadBuildArtifacts@0
       displayName: 'Download Build Artifacts wheel-3.13.x86'
       inputs:
         artifactName: 'wheel-3.13.x86'

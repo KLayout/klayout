@@ -1991,7 +1991,25 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             cmd06 = "rm -rf %s" % binTarget
 
             cmd07 = "mkdir %s" % sitepackagesTarget
-            cmd08 = "cp -RL %s/{*distutils*,pip*,pkg_resources,setuptools*,wheel*} %s" % (sitepackagesSource, sitepackagesTarget)
+            # cmd08 = "cp -RL %s/{*distutils*,pip*,pkg_resources,setuptools*,wheel*} %s" % (sitepackagesSource, sitepackagesTarget)
+            # Updated for compatibility with modern Python environments (e.g., pip 26.0.1+).
+            #  Since 'pkg_resources' and other legacy paths may be absent in recent setuptools,
+            #  we use a loop to copy only available directories while suppressing errors.
+            # Define patterns for essential packages to be bundled
+            patterns = ['*distutils*', 'pip*', 'pkg_resources*', 'setuptools*', 'wheel*']
+            sources = []
+
+            # Collect only existing paths to avoid "No such file or directory" errors,
+            # especially for 'pkg_resources' which is deprecated and often missing in Python 3.11+.
+            for p in patterns:
+                sources.extend(glob.glob(os.path.join(sitepackagesSource, p)))
+
+            if sources:
+                # Join all existing paths into a single string for the 'cp' command
+                cmd08 = "cp -RL %s %s" % (" ".join(sources), sitepackagesTarget)
+            else:
+                # Fallback or log if no packages are found
+                cmd08 = "echo 'No matching site-packages found to copy; skipping.'"
 
             shell_commands = list()
             shell_commands.append(cmd01)

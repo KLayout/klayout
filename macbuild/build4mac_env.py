@@ -328,7 +328,7 @@ RubyTahoe        = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions
 #  install with 'sudo port install ruby34'
 # [Key Type Name] = 'MP34'
 Ruby34MacPorts  = { 'exe': '/opt/local/bin/ruby3.4',
-                    'inc': '/opt/local/include/ruby-3.4.7',
+                    'inc': '/opt/local/include/ruby-3.4.8',
                     'lib': '/opt/local/lib/libruby.3.4.dylib'
                   }
 

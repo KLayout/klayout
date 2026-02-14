@@ -914,6 +914,23 @@ class QtBinding_TestClass < TestBase
 
   end
 
+  # issue #2273
+  def test_62
+
+    1000.times do |i|
+        
+      spacer = RBA::QSpacerItem.new(0, 5)
+      basic_tab = RBA::QWidget.new
+      basic_layout_setup = RBA::QFormLayout.new(basic_tab)
+      basic_layout_setup.setSpacing(15)
+
+      basic_layout_setup.addItem(spacer)
+      basic_layout_setup.setSpacing(10)
+        
+    end
+
+  end
+
 end 
 
 load("test_epilogue.rb")

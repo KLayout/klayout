@@ -86,87 +86,6 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="0">
-           <widget class="QFrame" name="frame_5">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QVBoxLayout" name="_14">
-             <property name="spacing">
-              <number>6</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QComboBox" name="fill_area_cbx">
-               <property name="toolTip">
-                <string>Select how the region to fill is specified.</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>All (whole cell)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Shapes on layer ...</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Selected shapes</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Single box with ...</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Ruler bounding boxes</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item>
-              <spacer>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Expanding</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item row="2" column="0" colspan="3">
            <widget class="QFrame" name="frame_6">
             <property name="frameShape">
@@ -277,22 +196,6 @@
               <property name="spacing">
                <number>6</number>
               </property>
-              <item row="1" column="0" colspan="2">
-               <spacer>
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Expanding</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>241</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
               <item row="0" column="1">
                <spacer>
                 <property name="orientation">
@@ -315,6 +218,22 @@
                  <enum>QComboBox::AdjustToContents</enum>
                 </property>
                </widget>
+              </item>
+              <item row="1" column="0" colspan="2">
+               <spacer>
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Expanding</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>241</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </widget>
@@ -436,6 +355,87 @@
             </property>
            </spacer>
           </item>
+          <item row="0" column="0">
+           <widget class="QFrame" name="frame_5">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QVBoxLayout" name="_14">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QComboBox" name="fill_area_cbx">
+               <property name="toolTip">
+                <string>Select how the region to fill is specified.</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>All (whole cell)</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Shapes on layer ...</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Selected shapes</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Single box with ...</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Ruler bounding boxes</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Expanding</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -490,6 +490,9 @@
         <widget class="QComboBox" name="layer_spec_cbx">
          <property name="toolTip">
           <string>The fill will not be generated over the areas specified by these layers</string>
+         </property>
+         <property name="currentIndex">
+          <number>3</number>
          </property>
          <item>
           <property name="text">
@@ -811,6 +814,83 @@
            </widget>
           </item>
           <item>
+           <widget class="QFrame" name="frame_3">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Raster origin</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="origin_le">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>(x, y of lower-left corner of fill cell in µm)</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>135</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
            <widget class="QGroupBox" name="second_order_fill_cb">
             <property name="title">
              <string>Second-order fill cell for remaining regions</string>
@@ -837,13 +917,6 @@
              <property name="spacing">
               <number>6</number>
              </property>
-             <item row="1" column="2">
-              <widget class="QLabel" name="label_60">
-               <property name="text">
-                <string>µm (keep distance between fill cells unless stitched)</string>
-               </property>
-              </widget>
-             </item>
              <item row="0" column="1" colspan="3">
               <widget class="QLineEdit" name="fill_cell_2nd_le">
                <property name="toolTip">
@@ -851,16 +924,17 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QLineEdit" name="fill2_margin_le">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+             <item row="1" column="2">
+              <widget class="QLabel" name="label_60">
+               <property name="text">
+                <string>µm (keep distance between fill cells unless stitched)</string>
                </property>
-               <property name="toolTip">
-                <string>Leave empty for no distance. Otherwise enter a distance in micron (can be anisotropic in the form &quot;dx,dy&quot;)</string>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_57">
+               <property name="text">
+                <string>Fill cell margin   </string>
                </property>
               </widget>
              </item>
@@ -868,26 +942,6 @@
               <widget class="QToolButton" name="choose_fc_2nd_pb">
                <property name="text">
                 <string>...</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3">
-              <spacer>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>141</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_57">
-               <property name="text">
-                <string>Fill cell margin   </string>
                </property>
               </widget>
              </item>
@@ -901,16 +955,6 @@
                </property>
                <property name="text">
                 <string>Fill cell         </string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0" colspan="5">
-              <widget class="QLabel" name="label_58">
-               <property name="text">
-                <string>The second order fill cell is used to fill space remaining from the first fill step. Thus, the second order fill cell must be smaller than the first order fill cell. The boundary layer must be the same for the second order fill cell.</string>
-               </property>
-               <property name="wordWrap">
-                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -980,6 +1024,42 @@
                </layout>
               </widget>
              </item>
+             <item row="1" column="3">
+              <spacer>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>141</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="3" column="0" colspan="5">
+              <widget class="QLabel" name="label_58">
+               <property name="text">
+                <string>The second order fill cell is used to fill space remaining from the first fill step. Thus, the second order fill cell must be smaller than the first order fill cell. The boundary layer must be the same for the second order fill cell.</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="fill2_margin_le">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>Leave empty for no distance. Otherwise enter a distance in micron (can be anisotropic in the form &quot;dx,dy&quot;)</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -1030,6 +1110,7 @@
   <tabstop>row_le</tabstop>
   <tabstop>column_le</tabstop>
   <tabstop>enhanced_cb</tabstop>
+  <tabstop>origin_le</tabstop>
   <tabstop>second_order_fill_cb</tabstop>
   <tabstop>fill_cell_2nd_le</tabstop>
   <tabstop>choose_fc_2nd_pb</tabstop>

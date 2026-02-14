@@ -92,6 +92,7 @@ FillDialog::FillDialog (QWidget *parent, LayoutViewBase *view)
 
   fill_area_stack->setCurrentIndex (0);
   connect (fill_area_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (fill_area_changed (int)));
+  connect (enhanced_cb, SIGNAL (stateChanged (int)), this, SLOT (enhanced_fill_changed (int)));
   connect (button_box, SIGNAL (accepted ()), this, SLOT (ok_pressed ()));
   connect (choose_fc_pb, SIGNAL (clicked ()), this, SLOT (choose_fc ()));
   connect (choose_fc_2nd_pb, SIGNAL (clicked ()), this, SLOT (choose_fc_2nd ()));
@@ -167,6 +168,8 @@ FillDialog::generate_fill (const FillParameters &fp)
 
   bool enhanced_fill = enhanced_cb->isChecked ();
 
+  db::Point fill_origin = db::CplxTrans (ly.dbu ()).inverted () * fp.fill_origin;
+
   db::Coord exclude_x = db::coord_traits<db::Coord>::rounded (fp.exclude_distance.x () / ly.dbu ());
   db::Coord exclude_y = db::coord_traits<db::Coord>::rounded (fp.exclude_distance.y () / ly.dbu ());
 
@@ -232,8 +235,6 @@ FillDialog::generate_fill (const FillParameters &fp)
       fill_region.merge ();
     }
 
-    db::Box fr_bbox = fill_region.bbox ();
-
     if (tl::verbosity () >= 20) {
       tl::info << "Collecting exclude areas";
     }
@@ -263,8 +264,6 @@ FillDialog::generate_fill (const FillParameters &fp)
     //  Perform the NOT operation to create the fill region
     fill_region -= es;
 
-    db::Region new_fill_area;
-
     int step = 0;
 
     do {
@@ -276,7 +275,7 @@ FillDialog::generate_fill (const FillParameters &fp)
       }
 
       if (! enhanced_fill) {
-        db::fill_region (cv.cell (), fill_region, fill_cell->cell_index (), fc_bbox, row_step, column_step, fr_bbox.p1 (), false, fill_cell2 ? &fill_region : 0, fill_margin, fill_cell2 ? &fill_region : 0);
+        db::fill_region (cv.cell (), fill_region, fill_cell->cell_index (), fc_bbox, row_step, column_step, fill_origin, false, fill_cell2 ? &fill_region : 0, fill_margin, fill_cell2 ? &fill_region : 0);
       } else {
         db::fill_region_repeat (cv.cell (), fill_region, fill_cell->cell_index (), fc_bbox, row_step, column_step, fill_margin, fill_cell2 ? &fill_region : 0);
       }
@@ -478,6 +477,20 @@ FillDialog::get_fill_parameters ()
 
   fp.enhanced_fill = enhanced_cb->isChecked ();
 
+  //  read origin
+  x = 0.0, y = 0.0;
+  s = tl::to_string (origin_le->text ());
+  ex = tl::Extractor (s.c_str ());
+  if (ex.try_read (x)) {
+    if (ex.test (",") && ex.try_read (y)) {
+      // take x, y
+    } else {
+      y = x;
+    }
+  }
+
+  fp.fill_origin = db::DPoint (x, y);
+
   db::DBox fc_bbox = db::CplxTrans (cv->layout ().dbu ()) * (fc_bbox_layer < 0 ? fill_cell->bbox () : fill_cell->bbox (fc_bbox_layer));
   if (fc_bbox.empty ()) {
     if (fc_bbox_layer >= 0) {
@@ -492,7 +505,7 @@ FillDialog::get_fill_parameters ()
   if (ex.try_read (x) && ex.test (",") && ex.try_read (y)) {
     fp.row_step = db::DVector (x, y);
   } else {
-    fp.row_step = db::DVector (fc_bbox.width (), 0.0);
+    fp.row_step = db::DVector (fc_bbox.width () + fp.fill_cell_margin.x (), 0.0);
   }
 
   s = tl::to_string (column_le->text ());
@@ -500,7 +513,7 @@ FillDialog::get_fill_parameters ()
   if (ex.try_read (x) && ex.test (",") && ex.try_read (y)) {
     fp.column_step = db::DVector (x, y);
   } else {
-    fp.column_step = db::DVector (0.0, fc_bbox.height ());
+    fp.column_step = db::DVector (0.0, fc_bbox.height () + fp.fill_cell_margin.y ());
   }
 
   fp.fc_bbox = fc_bbox;
@@ -528,7 +541,7 @@ FillDialog::get_fill_parameters ()
     if (ex.try_read (x) && ex.test (",") && ex.try_read (y)) {
       fp.row_step2 = db::DVector (x, y);
     } else {
-      fp.row_step2 = db::DVector (fc_bbox2.width (), 0.0);
+      fp.row_step2 = db::DVector (fc_bbox2.width () + fp.fill_cell_margin2.x (), 0.0);
     }
 
     s = tl::to_string (column_2nd_le->text ());
@@ -536,7 +549,7 @@ FillDialog::get_fill_parameters ()
     if (ex.try_read (x) && ex.test (",") && ex.try_read (y)) {
       fp.column_step2 = db::DVector (x, y);
     } else {
-      fp.column_step2 = db::DVector (0.0, fc_bbox2.height ());
+      fp.column_step2 = db::DVector (0.0, fc_bbox2.height () + fp.fill_cell_margin2.y ());
     }
 
     fp.fc_bbox2 = fc_bbox2;
@@ -573,6 +586,12 @@ BEGIN_PROTECTED
   QDialog::accept ();
 
 END_PROTECTED
+}
+
+void
+FillDialog::enhanced_fill_changed (int ef)
+{
+  origin_le->setEnabled (ef != Qt::Checked);
 }
 
 void 

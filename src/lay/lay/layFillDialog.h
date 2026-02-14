@@ -53,6 +53,7 @@ struct LAY_PUBLIC FillParameters
   bool exclude_all_layers;
   std::vector<db::LayerProperties> exclude_layers;
   FillRegionMode fill_region_mode;
+  db::DPoint fill_origin;
   db::Region fill_region;
   db::LayerProperties fill_region_layer;
   db::DVector exclude_distance;
@@ -81,6 +82,7 @@ public:
 
 public slots:
   void fill_area_changed (int);
+  void enhanced_fill_changed (int);
   void ok_pressed ();
   void choose_fc ();
   void choose_fc_2nd ();

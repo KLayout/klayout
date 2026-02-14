@@ -482,7 +482,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QImageEncoderControl_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -506,7 +506,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QImageEncoderControl_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -548,7 +548,7 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QImageEncoderControl_Adaptor *)cls)->cbs_disconnectNotify_2394_0 (arg1);
 }
@@ -572,7 +572,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QImageEncoderControl_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -597,8 +597,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QImageEncoderControl_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -621,7 +621,7 @@ static void _call_cbs_imageCodecDescription_c2025_0 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QImageEncoderControl_Adaptor *)cls)->cbs_imageCodecDescription_c2025_0 (arg1));
 }
 
@@ -745,7 +745,7 @@ static void _call_cbs_setImageSettings_3430_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImageEncoderSettings &arg1 = args.read<const QImageEncoderSettings & > (heap);
+  const QImageEncoderSettings &arg1 = gsi::arg_reader<const QImageEncoderSettings & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QImageEncoderControl_Adaptor *)cls)->cbs_setImageSettings_3430_0 (arg1);
 }
@@ -790,8 +790,8 @@ static void _call_cbs_supportedResolutions_c4372_1 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImageEncoderSettings &arg1 = args.read<const QImageEncoderSettings & > (heap);
-  bool *arg2 = args.read<bool * > (heap);
+  const QImageEncoderSettings &arg1 = gsi::arg_reader<const QImageEncoderSettings & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<QList<QSize> > ((QList<QSize>)((QImageEncoderControl_Adaptor *)cls)->cbs_supportedResolutions_c4372_1 (arg1, arg2));
 }
 
@@ -814,7 +814,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QImageEncoderControl_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }

@@ -164,7 +164,7 @@ static void _call_cbs_setMediaObject_1782_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMediaObject *arg1 = args.read<QMediaObject * > (heap);
+  QMediaObject *arg1 = gsi::arg_reader<QMediaObject * >() (args, heap);
   ret.write<bool > ((bool)((QMediaBindableInterface_Adaptor *)cls)->cbs_setMediaObject_1782_0 (arg1));
 }
 

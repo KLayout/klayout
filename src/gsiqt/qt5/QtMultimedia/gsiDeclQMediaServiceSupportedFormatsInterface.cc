@@ -170,8 +170,8 @@ static void _call_cbs_hasSupport_c4354_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QStringList &arg2 = args.read<const QStringList & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QStringList &arg2 = gsi::arg_reader<const QStringList & >() (args, heap);
   ret.write<qt_gsi::Converter<QMultimedia::SupportEstimate>::target_type > ((qt_gsi::Converter<QMultimedia::SupportEstimate>::target_type)((QMediaServiceSupportedFormatsInterface_Adaptor *)cls)->cbs_hasSupport_c4354_0 (arg1, arg2));
 }
 

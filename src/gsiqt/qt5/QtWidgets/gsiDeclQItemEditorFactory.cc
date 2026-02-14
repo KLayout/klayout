@@ -235,8 +235,8 @@ static void _call_cbs_createEditor_c1974_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QItemEditorFactory_Adaptor *)cls)->cbs_createEditor_c1974_0 (arg1, arg2));
 }
 
@@ -259,7 +259,7 @@ static void _call_cbs_valuePropertyName_c767_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QItemEditorFactory_Adaptor *)cls)->cbs_valuePropertyName_c767_0 (arg1));
 }
 

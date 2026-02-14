@@ -132,7 +132,7 @@ static void _call_cbs_defaultDevice_c2309_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QMediaServiceDefaultDeviceInterface_Adaptor *)cls)->cbs_defaultDevice_c2309_0 (arg1));
 }
 

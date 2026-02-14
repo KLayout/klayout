@@ -555,7 +555,7 @@ static void _call_cbs_characters_2025_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler_Adaptor *)cls)->cbs_characters_2025_0 (arg1));
 }
 
@@ -601,9 +601,9 @@ static void _call_cbs_endElement_5859_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler_Adaptor *)cls)->cbs_endElement_5859_0 (arg1, arg2, arg3));
 }
 
@@ -626,7 +626,7 @@ static void _call_cbs_endPrefixMapping_2025_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler_Adaptor *)cls)->cbs_endPrefixMapping_2025_0 (arg1));
 }
 
@@ -668,7 +668,7 @@ static void _call_cbs_ignorableWhitespace_2025_0 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler_Adaptor *)cls)->cbs_ignorableWhitespace_2025_0 (arg1));
 }
 
@@ -693,8 +693,8 @@ static void _call_cbs_processingInstruction_3942_0 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler_Adaptor *)cls)->cbs_processingInstruction_3942_0 (arg1, arg2));
 }
 
@@ -717,7 +717,7 @@ static void _call_cbs_setDocumentLocator_1732_0 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QXmlLocator *arg1 = args.read<QXmlLocator * > (heap);
+  QXmlLocator *arg1 = gsi::arg_reader<QXmlLocator * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlContentHandler_Adaptor *)cls)->cbs_setDocumentLocator_1732_0 (arg1);
 }
@@ -741,7 +741,7 @@ static void _call_cbs_skippedEntity_2025_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler_Adaptor *)cls)->cbs_skippedEntity_2025_0 (arg1));
 }
 
@@ -789,10 +789,10 @@ static void _call_cbs_startElement_8513_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  const QXmlAttributes &arg4 = args.read<const QXmlAttributes & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  const QXmlAttributes &arg4 = gsi::arg_reader<const QXmlAttributes & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler_Adaptor *)cls)->cbs_startElement_8513_0 (arg1, arg2, arg3, arg4));
 }
 
@@ -817,8 +817,8 @@ static void _call_cbs_startPrefixMapping_3942_0 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler_Adaptor *)cls)->cbs_startPrefixMapping_3942_0 (arg1, arg2));
 }
 

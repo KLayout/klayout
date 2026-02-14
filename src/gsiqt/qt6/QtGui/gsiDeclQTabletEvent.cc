@@ -492,7 +492,7 @@ static void _call_cbs_setAccepted_864_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabletEvent_Adaptor *)cls)->cbs_setAccepted_864_0 (arg1);
 }
@@ -516,7 +516,7 @@ static void _call_cbs_setTimestamp_1103_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  quint64 arg1 = args.read<quint64 > (heap);
+  quint64 arg1 = gsi::arg_reader<quint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabletEvent_Adaptor *)cls)->cbs_setTimestamp_1103_0 (arg1);
 }

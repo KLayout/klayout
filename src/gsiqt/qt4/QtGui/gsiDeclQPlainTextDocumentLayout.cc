@@ -735,7 +735,7 @@ static void _call_cbs_blockBoundingRect_c2306_0 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_blockBoundingRect_c2306_0 (arg1));
 }
 
@@ -758,7 +758,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -782,7 +782,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -824,7 +824,7 @@ static void _call_cbs_disconnectNotify_1731_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_disconnectNotify_1731_0 (arg1);
 }
@@ -852,9 +852,9 @@ static void _call_cbs_documentChanged_2085_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_documentChanged_2085_0 (arg1, arg2, arg3);
 }
@@ -917,8 +917,8 @@ static void _call_cbs_draw_6787_0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QAbstractTextDocumentLayout::PaintContext &arg2 = args.read<const QAbstractTextDocumentLayout::PaintContext & > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QAbstractTextDocumentLayout::PaintContext &arg2 = gsi::arg_reader<const QAbstractTextDocumentLayout::PaintContext & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_draw_6787_0 (arg1, arg2);
 }
@@ -950,11 +950,11 @@ static void _call_cbs_drawInlineObject_8199_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QRectF &arg2 = args.read<const QRectF & > (heap);
-  QTextInlineObject arg3 = args.read<QTextInlineObject > (heap);
-  int arg4 = args.read<int > (heap);
-  const QTextFormat &arg5 = args.read<const QTextFormat & > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QRectF &arg2 = gsi::arg_reader<const QRectF & >() (args, heap);
+  QTextInlineObject arg3 = gsi::arg_reader<QTextInlineObject >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  const QTextFormat &arg5 = gsi::arg_reader<const QTextFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_drawInlineObject_8199_0 (arg1, arg2, arg3, arg4, arg5);
 }
@@ -978,7 +978,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -1003,8 +1003,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -1063,7 +1063,7 @@ static void _call_cbs_frameBoundingRect_c1615_0 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextFrame *arg1 = args.read<QTextFrame * > (heap);
+  QTextFrame *arg1 = gsi::arg_reader<QTextFrame * >() (args, heap);
   ret.write<QRectF > ((QRectF)((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_frameBoundingRect_c1615_0 (arg1));
 }
 
@@ -1088,8 +1088,8 @@ static void _call_cbs_hitTest_c4147_0 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const qt_gsi::Converter<Qt::HitTestAccuracy>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::HitTestAccuracy>::target_type & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const qt_gsi::Converter<Qt::HitTestAccuracy>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::HitTestAccuracy>::target_type & >() (args, heap);
   ret.write<int > ((int)((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_hitTest_c4147_0 (arg1, arg2));
 }
 
@@ -1153,9 +1153,9 @@ static void _call_cbs_positionInlineObject_5127_0 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextInlineObject arg1 = args.read<QTextInlineObject > (heap);
-  int arg2 = args.read<int > (heap);
-  const QTextFormat &arg3 = args.read<const QTextFormat & > (heap);
+  QTextInlineObject arg1 = gsi::arg_reader<QTextInlineObject >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QTextFormat &arg3 = gsi::arg_reader<const QTextFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_positionInlineObject_5127_0 (arg1, arg2, arg3);
 }
@@ -1201,9 +1201,9 @@ static void _call_cbs_resizeInlineObject_5127_0 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextInlineObject arg1 = args.read<QTextInlineObject > (heap);
-  int arg2 = args.read<int > (heap);
-  const QTextFormat &arg3 = args.read<const QTextFormat & > (heap);
+  QTextInlineObject arg1 = gsi::arg_reader<QTextInlineObject >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QTextFormat &arg3 = gsi::arg_reader<const QTextFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_resizeInlineObject_5127_0 (arg1, arg2, arg3);
 }
@@ -1241,7 +1241,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }

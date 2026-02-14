@@ -770,7 +770,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -794,7 +794,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -836,7 +836,7 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter_Adaptor *)cls)->cbs_disconnectNotify_2394_0 (arg1);
 }
@@ -860,7 +860,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QPdfWriter_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -885,8 +885,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QPdfWriter_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -909,7 +909,7 @@ static void _call_cbs_initPainter_c1426_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter_Adaptor *)cls)->cbs_initPainter_c1426_0 (arg1);
 }
@@ -951,7 +951,7 @@ static void _call_cbs_metric_c3445_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & arg1 = args.read<const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & > (heap);
+  const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & >() (args, heap);
   ret.write<int > ((int)((QPdfWriter_Adaptor *)cls)->cbs_metric_c3445_0 (arg1));
 }
 
@@ -1048,7 +1048,7 @@ static void _call_cbs_redirected_c1225_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPoint *arg1 = args.read<QPoint * > (heap);
+  QPoint *arg1 = gsi::arg_reader<QPoint * >() (args, heap);
   ret.write<QPaintDevice * > ((QPaintDevice *)((QPdfWriter_Adaptor *)cls)->cbs_redirected_c1225_0 (arg1));
 }
 
@@ -1099,7 +1099,7 @@ static void _call_cbs_setPageLayout_2413_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPageLayout &arg1 = args.read<const QPageLayout & > (heap);
+  const QPageLayout &arg1 = gsi::arg_reader<const QPageLayout & >() (args, heap);
   ret.write<bool > ((bool)((QPdfWriter_Adaptor *)cls)->cbs_setPageLayout_2413_0 (arg1));
 }
 
@@ -1124,8 +1124,8 @@ static void _call_cbs_setPageMargins_4145_1 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMarginsF &arg1 = args.read<const QMarginsF & > (heap);
-  const qt_gsi::Converter<QPageLayout::Unit>::target_type & arg2 = args.read<const qt_gsi::Converter<QPageLayout::Unit>::target_type & > (heap);
+  const QMarginsF &arg1 = gsi::arg_reader<const QMarginsF & >() (args, heap);
+  const qt_gsi::Converter<QPageLayout::Unit>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QPageLayout::Unit>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QPageLayout::Unit>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QPageLayout::Unit>(heap, QPageLayout::Millimeter), heap);
   ret.write<bool > ((bool)((QPdfWriter_Adaptor *)cls)->cbs_setPageMargins_4145_1 (arg1, arg2));
 }
 
@@ -1148,7 +1148,7 @@ static void _call_cbs_setPageOrientation_2816_0 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageLayout::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageLayout::Orientation>::target_type & > (heap);
+  const qt_gsi::Converter<QPageLayout::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageLayout::Orientation>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QPdfWriter_Adaptor *)cls)->cbs_setPageOrientation_2816_0 (arg1));
 }
 
@@ -1171,7 +1171,7 @@ static void _call_cbs_setPageRanges_2383_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPageRanges &arg1 = args.read<const QPageRanges & > (heap);
+  const QPageRanges &arg1 = gsi::arg_reader<const QPageRanges & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter_Adaptor *)cls)->cbs_setPageRanges_2383_0 (arg1);
 }
@@ -1195,7 +1195,7 @@ static void _call_cbs_setPageSize_2186_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPageSize &arg1 = args.read<const QPageSize & > (heap);
+  const QPageSize &arg1 = gsi::arg_reader<const QPageSize & >() (args, heap);
   ret.write<bool > ((bool)((QPdfWriter_Adaptor *)cls)->cbs_setPageSize_2186_0 (arg1));
 }
 
@@ -1237,7 +1237,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }

@@ -952,8 +952,8 @@ static void _call_cbs_feature_c2967_1 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  bool *arg2 = args.read<bool * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<bool > ((bool)((QXmlSimpleReader_Adaptor *)cls)->cbs_feature_c2967_1 (arg1, arg2));
 }
 
@@ -976,7 +976,7 @@ static void _call_cbs_hasFeature_c2025_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlSimpleReader_Adaptor *)cls)->cbs_hasFeature_c2025_0 (arg1));
 }
 
@@ -999,7 +999,7 @@ static void _call_cbs_hasProperty_c2025_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlSimpleReader_Adaptor *)cls)->cbs_hasProperty_c2025_0 (arg1));
 }
 
@@ -1041,7 +1041,7 @@ static void _call_cbs_parse_2856_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlInputSource *arg1 = args.read<const QXmlInputSource * > (heap);
+  const QXmlInputSource *arg1 = gsi::arg_reader<const QXmlInputSource * >() (args, heap);
   ret.write<bool > ((bool)((QXmlSimpleReader_Adaptor *)cls)->cbs_parse_2856_0 (arg1));
 }
 
@@ -1066,8 +1066,8 @@ static void _call_cbs_parse_3612_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlInputSource *arg1 = args.read<const QXmlInputSource * > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const QXmlInputSource *arg1 = gsi::arg_reader<const QXmlInputSource * >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   ret.write<bool > ((bool)((QXmlSimpleReader_Adaptor *)cls)->cbs_parse_3612_0 (arg1, arg2));
 }
 
@@ -1111,8 +1111,8 @@ static void _call_cbs_property_c2967_1 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  bool *arg2 = args.read<bool * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<void * > ((void *)((QXmlSimpleReader_Adaptor *)cls)->cbs_property_c2967_1 (arg1, arg2));
 }
 
@@ -1135,7 +1135,7 @@ static void _call_cbs_setContentHandler_2441_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QXmlContentHandler *arg1 = args.read<QXmlContentHandler * > (heap);
+  QXmlContentHandler *arg1 = gsi::arg_reader<QXmlContentHandler * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSimpleReader_Adaptor *)cls)->cbs_setContentHandler_2441_0 (arg1);
 }
@@ -1159,7 +1159,7 @@ static void _call_cbs_setDTDHandler_1930_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QXmlDTDHandler *arg1 = args.read<QXmlDTDHandler * > (heap);
+  QXmlDTDHandler *arg1 = gsi::arg_reader<QXmlDTDHandler * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSimpleReader_Adaptor *)cls)->cbs_setDTDHandler_1930_0 (arg1);
 }
@@ -1183,7 +1183,7 @@ static void _call_cbs_setDeclHandler_2086_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QXmlDeclHandler *arg1 = args.read<QXmlDeclHandler * > (heap);
+  QXmlDeclHandler *arg1 = gsi::arg_reader<QXmlDeclHandler * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSimpleReader_Adaptor *)cls)->cbs_setDeclHandler_2086_0 (arg1);
 }
@@ -1207,7 +1207,7 @@ static void _call_cbs_setEntityResolver_2495_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QXmlEntityResolver *arg1 = args.read<QXmlEntityResolver * > (heap);
+  QXmlEntityResolver *arg1 = gsi::arg_reader<QXmlEntityResolver * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSimpleReader_Adaptor *)cls)->cbs_setEntityResolver_2495_0 (arg1);
 }
@@ -1231,7 +1231,7 @@ static void _call_cbs_setErrorHandler_2232_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QXmlErrorHandler *arg1 = args.read<QXmlErrorHandler * > (heap);
+  QXmlErrorHandler *arg1 = gsi::arg_reader<QXmlErrorHandler * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSimpleReader_Adaptor *)cls)->cbs_setErrorHandler_2232_0 (arg1);
 }
@@ -1257,8 +1257,8 @@ static void _call_cbs_setFeature_2781_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSimpleReader_Adaptor *)cls)->cbs_setFeature_2781_0 (arg1, arg2);
 }
@@ -1282,7 +1282,7 @@ static void _call_cbs_setLexicalHandler_2416_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QXmlLexicalHandler *arg1 = args.read<QXmlLexicalHandler * > (heap);
+  QXmlLexicalHandler *arg1 = gsi::arg_reader<QXmlLexicalHandler * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSimpleReader_Adaptor *)cls)->cbs_setLexicalHandler_2416_0 (arg1);
 }
@@ -1308,8 +1308,8 @@ static void _call_cbs_setProperty_2973_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  void *arg2 = args.read<void * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  void *arg2 = gsi::arg_reader<void * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSimpleReader_Adaptor *)cls)->cbs_setProperty_2973_0 (arg1, arg2);
 }

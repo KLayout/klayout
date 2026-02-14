@@ -1102,7 +1102,7 @@ static void _call_cbs_actionEvent_1823_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QActionEvent *arg1 = args.read<QActionEvent * > (heap);
+  QActionEvent *arg1 = gsi::arg_reader<QActionEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_actionEvent_1823_0 (arg1);
 }
@@ -1126,7 +1126,7 @@ static void _call_cbs_changeEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_changeEvent_1217_0 (arg1);
 }
@@ -1150,7 +1150,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -1174,7 +1174,7 @@ static void _call_cbs_closeEvent_1719_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QCloseEvent *arg1 = args.read<QCloseEvent * > (heap);
+  QCloseEvent *arg1 = gsi::arg_reader<QCloseEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_closeEvent_1719_0 (arg1);
 }
@@ -1216,7 +1216,7 @@ static void _call_cbs_contextMenuEvent_2363_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QContextMenuEvent *arg1 = args.read<QContextMenuEvent * > (heap);
+  QContextMenuEvent *arg1 = gsi::arg_reader<QContextMenuEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_contextMenuEvent_2363_0 (arg1);
 }
@@ -1283,7 +1283,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -1347,7 +1347,7 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_disconnectNotify_2394_0 (arg1);
 }
@@ -1371,7 +1371,7 @@ static void _call_cbs_dragEnterEvent_2109_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDragEnterEvent *arg1 = args.read<QDragEnterEvent * > (heap);
+  QDragEnterEvent *arg1 = gsi::arg_reader<QDragEnterEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_dragEnterEvent_2109_0 (arg1);
 }
@@ -1395,7 +1395,7 @@ static void _call_cbs_dragLeaveEvent_2092_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDragLeaveEvent *arg1 = args.read<QDragLeaveEvent * > (heap);
+  QDragLeaveEvent *arg1 = gsi::arg_reader<QDragLeaveEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_dragLeaveEvent_2092_0 (arg1);
 }
@@ -1419,7 +1419,7 @@ static void _call_cbs_dragMoveEvent_2006_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDragMoveEvent *arg1 = args.read<QDragMoveEvent * > (heap);
+  QDragMoveEvent *arg1 = gsi::arg_reader<QDragMoveEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_dragMoveEvent_2006_0 (arg1);
 }
@@ -1443,7 +1443,7 @@ static void _call_cbs_dropEvent_1622_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDropEvent *arg1 = args.read<QDropEvent * > (heap);
+  QDropEvent *arg1 = gsi::arg_reader<QDropEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_dropEvent_1622_0 (arg1);
 }
@@ -1467,7 +1467,7 @@ static void _call_cbs_enterEvent_1727_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEnterEvent *arg1 = args.read<QEnterEvent * > (heap);
+  QEnterEvent *arg1 = gsi::arg_reader<QEnterEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_enterEvent_1727_0 (arg1);
 }
@@ -1491,7 +1491,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QSplitterHandle_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -1516,8 +1516,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QSplitterHandle_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -1540,7 +1540,7 @@ static void _call_cbs_focusInEvent_1729_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFocusEvent *arg1 = args.read<QFocusEvent * > (heap);
+  QFocusEvent *arg1 = gsi::arg_reader<QFocusEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_focusInEvent_1729_0 (arg1);
 }
@@ -1578,7 +1578,7 @@ static void _call_cbs_focusNextPrevChild_864_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ret.write<bool > ((bool)((QSplitterHandle_Adaptor *)cls)->cbs_focusNextPrevChild_864_0 (arg1));
 }
 
@@ -1601,7 +1601,7 @@ static void _call_cbs_focusOutEvent_1729_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFocusEvent *arg1 = args.read<QFocusEvent * > (heap);
+  QFocusEvent *arg1 = gsi::arg_reader<QFocusEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_focusOutEvent_1729_0 (arg1);
 }
@@ -1658,7 +1658,7 @@ static void _call_cbs_heightForWidth_c767_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QSplitterHandle_Adaptor *)cls)->cbs_heightForWidth_c767_0 (arg1));
 }
 
@@ -1681,7 +1681,7 @@ static void _call_cbs_hideEvent_1595_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QHideEvent *arg1 = args.read<QHideEvent * > (heap);
+  QHideEvent *arg1 = gsi::arg_reader<QHideEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_hideEvent_1595_0 (arg1);
 }
@@ -1705,7 +1705,7 @@ static void _call_cbs_initPainter_c1426_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_initPainter_c1426_0 (arg1);
 }
@@ -1729,7 +1729,7 @@ static void _call_cbs_inputMethodEvent_2354_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QInputMethodEvent *arg1 = args.read<QInputMethodEvent * > (heap);
+  QInputMethodEvent *arg1 = gsi::arg_reader<QInputMethodEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_inputMethodEvent_2354_0 (arg1);
 }
@@ -1753,7 +1753,7 @@ static void _call_cbs_inputMethodQuery_c2420_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QSplitterHandle_Adaptor *)cls)->cbs_inputMethodQuery_c2420_0 (arg1));
 }
 
@@ -1794,7 +1794,7 @@ static void _call_cbs_keyPressEvent_1514_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QKeyEvent *arg1 = args.read<QKeyEvent * > (heap);
+  QKeyEvent *arg1 = gsi::arg_reader<QKeyEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_keyPressEvent_1514_0 (arg1);
 }
@@ -1818,7 +1818,7 @@ static void _call_cbs_keyReleaseEvent_1514_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QKeyEvent *arg1 = args.read<QKeyEvent * > (heap);
+  QKeyEvent *arg1 = gsi::arg_reader<QKeyEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_keyReleaseEvent_1514_0 (arg1);
 }
@@ -1842,7 +1842,7 @@ static void _call_cbs_leaveEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_leaveEvent_1217_0 (arg1);
 }
@@ -1866,7 +1866,7 @@ static void _call_cbs_metric_c3445_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & arg1 = args.read<const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & > (heap);
+  const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & >() (args, heap);
   ret.write<int > ((int)((QSplitterHandle_Adaptor *)cls)->cbs_metric_c3445_0 (arg1));
 }
 
@@ -1908,7 +1908,7 @@ static void _call_cbs_mouseDoubleClickEvent_1738_0 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMouseEvent *arg1 = args.read<QMouseEvent * > (heap);
+  QMouseEvent *arg1 = gsi::arg_reader<QMouseEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_mouseDoubleClickEvent_1738_0 (arg1);
 }
@@ -1932,7 +1932,7 @@ static void _call_cbs_mouseMoveEvent_1738_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMouseEvent *arg1 = args.read<QMouseEvent * > (heap);
+  QMouseEvent *arg1 = gsi::arg_reader<QMouseEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_mouseMoveEvent_1738_0 (arg1);
 }
@@ -1956,7 +1956,7 @@ static void _call_cbs_mousePressEvent_1738_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMouseEvent *arg1 = args.read<QMouseEvent * > (heap);
+  QMouseEvent *arg1 = gsi::arg_reader<QMouseEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_mousePressEvent_1738_0 (arg1);
 }
@@ -1980,7 +1980,7 @@ static void _call_cbs_mouseReleaseEvent_1738_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMouseEvent *arg1 = args.read<QMouseEvent * > (heap);
+  QMouseEvent *arg1 = gsi::arg_reader<QMouseEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_mouseReleaseEvent_1738_0 (arg1);
 }
@@ -2004,7 +2004,7 @@ static void _call_cbs_moveEvent_1624_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMoveEvent *arg1 = args.read<QMoveEvent * > (heap);
+  QMoveEvent *arg1 = gsi::arg_reader<QMoveEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_moveEvent_1624_0 (arg1);
 }
@@ -2051,9 +2051,9 @@ static void _call_cbs_nativeEvent_6949_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  void *arg2 = args.read<void * > (heap);
-  QIntegerForSizeof<void *>::Signed *arg3 = args.read<QIntegerForSizeof<void *>::Signed * > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  void *arg2 = gsi::arg_reader<void * >() (args, heap);
+  QIntegerForSizeof<void *>::Signed *arg3 = gsi::arg_reader<QIntegerForSizeof<void *>::Signed * >() (args, heap);
   ret.write<bool > ((bool)((QSplitterHandle_Adaptor *)cls)->cbs_nativeEvent_6949_0 (arg1, arg2, arg3));
 }
 
@@ -2113,7 +2113,7 @@ static void _call_cbs_paintEvent_1725_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPaintEvent *arg1 = args.read<QPaintEvent * > (heap);
+  QPaintEvent *arg1 = gsi::arg_reader<QPaintEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_paintEvent_1725_0 (arg1);
 }
@@ -2155,7 +2155,7 @@ static void _call_cbs_redirected_c1225_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPoint *arg1 = args.read<QPoint * > (heap);
+  QPoint *arg1 = gsi::arg_reader<QPoint * >() (args, heap);
   ret.write<QPaintDevice * > ((QPaintDevice *)((QSplitterHandle_Adaptor *)cls)->cbs_redirected_c1225_0 (arg1));
 }
 
@@ -2178,7 +2178,7 @@ static void _call_cbs_resizeEvent_1843_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QResizeEvent *arg1 = args.read<QResizeEvent * > (heap);
+  QResizeEvent *arg1 = gsi::arg_reader<QResizeEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_resizeEvent_1843_0 (arg1);
 }
@@ -2230,7 +2230,7 @@ static void _call_cbs_setVisible_864_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_setVisible_864_0 (arg1);
 }
@@ -2273,7 +2273,7 @@ static void _call_cbs_showEvent_1634_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QShowEvent *arg1 = args.read<QShowEvent * > (heap);
+  QShowEvent *arg1 = gsi::arg_reader<QShowEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_showEvent_1634_0 (arg1);
 }
@@ -2316,7 +2316,7 @@ static void _call_cbs_tabletEvent_1821_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTabletEvent *arg1 = args.read<QTabletEvent * > (heap);
+  QTabletEvent *arg1 = gsi::arg_reader<QTabletEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_tabletEvent_1821_0 (arg1);
 }
@@ -2340,7 +2340,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }
@@ -2383,7 +2383,7 @@ static void _call_cbs_wheelEvent_1718_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWheelEvent *arg1 = args.read<QWheelEvent * > (heap);
+  QWheelEvent *arg1 = gsi::arg_reader<QWheelEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplitterHandle_Adaptor *)cls)->cbs_wheelEvent_1718_0 (arg1);
 }

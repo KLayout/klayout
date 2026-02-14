@@ -257,7 +257,7 @@ static void _call_cbs_create_1302_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QGesture * > ((QGesture *)((QGestureRecognizer_Adaptor *)cls)->cbs_create_1302_0 (arg1));
 }
 
@@ -284,9 +284,9 @@ static void _call_cbs_recognize_3741_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGesture *arg1 = args.read<QGesture * > (heap);
-  QObject *arg2 = args.read<QObject * > (heap);
-  QEvent *arg3 = args.read<QEvent * > (heap);
+  QGesture *arg1 = gsi::arg_reader<QGesture * >() (args, heap);
+  QObject *arg2 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg3 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<QFlags<QGestureRecognizer::ResultFlag> > ((QFlags<QGestureRecognizer::ResultFlag>)((QGestureRecognizer_Adaptor *)cls)->cbs_recognize_3741_0 (arg1, arg2, arg3));
 }
 
@@ -309,7 +309,7 @@ static void _call_cbs_reset_1438_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGesture *arg1 = args.read<QGesture * > (heap);
+  QGesture *arg1 = gsi::arg_reader<QGesture * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGestureRecognizer_Adaptor *)cls)->cbs_reset_1438_0 (arg1);
 }

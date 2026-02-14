@@ -172,7 +172,7 @@ static void _call_cbs_setAccepted_864_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollEvent_Adaptor *)cls)->cbs_setAccepted_864_0 (arg1);
 }

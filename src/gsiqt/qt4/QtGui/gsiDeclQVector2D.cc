@@ -477,42 +477,42 @@ static void _call_f_dotProduct_4170 (const qt_gsi::GenericStaticMethod * /*decl*
 
 //  bool ::operator==(const QVector2D &v1, const QVector2D &v2)
 static bool op_QVector2D_operator_eq__eq__4170(const QVector2D *_self, const QVector2D &v2) {
-  return ::operator==(*_self, v2);
+  return operator==(*_self, v2);
 }
 
 //  bool ::operator!=(const QVector2D &v1, const QVector2D &v2)
 static bool op_QVector2D_operator_excl__eq__4170(const QVector2D *_self, const QVector2D &v2) {
-  return ::operator!=(*_self, v2);
+  return operator!=(*_self, v2);
 }
 
 //  const QVector2D ::operator+(const QVector2D &v1, const QVector2D &v2)
 static const QVector2D op_QVector2D_operator_plus__4170(const QVector2D *_self, const QVector2D &v2) {
-  return ::operator+(*_self, v2);
+  return operator+(*_self, v2);
 }
 
 //  const QVector2D ::operator-(const QVector2D &v1, const QVector2D &v2)
 static const QVector2D op_QVector2D_operator_minus__4170(const QVector2D *_self, const QVector2D &v2) {
-  return ::operator-(*_self, v2);
+  return operator-(*_self, v2);
 }
 
 //  const QVector2D ::operator*(const QVector2D &vector, qreal factor)
 static const QVector2D op_QVector2D_operator_star__3000(const QVector2D *_self, qreal factor) {
-  return ::operator*(*_self, factor);
+  return operator*(*_self, factor);
 }
 
 //  const QVector2D ::operator*(const QVector2D &v1, const QVector2D &v2)
 static const QVector2D op_QVector2D_operator_star__4170(const QVector2D *_self, const QVector2D &v2) {
-  return ::operator*(*_self, v2);
+  return operator*(*_self, v2);
 }
 
 //  const QVector2D ::operator-(const QVector2D &vector)
 static const QVector2D op_QVector2D_operator_minus__2139(const QVector2D *_self) {
-  return ::operator-(*_self);
+  return operator-(*_self);
 }
 
 //  const QVector2D ::operator/(const QVector2D &vector, qreal divisor)
 static const QVector2D op_QVector2D_operator_slash__3000(const QVector2D *_self, qreal divisor) {
-  return ::operator/(*_self, divisor);
+  return operator/(*_self, divisor);
 }
 
 

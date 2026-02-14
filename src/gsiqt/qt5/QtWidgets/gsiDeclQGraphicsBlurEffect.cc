@@ -538,7 +538,7 @@ static void _call_cbs_boundingRectFor_c1862_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QGraphicsBlurEffect_Adaptor *)cls)->cbs_boundingRectFor_c1862_0 (arg1));
 }
 
@@ -561,7 +561,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsBlurEffect_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -585,7 +585,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsBlurEffect_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -627,7 +627,7 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsBlurEffect_Adaptor *)cls)->cbs_disconnectNotify_2394_0 (arg1);
 }
@@ -651,7 +651,7 @@ static void _call_cbs_draw_1426_0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsBlurEffect_Adaptor *)cls)->cbs_draw_1426_0 (arg1);
 }
@@ -712,7 +712,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsBlurEffect_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -737,8 +737,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsBlurEffect_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -861,7 +861,7 @@ static void _call_cbs_sourceChanged_3695_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QGraphicsEffect::ChangeFlag> arg1 = args.read<QFlags<QGraphicsEffect::ChangeFlag> > (heap);
+  QFlags<QGraphicsEffect::ChangeFlag> arg1 = gsi::arg_reader<QFlags<QGraphicsEffect::ChangeFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsBlurEffect_Adaptor *)cls)->cbs_sourceChanged_3695_0 (arg1);
 }
@@ -923,7 +923,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsBlurEffect_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }

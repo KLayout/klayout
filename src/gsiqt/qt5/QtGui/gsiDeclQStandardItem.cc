@@ -1977,7 +1977,7 @@ static void _call_cbs_data_c767_1 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::UserRole + 1, heap);
   ret.write<QVariant > ((QVariant)((QStandardItem_Adaptor *)cls)->cbs_data_c767_1 (arg1));
 }
 
@@ -2015,7 +2015,7 @@ static void _call_cbs_operator_lt__c2610_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStandardItem &arg1 = args.read<const QStandardItem & > (heap);
+  const QStandardItem &arg1 = gsi::arg_reader<const QStandardItem & >() (args, heap);
   ret.write<bool > ((bool)((QStandardItem_Adaptor *)cls)->cbs_operator_lt__c2610_0 (arg1));
 }
 
@@ -2038,7 +2038,7 @@ static void _call_cbs_read_1697_0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDataStream &arg1 = args.read<QDataStream & > (heap);
+  QDataStream &arg1 = gsi::arg_reader<QDataStream & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItem_Adaptor *)cls)->cbs_read_1697_0 (arg1);
 }
@@ -2064,8 +2064,8 @@ static void _call_cbs_setData_2778_1 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
-  int arg2 = args.read<int > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::UserRole + 1, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItem_Adaptor *)cls)->cbs_setData_2778_1 (arg1, arg2);
 }
@@ -2108,7 +2108,7 @@ static void _call_cbs_write_c1697_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDataStream &arg1 = args.read<QDataStream & > (heap);
+  QDataStream &arg1 = gsi::arg_reader<QDataStream & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItem_Adaptor *)cls)->cbs_write_c1697_0 (arg1);
 }

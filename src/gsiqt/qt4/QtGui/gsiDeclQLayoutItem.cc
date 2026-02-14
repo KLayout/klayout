@@ -683,7 +683,7 @@ static void _call_cbs_heightForWidth_c767_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QLayoutItem_Adaptor *)cls)->cbs_heightForWidth_c767_0 (arg1));
 }
 
@@ -783,7 +783,7 @@ static void _call_cbs_minimumHeightForWidth_c767_0 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QLayoutItem_Adaptor *)cls)->cbs_minimumHeightForWidth_c767_0 (arg1));
 }
 
@@ -825,7 +825,7 @@ static void _call_cbs_setGeometry_1792_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayoutItem_Adaptor *)cls)->cbs_setGeometry_1792_0 (arg1);
 }

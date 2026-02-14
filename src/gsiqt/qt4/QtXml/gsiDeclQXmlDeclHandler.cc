@@ -274,11 +274,11 @@ static void _call_cbs_attributeDecl_9693_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  const QString &arg4 = args.read<const QString & > (heap);
-  const QString &arg5 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg4 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg5 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlDeclHandler_Adaptor *)cls)->cbs_attributeDecl_9693_0 (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -324,9 +324,9 @@ static void _call_cbs_externalEntityDecl_5859_0 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlDeclHandler_Adaptor *)cls)->cbs_externalEntityDecl_5859_0 (arg1, arg2, arg3));
 }
 
@@ -351,8 +351,8 @@ static void _call_cbs_internalEntityDecl_3942_0 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlDeclHandler_Adaptor *)cls)->cbs_internalEntityDecl_3942_0 (arg1, arg2));
 }
 

@@ -857,7 +857,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -899,7 +899,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -941,7 +941,7 @@ static void _call_cbs_disconnectNotify_1731_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper_Adaptor *)cls)->cbs_disconnectNotify_1731_0 (arg1);
 }
@@ -965,7 +965,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QDataWidgetMapper_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -990,8 +990,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QDataWidgetMapper_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -1046,7 +1046,7 @@ static void _call_cbs_setCurrentIndex_767_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper_Adaptor *)cls)->cbs_setCurrentIndex_767_0 (arg1);
 }
@@ -1070,7 +1070,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }

@@ -227,8 +227,8 @@ static void _call_cbs_deleteText_1426_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleEditableTextInterface_Adaptor *)cls)->cbs_deleteText_1426_0 (arg1, arg2);
 }
@@ -254,8 +254,8 @@ static void _call_cbs_insertText_2684_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleEditableTextInterface_Adaptor *)cls)->cbs_insertText_2684_0 (arg1, arg2);
 }
@@ -283,9 +283,9 @@ static void _call_cbs_replaceText_3343_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleEditableTextInterface_Adaptor *)cls)->cbs_replaceText_3343_0 (arg1, arg2, arg3);
 }

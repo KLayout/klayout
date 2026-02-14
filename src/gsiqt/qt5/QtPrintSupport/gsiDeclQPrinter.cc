@@ -1673,7 +1673,7 @@ static void _call_cbs_initPainter_c1426_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter_Adaptor *)cls)->cbs_initPainter_c1426_0 (arg1);
 }
@@ -1697,7 +1697,7 @@ static void _call_cbs_metric_c3445_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & arg1 = args.read<const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & > (heap);
+  const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & >() (args, heap);
   ret.write<int > ((int)((QPrinter_Adaptor *)cls)->cbs_metric_c3445_0 (arg1));
 }
 
@@ -1758,7 +1758,7 @@ static void _call_cbs_redirected_c1225_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPoint *arg1 = args.read<QPoint * > (heap);
+  QPoint *arg1 = gsi::arg_reader<QPoint * >() (args, heap);
   ret.write<QPaintDevice * > ((QPaintDevice *)((QPrinter_Adaptor *)cls)->cbs_redirected_c1225_0 (arg1));
 }
 
@@ -1803,7 +1803,7 @@ static void _call_cbs_setMargins_3812_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPagedPaintDevice::Margins &arg1 = args.read<const QPagedPaintDevice::Margins & > (heap);
+  const QPagedPaintDevice::Margins &arg1 = gsi::arg_reader<const QPagedPaintDevice::Margins & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter_Adaptor *)cls)->cbs_setMargins_3812_0 (arg1);
 }
@@ -1827,7 +1827,7 @@ static void _call_cbs_setPageSize_3006_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPagedPaintDevice::PageSize>::target_type & arg1 = args.read<const qt_gsi::Converter<QPagedPaintDevice::PageSize>::target_type & > (heap);
+  const qt_gsi::Converter<QPagedPaintDevice::PageSize>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPagedPaintDevice::PageSize>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter_Adaptor *)cls)->cbs_setPageSize_3006_0 (arg1);
 }
@@ -1851,7 +1851,7 @@ static void _call_cbs_setPageSizeMM_1875_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter_Adaptor *)cls)->cbs_setPageSizeMM_1875_0 (arg1);
 }

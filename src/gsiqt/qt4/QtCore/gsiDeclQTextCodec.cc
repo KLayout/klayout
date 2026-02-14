@@ -661,9 +661,9 @@ static void _call_cbs_convertFromUnicode_c5514_0 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QChar>::target_type * arg1 = args.read<const qt_gsi::Converter<QChar>::target_type * > (heap);
-  int arg2 = args.read<int > (heap);
-  QTextCodec::ConverterState *arg3 = args.read<QTextCodec::ConverterState * > (heap);
+  const qt_gsi::Converter<QChar>::target_type * arg1 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QTextCodec::ConverterState *arg3 = gsi::arg_reader<QTextCodec::ConverterState * >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QTextCodec_Adaptor *)cls)->cbs_convertFromUnicode_c5514_0 (arg1, arg2, arg3));
 }
 
@@ -690,9 +690,9 @@ static void _call_cbs_convertToUnicode_c5465_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  int arg2 = args.read<int > (heap);
-  QTextCodec::ConverterState *arg3 = args.read<QTextCodec::ConverterState * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QTextCodec::ConverterState *arg3 = gsi::arg_reader<QTextCodec::ConverterState * >() (args, heap);
   ret.write<QString > ((QString)((QTextCodec_Adaptor *)cls)->cbs_convertToUnicode_c5465_0 (arg1, arg2, arg3));
 }
 

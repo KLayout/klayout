@@ -337,7 +337,7 @@ static void _call_cbs_setCurrentValue_2119_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleValueInterface_Adaptor *)cls)->cbs_setCurrentValue_2119_0 (arg1);
 }

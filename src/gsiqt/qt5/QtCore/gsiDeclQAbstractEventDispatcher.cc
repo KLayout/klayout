@@ -980,7 +980,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractEventDispatcher_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -1024,7 +1024,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractEventDispatcher_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -1066,7 +1066,7 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractEventDispatcher_Adaptor *)cls)->cbs_disconnectNotify_2394_0 (arg1);
 }
@@ -1090,7 +1090,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QAbstractEventDispatcher_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -1115,8 +1115,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QAbstractEventDispatcher_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -1234,7 +1234,7 @@ static void _call_cbs_processEvents_3995_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QEventLoop::ProcessEventsFlag> arg1 = args.read<QFlags<QEventLoop::ProcessEventsFlag> > (heap);
+  QFlags<QEventLoop::ProcessEventsFlag> arg1 = gsi::arg_reader<QFlags<QEventLoop::ProcessEventsFlag> >() (args, heap);
   ret.write<bool > ((bool)((QAbstractEventDispatcher_Adaptor *)cls)->cbs_processEvents_3995_0 (arg1));
 }
 
@@ -1275,7 +1275,7 @@ static void _call_cbs_registerSocketNotifier_2152_0 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QSocketNotifier *arg1 = args.read<QSocketNotifier * > (heap);
+  QSocketNotifier *arg1 = gsi::arg_reader<QSocketNotifier * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractEventDispatcher_Adaptor *)cls)->cbs_registerSocketNotifier_2152_0 (arg1);
 }
@@ -1305,10 +1305,10 @@ static void _call_cbs_registerTimer_4192_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::TimerType>::target_type & arg3 = args.read<const qt_gsi::Converter<Qt::TimerType>::target_type & > (heap);
-  QObject *arg4 = args.read<QObject * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::TimerType>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimerType>::target_type & >() (args, heap);
+  QObject *arg4 = gsi::arg_reader<QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractEventDispatcher_Adaptor *)cls)->cbs_registerTimer_4192_0 (arg1, arg2, arg3, arg4);
 }
@@ -1332,7 +1332,7 @@ static void _call_cbs_registeredTimers_c1302_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QList<QAbstractEventDispatcher::TimerInfo> > ((QList<QAbstractEventDispatcher::TimerInfo>)((QAbstractEventDispatcher_Adaptor *)cls)->cbs_registeredTimers_c1302_0 (arg1));
 }
 
@@ -1355,7 +1355,7 @@ static void _call_cbs_remainingTime_767_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QAbstractEventDispatcher_Adaptor *)cls)->cbs_remainingTime_767_0 (arg1));
 }
 
@@ -1426,7 +1426,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractEventDispatcher_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }
@@ -1450,7 +1450,7 @@ static void _call_cbs_unregisterSocketNotifier_2152_0 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QSocketNotifier *arg1 = args.read<QSocketNotifier * > (heap);
+  QSocketNotifier *arg1 = gsi::arg_reader<QSocketNotifier * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractEventDispatcher_Adaptor *)cls)->cbs_unregisterSocketNotifier_2152_0 (arg1);
 }
@@ -1474,7 +1474,7 @@ static void _call_cbs_unregisterTimer_767_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QAbstractEventDispatcher_Adaptor *)cls)->cbs_unregisterTimer_767_0 (arg1));
 }
 
@@ -1497,7 +1497,7 @@ static void _call_cbs_unregisterTimers_1302_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<bool > ((bool)((QAbstractEventDispatcher_Adaptor *)cls)->cbs_unregisterTimers_1302_0 (arg1));
 }
 

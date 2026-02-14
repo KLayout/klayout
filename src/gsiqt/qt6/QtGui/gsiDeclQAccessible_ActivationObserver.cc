@@ -133,7 +133,7 @@ static void _call_cbs_accessibilityActiveChanged_864_0 (const qt_gsi::GenericMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessible_ActivationObserver_Adaptor *)cls)->cbs_accessibilityActiveChanged_864_0 (arg1);
 }

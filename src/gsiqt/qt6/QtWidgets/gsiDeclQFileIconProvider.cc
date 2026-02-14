@@ -219,7 +219,7 @@ static void _call_cbs_icon_c3884_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractFileIconProvider::IconType>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractFileIconProvider::IconType>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractFileIconProvider::IconType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractFileIconProvider::IconType>::target_type & >() (args, heap);
   ret.write<QIcon > ((QIcon)((QFileIconProvider_Adaptor *)cls)->cbs_icon_c3884_0 (arg1));
 }
 
@@ -242,7 +242,7 @@ static void _call_cbs_icon_c2174_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFileInfo &arg1 = args.read<const QFileInfo & > (heap);
+  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
   ret.write<QIcon > ((QIcon)((QFileIconProvider_Adaptor *)cls)->cbs_icon_c2174_0 (arg1));
 }
 
@@ -284,7 +284,7 @@ static void _call_cbs_setOptions_4402_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QAbstractFileIconProvider::Option> arg1 = args.read<QFlags<QAbstractFileIconProvider::Option> > (heap);
+  QFlags<QAbstractFileIconProvider::Option> arg1 = gsi::arg_reader<QFlags<QAbstractFileIconProvider::Option> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileIconProvider_Adaptor *)cls)->cbs_setOptions_4402_0 (arg1);
 }
@@ -308,7 +308,7 @@ static void _call_cbs_type_c2174_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFileInfo &arg1 = args.read<const QFileInfo & > (heap);
+  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
   ret.write<QString > ((QString)((QFileIconProvider_Adaptor *)cls)->cbs_type_c2174_0 (arg1));
 }
 

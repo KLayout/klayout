@@ -1025,7 +1025,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoWindowControl_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -1086,7 +1086,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoWindowControl_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -1128,7 +1128,7 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoWindowControl_Adaptor *)cls)->cbs_disconnectNotify_2394_0 (arg1);
 }
@@ -1171,7 +1171,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QVideoWindowControl_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -1196,8 +1196,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QVideoWindowControl_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -1466,7 +1466,7 @@ static void _call_cbs_setAspectRatioMode_2257_0 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoWindowControl_Adaptor *)cls)->cbs_setAspectRatioMode_2257_0 (arg1);
 }
@@ -1490,7 +1490,7 @@ static void _call_cbs_setBrightness_767_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoWindowControl_Adaptor *)cls)->cbs_setBrightness_767_0 (arg1);
 }
@@ -1514,7 +1514,7 @@ static void _call_cbs_setContrast_767_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoWindowControl_Adaptor *)cls)->cbs_setContrast_767_0 (arg1);
 }
@@ -1538,7 +1538,7 @@ static void _call_cbs_setDisplayRect_1792_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoWindowControl_Adaptor *)cls)->cbs_setDisplayRect_1792_0 (arg1);
 }
@@ -1562,7 +1562,7 @@ static void _call_cbs_setFullScreen_864_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoWindowControl_Adaptor *)cls)->cbs_setFullScreen_864_0 (arg1);
 }
@@ -1586,7 +1586,7 @@ static void _call_cbs_setHue_767_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoWindowControl_Adaptor *)cls)->cbs_setHue_767_0 (arg1);
 }
@@ -1610,7 +1610,7 @@ static void _call_cbs_setSaturation_767_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoWindowControl_Adaptor *)cls)->cbs_setSaturation_767_0 (arg1);
 }
@@ -1634,7 +1634,7 @@ static void _call_cbs_setWinId_696_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args.read<const qt_gsi::Converter<WId>::target_type & > (heap);
+  const qt_gsi::Converter<WId>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoWindowControl_Adaptor *)cls)->cbs_setWinId_696_0 (arg1);
 }
@@ -1658,7 +1658,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoWindowControl_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }

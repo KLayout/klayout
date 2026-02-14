@@ -205,7 +205,7 @@ static void _call_cbs_encodedData_c1731_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QMimeSource_Adaptor *)cls)->cbs_encodedData_c1731_0 (arg1));
 }
 
@@ -228,7 +228,7 @@ static void _call_cbs_format_c767_1 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<const char * > ((const char *)((QMimeSource_Adaptor *)cls)->cbs_format_c767_1 (arg1));
 }
 
@@ -251,7 +251,7 @@ static void _call_cbs_provides_c1731_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<bool > ((bool)((QMimeSource_Adaptor *)cls)->cbs_provides_c1731_0 (arg1));
 }
 

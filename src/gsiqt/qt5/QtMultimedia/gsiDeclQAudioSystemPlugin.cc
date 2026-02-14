@@ -520,7 +520,7 @@ static void _call_cbs_availableDevices_c1520_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAudio::Mode>::target_type & arg1 = args.read<const qt_gsi::Converter<QAudio::Mode>::target_type & > (heap);
+  const qt_gsi::Converter<QAudio::Mode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudio::Mode>::target_type & >() (args, heap);
   ret.write<QList<QByteArray> > ((QList<QByteArray>)((QAudioSystemPlugin_Adaptor *)cls)->cbs_availableDevices_c1520_0 (arg1));
 }
 
@@ -543,7 +543,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioSystemPlugin_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -569,8 +569,8 @@ static void _call_cbs_createDeviceInfo_3721_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const qt_gsi::Converter<QAudio::Mode>::target_type & arg2 = args.read<const qt_gsi::Converter<QAudio::Mode>::target_type & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const qt_gsi::Converter<QAudio::Mode>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAudio::Mode>::target_type & >() (args, heap);
   ret.write<QAbstractAudioDeviceInfo * > ((QAbstractAudioDeviceInfo *)((QAudioSystemPlugin_Adaptor *)cls)->cbs_createDeviceInfo_3721_0 (arg1, arg2));
 }
 
@@ -593,7 +593,7 @@ static void _call_cbs_createInput_2309_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QAbstractAudioInput * > ((QAbstractAudioInput *)((QAudioSystemPlugin_Adaptor *)cls)->cbs_createInput_2309_0 (arg1));
 }
 
@@ -616,7 +616,7 @@ static void _call_cbs_createOutput_2309_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QAbstractAudioOutput * > ((QAbstractAudioOutput *)((QAudioSystemPlugin_Adaptor *)cls)->cbs_createOutput_2309_0 (arg1));
 }
 
@@ -639,7 +639,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioSystemPlugin_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -681,7 +681,7 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioSystemPlugin_Adaptor *)cls)->cbs_disconnectNotify_2394_0 (arg1);
 }
@@ -705,7 +705,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QAudioSystemPlugin_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -730,8 +730,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QAudioSystemPlugin_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -836,7 +836,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioSystemPlugin_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }

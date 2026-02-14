@@ -1267,7 +1267,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDriver_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -1349,7 +1349,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDriver_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -1391,7 +1391,7 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDriver_Adaptor *)cls)->cbs_disconnectNotify_2394_0 (arg1);
 }
@@ -1417,8 +1417,8 @@ static void _call_cbs_escapeIdentifier_c4919_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & arg2 = args.read<const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & >() (args, heap);
   ret.write<QString > ((QString)((QSqlDriver_Adaptor *)cls)->cbs_escapeIdentifier_c4919_0 (arg1, arg2));
 }
 
@@ -1441,7 +1441,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QSqlDriver_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -1466,8 +1466,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QSqlDriver_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -1492,8 +1492,8 @@ static void _call_cbs_formatValue_c2938_1 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlField &arg1 = args.read<const QSqlField & > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const QSqlField &arg1 = gsi::arg_reader<const QSqlField & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   ret.write<QString > ((QString)((QSqlDriver_Adaptor *)cls)->cbs_formatValue_c2938_1 (arg1, arg2));
 }
 
@@ -1535,7 +1535,7 @@ static void _call_cbs_hasFeature_c2893_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSqlDriver::DriverFeature>::target_type & arg1 = args.read<const qt_gsi::Converter<QSqlDriver::DriverFeature>::target_type & > (heap);
+  const qt_gsi::Converter<QSqlDriver::DriverFeature>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSqlDriver::DriverFeature>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QSqlDriver_Adaptor *)cls)->cbs_hasFeature_c2893_0 (arg1));
 }
 
@@ -1560,8 +1560,8 @@ static void _call_cbs_isIdentifierEscaped_c4919_0 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & arg2 = args.read<const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QSqlDriver_Adaptor *)cls)->cbs_isIdentifierEscaped_c4919_0 (arg1, arg2));
 }
 
@@ -1621,7 +1621,7 @@ static void _call_cbs_maximumIdentifierLength_c3002_0 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & arg1 = args.read<const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & > (heap);
+  const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & >() (args, heap);
   ret.write<int > ((int)((QSqlDriver_Adaptor *)cls)->cbs_maximumIdentifierLength_c3002_0 (arg1));
 }
 
@@ -1696,12 +1696,12 @@ static void _call_cbs_open_10352_5 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  const QString &arg4 = args.read<const QString & > (heap);
-  int arg5 = args.read<int > (heap);
-  const QString &arg6 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg4 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  int arg5 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  const QString &arg6 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<bool > ((bool)((QSqlDriver_Adaptor *)cls)->cbs_open_10352_5 (arg1, arg2, arg3, arg4, arg5, arg6));
 }
 
@@ -1724,7 +1724,7 @@ static void _call_cbs_primaryIndex_c2025_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QSqlIndex > ((QSqlIndex)((QSqlDriver_Adaptor *)cls)->cbs_primaryIndex_c2025_0 (arg1));
 }
 
@@ -1765,7 +1765,7 @@ static void _call_cbs_record_c2025_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QSqlRecord > ((QSqlRecord)((QSqlDriver_Adaptor *)cls)->cbs_record_c2025_0 (arg1));
 }
 
@@ -1835,7 +1835,7 @@ static void _call_cbs_setLastError_2220_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlError &arg1 = args.read<const QSqlError & > (heap);
+  const QSqlError &arg1 = gsi::arg_reader<const QSqlError & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDriver_Adaptor *)cls)->cbs_setLastError_2220_0 (arg1);
 }
@@ -1859,7 +1859,7 @@ static void _call_cbs_setOpen_864_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDriver_Adaptor *)cls)->cbs_setOpen_864_0 (arg1);
 }
@@ -1883,7 +1883,7 @@ static void _call_cbs_setOpenError_864_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDriver_Adaptor *)cls)->cbs_setOpenError_864_0 (arg1);
 }
@@ -1913,10 +1913,10 @@ static void _call_cbs_sqlStatement_c7794_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSqlDriver::StatementType>::target_type & arg1 = args.read<const qt_gsi::Converter<QSqlDriver::StatementType>::target_type & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QSqlRecord &arg3 = args.read<const QSqlRecord & > (heap);
-  bool arg4 = args.read<bool > (heap);
+  const qt_gsi::Converter<QSqlDriver::StatementType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSqlDriver::StatementType>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QSqlRecord &arg3 = gsi::arg_reader<const QSqlRecord & >() (args, heap);
+  bool arg4 = gsi::arg_reader<bool >() (args, heap);
   ret.write<QString > ((QString)((QSqlDriver_Adaptor *)cls)->cbs_sqlStatement_c7794_0 (arg1, arg2, arg3, arg4));
 }
 
@@ -1941,8 +1941,8 @@ static void _call_cbs_stripDelimiters_c4919_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & arg2 = args.read<const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSqlDriver::IdentifierType>::target_type & >() (args, heap);
   ret.write<QString > ((QString)((QSqlDriver_Adaptor *)cls)->cbs_stripDelimiters_c4919_0 (arg1, arg2));
 }
 
@@ -1965,7 +1965,7 @@ static void _call_cbs_subscribeToNotification_2025_0 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QSqlDriver_Adaptor *)cls)->cbs_subscribeToNotification_2025_0 (arg1));
 }
 
@@ -2007,7 +2007,7 @@ static void _call_cbs_tables_c1843_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSql::TableType>::target_type & arg1 = args.read<const qt_gsi::Converter<QSql::TableType>::target_type & > (heap);
+  const qt_gsi::Converter<QSql::TableType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSql::TableType>::target_type & >() (args, heap);
   ret.write<QStringList > ((QStringList)((QSqlDriver_Adaptor *)cls)->cbs_tables_c1843_0 (arg1));
 }
 
@@ -2030,7 +2030,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDriver_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }
@@ -2054,7 +2054,7 @@ static void _call_cbs_unsubscribeFromNotification_2025_0 (const qt_gsi::GenericM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QSqlDriver_Adaptor *)cls)->cbs_unsubscribeFromNotification_2025_0 (arg1));
 }
 

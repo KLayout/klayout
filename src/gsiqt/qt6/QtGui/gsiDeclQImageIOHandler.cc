@@ -741,7 +741,7 @@ static void _call_cbs_jumpToImage_767_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QImageIOHandler_Adaptor *)cls)->cbs_jumpToImage_767_0 (arg1));
 }
 
@@ -821,7 +821,7 @@ static void _call_cbs_option_c3086_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & > (heap);
+  const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QImageIOHandler_Adaptor *)cls)->cbs_option_c3086_0 (arg1));
 }
 
@@ -844,7 +844,7 @@ static void _call_cbs_read_1186_0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QImage *arg1 = args.read<QImage * > (heap);
+  QImage *arg1 = gsi::arg_reader<QImage * >() (args, heap);
   ret.write<bool > ((bool)((QImageIOHandler_Adaptor *)cls)->cbs_read_1186_0 (arg1));
 }
 
@@ -869,8 +869,8 @@ static void _call_cbs_setOption_5097_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QImageIOHandler_Adaptor *)cls)->cbs_setOption_5097_0 (arg1, arg2);
 }
@@ -894,7 +894,7 @@ static void _call_cbs_supportsOption_c3086_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & > (heap);
+  const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QImageIOHandler_Adaptor *)cls)->cbs_supportsOption_c3086_0 (arg1));
 }
 
@@ -917,7 +917,7 @@ static void _call_cbs_write_1877_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImage &arg1 = args.read<const QImage & > (heap);
+  const QImage &arg1 = gsi::arg_reader<const QImage & >() (args, heap);
   ret.write<bool > ((bool)((QImageIOHandler_Adaptor *)cls)->cbs_write_1877_0 (arg1));
 }
 

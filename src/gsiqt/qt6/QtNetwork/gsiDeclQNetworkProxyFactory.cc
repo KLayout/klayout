@@ -232,7 +232,7 @@ static void _call_cbs_queryProxy_3220_1 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkProxyQuery &arg1 = args.read<const QNetworkProxyQuery & > (heap);
+  const QNetworkProxyQuery &arg1 = args ? gsi::arg_reader<const QNetworkProxyQuery & >() (args, heap) : gsi::arg_maker<const QNetworkProxyQuery & >() (QNetworkProxyQuery(), heap);
   ret.write<QList<QNetworkProxy> > ((QList<QNetworkProxy>)((QNetworkProxyFactory_Adaptor *)cls)->cbs_queryProxy_3220_1 (arg1));
 }
 

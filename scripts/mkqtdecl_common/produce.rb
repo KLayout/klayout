@@ -2995,12 +2995,8 @@ END
             ofile.puts("static void _call_cbs_#{mn}_#{hk}_#{i_var} (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) ")
             ofile.puts("{")
             ofile.puts("  __SUPPRESS_UNUSED_WARNING(args);")
-            if !ant.empty?
-              ofile.puts("  tl::Heap heap;")
-            end
-            ant.each_with_index do |at,ia|
-              ofile.puts("  #{at.renamed_type(alist[ia]).gsi_decl_arg(decl_obj)} = args.read<#{at.gsi_decl_arg(decl_obj)} > (heap);")
-            end
+            produce_arg_read(ofile, decl_obj, func, alist, conf.kept_args(bd))
+            produce_keep_self(ofile, alist, "(#{cls} *)cls", conf.owner_args(bd))
             if !rt.is_void?
               ofile.puts("  ret.write<#{rt.gsi_decl_return(decl_obj)} > ((#{rt.gsi_decl_return(decl_obj)})((#{clsn}_Adaptor *)cls)->cbs_#{mn}_#{hk}_#{i_var} (#{alist.join(', ')}));")
             else

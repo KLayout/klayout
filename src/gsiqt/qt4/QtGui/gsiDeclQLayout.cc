@@ -1579,7 +1579,8 @@ static void _call_cbs_addItem_1740_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLayoutItem *arg1 = args.read<QLayoutItem * > (heap);
+  QLayoutItem *arg1 = gsi::arg_reader<QLayoutItem * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout_Adaptor *)cls)->cbs_addItem_1740_0 (arg1);
 }
@@ -1621,7 +1622,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -1664,7 +1665,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -1706,7 +1707,7 @@ static void _call_cbs_disconnectNotify_1731_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout_Adaptor *)cls)->cbs_disconnectNotify_1731_0 (arg1);
 }
@@ -1730,7 +1731,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QLayout_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -1755,8 +1756,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QLayout_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -1836,7 +1837,7 @@ static void _call_cbs_heightForWidth_c767_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QLayout_Adaptor *)cls)->cbs_heightForWidth_c767_0 (arg1));
 }
 
@@ -1859,7 +1860,7 @@ static void _call_cbs_indexOf_c1315_0 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<int > ((int)((QLayout_Adaptor *)cls)->cbs_indexOf_c1315_0 (arg1));
 }
 
@@ -1921,7 +1922,7 @@ static void _call_cbs_itemAt_c767_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QLayoutItem * > ((QLayoutItem *)((QLayout_Adaptor *)cls)->cbs_itemAt_c767_0 (arg1));
 }
 
@@ -1982,7 +1983,7 @@ static void _call_cbs_minimumHeightForWidth_c767_0 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QLayout_Adaptor *)cls)->cbs_minimumHeightForWidth_c767_0 (arg1));
 }
 
@@ -2056,7 +2057,7 @@ static void _call_cbs_setGeometry_1792_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout_Adaptor *)cls)->cbs_setGeometry_1792_0 (arg1);
 }
@@ -2118,7 +2119,7 @@ static void _call_cbs_takeAt_767_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QLayoutItem * > ((QLayoutItem *)((QLayout_Adaptor *)cls)->cbs_takeAt_767_0 (arg1));
 }
 
@@ -2141,7 +2142,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }

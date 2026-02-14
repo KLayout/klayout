@@ -1687,6 +1687,69 @@ connected_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id,
 }
 
 template <class T>
+void
+connected_clusters<T>::join_clusters_with (typename local_cluster<T>::id_type id, typename std::set<typename local_cluster<T>::id_type>::const_iterator with_from, typename std::set<typename local_cluster<T>::id_type>::const_iterator with_to)
+{
+  if (with_from != with_to && *with_from == id) {
+    ++with_from;
+  }
+  if (with_from == with_to) {
+    return;
+  }
+
+  connections_type &target = m_connections [id];
+  std::set<connections_type::value_type> target_set;
+  bool target_set_valid = false;
+
+  for (auto w = with_from; w != with_to; ++w) {
+
+    local_clusters<T>::join_cluster_with (id, *w);
+
+    //  handle the connections by translating
+
+    typename std::map<typename local_cluster<T>::id_type, connections_type>::iterator tc = m_connections.find (*w);
+    if (tc != m_connections.end ()) {
+
+      connections_type &to_join = tc->second;
+
+      for (connections_type::const_iterator c = to_join.begin (); c != to_join.end (); ++c) {
+        m_rev_connections [*c] = id;
+      }
+
+      if (target.empty ()) {
+
+        target.swap (to_join);
+
+      } else if (! to_join.empty ()) {
+
+        //  Join while removing duplicates
+        if (! target_set_valid) {
+          target_set.insert (target.begin (), target.end ());
+          target_set_valid = true;
+        }
+
+        for (auto j = to_join.begin (); j != to_join.end (); ++j) {
+          if (target_set.find (*j) == target_set.end ()) {
+            target.push_back (*j);
+            target_set.insert (*j);
+          }
+        }
+
+      }
+
+      m_connections.erase (tc);
+
+    }
+
+    if (m_connected_clusters.find (*w) != m_connected_clusters.end ()) {
+      m_connected_clusters.insert (id);
+      m_connected_clusters.erase (*w);
+    }
+
+  }
+}
+
+template <class T>
 typename local_cluster<T>::id_type
 connected_clusters<T>::find_cluster_with_connection (const ClusterInstance &inst) const
 {
@@ -1995,8 +2058,9 @@ public:
 
       typename std::set<id_type>::const_iterator c = sc->begin ();
       typename std::set<id_type>::const_iterator cc = c;
-      for (++cc; cc != sc->end (); ++cc) {
-        mp_cell_clusters->join_cluster_with (*c, *cc);
+      ++cc;
+      if (cc != sc->end ()) {
+        mp_cell_clusters->join_clusters_with (*c, cc, sc->end ());
       }
 
     }

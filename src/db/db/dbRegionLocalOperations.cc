@@ -232,6 +232,8 @@ check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cel
   bool take_all = edge_check.has_negative_edge_output () || intruders.empty ();
 
   db::Box common_box;
+  bool subjects_are_fully_covered = false;
+
   if (! take_all) {
 
     db::Vector e (edge_check.distance (), edge_check.distance ());
@@ -241,14 +243,24 @@ check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cel
       subject_box += db::box_convert<TS> () (**i);
     }
 
-    if (edge_check.requires_different_layers ()) {
-      db::Box intruder_box;
+    common_box = subject_box.enlarged (e);
+
+    if (edge_check.requires_different_layers () && ! common_box.empty ()) {
+
+      subjects_are_fully_covered = false;
+
+      db::Box all_intruders_box;
+
       for (auto i = intruders.begin (); i != intruders.end (); ++i) {
-        intruder_box += db::box_convert<TI> () (**i);
+        db::Box intruder_box = db::box_convert<TI> () (**i);
+        if (! subjects_are_fully_covered && (*i)->is_box () && common_box.inside (intruder_box)) {
+          subjects_are_fully_covered = true;
+        }
+        all_intruders_box += intruder_box.enlarged (e);
       }
-      common_box = subject_box.enlarged (e) & intruder_box.enlarged (e);
-    } else {
-      common_box = subject_box.enlarged (e);
+
+      common_box &= all_intruders_box;
+
     }
 
   }
@@ -305,6 +317,22 @@ check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cel
     if (intruders.empty ()) {
 
       //  empty intruders
+
+    } else if (subjects_are_fully_covered) {
+
+      //  optimization: can use a single box for the intruders
+
+      n = 1;
+
+      db::Point ul = common_box.upper_left ();
+      db::Point lr = common_box.lower_right ();
+
+      poly_check.enter (db::Edge (common_box.p1 (), ul), n);
+      poly_check.enter (db::Edge (ul, common_box.p2 ()), n);
+      poly_check.enter (db::Edge (common_box.p2 (), lr), n);
+      poly_check.enter (db::Edge (lr, common_box.p1 ()), n);
+
+      n += 2;
 
     } else if (! m_other_is_merged && (intruders.size () > 1 || ! (*intruders.begin ())->is_box ())) {
 

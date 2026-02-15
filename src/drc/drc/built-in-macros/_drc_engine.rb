@@ -942,15 +942,18 @@ module DRC
     # Turns profiling on or off (default). In profiling mode, the 
     # system will collect statistics about rules executed, their execution time
     # and memory information. The argument specifies how many operations to 
-    # print at the end of the run. Without an argument, all operations are
+    # print at the end of the run. Without an argument or when passing "true", all operations are
     # printed. Passing "false" for the argument will disable profiling. This is the
     # default.
 
     def profile(n = 0)
-      if !n.is_a?(1.class) && n != nil && n != false
-        raise("Argument to 'profile' must be either an integer number or nil")
+      if !n.is_a?(1.class) && n != nil && n != false && n != true
+        raise("Argument to 'profile' must be either an integer number, true, false or nil")
       end
       @profile = !!n
+      if n == true
+        n = 0
+      end
       @profile_n = [n || 0, 0].max
     end
 

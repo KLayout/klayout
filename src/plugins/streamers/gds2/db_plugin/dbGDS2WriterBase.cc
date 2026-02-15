@@ -220,7 +220,11 @@ GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, 
 
   std::vector <std::string> context_prop_strings;
 
-  if (layout.has_context_info ()) {
+  layout.get_context_info (context_prop_strings);
+
+  //  @@@ Add context strings for m_prop_names_map and m_prop_values_map and layout properties if needed
+
+  if (! context_prop_strings.empty ()) {
 
     //  Use a dummy BOUNDARY element to attach the global context
 
@@ -241,18 +245,12 @@ GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, 
       write_int (0);
     }
 
-    context_prop_strings.clear ();
-
-    if (layout.get_context_info (context_prop_strings)) {
-
-      //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
-      //  will arrive)
-      for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
-        --s;
-        size_t n = std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s);
-        write_context_string (n, *s);
-      }
-
+    //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
+    //  will arrive)
+    for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
+      --s;
+      size_t n = std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s);
+      write_context_string (n, *s);
     }
 
     write_record_size (4);
@@ -262,7 +260,12 @@ GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, 
 
   for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
 
-    if (layout.has_context_info (*cell)) {
+    context_prop_strings.clear ();
+    layout.get_context_info (*cell, context_prop_strings);
+
+    //  @@@ Add cell properties if needed
+
+    if (! context_prop_strings.empty ()) {
 
       write_record_size (4);
       write_record (sSREF);
@@ -276,16 +279,12 @@ GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, 
 
       context_prop_strings.clear ();
 
-      if (layout.get_context_info (*cell, context_prop_strings)) {
-
-        //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
-        //  will arrive)
-        for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
-          --s;
-          size_t n = std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s);
-          write_context_string (n, *s);
-        }
-
+      //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
+      //  will arrive)
+      for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
+        --s;
+        size_t n = std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s);
+        write_context_string (n, *s);
       }
 
       write_record_size (4);
@@ -538,23 +537,32 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
   write_double (m_dbu / std::max (1e-9, gds2_options.user_units));
   write_double (m_dbu * 1e-6);
 
+  //  build property translation maps if possible
+  //  Property translation maps non-numeric property keys to numeric ones and
+  //  complex-type values to string ones. The neccessary maps are included in
+  //  the meta data
+
   //  layout properties 
 
-  if (gds2_options.write_file_properties && layout.prop_id () != 0) {
-    try {
-      write_properties (layout, layout.prop_id ());
-    } catch (tl::Exception &ex) {
-      throw tl::Exception (ex.msg () + tl::to_string (tr (", writing layout properties")));
-    }
-  }
+  if (layout.prop_id () != 0) {
+    if (gds2_options.write_file_properties) {
+      try {
+        write_properties (layout, layout.prop_id ());
+      } catch (tl::Exception &ex) {
+        throw tl::Exception (ex.msg () + tl::to_string (tr (", writing layout properties")));
+      }
+    } else if ()
 
   //  write context info
   
   bool has_context = false;
 
   if (options.write_context_info ()) {
-    has_context = layout.has_context_info ();
-    for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end () && !has_context; ++cell) {
+    @@@ require a context if meta data has to be added
+    if (! has_context) {
+      has_context = layout.has_context_info ();
+    }
+    for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end () && ! has_context; ++cell) {
       has_context = layout.has_context_info (*cell);
     }
   }
@@ -1106,10 +1114,14 @@ GDS2WriterBase::write_polygon (int layer, int datatype, double sf, const db::Sha
 void 
 GDS2WriterBase::write_properties (const db::Layout & /*layout*/, db::properties_id_type prop_id)
 {
-  auto props = db::properties (prop_id).to_map ();
+  auto props = db::properties (prop_id);
   for (auto p = props.begin (); p != props.end (); ++p) {
 
-    const tl::Variant &name = p->first;
+    auto pn = m_prop_names_map.find (p->first);
+    auto pv = m_prop_values_map.find (p->second);
+
+    const tl::Variant &value = (pn == m_prop_names_map.end ()) ? db::property_value (p->second) : pn->second;
+    const tl::Variant &name = (pv == m_prop_values_map.end ()) ? db::property_name (p->first) : pv->second;
 
     long attr = -1;
     if (name.can_convert_to_long ()) {
@@ -1122,7 +1134,7 @@ GDS2WriterBase::write_properties (const db::Layout & /*layout*/, db::properties_
       write_record (sPROPATTR);
       write_short ((int16_t) attr);
 
-      write_string_record (sPROPVALUE, p->second.to_string ());
+      write_string_record (sPROPVALUE, value.to_string ());
 
     }
 
@@ -1150,6 +1162,46 @@ GDS2WriterBase::write_string_record (short record, const std::string &t)
   write_record_size (uint16_t (rs));
   write_record (record);
   write_string (t);
+}
+
+void
+GDS2WriterBase::collect_property_ids (std::set<db::properties_id_type> &property_ids, const db::Layout &layout, const std::vector<cell_index_type> &cells, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers)
+{
+  if (layout.prop_id () != 0) {
+    property_ids.insert (layout.prop_id ());
+  }
+
+  for (auto cell = cells.begin (); cell != cells.end (); ++cell) {
+
+    const db::Cell &cref (layout.cell (*cell));
+
+    if (cref.prop_id () != 0) {
+      property_ids.insert (cref.prop_id ());
+    }
+
+    for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
+      if (inst->has_prop_id () && inst->prop_id () != 0) {
+        prop_ids_done.insert (inst->prop_id ());
+      }
+    }
+
+    for (auto l = layers.begin (); l != layers.end (); ++l) {
+      db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Properties | db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Texts));
+      while (! shape.at_end ()) {
+        if (shape->has_prop_id () && shape->prop_id () != 0) {
+          prop_ids_done.insert (shape->prop_id ());
+        }
+        shape.finish_array ();
+      }
+    }
+
+  }
+}
+
+void
+GDS2WriterBase::build_property_maps (const std::set<db::properties_id_type> &property_ids)
+{
+
 }
 
 } // namespace db

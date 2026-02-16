@@ -89,7 +89,7 @@ struct simple_result_inserter
 {
   typedef TR value_type;
 
-  simple_result_inserter<TR> (std::unordered_set<TR> &result)
+  simple_result_inserter (std::unordered_set<TR> &result)
     : mp_result (&result)
   {
     //  .. nothing yet ..

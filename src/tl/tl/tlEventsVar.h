@@ -175,13 +175,13 @@ public:
   typedef typename receivers::iterator receivers_iterator;
 #endif
 
-  event<_TMPLARGLISTP> ()
+  event ()
     : mp_destroyed_sentinel (0)
   {
     //  .. nothing yet ..
   }
 
-  ~event<_TMPLARGLISTP> ()
+  ~event ()
   {
     if (mp_destroyed_sentinel) {
       *mp_destroyed_sentinel = true;

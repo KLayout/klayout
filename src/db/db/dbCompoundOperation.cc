@@ -859,7 +859,7 @@ namespace
   struct generic_result_adaptor
   {
   public:
-    generic_result_adaptor<T> (std::vector<std::unordered_set<T> > *results)
+    generic_result_adaptor (std::vector<std::unordered_set<T> > *results)
       : mp_results (results)
     {
       m_intermediate.reserve (results->size ());

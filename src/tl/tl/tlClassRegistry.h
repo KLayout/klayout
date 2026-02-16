@@ -217,7 +217,7 @@ public:
   /**
    *  @brief Constructor
    */
-  Registrar <X> () 
+  Registrar ()
     : mp_first (0)
   {
     //  .. nothing yet ..

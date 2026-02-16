@@ -1758,7 +1758,7 @@ public:
    *  Creates a local operation which utilizes the operation tree. "node" is the root of the operation tree.
    *  Ownership of the node is *not* transferred to the local operation.
    */
-  compound_local_operation<TS, TI, TR> (CompoundRegionOperationNode *node)
+  compound_local_operation (CompoundRegionOperationNode *node)
     : mp_node (node)
   { }
 
@@ -1802,7 +1802,7 @@ public:
    *  Creates a local operation which utilizes the operation tree. "node" is the root of the operation tree.
    *  Ownership of the node is *not* transferred to the local operation.
    */
-  compound_local_operation_with_properties<TS, TI, TR> (CompoundRegionOperationNode *node, db::PropertyConstraint prop_constraint)
+  compound_local_operation_with_properties (CompoundRegionOperationNode *node, db::PropertyConstraint prop_constraint)
     : mp_node (node), m_prop_constraint (prop_constraint)
   {
     //  .. nothing yet ..

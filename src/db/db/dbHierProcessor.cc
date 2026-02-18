@@ -714,7 +714,6 @@ local_processor_result_computation_task<TS, TI, TR>::perform ()
 {
   mp_cell_contexts->compute_results (*mp_contexts, mp_cell, mp_op, m_output_layers, mp_proc);
 
-  //  erase the contexts we don't need any longer
   {
     tl::MutexLocker locker (& mp_contexts->lock ());
 
@@ -734,7 +733,10 @@ local_processor_result_computation_task<TS, TI, TR>::perform ()
     }
 #endif
 
-    mp_contexts->context_map ().erase (mp_cell);
+    //  release some memory
+    auto ctx = mp_contexts->context_map ().find (mp_cell);
+    tl_assert (ctx != mp_contexts->context_map ().end ());
+    ctx->second.cleanup ();
   }
 }
 
@@ -879,15 +881,6 @@ void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned
   local_processor_contexts<TS, TI, TR> contexts;
   compute_contexts (contexts, op, subject_layer, intruder_layers);
   compute_results (contexts, op, output_layers);
-}
-
-template <class TS, class TI, class TR>
-void local_processor<TS, TI, TR>::push_results (db::Cell *cell, unsigned int output_layer, const std::unordered_set<TR> &result) const
-{
-  if (! result.empty ()) {
-    tl::MutexLocker locker (&cell->layout ()->lock ());
-    cell->shapes (output_layer).insert (result.begin (), result.end ());
-  }
 }
 
 template <class TS, class TI, class TR>
@@ -1248,7 +1241,7 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
         typename local_processor_contexts<TS, TI, TR>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
         if (cpc != contexts.context_map ().end ()) {
           cpc->second.compute_results (contexts, cpc->first, op, output_layers, this);
-          contexts.context_map ().erase (cpc);
+          cpc->second.cleanup ();   //  release some memory
         }
 
       }
@@ -1260,6 +1253,24 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
       throw;
     }
 
+  }
+
+  //  deliver the results
+  {
+    tl::MutexLocker locker (& mp_subject_layout->lock ());
+    for (auto c = contexts.begin (); c != contexts.end (); ++c) {
+
+      db::Cell *cell = c->first;
+      auto r = c->second.result ().begin ();
+      auto rend = c->second.result ().end ();
+
+      for (auto o = output_layers.begin (); r != rend && o != output_layers.end (); ++o, ++r) {
+        if (! r->empty ()) {
+          cell->shapes (*o).insert (r->begin (), r->end ());
+        }
+      }
+
+    }
   }
 }
 

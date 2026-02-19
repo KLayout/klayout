@@ -913,7 +913,7 @@ Writer::make_meta_data (const db::Cell *cell, stream::metaData::MetaData::Builde
 void 
 Writer::write_cell (db::cell_index_type ci, kj::BufferedOutputStream &os)
 {
-  bool needs_layout_view = ! mp_layout->cell (ci).is_ghost_cell ();
+  bool needs_layout_view = ! mp_layout->cell (ci).is_real_ghost_cell ();
   bool needs_meta_data_view = mp_layout->begin_meta (ci) != mp_layout->end_meta (ci);
 
   capnp::MallocMessageBuilder message;

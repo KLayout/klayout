@@ -1443,12 +1443,6 @@ static bool must_write_cell (const db::Cell &cref)
   return ! cref.is_proxy () || ! cref.is_top ();
 }
 
-static bool skip_cell_body (const db::Cell &cref)
-{
-  //  Skip cell bodies for ghost cells unless empty (they are not longer ghost cells in this case)
-  return cref.is_ghost_cell () && cref.empty ();
-}
-
 void
 OASISWriter::create_cell_nstrings (const db::Layout &layout, const std::set <db::cell_index_type> &cell_set)
 {
@@ -1670,7 +1664,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     mp_cell = &cref;
 
     //  skip cell body if the cell is not to be written
-    if (skip_cell_body (cref)) {
+    if (cref.is_real_ghost_cell ()) {
       continue;
     }
 

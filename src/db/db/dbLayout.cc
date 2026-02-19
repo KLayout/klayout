@@ -1417,7 +1417,7 @@ Layout::add_cell (const char *name)
     if (cm != m_cell_map.end ()) {
 
       const db::Cell &c= cell (cm->second);
-      if (c.is_ghost_cell () && c.empty ()) {
+      if (c.is_real_ghost_cell ()) {
         //  ghost cells are available as new cells - the idea is to 
         //  treat them as non-existing.
         return cm->second;

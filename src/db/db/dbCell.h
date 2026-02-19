@@ -926,14 +926,25 @@ public:
   }
 
   /**
+   *  @brief Gets a value indicating whether the cell is a "real" ghost cell
+   *
+   *  A ghost cell is a real ghost cell only if the ghost cell flag is set
+   *  and the cell is empty. Only in that case for example the cell is written
+   *  to GDS files as a ghost cell.
+   *
+   *  Otherwise, the ghost cell flag is mostly ignored.
+   */
+  bool is_real_ghost_cell () const
+  {
+    return m_ghost_cell && empty ();
+  }
+
+  /**
    *  @brief Sets the "ghost cell" flag
    *
    *  See "is_ghost_cell" for a description of this property.
    */
-  void set_ghost_cell (bool g)
-  {
-    m_ghost_cell = g;
-  }
+  void set_ghost_cell (bool g);
 
   /**
    *  @brief Gets a value indicating whether the cell is locked

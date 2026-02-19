@@ -577,7 +577,7 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
 
     //  don't write ghost cells unless they are not empty (any more)
     //  also don't write proxy cells which are not employed
-    if ((! cref.is_ghost_cell () || ! cref.empty ()) && (! cref.is_proxy () || ! cref.is_top ())) {
+    if (! cref.is_real_ghost_cell () && (! cref.is_proxy () || ! cref.is_top ())) {
 
       try {
         write_cell (layout, cref, layers, cell_set, sf, time_data);

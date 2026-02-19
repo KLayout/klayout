@@ -945,7 +945,7 @@ std::string
 Cell::get_display_name () const
 {
   tl_assert (layout () != 0);
-  if (is_ghost_cell () && empty ()) {
+  if (is_real_ghost_cell ()) {
     return std::string ("(") + layout ()->cell_name (cell_index ()) + std::string (")");
   } else {
     return layout ()->cell_name (cell_index ());
@@ -957,6 +957,20 @@ Cell::set_name (const std::string &name)
 {
   tl_assert (layout () != 0);
   layout ()->rename_cell (cell_index (), name.c_str ());
+}
+
+void
+Cell::set_ghost_cell (bool g)
+{
+  //  NOTE: this change is not undo managed
+  if (m_ghost_cell != g) {
+
+    m_ghost_cell = g;
+    tl_assert (layout () != 0);
+    //  To trigger a redraw and cell tree rebuild
+    layout ()->cell_name_changed ();
+
+  }
 }
 
 void

@@ -20,15 +20,17 @@
 
 */
 
-#if !defined(HAVE_QT) || defined(HAVE_PTHREADS)
-
 #include "tlThreads.h"
 #include "tlUtils.h"
 #include "tlTimer.h"
+#include "tlSleep.h"
 #include "tlLog.h"
 #include "tlInternational.h"
 
 #include <map>
+
+#if defined(HAVE_PTHREADS)
+
 #define _TIMESPEC_DEFINED   //  avoids errors with pthread-win and MSVC2017
 #include <pthread.h>
 #include <errno.h>
@@ -39,12 +41,71 @@
 #  include <unistd.h>
 #endif
 
+#endif
+
 namespace tl
 {
 
 // -------------------------------------------------------------------------------
 //  WaitCondition implementation
 
+#if defined(HAVE_CPP20) || !defined(HAVE_QT) || defined(HAVE_PTHREADS)
+
+#if defined(HAVE_CPP20)
+
+class WaitConditionPrivate
+{
+public:
+  WaitConditionPrivate ()
+    : m_condition ()
+  {
+  }
+
+  ~WaitConditionPrivate ()
+  {
+  }
+
+  bool wait (Mutex *mutex, unsigned long time)
+  {
+    bool result = true;
+    m_condition.clear (std::memory_order_release);
+
+    mutex->unlock ();
+
+    if (time != std::numeric_limits<unsigned long>::max ()) {
+      while (time > 0 && ! m_condition.test (std::memory_order_acquire)) {
+        tl::usleep (1000);
+        --time;
+      }
+      result = (time != 0);
+    } else {
+      m_condition.wait (false);
+    }
+
+    mutex->lock ();
+
+    return result;
+  }
+
+  void wake_all ()
+  {
+    if (! m_condition.test_and_set (std::memory_order_acquire)) {
+      m_condition.notify_all ();
+    }
+  }
+
+  void wake_one ()
+  {
+    if (! m_condition.test_and_set (std::memory_order_acquire)) {
+      m_condition.notify_one ();
+    }
+  }
+
+private:
+  std::atomic_flag m_condition;
+};
+
+#else
 
 class WaitConditionPrivate
 {
@@ -139,6 +200,8 @@ private:
   bool m_initialized;
 };
 
+#endif
+
 WaitCondition::WaitCondition ()
 {
   mp_data = new WaitConditionPrivate ();
@@ -165,8 +228,12 @@ void WaitCondition::wakeOne ()
   mp_data->wake_one ();
 }
 
+#endif
+
 // -------------------------------------------------------------------------------
 //  Thread implementation
+
+#if !(defined(HAVE_QT) && !defined(HAVE_PTHREADS))
 
 class ThreadPrivateData
 {
@@ -401,6 +468,6 @@ ThreadStorageHolderBase *ThreadStorageBase::holder ()
   }
 }
 
-}
-
 #endif
+
+}

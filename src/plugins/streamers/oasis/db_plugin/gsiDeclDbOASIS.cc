@@ -38,7 +38,7 @@ static void set_oasis_read_all_properties (db::LoadLayoutOptions *options, bool 
   options->get_options<db::OASISReaderOptions> ().read_all_properties = f;
 }
 
-static int get_oasis_read_all_properties (const db::LoadLayoutOptions *options)
+static bool get_oasis_read_all_properties (const db::LoadLayoutOptions *options)
 {
   return options->get_options<db::OASISReaderOptions> ().read_all_properties;
 }

@@ -27,6 +27,7 @@
 #include "tlString.h"
 #include "tlAssert.h"
 #include "tlHash.h"
+#include "tlStaticObjects.h"
 
 namespace db
 {
@@ -348,13 +349,21 @@ PropertiesSet::hash () const
 // ----------------------------------------------------------------------------------
 //  PropertiesRepository implementation
 
-static PropertiesRepository s_instance;
+static PropertiesRepository *sp_global_instance = 0;
 static PropertiesRepository *sp_temp_instance = 0;
 
 PropertiesRepository &
 PropertiesRepository::instance ()
 {
-  return sp_temp_instance ? *sp_temp_instance : s_instance;
+  if (sp_temp_instance) {
+    return *sp_temp_instance;
+  } else {
+    if (! sp_global_instance) {
+      sp_global_instance = new PropertiesRepository ();
+      tl::StaticObjects::reg (&sp_global_instance);
+    }
+    return *sp_global_instance;
+  }
 }
 
 void

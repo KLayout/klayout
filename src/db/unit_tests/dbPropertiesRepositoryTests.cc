@@ -503,3 +503,19 @@ TEST(SameValueDifferentTypes)
     EXPECT_EQ (db::property_name (rp.prop_name_id ((int) 5)).to_parsable_string (), "#5");
   }
 }
+
+TEST(ComplexTypes)
+{
+  //  This is also a smoke test: we intentionally register globally as the finalization code
+  //  is critical: without the right destruction order we destroy the class object before the
+  //  variant and trigger an assertion (pure virtual function called)
+
+  db::PropertiesSet ps;
+  ps.insert (tl::Variant (17), db::DBox (0, 0, 1.5, 2.5));
+
+  db::properties_id_type pid = db::properties_id (ps);
+
+  auto const &ps_out = db::properties (pid);
+
+  EXPECT_EQ (ps_out.to_dict_var ().to_string (), "{17=>(0,0;1.5,2.5)}");
+}

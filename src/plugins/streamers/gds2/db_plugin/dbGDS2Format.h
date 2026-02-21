@@ -115,6 +115,7 @@ public:
       write_timestamps (true),
       write_cell_properties (false),
       write_file_properties (false),
+      extended_features (true),
       default_text_size (-1.0)
   {
     //  .. nothing yet ..
@@ -183,6 +184,22 @@ public:
    *  @brief Write layout properties (non-standard PROPATTR/PROPVALUE records)
    */
   bool write_file_properties;
+
+  /**
+   *  @brief Write extended features
+   *
+   *  Extended features are:
+   *  - non-numerical property names
+   *  - complex property values
+   *  - file and cell properties without "write_cell_properties" and "write_file_properties"
+   *  - layer names
+   *
+   *  These extended features require a context cell to be created (unless
+   *  needed for other reasons). Hence this flag is not compatible with
+   *  "write_context_info = false". On the plus side, GDS files written with extended
+   *  features are backward compatible.
+   */
+  bool extended_features;
 
   /**
    *  @brief The default text size if none is given (in fact, if the text size is zero)

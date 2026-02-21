@@ -89,6 +89,8 @@ private:
   unsigned int m_box_mode;
   std::map <tl::string, std::vector<std::string> > m_context_info;
   std::vector <db::Point> m_all_points;
+  std::map <long, tl::Variant> m_property_names_map;
+  std::map <std::string, tl::Variant> m_property_values_map;
 
   void read_context_info_cell ();
   void read_boundary (db::Layout &layout, db::Cell &cell, bool from_box_record);
@@ -96,6 +98,10 @@ private:
   void read_text (db::Layout &layout, db::Cell &cell);
   void read_box (db::Layout &layout, db::Cell &cell);
   void read_ref (db::Layout &layout, db::Cell &cell, bool array, tl::vector<db::CellInstArray> &instances, tl::vector<db::CellInstArrayWithProperties> &insts_wp);
+  tl::Variant map_property_name (long attr) const;
+  tl::Variant map_property_value (const std::string &value) const;
+  void build_properties_from_context (const std::vector<std::string> &context, db::PropertiesSet &properties) const;
+  void digest_context (Layout &layout, const std::vector<std::string> &context);
 
   std::pair <bool, db::properties_id_type> finish_element_with_props ();
   void finish_element ();

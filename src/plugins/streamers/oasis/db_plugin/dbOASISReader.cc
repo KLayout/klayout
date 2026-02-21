@@ -480,30 +480,6 @@ OASISReader::warn (const std::string &msg, int wl)
 }
 
 /**
- *  @brief A helper class to join two datatype layer name map members
- */
-struct LNameJoinOp1
-{
-  void operator() (std::string &a, const std::string &b)
-  {
-    join_layer_names (a, b);
-  }
-};
-
-/**
- *  @brief A helper class to join two layer map members
- *  This implementation basically merged the datatype maps.
- */
-struct LNameJoinOp2
-{
-  void operator() (tl::interval_map<db::ld_type, std::string> &a, const tl::interval_map<db::ld_type, std::string> &b)
-  {
-    LNameJoinOp1 op1;
-    a.add (b.begin (), b.end (), op1);
-  }
-};
-
-/**
  *  @brief Marks the beginning of a new table
  *
  *  This method will update m_table_start which is the location used as

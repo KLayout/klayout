@@ -66,6 +66,7 @@ GenericWriterOptions::init_from_options (const db::SaveLayoutOptions &save_optio
   m_gds2_write_file_properties = save_options.get_option_by_name ("gds2_write_file_properties").to_bool ();
   tl::Variant def_text_size = save_options.get_option_by_name ("gds2_default_text_size");
   m_gds2_default_text_size = def_text_size.is_nil () ? -1.0 : def_text_size.to_double ();
+  m_gds2_extended_features = save_options.get_option_by_name ("gds2_extended_features").to_bool ();
 
   m_oasis_compression_level = save_options.get_option_by_name ("oasis_compression_level").to_int ();
   m_oasis_write_cblocks = save_options.get_option_by_name ("oasis_write_cblocks").to_bool ();
@@ -221,6 +222,14 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                     "#--write-file-properties", &m_gds2_write_file_properties, "Write file properties",
                     "This option enables a GDS2 extension that allows writing of file properties to GDS2 files. "
                     "Consumers that don't support this feature, may not be able to read such a GDS2 files."
+                   )
+        << tl::arg (group +
+                    "!#--no-extended-features", &m_gds2_extended_features, "Disables extended GDS2 features",
+                    "This option disables extended GDS2 features. Extended GDS features allow writing file and cell level "
+                    "properties without 'write-cell-properties' or 'write-file-properties', store layer names and allow "
+                    "string names for properties and complex property values such as very long strings or lists.\n"
+                    "\n"
+                    "Extended features rely on the context, so they are not available with 'no-context-info'."
                    )
         << tl::arg (group +
                     "#--default-text-size", &m_gds2_default_text_size, "Default text size",
@@ -435,6 +444,7 @@ GenericWriterOptions::configure (db::SaveLayoutOptions &save_options, const db::
   save_options.set_option_by_name ("gds2_write_timestamps", m_gds2_write_timestamps);
   save_options.set_option_by_name ("gds2_write_cell_properties", m_gds2_write_cell_properties);
   save_options.set_option_by_name ("gds2_write_file_properties", m_gds2_write_file_properties);
+  save_options.set_option_by_name ("gds2_extended_features", m_gds2_extended_features);
   save_options.set_option_by_name ("gds2_default_text_size", m_gds2_default_text_size < 0.0 ? tl::Variant () : tl::Variant (m_gds2_default_text_size));
 
   save_options.set_option_by_name ("oasis_compression_level", m_oasis_compression_level);

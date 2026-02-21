@@ -92,6 +92,30 @@ DB_PUBLIC void
 join_layer_names (std::string &s, const std::string &n);
 
 /**
+ *  @brief A helper class to join two datatype layer name map members
+ */
+struct LNameJoinOp1
+{
+  void operator() (std::string &a, const std::string &b)
+  {
+    join_layer_names (a, b);
+  }
+};
+
+/**
+ *  @brief A helper class to join two layer map members
+ *  This implementation basically merged the datatype maps.
+ */
+struct LNameJoinOp2
+{
+  void operator() (tl::interval_map<db::ld_type, std::string> &a, const tl::interval_map<db::ld_type, std::string> &b)
+  {
+    LNameJoinOp1 op1;
+    a.add (b.begin (), b.end (), op1);
+  }
+};
+
+/**
  *  @brief The generic reader base class
  */
 class DB_PUBLIC ReaderBase

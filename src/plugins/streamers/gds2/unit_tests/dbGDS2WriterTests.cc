@@ -1577,4 +1577,415 @@ TEST(166)
   run_test (_this, "t166.oas.gz", "t166_au.gds.gz", false, opt);
 }
 
+static std::string p2s (db::properties_id_type pid)
+{
+  return db::properties (pid).to_dict_var ().to_parsable_string ();
+}
+
+namespace {
+
+/**
+ *  @brief Installs a temporary repository instance for testing
+ *
+ *  By using a temp instance, we do not disturb other tests.
+ */
+class TempPropertiesRepository
+{
+public:
+  TempPropertiesRepository ()
+  {
+    db::PropertiesRepository::replace_instance_temporarily (&m_temp);
+  }
+
+  ~TempPropertiesRepository ()
+  {
+    db::PropertiesRepository::replace_instance_temporarily (0);
+  }
+
+private:
+  db::PropertiesRepository m_temp;
+};
+
+}
+
+//  Layout and cell properties are written to the context cell unless this is allowed by "write_cell/file_properties"
+TEST(200_extended_props)
+{
+  TempPropertiesRepository temp_pr;
+
+  db::GDS2WriterOptions gds2_opt;
+  gds2_opt.write_cell_properties = false;
+  gds2_opt.write_file_properties = false;
+
+  db::PropertiesSet ps1;
+  ps1.insert (tl::Variant ("prop_name"), db::DBox (0, 0, 1.5, 2.5));
+  ps1.insert (tl::Variant (17), 2.5);
+
+  db::PropertiesSet ps2;
+  tl::Variant l = tl::Variant::empty_list ();
+  l.push (17);
+  l.push ("X");
+  ps2.insert (tl::Variant ("prop_name2"), l);
+  ps2.insert (tl::Variant (42), "A string");
+
+  db::Layout layout_org;
+  layout_org.prop_id (db::properties_id (ps1));
+
+  db::Cell &xcell = layout_org.cell (layout_org.add_cell ("X"));
+  xcell.prop_id (db::properties_id (ps2));
+
+  EXPECT_EQ (p2s (layout_org.prop_id ()), "{#17=>##2.5,'prop_name'=>[dbox:(0,0;1.5,2.5)]}");
+  EXPECT_EQ (p2s (xcell.prop_id ()), "{#42=>'A string','prop_name2'=>(#17,'X')}");
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_200.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    options.set_options (gds2_opt);
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  db::Layout layout_read;
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (p2s (layout_read.prop_id ()), "{#17=>##2.5,'prop_name'=>[dbox:(0,0;1.5,2.5)]}");
+  auto xc = layout_read.cell_by_name ("X");
+  tl_assert (xc.first);
+  EXPECT_EQ (p2s (layout_read.cell (xc.second).prop_id ()), "{#42=>'A string','prop_name2'=>(#17,'X')}");
+}
+
+//  Without a context cell, layout and file properties are written if requested, but only
+//  numerical property keys are supported
+TEST(201_extended_props)
+{
+  TempPropertiesRepository temp_pr;
+
+  db::GDS2WriterOptions gds2_opt;
+  gds2_opt.write_cell_properties = true;
+  gds2_opt.write_file_properties = true;
+  db::SaveLayoutOptions options;
+  options.set_write_context_info (false);
+  options.set_options (gds2_opt);
+
+  db::PropertiesSet ps1;
+  ps1.insert (tl::Variant ("prop_name"), db::DBox (0, 0, 1.5, 2.5));
+  ps1.insert (tl::Variant (17), 2.5);
+
+  db::PropertiesSet ps2;
+  tl::Variant l = tl::Variant::empty_list ();
+  l.push (17);
+  l.push ("X");
+  ps2.insert (tl::Variant ("prop_name2"), l);
+  ps2.insert (tl::Variant (42), "A string");
+
+  db::Layout layout_org;
+  layout_org.prop_id (db::properties_id (ps1));
+
+  db::Cell &xcell = layout_org.cell (layout_org.add_cell ("X"));
+  xcell.prop_id (db::properties_id (ps2));
+
+  EXPECT_EQ (p2s (layout_org.prop_id ()), "{#17=>##2.5,'prop_name'=>[dbox:(0,0;1.5,2.5)]}");
+  EXPECT_EQ (p2s (xcell.prop_id ()), "{#42=>'A string','prop_name2'=>(#17,'X')}");
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_201.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  db::Layout layout_read;
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (p2s (layout_read.prop_id ()), "{#17=>'2.5'}");
+  auto xc = layout_read.cell_by_name ("X");
+  tl_assert (xc.first);
+  EXPECT_EQ (p2s (layout_read.cell (xc.second).prop_id ()), "{#42=>'A string'}");
+}
+
+//  With a context cell, layout and file properties are written if requested, and property
+//  name and value translation happens
+TEST(202_extended_props)
+{
+  TempPropertiesRepository temp_pr;
+
+  db::GDS2WriterOptions gds2_opt;
+  gds2_opt.write_cell_properties = true;
+  gds2_opt.write_file_properties = true;
+  db::SaveLayoutOptions options;
+  options.set_options (gds2_opt);
+
+  db::PropertiesSet ps1;
+  ps1.insert (tl::Variant ("prop_name"), db::DBox (0, 0, 1.5, 2.5));
+  ps1.insert (tl::Variant (17), 2.5);
+
+  db::PropertiesSet ps2;
+  tl::Variant l = tl::Variant::empty_list ();
+  l.push (17);
+  l.push ("X");
+  ps2.insert (tl::Variant ("prop_name2"), l);
+  ps2.insert (tl::Variant (42), "A string");
+
+  db::Layout layout_org;
+  layout_org.prop_id (db::properties_id (ps1));
+
+  db::Cell &xcell = layout_org.cell (layout_org.add_cell ("X"));
+  xcell.prop_id (db::properties_id (ps2));
+
+  EXPECT_EQ (p2s (layout_org.prop_id ()), "{#17=>##2.5,'prop_name'=>[dbox:(0,0;1.5,2.5)]}");
+  EXPECT_EQ (p2s (xcell.prop_id ()), "{#42=>'A string','prop_name2'=>(#17,'X')}");
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_202.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  db::Layout layout_read;
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (p2s (layout_read.prop_id ()), "{#17=>'2.5','prop_name'=>[dbox:(0,0;1.5,2.5)]}");
+  auto xc = layout_read.cell_by_name ("X");
+  tl_assert (xc.first);
+  EXPECT_EQ (p2s (layout_read.cell (xc.second).prop_id ()), "{#42=>'A string','prop_name2'=>(#17,'X')}");
+}
+
+//  With a context cell, shape and instance properties can have non-numeric names
+//  and complex types for values
+TEST(203_extended_props)
+{
+  TempPropertiesRepository temp_pr;
+
+  db::GDS2WriterOptions gds2_opt;
+  db::SaveLayoutOptions options;
+  options.set_options (gds2_opt);
+
+  db::PropertiesSet ps1;
+  ps1.insert (tl::Variant ("prop_name"), db::DBox (0, 0, 1.5, 2.5));
+  ps1.insert (tl::Variant (17), 2.5);
+
+  db::PropertiesSet ps2;
+  tl::Variant l = tl::Variant::empty_list ();
+  l.push (17);
+  l.push ("X");
+  ps2.insert (tl::Variant ("prop_name2"), l);
+  ps2.insert (tl::Variant (42), "A string");
+
+  db::Layout layout_org;
+  unsigned int l1 = layout_org.insert_layer (db::LayerProperties (1, 0, "NAME"));
+  layout_org.insert_layer (db::LayerProperties (2, 17, "U"));
+
+  db::Cell &xcell = layout_org.cell (layout_org.add_cell ("X"));
+  db::Shape shape = xcell.shapes (l1).insert (db::BoxWithProperties (db::Box (0, 0, 1000, 2000), db::properties_id (ps1)));
+
+  db::Cell &ycell = layout_org.cell (layout_org.add_cell ("Y"));
+  db::Instance instance = xcell.insert (db::CellInstArrayWithProperties (db::CellInstArray (ycell.cell_index (), db::Trans ()), db::properties_id (ps2)));
+
+  EXPECT_EQ (p2s (shape.prop_id ()), "{#17=>##2.5,'prop_name'=>[dbox:(0,0;1.5,2.5)]}");
+  EXPECT_EQ (p2s (instance.prop_id ()), "{#42=>'A string','prop_name2'=>(#17,'X')}");
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_203.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  layout_org.clear ();
+
+  {
+    db::Layout layout_read;
+
+    {
+      tl::InputStream in (tmp_file);
+      db::Reader reader (in);
+      reader.read (layout_read);
+    }
+
+    unsigned int l1 = layout_read.get_layer (db::LayerProperties (1, 0));
+    int l2d17 = layout_read.get_layer_maybe (db::LayerProperties (2, 17));
+
+    //  layer names are also persisted, 2/17 is created even as it is empty
+    EXPECT_EQ (layout_read.get_properties (l1).name, "NAME");
+    EXPECT_EQ (l2d17 >= 0, true);
+    if (l2d17 >= 0) {
+      EXPECT_EQ (layout_read.get_properties (l2d17).name, "U");
+    }
+
+    auto xc = layout_read.cell_by_name ("X");
+    tl_assert (xc.first);
+    const db::Cell &xcell = layout_read.cell (xc.second);
+
+    auto s = xcell.shapes (l1).begin (db::ShapeIterator::All);
+    tl_assert (! s.at_end ());
+    EXPECT_EQ (p2s (s->prop_id ()), "{#17=>'2.5','prop_name'=>[dbox:(0,0;1.5,2.5)]}");
+
+    auto i = xcell.begin ();
+    tl_assert (! i.at_end ());
+    EXPECT_EQ (p2s (i->prop_id ()), "{#42=>'A string','prop_name2'=>(#17,'X')}");
+  }
+}
+
+//  Without a context cell, shape and instance properties cannot have non-numeric names
+//  or complex types for values
+TEST(204_extended_props)
+{
+  TempPropertiesRepository temp_pr;
+
+  db::GDS2WriterOptions gds2_opt;
+  db::SaveLayoutOptions options;
+  options.set_write_context_info (false);
+  options.set_options (gds2_opt);
+
+  db::PropertiesSet ps1;
+  ps1.insert (tl::Variant ("prop_name"), db::DBox (0, 0, 1.5, 2.5));
+  ps1.insert (tl::Variant (17), 2.5);
+
+  db::PropertiesSet ps2;
+  tl::Variant l = tl::Variant::empty_list ();
+  l.push (17);
+  l.push ("X");
+  ps2.insert (tl::Variant ("prop_name2"), l);
+  ps2.insert (tl::Variant (42), "A string");
+
+  db::Layout layout_org;
+  unsigned int l1 = layout_org.insert_layer (db::LayerProperties (1, 0, "NAME"));
+
+  db::Cell &xcell = layout_org.cell (layout_org.add_cell ("X"));
+  db::Shape shape = xcell.shapes (l1).insert (db::BoxWithProperties (db::Box (0, 0, 1000, 2000), db::properties_id (ps1)));
+
+  db::Cell &ycell = layout_org.cell (layout_org.add_cell ("Y"));
+  db::Instance instance = xcell.insert (db::CellInstArrayWithProperties (db::CellInstArray (ycell.cell_index (), db::Trans ()), db::properties_id (ps2)));
+
+  EXPECT_EQ (p2s (shape.prop_id ()), "{#17=>##2.5,'prop_name'=>[dbox:(0,0;1.5,2.5)]}");
+  EXPECT_EQ (p2s (instance.prop_id ()), "{#42=>'A string','prop_name2'=>(#17,'X')}");
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_204.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  layout_org.clear ();
+
+  {
+    db::Layout layout_read;
+
+    {
+      tl::InputStream in (tmp_file);
+      db::Reader reader (in);
+      reader.read (layout_read);
+    }
+
+    unsigned int l1 = layout_read.get_layer (db::LayerProperties (1, 0));
+    int l2d17 = layout_read.get_layer_maybe (db::LayerProperties (2, 17));
+
+    //  layer names are not persisted, 2/17 is not created
+    EXPECT_EQ (layout_read.get_properties (l1).name, "");
+    EXPECT_EQ (l2d17 >= 0, false);
+
+    auto xc = layout_read.cell_by_name ("X");
+    tl_assert (xc.first);
+    const db::Cell &xcell = layout_read.cell (xc.second);
+
+    auto s = xcell.shapes (l1).begin (db::ShapeIterator::All);
+    tl_assert (! s.at_end ());
+    EXPECT_EQ (p2s (s->prop_id ()), "{#17=>'2.5'}");
+
+    auto i = xcell.begin ();
+    tl_assert (! i.at_end ());
+    EXPECT_EQ (p2s (i->prop_id ()), "{#42=>'A string'}");
+  }
+}
+
+//  Without extended features enabled, shape and instance properties cannot have non-numeric names
+//  or complex types for values
+TEST(205_extended_props)
+{
+  TempPropertiesRepository temp_pr;
+
+  db::GDS2WriterOptions gds2_opt;
+  gds2_opt.extended_features = false;
+  db::SaveLayoutOptions options;
+  options.set_options (gds2_opt);
+
+  db::PropertiesSet ps1;
+  ps1.insert (tl::Variant ("prop_name"), db::DBox (0, 0, 1.5, 2.5));
+  ps1.insert (tl::Variant (17), 2.5);
+
+  db::PropertiesSet ps2;
+  tl::Variant l = tl::Variant::empty_list ();
+  l.push (17);
+  l.push ("X");
+  ps2.insert (tl::Variant ("prop_name2"), l);
+  ps2.insert (tl::Variant (42), "A string");
+
+  db::Layout layout_org;
+  unsigned int l1 = layout_org.insert_layer (db::LayerProperties (1, 0, "NAME"));
+
+  db::Cell &xcell = layout_org.cell (layout_org.add_cell ("X"));
+  db::Shape shape = xcell.shapes (l1).insert (db::BoxWithProperties (db::Box (0, 0, 1000, 2000), db::properties_id (ps1)));
+
+  db::Cell &ycell = layout_org.cell (layout_org.add_cell ("Y"));
+  db::Instance instance = xcell.insert (db::CellInstArrayWithProperties (db::CellInstArray (ycell.cell_index (), db::Trans ()), db::properties_id (ps2)));
+
+  EXPECT_EQ (p2s (shape.prop_id ()), "{#17=>##2.5,'prop_name'=>[dbox:(0,0;1.5,2.5)]}");
+  EXPECT_EQ (p2s (instance.prop_id ()), "{#42=>'A string','prop_name2'=>(#17,'X')}");
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_205.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  layout_org.clear ();
+
+  {
+    db::Layout layout_read;
+
+    {
+      tl::InputStream in (tmp_file);
+      db::Reader reader (in);
+      reader.read (layout_read);
+    }
+
+    unsigned int l1 = layout_read.get_layer (db::LayerProperties (1, 0));
+    auto xc = layout_read.cell_by_name ("X");
+    tl_assert (xc.first);
+    const db::Cell &xcell = layout_read.cell (xc.second);
+
+    auto s = xcell.shapes (l1).begin (db::ShapeIterator::All);
+    tl_assert (! s.at_end ());
+    EXPECT_EQ (p2s (s->prop_id ()), "{#17=>'2.5'}");
+
+    auto i = xcell.begin ();
+    tl_assert (! i.at_end ());
+    EXPECT_EQ (p2s (i->prop_id ()), "{#42=>'A string'}");
+  }
+}
 

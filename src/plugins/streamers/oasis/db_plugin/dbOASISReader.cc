@@ -776,13 +776,13 @@ OASISReader::do_read (db::Layout &layout)
         get (id);
       }
 
-      if (! m_propnames.insert (std::make_pair (id, name)).second) {
+      if (! m_propnames.insert (std::make_pair (id, make_prop_value (name))).second) {
         error (tl::sprintf (tl::to_string (tr ("A PROPNAME with id %ld is present already")), id));
       }
 
       auto fw = m_propname_forward_references.find (id);
       if (fw != m_propname_forward_references.end ()) {
-        fw->second = db::property_names_id (name);
+        fw->second = db::property_names_id (make_prop_value (name));
       }
 
       reset_modal_variables ();
@@ -818,13 +818,13 @@ OASISReader::do_read (db::Layout &layout)
         get (id);
       }
 
-      if (! m_propstrings.insert (std::make_pair (id, name)).second) {
+      if (! m_propstrings.insert (std::make_pair (id, make_prop_value (name))).second) {
         error (tl::sprintf (tl::to_string (tr ("A PROPSTRING with id %ld is present already")), id));
       }
 
-      std::map<uint64_t, std::string>::iterator fw = m_propvalue_forward_references.find (id);
+      auto fw = m_propvalue_forward_references.find (id);
       if (fw != m_propvalue_forward_references.end ()) {
-        fw->second = name;
+        fw->second = db::property_values_id (make_prop_value (name));
       }
 
       reset_modal_variables ();
@@ -1028,6 +1028,13 @@ OASISReader::do_read (db::Layout &layout)
     }
   }
 
+  //  all forward references to property values must be resolved
+  for (std::map <uint64_t, db::property_values_id_type>::const_iterator fw = m_propvalue_forward_references.begin (); fw != m_propvalue_forward_references.end (); ++fw) {
+    if (fw->second == 0) {
+      error (tl::sprintf (tl::to_string (tr ("No property string defined for property string id %ld")), fw->first));
+    }
+  }
+
   //  Resolve forward references for stored shape and instance prop_ids.
   //  This makes these shape and instance property IDs valid
 
@@ -1216,6 +1223,32 @@ OASISReader::has_forward_refs (const db::PropertiesSet &properties)
   return false;
 }
 
+const std::string klayout_prop_string_prefix = "KLAYOUT_VALUE:";
+
+tl::Variant
+OASISReader::make_prop_value (const std::string &s)
+{
+  if (strncmp (s.c_str (), klayout_prop_string_prefix.c_str (), klayout_prop_string_prefix.size ()) == 0) {
+
+    tl::Extractor ex (s.c_str () + klayout_prop_string_prefix.size ());
+    try {
+
+      tl::Variant v;
+      ex.read (v);
+      return v;
+
+    } catch (tl::Exception &) {
+
+      warn (tl::sprintf (tl::to_string (tr ("Unable to decode special value string (%s) - keeping as a string")), s));
+      return tl::Variant (s);
+
+    }
+
+  } else {
+    return tl::Variant (s);
+  }
+}
+
 properties_id_type OASISReader::make_forward_properties_id (const db::PropertiesSet &properties)
 {
   //  NOTE: the forward properties ID scheme makes use of the fact that IDs
@@ -1331,9 +1364,9 @@ OASISReader::replace_forward_references_in_variant (tl::Variant &v)
   if (v.is_id ()) {
 
     uint64_t id = (uint64_t) v.to_id ();
-    std::map <uint64_t, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
+    auto fw = m_propvalue_forward_references.find (id);
     if (fw != m_propvalue_forward_references.end ()) {
-      v = tl::Variant (fw->second);
+      v = db::property_value (fw->second);
     } else {
       error (tl::sprintf (tl::to_string (tr ("No property value defined for property value id %ld")), id));
     }
@@ -1355,9 +1388,9 @@ OASISReader::replace_forward_references_in_variant (tl::Variant &v)
       for (std::vector<tl::Variant>::iterator ll = new_list.begin (); ll != new_list.end (); ++ll) {
         if (ll->is_id ()) {
           uint64_t id = (uint64_t) ll->to_id ();
-          std::map <uint64_t, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
+          auto fw = m_propvalue_forward_references.find (id);
           if (fw != m_propvalue_forward_references.end ()) {
-            *ll = tl::Variant (fw->second);
+            *ll = db::property_value (fw->second);
           } else {
             error (tl::sprintf (tl::to_string (tr ("No property value defined for property value id %ld")), id));
           }
@@ -1484,12 +1517,12 @@ OASISReader::read_properties ()
       uint64_t id;
       get (id);
 
-      std::map <uint64_t, std::string>::const_iterator cid = m_propnames.find (id);
+      auto cid = m_propnames.find (id);
       if (cid == m_propnames.end ()) {
         mm_last_property_name = db::property_names_id (tl::Variant (id, true /*dummy for id type*/));
         m_propname_forward_references.insert (std::make_pair (id, db::property_names_id_type (0)));
       } else {
-        mm_last_property_name = db::property_names_id (tl::Variant (cid->second));
+        mm_last_property_name = db::property_names_id (cid->second);
       }
 
     } else {
@@ -1498,7 +1531,7 @@ OASISReader::read_properties ()
         warn (tl::to_string (tr ("PROPERTY names must be references to PROPNAME ids in strict mode")));
       }
 
-      mm_last_property_name = db::property_names_id (tl::Variant (get_str ()));
+      mm_last_property_name = db::property_names_id (make_prop_value (get_str ()));
 
     }
   }
@@ -1547,7 +1580,7 @@ OASISReader::read_properties ()
         }
 
         if (m_read_properties) {
-          mm_last_value_list.get_non_const ().push_back (tl::Variant (get_str ()));
+          mm_last_value_list.get_non_const ().push_back (make_prop_value (get_str ()));
         } else {
           get_str ();
         }
@@ -1557,12 +1590,12 @@ OASISReader::read_properties ()
         uint64_t id;
         get (id);
         if (m_read_properties) {
-          std::map <uint64_t, std::string>::const_iterator sid = m_propstrings.find (id);
+          auto sid = m_propstrings.find (id);
           if (sid == m_propstrings.end ()) {
-            m_propvalue_forward_references.insert (std::make_pair (id, std::string ()));
+            m_propvalue_forward_references.insert (std::make_pair (id, db::property_values_id_type (0)));
             mm_last_value_list.get_non_const ().push_back (tl::Variant (id, true /*dummy for id type*/));
           } else {
-            mm_last_value_list.get_non_const ().push_back (tl::Variant (sid->second));
+            mm_last_value_list.get_non_const ().push_back (sid->second);
           }
         }
 

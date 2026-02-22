@@ -967,20 +967,35 @@ OASISWriter::write_ucoord (db::Coord c)
   }
 }
 
+const std::string klayout_prop_string_prefix = "KLAYOUT_VALUE:";
+
+std::string
+OASISWriter::make_prop_string (const tl::Variant &v)
+{
+  if (v.is_a_string ()) {
+    return v.to_stdstring ();
+  } else {
+    return klayout_prop_string_prefix + v.to_parsable_string ();
+  }
+}
+
 void
 OASISWriter::emit_propname_def (db::properties_id_type prop_id)
 {
-  auto props = db::properties (prop_id).to_map ();
+  auto props = db::properties (prop_id);
   for (auto p = props.begin (); p != props.end (); ++p) {
 
-    const tl::Variant &name = p->first;
-    const char *name_str = s_gds_property_name;
-    if (! make_gds_property (name)) {
-      name_str = name.to_string ();
+    const tl::Variant &name = db::property_name (p->first);
+    const tl::Variant &value = db::property_value (p->second);
+
+    std::string name_str (s_gds_property_name);
+    if (! value.is_a_string () || ! make_gds_property (name)) {
+      name_str = make_prop_string (name);
     }
+
     if (m_propnames.insert (std::make_pair (name_str, m_propname_id)).second) {
       write_record_id (7);
-      write_nstring (name_str);
+      write_nstring (name_str.c_str ());
       ++m_propname_id;
     }
 
@@ -992,38 +1007,50 @@ OASISWriter::emit_propstring_def (db::properties_id_type prop_id)
 {
   std::vector<tl::Variant> pv_list;
 
-  auto props = db::properties (prop_id).to_map ();
+  auto props = db::properties (prop_id);
   for (auto p = props.begin (); p != props.end (); ++p) {
 
     pv_list.clear ();
     const std::vector<tl::Variant> *pvl = &pv_list;
 
-    const tl::Variant &name = p->first;
-    if (! make_gds_property (name)) {
+    const tl::Variant &name = db::property_name (p->first);
+    const tl::Variant &value = db::property_value (p->second);
 
-      if (p->second.is_list ()) {
-        pvl = &p->second.get_list ();
-      } else if (!p->second.is_nil ()) {
+    if (! value.is_a_string () || ! make_gds_property (name)) {
+
+      if (value.is_list ()) {
+        pvl = &value.get_list ();
+      } else if (!value.is_nil ()) {
         pv_list.reserve (1);
-        pv_list.push_back (p->second);
+        pv_list.push_back (value);
+      }
+
+      for (std::vector<tl::Variant>::const_iterator pv = pvl->begin (); pv != pvl->end (); ++pv) {
+
+        if (!pv->is_double () && !pv->is_longlong () && !pv->is_ulonglong () && !pv->is_long () && !pv->is_ulong ()) {
+
+          std::string v = make_prop_string (*pv);
+
+          if (m_propstrings.insert (std::make_pair (v, m_propstring_id)).second) {
+            write_record_id (9);
+            write_bstring (v.c_str ());
+            ++m_propstring_id;
+          }
+
+        }
+
       }
 
     } else {
 
-      pv_list.reserve (2);
-      pv_list.push_back (name.to_ulong ());
-      pv_list.push_back (p->second.to_string ());
+      std::string v = make_prop_string (value);
 
-    }
-
-    for (std::vector<tl::Variant>::const_iterator pv = pvl->begin (); pv != pvl->end (); ++pv) {
-      if (!pv->is_double () && !pv->is_longlong () && !pv->is_ulonglong () && !pv->is_long () && !pv->is_ulong ()) {
-        if (m_propstrings.insert (std::make_pair (pv->to_string (), m_propstring_id)).second) {
-          write_record_id (9);
-          write_bstring (pv->to_string ());
-          ++m_propstring_id;
-        }
+      if (m_propstrings.insert (std::make_pair (v, m_propstring_id)).second) {
+        write_record_id (9);
+        write_bstring (v.c_str ());
+        ++m_propstring_id;
       }
+
     }
 
   }
@@ -2117,37 +2144,37 @@ OASISWriter::write_props (db::properties_id_type prop_id)
 {
   std::vector<tl::Variant> pv_list; 
 
-  auto props = db::properties (prop_id).to_map ();
-
+  auto props = db::properties (prop_id);
   for (auto p = props.begin (); p != props.end (); ++p) {
+
+    const tl::Variant &name = db::property_name (p->first);
+    const tl::Variant &value = db::property_value (p->second);
 
     m_progress.set (mp_stream->pos ());
 
-    const tl::Variant &name = p->first;
-
-    const char *name_str = s_gds_property_name;
+    std::string name_str (s_gds_property_name);
     bool sflag = true;
 
     pv_list.clear ();
     const std::vector<tl::Variant> *pvl = &pv_list;
 
-    if (! make_gds_property (name)) {
+    if (! value.is_a_string () || ! make_gds_property (name)) {
 
-      name_str = name.to_string ();
+      name_str = make_prop_string (name);
       sflag = false;
 
-      if (p->second.is_list ()) {
-        pvl = &p->second.get_list ();
-      } else if (!p->second.is_nil ()) {
+      if (value.is_list ()) {
+        pvl = &value.get_list ();
+      } else if (!value.is_nil ()) {
         pv_list.reserve (1);
-        pv_list.push_back (p->second);
+        pv_list.push_back (value);
       }
 
     } else {
 
       pv_list.reserve (2);
       pv_list.push_back (name.to_ulong ());
-      pv_list.push_back (p->second.to_string ());
+      pv_list.push_back (value);
 
     }
 
@@ -2157,7 +2184,7 @@ OASISWriter::write_props (db::properties_id_type prop_id)
 }
 
 void
-OASISWriter::write_property_def (const char *name_str, const tl::Variant &pv, bool sflag)
+OASISWriter::write_property_def (const std::string &name_str, const tl::Variant &pv, bool sflag)
 { 
   std::vector<tl::Variant> pvl;
   pvl.reserve (1);
@@ -2166,7 +2193,7 @@ OASISWriter::write_property_def (const char *name_str, const tl::Variant &pv, bo
 }
 
 void
-OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Variant> &pvl, bool sflag)
+OASISWriter::write_property_def (const std::string &name_str, const std::vector<tl::Variant> &pvl, bool sflag)
 { 
   bool same_name = (mm_last_property_name == name_str);
   bool same_value = (mm_last_value_list == pvl);
@@ -2203,7 +2230,7 @@ OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Var
       if (pni == m_propnames.end ()) {
         //  write the name itself, if not found in the property repository
         write_byte (info | 0x04);
-        write_nstring (name_str);
+        write_nstring (name_str.c_str ());
       } else {
         //  write the property ID
         write_byte (info | 0x06);
@@ -2253,7 +2280,7 @@ OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Var
 
         } else {
 
-          const char *pvs = v.to_string ();
+          std::string pvs = make_prop_string (v);
           std::map <std::string, uint64_t>::const_iterator pvi = m_propstrings.find (pvs);
 
           //  In strict mode always write property string ID's: before we have issued the table we can 
@@ -2264,11 +2291,11 @@ OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Var
           }
 
           if (pvi != m_propstrings.end ()) {
-            write_byte (13 + string_type (pvs));
+            write_byte (13 + string_type (pvs.c_str ()));
             write (pvi->second);
           } else {
-            write_byte (10 + string_type (pvs));
-            write_bstring (pvs);
+            write_byte (10 + string_type (pvs.c_str ()));
+            write_bstring (pvs.c_str ());
           }
 
         }

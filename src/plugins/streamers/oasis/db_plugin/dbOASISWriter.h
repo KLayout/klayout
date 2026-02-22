@@ -300,6 +300,7 @@ private:
 
   void reset_modal_variables ();
 
+  static std::string make_prop_string (const tl::Variant &v);
   void emit_propname_def (db::properties_id_type prop_id);
   void emit_propstring_def (db::properties_id_type prop_id);
   void write_insts (const std::set <db::cell_index_type> &cell_set);
@@ -307,8 +308,8 @@ private:
   void write_shapes (const db::LayerProperties &lprops, const db::Shapes &shapes);
 
   void write_props (db::properties_id_type prop_id);
-  void write_property_def (const char *name_str, const std::vector<tl::Variant> &pvl, bool sflag);
-  void write_property_def (const char *name_str, const tl::Variant &pv, bool sflag);
+  void write_property_def (const std::string &name_str, const std::vector<tl::Variant> &pvl, bool sflag);
+  void write_property_def (const std::string &name_str, const tl::Variant &pv, bool sflag);
   void write_pointlist (const std::vector<db::Vector> &pointlist, bool for_polygons);
 
   void write_inst_with_rep (const db::CellInstArray &inst, db::properties_id_type prop_id, const db::Vector &disp, const db::Repetition &rep);

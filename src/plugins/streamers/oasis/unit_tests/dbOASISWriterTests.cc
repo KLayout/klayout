@@ -33,6 +33,37 @@
 
 #include <cstdlib>
 
+namespace {
+
+static std::string p2s (db::properties_id_type pid)
+{
+  return db::properties (pid).to_dict_var ().to_parsable_string ();
+}
+
+/**
+ *  @brief Installs a temporary repository instance for testing
+ *
+ *  By using a temp instance, we do not disturb other tests.
+ */
+class TempPropertiesRepository
+{
+public:
+  TempPropertiesRepository ()
+  {
+    db::PropertiesRepository::replace_instance_temporarily (&m_temp);
+  }
+
+  ~TempPropertiesRepository ()
+  {
+    db::PropertiesRepository::replace_instance_temporarily (0);
+  }
+
+private:
+  db::PropertiesRepository m_temp;
+};
+
+}
+
 void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int compr, bool recompress, bool tables_at_end)
 {
   {
@@ -2098,5 +2129,70 @@ TEST(140)
     reader.read (gg);
 
     db::compare_layouts (_this, gg, tl::testdata () + "/oasis/dbOASISWriter40_au.gds", db::NoNormalization);
+  }
+}
+
+//  Writing enhanced properties to OASIS
+TEST(150)
+{
+  TempPropertiesRepository temp_pr;
+
+  db::Layout layout_org;
+
+  db::PropertiesSet ps;
+  tl::Variant list = tl::Variant::empty_list ();
+  list.push (tl::Variant (-1));
+  list.push (tl::Variant (2.5));
+  list.push (tl::Variant ("KLAYOUT_VALUE:h*ll*"));  //  a string that clashes with the annotation scheme
+  ps.insert (tl::Variant (17), list);
+  ps.insert (tl::Variant ("x"), tl::Variant (db::DBox (0, 0, 1.5, 2.5)));
+
+  db::properties_id_type ps_id = db::properties_id (ps);
+  EXPECT_EQ (p2s (ps_id), "{#17=>(#-1,##2.5,'KLAYOUT_VALUE:h*ll*'),'x'=>[dbox:(0,0;1.5,2.5)]}");
+
+  layout_org.prop_id (ps_id);
+
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter150a.oas"));
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    options.set_format ("OASIS");
+    EXPECT_EQ (options.get_option_by_name ("oasis_enhanced_properties").to_bool (), true);
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    db::Layout gg;
+    reader.set_warnings_as_errors (true);
+    reader.read (gg);
+
+    EXPECT_EQ (p2s (gg.prop_id ()), "{#17=>(#-1,##2.5,'KLAYOUT_VALUE:h*ll*'),'x'=>[dbox:(0,0;1.5,2.5)]}");
+
+  }
+
+  tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter150b.oas"));
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    options.set_format ("OASIS");
+    options.set_option_by_name ("oasis_enhanced_properties", false);
+    EXPECT_EQ (options.get_option_by_name ("oasis_enhanced_properties").to_bool (), false);
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    db::Layout gg;
+    reader.read (gg);
+
+    EXPECT_EQ (p2s (gg.prop_id ()), "{#17=>'(-1,2.5,KLAYOUT_VALUE:h*ll*)','x'=>'(0,0;1.5,2.5)'}");
+
   }
 }

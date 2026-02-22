@@ -78,20 +78,6 @@ struct vector_cmp_y
   }
 };
 
-/**
- *  @brief Determines whether a property shall be produced as S_GDS_PROPERTY
- */
-static bool 
-make_gds_property (const tl::Variant &name)
-{
-  //  We write S_GDS_PROPERTY properties, because that is the only way to write properties
-  //  with numerical keys
-  return (name.is_longlong () && name.to_longlong () < 0x8000 && name.to_longlong () >= 0) ||
-         (name.is_ulonglong () && name.to_ulonglong () < 0x8000) ||
-         (name.is_long () && name.to_long () < 0x8000 && name.to_long () >= 0) ||
-         (name.is_ulong () && name.to_ulong () < 0x8000);
-}
-
 // ---------------------------------------------------------------------------------
 
 /**
@@ -970,13 +956,44 @@ OASISWriter::write_ucoord (db::Coord c)
 const std::string klayout_prop_string_prefix = "KLAYOUT_VALUE:";
 
 std::string
-OASISWriter::make_prop_string (const tl::Variant &v)
+OASISWriter::make_prop_string (const tl::Variant &v) const
 {
-  if (v.is_a_string ()) {
+  if (! m_options.enhanced_property_types) {
+
     return v.to_stdstring ();
+
+  } else if (v.is_a_string ()) {
+
+    std::string s = v.to_stdstring ();
+
+    //  if the string starts with the prefix, encode it using the prefixed notation
+    if (strncmp (s.c_str (), klayout_prop_string_prefix.c_str (), klayout_prop_string_prefix.size ()) == 0) {
+      return klayout_prop_string_prefix + v.to_parsable_string ();
+    } else {
+      return s;
+    }
+
   } else {
+
     return klayout_prop_string_prefix + v.to_parsable_string ();
+
   }
+}
+
+bool
+OASISWriter::make_gds_property (const tl::Variant &name, const tl::Variant &value) const
+{
+  //  Only strings will become GDS properties in enhanced properties mode
+  if (m_options.enhanced_property_types && !value.is_a_string ()) {
+    return false;
+  }
+
+  //  We write S_GDS_PROPERTY properties, because that is the only way to write properties
+  //  with numerical keys
+  return (name.is_longlong () && name.to_longlong () < 0x8000 && name.to_longlong () >= 0) ||
+         (name.is_ulonglong () && name.to_ulonglong () < 0x8000) ||
+         (name.is_long () && name.to_long () < 0x8000 && name.to_long () >= 0) ||
+         (name.is_ulong () && name.to_ulong () < 0x8000);
 }
 
 void
@@ -989,7 +1006,7 @@ OASISWriter::emit_propname_def (db::properties_id_type prop_id)
     const tl::Variant &value = db::property_value (p->second);
 
     std::string name_str (s_gds_property_name);
-    if (! value.is_a_string () || ! make_gds_property (name)) {
+    if (! make_gds_property (name, value)) {
       name_str = make_prop_string (name);
     }
 
@@ -1016,7 +1033,7 @@ OASISWriter::emit_propstring_def (db::properties_id_type prop_id)
     const tl::Variant &name = db::property_name (p->first);
     const tl::Variant &value = db::property_value (p->second);
 
-    if (! value.is_a_string () || ! make_gds_property (name)) {
+    if (! make_gds_property (name, value)) {
 
       if (value.is_list ()) {
         pvl = &value.get_list ();
@@ -2158,7 +2175,7 @@ OASISWriter::write_props (db::properties_id_type prop_id)
     pv_list.clear ();
     const std::vector<tl::Variant> *pvl = &pv_list;
 
-    if (! value.is_a_string () || ! make_gds_property (name)) {
+    if (! make_gds_property (name, value)) {
 
       name_str = make_prop_string (name);
       sflag = false;

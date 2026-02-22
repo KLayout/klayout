@@ -300,7 +300,9 @@ private:
 
   void reset_modal_variables ();
 
-  static std::string make_prop_string (const tl::Variant &v);
+  std::string make_prop_string (const tl::Variant &v) const;
+  bool make_gds_property (const tl::Variant &name, const tl::Variant &value) const;
+
   void emit_propname_def (db::properties_id_type prop_id);
   void emit_propstring_def (db::properties_id_type prop_id);
   void write_insts (const std::set <db::cell_index_type> &cell_set);

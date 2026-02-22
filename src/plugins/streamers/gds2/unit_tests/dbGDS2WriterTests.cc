@@ -1989,3 +1989,62 @@ TEST(205_extended_props)
   }
 }
 
+//  Tests the ability to store huge strings, polygons and lists
+TEST(206_large_props)
+{
+  TempPropertiesRepository temp_pr;
+
+  db::GDS2WriterOptions gds2_opt;
+  db::SaveLayoutOptions options;
+  options.set_options (gds2_opt);
+
+  tl::Variant large_list = tl::Variant::empty_list ();
+  std::string large_string;
+  large_string.reserve (size_t (150000));
+  for (int i = 0; i < 30000; ++i) {
+    large_string += tl::to_string (i);
+    large_list.push (i);
+  }
+
+  int npoints = 10000;
+  double r = 10000000.0;
+  std::vector<db::Point> points;
+  points.reserve (size_t (npoints));
+  for (int i = 0; i < npoints; ++i) {
+    double a = M_PI * 2.0 * i / double (npoints);
+    points.push_back (db::Point (r * sin (a), r * cos (a)));
+  }
+  db::SimplePolygon large_polygon;
+  large_polygon.assign_hull (points.begin (), points.end ());
+
+  db::PropertiesSet ps1;
+  ps1.insert (tl::Variant (1), large_string);
+  ps1.insert (tl::Variant (2), large_list);
+  ps1.insert (tl::Variant (3), large_polygon);
+
+  auto ps1_id = db::properties_id (ps1);
+
+  db::Layout layout_org;
+  layout_org.prop_id (ps1_id);
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_206.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  layout_org.clear ();
+
+  db::Layout layout_read;
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (layout_read.prop_id (), ps1_id);
+}
+

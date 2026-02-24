@@ -245,6 +245,8 @@ LayoutViewWidget::remove_notification (const LayoutViewNotification &notificatio
 void
 LayoutViewWidget::notification_action (const LayoutViewNotification &notification, const std::string &action)
 {
+  BEGIN_PROTECTED
+
   if (action == "reload") {
 
     std::string fn = notification.parameter ().to_string ();
@@ -259,6 +261,8 @@ LayoutViewWidget::notification_action (const LayoutViewNotification &notificatio
     remove_notification (notification);
 
   }
+
+  END_PROTECTED
 }
 
 void

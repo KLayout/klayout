@@ -187,7 +187,6 @@ private:
   void write_cell (db::Layout &layout, const db::Cell &cref, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers,
                    const std::set <db::cell_index_type> &cell_set, double sf, short *time_data);
   void write_shape (const db::Layout &layout, int layer, int datatype, const db::Shape &shape, double sf);
-  void collect_property_ids (std::set<db::properties_id_type> &property_ids, const db::Layout &layout, const std::vector<cell_index_type> &cells, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers);
   void build_property_translations (const db::Layout &layout, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, const std::vector <db::cell_index_type> &cells, const db::GDS2WriterOptions &gds2_options);
   void get_property_map_context (std::vector <std::string> &context_strings);
 };

@@ -496,11 +496,10 @@ GDS2WriterBase::build_property_translations (const db::Layout &layout, const std
 
     for (auto l = layers.begin (); l != layers.end (); ++l) {
       const db::Shapes &shapes = cell.shapes (l->first);
-      for (auto s = shapes.begin (db::ShapeIterator::AllWithProperties); ! s.at_end (); ++s) {
+      for (auto s = shapes.begin (db::ShapeIterator::AllWithProperties); ! s.at_end (); s.finish_array ()) {
         if (s->prop_id () != 0) {
           prop_ids.insert (s->prop_id ());
         }
-        s.finish_array ();
       }
     }
 
@@ -1365,40 +1364,6 @@ GDS2WriterBase::write_string_record (short record, const std::string &t)
   write_record_size (uint16_t (rs));
   write_record (record);
   write_string (t);
-}
-
-void
-GDS2WriterBase::collect_property_ids (std::set<db::properties_id_type> &property_ids, const db::Layout &layout, const std::vector<cell_index_type> &cells, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers)
-{
-  if (layout.prop_id () != 0) {
-    property_ids.insert (layout.prop_id ());
-  }
-
-  for (auto cell = cells.begin (); cell != cells.end (); ++cell) {
-
-    const db::Cell &cref (layout.cell (*cell));
-
-    if (cref.prop_id () != 0) {
-      property_ids.insert (cref.prop_id ());
-    }
-
-    for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
-      if (inst->has_prop_id () && inst->prop_id () != 0) {
-        property_ids.insert (inst->prop_id ());
-      }
-    }
-
-    for (auto l = layers.begin (); l != layers.end (); ++l) {
-      db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Properties | db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Texts));
-      while (! shape.at_end ()) {
-        if (shape->has_prop_id () && shape->prop_id () != 0) {
-          property_ids.insert (shape->prop_id ());
-        }
-        shape.finish_array ();
-      }
-    }
-
-  }
 }
 
 } // namespace db

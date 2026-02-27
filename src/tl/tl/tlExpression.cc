@@ -3947,15 +3947,29 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> 
       }
 
       if (dbu_units) {
+
         //  round to integers and check whether that is possible
         double gg = g;
         g = floor (0.5 + g);
         if (fabs (g) < 1e12 && fabs (g - gg) > 1e-3) {
           throw EvalError (tl::to_string (tr ("Value is not a multiple of the database unit")), ex1);
         }
+
+        n.reset (new ConstantExpressionNode (ex1, tl::Variant (g)));
+
+      } else {
+
+        tl::Variant v (g);
+
+        //  prefer integers
+        if (g - floor (g) == 0.0 && v.can_convert_to_long ()) {
+          n.reset (new ConstantExpressionNode (ex1, tl::Variant (v.to_long ())));
+        } else {
+          n.reset (new ConstantExpressionNode (ex1, v));
+        }
+
       }
 
-      n.reset (new ConstantExpressionNode (ex1, tl::Variant (g)));
 
     }
 

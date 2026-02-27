@@ -1263,3 +1263,71 @@ TEST(20)
   EXPECT_EQ (v.to_string (), std::string ("0.3"));
 }
 
+namespace
+{
+
+class MyContextHandler
+  : public tl::ContextHandler
+{
+public:
+  MyContextHandler () { }
+
+  virtual tl::Variant eval_bracket (const std::string &content) const
+  {
+    return tl::Variant (content);
+  }
+
+  virtual tl::Variant eval_double_bracket (const std::string &content) const
+  {
+    return tl::Variant ("{" + content + "}");
+  }
+
+  virtual double dbu () const
+  {
+    return 0.25;
+  }
+};
+
+}
+
+// with context handler
+TEST(21)
+{
+  tl::Eval e;
+  MyContextHandler ctx;
+  e.set_ctx_handler (&ctx);
+
+  tl::Variant v;
+  v = e.parse ("1um").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##4"));
+  v = e.parse ("250nm").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##1"));
+  v = e.parse ("2mm").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##8000"));
+  v = e.parse ("2m").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##8000000"));
+  v = e.parse ("1um2+0.5um2").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##24"));
+  v = e.parse ("1mm2").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##16000000"));
+  v = e.parse ("1m2").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##16000000000000"));
+  v = e.parse ("<<xxx>>").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("'{xxx}'"));
+  v = e.parse ("<yyy>").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("'yyy'"));
+
+  e.set_ctx_handler (0);
+  try {
+    v = e.parse ("1um").execute ();
+    EXPECT_EQ (0, 1);
+  } catch (...) {
+  }
+
+  tl::Eval es (0, true /*sloppy*/);
+  v = es.parse ("1.5").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##1.5"));
+  v = es.parse ("1.5um").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("nil"));
+}
+

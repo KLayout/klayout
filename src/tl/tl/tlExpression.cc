@@ -3789,15 +3789,17 @@ Eval::read_number (ExpressionParserContext &ex, tl::Variant &t)
 
     } else {
 
-      if (m_sloppy) {
-        t = tl::Variant (t.to_double () * f);
-      } else {
-        double gg = t.to_double ();
-        double g = floor (0.5 + t.to_double ());
+      double gg = t.to_double () * f;
+
+      if (! m_sloppy) {
+        //  check, if the result is an integer
+        double g = floor (0.5 + gg);
         if (fabs (g) < 1e12 && fabs (g - gg) > 1e-3) {
           throw EvalError (tl::to_string (tr ("Value is not a multiple of the database unit")), ex1);
         }
       }
+
+      t = tl::Variant (gg);
 
     }
 

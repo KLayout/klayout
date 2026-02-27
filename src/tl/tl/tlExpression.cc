@@ -3722,12 +3722,96 @@ get_variable_name (tl::Extractor &ex, std::string &name)
   }
 }
 
+bool
+Eval::read_number (ExpressionParserContext &ex, tl::Variant &t)
+{
+  ExpressionParserContext exl = ex, exd = ex, ex1 = ex;
+
+  long long l = 0;
+  double d = 0.0;
+  bool is_long = exl.try_read (l);
+  bool is_double = exd.try_read (d);
+
+  if (! is_long && ! is_double) {
+
+    return false;
+
+  } else if ((is_long && ! is_double) || (is_long && is_double && exl.get () >= exd.get ())) {
+
+    ex = exl;
+
+    if (l <= (long long) std::numeric_limits<long>::max () && l >= (long long) std::numeric_limits<long>::min ()) {
+      t = tl::Variant (long (l));
+    } else {
+      t = tl::Variant (l);
+    }
+
+  } else {
+
+    ex = exd;
+    t = tl::Variant (d);
+
+  }
+
+  double f = 0.0;
+  double dbu = ctx_handler () ? ctx_handler ()->dbu () : 1.0;
+
+  if (ex.test ("um2") || ex.test("micron2") || ex.test ("mic2")) {
+    f = 1.0 / (dbu * dbu);
+  } else if (ex.test ("nm2")) {
+    f = 1e-6 / (dbu * dbu);
+  } else if (ex.test ("mm2")) {
+    f = 1e6 / (dbu * dbu);
+  } else if (ex.test ("m2")) {
+    f = 1e12 / (dbu * dbu);
+  } else if (ex.test ("bs")) {
+    f = 0.005 / dbu;
+  } else if (ex.test ("nm")) {
+    f = 1e-3 / dbu;
+  } else if (ex.test ("um") || ex.test("micron") || ex.test ("mic")) {
+    f = 1.0 / dbu;
+  } else if (ex.test ("mm")) {
+    f = 1e3 / dbu;
+  } else if (ex.test ("m")) {
+    f = 1e6 / dbu;
+  }
+
+  //  DBU conversion
+  if (f != 0.0) {
+
+    if (! ctx_handler ()) {
+
+      if (m_sloppy) {
+        t = tl::Variant ();
+      } else {
+        throw EvalError (tl::to_string (tr ("Length or area value with unit requires a layout context")), ex1);
+      }
+
+    } else {
+
+      if (m_sloppy) {
+        t = tl::Variant (t.to_double () * f);
+      } else {
+        double gg = t.to_double ();
+        double g = floor (0.5 + t.to_double ());
+        if (fabs (g) < 1e12 && fabs (g - gg) > 1e-3) {
+          throw EvalError (tl::to_string (tr ("Value is not a multiple of the database unit")), ex1);
+        }
+      }
+
+    }
+
+  }
+
+  return true;
+}
+
 void
 Eval::eval_atomic (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n, int am)
 {
-  double g = 0.0;
   int match_group = 0;
   std::string t;
+  tl::Variant g;
 
   ExpressionParserContext ex1 = ex;
   if (ex.test ("(")) {
@@ -3881,97 +3965,9 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> 
 
     n.reset (new ConstantExpressionNode (ex1, tl::Variant (x)));
 
-  } else if (ex.try_read (g)) {
+  } else if (read_number (ex, g)) {
 
-    bool dbu_units = false;
-
-    if (ex.test ("um2") || ex.test("micron2") || ex.test ("mic2")) {
-      dbu_units = true;
-      if (ctx_handler ()) {
-        g *= 1.0 / (ctx_handler ()->dbu () * ctx_handler ()->dbu ());
-      }
-    } else if (ex.test ("nm2")) {
-      dbu_units = true;
-      if (ctx_handler ()) {
-        g *= 1e-6 / (ctx_handler ()->dbu () * ctx_handler ()->dbu ());
-      }
-    } else if (ex.test ("mm2")) {
-      dbu_units = true;
-      if (ctx_handler ()) {
-        g *= 1e6 / (ctx_handler ()->dbu () * ctx_handler ()->dbu ());
-      }
-    } else if (ex.test ("m2")) {
-      dbu_units = true;
-      if (ctx_handler ()) {
-        g *= 1e12 / (ctx_handler ()->dbu () * ctx_handler ()->dbu ());
-      }
-    } else if (ex.test ("bs")) {
-      dbu_units = true;
-      if (ctx_handler ()) {
-        g *= 0.005 / ctx_handler ()->dbu ();
-      }
-    } else if (ex.test ("nm")) {
-      dbu_units = true;
-      if (ctx_handler ()) {
-        g *= 1e-3 / ctx_handler ()->dbu ();
-      }
-    } else if (ex.test ("um") || ex.test("micron") || ex.test ("mic")) {
-      dbu_units = true;
-      if (ctx_handler ()) {
-        g *= 1.0 / ctx_handler ()->dbu ();
-      }
-    } else if (ex.test ("mm")) {
-      dbu_units = true;
-      if (ctx_handler ()) {
-        g *= 1e3 / ctx_handler ()->dbu ();
-      }
-    } else if (ex.test ("m")) {
-      dbu_units = true;
-      if (ctx_handler ()) {
-        g *= 1e6 / ctx_handler ()->dbu ();
-      }
-    }
-
-    if (m_sloppy) {
-
-      if (dbu_units && ! ctx_handler ()) {
-        n.reset (new ConstantExpressionNode (ex1, tl::Variant ()));
-      } else {
-        n.reset (new ConstantExpressionNode (ex1, tl::Variant (g)));
-      }
-
-    } else {
-
-      if (dbu_units && ! ctx_handler ()) {
-        throw EvalError (tl::to_string (tr ("Length or area value with unit requires a layout context")), ex1);
-      }
-
-      if (dbu_units) {
-
-        //  round to integers and check whether that is possible
-        double gg = g;
-        g = floor (0.5 + g);
-        if (fabs (g) < 1e12 && fabs (g - gg) > 1e-3) {
-          throw EvalError (tl::to_string (tr ("Value is not a multiple of the database unit")), ex1);
-        }
-
-        n.reset (new ConstantExpressionNode (ex1, tl::Variant (g)));
-
-      } else {
-
-        tl::Variant v (g);
-
-        //  prefer integers
-        if (g - floor (g) == 0.0 && v.can_convert_to_long ()) {
-          n.reset (new ConstantExpressionNode (ex1, tl::Variant (v.to_long ())));
-        } else {
-          n.reset (new ConstantExpressionNode (ex1, v));
-        }
-
-      }
-
-
-    }
+    n.reset (new ConstantExpressionNode (ex1, g));
 
   } else if (ex.try_read_quoted (t)) {
 

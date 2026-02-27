@@ -40,12 +40,12 @@ class TLTest(unittest.TestCase):
     self.assertEqual(str(type(res)).replace("class", "type"), "<type 'NoneType'>")
     self.assertEqual(repr(res), "None")
 
-    expr = pya.Expression.eval("1+2")
+    expr = pya.Expression.eval("1+2.0")
     self.assertEqual(str(type(expr)).replace("class", "type"), "<type 'float'>")
     self.assertEqual(repr(expr), "3.0")
 
     expr = pya.Expression()
-    expr.text = "1+2"
+    expr.text = "1+2.0"
     res = expr.eval()
     self.assertEqual(str(type(res)).replace("class", "type"), "<type 'float'>")
     self.assertEqual(str(res), "3.0")

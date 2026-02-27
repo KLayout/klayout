@@ -1928,9 +1928,9 @@ TEST(205_extended_props)
   TempPropertiesRepository temp_pr;
 
   db::SaveLayoutOptions options;
-  EXPECT_EQ (options.get_option_by_name ("extended_features").to_bool (), true);
-  options.set_option_by_name ("extended_features", false);
-  EXPECT_EQ (options.get_option_by_name ("extended_features").to_bool (), false);
+  EXPECT_EQ (options.get_option_by_name ("gds2_extended_features").to_bool (), true);
+  options.set_option_by_name ("gds2_extended_features", false);
+  EXPECT_EQ (options.get_option_by_name ("gds2_extended_features").to_bool (), false);
 
   db::PropertiesSet ps1;
   ps1.insert (tl::Variant ("prop_name"), db::DBox (0, 0, 1.5, 2.5));

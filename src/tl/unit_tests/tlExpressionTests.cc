@@ -60,6 +60,8 @@ TEST(1)
   v = e.parse ("7%4").execute ();
   EXPECT_EQ (v.to_string (), std::string ("3"));
   v = e.parse ("2+3/2").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("3"));
+  v = e.parse ("2+3/2.0").execute ();
   EXPECT_EQ (v.to_string (), std::string ("3.5"));
 
   v = e.parse ("to_i(1)*to_i(2)").execute ();
@@ -650,13 +652,57 @@ TEST(2)
   EXPECT_EQ (v.to_string (), std::string ("2"));
 }
 
-//  to_double
+//  numerical constants
 TEST(3)
 {
   tl::Eval e;
   tl::Variant v;
 
-  v = e.parse ("[1,2,3]/2").execute ();
+  v = e.parse ("2.5+1 ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##3.5"));
+  v = e.parse ("-2.5+1 ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##-1.5"));
+  v = e.parse ("2+1   ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("#3"));
+  v = e.parse ("-2+1   ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("#-1"));
+  v = e.parse ("2.0+1 ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##3"));
+  v = e.parse ("-2.0+1 ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##-1"));
+  v = e.parse ("2.+1  ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##3"));
+  v = e.parse ("-2.+1  ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##-1"));
+  v = e.parse ("2.e1+1  ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##21"));
+  v = e.parse ("-2.e1+1  ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##-19"));
+  v = e.parse ("2e-1+1  ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##1.2"));
+  v = e.parse ("-2e-1+1  ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##0.8"));
+  v = e.parse (".2e+1+1  ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##3"));
+  v = e.parse ("-.2e+1+1  ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##-1"));
+  v = e.parse (".2+1  ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##1.2"));
+  v = e.parse ("-.2+1  ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##0.8"));
+  v = e.parse ("0.2+1  ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##1.2"));
+  v = e.parse ("-0.2+1  ").execute ();
+  EXPECT_EQ (v.to_parsable_string (), std::string ("##0.8"));
+}
+
+//  to_double
+TEST(4)
+{
+  tl::Eval e;
+  tl::Variant v;
+
+  v = e.parse ("[1,2,3]/2.0").execute ();
   EXPECT_EQ (v.to_string (), std::string ("1.5"));
 }
 

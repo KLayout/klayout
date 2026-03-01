@@ -50,7 +50,7 @@ class Tl_TestClass < TestBase
     expr = RBA::Expression::new
     expr.text = "1+2"
     res = expr.eval
-    assert_equal(res.class.to_s, "Integer")
+    assert_equal(res.class.to_s == "Fixnum" || res.class.to_s == "Integer", true)
     assert_equal(res.to_s, "3")
 
     expr = RBA::Expression::new

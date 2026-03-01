@@ -281,8 +281,6 @@ static void delete_layers1 (lay::LayoutViewBase *view, const std::vector<lay::La
 
 static unsigned int show_layout1 (lay::LayoutViewBase *view, db::Layout *layout, bool add_cellview)
 {
-  //  the layout gets held by the LayoutHandle object
-  layout->keep ();
   lay::LayoutHandle *handle = lay::LayoutHandle::find_layout (layout);
   if (! handle) {
     handle = new lay::LayoutHandle (layout, std::string ());
@@ -292,8 +290,6 @@ static unsigned int show_layout1 (lay::LayoutViewBase *view, db::Layout *layout,
 
 static unsigned int show_layout2 (lay::LayoutViewBase *view, db::Layout *layout, std::string &tech, bool add_cellview)
 {
-  //  the layout gets held by the LayoutHandle object
-  layout->keep ();
   lay::LayoutHandle *handle = lay::LayoutHandle::find_layout (layout);
   if (! handle) {
     handle = new lay::LayoutHandle (layout, std::string ());
@@ -304,8 +300,6 @@ static unsigned int show_layout2 (lay::LayoutViewBase *view, db::Layout *layout,
 
 static unsigned int show_layout3 (lay::LayoutViewBase *view, db::Layout *layout, std::string &tech, bool add_cellview, bool initialize_layers)
 {
-  //  the layout gets held by the LayoutHandle object
-  layout->keep ();
   lay::LayoutHandle *handle = lay::LayoutHandle::find_layout (layout);
   if (! handle) {
     handle = new lay::LayoutHandle (layout, std::string ());

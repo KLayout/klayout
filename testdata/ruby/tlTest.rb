@@ -40,14 +40,18 @@ class Tl_TestClass < TestBase
     assert_equal(res.to_s, "")
 
     expr = RBA::Expression.eval("1+2")
+    assert_equal(expr.class.to_s == "Fixnum" || expr.class.to_s == "Integer", true)
+    assert_equal(expr.to_s, "3")
+
+    expr = RBA::Expression.eval("1+2.0")
     assert_equal(expr.class.to_s, "Float")
     assert_equal(expr.to_s, "3.0")
 
     expr = RBA::Expression::new
     expr.text = "1+2"
     res = expr.eval
-    assert_equal(res.class.to_s, "Float")
-    assert_equal(res.to_s, "3.0")
+    assert_equal(res.class.to_s == "Fixnum" || res.class.to_s == "Integer", true)
+    assert_equal(res.to_s, "3")
 
     expr = RBA::Expression::new
     expr.var("a", 5)

@@ -117,7 +117,7 @@ TEST(4)
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("Metal:1,Metal2:5");
   opt.create_other_layers = true;
-  run_test (_this, "t4.dxf.gz", "t4_au.gds.gz", opt);
+  run_test (_this, "t4.dxf.gz", "t4_au_2.gds.gz", opt);
 }
 
 TEST(5)
@@ -127,7 +127,7 @@ TEST(5)
 
 TEST(6)
 {
-  run_test (_this, "t6.dxf.gz", "t6_au.gds.gz");
+  run_test (_this, "t6.dxf.gz", "t6_au_2.gds.gz");
 }
 
 TEST(7)
@@ -140,7 +140,7 @@ TEST(8)
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("Metal:4,Kommentare:3,Bemassung:2");
   opt.create_other_layers = true;
-  run_test (_this, "t8.dxf.gz", "t8_au.gds.gz", opt);
+  run_test (_this, "t8.dxf.gz", "t8_au_2.gds.gz", opt);
 }
 
 TEST(9)
@@ -148,7 +148,7 @@ TEST(9)
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("Bemassung:2,Metal:5,Kommentare:4");
   opt.create_other_layers = true;
-  run_test (_this, "t9.dxf.gz", "t9_au.gds.gz", opt);
+  run_test (_this, "t9.dxf.gz", "t9_au_2.gds.gz", opt);
 }
 
 TEST(10)
@@ -156,7 +156,7 @@ TEST(10)
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("METAL:1,KOMMENTARE:4");
   opt.create_other_layers = true;
-  run_test (_this, "t10.dxf.gz", "t10_au.gds.gz", opt);
+  run_test (_this, "t10.dxf.gz", "t10_au_2.gds.gz", opt);
 }
 
 TEST(11)
@@ -166,7 +166,7 @@ TEST(11)
 
 TEST(12)
 {
-  run_test (_this, "t12.dxf.gz", "t12_au.gds.gz");
+  run_test (_this, "t12.dxf.gz", "t12_au_2.gds.gz");
 }
 
 TEST(14)
@@ -174,7 +174,7 @@ TEST(14)
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("'A11-STRUKTUR__E_TYP_':10,A21_NITRID:11,'B11-KONTAKT':9,'B11-STRUKTUR':3,HELLFELD:7,MASKE:5,NORM_MIN_MAX_WAFER:6,RASTER:2,_BEGRENZUNG_A11_A21_A31_B1:8");
   opt.create_other_layers = true;
-  run_test (_this, "t14.dxf.gz", "t14_au.gds.gz", opt);
+  run_test (_this, "t14.dxf.gz", "t14_au_2.gds.gz", opt);
 }
 
 TEST(15)
@@ -182,7 +182,7 @@ TEST(15)
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("TEXT:4,IGBT:5,Wire:7,Ceramic:11,LAYER_1:14,Diode:18,'DBC TOP Plate':19,'Terminal Position':20");
   opt.create_other_layers = true;
-  run_test (_this, "t15.dxf.gz", "t15_au2_2.gds.gz", opt);
+  run_test (_this, "t15.dxf.gz", "t15_au2_3.gds.gz", opt);
 }
 
 TEST(16)
@@ -190,7 +190,7 @@ TEST(16)
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("TEXT:4,IGBT:5,Wire:7,Ceramic:11,LAYER_1:14,Diode:18,'DBC TOP Plate':19,'Terminal Position':20");
   opt.create_other_layers = true;
-  run_test (_this, "t16.dxf.gz", "t16_au2_2.gds.gz", opt);
+  run_test (_this, "t16.dxf.gz", "t16_au2_3.gds.gz", opt);
 }
 
 TEST(17)
@@ -198,32 +198,32 @@ TEST(17)
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("TEXT:4,IGBT:5,Wire:7,Ceramic:11,LAYER_1:14,Diode:18,'DBC TOP Plate':19,'Terminal Position':20");
   opt.create_other_layers = true;
-  run_test (_this, "t17.dxf.gz", "t17_au2_2.gds.gz", opt);
+  run_test (_this, "t17.dxf.gz", "t17_au2_3.gds.gz", opt);
 }
 
 TEST(18)
 {
-  run_test (_this, "t18.dxf.gz", "t18_au.gds.gz");
+  run_test (_this, "t18.dxf.gz", "t18_au_2.gds.gz");
 }
 
 TEST(19)
 {
-  run_test (_this, "t19.dxf.gz", "t19_au.gds.gz");
+  run_test (_this, "t19.dxf.gz", "t19_au_2.gds.gz");
 }
 
 TEST(20)
 {
-  run_test (_this, "t20.dxf.gz", "t20_au.gds.gz");
+  run_test (_this, "t20.dxf.gz", "t20_au_2.gds.gz");
 }
 
 TEST(21)
 {
-  run_test (_this, "t21.dxf.gz", "t21_au.gds.gz");
+  run_test (_this, "t21.dxf.gz", "t21_au_2.gds.gz");
 }
 
 TEST(22)
 {
-  run_test (_this, "t22.dxf.gz", "t22_au.gds.gz");
+  run_test (_this, "t22.dxf.gz", "t22_au_2.gds.gz");
 }
 
 TEST(23a)
@@ -233,7 +233,7 @@ TEST(23a)
   opt.unit = 1;
   opt.polyline_mode = 0;
   opt.circle_points = 10;
-  run_test (_this, "t23.dxf.gz", "t23a_au.gds.gz", opt);
+  run_test (_this, "t23.dxf.gz", "t23a_au_2.gds.gz", opt);
 }
 
 TEST(23b)
@@ -243,7 +243,7 @@ TEST(23b)
   opt.unit = 1;
   opt.polyline_mode = 1;
   opt.circle_points = 10;
-  run_test (_this, "t23.dxf.gz", "t23b_au.gds.gz", opt);
+  run_test (_this, "t23.dxf.gz", "t23b_au_2.gds.gz", opt);
 }
 
 TEST(23c)
@@ -253,7 +253,7 @@ TEST(23c)
   opt.unit = 1;
   opt.polyline_mode = 2;
   opt.circle_points = 10;
-  run_test (_this, "t23.dxf.gz", "t23c_au.gds.gz", opt);
+  run_test (_this, "t23.dxf.gz", "t23c_au_2.gds.gz", opt);
 }
 
 TEST(23d)
@@ -263,7 +263,7 @@ TEST(23d)
   opt.unit = 1;
   opt.polyline_mode = 3;
   opt.circle_points = 10;
-  run_test (_this, "t23.dxf.gz", "t23d_au.gds.gz", opt);
+  run_test (_this, "t23.dxf.gz", "t23d_au_2.gds.gz", opt);
 }
 
 TEST(23e)
@@ -273,7 +273,7 @@ TEST(23e)
   opt.unit = 1;
   opt.polyline_mode = 4;
   opt.circle_points = 10;
-  run_test (_this, "t23.dxf.gz", "t23e_au.gds.gz", opt);
+  run_test (_this, "t23.dxf.gz", "t23e_au_2.gds.gz", opt);
 }
 
 TEST(26a)
@@ -283,7 +283,7 @@ TEST(26a)
   opt.unit = 1;
   opt.polyline_mode = 0;
   opt.circle_points = 100;
-  run_test (_this, "t26.dxf.gz", "t26a_au.gds.gz", opt);
+  run_test (_this, "t26.dxf.gz", "t26a_au_2.gds.gz", opt);
 }
 
 TEST(26b)
@@ -293,7 +293,7 @@ TEST(26b)
   opt.unit = 1;
   opt.polyline_mode = 1;
   opt.circle_points = 100;
-  run_test (_this, "t26.dxf.gz", "t26b_au.gds.gz", opt);
+  run_test (_this, "t26.dxf.gz", "t26b_au_2.gds.gz", opt);
 }
 
 TEST(26c)
@@ -303,7 +303,7 @@ TEST(26c)
   opt.unit = 1;
   opt.polyline_mode = 2;
   opt.circle_points = 100;
-  run_test (_this, "t26.dxf.gz", "t26c_au.gds.gz", opt);
+  run_test (_this, "t26.dxf.gz", "t26c_au_2.gds.gz", opt);
 }
 
 TEST(26d)
@@ -313,7 +313,7 @@ TEST(26d)
   opt.unit = 1;
   opt.polyline_mode = 3;
   opt.circle_points = 100;
-  run_test (_this, "t26.dxf.gz", "t26d_au.gds.gz", opt);
+  run_test (_this, "t26.dxf.gz", "t26d_au_2.gds.gz", opt);
 }
 
 TEST(26e)
@@ -323,7 +323,7 @@ TEST(26e)
   opt.unit = 1;
   opt.polyline_mode = 4;
   opt.circle_points = 100;
-  run_test (_this, "t26.dxf.gz", "t26e_au.gds.gz", opt);
+  run_test (_this, "t26.dxf.gz", "t26e_au_2.gds.gz", opt);
 }
 
 TEST(27a)
@@ -438,7 +438,7 @@ TEST(30)
   opt.polyline_mode = 4;
   opt.circle_points = 1000;
   opt.circle_accuracy = 0.001;
-  run_test (_this, "t30.dxf.gz", "t30d_au.gds.gz", opt);
+  run_test (_this, "t30.dxf.gz", "t30d_au_2.gds.gz", opt);
 }
 
 //  accuracy
@@ -449,16 +449,16 @@ TEST(31)
   opt.unit = 1000;
 
   opt.contour_accuracy = 0;
-  run_test (_this, "t31.dxf.gz", "t31a_au.gds.gz", opt);
+  run_test (_this, "t31.dxf.gz", "t31a_au_2.gds.gz", opt);
 
   opt.contour_accuracy = 0.005;
-  run_test (_this, "t31.dxf.gz", "t31b_au.gds.gz", opt);
+  run_test (_this, "t31.dxf.gz", "t31b_au_2.gds.gz", opt);
 
   opt.contour_accuracy = 0.01;
-  run_test (_this, "t31.dxf.gz", "t31c_au.gds.gz", opt);
+  run_test (_this, "t31.dxf.gz", "t31c_au_2.gds.gz", opt);
 
   opt.contour_accuracy = 0.02;
-  run_test (_this, "t31.dxf.gz", "t31d_au.gds.gz", opt);
+  run_test (_this, "t31.dxf.gz", "t31d_au_2.gds.gz", opt);
 }
 
 //  issue #198
@@ -491,20 +491,20 @@ TEST(33)
   db::DXFReaderOptions opt;
   opt.polyline_mode = 3;
 
-  run_test (_this, "t33.dxf.gz", "t33a_au.gds.gz", opt);
+  run_test (_this, "t33.dxf.gz", "t33a_au_2.gds.gz", opt);
 
   opt.circle_accuracy = 1.0;
-  run_test (_this, "t33.dxf.gz", "t33b_au.gds.gz", opt);
+  run_test (_this, "t33.dxf.gz", "t33b_au_2.gds.gz", opt);
 
   opt.circle_accuracy = 50.0;
-  run_test (_this, "t33.dxf.gz", "t33c_au.gds.gz", opt);
+  run_test (_this, "t33.dxf.gz", "t33c_au_2.gds.gz", opt);
 
   opt.circle_accuracy = 0.0;
   opt.polyline_mode = 4;
-  run_test (_this, "t33.dxf.gz", "t33d_au.gds.gz", opt);
+  run_test (_this, "t33.dxf.gz", "t33d_au_2.gds.gz", opt);
 
   opt.polyline_mode = 2;
-  run_test (_this, "t33.dxf.gz", "t33e_au.gds.gz", opt);
+  run_test (_this, "t33.dxf.gz", "t33e_au_2.gds.gz", opt);
 }
 
 //  issue #1173

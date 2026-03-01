@@ -115,6 +115,16 @@ static bool get_gds2_write_timestamps (const db::SaveLayoutOptions *options)
   return options->get_options<db::GDS2WriterOptions> ().write_timestamps;
 }
 
+static void set_gds2_extended_features (db::SaveLayoutOptions *options, bool n)
+{
+  options->get_options<db::GDS2WriterOptions> ().extended_features = n;
+}
+
+static bool get_gds2_extended_features(const db::SaveLayoutOptions *options)
+{
+  return options->get_options<db::GDS2WriterOptions> ().extended_features;
+}
+
 static void set_gds2_default_text_size (db::SaveLayoutOptions *options, const tl::Variant &v)
 {
   options->get_options<db::GDS2WriterOptions> ().default_text_size = v.is_nil () ? -1.0 : v.to_double ();
@@ -189,6 +199,29 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
   gsi::method_ext ("gds2_write_timestamps?", &get_gds2_write_timestamps,
     "@brief Gets a value indicating whether the current time is written into the GDS2 timestamp fields\n"
     "\nThis property has been added in version 0.21.16.\n"
+  ) +
+  gsi::method_ext ("gds2_extended_features=", &set_gds2_extended_features, gsi::arg ("flag"),
+    "@brief Enables extended features if set to true\n"
+    "\n"
+    "With extended features enabled, the GDS2 writer will support the following features:\n"
+    "\n"
+    "@ul\n"
+    "@li Long property value strings and complex types such a lists @/li\n"
+    "@li Non-numerical property names - i.e. strings @/li\n"
+    "@li File and cell level properties in a backward compatible way and with the respective option turned off @/li\n"
+    "@li Layer names - this includes empty layers, so this is a way to indicate the presence of a layer without a shape on it @/li\n"
+    "@/ul\n"
+    "\n"
+    "KLayout uses the context to implement these features. Therefore, this option is not compatible with \\write_context_info off.\n"
+    "By default, this feature is enabled.\n"
+    "\n"
+    "\nThis property has been added in version 0.30.7.\n"
+  ) +
+  gsi::method_ext ("gds2_extended_features?", &get_gds2_extended_features,
+    "@brief Gets a value indicating whether extended features are enabled\n"
+    "See \\gds2_extended_features= for a description of the extended features.\n"
+    "\n"
+    "\nThis property has been added in version 0.30.7.\n"
   ) +
   gsi::method_ext ("gds2_default_text_size=", &set_gds2_default_text_size, gsi::arg ("size"),
     "@brief Specifies the default text size to use when a text does not have a size\n"

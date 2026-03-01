@@ -26,6 +26,7 @@
 #include "bdCommon.h"
 
 #include <string>
+#include <vector>
 
 namespace tl
 {
@@ -59,6 +60,11 @@ public:
    *  The "options" object specifies the defaults to be used.
    */
   GenericWriterOptions (const db::SaveLayoutOptions &options);
+
+  /**
+   *  @brief Gets a list with all format names available
+   */
+  static std::vector<std::string> all_format_names ();
 
   /**
    *  @brief Adds the generic options to the command line parser object
@@ -114,6 +120,7 @@ public:
   static const std::string mag_format_name;
 
 private:
+  std::string m_format;
   double m_scale_factor;
   double m_dbu;
   bool m_dont_write_empty_cells;
@@ -132,6 +139,7 @@ private:
   bool m_gds2_write_cell_properties;
   bool m_gds2_write_file_properties;
   double m_gds2_default_text_size;
+  bool m_gds2_extended_features;
 
   int m_oasis_compression_level;
   bool m_oasis_write_cblocks;

@@ -209,7 +209,21 @@ GDS2WriterBase::write_context_string (size_t n, const std::string &s)
 }
 
 void
-GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, const std::vector<db::cell_index_type> &cells)
+GDS2WriterBase::get_property_map_context (std::vector<std::string> &context_strings)
+{
+  for (auto i = m_prop_name_placeholders.begin (); i != m_prop_name_placeholders.end (); ++i) {
+    context_strings.push_back (std::string ());
+    context_strings.back () = "PROP_NAME(" + tl::to_string (int (i->second)) + ")=" + i->first.to_parsable_string ();
+  }
+
+  for (auto i = m_prop_value_placeholders.begin (); i != m_prop_value_placeholders.end (); ++i) {
+    context_strings.push_back (std::string ());
+    context_strings.back () = "PROP_VALUE(" + tl::to_quoted_string (i->second) + ")=" + i->first.to_parsable_string ();
+  }
+}
+
+void
+GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, const std::vector<db::cell_index_type> &cells, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, const db::GDS2WriterOptions &gds2_options)
 {
   write_record_size (4 + 12 * 2);
   write_record (sBGNSTR);
@@ -220,7 +234,37 @@ GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, 
 
   std::vector <std::string> context_prop_strings;
 
-  if (layout.has_context_info ()) {
+  layout.get_context_info (context_prop_strings);
+  get_property_map_context (context_prop_strings);
+
+  //  Add file properties if needed
+
+  if (layout.prop_id () != 0 && ! gds2_options.write_file_properties && gds2_options.extended_features) {
+
+    const auto &props = db::properties (layout.prop_id ());
+    for (auto p = props.begin (); p != props.end (); ++p) {
+      const tl::Variant &pn = db::property_name (p->first);
+      const tl::Variant &pv = db::property_value (p->second);
+      context_prop_strings.push_back (std::string ());
+      context_prop_strings.back () = "PROP(" + pn.to_parsable_string () + ")=" + pv.to_parsable_string ();
+    }
+
+  }
+
+  //  Add layer names if needed
+
+  if (gds2_options.extended_features) {
+
+    for (auto l = layers.begin (); l != layers.end (); ++l) {
+      if (! l->second.name.empty ()) {
+        context_prop_strings.push_back (std::string ());
+        context_prop_strings.back () = "LNAME(" + tl::to_string (l->second.layer) + "," + tl::to_string (l->second.datatype) + ")=" + tl::to_quoted_string (l->second.name);
+      }
+    }
+
+  }
+
+  if (! context_prop_strings.empty ()) {
 
     //  Use a dummy BOUNDARY element to attach the global context
 
@@ -241,18 +285,12 @@ GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, 
       write_int (0);
     }
 
-    context_prop_strings.clear ();
-
-    if (layout.get_context_info (context_prop_strings)) {
-
-      //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
-      //  will arrive)
-      for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
-        --s;
-        size_t n = std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s);
-        write_context_string (n, *s);
-      }
-
+    //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
+    //  will arrive)
+    for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
+      --s;
+      size_t n = std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s);
+      write_context_string (n, *s);
     }
 
     write_record_size (4);
@@ -262,7 +300,26 @@ GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, 
 
   for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
 
-    if (layout.has_context_info (*cell)) {
+    context_prop_strings.clear ();
+    layout.get_context_info (*cell, context_prop_strings);
+
+    const db::Cell &cell_obj = layout.cell (*cell);
+
+    //  Add cell properties if needed
+
+    if (cell_obj.prop_id () != 0 && ! gds2_options.write_cell_properties && gds2_options.extended_features) {
+
+      const auto &props = db::properties (cell_obj.prop_id ());
+      for (auto p = props.begin (); p != props.end (); ++p) {
+        const tl::Variant &pn = db::property_name (p->first);
+        const tl::Variant &pv = db::property_value (p->second);
+        context_prop_strings.push_back (std::string ());
+        context_prop_strings.back () = "PROP(" + pn.to_parsable_string () + ")=" + pv.to_parsable_string ();
+      }
+
+    }
+
+    if (! context_prop_strings.empty ()) {
 
       write_record_size (4);
       write_record (sSREF);
@@ -274,18 +331,12 @@ GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, 
       write_int (0);
       write_int (0);
 
-      context_prop_strings.clear ();
-
-      if (layout.get_context_info (*cell, context_prop_strings)) {
-
-        //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
-        //  will arrive)
-        for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
-          --s;
-          size_t n = std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s);
-          write_context_string (n, *s);
-        }
-
+      //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
+      //  will arrive)
+      for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
+        --s;
+        size_t n = std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s);
+        write_context_string (n, *s);
       }
 
       write_record_size (4);
@@ -422,6 +473,128 @@ GDS2WriterBase::write_cell (db::Layout &layout, const db::Cell &cref, const std:
 }
 
 void
+GDS2WriterBase::build_property_translations (const db::Layout &layout, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, const std::vector <db::cell_index_type> &cells, const db::GDS2WriterOptions &gds2_options)
+{
+  std::set<db::properties_id_type> prop_ids;
+
+  if (layout.prop_id () != 0 && gds2_options.write_file_properties) {
+    prop_ids.insert (layout.prop_id ());
+  }
+
+  for (auto c = cells.begin (); c != cells.end (); ++c) {
+
+    const db::Cell &cell = layout.cell (*c);
+    if (cell.prop_id () != 0 && gds2_options.write_cell_properties) {
+      prop_ids.insert (cell.prop_id ());
+    }
+
+    for (auto i = cell.begin (); ! i.at_end (); ++i) {
+      if (i->prop_id () != 0) {
+        prop_ids.insert (i->prop_id ());
+      }
+    }
+
+    for (auto l = layers.begin (); l != layers.end (); ++l) {
+      const db::Shapes &shapes = cell.shapes (l->first);
+      for (auto s = shapes.begin (db::ShapeIterator::AllWithProperties); ! s.at_end (); s.finish_array ()) {
+        if (s->prop_id () != 0) {
+          prop_ids.insert (s->prop_id ());
+        }
+      }
+    }
+
+  }
+
+  const size_t max_string_length = 32768 - 6;
+
+  std::set<unsigned short> names_taken;
+  std::set<db::property_names_id_type> name_ids_to_translate;
+  std::set<db::property_values_id_type> value_ids_to_translate;
+
+  for (auto p = prop_ids.begin (); p != prop_ids.end (); ++p) {
+
+    const auto &props = db::properties (*p);
+    for (auto i = props.begin (); i != props.end (); ++i) {
+
+      const auto &pn = db::property_name (i->first);
+      const auto &pv = db::property_value (i->second);
+
+      if (pn.is_long ()) {
+        long iv = pn.to_long ();
+        if (iv > long (std::numeric_limits<unsigned short>::max ()) || iv < 0) {
+          name_ids_to_translate.insert (i->first);
+        } else {
+          names_taken.insert ((unsigned short) iv);
+        }
+      } else if (pn.is_ulong ()) {
+        unsigned long iv = pn.to_ulong ();
+        if (iv > (unsigned long) (std::numeric_limits<unsigned short>::max ())) {
+          name_ids_to_translate.insert (i->first);
+        } else {
+          names_taken.insert ((unsigned short) iv);
+        }
+      } else {
+        name_ids_to_translate.insert (i->first);
+      }
+
+      if (pv.is_array () || pv.is_list () || pv.is_user () ||
+          (pv.is_a_string () && strlen (pv.to_string ()) > max_string_length)) {
+        value_ids_to_translate.insert (i->second);
+      }
+
+    }
+
+  }
+
+  //  Assign unique numerical keys to names, starting with big numbers
+
+  for (auto i = name_ids_to_translate.begin (); i != name_ids_to_translate.end (); ++i) {
+    m_prop_name_placeholders.insert (std::make_pair (db::property_name (*i), (unsigned short) 0));
+  }
+
+  unsigned short key = 32768;
+  for (auto i = m_prop_name_placeholders.begin (); i != m_prop_name_placeholders.end (); ++i) {
+    while (key > 0 && names_taken.find (--key) != names_taken.end ())
+      ;
+    if (key == 0) {
+      //  if the key reaches zero, we cannot translate further non-numerical property keys
+      tl::warn << tl::to_string (tr ("Too many non-numerical property keys present - cannot map them to limited GDS property name space"));
+      m_prop_name_placeholders.clear ();
+      name_ids_to_translate.clear ();
+      break;
+    } else {
+      i->second = key;
+    }
+  }
+
+
+  for (auto i = name_ids_to_translate.begin (); i != name_ids_to_translate.end (); ++i) {
+    const auto &n = db::property_name (*i);
+    auto p = m_prop_name_placeholders.find (n);
+    tl_assert (p != m_prop_name_placeholders.end ());
+    m_prop_names_map.insert (std::make_pair (*i, tl::Variant (p->second)));
+  }
+
+  //  Assign "unique" placeholder strings for the values
+
+  for (auto i = value_ids_to_translate.begin (); i != value_ids_to_translate.end (); ++i) {
+    m_prop_value_placeholders.insert (std::make_pair (db::property_value (*i), std::string ()));
+  }
+  size_t value_index = 0;
+  for (auto i = m_prop_value_placeholders.begin (); i != m_prop_value_placeholders.end (); ++i) {
+    //  TODO: check if this value really is unique
+    i->second = tl::sprintf ("klayout-prop-value#%u:%x", ++value_index, i->first.hash ());
+  }
+
+  for (auto i = value_ids_to_translate.begin (); i != value_ids_to_translate.end (); ++i) {
+    const auto &v = db::property_value (*i);
+    auto p = m_prop_value_placeholders.find (v);
+    tl_assert (p != m_prop_value_placeholders.end ());
+    m_prop_values_map.insert (std::make_pair (*i, tl::Variant (p->second)));
+  }
+}
+
+void
 GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
 {
   set_stream (stream);
@@ -466,7 +639,20 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
     }
   }
 
+  //  collect property translations - these are needed to store properties with non-numerical keys
+  //  and non-scalar values.
+
+  m_prop_names_map.clear ();
+  m_prop_name_placeholders.clear ();
+  m_prop_values_map.clear ();
+  m_prop_value_placeholders.clear ();
+
+  if (options.write_context_info () && gds2_options.extended_features) {
+    build_property_translations (layout, layers, cells, gds2_options);
+  }
+
   //  get current time
+
   short time_data [6] = { 0, 0, 0, 0, 0, 0 };
   if (gds2_options.write_timestamps) {
     time_t ti = 0;
@@ -485,6 +671,8 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
   std::string str_time = tl::sprintf ("%d/%d/%d %d:%02d:%02d", time_data[1], time_data[2], time_data[0], time_data[3], time_data[4], time_data[5]); 
   layout.add_meta_info ("mod_time", MetaInfo (tl::to_string (tr ("Modification Time")), str_time));
   layout.add_meta_info ("access_time", MetaInfo (tl::to_string (tr ("Access Time")), str_time));
+
+  //  initialize options
 
   m_keep_instances = options.keep_instances ();
   m_multi_xy = gds2_options.multi_xy_records;
@@ -538,9 +726,14 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
   write_double (m_dbu / std::max (1e-9, gds2_options.user_units));
   write_double (m_dbu * 1e-6);
 
+  //  build property translation maps if possible
+  //  Property translation maps non-numeric property keys to numeric ones and
+  //  complex-type values to string ones. The neccessary maps are included in
+  //  the meta data
+
   //  layout properties 
 
-  if (gds2_options.write_file_properties && layout.prop_id () != 0) {
+  if (layout.prop_id () != 0 && gds2_options.write_file_properties) {
     try {
       write_properties (layout, layout.prop_id ());
     } catch (tl::Exception &ex) {
@@ -549,19 +742,36 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
   }
 
   //  write context info
+  //  A context info header ("context cell") is needed, if
+  //  * The layout or the cells explicitly need context info (meta data, library references etc.)
+  //  * layout or cell properties are present and "write_file_properties" or "write_cell_properties" is OFF.
+  //  * Property names or values need to be translated
+  //  * Named layers are present
   
   bool has_context = false;
 
   if (options.write_context_info ()) {
-    has_context = layout.has_context_info ();
-    for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end () && !has_context; ++cell) {
-      has_context = layout.has_context_info (*cell);
+
+    has_context = layout.has_context_info () ||
+                  (! m_prop_names_map.empty () || ! m_prop_values_map.empty ()) ||
+                  (layout.prop_id () != 0 && ! gds2_options.write_file_properties && gds2_options.extended_features);
+
+    for (auto cell = cells.begin (); cell != cells.end () && ! has_context; ++cell) {
+      has_context = layout.has_context_info (*cell) ||
+                    (layout.cell (*cell).prop_id () != 0 && ! gds2_options.write_cell_properties && gds2_options.extended_features);
     }
+
+    if (gds2_options.extended_features) {
+      for (auto layer = layers.begin (); layer != layers.end () && ! has_context; ++layer) {
+        has_context = ! layer->second.name.empty ();
+      }
+    }
+
   }
 
   if (has_context) {
     try {
-      write_context_cell (layout, time_data, cells);
+      write_context_cell (layout, time_data, cells, layers, gds2_options);
     } catch (tl::Exception &ex) {
       throw tl::Exception (ex.msg () + tl::to_string (tr (", writing context cell")));
     }
@@ -1106,10 +1316,14 @@ GDS2WriterBase::write_polygon (int layer, int datatype, double sf, const db::Sha
 void 
 GDS2WriterBase::write_properties (const db::Layout & /*layout*/, db::properties_id_type prop_id)
 {
-  auto props = db::properties (prop_id).to_map ();
+  auto props = db::properties (prop_id);
   for (auto p = props.begin (); p != props.end (); ++p) {
 
-    const tl::Variant &name = p->first;
+    auto pn = m_prop_names_map.find (p->first);
+    auto pv = m_prop_values_map.find (p->second);
+
+    const tl::Variant &value = (pv == m_prop_values_map.end ()) ? db::property_value (p->second) : pv->second;
+    const tl::Variant &name = (pn == m_prop_names_map.end ()) ? db::property_name (p->first) : pn->second;
 
     long attr = -1;
     if (name.can_convert_to_long ()) {
@@ -1122,7 +1336,7 @@ GDS2WriterBase::write_properties (const db::Layout & /*layout*/, db::properties_
       write_record (sPROPATTR);
       write_short ((int16_t) attr);
 
-      write_string_record (sPROPVALUE, p->second.to_string ());
+      write_string_record (sPROPVALUE, value.to_string ());
 
     }
 

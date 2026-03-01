@@ -616,6 +616,7 @@ private:
   void eval_unary (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
   void eval_atomic (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v, int am);
   void eval_suffix (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
+  bool read_number (ExpressionParserContext &ex, tl::Variant &t);
 
   static Eval m_global;
 };

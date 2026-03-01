@@ -166,8 +166,8 @@ private:
   std::map <uint64_t, db::properties_id_type> m_cellname_properties;
   std::map <uint64_t, std::string> m_textstrings;
   std::map <uint64_t, const db::StringRef *> m_text_forward_references;
-  std::map <uint64_t, std::string> m_propstrings;
-  std::map <uint64_t, std::string> m_propnames;
+  std::map <uint64_t, tl::Variant> m_propstrings;
+  std::map <uint64_t, tl::Variant> m_propnames;
 
   std::map <db::cell_index_type, std::vector<tl::Variant> > m_context_strings_per_cell;
 
@@ -179,7 +179,7 @@ private:
   bool m_read_all_properties;
 
   std::map <uint64_t, db::property_names_id_type> m_propname_forward_references;
-  std::map <uint64_t, std::string> m_propvalue_forward_references;
+  std::map <uint64_t, db::property_values_id_type> m_propvalue_forward_references;
   std::map <db::properties_id_type, std::set<db::Shapes *> > m_forward_properties_for_shapes;
   std::map <db::properties_id_type, std::set<db::Instances *> > m_forward_properties_for_instances;
   std::map <db::cell_index_type, db::PropertiesSet> m_future_cell_properties;
@@ -216,6 +216,8 @@ private:
   void replace_forward_references_in_variant (tl::Variant &v);
   void extract_context_strings (db::PropertiesSet &properties, std::vector<tl::Variant> &context_strings);
   bool has_forward_refs (const db::PropertiesSet &properties);
+
+  tl::Variant make_prop_value (const std::string &s);
   db::properties_id_type make_forward_properties_id (const db::PropertiesSet &properties);
   const db::PropertiesSet &forward_properties (db::properties_id_type id) const;
   bool is_forward_properties_id (db::properties_id_type id) const;

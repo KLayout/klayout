@@ -1146,8 +1146,8 @@ class DBLayoutTest(unittest.TestCase):
     self.assertEqual(shape.property("2"), None)
     self.assertEqual(shape.property(2.0), None)
     self.assertEqual(shape.property(22), None)
-    self.assertEqual(shape.property(42), "the answer")
-    self.assertEqual(shape.property("42"), None)
+    self.assertEqual(shape.property("42"), "the answer")
+    self.assertEqual(shape.property(42), None)
     self.assertEqual(shape.property(42.0), None)
 
     ly2 = pya.Layout()

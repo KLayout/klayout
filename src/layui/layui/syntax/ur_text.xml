@@ -7,67 +7,58 @@
 
 		<contexts>
 
-			<context name="Normal" attribute="Normal Text">
+			<context name="Normal" attribute="Normal Text" fallthrough="true" fallthroughContext="Error">
 
-				<DetectChar attribute="String" char="&quot;" context="Quoted Key String"/>
-				<DetectChar attribute="Raw String" char="'" context="Apostrophed Key String"/>
+				<DetectChar attribute="Normal Text" char=":" context="#stay"/>
+				<DetectChar attribute="String" char="&quot;" context="Quoted String"/>
+				<DetectChar attribute="Raw String" char="'" context="Apostrophed String"/>
+				<DetectChar attribute="Normal Text" char="(" context="List"/>
+				<DetectChar attribute="Normal Text" char="[" context="Object"/>
+				<DetectChar attribute="Normal Text" char="{" context="Array"/>
 
 				<RegExpr attribute="Float" String="##\s*\-?[0-9]([0-9]|_[0-9])*(\.[0-9]([0-9]|_[0-9])*)?([eE]\-?[1-9]([0-9]|_[0-9])*(\.[0-9]*)?)?" context="After Key"/>
-				<RegExpr attribute="Dec" String="#\s*\-?[1-9]([0-9]|_[0-9])*" context="After Key"/>
-				<RegExpr attribute="Symbol" String="[_A-Za-z0-9]+\b" context="After Key"/>
+				<RegExpr attribute="Dec" String="#\s*\-?[1-9]([0-9]|_[0-9])*" context="#stay"/>
+				<RegExpr attribute="Symbol" String="[_A-Za-z0-9]+\b" context="#stay"/>
 
-				<RegExpr attribute="Error" String="[^\s]" context="Error"/>
-
-			</context>
-
-			<context name="After Key" attribute="Normal Text" fallthrough="true" fallthroughContext="Value" lineEndContext="Error">
-				<DetectChar attribute="Normal" char=":" context="Value"/>
-				<RegExpr attribute="Normal" String="\s+" context="#stay"/>
-      </context>
-
-			<context name="Value" attribute="Normal Text" fallthrough="true" fallthroughContext="Error" lineEndContext="Error">
-
-				<DetectChar attribute="String" char="&quot;" context="Quoted Value String"/>
-				<DetectChar attribute="Raw String" char="'" context="Apostrophed Value String"/>
-
-				<RegExpr attribute="Float" String="##\s*\-?[0-9]([0-9]|_[0-9])*(\.[0-9]([0-9]|_[0-9])*)?([eE]\-?[1-9]([0-9]|_[0-9])*(\.[0-9]*)?)?" context="After Value"/>
-				<RegExpr attribute="Dec" String="#\s*\-?[1-9]([0-9]|_[0-9])*" context="After Value"/>
-				<RegExpr attribute="Symbol" String="[_A-Za-z0-9]+\b" context="After Value"/>
-
-				<RegExpr attribute="Normal" String="\s+" context="Value"/>
+				<RegExpr attribute="Normal Text" String="\s+" context="#stay"/>
 
 			</context>
 
-			<context name="After Value" attribute="Normal Text" fallthrough="true" fallthroughContext="Error" lineEndContext="Normal">
-				<RegExpr attribute="Normal" String="\s+" context="#stay"/>
+			<context name="Object" attribute="Normal Text" lineEndContext="Error">
+				<DetectChar attribute="Normal Text" char="]" context="#pop"/>
+        <!-- nested square brackets -->
+				<DetectChar attribute="Normal Text" char="[" context="Object"/>
+			</context>
+
+			<context name="List" attribute="Normal Text" lineEndContext="Error">
+				<RegExpr attribute="Normal Text" String="\s+" context="#stay"/>
+				<DetectChar attribute="Normal Text" char="," context="#stay"/>
+				<DetectChar attribute="Normal Text" char=")" context="#pop"/>
+        <IncludeRules context="Normal"/>
       </context>
+
+			<context name="Array" attribute="Normal Text" lineEndContext="Error">
+				<RegExpr attribute="Normal Text" String="\s+" context="#stay"/>
+				<DetectChar attribute="Normal Text" char="," context="#stay"/>
+				<DetectChar attribute="Normal Text" char="}" context="#pop"/>
+				<Detect2Chars attribute="Normal Text" char="=" char1="&gt;" context="#stay"/>
+        <IncludeRules context="Normal"/>
+      </context>
+
+			<context name="Quoted String" attribute="String" lineEndContext="Error">
+				<StringDetect attribute="String" String="\\" context="#stay"/>
+				<RegExpr attribute="String" String="\\\&quot;" context="#stay"/>
+				<DetectChar char="&quot;" attribute="String" context="#pop"/>
+			</context>
+
+			<context name="Apostrophed String" attribute="Raw String" lineEndContext="Error">
+				<StringDetect attribute="String" String="\\" context="#stay"/>
+				<RegExpr attribute="String" String="\\\'" context="#stay"/>
+				<DetectChar char="'" attribute="Raw String" context="#pop"/>
+			</context>
 
 			<context name="Error" attribute="Error" lineEndContext="Normal">
       </context>
-
-			<context name="Quoted Key String" attribute="String" lineEndContext="Error">
-				<StringDetect attribute="String" String="\\" context="#stay"/>
-				<RegExpr attribute="String" String="\\\&quot;" context="#stay"/>
-				<DetectChar char="&quot;" attribute="String" context="After Key"/>
-			</context>
-
-			<context name="Apostrophed Key String" attribute="Raw String" lineEndContext="Error">
-				<StringDetect attribute="String" String="\\" context="#stay"/>
-				<RegExpr attribute="String" String="\\\'" context="#stay"/>
-				<DetectChar char="'" attribute="Raw String" context="After Key"/>
-			</context>
-
-			<context name="Quoted Value String" attribute="String" lineEndContext="Error">
-				<StringDetect attribute="String" String="\\" context="#stay"/>
-				<RegExpr attribute="String" String="\\\&quot;" context="#stay"/>
-				<DetectChar char="&quot;" attribute="String" context="After Value"/>
-			</context>
-
-			<context name="Apostrophed Value String" attribute="Raw String" lineEndContext="Error">
-				<StringDetect attribute="String" String="\\" context="#stay"/>
-				<RegExpr attribute="String" String="\\\'" context="#stay"/>
-				<DetectChar char="'" attribute="Raw String" context="After Value"/>
-			</context>
 
     </contexts>
 

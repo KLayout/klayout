@@ -38,7 +38,7 @@ static void set_oasis_read_all_properties (db::LoadLayoutOptions *options, bool 
   options->get_options<db::OASISReaderOptions> ().read_all_properties = f;
 }
 
-static int get_oasis_read_all_properties (const db::LoadLayoutOptions *options)
+static bool get_oasis_read_all_properties (const db::LoadLayoutOptions *options)
 {
   return options->get_options<db::OASISReaderOptions> ().read_all_properties;
 }
@@ -131,6 +131,16 @@ static void set_oasis_write_std_properties_ext (db::SaveLayoutOptions *options, 
 static int get_oasis_write_std_properties_ext (const db::SaveLayoutOptions *options)
 {
   return options->get_options<db::OASISWriterOptions> ().write_std_properties;
+}
+
+static bool get_oasis_enhanced_properties (const db::SaveLayoutOptions *options)
+{
+  return options->get_options<db::OASISWriterOptions> ().enhanced_property_types;
+}
+
+static void set_oasis_enhanced_properties (db::SaveLayoutOptions *options, bool f)
+{
+  options->get_options<db::OASISWriterOptions> ().enhanced_property_types = f;
 }
 
 static void set_oasis_write_cell_bounding_boxes (db::SaveLayoutOptions *options, bool f)
@@ -277,6 +287,21 @@ gsi::ClassExt<db::SaveLayoutOptions> oasis_writer_options (
   gsi::method_ext ("oasis_write_std_properties_ext", &get_oasis_write_std_properties_ext,
     //  this method is mainly provided as access point for the generic interface
     "@hide"
+  ) +
+  gsi::method_ext ("oasis_enhanced_properties=", &set_oasis_enhanced_properties, gsi::arg ("flag"),
+    "@brief Sets a value indicating whether to write enhanced property values\n"
+    "With this option set to true (the default), non-standard types like lists or objects are supported "
+    "for property names and values. These types are encoded in specially annotated strings.\n"
+    "KLayout's OASIS reader will convert them back to the original types.\n"
+    "With this option set to false, such values are translated into strings.\n"
+    "\n"
+    "This attribute has been introduced in version 0.30.7."
+  ) +
+  gsi::method_ext ("oasis_enhanced_properties?", &get_oasis_enhanced_properties,
+    "@brief Gets a value indicating whether to write enhanced property values\n"
+    "See \\oasis_enhanced_properties= for details.\n"
+    "\n"
+    "This attribute has been introduced in version 0.30.7."
   ) +
   gsi::method_ext ("oasis_compression_level=", &set_oasis_compression, gsi::arg ("level"),
     "@brief Set the OASIS compression level\n"

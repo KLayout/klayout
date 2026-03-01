@@ -822,3 +822,250 @@ TEST(13_ApplyIgnoreUnknownTag)
   EXPECT_EQ (i1->tag_str (), "tag2");
 }
 
+TEST(20_MergeBasic)
+{
+  rdb::Database db1;
+  db1.set_top_cell_name ("A");
+
+  rdb::Database db2;
+  db1.set_top_cell_name ("B");
+
+  try {
+    //  can't merge DB's with different top cell names
+    db1.merge (db2);
+    EXPECT_EQ (0, 1);
+  } catch (...) { }
+
+  db1.set_top_cell_name ("TOP");
+  db2.set_top_cell_name ("TOP");
+  db1.merge (db2);
+
+  {
+    rdb::Cell *cell = db2.create_cell ("A", "VAR", "ALAY");
+
+    rdb::Category *pcat = db2.create_category ("PCAT");
+    rdb::Category *cat = db2.create_category (pcat, "CAT");
+    cat->set_description ("A child category");
+
+    //  create two tags
+    /*auto t1_id =*/ db2.tags ().tag ("T1").id ();
+    auto t2_id = db2.tags ().tag ("T2", true).id ();
+
+    rdb::Item *item = db2.create_item (cell->id (), cat->id ());
+    item->set_comment ("Comment");
+    item->add_tag (t2_id);
+    item->set_image_str ("%nonsense%");
+    item->set_multiplicity (42);
+    item->add_value (db::DBox (0, 0, 1.0, 1.5));
+    item->add_value (42.0);
+  }
+
+  db1.merge (db2);
+
+  auto c = db1.cells ().begin ();
+  tl_assert (c != db1.cells ().end ());
+  const rdb::Cell *cell = c.operator-> ();
+  ++c;
+  EXPECT_EQ (c == db1.cells ().end (), true);
+  EXPECT_EQ (cell->name (), "A");
+  EXPECT_EQ (cell->variant (), "VAR");
+  EXPECT_EQ (cell->layout_name (), "ALAY");
+
+  const rdb::Category *cat = db1.category_by_name ("PCAT.CAT");
+  tl_assert (cat != 0);
+  EXPECT_EQ (cat->name (), "CAT");
+  EXPECT_EQ (cat->path (), "PCAT.CAT");
+  EXPECT_EQ (cat->description (), "A child category");
+  EXPECT_EQ (cat->num_items (), size_t (1));
+
+  auto i = db1.items ().begin ();
+  tl_assert (i != db1.items ().end ());
+  const rdb::Item *item = i.operator-> ();
+  ++i;
+  EXPECT_EQ (i == db1.items ().end (), true);
+  EXPECT_EQ (item->category_id (), cat->id ());
+  EXPECT_EQ (item->cell_id (), cell->id ());
+  EXPECT_EQ (item->comment (), "Comment");
+  EXPECT_EQ (item->multiplicity (), size_t (42));
+  EXPECT_EQ (item->has_image (), true);
+  EXPECT_EQ (item->image_str (), "%nonsense%")
+  EXPECT_EQ (item->values ().to_string (&db1), "box: (0,0;1,1.5);float: 42");
+  EXPECT_EQ (item->tag_str (), "#T2");
+}
+
+TEST(21_MergeCategories)
+{
+  rdb::Database db1;
+  db1.set_top_cell_name ("TOP");
+
+  rdb::Database db2;
+  db2.set_top_cell_name ("TOP");
+
+  {
+    rdb::Category *pcat = db1.create_category ("PCAT");
+    pcat->set_description ("db1");
+    rdb::Category *cat = db1.create_category (pcat, "CAT");
+    cat->set_description ("db1");
+  }
+
+  {
+    rdb::Category *pcat = db2.create_category ("PCAT");
+    pcat->set_description ("db2a");
+    rdb::Category *cat2 = db2.create_category (pcat, "CAT2");
+    cat2->set_description ("db2a");
+
+    rdb::Category *pcat2 = db2.create_category ("PCAT2");
+    pcat2->set_description ("db2b");
+    rdb::Category *cat3 = db2.create_category (pcat2, "CAT3");
+    cat3->set_description ("db2b");
+  }
+
+  db1.merge (db2);
+
+  const rdb::Category *cat;
+
+  cat = db1.category_by_name ("PCAT");
+  tl_assert (cat != 0);
+  EXPECT_EQ (cat->name (), "PCAT");
+  EXPECT_EQ (cat->description (), "db1");
+
+  cat = db1.category_by_name ("PCAT2");
+  tl_assert (cat != 0);
+  EXPECT_EQ (cat->name (), "PCAT2");
+  EXPECT_EQ (cat->description (), "db2b");
+
+  cat = db1.category_by_name ("PCAT.CAT");
+  tl_assert (cat != 0);
+  EXPECT_EQ (cat->name (), "CAT");
+  EXPECT_EQ (cat->description (), "db1");
+
+  cat = db1.category_by_name ("PCAT.CAT2");
+  tl_assert (cat != 0);
+  EXPECT_EQ (cat->name (), "CAT2");
+  EXPECT_EQ (cat->description (), "db2a");
+
+  cat = db1.category_by_name ("PCAT2.CAT3");
+  tl_assert (cat != 0);
+  EXPECT_EQ (cat->name (), "CAT3");
+  EXPECT_EQ (cat->description (), "db2b");
+
+  int ncat = 0;
+  for (auto c = db1.categories ().begin (); c != db1.categories ().end (); ++c) {
+    ++ncat;
+    for (auto s = c->sub_categories ().begin (); s != c->sub_categories ().end (); ++s) {
+      ++ncat;
+    }
+  }
+  EXPECT_EQ (ncat, 5);
+}
+
+TEST(22_MergeCells)
+{
+  rdb::Database db1;
+  db1.set_top_cell_name ("TOP");
+
+  rdb::Database db2;
+  db2.set_top_cell_name ("TOP");
+
+  {
+    rdb::Cell *parent;
+    parent = db1.create_cell ("TOP");
+
+    rdb::Cell *cell;
+    cell = db1.create_cell ("A");
+    cell->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, 2.0)), parent->id ()));
+    cell = db1.create_cell ("A", "VAR1", "ALAY");
+    cell->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, -2.0)), parent->id ()));
+  }
+
+  {
+    rdb::Cell *parent;
+    parent = db2.create_cell ("TOP");
+
+    rdb::Cell *cell;
+    cell = db2.create_cell ("B");
+    cell->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, 0.0)), parent->id ()));
+    cell = db2.create_cell ("A");
+    cell->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, 2.5)), parent->id ()));  //  reference not taken!
+    cell = db2.create_cell ("A", "VAR2", "ALAY");
+    cell->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, -1.0)), parent->id ()));
+  }
+
+  db1.merge (db2);
+
+  std::set<std::string> cells;
+  for (auto c = db1.cells ().begin (); c != db1.cells ().end (); ++c) {
+    if (c->references ().begin () != c->references ().end ()) {
+      cells.insert (c->qname () + "[" + c->references ().begin ()->trans_str () + "]");
+    } else {
+      cells.insert (c->qname ());
+    }
+  }
+
+  EXPECT_EQ (tl::join (cells.begin (), cells.end (), ";"), "A:1[r0 *1 1,2];A:VAR1[r0 *1 1,-2];A:VAR2[r0 *1 1,-1];B[r0 *1 1,0];TOP");
+}
+
+TEST(23_MergeTags)
+{
+  rdb::Database db1;
+  db1.set_top_cell_name ("TOP");
+
+  rdb::Database db2;
+  db2.set_top_cell_name ("TOP");
+
+  db1.tags ().tag ("T1");
+  db1.tags ().tag ("T2");
+
+  db2.tags ().tag ("T1");
+  db2.tags ().tag ("T3", true);
+
+  db1.merge (db2);
+
+  std::set<std::string> tags;
+  for (auto t = db1.tags ().begin_tags (); t != db1.tags ().end_tags (); ++t) {
+    tags.insert (t->is_user_tag () ? "#" + t->name () : t->name ());
+  }
+  EXPECT_EQ (tl::join (tags.begin (), tags.end (), ";"), "#T3;T1;T2");
+}
+
+TEST(24_MergeItems)
+{
+  rdb::Database db1;
+  db1.set_top_cell_name ("TOP");
+
+  rdb::Database db2;
+  db2.set_top_cell_name ("TOP");
+
+  {
+    rdb::Cell *cell = db1.create_cell ("TOP");
+    rdb::Category *cat1 = db1.create_category ("CAT1");
+    rdb::Category *cat2 = db1.create_category ("CAT2");
+
+    rdb::Item *item;
+    item = db1.create_item (cell->id (), cat1->id ());
+    item->set_comment ("db1a");
+    item = db1.create_item (cell->id (), cat2->id ());
+    item->set_comment ("db1b");
+  }
+
+  {
+    rdb::Cell *cell = db2.create_cell ("TOP");
+    rdb::Category *cat1 = db2.create_category ("CAT1");
+    rdb::Category *cat3 = db2.create_category ("CAT3");
+
+    rdb::Item *item;
+    item = db2.create_item (cell->id (), cat1->id ());
+    item->set_comment ("db2a");
+    item = db2.create_item (cell->id (), cat3->id ());
+    item->set_comment ("db2b");
+  }
+
+  db1.merge (db2);
+
+  std::set<std::string> items;
+  for (auto i = db1.items ().begin (); i != db1.items ().end (); ++i) {
+    const rdb::Item *item = i.operator-> ();
+    items.insert (item->cell_qname () + ":" + item->category_name () + "=" + item->comment ());
+  }
+  EXPECT_EQ (tl::join (items.begin (), items.end (), ";"), "TOP:CAT1=db1a;TOP:CAT1=db2a;TOP:CAT2=db1b;TOP:CAT3=db2b");
+}

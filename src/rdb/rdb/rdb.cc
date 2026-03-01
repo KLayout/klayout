@@ -958,11 +958,18 @@ Tags::tag (id_type id)
 void
 Tags::import_tag (const Tag &t)
 {
-  Tag &tt = tag (t.name (), t.is_user_tag ());
-  tt.set_description (t.description ());
+  import_tag_with_ref (t);
 }
 
-bool 
+Tag &
+Tags::import_tag_with_ref (const Tag &t)
+{
+  Tag &tt = tag (t.name (), t.is_user_tag ());
+  tt.set_description (t.description ());
+  return tt;
+}
+
+bool
 Tags::has_tag (const std::string &name, bool user_tag) const
 {
   return m_ids_for_names.find (std::make_pair (name, user_tag)) != m_ids_for_names.end ();
@@ -1312,6 +1319,13 @@ Database::import_tags (const Tags &tags)
   for (Tags::const_iterator t = tags.begin_tags (); t != tags.end_tags (); ++t) {
     m_tags.import_tag (*t);
   }
+}
+
+Tag &
+Database::import_tag (const Tag &tag)
+{
+  set_modified ();
+  return m_tags.import_tag_with_ref (tag);
 }
 
 void 
@@ -1880,41 +1894,52 @@ namespace
   };
 }
 
-static void map_category (const rdb::Category &cat, const rdb::Database &db, std::map<id_type, id_type> &cat2cat)
+static void map_category (const rdb::Category &cat, rdb::Database &db, std::map<id_type, id_type> &cat2cat, std::map<id_type, id_type> &rev_cat2cat, bool create_missing, rdb::Category *parent)
 {
-  const rdb::Category *this_cat = db.category_by_name (cat.path ());
+  rdb::Category *this_cat = db.category_by_name_non_const (cat.path ());
+  if (! this_cat && create_missing) {
+    this_cat = db.create_category (parent, cat.name ());
+    this_cat->set_description (cat.description ());
+  }
   if (this_cat) {
     cat2cat.insert (std::make_pair (this_cat->id (), cat.id ()));
+    rev_cat2cat.insert (std::make_pair (cat.id (), this_cat->id ()));
   }
 
   for (auto c = cat.sub_categories ().begin (); c != cat.sub_categories ().end (); ++c) {
-    map_category (*c, db, cat2cat);
+    map_category (*c, db, cat2cat, rev_cat2cat, create_missing, this_cat);
   }
 }
 
-void
-Database::apply (const rdb::Database &other)
+static void map_databases (rdb::Database &self, const rdb::Database &other,
+                           std::map<id_type, id_type> &cell2cell,
+                           std::map<id_type, id_type> &rev_cell2cell,
+                           std::map<id_type, id_type> &cat2cat,
+                           std::map<id_type, id_type> &rev_cat2cat,
+                           std::map<id_type, id_type> &tag2tag,
+                           std::map<id_type, id_type> &rev_tag2tag,
+                           bool create_missing)
 {
-  std::map<id_type, id_type> cell2cell;
-  std::map<id_type, id_type> cat2cat;
-  std::map<id_type, id_type> tag2tag;
-  std::map<id_type, id_type> rev_tag2tag;
-
   for (auto c = other.cells ().begin (); c != other.cells ().end (); ++c) {
     //  TODO: do we have a consistent scheme of naming variants? What requirements
     //  exist towards detecting variant specific waivers
-    const rdb::Cell *this_cell = cell_by_qname (c->qname ());
+    rdb::Cell *this_cell = self.cell_by_qname_non_const (c->qname ());
+    if (! this_cell && create_missing) {
+      this_cell = self.create_cell (c->name (), c->variant (), c->layout_name ());
+      this_cell->import_references (c->references ());
+    }
     if (this_cell) {
       cell2cell.insert (std::make_pair (this_cell->id (), c->id ()));
+      rev_cell2cell.insert (std::make_pair (c->id (), this_cell->id ()));
     }
   }
 
   for (auto c = other.categories ().begin (); c != other.categories ().end (); ++c) {
-    map_category (*c, *this, cat2cat);
+    map_category (*c, self, cat2cat, rev_cat2cat, create_missing, 0);
   }
 
   std::map<std::string, id_type> tags_by_name;
-  for (auto c = tags ().begin_tags (); c != tags ().end_tags (); ++c) {
+  for (auto c = self.tags ().begin_tags (); c != self.tags ().end_tags (); ++c) {
     tags_by_name.insert (std::make_pair (c->name (), c->id ()));
   }
 
@@ -1923,8 +1948,25 @@ Database::apply (const rdb::Database &other)
     if (t != tags_by_name.end ()) {
       tag2tag.insert (std::make_pair (t->second, c->id ()));
       rev_tag2tag.insert (std::make_pair (c->id (), t->second));
+    } else if (create_missing) {
+      auto tt = self.import_tag (*c);
+      tag2tag.insert (std::make_pair (tt.id (), c->id ()));
+      rev_tag2tag.insert (std::make_pair (c->id (), tt.id ()));
     }
   }
+}
+
+void
+Database::apply (const rdb::Database &other)
+{
+  std::map<id_type, id_type> cell2cell;
+  std::map<id_type, id_type> rev_cell2cell;
+  std::map<id_type, id_type> cat2cat;
+  std::map<id_type, id_type> rev_cat2cat;
+  std::map<id_type, id_type> tag2tag;
+  std::map<id_type, id_type> rev_tag2tag;
+
+  map_databases (*this, other, cell2cell, rev_cell2cell, cat2cat, rev_cat2cat, tag2tag, rev_tag2tag, false);
 
   std::map<std::pair<id_type, id_type>, ValueMapEntry> value_map;
 
@@ -1958,6 +2000,50 @@ Database::apply (const rdb::Database &other)
       i->set_image_str (other->image_str ());
       i->set_tag_str (other->tag_str ());
 
+    }
+
+  }
+}
+
+void
+Database::merge (const Database &other)
+{
+  if (top_cell_name () != other.top_cell_name ()) {
+    throw tl::Exception (tl::to_string (tr ("Merging of RDB databases requires identical top cell names")));
+  }
+
+  std::map<id_type, id_type> cell2cell;
+  std::map<id_type, id_type> rev_cell2cell;
+  std::map<id_type, id_type> cat2cat;
+  std::map<id_type, id_type> rev_cat2cat;
+  std::map<id_type, id_type> tag2tag;
+  std::map<id_type, id_type> rev_tag2tag;
+
+  map_databases (*this, other, cell2cell, rev_cell2cell, cat2cat, rev_cat2cat, tag2tag, rev_tag2tag, true);
+
+  for (Items::const_iterator i = other.items ().begin (); i != other.items ().end (); ++i) {
+
+    auto icell = rev_cell2cell.find (i->cell_id ());
+    if (icell == rev_cell2cell.end ()) {
+      continue;
+    }
+
+    auto icat = rev_cat2cat.find (i->category_id ());
+    if (icat == rev_cat2cat.end ()) {
+      continue;
+    }
+
+    rdb::Item *this_item = create_item (icell->second, icat->second);
+
+    this_item->set_values (i->values ());
+    this_item->set_multiplicity (i->multiplicity ());
+    this_item->set_comment (i->comment ());
+    this_item->set_image_str (i->image_str ());
+
+    for (auto tt = rev_tag2tag.begin (); tt != rev_tag2tag.end (); ++tt) {
+      if (i->has_tag (tt->first)) {
+        this_item->add_tag (tt->second);
+      }
     }
 
   }

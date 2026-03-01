@@ -1988,6 +1988,11 @@ public:
   void import_tag (const Tag &tag);
 
   /**
+   *  @brief Import a tag and returns the reference for the new tag
+   */
+  Tag &import_tag_with_ref (const Tag &tag);
+
+  /**
    *  @brief Clear the collection of tags
    */
   void clear ();
@@ -2142,6 +2147,11 @@ public:
    *  This method is provided for persistency application only. It should not be used otherwise.
    */
   void import_tags (const Tags &tags);
+
+  /**
+   *  @brief Import a tag
+   */
+  Tag &import_tag (const Tag &tag);
 
   /**
    *  @brief Get the reference to the categories collection (const version)
@@ -2477,6 +2487,17 @@ public:
    *  The attributes are applied to markers with identical value(s), category and cell context.
    */
   void apply (const rdb::Database &other);
+
+  /**
+   *  @brief Merges another database to this one
+   *
+   *  Merging requires the other database to have the same top cell.
+   *  Merging involves:
+   *  * categories present in other, but not in *this will be created (based on category name and parent category)
+   *  * cells present in other, but not in *this will be created (based on cell name and variant)
+   *  * items will be transferred from other to *this based on cell and category
+   */
+  void merge (const rdb::Database &other);
 
   /**
    *  @brief Scans a layout into this RDB

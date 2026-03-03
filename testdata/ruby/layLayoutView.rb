@@ -622,6 +622,109 @@ class LAYLayoutView_TestClass < TestBase
 
   end
 
+  # layout handles
+  def test_20
+
+    name = "LayoutViewTest::test_20"
+
+    hh = RBA::LayoutHandle.find("DOESNOTEXIST???")
+    assert_equal(hh == nil, true)
+
+    h = RBA::LayoutHandle::new
+    assert_equal(h.is_valid?, false)
+
+    lv = RBA::LayoutView::new(true)
+
+    ly = RBA::Layout::new
+    hh = RBA::LayoutHandle.find(ly) # not yet
+    assert_equal(hh == nil, true)
+
+    ly.create_cell("TOPCELL")
+
+    h = RBA::LayoutHandle::new(ly)
+    assert_equal(h.is_valid?, true)
+    h.name = name 
+    assert_equal(h.name, name)
+    assert_equal(RBA::LayoutHandle.names.member?(name), true)
+    hh = RBA::LayoutHandle.find(name)
+    assert_equal(hh.name, name)
+    hh._destroy
+    hh = RBA::LayoutHandle.find(ly)
+    assert_equal(hh.name, name)
+    hh._destroy
+    assert_equal(h.filename, "")
+    assert_equal(h.ref_count, 1)
+    assert_equal(h.is_dirty?, false)
+    assert_equal(h.layout.top_cell.name, "TOPCELL")
+
+    # smoke test
+    assert_equal(h.save_options, nil)
+    assert_equal(h.load_options.class, RBA::LoadLayoutOptions)
+
+    l1 = ly.layer(1, 0)
+    ly.top_cell.shapes(l1).insert(RBA::Box::new(0, 0, 1000, 2000))
+    assert_equal(h.is_dirty?, true)
+
+    hh = RBA::LayoutHandle::find(ly)
+    assert_equal(hh.name, name)
+    assert_equal(hh.layout.top_cell.name, "TOPCELL")
+    hh._destroy
+
+    lv.show_layout(h, true)
+    assert_equal(h.ref_count, 2)
+
+    hh = RBA::LayoutHandle::find(name)
+    assert_equal(hh.name, name)
+    assert_equal(hh.layout.top_cell.name, "TOPCELL")
+    hh._destroy
+
+    cv = lv.cellview(0)
+    hh = cv.layout_handle
+    assert_equal(hh.name, name)
+    assert_equal(hh.layout.top_cell.name, "TOPCELL")
+    hh._destroy
+    assert_equal(RBA::LayoutHandle.names.member?(name), true)
+
+    lv.erase_cellview(0)
+  
+    # still there?
+    assert_equal(h.layout.top_cell.name, "TOPCELL")
+
+    assert_equal(h.ref_count, 1)
+    h._destroy
+    assert_equal(RBA::LayoutHandle.names.member?(name), false)
+
+  end
+
+  # layout handles
+  def test_21
+
+    name = "LayoutViewTest::test_21"
+
+    h = RBA::LayoutHandle::new(RBA::Layout::new)
+    h.name = name
+    assert_equal(h.is_valid?, true)
+    assert_equal(h.filename, "")
+
+    h.layout.create_cell("TOP_CELL")
+    assert_equal(h.is_dirty?, true)
+
+    tmp = File.join($ut_testtmp, "layout_handles.gds")
+    h.save_as(tmp, RBA::SaveLayoutOptions::new)
+    assert_equal(h.filename, tmp)
+    assert_equal(h.save_options.class, RBA::SaveLayoutOptions)
+    assert_equal(h.is_dirty?, false)
+
+    h._destroy
+
+    h = RBA::LayoutHandle::new(tmp, RBA::LoadLayoutOptions::new)
+    assert_equal(h.filename, tmp)
+    assert_equal(h.layout.top_cell.name, "TOP_CELL")
+
+    h._destroy
+
+  end
+
 end
 
 load("test_epilogue.rb")

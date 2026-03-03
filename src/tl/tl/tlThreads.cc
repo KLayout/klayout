@@ -29,7 +29,7 @@
 
 #include <map>
 
-#if defined(HAVE_PTHREADS)
+#if !defined(HAVE_QT) || defined(HAVE_PTHREADS)
 
 #define _TIMESPEC_DEFINED   //  avoids errors with pthread-win and MSVC2017
 #include <pthread.h>
@@ -233,7 +233,7 @@ void WaitCondition::wakeOne ()
 // -------------------------------------------------------------------------------
 //  Thread implementation
 
-#if !(defined(HAVE_QT) && !defined(HAVE_PTHREADS))
+#if !defined(HAVE_QT) || defined(HAVE_PTHREADS)
 
 class ThreadPrivateData
 {

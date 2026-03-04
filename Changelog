@@ -1,3 +1,21 @@
+0.30.7           (2026-03-05):
+* Enhancement: %GITHUB%/issues/2248 Switch layouts but without losing the handle
+* Bugfix: %GITHUB%/issues/2273 Potential use-after-free bug due to Ruby GC
+* Bugfix: %GITHUB%/issues/2277 Poor netlister performance in some cases
+* Enhancement: %GITHUB%/issues/2278 Option to hide markers frames
+* Bugfix: %GITHUB%/issues/2284 klayoutrc parse issue silently replaces config file
+* Bugfix: %GITHUB%/issues/2286 CLI arguments, '--help' / '--version' should be implemented
+* Enhancement: ReportDatabase#merge - a method to merge two report databases
+* Bugfix: double clicking an edge in partial mode opened the properties dialog, not setting a point
+* Bugfix: Python did not support downcasting of PolygonWithProperties to Polygon on Shapes#polygon for example
+* Bugfix: OASIS reader was not able to read S_GDS_PROPERTY from file level or under forward reference conditions
+* Enhancement: Adding an option '-of|--format' to strmxor and strmclip to specify the output format instead of taking it from the suffix
+* Bugfix: 'oasis_read_all_options' as always on in buddy tools
+* Bugfix: avoid a crash on application exit when using objects for user property values or names
+* Bugfix: Fixing a small glitch: drawing into a ghost cell is possible, but did not turn off the ghost cell flag
+* Bugfix: Fixing a potential segfault during layout painting due to a race condition (rare but happened)
+* Enhancement: Performance improvement for hierarchical processor - better parallelization in some cases
+
 0.30.6           (2026-02-07):
 * Bugfix: %GITHUB%/issues/2210 LayoutView::create_measure_ruler() creates incorrect rulers
 * Enhancement: %GITHUB%/issues/2214 Take selection modifer into account on release rather than on click

@@ -1322,21 +1322,37 @@ OASISReader::resolve_forward_references (db::PropertiesSet &properties)
     const tl::Variant &name = db::property_name (p->first);
     if (name.is_id ()) {
 
-      std::map <uint64_t, db::property_names_id_type>::iterator pf = m_propname_forward_references.find (name.to_id ());
+      uint64_t name_id = name.to_id ();
+      bool is_sprop = (name_id & 1) != 0;
+      name_id >>= 1;
+
+      std::map <uint64_t, db::property_names_id_type>::iterator pf = m_propname_forward_references.find (name_id);
       if (pf != m_propname_forward_references.end ()) {
 
-        if (pf->second == m_s_gds_property_name_id) {
+        if (pf->second == m_klayout_context_property_name_id) {
+
+          //  NOTE: property names ID 0 is reserved for context strings
+          new_props.insert (property_names_id_type (0), value);
+
+        } else if (! m_read_properties) {
+
+          //  ignore other properties
+
+        } else if (pf->second == m_s_gds_property_name_id && is_sprop) {
 
           //  S_GDS_PROPERTY translation
           if (value.is_list () && value.get_list ().size () >= 2) {
             new_props.insert (value.get_list () [0], value.get_list () [1]);
           }
 
-        } else if (pf->second == m_klayout_context_property_name_id) {
-          //  NOTE: property names ID 0 is reserved for context strings
-          new_props.insert (property_names_id_type (0), value);
+        } else if (is_sprop && ! m_read_all_properties) {
+
+          //  ignore system properties
+
         } else {
+
           new_props.insert (pf->second, value);
+
         }
 
       }
@@ -1395,10 +1411,27 @@ OASISReader::replace_forward_references_in_variant (tl::Variant &v)
   }
 }
 
+static void
+store_properties (db::PropertiesSet &properties, db::property_names_id_type name, const db::OASISReader::property_value_list &value)
+{
+  if (value.size () == 0) {
+    properties.insert (name, tl::Variant ());
+  } else if (value.size () == 1) {
+    properties.insert (name, tl::Variant (value [0]));
+  } else if (value.size () > 1) {
+    properties.insert (name, tl::Variant (value.begin (), value.end ()));
+  }
+}
+
 void
 OASISReader::store_last_properties (db::PropertiesSet &properties, bool ignore_special, bool with_context_props)
 {
-  if (with_context_props && mm_last_property_name.get () == m_klayout_context_property_name_id) {
+  const tl::Variant &name = db::property_name (mm_last_property_name.get ());
+  if (name.is_id ()) {
+
+    store_properties (properties, mm_last_property_name.get (), mm_last_value_list.get ());
+
+  } else if (with_context_props && mm_last_property_name.get () == m_klayout_context_property_name_id) {
 
     //  Context properties are stored with a special property name ID of 0
 
@@ -1422,12 +1455,10 @@ OASISReader::store_last_properties (db::PropertiesSet &properties, bool ignore_s
     //  This is mode is used for cells and layouts so the standard properties do not appear as user properties.
     //  For shapes we need to keep the special ones since they may be forward-references S_GDS_PROPERTY names.
 
-  } else if (mm_last_value_list.get ().size () == 0) {
-    properties.insert (mm_last_property_name.get (), tl::Variant ());
-  } else if (mm_last_value_list.get ().size () == 1) {
-    properties.insert (mm_last_property_name.get (), tl::Variant (mm_last_value_list.get () [0]));
-  } else if (mm_last_value_list.get ().size () > 1) {
-    properties.insert (mm_last_property_name.get (), tl::Variant (mm_last_value_list.get ().begin (), mm_last_value_list.get ().end ()));
+  } else {
+
+    store_properties (properties, mm_last_property_name.get (), mm_last_value_list.get ());
+
   }
 }
 
@@ -1510,7 +1541,7 @@ OASISReader::read_properties ()
 
       std::map <uint64_t, std::string>::const_iterator cid = m_propnames.find (id);
       if (cid == m_propnames.end ()) {
-        mm_last_property_name = db::property_names_id (tl::Variant (id, true /*dummy for id type*/));
+        mm_last_property_name = db::property_names_id (tl::Variant ((id << 1) + uint64_t (is_sprop ? 1 : 0), true /*dummy for id type*/));
         m_propname_forward_references.insert (std::make_pair (id, db::property_names_id_type (0)));
       } else {
         mm_last_property_name = db::property_names_id (tl::Variant (cid->second));

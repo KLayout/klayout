@@ -446,7 +446,12 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
         proc->compute_local_cell (contexts, cell, mp_intruder_cell, op, *c->first, res);
       }
 
-      if (common.empty ()) {
+      bool common_empty = true;
+      for (auto c = common.begin (); common_empty && c != common.end (); ++c) {
+        common_empty = c->empty ();
+      }
+
+      if (common_empty) {
 
         CRONOLOGY_COMPUTE_BRACKET(event_propagate)
         for (std::vector<unsigned int>::const_iterator o = output_layers.begin (); o != output_layers.end (); ++o) {
@@ -519,9 +524,30 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
 
   }
 
-  for (std::vector<unsigned int>::const_iterator o = output_layers.begin (); o != output_layers.end (); ++o) {
-    size_t oi = o - output_layers.begin ();
-    proc->push_results (cell, *o, common[oi]);
+  //  store the results
+
+  bool common_empty = true;
+  for (auto c = common.begin (); common_empty && c != common.end (); ++c) {
+    common_empty = c->empty ();
+  }
+
+  if (! common_empty) {
+    if (m_result.empty ()) {
+      m_result.swap (common);
+    } else {
+      if (m_result.size () < common.size ()) {
+        m_result.resize (common.size ());
+      }
+      auto t = m_result.begin ();
+      for (auto s = common.begin (); s != common.end (); ++s, ++t) {
+        if (t->empty ()) {
+          t->swap (*s);
+        } else {
+          t->insert (s->begin (), s->end ());
+          s->clear ();
+        }
+      }
+    }
   }
 }
 

@@ -244,9 +244,20 @@ public:
     return m_contexts.end ();
   }
 
+  const std::vector<std::unordered_set<TR> > &result () const
+  {
+    return m_result;
+  }
+
+  void cleanup ()
+  {
+    m_contexts.clear ();
+  }
+
 private:
   const db::Cell *mp_intruder_cell;
   std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR> > m_contexts;
+  std::vector<std::unordered_set<TR> > m_result;
 };
 
 template <class TS, class TI, class TR>
@@ -558,7 +569,6 @@ private:
   size_t get_progress () const;
   void compute_contexts (db::local_processor_contexts<TS, TI, TR> &contexts, db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, db::Coord dist) const;
   void issue_compute_contexts (db::local_processor_contexts<TS, TI, TR> &contexts, db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, db::Coord dist) const;
-  void push_results (db::Cell *cell, unsigned int output_layer, const std::unordered_set<TR> &result) const;
   void compute_local_cell (const db::local_processor_contexts<TS, TI, TR> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<TS, TI, TR> *op, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, std::vector<std::unordered_set<TR> > &result) const;
 
   bool subject_cell_is_breakout (db::cell_index_type ci) const

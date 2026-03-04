@@ -1770,6 +1770,7 @@ PartialService::edit_cancel ()
 
   ui ()->ungrab_mouse (this);
 
+  clear_mouse_cursors ();
   close_editor_hooks (false);
 
   selection_to_view ();

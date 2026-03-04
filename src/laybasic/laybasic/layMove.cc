@@ -269,9 +269,12 @@ MoveService::mouse_double_click_event (const db::DPoint &p, unsigned int buttons
       handle_click (p, buttons, false, 0);
     }
 
-    lay::SelectionService *selector = mp_view->selection_service ();
-    if (selector) {
-      return selector->mouse_double_click_event (p, buttons, prio);
+    if (is_active ()) {
+      //  in move mode, a double click opens the properties dialog
+      lay::SelectionService *selector = mp_view->selection_service ();
+      if (selector) {
+        return selector->mouse_double_click_event (p, buttons, prio);
+      }
     }
 
   }

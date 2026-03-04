@@ -1676,6 +1676,15 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "\n"
     "This method has been added in version 0.29.1."
   ) +
+  gsi::method ("merge", &rdb::Database::merge, gsi::arg ("other"),
+    "@brief Merges the other database with this one\n"
+    "This method will merge the other database with this one. The other database needs to have the same top cell than\n"
+    "this database. In the merge step, identical cells and categories will be identified and missing cells or categories\n"
+    "will be created in this database. After that, all items will be transferred from the other database into this one\n"
+    "and will be associated with cells and categories from this database.\n"
+    "\n"
+    "This method has been added in version 0.30.7."
+  ) +
   gsi::method ("is_modified?", &rdb::Database::is_modified,
     "@brief Returns a value indicating whether the database has been modified\n"
   ) +

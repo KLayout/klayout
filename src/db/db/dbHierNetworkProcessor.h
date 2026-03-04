@@ -1275,6 +1275,13 @@ public:
   void join_cluster_with (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
 
   /**
+   *  @brief Joins a cluster id with the a set of clusters given by an iterator interval with_to .. with_from
+   *
+   *  This function is equivalent to calling "join_cluster_with" multiple times, but more efficient.
+   */
+  void join_clusters_with (typename local_cluster<T>::id_type id, typename std::set<typename local_cluster<T>::id_type>::const_iterator with_from, typename std::set<typename local_cluster<T>::id_type>::const_iterator with_to);
+
+  /**
    *  @brief An iterator delivering all clusters (even the connectors)
    *
    *  This iterator will deliver ID's rather than cluster objects.

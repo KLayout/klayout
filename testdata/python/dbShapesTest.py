@@ -61,6 +61,26 @@ class DBShapesTest(unittest.TestCase):
     shapes = top.shapes(l1)
     self.assertEqual(sys.getrefcount(shapes), 2)
 
+  # Tests the ability to take PolygonWithProperties instead of base class
+  # for setter
+  def test_3(self):
+
+    shapes = pya.Shapes()
+    shapes.insert(pya.Polygon(pya.Box(0, 0, 100, 200)))
+    self.assertEqual(";".join([ str(s) for s in shapes.each() ]), "polygon (0,0;0,200;100,200;100,0)")
+
+    pwp = pya.PolygonWithProperties(pya.Polygon(pya.Box(0, 0, 110, 210)))
+    s0 = [ s for s in shapes.each() ][0]
+    s0.polygon = pwp
+    self.assertEqual(";".join([ str(s) for s in shapes.each() ]), "polygon (0,0;0,210;110,210;110,0)")
+
+    # with object substitution
+    s0.polygon = ( pya.Box(0, 0, 120, 220) )
+    self.assertEqual(";".join([ str(s) for s in shapes.each() ]), "polygon (0,0;0,220;120,220;120,0)")
+
+    # with object substitution by constructor inference
+    s0.polygon = pya.Box(0, 0, 130, 230)
+    self.assertEqual(";".join([ str(s) for s in shapes.each() ]), "polygon (0,0;0,230;130,230;130,0)")
 
 # run unit tests
 if __name__ == '__main__':

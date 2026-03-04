@@ -3450,6 +3450,9 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "To satisfy the references inside the layout, a dummy cell is created in this case\n"
     "which has the \"ghost cell\" flag set to true.\n"
     "\n"
+    "A ghost cell is a real ghost cell only if the cell is empty. In that case, it is written "
+    "as a ghost cell to GDS files for example. If a cell is not empty, this flag is ignored.\n"
+    "\n"
     "This method has been introduced in version 0.20.\n"
   ) +
   gsi::method ("ghost_cell=", &db::Cell::set_ghost_cell, gsi::arg ("flag"),

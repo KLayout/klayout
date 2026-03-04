@@ -98,6 +98,20 @@ const std::string GenericWriterOptions::dxf_format_name       = "DXF";
 const std::string GenericWriterOptions::cif_format_name       = "CIF";
 const std::string GenericWriterOptions::mag_format_name       = "MAG";
 
+std::vector<std::string>
+GenericWriterOptions::all_format_names ()
+{
+  std::vector<std::string> names;
+  names.push_back (gds2_format_name);
+  names.push_back (gds2text_format_name);
+  names.push_back (oasis_format_name);
+  names.push_back (lstream_format_name);
+  names.push_back (dxf_format_name);
+  names.push_back (cif_format_name);
+  names.push_back (mag_format_name);
+  return names;
+}
+
 void
 GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::string &format)
 {
@@ -108,6 +122,15 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                   "Specifies layout scaling. If given, the saved layout will be scaled by the "
                   "given factor."
                  );
+
+  if (format.empty ()) {
+    cmd << tl::arg (group +
+                    "-of|--format=format", &m_format, "Specifies the output format",
+                    "By default, the output format is derived from the file name suffix. "
+                    "You can also specify the format directly using this option. Allowed format names are: "
+                    + tl::join (all_format_names (), ", ")
+                   );
+  }
 
   if (format.empty () || format == gds2_format_name || format == gds2text_format_name || format == oasis_format_name) {
     cmd << tl::arg (group +
@@ -425,6 +448,22 @@ GenericWriterOptions::configure (db::SaveLayoutOptions &save_options, const db::
   save_options.set_dont_write_empty_cells (m_dont_write_empty_cells);
   save_options.set_keep_instances (m_keep_instances);
   save_options.set_write_context_info (m_write_context_info);
+
+  if (! m_format.empty ()) {
+
+    //  check, if the format name is a valid one
+    std::vector<std::string> af = all_format_names ();
+    auto i = af.begin ();
+    while (i != af.end () && *i != m_format) {
+      ++i;
+    }
+    if (i == af.end ()) {
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid fornat name %s. Allowed names are: %s")), m_format, tl::join (af, ", ")));
+    }
+
+    save_options.set_format (m_format);
+
+  }
 
   save_options.set_option_by_name ("gds2_max_vertex_count", m_gds2_max_vertex_count);
   save_options.set_option_by_name ("gds2_no_zero_length_paths", m_gds2_no_zero_length_paths);

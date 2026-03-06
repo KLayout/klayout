@@ -1925,6 +1925,17 @@ class ReportDatabase:
         The reader recognizes the format automatically and will choose the appropriate decoder. 'gzip' compressed files are uncompressed automatically.
         """
         ...
+    def merge(self, other: ReportDatabase) -> None:
+        r"""
+        @brief Merges the other database with this one
+        This method will merge the other database with this one. The other database needs to have the same top cell than
+        this database. In the merge step, identical cells and categories will be identified and missing cells or categories
+        will be created in this database. After that, all items will be transferred from the other database into this one
+        and will be associated with cells and categories from this database.
+
+        This method has been added in version 0.30.7.
+        """
+        ...
     def name(self) -> str:
         r"""
         @brief Gets the database name

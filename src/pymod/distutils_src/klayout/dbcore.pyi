@@ -1082,6 +1082,8 @@ class Cell:
     To satisfy the references inside the layout, a dummy cell is created in this case
     which has the "ghost cell" flag set to true.
 
+    A ghost cell is a real ghost cell only if the cell is empty. In that case, it is written as a ghost cell to GDS files for example. If a cell is not empty, this flag is ignored.
+
     This method has been introduced in version 0.20.
 
     Setter:
@@ -2206,6 +2208,8 @@ class Cell:
         whether to write the cell or not.
         To satisfy the references inside the layout, a dummy cell is created in this case
         which has the "ghost cell" flag set to true.
+
+        A ghost cell is a real ghost cell only if the cell is empty. In that case, it is written as a ghost cell to GDS files for example. If a cell is not empty, this flag is ignored.
 
         This method has been introduced in version 0.20.
         """
@@ -15691,7 +15695,8 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: float
     r"""
@@ -35865,11 +35870,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'b' axis
+    @brief Sets the displacement vector for the 'b' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \b= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     cell: Cell
     r"""
@@ -35912,9 +35917,10 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array
+    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     da: DVector
     r"""
@@ -45024,204 +45030,6 @@ class LoadLayoutOptions:
 
     This method has been added in version 0.30.2.
     """
-    mebes_boundary_datatype: int
-    r"""
-    Getter:
-    @brief Gets the datatype number of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the datatype number of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_boundary_layer: int
-    r"""
-    Getter:
-    @brief Gets the layer number of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the layer number of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_boundary_name: str
-    r"""
-    Getter:
-    @brief Gets the name of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the name of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_create_other_layers: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether other layers shall be created
-    @return True, if other layers will be created.
-    This attribute acts together with a layer map (see \mebes_layer_map=). Layers not listed in this map are created as well when \mebes_create_other_layers? is true. Otherwise they are ignored.
-
-    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-    Setter:
-    @brief Specifies whether other layers shall be created
-    @param create True, if other layers will be created.
-    See \mebes_create_other_layers? for a description of this attribute.
-
-    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-    """
-    mebes_data_datatype: int
-    r"""
-    Getter:
-    @brief Gets the datatype number of the data layer to produce
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the datatype number of the data layer to produce
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_data_layer: int
-    r"""
-    Getter:
-    @brief Gets the layer number of the data layer to produce
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the layer number of the data layer to produce
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_data_name: str
-    r"""
-    Getter:
-    @brief Gets the name of the data layer to produce
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the name of the data layer to produce
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_invert: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether to invert the MEBES pattern
-    If this property is set to true, the pattern will be inverted.
-
-    This property has been added in version 0.22.
-
-    Setter:
-    @brief Specify whether to invert the MEBES pattern
-    If this property is set to true, the pattern will be inverted.
-
-    This property has been added in version 0.22.
-    """
-    mebes_layer_map: LayerMap
-    r"""
-    Getter:
-    @brief Gets the layer map
-    @return The layer map.
-
-    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-    Setter:
-    @brief Sets the layer map
-    This sets a layer mapping for the reader. Unlike \mebes_set_layer_map, the 'create_other_layers' flag is not changed.
-    @param map The layer map to set.
-
-    This convenience method has been added in version 0.26.2.
-    """
-    mebes_num_shapes_per_cell: int
-    r"""
-    Getter:
-    @brief Gets the number of stripes collected per cell
-    See \mebes_num_stripes_per_cell= for details about this property.
-
-    This property has been added in version 0.24.5.
-
-    Setter:
-    @brief Specify the number of stripes collected per cell
-    See \mebes_num_stripes_per_cell= for details about this property.
-
-    This property has been added in version 0.24.5.
-    """
-    mebes_num_stripes_per_cell: int
-    r"""
-    Getter:
-    @brief Gets the number of stripes collected per cell
-    See \mebes_num_stripes_per_cell= for details about this property.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Specify the number of stripes collected per cell
-    This property specifies how many stripes will be collected into one cell.
-    A smaller value means less but bigger cells. The default value is 64.
-    New cells will be formed whenever more than this number of stripes has been read
-    or a new segment is started and the number of shapes given by \mebes_num_shapes_per_cell
-    is exceeded.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_produce_boundary: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether a boundary layer will be produced
-    See \mebes_produce_boundary= for details about this property.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Specify whether to produce a boundary layer
-    If this property is set to true, the pattern boundary will be written to the layer and datatype specified with \mebes_boundary_name, \mebes_boundary_layer and \mebes_boundary_datatype.
-    By default, the boundary layer is produced.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_subresolution: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether to invert the MEBES pattern
-    See \subresolution= for details about this property.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Specify whether subresolution trapezoids are supported
-    If this property is set to true, subresolution trapezoid vertices are supported.
-    In order to implement support, the reader will create magnified instances with a magnification of 1/16.
-    By default this property is enabled.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_top_cell_index: int
-    r"""
-    Getter:
-    @brief Gets the cell index for the top cell to use
-    See \mebes_top_cell_index= for a description of this property.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Specify the cell index for the top cell to use
-    If this property is set to a valid cell index, the MEBES reader will put the subcells and shapes into this cell.
-
-    This property has been added in version 0.23.10.
-    """
     oasis_expect_strict_mode: int
     r"""
     Getter:
@@ -45229,7 +45037,7 @@ class LoadLayoutOptions:
     Setter:
     @hide
     """
-    oasis_read_all_properties: int
+    oasis_read_all_properties: bool
     r"""
     Getter:
     @hide
@@ -45481,26 +45289,6 @@ class LoadLayoutOptions:
         Layer maps can also be used to map the named MALY mask layers to GDS layer/datatypes.
 
         This method has been added in version 0.30.2.
-        """
-        ...
-    def mebes_select_all_layers(self) -> None:
-        r"""
-        @brief Selects all layers and disables the layer map
-
-        This disables any layer map and enables reading of all layers.
-        New layers will be created when required.
-
-        This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-        """
-        ...
-    def mebes_set_layer_map(self, map: LayerMap, create_other_layers: bool) -> None:
-        r"""
-        @brief Sets the layer map
-        This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers.
-        @param map The layer map to set.
-        @param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.
-
-        This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
         """
         ...
     def select_all_layers(self) -> None:
@@ -65327,8 +65115,9 @@ class Shape:
     This method has been introduced in version 0.28.
 
     Setter:
-    @brief Replaces the shape by the given point (in micrometer units)
-    This method replaces the shape by the given point, like \point= with a \Point argument does. This version translates the point from micrometer units to database units internally.
+    @brief Replaces the shape by the given point
+    This method replaces the shape by the given point. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
     This method has been introduced in version 0.28.
     """
@@ -65398,11 +65187,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a text.
     Setter:
-    @brief Replaces the shape by the given text object
-    This method replaces the shape by the given text object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given text (in micrometer units)
+    This method replaces the shape by the given text, like \text= with a \Text argument does. This version translates the text from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     text_dpos: DVector
     r"""
@@ -69618,16 +69406,16 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit referenced by the subcircuit (non-const version).
+
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit (non-const version).
-
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
@@ -69673,17 +69461,17 @@ class SubCircuit(NetlistObject):
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
+        @brief Gets the net connected to the specified pin of the subcircuit.
         If the pin is not connected, nil is returned for the net.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit.
+        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
         If the pin is not connected, nil is returned for the net.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     ...
@@ -70333,7 +70121,8 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: int
     r"""

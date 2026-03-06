@@ -2727,6 +2727,14 @@ class CellView:
         @brief Gets the reference to the layout object addressed by this view
         """
         ...
+    def layout_handle(self) -> LayoutHandle:
+        r"""
+        @brief Gets the handle to the layout object addressed by this cell view
+        A layout handle is a reference-counted pointer to a layout object and allows sharing this resource among different views or objects. By holding a handle, the layout object is not destroyed when the view closes for example.
+
+        This method has been added in version 0.30.7.
+        """
+        ...
     def reset_cell(self) -> None:
         r"""
         @brief Resets the cell 
@@ -3158,16 +3166,23 @@ class Dispatcher:
         @param name The name of the configuration parameter to set
         @param value The value to which to set the configuration parameter
 
+        The configuration parameter name needs to be a valid XML element name. Otherwise, a corrupt configuration file will be produced.
+
         This method sets a configuration parameter with the given name to the given value. Values can only be strings. Numerical values have to be converted into strings first. Local configuration parameters override global configurations for this specific view. This allows for example to override global settings of background colors. Any local settings are not written to the configuration file. 
         """
         ...
-    def write_config(self, file_name: str) -> bool:
+    def write_config(self, file_name: str, keep_backups: Optional[int] = ...) -> bool:
         r"""
         @brief Writes configuration to a file
         @return A value indicating whether the operation was successful
 
         If the configuration file cannot be written, false 
         is returned but no exception is thrown.
+
+        @param file_name The path to write the config file to.
+        @param keep_backups The number of backups to keep (0 for 'no backups').
+
+        The 'keep_backups' option was introduced in version 0.30.7.
         """
         ...
     ...
@@ -6129,6 +6144,244 @@ class LayerPropertiesNodeRef(LayerPropertiesNode):
         ...
     ...
 
+class LayoutHandle:
+    r"""
+    @brief A handle to a global layout object
+    Layout objects shown in layout views are stored in a global repository. The layout handle is a pointer into that repository. Handles are reference counted - when no handle points to a layout, the layout is discarded.
+    A handle stores some more information about the layout, i.e. whether it is 'dirty' (needs saving) and the options used for loading or saving the layout.
+
+    The layout handle object is useful to hold a separate reference to a layout. This way it is possible to close a layout view, but still have a reference to the layout:
+
+    You can use layout handles to move a layout to a different view for example:
+
+    @code
+    cellview = ...   # the source cellview
+    new_view = ...   # the new target view
+
+    h = cellview.handle
+    cellview.close
+    new_view.show_layout(h, true)
+    @/code
+
+    Handles are named. You can use \LayoutHandle#find the find a handle by name or to obtain the handle for a given layout object. You can use \LayoutHandle#names to get the names of all handles registered in the system.
+
+    This class has been introduced in version 0.30.7.
+    """
+    name: str
+    r"""
+    Getter:
+    @brief Gets the name of the layout handle.
+    The name identifies a layout handle in the global context. Names should be unique. Handles can be retrieved by name using \find.
+    Setter:
+    @brief Sets the name of the layout handle.
+    The caller is responsible for selecting a unique name for the handle. Only uniquely named handles can be retrieved by \find.
+    """
+    @overload
+    @classmethod
+    def find(cls, layout: db.Layout) -> LayoutHandle:
+        r"""
+        @brief Finds a layout handle for the given layout object.
+        If no handle for that layout exists, nil is returned.
+        """
+        ...
+    @overload
+    @classmethod
+    def find(cls, name: str) -> LayoutHandle:
+        r"""
+        @brief Finds a layout handle by name.
+        If no handle with that name exists, nil is returned.
+        """
+        ...
+    @classmethod
+    def names(cls) -> List[str]:
+        r"""
+        @brief Gets the names of all layout handles registered currently.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, filename: str, options: db.LoadLayoutOptions, technology: Optional[str] = ...) -> LayoutHandle:
+        r"""
+        @brief Creates a handle from a file.
+        Loads the layout and creates a handle from that layout. The name is derived from the file name initially. You can pass load options and assign a technology using 'options' and 'technology' respectively.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, layout: db.Layout) -> LayoutHandle:
+        r"""
+        @brief Creates a handle from an existing layout object.
+        Creates a layout handle for an existing layout object. The ownership over the layout object is transferred to the handle. 
+        """
+        ...
+    def __copy__(self) -> LayoutHandle:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> LayoutHandle:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    @overload
+    def __init__(self, filename: str, options: db.LoadLayoutOptions, technology: Optional[str] = ...) -> None:
+        r"""
+        @brief Creates a handle from a file.
+        Loads the layout and creates a handle from that layout. The name is derived from the file name initially. You can pass load options and assign a technology using 'options' and 'technology' respectively.
+        """
+        ...
+    @overload
+    def __init__(self, layout: db.Layout) -> None:
+        r"""
+        @brief Creates a handle from an existing layout object.
+        Creates a layout handle for an existing layout object. The ownership over the layout object is transferred to the handle. 
+        """
+        ...
+    def _const_cast(self) -> LayoutHandle:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LayoutHandle:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: LayoutHandle) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> LayoutHandle:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def filename(self) -> str:
+        r"""
+        @brief Gets the file name the layout was loaded from.
+        If the handle was not constructed from a file, this attribute is an empty string.
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def is_dirty(self) -> bool:
+        r"""
+        @brief Gets a value indicating whether the layout needs saving.
+        """
+        ...
+    def is_valid(self) -> bool:
+        r"""
+        @brief Gets a value indicating whether the layout handle is valid.
+        Invalid layout handles cannot be used. Default-created layout handles are invalid for example.
+        """
+        ...
+    def layout(self) -> db.Layout:
+        r"""
+        @brief Gets the layout object kept by the handle.
+        """
+        ...
+    def load_options(self) -> db.LoadLayoutOptions:
+        r"""
+        @brief Gets the load options used when the layout was read.
+        Default options will be returned when the layout was not created from a file.
+        """
+        ...
+    def ref_count(self) -> int:
+        r"""
+        @brief Gets the reference count.
+        The reference count indicates how many references are present for the handle. If the reference count reaches zero, the layout object is destroyed. References are kept by layout views showing the layout, but can also be kept by separate handles.
+        """
+        ...
+    def save_as(self, filename: str, options: db.SaveLayoutOptions, keep_backups: Optional[int] = ...) -> None:
+        r"""
+        @brief Saves the layout to a file.
+        This method will save the layout kept by the handle to the given file. Calling this method will change the file name and reset the \is_dirty? flag and set \save_options to the options passed.
+
+        @param filename The path where to save the layout to
+        @param options The options used for saving the file
+        @param keep_backups The number of backup files to keep (0 for 'no backups')
+        """
+        ...
+    def save_options(self) -> Any:
+        r"""
+        @brief Gets the save options used most recently when saving the file or 'nil' if no save options are available.
+        """
+        ...
+    ...
+
 class LayoutView(LayoutViewBase):
     r"""
     @brief The view object presenting one or more layout objects
@@ -8562,23 +8815,7 @@ class LayoutViewBase(Dispatcher):
         """
         ...
     @overload
-    def show_layout(self, layout: db.Layout, tech: str, add_cellview: bool) -> int:
-        r"""
-        @brief Shows an existing layout in the view
-
-        Shows the given layout in the view. If add_cellview is true, the new layout is added to the list of cellviews in the view.
-        The technology to use for that layout can be specified as well with the 'tech' parameter. Depending on the definition of the technology, layer properties may be loaded for example.
-        The technology string can be empty for the default technology.
-
-        Note: once a layout is passed to the view with show_layout, it is owned by the view and must not be destroyed with the 'destroy' method.
-
-        @return The index of the cellview created.
-
-        This method has been introduced in version 0.22.
-        """
-        ...
-    @overload
-    def show_layout(self, layout: db.Layout, tech: str, add_cellview: bool, init_layers: bool) -> int:
+    def show_layout(self, layout: db.Layout, tech: str, add_cellview: bool, init_layers: Optional[bool] = ...) -> int:
         r"""
         @brief Shows an existing layout in the view
 
@@ -8593,6 +8830,20 @@ class LayoutViewBase(Dispatcher):
         @return The index of the cellview created.
 
         This method has been introduced in version 0.22.
+        """
+        ...
+    @overload
+    def show_layout(self, layout_handle: LayoutHandle, add_cellview: bool, init_layers: Optional[bool] = ...) -> int:
+        r"""
+        @brief Shows an existing layout (from a handle) in the view
+
+        This variant of \show_layout takes a layout handle instead of the layout. Layout handles are reference-counted pointers
+        and can be used to hold a reference to a layout object. This way, ownership over the layout can be shared between different
+        objects.
+
+        @return The index of the cellview created.
+
+        This method has been introduced in version 0.30.7.
         """
         ...
     def stop(self) -> None:
@@ -10011,6 +10262,19 @@ class Marker:
     Setter:
     @brief Sets the line width of the marker
     This is the width of the line drawn for the outline of the marker.
+    """
+    text_frame_enabled: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether label frames are enabled
+    See \text_frame_enabled= for a description of this attribute.
+    This attribute has been introduced in version 0.30.7.
+    Setter:
+    @brief Enables or disables the label frame
+    With the value set to true (the default), texts (labels) are drawn with a frame indicating the label dimension.
+    To turn off that frame, set this attribute to false.
+
+    This attribute has been introduced in version 0.30.7.
     """
     vertex_size: int
     r"""

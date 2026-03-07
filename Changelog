@@ -1,10 +1,11 @@
-0.30.7           (2026-03-05):
+0.30.7           (2026-03-07):
 * Enhancement: %GITHUB%/issues/2248 Switch layouts but without losing the handle
 * Bugfix: %GITHUB%/issues/2273 Potential use-after-free bug due to Ruby GC
 * Bugfix: %GITHUB%/issues/2277 Poor netlister performance in some cases
 * Enhancement: %GITHUB%/issues/2278 Option to hide markers frames
 * Bugfix: %GITHUB%/issues/2284 klayoutrc parse issue silently replaces config file
 * Bugfix: %GITHUB%/issues/2286 CLI arguments, '--help' / '--version' should be implemented
+* Bugfix: %GITHUB%/issues/2293 Layers window: changing the layer order with the arrow buttons deselects the layer to be moved
 * Enhancement: ReportDatabase#merge - a method to merge two report databases
 * Bugfix: double clicking an edge in partial mode opened the properties dialog, not setting a point
 * Bugfix: Python did not support downcasting of PolygonWithProperties to Polygon on Shapes#polygon for example

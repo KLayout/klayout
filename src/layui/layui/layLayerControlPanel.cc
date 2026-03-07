@@ -1951,7 +1951,9 @@ LayerControlPanel::do_update_content ()
     mp_layer_list->doItemsLayout ();
 
     //  establishes the current layer in case it was changed during the "in update" phase
-    mp_layer_list->set_current (lay::LayerPropertiesConstIterator (mp_view->get_properties (), m_current_layer));
+    if (m_current_layer != 0) {
+      mp_layer_list->set_current (lay::LayerPropertiesConstIterator (mp_view->get_properties (), m_current_layer));
+    }
 
     m_needs_update = false;
 

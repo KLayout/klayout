@@ -3282,13 +3282,13 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   handle = new lay::LayoutHandle (new db::Layout (is_editable (), manager ()), filename);
   cv.set (handle);
 
-  try {
+  BEGIN_PROTECTED_CLEANUP
 
     //  re-create the layers required
     for (std::map <unsigned int, db::LayerProperties>::const_iterator ol = org_layers.begin (); ol != org_layers.end (); ++ol) {
       cv->layout ().insert_layer (ol->first, ol->second);
     }
-    
+
     {
       tl::log << tl::to_string (tr ("Loading file: ")) << filename;
       tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Loading")));
@@ -3320,9 +3320,10 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
     cv->rename (name, true);
     set_layout (cv, cv_index);
 
-  } catch (...) {
+  END_PROTECTED_CLEANUP
+  {
     update_content ();
-    throw;
+    return;
   }
 
   //  recreate the hidden cell indices from the names

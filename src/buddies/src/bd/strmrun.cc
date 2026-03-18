@@ -36,6 +36,8 @@
 #include "libForceLink.h"
 #include "rdbForceLink.h"
 #include "pexForceLink.h"
+#include "drcForceLink.h"
+#include "lvsForceLink.h"
 #include "lymMacro.h"
 #include "lymMacroCollection.h"
 

@@ -125,6 +125,27 @@ private:
 };
 
 /**
+ *  @brief A shape delivery implementation for polygons with properties
+ */
+template <>
+struct DB_PUBLIC shape_collection_processor_delivery<db::PolygonWithProperties>
+{
+  shape_collection_processor_delivery (db::Layout *layout, db::Shapes *shapes)
+    : mp_layout (layout), mp_shapes (shapes)
+  { }
+
+  void put (const db::PolygonWithProperties &result)
+  {
+    tl::MutexLocker locker (&mp_layout->lock ());
+    mp_shapes->insert (db::PolygonRefWithProperties (db::PolygonRef (result, mp_layout->shape_repository ()), result.properties_id ()));
+  }
+
+private:
+  db::Layout *mp_layout;
+  db::Shapes *mp_shapes;
+};
+
+/**
  *  @brief A shape delivery implementation for texts
  */
 template <>
@@ -138,6 +159,27 @@ struct DB_PUBLIC shape_collection_processor_delivery<db::Text>
   {
     tl::MutexLocker locker (&mp_layout->lock ());
     mp_shapes->insert (db::TextRef (result, mp_layout->shape_repository ()));
+  }
+
+private:
+  db::Layout *mp_layout;
+  db::Shapes *mp_shapes;
+};
+
+/**
+ *  @brief A shape delivery implementation for texts with properties
+ */
+template <>
+struct DB_PUBLIC shape_collection_processor_delivery<db::TextWithProperties>
+{
+  shape_collection_processor_delivery (db::Layout *layout, db::Shapes *shapes)
+    : mp_layout (layout), mp_shapes (shapes)
+  { }
+
+  void put (const db::TextWithProperties &result)
+  {
+    tl::MutexLocker locker (&mp_layout->lock ());
+    mp_shapes->insert (db::TextRefWithProperties (db::TextRef (result, mp_layout->shape_repository ()), result.properties_id ()));
   }
 
 private:

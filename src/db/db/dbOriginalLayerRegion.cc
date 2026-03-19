@@ -317,6 +317,12 @@ OriginalLayerRegion::begin_merged () const
   }
 }
 
+RegionIteratorDelegate *
+OriginalLayerRegion::begin_unmerged () const
+{
+  return begin ();
+}
+
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
 OriginalLayerRegion::begin_iter () const
 {
@@ -332,6 +338,12 @@ OriginalLayerRegion::begin_merged_iter () const
     ensure_merged_polygons_valid ();
     return std::make_pair (db::RecursiveShapeIterator (m_merged_polygons), db::ICplxTrans ());
   }
+}
+
+std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
+OriginalLayerRegion::begin_unmerged_iter () const
+{
+  return std::make_pair (m_iter, m_iter_trans);
 }
 
 bool

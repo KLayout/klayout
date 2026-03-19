@@ -121,6 +121,11 @@ public:
   bool operator== (const DeepLayer &other) const;
 
   /**
+   *  @brief Swap two layers
+   */
+  void swap (DeepLayer &other);
+
+  /**
    *  @brief Gets the layout object
    *  The return value is guaranteed to be non-null.
    */

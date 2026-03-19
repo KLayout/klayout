@@ -350,6 +350,17 @@ public:
   }
 
   /**
+   *  @brief Returns the unmerged polygons
+   *
+   *  "unmerged" polygons are polygons which are optimized for local operations,
+   *  specifically broken according to the area ratio and max vertex count.
+   */
+  const_iterator begin_unmerged () const
+  {
+    return RegionIterator (mp_delegate->begin_unmerged ());
+  }
+
+  /**
    *  @brief Delivers a RecursiveShapeIterator pointing to the polygons plus the necessary transformation
    */
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const
@@ -363,6 +374,14 @@ public:
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const
   {
     return mp_delegate->begin_merged_iter ();
+  }
+
+  /**
+   *  @brief Delivers a RecursiveShapeIterator pointing to the unmerged polygons plus the necessary transformation
+   */
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_unmerged_iter () const
+  {
+    return mp_delegate->begin_unmerged_iter ();
   }
 
   /**

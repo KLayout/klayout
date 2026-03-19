@@ -66,9 +66,11 @@ public:
 
   virtual RegionIteratorDelegate *begin () const;
   virtual RegionIteratorDelegate *begin_merged () const;
+  virtual RegionIteratorDelegate *begin_unmerged () const;
 
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const;
+  virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_unmerged_iter () const;
 
   virtual bool empty () const;
   virtual bool is_merged () const;
@@ -176,10 +178,11 @@ private:
   mutable DeepLayer m_merged_polygons;
   mutable bool m_merged_polygons_valid;
   mutable size_t m_merged_polygons_boc_hash;
-  bool m_is_merged;
+  mutable bool m_is_merged;
 
   void init ();
   void ensure_merged_polygons_valid () const;
+  void ensure_unmerged_polygons_valid () const;
   DeepLayer not_with_impl (const DeepRegion *other, PropertyConstraint property_constraint) const;
   DeepLayer and_with_impl (const DeepRegion *other, PropertyConstraint property_constraint) const;
   std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other, PropertyConstraint property_constraint) const;

@@ -232,6 +232,14 @@ bool DeepLayer::operator== (const DeepLayer &other) const
   return true;
 }
 
+void
+DeepLayer::swap (DeepLayer &other)
+{
+  tl_assert (mp_store.get () == other.mp_store.get ());
+  std::swap (m_layer, other.m_layer);
+  std::swap (m_layout, other.m_layout);
+}
+
 db::Layout &
 DeepLayer::layout ()
 {

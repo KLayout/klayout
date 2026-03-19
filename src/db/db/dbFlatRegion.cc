@@ -33,29 +33,33 @@ namespace db
 // -------------------------------------------------------------------------------------------------------------
 //  FlatRegion implementation
 
-FlatRegion::FlatRegion ()
-  : MutableRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false))
+FlatRegion::FlatRegion (double area_ratio, size_t max_vertex_count)
+  : MutableRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false)),
+    m_area_ratio (area_ratio), m_max_vertex_count (max_vertex_count)
 {
   init ();
 }
 
 FlatRegion::FlatRegion (const FlatRegion &other)
-  : MutableRegion (other), mp_polygons (other.mp_polygons), mp_merged_polygons (other.mp_merged_polygons)
+  : MutableRegion (other), mp_polygons (other.mp_polygons), mp_merged_polygons (other.mp_merged_polygons),
+    m_area_ratio (other.m_area_ratio), m_max_vertex_count (other.m_max_vertex_count)
 {
   init ();
   m_is_merged = other.m_is_merged;
   m_merged_polygons_valid = other.m_merged_polygons_valid;
 }
 
-FlatRegion::FlatRegion (const db::Shapes &polygons, bool is_merged)
-  : MutableRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false))
+FlatRegion::FlatRegion (const db::Shapes &polygons, bool is_merged, double area_ratio, size_t max_vertex_count)
+  : MutableRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false)),
+    m_area_ratio (area_ratio), m_max_vertex_count (max_vertex_count)
 {
   init ();
   m_is_merged = is_merged;
 }
 
-FlatRegion::FlatRegion (const db::Shapes &polygons, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged)
-  : MutableRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false))
+FlatRegion::FlatRegion (const db::Shapes &polygons, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged, double area_ratio, size_t max_vertex_count)
+  : MutableRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false)),
+    m_area_ratio (area_ratio), m_max_vertex_count (max_vertex_count)
 {
   init ();
   m_is_merged = is_merged;
@@ -63,8 +67,9 @@ FlatRegion::FlatRegion (const db::Shapes &polygons, const db::ICplxTrans &trans,
   set_merged_semantics (merged_semantics);
 }
 
-FlatRegion::FlatRegion (bool is_merged)
-  : MutableRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false))
+FlatRegion::FlatRegion (bool is_merged, double area_ratio, size_t max_vertex_count)
+  : MutableRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false)),
+    m_area_ratio (area_ratio), m_max_vertex_count (max_vertex_count)
 {
   init ();
   m_is_merged = is_merged;
@@ -126,6 +131,20 @@ FlatRegion::ensure_merged_polygons_valid () const
   }
 }
 
+void
+FlatRegion::ensure_unmerged_polygons_valid () const
+{
+  if (! m_is_merged || (m_area_ratio == 0.0 && m_max_vertex_count == 0)) {
+    return;
+  }
+
+  mp_merged_polygons.reset (new db::Shapes (*mp_polygons));
+  m_merged_polygons_valid = true;
+  m_is_merged = false;
+
+  break_polygons (*mp_polygons, m_max_vertex_count, m_area_ratio);
+}
+
 RegionIteratorDelegate *FlatRegion::begin () const
 {
   return new FlatRegionIterator (mp_polygons.get_const ());
@@ -141,6 +160,12 @@ RegionIteratorDelegate *FlatRegion::begin_merged () const
   }
 }
 
+RegionIteratorDelegate *FlatRegion::begin_unmerged () const
+{
+  ensure_unmerged_polygons_valid ();
+  return begin ();
+}
+
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatRegion::begin_iter () const
 {
   return std::make_pair (db::RecursiveShapeIterator (*mp_polygons), db::ICplxTrans ());
@@ -154,6 +179,12 @@ std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatRegion::begin_merged_i
     ensure_merged_polygons_valid ();
     return std::make_pair (db::RecursiveShapeIterator (*mp_merged_polygons), db::ICplxTrans ());
   }
+}
+
+std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatRegion::begin_unmerged_iter () const
+{
+  ensure_unmerged_polygons_valid ();
+  return begin_iter ();
 }
 
 bool FlatRegion::empty () const

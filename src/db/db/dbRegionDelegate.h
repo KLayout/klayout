@@ -185,9 +185,11 @@ public:
 
   virtual RegionIteratorDelegate *begin () const = 0;
   virtual RegionIteratorDelegate *begin_merged () const = 0;
+  virtual RegionIteratorDelegate *begin_unmerged () const = 0;
 
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const = 0;
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const = 0;
+  virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_unmerged_iter () const = 0;
 
   virtual bool empty () const = 0;
   virtual bool is_box () const = 0;

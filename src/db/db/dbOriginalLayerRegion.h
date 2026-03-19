@@ -51,9 +51,11 @@ public:
 
   virtual RegionIteratorDelegate *begin () const;
   virtual RegionIteratorDelegate *begin_merged () const;
+  virtual RegionIteratorDelegate *begin_unmerged () const;
 
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const;
+  virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_unmerged_iter () const;
 
   virtual bool empty () const;
 

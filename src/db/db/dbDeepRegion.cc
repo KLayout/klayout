@@ -401,6 +401,13 @@ DeepRegion::begin_merged () const
   }
 }
 
+RegionIteratorDelegate *
+DeepRegion::begin_unmerged () const
+{
+  ensure_unmerged_polygons_valid ();
+  return begin ();
+}
+
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
 DeepRegion::begin_iter () const
 {
@@ -443,6 +450,13 @@ DeepRegion::begin_merged_iter () const
     }
 
   }
+}
+
+std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
+DeepRegion::begin_unmerged_iter () const
+{
+  ensure_unmerged_polygons_valid ();
+  return begin_iter ();
 }
 
 bool
@@ -788,6 +802,46 @@ DeepRegion::ensure_merged_polygons_valid () const
 }
 
 void
+DeepRegion::ensure_unmerged_polygons_valid () const
+{
+  if (! m_is_merged ||
+      (deep_layer ().store ()->max_area_ratio () == 0.0 && deep_layer ().store ()->max_vertex_count () == 0)) {
+    return;
+  }
+
+  m_merged_polygons = deep_layer ().derived ();
+  db::DeepLayer &polygons = const_cast<db::DeepLayer &> (deep_layer ());
+
+  m_merged_polygons_valid = true;
+  m_is_merged = false;
+  m_merged_polygons_boc_hash = deep_layer ().breakout_cells_hash ();
+
+  db::Layout &layout = polygons.layout ();
+  polygons.swap (m_merged_polygons);
+
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    db::Shapes &st = c->shapes (deep_layer ().layer ());
+
+    db::PolygonRefToShapesGenerator pr (&layout, &st);
+    db::PolygonSplitter splitter (pr, polygons.store ()->max_area_ratio (), polygons.store ()->max_vertex_count ());
+
+    splitter.start ();
+    for (auto p = s.begin (db::ShapeIterator::All); ! p.at_end (); ++p) {
+      if (p->is_polygon ()) {
+        pr.set_prop_id (p->prop_id ());
+        db::Polygon poly;
+        p->polygon (poly);
+        splitter.put (poly);
+      }
+    }
+    splitter.flush ();
+
+  }
+}
+
+void
 DeepRegion::set_is_merged (bool f)
 {
   m_is_merged = f;
@@ -922,6 +976,10 @@ DeepRegion::andnot_with (const Region &other, PropertyConstraint property_constr
 DeepLayer
 DeepRegion::and_with_impl (const DeepRegion *other, db::PropertyConstraint property_constraint) const
 {
+  //  booleans run better on simple polygons
+  ensure_unmerged_polygons_valid ();
+  other->ensure_unmerged_polygons_valid ();
+
   DeepLayer dl_out (deep_layer ().derived ());
 
   if (pc_skip (property_constraint)) {
@@ -956,6 +1014,10 @@ DeepRegion::and_with_impl (const DeepRegion *other, db::PropertyConstraint prope
 DeepLayer
 DeepRegion::not_with_impl (const DeepRegion *other, db::PropertyConstraint property_constraint) const
 {
+  //  booleans run better on simple polygons
+  ensure_unmerged_polygons_valid ();
+  other->ensure_unmerged_polygons_valid ();
+
   DeepLayer dl_out (deep_layer ().derived ());
   DeepLayer dl_prep;
 
@@ -1059,6 +1121,10 @@ DeepRegion::not_with_impl (const DeepRegion *other, db::PropertyConstraint prope
 std::pair<DeepLayer, DeepLayer>
 DeepRegion::and_and_not_with (const DeepRegion *other, PropertyConstraint property_constraint) const
 {
+  //  booleans run better on simple polygons
+  ensure_unmerged_polygons_valid ();
+  other->ensure_unmerged_polygons_valid ();
+
   DeepLayer dl_out1 (deep_layer ().derived ());
   DeepLayer dl_out2 (deep_layer ().derived ());
 
@@ -1178,6 +1244,10 @@ DeepRegion::add_in_place (const Region &other)
 
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
   if (other_deep) {
+
+    //  NOTE: as we don't benefit from merged shapes here, we prefer unmerged ones
+    //  for potentially better performance.
+    other_deep->ensure_unmerged_polygons_valid ();
 
     deep_layer ().add_from (other_deep->deep_layer ());
 
@@ -1885,6 +1955,10 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
     return clone ();
   }
 
+  //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
+  //  overlap after size and are not necessarily merged)
+  bool will_be_merged = (d < 0 && (merged_semantics () || is_merged ()));
+
   const db::DeepLayer &polygons = merged_deep_layer ();
 
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
@@ -1904,7 +1978,8 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
     db::PolygonRefToShapesGenerator pr (&layout, &st);
-    db::PolygonGenerator pg2 (pr, false /*don't resolve holes*/, true /*min. coherence*/);
+    db::PolygonSplitter splitter (pr, will_be_merged ? 0.0 : polygons.store ()->max_area_ratio (), will_be_merged ? 0 : polygons.store ()->max_vertex_count ());
+    db::PolygonGenerator pg2 (splitter, false /*don't resolve holes*/, true /*min. coherence*/);
     db::SizingPolygonFilter siz (pg2, d_with_mag, d_with_mag, mode);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
@@ -1916,11 +1991,7 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
 
   }
 
-  //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
-  //  overlap after size and are not necessarily merged)
-  if (d < 0 && (merged_semantics () || is_merged ())) {
-    res->set_is_merged (true);
-  }
+  res->set_is_merged (will_be_merged);
 
   return res.release ();
 }
@@ -1937,6 +2008,10 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
   if (dx == dy) {
     return sized (dx, mode);
   }
+
+  //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
+  //  overlap after size and are not necessarily merged)
+  bool will_be_merged = (dx < 0 && dy < 0 && (merged_semantics () || is_merged ()));
 
   const db::DeepLayer &polygons = merged_deep_layer ();
 
@@ -1964,7 +2039,8 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
     db::PolygonRefToShapesGenerator pr (&layout, &st);
-    db::PolygonGenerator pg2 (pr, false /*don't resolve holes*/, true /*min. coherence*/);
+    db::PolygonSplitter splitter (pr, will_be_merged ? 0.0 : polygons.store ()->max_area_ratio (), will_be_merged ? 0 : polygons.store ()->max_vertex_count ());
+    db::PolygonGenerator pg2 (splitter, false /*don't resolve holes*/, true /*min. coherence*/);
     db::SizingPolygonFilter siz (pg2, dx_with_mag, dy_with_mag, mode);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
@@ -1976,11 +2052,7 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 
   }
 
-  //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
-  //  overlap after size and are not necessarily merged)
-  if (dx < 0 && dy < 0 && (merged_semantics () || is_merged ())) {
-    res->set_is_merged (true);
-  }
+  res->set_is_merged (will_be_merged);
 
   return res.release ();
 }

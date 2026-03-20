@@ -690,12 +690,13 @@ static void
 write_simple (db::Layout *layout, const std::string &filename)
 {
   db::SaveLayoutOptions options;
-  if (! options.set_format_from_filename (filename)) {
+  auto ff = options.set_format_from_filename (filename);
+  if (! ff.first) {
     throw tl::Exception (tl::to_string (tr ("Cannot determine format from filename")));
   }
 
   db::Writer writer (options);
-  tl::OutputStream stream (filename);
+  tl::OutputStream stream (ff.second);
   writer.write (*layout, stream);
 }
 
@@ -2868,12 +2869,13 @@ static db::SaveLayoutOptions *new_v ()
   return new db::SaveLayoutOptions ();
 }
 
-static bool set_format_from_filename (db::SaveLayoutOptions *opt, const std::string &fn)
+static std::string set_format_from_filename (db::SaveLayoutOptions *opt, const std::string &fn)
 {
-  if (! opt->set_format_from_filename (fn)) {
+  auto ff = opt->set_format_from_filename (fn);
+  if (! ff.first) {
     throw tl::Exception (tl::to_string (tr ("Cannot determine format from filename")));
   }
-  return true;
+  return ff.second;
 }
 
 Class<db::SaveLayoutOptions> decl_SaveLayoutOptions ("db", "SaveLayoutOptions",
@@ -2893,6 +2895,10 @@ Class<db::SaveLayoutOptions> decl_SaveLayoutOptions ("db", "SaveLayoutOptions",
     "Beginning with version 0.23, this method always returns true, since the "
     "only consumer for the return value, Layout#write, now ignores that "
     "parameter and automatically determines the compression mode from the file name.\n"
+    "\n"
+    "Starting with version 0.30.7, this method allows specifying the desired format's extension in square brackets "
+    "after the file name (e.g. 'file.txt[def]'). This allows writing files with non-standard extensions. "
+    "The return value of this function now the is actual file name used without the square brackets ('file.txt' in the example case)."
   ) +
   gsi::method ("format=", &db::SaveLayoutOptions::set_format, gsi::arg ("format"),
     "@brief Select a format\n"

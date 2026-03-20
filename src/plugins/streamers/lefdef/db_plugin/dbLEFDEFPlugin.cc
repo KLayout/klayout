@@ -46,38 +46,8 @@ namespace db
  */
 static bool is_lef_format (const std::string &fn)
 {
-  static const char *suffixes[] = { ".lef", ".LEF", ".lef.gz", ".LEF.gz" };
-
-  //  NOTE: there is no reliable way of (easily) detecting the format. Hence we use the file
-  //  name's suffix for the format hint.
-  for (size_t i = 0; i < sizeof (suffixes) / sizeof (suffixes[0]); ++i) {
-    std::string suffix = suffixes [i];
-    if (fn.size () > suffix.size () && fn.find (suffix) == fn.size () - suffix.size ()) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/**
- *  @brief Determines the format of the given stream
- *  Returns true, if the stream has DEF format
- */
-static bool is_def_format (const std::string &fn)
-{
-  static const char *suffixes[] = { ".def", ".DEF", ".def.gz", ".DEF.gz" };
-
-  //  NOTE: there is no reliable way of (easily) detecting the format. Hence we use the file
-  //  name's suffix for the format hint.
-  for (size_t i = 0; i < sizeof (suffixes) / sizeof (suffixes[0]); ++i) {
-    std::string suffix = suffixes [i];
-    if (fn.size () > suffix.size () && fn.find (suffix) == fn.size () - suffix.size ()) {
-      return true;
-    }
-  }
-
-  return false;
+  static std::string lef_format ("LEF files (*.lef *.LEF *.lef.gz *.LEF.gz)");
+  return tl::match_filename_to_format (fn, lef_format);
 }
 
 // ---------------------------------------------------------------
@@ -92,13 +62,13 @@ LEFDEFReader::LEFDEFReader (tl::InputStream &s)
 const db::LayerMap &
 LEFDEFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
-  return read_lefdef (layout, options, is_lef_format (m_stream.filename ()));
+  return read_lefdef (layout, options, is_lef_format ("." + m_stream.suffix ()));
 }
 
 const db::LayerMap &
 LEFDEFReader::read (db::Layout &layout)
 {
-  return read_lefdef (layout, db::LoadLayoutOptions (), is_lef_format (m_stream.filename ()));
+  return read_lefdef (layout, db::LoadLayoutOptions (), is_lef_format ("." + m_stream.suffix ()));
 }
 
 const char *
@@ -287,7 +257,7 @@ class LEFDEFFormatDeclaration
 
   virtual bool detect (tl::InputStream &stream) const
   {
-    return is_lef_format (stream.filename ()) || is_def_format (stream.filename ());
+    return tl::match_filename_to_format (stream.filename (), file_format ());
   }
 
   virtual db::ReaderBase *create_reader (tl::InputStream &s) const

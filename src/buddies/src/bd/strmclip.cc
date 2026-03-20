@@ -153,10 +153,10 @@ void clip (ClipData &data)
   //  write the layout
 
   db::SaveLayoutOptions save_options;
-  save_options.set_format_from_filename (data.file_out);
+  std::string of = save_options.set_format_from_filename (data.file_out).second;
   data.writer_options.configure (save_options, target_layout);
 
-  tl::OutputStream stream (data.file_out);
+  tl::OutputStream stream (of);
   db::Writer writer (save_options);
   writer.write (target_layout, stream);
 }

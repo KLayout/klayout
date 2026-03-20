@@ -27,6 +27,7 @@
 #include "tlStream.h"
 #include "tlExpression.h"
 #include "tlInternational.h"
+#include "tlGlobPattern.h"
 
 namespace db
 {
@@ -444,16 +445,33 @@ SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index
   }
 }
 
-bool 
+std::pair<bool, std::string>
 SaveLayoutOptions::set_format_from_filename (const std::string &fn)
 {
-  for (tl::Registrar<db::StreamFormatDeclaration>::iterator fmt = tl::Registrar<db::StreamFormatDeclaration>::begin (); fmt != tl::Registrar<db::StreamFormatDeclaration>::end (); ++fmt) {
-    if (tl::match_filename_to_format (fn, fmt->file_format ())) {
-      m_format = fmt->format_name ();
-      return true;
+  tl::GlobPattern pat ("(*)\\[(*)\\]");
+
+  std::vector<std::string> pat_parts;
+  if (pat.match (fn, pat_parts) && pat_parts.size () == 2) {
+
+    for (tl::Registrar<db::StreamFormatDeclaration>::iterator fmt = tl::Registrar<db::StreamFormatDeclaration>::begin (); fmt != tl::Registrar<db::StreamFormatDeclaration>::end (); ++fmt) {
+      if (tl::match_filename_to_format ("." + pat_parts[1], fmt->file_format ())) {
+        m_format = fmt->format_name ();
+        return std::make_pair (true, pat_parts[0]);
+      }
     }
+
+  } else {
+
+    for (tl::Registrar<db::StreamFormatDeclaration>::iterator fmt = tl::Registrar<db::StreamFormatDeclaration>::begin (); fmt != tl::Registrar<db::StreamFormatDeclaration>::end (); ++fmt) {
+      if (tl::match_filename_to_format (fn, fmt->file_format ())) {
+        m_format = fmt->format_name ();
+        return std::make_pair (true, fn);
+      }
+    }
+
   }
-  return false;
+
+  return std::make_pair (false, fn);
 }
 
 }

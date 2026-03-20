@@ -97,6 +97,52 @@ TEST(1A_Flat)
     tl::InputStream stream (output);
     db::Reader reader (stream);
     reader.read (layout);
+
+    EXPECT_EQ (std::string (reader.format ()), "OASIS");
+  }
+
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
+  EXPECT_EQ (cap.captured_text (),
+    "Layer 10/0 is not present in first layout, but in second\n"
+    "Result summary (layers without differences are not shown):\n"
+    "\n"
+    "  Layer      Output       Differences (shape count)\n"
+    "  ----------------------------------------------------------------\n"
+    "  3/0        3/0          30\n"
+    "  6/0        6/0          41\n"
+    "  8/1        8/1          1\n"
+    "  10/0       -            (no such layer in first layout)\n"
+    "\n"
+  );
+}
+
+TEST(1A_FlatWithExplicitOutputFormat)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
+
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
+
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au1.oas";
+
+  std::string output = this->tmp_file ("tmp.xxx[oas]");
+
+  const char *argv[] = { "x", input_a.c_str (), input_b.c_str (), output.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+
+    EXPECT_EQ (std::string (reader.format ()), "OASIS");
   }
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));

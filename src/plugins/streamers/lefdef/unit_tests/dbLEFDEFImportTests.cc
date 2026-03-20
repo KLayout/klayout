@@ -467,13 +467,25 @@ TEST(100)
   run_test (_this, "issue-172", "lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);
 }
 
-TEST(101)
+TEST(101a)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_produce_pin_names (true);
   opt.set_pin_property_name (2);
   opt.set_cell_outline_layer ("OUTLINE (13/0)");
+
   run_test (_this, "issue-489", "lef:in.lef+def:in.def", "au.oas", opt, false);
+}
+
+TEST(101b)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+  opt.set_produce_pin_names (true);
+  opt.set_pin_property_name (2);
+  opt.set_cell_outline_layer ("OUTLINE (13/0)");
+
+  //  also with fake suffix
+  run_test (_this, "issue-489", "lef:'in.l[lef]'+def:'in.d[def]'", "au.oas", opt, false);
 }
 
 TEST(102)

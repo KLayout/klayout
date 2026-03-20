@@ -587,10 +587,10 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   if (output_layout.get ()) {
 
     db::SaveLayoutOptions save_options;
-    save_options.set_format_from_filename (output);
+    std::string of = save_options.set_format_from_filename (output).second;
     writer_options.configure (save_options, *output_layout);
 
-    tl::OutputStream stream (output);
+    tl::OutputStream stream (of);
     db::Writer writer (save_options);
     writer.write (*output_layout, stream);
 

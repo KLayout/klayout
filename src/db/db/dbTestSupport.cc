@@ -71,7 +71,7 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
   } else {
     //  write the temp file in the same format than the au file
     tmp_file = _this->tmp_file (tl::sprintf ("tmp_%x." + tl::extension (au_file), hash));
-    options.set_format_from_filename (tmp_file);
+    tmp_file = options.set_format_from_filename (tmp_file).second;
   }
 
   if ((norm & NoContext) != 0) {

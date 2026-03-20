@@ -24,6 +24,7 @@
 #include "tlTimer.h"
 #include "tlStream.h"
 #include "tlFileUtils.h"
+#include "tlEnv.h"
 
 #include "dbReader.h"
 #include "dbStream.h"
@@ -40,14 +41,31 @@ namespace db
 // ---------------------------------------------------------------
 //  Plugin for the stream reader
 
+static std::string lef_file_formats ()
+{
+  static std::string s;
+  if (s.empty ()) {
+    s = tl::get_env ("KLAYOUT_LEF_FORMAT", "*.lef *.LEF *.lef.gz *.LEF.gz");
+  }
+  return s;
+}
+
+static std::string def_file_formats ()
+{
+  static std::string s;
+  if (s.empty ()) {
+    s = tl::get_env ("KLAYOUT_DEF_FORMAT", "*.def *.DEF *.def.gz *.DEF.gz");
+  }
+  return s;
+}
+
 /**
  *  @brief Determines the format of the given stream
  *  Returns true, if the stream has LEF format
  */
 static bool is_lef_format (const std::string &fn)
 {
-  static std::string lef_format ("LEF files (*.lef *.LEF *.lef.gz *.LEF.gz)");
-  return tl::match_filename_to_format (fn, lef_format);
+  return tl::match_filename_to_format (fn, std::string ("LEF files (") + lef_file_formats () + ")");
 }
 
 // ---------------------------------------------------------------
@@ -253,7 +271,7 @@ class LEFDEFFormatDeclaration
   virtual std::string format_name () const { return "LEFDEF"; }
   virtual std::string format_desc () const { return "LEF/DEF"; }
   virtual std::string format_title () const { return "LEF/DEF (unified reader)"; }
-  virtual std::string file_format () const { return "LEF/DEF files (*.lef *.LEF *.lef.gz *.LEF.gz *.def *.DEF *.def.gz *.DEF.gz)"; }
+  virtual std::string file_format () const { return std::string ("LEF/DEF files (") + lef_file_formats () + " " + def_file_formats () + ")"; }
 
   virtual bool detect (tl::InputStream &stream) const
   {

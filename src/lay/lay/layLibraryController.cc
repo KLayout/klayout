@@ -33,6 +33,7 @@
 #include "tlLog.h"
 #include "tlStream.h"
 #include "tlFileUtils.h"
+#include "tlEnv.h"
 
 #include <QDir>
 
@@ -152,6 +153,38 @@ LibraryController::sync_files ()
     }
   }
 
+  //  scan for library definition files
+
+  std::string lib_file = tl::get_env ("KLAYOUT_LIB");
+
+  std::vector <std::pair<std::string, std::string> > lib_files;
+
+  if (lib_file.empty ()) {
+    for (std::vector <std::pair<std::string, std::string> >::const_iterator p = paths.begin (); p != paths.end (); ++p) {
+      std::string lf = tl::combine_path (p->first, "klayout.lib");
+      if (tl::is_readable (lf)) {
+        lib_files.push_back (std::make_pair (lf, p->second));
+      }
+    }
+  } else if (tl::is_readable (lib_file)) {
+    lib_files.push_back (std::make_pair (lib_file, std::string ()));
+  }
+
+  for (auto lf = lib_files.begin (); lf != lib_files.end (); ++lf) {
+
+    tl::log << "Reading lib file '" << *lf << "'";
+
+    std::vector<LibFileInfo> libs;
+    read_lib_file (lf->first, lf->second, libs);
+
+    read_libs (libs, new_lib_files);
+
+    if (m_file_watcher) {
+      m_file_watcher->add_file (tl::absolute_file_path (lf->first));
+    }
+
+  }
+
   //  scan for libraries
 
   for (std::vector <std::pair<std::string, std::string> >::const_iterator p = paths.begin (); p != paths.end (); ++p) {
@@ -169,108 +202,20 @@ LibraryController::sync_files ()
       name_filters << QString::fromUtf8 ("*");
 
       //  NOTE: this should return a list sorted by name
-      QStringList libs = lp.entryList (name_filters, QDir::Files);
+      QStringList entries = lp.entryList (name_filters, QDir::Files);
 
-      bool needs_load = false;
+      std::vector<LibFileInfo> libs;
+      libs.reserve (entries.size ());
 
-      for (QStringList::const_iterator im = libs.begin (); im != libs.end () && ! needs_load; ++im) {
-
-        std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
-        QFileInfo fi (tl::to_qstring (lib_path));
-
-        auto ll = m_lib_files.find (lib_path);
-        if (ll == m_lib_files.end ()) {
-          needs_load = true;
-        } else if (fi.lastModified () > ll->second.time) {
-          needs_load = true;
+      for (auto e = entries.begin (); e != entries.end (); ++e) {
+        libs.push_back (LibFileInfo ());
+        libs.back ().path = tl::to_string (lp.absoluteFilePath (*e));
+        if (! p->second.empty ()) {
+          libs.back ().tech.insert (p->second);
         }
-
       }
 
-      if (! needs_load) {
-
-        //  If not reloading, register the existing files as known ones - this allows detecting if
-        //  a file got removed.
-        for (QStringList::const_iterator im = libs.begin (); im != libs.end () && ! needs_load; ++im) {
-
-          std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
-          auto ll = m_lib_files.find (lib_path);
-          if (ll != m_lib_files.end ()) {
-            new_lib_files.insert (*ll);
-          }
-
-        }
-
-      } else {
-
-        std::map<std::string, db::FileBasedLibrary *> libs_by_name_here;
-
-        //  Reload all files
-        for (QStringList::const_iterator im = libs.begin (); im != libs.end (); ++im) {
-
-          std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
-          QFileInfo fi (tl::to_qstring (lib_path));
-
-          try {
-
-            std::unique_ptr<db::FileBasedLibrary> lib (new db::FileBasedLibrary (lib_path));
-            if (! p->second.empty ()) {
-              lib->set_technology (p->second);
-            }
-
-            tl::log << "Reading library '" << lib_path << "'";
-            std::string libname = lib->load ();
-
-            //  merge with existing lib if there is already one in this folder with the right name
-            auto il = libs_by_name_here.find (libname);
-            if (il != libs_by_name_here.end ()) {
-
-              tl::log << "Merging with other library file with the same name: " << libname;
-
-              il->second->merge_with_other_layout (lib_path);
-
-              //  now, we can forget the new library as it is included in the first one
-
-            } else {
-
-              //  otherwise register the new library
-
-              if (! p->second.empty ()) {
-                tl::log << "Registering as '" << libname << "' for tech '" << p->second << "'";
-              } else {
-                tl::log << "Registering as '" << libname << "'";
-              }
-
-              LibInfo li;
-              li.name = libname;
-              li.time = fi.lastModified ();
-              if (! p->second.empty ()) {
-                li.tech.insert (p->second);
-              }
-              new_lib_files.insert (std::make_pair (lib_path, li));
-
-              lib->set_name (libname);
-              libs_by_name_here.insert (std::make_pair (libname, lib.release ()));
-
-            }
-
-          } catch (tl::Exception &ex) {
-            tl::error << ex.msg ();
-          }
-
-        }
-
-        //  Register the libs (NOTE: this needs to happen after the merge)
-        for (auto l = libs_by_name_here.begin (); l != libs_by_name_here.end (); ++l) {
-          try {
-            db::LibraryManager::instance ().register_lib (l->second);
-          } catch (tl::Exception &ex) {
-            tl::error << ex.msg ();
-          } catch (...) {
-          }
-        }
-
-      }
+      read_libs (libs, new_lib_files);
 
     }
 
@@ -310,6 +255,254 @@ LibraryController::sync_files ()
   //  establish the new libraries
 
   m_lib_files = new_lib_files;
+}
+
+namespace
+{
+
+struct LibFileFunctionContext
+{
+  std::string lib_file;
+  std::string tech;
+  std::vector<LibraryController::LibFileInfo> *lib_files;
+};
+
+static void do_read_lib_file (LibFileFunctionContext &fc);
+
+class DefineFunction
+  : public tl::EvalFunction
+{
+public:
+  DefineFunction (LibFileFunctionContext *fc)
+    : mp_fc (fc)
+  { }
+
+  virtual bool supports_keyword_parameters () const { return true; }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant & /*out*/, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
+  {
+    if (args.size () < 1 || args.size () > 2) {
+      throw tl::EvalError (tl::to_string (tr ("'define' function needs one or two arguments (a path or a name and path)")), context);
+    }
+
+    std::string lf, name;
+    if (args.size () == 1) {
+      lf = args[0].to_string ();
+    } else {
+      name = args[0].to_string ();
+      lf = args[1].to_string ();
+    }
+
+    LibraryController::LibFileInfo fi;
+    fi.name = name;
+    fi.path = lf;
+    if (! mp_fc->tech.empty ()) {
+      fi.tech.insert (mp_fc->tech);
+    }
+
+    if (kwargs) {
+
+      for (auto k = kwargs->begin (); k != kwargs->end (); ++k) {
+
+        static const std::string replicate_key ("replicate");
+        static const std::string technology_key ("technology");
+        static const std::string technologies_key ("technologies");
+
+        if (k->first == replicate_key) {
+
+          fi.replicate = k->second.to_bool ();
+
+        } else if (k->first == technology_key) {
+
+          fi.tech.clear ();
+          fi.tech.insert (k->second.to_string ());
+
+        } else if (k->first == technologies_key) {
+
+          fi.tech.clear ();
+          if (k->second.is_list ()) {
+            for (auto t = k->second.begin (); t != k->second.end (); ++t) {
+              fi.tech.insert (t->to_string ());
+            }
+          }
+
+        } else {
+
+          throw tl::EvalError (tl::sprintf (tl::to_string (tr ("Unknown keyword argument '%s' for 'define' function - the only allowed keyword arguments are 'replicate', 'technology' and 'technologies")), k->first), context);
+
+        }
+
+      }
+
+    }
+
+    mp_fc->lib_files->push_back (fi);
+
+  }
+
+private:
+  LibFileFunctionContext *mp_fc;
+};
+
+class IncludeFunction
+  : public tl::EvalFunction
+{
+public:
+  IncludeFunction (LibFileFunctionContext *fc)
+    : mp_fc (fc)
+  { }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant & /*out*/, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+  {
+    if (args.size () != 1) {
+      throw tl::EvalError (tl::to_string (tr ("'include' function needs exactly one argument (the include file path)")), context);
+    }
+
+    std::string lf = args[0].to_string ();
+
+    LibFileFunctionContext fc = *mp_fc;
+    fc.lib_file = tl::is_absolute (lf) ? lf : tl::combine_path (tl::absolute_path (mp_fc->lib_file), lf);
+
+    do_read_lib_file (fc);
+  }
+
+private:
+  LibFileFunctionContext *mp_fc;
+};
+
+static void
+do_read_lib_file (LibFileFunctionContext &fc)
+{
+  tl::Eval eval;
+
+  DefineFunction define_function (&fc);
+  IncludeFunction include_function (&fc);
+
+  eval.define_function ("define", &define_function);
+  eval.define_function ("include", &include_function);
+  eval.set_var ("file", fc.lib_file);
+  eval.set_var ("tech", fc.tech);
+
+  tl::InputStream is (fc.lib_file);
+  std::string lib_file = tl::TextInputStream (is).read_all ();
+
+  tl::Extractor ex (lib_file.c_str ());
+  eval.parse (ex).execute ();
+}
+
+}
+
+void
+LibraryController::read_lib_file (const std::string &lib_file, const std::string &tech, std::vector<LibraryController::LibFileInfo> &file_info)
+{
+  LibFileFunctionContext fc;
+  fc.tech = tech;
+  fc.lib_file = tl::absolute_file_path (lib_file);
+  fc.lib_files = &file_info;
+
+  do_read_lib_file (fc);
+}
+
+void
+LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> &libs, std::map<std::string, LibraryController::LibInfo> &new_lib_files)
+{
+  bool needs_load = false;
+
+  for (auto im = libs.begin (); im != libs.end () && ! needs_load; ++im) {
+
+    const std::string &lib_path = im->path;
+    QFileInfo fi (tl::to_qstring (lib_path));
+
+    auto ll = m_lib_files.find (lib_path);
+    if (ll == m_lib_files.end ()) {
+      needs_load = true;
+    } else if (fi.lastModified () > ll->second.time) {
+      needs_load = true;
+    }
+
+  }
+
+  if (! needs_load) {
+
+    //  If not reloading, register the existing files as known ones - this allows detecting if
+    //  a file got removed.
+    for (auto im = libs.begin (); im != libs.end () && ! needs_load; ++im) {
+
+      const std::string &lib_path = im->path;
+      auto ll = m_lib_files.find (lib_path);
+      if (ll != m_lib_files.end ()) {
+        new_lib_files.insert (*ll);
+      }
+
+    }
+
+  } else {
+
+    std::map<std::string, db::FileBasedLibrary *> libs_by_name_here;
+
+    //  Reload all files
+    for (auto im = libs.begin (); im != libs.end (); ++im) {
+
+      const std::string &lib_path = im->path;
+      QFileInfo fi (tl::to_qstring (lib_path));
+
+      try {
+
+        std::unique_ptr<db::FileBasedLibrary> lib (new db::FileBasedLibrary (lib_path, im->name));
+        lib->set_technologies (im->tech);
+        lib->set_replicate (im->replicate);
+
+        tl::log << "Reading library '" << lib_path << "'";
+        std::string libname = lib->load ();
+
+        //  merge with existing lib if there is already one in this folder with the right name
+        auto il = libs_by_name_here.find (libname);
+        if (il != libs_by_name_here.end ()) {
+
+          tl::log << "Merging with other library file with the same name: " << libname;
+
+          il->second->merge_with_other_layout (lib_path);
+
+          //  now, we can forget the new library as it is included in the first one
+
+        } else {
+
+          //  otherwise register the new library
+
+          if (! im->tech.empty ()) {
+            tl::log << "Registering as '" << libname << "' for tech '" << tl::join (im->tech.begin (), im->tech.end (), ",") << "'";
+          } else {
+            tl::log << "Registering as '" << libname << "'";
+          }
+
+          LibInfo li;
+          li.name = libname;
+          li.time = fi.lastModified ();
+          li.tech = im->tech;
+          new_lib_files.insert (std::make_pair (lib_path, li));
+
+          lib->set_name (libname);
+          libs_by_name_here.insert (std::make_pair (libname, lib.release ()));
+
+        }
+
+      } catch (tl::Exception &ex) {
+        tl::error << ex.msg ();
+      }
+
+    }
+
+    //  Register the libs (NOTE: this needs to happen after the merge)
+    for (auto l = libs_by_name_here.begin (); l != libs_by_name_here.end (); ++l) {
+      try {
+        db::LibraryManager::instance ().register_lib (l->second);
+      } catch (tl::Exception &ex) {
+        tl::error << ex.msg ();
+      } catch (...) {
+      }
+    }
+
+  }
 }
 
 void

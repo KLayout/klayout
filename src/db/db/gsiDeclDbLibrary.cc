@@ -266,6 +266,26 @@ LibraryClass<db::Library> decl_Library ("db", "LibraryBase",
     "\n"
     "This method has been introduced in version 0.30.5."
   ) +
+  gsi::method ("replicate=", &db::Library::set_replicate, gsi::arg ("flag"),
+    "@brief Sets a value indicating whether the library produces replicas\n"
+    "\n"
+    "If this value is true (the default), layout written will include the\n"
+    "actual layout of a library cell (replica). With this, it is possible\n"
+    "to regenerate the layout without actually having the library at the\n"
+    "cost of additional bytes in the file.\n"
+    "\n"
+    "Setting this flag to false avoids this replication, but a layout\n"
+    "cannot be regenerated without having this library.\n"
+    "\n"
+    "This attribute has been introduced in version 0.30.8."
+  ) +
+  gsi::method ("replicate", &db::Library::replicate,
+    "@brief Gets a value indicating whether the library produces replicas\n"
+    "\n"
+    "See \\replicate= for a description of this attribute.\n"
+    "\n"
+    "This attribute has been introduced in version 0.30.8."
+  ) +
   gsi::method ("rename", &db::Library::rename, gsi::arg ("name"),
     "@brief Renames the library\n"
     "\n"

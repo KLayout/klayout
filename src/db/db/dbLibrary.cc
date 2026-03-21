@@ -32,14 +32,17 @@
 namespace db
 {
 
-Library::Library()
-  : m_id (std::numeric_limits<lib_id_type>::max ()), m_layout (true)
+Library::Library ()
+  : m_id (std::numeric_limits<lib_id_type>::max ()), m_layout (true), m_replicate (true)
 {
   m_layout.set_library (this);
 }
 
-Library::Library(const Library &d)
-  : gsi::ObjectBase (), tl::Object (), m_name (d.m_name), m_description (d.m_description), m_id (std::numeric_limits<lib_id_type>::max ()), m_layout (d.m_layout)
+Library::Library (const Library &d)
+  : gsi::ObjectBase (), tl::Object (),
+    m_name (d.m_name), m_description (d.m_description),
+    m_id (std::numeric_limits<lib_id_type>::max ()), m_layout (d.m_layout),
+    m_replicate (d.m_replicate)
 {
   m_layout.set_library (this);
 }
@@ -62,6 +65,12 @@ bool
 Library::for_technologies () const
 {
   return ! m_technologies.empty ();
+}
+
+void
+Library::set_technologies (const std::set<std::string> &t)
+{
+  m_technologies = t;
 }
 
 void
@@ -143,6 +152,12 @@ Library::is_retired (const db::cell_index_type library_cell_index) const
   std::map<db::cell_index_type, int>::const_iterator i = m_refcount.find (library_cell_index);
   std::map<db::cell_index_type, int>::const_iterator j = m_retired_count.find (library_cell_index);
   return (i != m_refcount.end () && j != m_retired_count.end () && i->second == j->second);
+}
+
+void
+Library::set_replicate (bool f)
+{
+  m_replicate = f;
 }
 
 void

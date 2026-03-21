@@ -57,6 +57,15 @@ class LibraryController
 Q_OBJECT
 
 public:
+  struct LibFileInfo
+  {
+    LibFileInfo () : name (), path (), replicate (true) { }
+    std::string name;
+    std::string path;
+    std::set<std::string> tech;
+    bool replicate;
+  };
+
   /**
    *  @brief Default constructor
    */
@@ -132,6 +141,8 @@ private:
   std::map<std::string, LibInfo> m_lib_files;
 
   void sync_files ();
+  void read_libs (const std::vector<LibFileInfo> &file_info, std::map<std::string, LibInfo> &new_lib_files);
+  void read_lib_file (const std::string &lib_file, const std::string &tech, std::vector<LibFileInfo> &file_info);
 };
 
 }

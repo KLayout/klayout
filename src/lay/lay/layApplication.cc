@@ -1060,47 +1060,72 @@ ApplicationBase::usage ()
 {
   std::string r;
   r = std::string (lay::Version::exe_name ()) + " [<options>] [<file>] ..\n";
-  r += tl::to_string (QObject::tr ("options")) + "\n";
-  r += tl::to_string (QObject::tr ("  -b                  Batch mode (same as -zz -nc -rx)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -c <config file>    Use this configuration file")) + "\n";
-  r += tl::to_string (QObject::tr ("  -nc                 Don't use a configuration file (implies -t)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -d <log level>      Set log level")) + "\n";
-  r += tl::to_string (QObject::tr ("  -e                  Editable mode (allow editing of files)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -ne                 Readonly mode (editing of files is disabled)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -gr <file name>     Record GUI test file")) + "\n";
-  r += tl::to_string (QObject::tr ("  -gp <file name>     Replay GUI test file")) + "\n";
-  r += tl::to_string (QObject::tr ("  -gb <line number>   Replay GUI test file up to (including) line")) + "\n";
-  r += tl::to_string (QObject::tr ("  -gx <millisec>      Replay rate for GUI test file")) + "\n";
-  r += tl::to_string (QObject::tr ("  -gi                 Incremental logs for GUI test file")) + "\n";
-  r += tl::to_string (QObject::tr ("  -i                  Disable undo buffering (less memory requirements)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -ni                 Enable undo buffering (default, overrides previous -i option)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -j <path>           Add the given path to the macro project paths")) + "\n"; 
-  r += tl::to_string (QObject::tr ("  -k <log file>       Write log to the given file plus stdout/stderr")) + "\n";
-  r += tl::to_string (QObject::tr ("  -l <lyp file>       Use layer properties file")) + "\n";
-  r += tl::to_string (QObject::tr ("  -lx                 With -l: add other layers as well")) + "\n";
-  r += tl::to_string (QObject::tr ("  -lf                 With -l: use the lyp file as it is (no expansion to multiple layouts)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -m <database file>  Load RDB (report database) file (into previous layout view)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -mn <database file> Load L2NDB (layout to netlist database) file (into previous layout view)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -n <technology>     Technology to use for next layout(s) on command line")) + "\n";
-  r += tl::to_string (QObject::tr ("  -nn <tech file>     Technology file (.lyt) to use for next layout(s) on command line")) + "\n";
-  r += tl::to_string (QObject::tr ("  -p <plugin>         Load the plugin (can be used multiple times)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -r <script>         Execute main script on startup (after having loaded files etc.)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -rr <script>        Like -r, but does not exit after executing the script")) + "\n";
-  r += tl::to_string (QObject::tr ("  -rm <script>        Execute script on startup before loading files (can be used multiple times)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -rd <name>=<value>  Specify script variable")) + "\n";
-  r += tl::to_string (QObject::tr ("  -rx                 Ignore all implicit macros (*.rbm, rbainit, *.lym)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -s                  Load files into same view")) + "\n";
-  r += tl::to_string (QObject::tr ("  -t                  Don't update the configuration file on exit")) + "\n";
-  r += tl::to_string (QObject::tr ("  -nt                 Update the configuration file on exit (default, overrides previous -t option)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -u <file name>      Restore session from given file")) + "\n";
-  r += tl::to_string (QObject::tr ("  -v                  Print program version and exit (also available as --version)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -wd <name>=<value>  Define a variable within expressions")) + "\n";
-  r += tl::to_string (QObject::tr ("  -x                  Synchronous drawing mode")) + "\n";
-  r += tl::to_string (QObject::tr ("  -y <package>        Package installation: install package(s) and exit - can be used more than once")) + "\n";
-  r += tl::to_string (QObject::tr ("                      ('package' is a name, an URL and optionally a version in round brackets)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -yd                 With -y: include dependencies")) + "\n";
-  r += tl::to_string (QObject::tr ("  -z                  Non-GUI mode (hidden views)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -zz                 Non-GUI mode (database only, implies -nc)")) + "\n";
+  r += tl::to_string (tr (
+    "\n"
+    "The format of the input files is usually detected automatically. In some cases, the format is derived from\n"
+    "the file's suffix. If your file does not have the neccessary suffix, you can explicitly specify the format\n"
+    "by adding the respective suffix to the file name in square brackets - e.g. 'file.data[def]' will read\n"
+    "the file 'file.data' as a DEF file.\n"
+    "\n"
+    "Options:\n"
+    "  -b                  Batch mode (same as -zz -nc -rx)\n"
+    "  -c <config file>    Use this configuration file\n"
+    "  -nc                 Don't use a configuration file (implies -t)\n"
+    "  -d <log level>      Set log level\n"
+    "  -e                  Editable mode (allow editing of files)\n"
+    "  -ne                 Readonly mode (editing of files is disabled)\n"
+    "  -gr <file name>     Record GUI test file\n"
+    "  -gp <file name>     Replay GUI test file\n"
+    "  -gb <line number>   Replay GUI test file up to (including) line\n"
+    "  -gx <millisec>      Replay rate for GUI test file\n"
+    "  -gi                 Incremental logs for GUI test file\n"
+    "  -i                  Disable undo buffering (less memory requirements)\n"
+    "  -ni                 Enable undo buffering (default, overrides previous -i option)\n"
+    "  -j <path>           Add the given path to the macro project paths\n"
+    "  -k <log file>       Write log to the given file plus stdout/stderr\n"
+    "  -l <lyp file>       Use layer properties file\n"
+    "  -lx                 With -l: add other layers as well\n"
+    "  -lf                 With -l: use the lyp file as it is (no expansion to multiple layouts)\n"
+    "  -m <database file>  Load RDB (report database) file (into previous layout view)\n"
+    "  -mn <database file> Load L2NDB (layout to netlist database) file (into previous layout view)\n"
+    "  -n <technology>     Technology to use for next layout(s) on command line\n"
+    "  -nn <tech file>     Technology file (.lyt) to use for next layout(s) on command line\n"
+    "  -p <plugin>         Load the plugin (can be used multiple times)\n"
+    "  -r <script>         Execute main script on startup (after having loaded files etc.)\n"
+    "  -rr <script>        Like -r, but does not exit after executing the script\n"
+    "  -rm <script>        Execute script on startup before loading files (can be used multiple times)\n"
+    "  -rd <name>=<value>  Specify script variable\n"
+    "  -rx                 Ignore all implicit macros (*.rbm, rbainit, *.lym)\n"
+    "  -s                  Load files into same view\n"
+    "  -t                  Don't update the configuration file on exit\n"
+    "  -nt                 Update the configuration file on exit (default, overrides previous -t option)\n"
+    "  -u <file name>      Restore session from given file\n"
+    "  -v                  Print program version and exit (also available as --version)\n"
+    "  -wd <name>=<value>  Define a variable within expressions\n"
+    "  -x                  Synchronous drawing mode\n"
+    "  -y <package>        Package installation: install package(s) and exit - can be used more than once\n"
+    "                      ('package' is a name, an URL and optionally a version in round brackets)\n"
+    "  -yd                 With -y: include dependencies\n"
+    "  -z                  Non-GUI mode (hidden views)\n"
+    "  -zz                 Non-GUI mode (database only, implies -nc)\n"
+    "\n"
+    "Environment variables:\n"
+    "  KLAYOUT_HOME               The path to KLayout's data (configuration, macros, libraries etc.).\n"
+    "                             Default path is '~/.klayout' on Linux and '%USERPROFILE%\\KLayout' on Windows.\n"
+    "  KLAYOUT_PATH               A list of locations to look into additionally to KLAYOUT_HOME for macros, libraries etc.\n"
+    "                             Separator for the locations is ':' on Linux and ';' on Windows.\n"
+    "  KLAYOUT_SALT_MINE          The package manager repository URL. Default is 'http://sami.klayout.org/repository.xml'.\n"
+    "  KLAYOUT_IGNORE_MACRO_DIRS  A colon-separated list of folder names to ignore in the macro editor tree.\n"
+    "                             By default, only '__pycache__' is ignored.\n"
+    "  KLAYOUT_LEF_FORMAT         A space-separated list of formats to be recognized as LEF files.\n"
+    "                             By default this format list is '*.lef *.LEF *.lef.gz *.LEF.gz'.\n"
+    "  KLAYOUT_DEF_FORMAT         A space-separated list of formats to be recognized as DEF files.\n"
+    "                             By default this format list is '*.def *.DEF *.def.gz *.DEF.gz'.\n"
+    "  KLAYOUT_PYTHONPATH         The equivalent of PYTHONPATH for KLayout.\n"
+    "  KLAYOUT_PYTHONHOME         The equivalent of PYTHONHOME for KLayout.\n"
+    "  KLAYOUT_HTTP_TIMEOUT       The timeout for HTTP(S) requests in seconds. The default value is 10.\n"
+    "  KLAYOUT_VERBOSITY          The default verbosity (see -d option).\n"
+  ));
   return r;
 }
 

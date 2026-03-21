@@ -176,7 +176,9 @@ BD_PUBLIC int strmclip (int argc, char *argv[])
       << tl::arg ("output",                    &data.file_out, "The output file",
                   "The output format is determined from the suffix of the file. If the suffix indicates "
                   "gzip compression, the file will be compressed on output. Examples for recognized suffixes are "
-                  "\".oas\", \".gds.gz\", \".dxf\" or \".gds2\"."
+                  "\".oas\", \".gds.gz\", \".dxf\" or \".gds2\". You can also use any name, and specify the "
+                  "desired suffix in square brackets after the file name. For example, 'file.clip[oas]' will "
+                  "create an OASIS file called 'file.clip'."
                  )
       << tl::arg ("-l|--clip-layer=spec",      &data, &ClipData::set_clip_layer, "Specifies a layer to take the clip regions from",
                   "If this option is given, the clip rectangles are taken from the given layer."

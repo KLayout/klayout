@@ -237,8 +237,11 @@ public:
    *  @brief Remap the library proxies to a different library
    *
    *  After remapping, "other" can replace "this".
+   *  When calling with "other=this", a pointer to the original
+   *  layout needs to be supplied, because in that case, the
+   *  layout of "this" is already replaced.
    */
-  void remap_to (db::Library *other);
+  void remap_to (db::Library *other, Layout *original_layout = 0);
 
   /**
    *  @brief This event is fired if proxies get retired on unretired

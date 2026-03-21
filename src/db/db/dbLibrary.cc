@@ -164,16 +164,25 @@ Library::rename (const std::string &name)
 void
 Library::refresh ()
 {
+  //  save a copy of the layout, so we can refer to it
+  std::unique_ptr<db::Layout> org_layout (new db::Layout (layout ()));
+
   std::string name = reload ();
   rename (name);
 
   layout ().refresh ();
-  remap_to (this);
+  remap_to (this, org_layout.get ());
 }
 
 void
-Library::remap_to (db::Library *other)
+Library::remap_to (db::Library *other, db::Layout *original_layout)
 {
+  tl_assert (other != this || original_layout != 0);
+
+  if (! original_layout) {
+    original_layout = &layout ();
+  }
+
   //  Hint: in the loop over the referrers we might unregister (delete from m_referrers) a referrer because no more cells refer to us.
   //  Hence we must not directly iterate of m_referrers.
   std::vector<std::pair<db::Layout *, int> > referrers;
@@ -194,7 +203,7 @@ Library::remap_to (db::Library *other)
       db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (&*c);
       if (lib_proxy && lib_proxy->lib_id () == get_id ()) {
 
-        db::Cell *lib_cell = &layout ().cell (lib_proxy->library_cell_index ());
+        db::Cell *lib_cell = &original_layout->cell (lib_proxy->library_cell_index ());
         db::PCellVariant *lib_pcell = dynamic_cast <db::PCellVariant *> (lib_cell);
         if (lib_pcell) {
           pcells_to_map.push_back (std::make_pair (lib_proxy, lib_pcell));
@@ -218,7 +227,7 @@ Library::remap_to (db::Library *other)
 
       std::pair<bool, pcell_id_type> pn (false, 0);
       if (other) {
-        pn = other->layout ().pcell_by_name (lp->first->get_basic_name ().c_str ());
+        pn = other->layout ().pcell_by_name (original_layout->cell (lp->first->library_cell_index ()).get_basic_name ().c_str ());
       }
 
       if (! pn.first) {
@@ -230,7 +239,7 @@ Library::remap_to (db::Library *other)
 
       } else {
 
-        const db::PCellDeclaration *old_pcell_decl = layout ().pcell_declaration (lib_pcell->pcell_id ());
+        const db::PCellDeclaration *old_pcell_decl = original_layout->pcell_declaration (lib_pcell->pcell_id ());
         const db::PCellDeclaration *new_pcell_decl = other->layout ().pcell_declaration (pn.second);
         if (! old_pcell_decl || ! new_pcell_decl) {
 
@@ -267,7 +276,7 @@ Library::remap_to (db::Library *other)
 
       std::pair<bool, cell_index_type> cn (false, 0);
       if (other) {
-        cn = other->layout ().cell_by_name ((*lp)->get_basic_name ().c_str ());
+        cn = other->layout ().cell_by_name (original_layout->cell ((*lp)->library_cell_index ()).get_basic_name ().c_str ());
       }
 
       if (! cn.first) {

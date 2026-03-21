@@ -1,0 +1,6 @@
+
+# This is a smoke test
+deep
+
+puts("This is DRC.")
+

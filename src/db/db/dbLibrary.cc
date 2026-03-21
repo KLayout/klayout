@@ -177,8 +177,6 @@ Library::refresh ()
 void
 Library::remap_to (db::Library *other, db::Layout *original_layout)
 {
-  tl_assert (other != this || original_layout != 0);
-
   if (! original_layout) {
     original_layout = &layout ();
   }

@@ -34,6 +34,7 @@ SOURCES = \
   dbEdgeProcessor.cc \
   dbEdges.cc \
   dbEdgesLocalOperations.cc \
+  dbFileBasedLibrary.cc \
   dbFillTool.cc \
   dbFuzzyCellMapping.cc \
   dbGenericShapeIterator.cc \
@@ -274,6 +275,7 @@ HEADERS = \
   dbEdges.h \
   dbEdgesLocalOperations.h \
   dbEdgesToContours.h \
+  dbFileBasedLibrary.h \
   dbFillTool.h \
   dbFuzzyCellMapping.h \
   dbGenericShapeIterator.h \

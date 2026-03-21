@@ -29,8 +29,7 @@
 #include "layQtTools.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
-#include "dbReader.h"
-#include "dbCellMapping.h"
+#include "dbFileBasedLibrary.h"
 #include "tlLog.h"
 #include "tlStream.h"
 #include "tlFileUtils.h"
@@ -39,81 +38,6 @@
 
 namespace lay
 {
-
-// -------------------------------------------------------------------------------------------
-
-class FileBasedLibrary
-  : public db::Library
-{
-public:
-  FileBasedLibrary (const std::string &path)
-    : db::Library (), m_path (path)
-  {
-    set_description (tl::filename (path));
-  }
-
-  void merge_with_other_layout (const std::string &path)
-  {
-    m_other_paths.push_back (path);
-    merge_impl (path);
-  }
-
-  virtual std::string reload ()
-  {
-    std::string name = tl::basename (m_path);
-
-    layout ().clear ();
-
-    tl::InputStream stream (m_path);
-    db::Reader reader (stream);
-    reader.read (layout ());
-
-    //  Use the libname if there is one
-    db::Layout::meta_info_name_id_type libname_name_id = layout ().meta_info_name_id ("libname");
-    for (db::Layout::meta_info_iterator m = layout ().begin_meta (); m != layout ().end_meta (); ++m) {
-      if (m->first == libname_name_id && ! m->second.value.is_nil ()) {
-        name = m->second.value.to_string ();
-        break;
-      }
-    }
-
-    for (auto p = m_other_paths.begin (); p != m_other_paths.end (); ++p) {
-      merge_impl (*p);
-    }
-
-    return name;
-  }
-
-private:
-  std::string m_path;
-  std::list<std::string> m_other_paths;
-
-  void merge_impl (const std::string &path)
-  {
-    db::Layout ly;
-
-    tl::InputStream stream (path);
-    db::Reader reader (stream);
-    reader.read (ly);
-
-    std::vector<db::cell_index_type> target_cells, source_cells;
-
-    //  collect the cells to pull in (all top cells of the library layout)
-    //  NOTE: cells are not overwritten - the first layout wins, in terms
-    //  of cell names and also in terms of database unit.
-    for (auto c = ly.begin_top_down (); c != ly.end_top_cells (); ++c) {
-      std::string cn = ly.cell_name (*c);
-      if (! layout ().has_cell (cn.c_str ())) {
-        source_cells.push_back (*c);
-        target_cells.push_back (layout ().add_cell (cn.c_str ()));
-      }
-    }
-
-    db::CellMapping cm;
-    cm.create_multi_mapping_full (layout (), target_cells, ly, source_cells);
-    layout ().copy_tree_shapes (ly, cm);
-  }
-};
 
 // -------------------------------------------------------------------------------------------
 
@@ -279,7 +203,7 @@ LibraryController::sync_files ()
 
       } else {
 
-        std::map<std::string, FileBasedLibrary *> libs_by_name_here;
+        std::map<std::string, db::FileBasedLibrary *> libs_by_name_here;
 
         //  Reload all files
         for (QStringList::const_iterator im = libs.begin (); im != libs.end (); ++im) {
@@ -289,13 +213,13 @@ LibraryController::sync_files ()
 
           try {
 
-            std::unique_ptr<FileBasedLibrary> lib (new FileBasedLibrary (lib_path));
+            std::unique_ptr<db::FileBasedLibrary> lib (new db::FileBasedLibrary (lib_path));
             if (! p->second.empty ()) {
               lib->set_technology (p->second);
             }
 
             tl::log << "Reading library '" << lib_path << "'";
-            std::string libname = lib->reload ();
+            std::string libname = lib->load ();
 
             //  merge with existing lib if there is already one in this folder with the right name
             auto il = libs_by_name_here.find (libname);

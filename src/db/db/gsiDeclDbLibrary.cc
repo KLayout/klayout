@@ -29,6 +29,7 @@
 #include "dbPCellDeclaration.h"
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
+#include "dbFileBasedLibrary.h"
 #include "tlLog.h"
 
 namespace gsi
@@ -156,11 +157,63 @@ static LibraryImpl *new_lib ()
   return new LibraryImpl ();
 }
 
+static db::Library *library_from_file (const std::string &path, const std::string &name)
+{
+  std::unique_ptr<db::FileBasedLibrary> lib (new db::FileBasedLibrary (path, name));
+
+  std::string n = lib->load ();
+  db::Library *ret = lib.get ();
+  register_lib (lib.release (), n);
+
+  return ret;
+}
+
+static  db::Library *library_from_files (const std::vector<std::string> &paths, const std::string &name)
+{
+  if (paths.empty ()) {
+    throw tl::Exception (tl::to_string (tr ("At least one path must be given")));
+  }
+
+  std::unique_ptr<db::FileBasedLibrary> lib (new db::FileBasedLibrary (paths.front (), name));
+  for (auto i = paths.begin () + 1; i != paths.end (); ++i) {
+    lib->merge_with_other_layout (*i);
+  }
+
+  std::string n = lib->load ();
+  db::Library *ret = lib.get ();
+  register_lib (lib.release (), n);
+
+  return ret;
+}
+
 /**
  *  @brief A basic implementation of the library
  */
 
 LibraryClass<db::Library> decl_Library ("db", "LibraryBase",
+  gsi::method ("library_from_file", &library_from_file, gsi::arg ("path"), gsi::arg ("name", std::string (), "auto"),
+    "@brief Creates a library from a file\n"
+    "@param path The path to the file from which to create the library from.\n"
+    "@param name The name of the library. If empty, the name will be derived from the GDS LIBNAME or the file name.\n"
+    "@return The library object created. It is already registered with the name given or derived from the file.\n"
+    "\n"
+    "This method will create a \\Library object which is tied to a specific file. This object supports "
+    "automatic reloading when the \\Library#refresh method is called.\n"
+    "\n"
+    "This convenience method has been added in version 0.30.8.\n"
+  ) +
+  gsi::method ("library_from_files", &library_from_files, gsi::arg ("paths"), gsi::arg ("name", std::string (), "auto"),
+    "@brief Creates a library from a set of files\n"
+    "@param paths The paths to the files from which to create the library from. At least one file needs to be given.\n"
+    "@param name The name of the library. If empty, the name will be derived from the GDS LIBNAME or the file name.\n"
+    "@return The library object created. It is already registered with the name given or derived from the file.\n"
+    "\n"
+    "This method will create a \\Library object which is tied to several files. This object supports "
+    "automatic reloading when the \\Library#refresh method is called. The content of the files is merged "
+    "into the library. This is useful for example to create one library from a collection of files.\n"
+    "\n"
+    "This convenience method has been added in version 0.30.8.\n"
+  ) +
   gsi::method ("library_by_name", &library_by_name, gsi::arg ("name"), gsi::arg ("for_technology", std::string (), "unspecific"),
     "@brief Gets a library by name\n"
     "Returns the library object for the given name. If the name is not a valid library name, nil is returned.\n"

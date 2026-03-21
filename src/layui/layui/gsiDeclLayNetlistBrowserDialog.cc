@@ -169,6 +169,20 @@ static lay::NetlistObjectPath current_path_second (lay::NetlistBrowserDialog *di
   return dialog->current_path ().second ();
 }
 
+static void set_current_path (lay::NetlistBrowserDialog *dialog, const lay::NetlistObjectsPath *path)
+{
+  if (! path) {
+    dialog->set_current_path (lay::NetlistObjectsPath ());
+  } else {
+    dialog->set_current_path (*path);
+  }
+}
+
+static lay::LayoutViewBase *get_view (lay::NetlistBrowserDialog *dialog)
+{
+  return dialog->view ();
+}
+
 Class<lay::NetlistBrowserDialog> decl_NetlistBrowserDialog ("lay", "NetlistBrowserDialog",
   gsi::event ("on_current_db_changed", &lay::NetlistBrowserDialog::current_db_changed_event,
     "@brief This event is triggered when the current database is changed.\n"
@@ -187,6 +201,16 @@ Class<lay::NetlistBrowserDialog> decl_NetlistBrowserDialog ("lay", "NetlistBrows
   gsi::method ("db", &lay::NetlistBrowserDialog::db,
     "@brief Gets the database the browser is connected to.\n"
   ) +
+  gsi::method ("db_index", &lay::NetlistBrowserDialog::l2n_index,
+    "@brief Gets the database index inside the view the browser is connected to.\n"
+    "\n"
+    "This attribute has been introduced in version 0.30.8.\n"
+  ) +
+  gsi::method_ext ("view", &get_view,
+    "@brief Gets the view the browser is connected to.\n"
+    "\n"
+    "This attribute has been introduced in version 0.30.8.\n"
+  ) +
   gsi::method_ext ("current_path_first", &current_path_first,
     "@brief Gets the path of the current object on the first (layout in case of LVS database) side.\n"
   ) +
@@ -195,6 +219,14 @@ Class<lay::NetlistBrowserDialog> decl_NetlistBrowserDialog ("lay", "NetlistBrows
   ) +
   gsi::method ("current_path", &lay::NetlistBrowserDialog::current_path,
     "@brief Gets the path of the current object as a path pair (combines layout and schematic object paths in case of a LVS database view).\n"
+  ) +
+  gsi::method_ext ("current_path=", &set_current_path,
+    "@brief Sets the current path.\n"
+    "This is the setter corresponding to the 'current_path' getter. Passing nil clears the selection.\n"
+    "Changing the selection will update the highlights and navigate to the location depending on the "
+    "settings. An \\on_selection_changed signal is not emitted.\n"
+    "\n"
+    "This setter has been introduced in version 0.30.8.\n"
   ) +
   gsi::method ("selected_paths", &lay::NetlistBrowserDialog::selected_paths,
     "@brief Gets the nets currently selected objects (paths) in the netlist database browser.\n"

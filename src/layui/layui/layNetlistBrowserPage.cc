@@ -502,9 +502,9 @@ NetlistBrowserPage::select_path (const lay::NetlistObjectsPath &path)
 {
   if (path.is_null ()) {
 
-    nl_directory_tree->clearSelection ();
-    sch_directory_tree->clearSelection ();
-    xref_directory_tree->clearSelection ();
+    nl_directory_tree->setCurrentIndex (QModelIndex ());
+    sch_directory_tree->setCurrentIndex (QModelIndex ());
+    xref_directory_tree->setCurrentIndex (QModelIndex ());
 
   } else {
 
@@ -1315,7 +1315,7 @@ NetlistBrowserPage::clear_highlights ()
 void
 NetlistBrowserPage::highlight (const NetlistObjectsPath &current_path, const std::vector<NetlistObjectsPath> &selected_paths)
 {
-  if (current_path != m_current_path && selected_paths != m_selected_paths) {
+  if (current_path != m_current_path || selected_paths != m_selected_paths) {
 
     m_current_path = current_path;
     m_selected_paths = selected_paths;

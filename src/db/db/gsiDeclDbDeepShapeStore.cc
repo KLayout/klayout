@@ -259,6 +259,9 @@ Class<db::DeepShapeStore> decl_dbDeepShapeStore ("db", "DeepShapeStore",
     "\n"
     "This method has been added in version 0.26.1\n"
   ) +
+  gsi::method ("layout", static_cast<db::Layout &(db::DeepShapeStore::*) (unsigned int)> (&db::DeepShapeStore::layout), gsi::arg ("index"),
+    "@hide"
+  ) +
   gsi::method ("push_state", &db::DeepShapeStore::push_state,
     "@brief Pushes the store's state on the state state\n"
     "This will save the stores state (\\threads, \\max_vertex_count, \\max_area_ratio, breakout cells ...) on "

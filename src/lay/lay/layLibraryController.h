@@ -51,7 +51,7 @@ class MainWindow;
  *  By making the controller a PluginDeclaration it will receive
  *  initialization and configuration calls.
  */
-class LibraryController
+class LAY_PUBLIC LibraryController
   : public lay::PluginDeclaration, public tl::Object
 {
 Q_OBJECT
@@ -116,6 +116,11 @@ public:
    */
   static LibraryController *instance ();
 
+  /**
+   *  @brief Provided for test purposes
+   */
+  static void read_lib_file (const std::string &lib_file, const std::string &tech, std::vector<LibFileInfo> &file_info);
+
 private slots:
   /**
    *  @brief Called when the file watcher detects a change in the file system
@@ -142,7 +147,6 @@ private:
 
   void sync_files ();
   void read_libs (const std::vector<LibFileInfo> &file_info, std::map<std::string, LibInfo> &new_lib_files);
-  void read_lib_file (const std::string &lib_file, const std::string &tech, std::vector<LibFileInfo> &file_info);
 };
 
 }

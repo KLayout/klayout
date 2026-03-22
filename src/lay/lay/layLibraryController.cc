@@ -295,7 +295,7 @@ public:
 
     LibraryController::LibFileInfo fi;
     fi.name = name;
-    fi.path = lf;
+    fi.path = tl::is_absolute (lf) ? lf : tl::combine_path (tl::absolute_path (mp_fc->lib_file), lf);
     if (! mp_fc->tech.empty ()) {
       fi.tech.insert (mp_fc->tech);
     }
@@ -315,7 +315,10 @@ public:
         } else if (k->first == technology_key) {
 
           fi.tech.clear ();
-          fi.tech.insert (k->second.to_string ());
+          std::string tn = k->second.to_string ();
+          if (! tn.empty () && tn != "*") {
+            fi.tech.insert (tn);
+          }
 
         } else if (k->first == technologies_key) {
 
@@ -375,11 +378,8 @@ do_read_lib_file (LibFileFunctionContext &fc)
 {
   tl::Eval eval;
 
-  DefineFunction define_function (&fc);
-  IncludeFunction include_function (&fc);
-
-  eval.define_function ("define", &define_function);
-  eval.define_function ("include", &include_function);
+  eval.define_function ("define", new DefineFunction (&fc));
+  eval.define_function ("include", new IncludeFunction (&fc));
   eval.set_var ("file", fc.lib_file);
   eval.set_var ("tech", fc.tech);
 

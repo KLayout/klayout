@@ -1,0 +1,10 @@
+
+define("L0", "l0.gds", technology = "*");
+
+# relative to this file
+include("../lay/a.libdef");
+
+var n4 = "L4";
+var f4 = "l4.gds";
+define(n4, f4);
+

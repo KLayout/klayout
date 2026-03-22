@@ -1,0 +1,6 @@
+
+# A comment
+define("noname.gds");
+define("L2", file + ".zzz", technology = "");
+define("L3", "subdir/l3.gds", technologies = [ "T2", "T3" ], replicate = false);
+

@@ -1892,8 +1892,8 @@ namespace
  */
 template <class T>
 struct hc_receiver
-  : public db::box_scanner_receiver<db::Instance, unsigned int>,
-    public db::box_scanner_receiver2<local_cluster<T>, unsigned int, db::Instance, unsigned int>
+  : public db::box_scanner_receiver<db::Instance, db::Box>,
+    public db::box_scanner_receiver2<local_cluster<T>, db::Box, db::Instance, db::Box>
 {
 public:
   typedef typename hier_clusters<T>::box_type box_type;
@@ -1963,7 +1963,7 @@ public:
   /**
    *  @brief Receiver main event for instance-to-instance interactions
    */
-  void add (const db::Instance *i1, unsigned int /*p1*/, const db::Instance *i2, unsigned int /*p2*/)
+  void add (const db::Instance *i1, db::Box /*p1*/, const db::Instance *i2, db::Box /*p2*/)
   {
     db::ICplxTrans t;
 
@@ -1976,7 +1976,7 @@ public:
   /**
    *  @brief Single-instance treatment - may be required because of interactions between array members
    */
-  void finish (const db::Instance *i, unsigned int /*p1*/)
+  void finish (const db::Instance *i, db::Box /*p1*/)
   {
     consider_single_inst (*i);
   }
@@ -1984,7 +1984,7 @@ public:
   /**
    *  @brief Receiver main event for local-to-instance interactions
    */
-  void add (const local_cluster<T> *c1, unsigned int /*p1*/, const db::Instance *i2, unsigned int /*p2*/)
+  void add (const local_cluster<T> *c1, db::Box /*p1*/, const db::Instance *i2, db::Box /*p2*/)
   {
     std::list<ClusterInstanceInteraction> ic;
 
@@ -3079,15 +3079,15 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
     static std::string desc = tl::to_string (tr ("Instance to instance treatment"));
     tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 30, desc);
 
-    db::box_scanner<db::Instance, unsigned int> bs (true, desc);
+    db::box_scanner<db::Instance, db::Box> bs (true, desc);
 
     for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
       if (! is_breakout_cell (breakout_cells, inst->cell_index ())) {
-        bs.insert (inst.operator-> (), 0);
+        bs.insert (inst.operator-> (), cibc (*inst));
       }
     }
 
-    bs.process (*rec, 1 /*touching*/, cibc);
+    bs.process_with_adaptor (*rec, 1 /*touching*/);
   }
 
   //  handle local to instance connections
@@ -3099,7 +3099,8 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
     static std::string desc = tl::to_string (tr ("Local to instance treatment"));
     tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 30, desc);
 
-    db::box_scanner2<db::local_cluster<T>, unsigned int, db::Instance, unsigned int> bs2 (true, desc);
+    local_cluster_box_convert<T> lcbc;
+    db::box_scanner2<db::local_cluster<T>, db::Box, db::Instance, db::Box> bs2 (true, desc);
 
     for (typename connected_clusters<T>::const_iterator c = local.begin (); c != local.end (); ++c) {
 
@@ -3108,22 +3109,23 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
       std::back_insert_iterator<std::list<local_cluster<T> > > iout = std::back_inserter (heap);
       size_t n = c->split (area_ratio, iout);
       if (n == 0) {
-        bs2.insert1 (c.operator-> (), 0);
+        bs2.insert1 (c.operator-> (), lcbc (*c));
       } else {
         typename std::list<local_cluster<T> >::iterator h = heap.end ();
         while (n-- > 0) {
-          bs2.insert1 ((--h).operator-> (), 0);
+          --h;
+          bs2.insert1 (h.operator-> (), lcbc (*h));
         }
       }
     }
 
     for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
       if (! is_breakout_cell (breakout_cells, inst->cell_index ())) {
-        bs2.insert2 (inst.operator-> (), 0);
+        bs2.insert2 (inst.operator-> (), cibc (*inst));
       }
     }
 
-    bs2.process (*rec, 1 /*touching*/, local_cluster_box_convert<T> (), cibc);
+    bs2.process_with_adaptor (*rec, 1 /*touching*/);
 
   }
 

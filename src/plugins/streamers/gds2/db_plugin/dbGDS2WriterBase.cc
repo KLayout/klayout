@@ -338,7 +338,7 @@ GDS2WriterBase::write_shape (const db::Layout &layout, int layer, int datatype, 
 }
 
 void
-GDS2WriterBase::write_cell (db::Layout &layout, const db::Cell &cref, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, const std::set<db::cell_index_type> &cell_set, double sf, short *time_data)
+GDS2WriterBase::write_cell (db::Layout &layout, const db::Cell &cref, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, const std::set<db::cell_index_type> &cell_set, double sf, short *time_data, bool skip_body)
 {
   //  cell header
 
@@ -363,51 +363,56 @@ GDS2WriterBase::write_cell (db::Layout &layout, const db::Cell &cref, const std:
     }
   }
 
-  //  instances
+  //  skip instances and shapes for replicas
+  if (! skip_body) {
 
-  for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
+    //  instances
 
-    //  write only instances to selected cells
-    if (m_keep_instances || cell_set.find (inst->cell_index ()) != cell_set.end ()) {
+    for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
 
-      progress_checkpoint ();
-      try {
-        write_inst (sf, *inst, true /*normalize*/, m_resolve_skew_arrays, layout, inst->prop_id ());
-      } catch (tl::Exception &ex) {
-        throw tl::Exception (ex.msg () + tl::to_string (tr (", writing instances")));
+      //  write only instances to selected cells
+      if (m_keep_instances || cell_set.find (inst->cell_index ()) != cell_set.end ()) {
+
+        progress_checkpoint ();
+        try {
+          write_inst (sf, *inst, true /*normalize*/, m_resolve_skew_arrays, layout, inst->prop_id ());
+        } catch (tl::Exception &ex) {
+          throw tl::Exception (ex.msg () + tl::to_string (tr (", writing instances")));
+        }
+
       }
 
     }
 
-  }
+    //  shapes
 
-  //  shapes
+    for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
 
-  for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+      if (layout.is_valid_layer (l->first) && l->second.layer >= 0 && l->second.datatype >= 0) {
 
-    if (layout.is_valid_layer (l->first) && l->second.layer >= 0 && l->second.datatype >= 0) {
-
-      int layer = l->second.layer;
-      if (layer > std::numeric_limits<uint16_t>::max ()) {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot write layer numbers larger than %d to GDS2 streams")), int (std::numeric_limits<uint16_t>::max ())));
-      }
-      int datatype = l->second.datatype;
-      if (datatype > std::numeric_limits<uint16_t>::max ()) {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot write datatype numbers larger than %d to GDS2 streams")), int (std::numeric_limits<uint16_t>::max ())));
-      }
-
-      db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::EdgePairs | db::ShapeIterator::Paths | db::ShapeIterator::Texts));
-      while (! shape.at_end ()) {
-
-        progress_checkpoint ();
-
-        try {
-          write_shape (layout, layer, datatype, *shape, sf);
-        } catch (tl::Exception &ex) {
-          throw tl::Exception (ex.msg () + tl::sprintf (tl::to_string (tr (", writing layer %d/%d")), layer, datatype));
+        int layer = l->second.layer;
+        if (layer > std::numeric_limits<uint16_t>::max ()) {
+          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot write layer numbers larger than %d to GDS2 streams")), int (std::numeric_limits<uint16_t>::max ())));
+        }
+        int datatype = l->second.datatype;
+        if (datatype > std::numeric_limits<uint16_t>::max ()) {
+          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot write datatype numbers larger than %d to GDS2 streams")), int (std::numeric_limits<uint16_t>::max ())));
         }
 
-        ++shape;
+        db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::EdgePairs | db::ShapeIterator::Paths | db::ShapeIterator::Texts));
+        while (! shape.at_end ()) {
+
+          progress_checkpoint ();
+
+          try {
+            write_shape (layout, layer, datatype, *shape, sf);
+          } catch (tl::Exception &ex) {
+            throw tl::Exception (ex.msg () + tl::sprintf (tl::to_string (tr (", writing layer %d/%d")), layer, datatype));
+          }
+
+          ++shape;
+
+        }
 
       }
 
@@ -580,7 +585,8 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
     if (! cref.is_real_ghost_cell () && (! cref.is_proxy () || ! cref.is_top ())) {
 
       try {
-        write_cell (layout, cref, layers, cell_set, sf, time_data);
+        bool skip_body = options.write_context_info () && cref.can_skip_replica ();
+        write_cell (layout, cref, layers, cell_set, sf, time_data, skip_body);
       } catch (tl::Exception &ex) {
         throw tl::Exception (ex.msg () + tl::sprintf (tl::to_string (tr (", writing cell '%s'")), layout.cell_name (*cell)));
       }

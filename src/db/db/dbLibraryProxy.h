@@ -94,6 +94,14 @@ public:
   }
 
   /**
+   *  @brief Gets a value indicating that this cell is a replica that can be skipped
+   *
+   *  This attribute is evaluated by file writers to skip cell replicas for
+   *  library cells that do not want to replicated.
+   */
+  virtual bool can_skip_replica () const;
+
+  /**
    *  @brief Gets the basic name
    *
    *  This returns the basic name of the proxy target

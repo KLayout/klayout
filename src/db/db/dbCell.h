@@ -857,7 +857,7 @@ public:
   void check_locked () const;
 
   /**
-   *  @brief Tell, if this cell is a proxy cell
+   *  @brief Gets a value indicating if this cell is a proxy cell
    *
    *  Proxy cells are such whose layout represents a snapshot of another entity.
    *  Such cells can be PCell variants or library references for example.
@@ -865,6 +865,17 @@ public:
   virtual bool is_proxy () const 
   { 
     return false; 
+  }
+
+  /**
+   *  @brief Gets a value indicating that this cell is a replica that can be skipped
+   *
+   *  This attribute is evaluated by file writers to skip cell replicas for
+   *  library cells that do not want to replicated.
+   */
+  virtual bool can_skip_replica () const
+  {
+    return false;
   }
 
   /**

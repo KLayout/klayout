@@ -135,10 +135,11 @@ private slots:
 private:
   struct LibInfo
   {
-    LibInfo () : name (), time (), tech () { }
+    LibInfo () : name (), time (), tech (), replicate (true) { }
     std::string name;
     QDateTime time;
     std::set<std::string> tech;
+    bool replicate;
   };
 
   tl::FileSystemWatcher *m_file_watcher;

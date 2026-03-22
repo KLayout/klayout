@@ -241,6 +241,13 @@ LibraryProxy::update (db::ImportLayerMapping *layer_mapping)
   }
 }
 
+bool
+LibraryProxy::can_skip_replica () const
+{
+  const Library *lib = LibraryManager::instance ().lib (lib_id ());
+  return lib && ! lib->replicate ();
+}
+
 std::string 
 LibraryProxy::get_basic_name () const
 {

@@ -172,15 +172,22 @@ LibraryController::sync_files ()
 
   for (auto lf = lib_files.begin (); lf != lib_files.end (); ++lf) {
 
-    tl::log << "Reading lib file '" << *lf << "'";
+    tl::log << "Reading lib file '" << lf->first << "'";
 
-    std::vector<LibFileInfo> libs;
-    read_lib_file (lf->first, lf->second, libs);
+    try {
 
-    read_libs (libs, new_lib_files);
+      std::vector<LibFileInfo> libs;
+      read_lib_file (lf->first, lf->second, libs);
 
-    if (m_file_watcher) {
-      m_file_watcher->add_file (tl::absolute_file_path (lf->first));
+      read_libs (libs, new_lib_files);
+
+      if (m_file_watcher) {
+        m_file_watcher->add_file (tl::absolute_file_path (lf->first));
+      }
+
+    } catch (tl::Exception &ex) {
+      tl::error << tl::to_string (tr ("Error reading lib file")) << " " << lf->first << ":" << tl::endl << ex.msg ();
+    } catch (...) {
     }
 
   }
@@ -416,7 +423,7 @@ LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> 
     auto ll = m_lib_files.find (lib_path);
     if (ll == m_lib_files.end ()) {
       needs_load = true;
-    } else if (fi.lastModified () > ll->second.time) {
+    } else if (fi.lastModified () > ll->second.time || im->tech != ll->second.tech || im->replicate != ll->second.replicate) {
       needs_load = true;
     }
 
@@ -479,6 +486,7 @@ LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> 
           li.name = libname;
           li.time = fi.lastModified ();
           li.tech = im->tech;
+          li.replicate = im->replicate;
           new_lib_files.insert (std::make_pair (lib_path, li));
 
           lib->set_name (libname);

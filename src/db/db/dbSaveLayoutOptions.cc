@@ -56,7 +56,7 @@ SaveLayoutOptions::operator= (const SaveLayoutOptions &d)
     m_format = d.m_format;
     m_layers = d.m_layers;
     m_cells = d.m_cells;
-    m_implied_childred = d.m_implied_childred;
+    m_implied_children = d.m_implied_children;
     m_all_layers = d.m_all_layers;
     m_all_cells = d.m_all_cells;
     m_dbu = d.m_dbu;
@@ -189,7 +189,7 @@ SaveLayoutOptions::add_cell (db::cell_index_type cell_index)
 {
   m_all_cells = false;
   m_cells.insert (cell_index);
-  m_implied_childred.insert (cell_index);
+  m_implied_children.insert (cell_index);
 }
 
 void 
@@ -204,7 +204,7 @@ SaveLayoutOptions::clear_cells ()
 {
   m_all_cells = false;
   m_cells.clear ();
-  m_implied_childred.clear ();
+  m_implied_children.clear ();
 }
 
 void
@@ -212,7 +212,7 @@ SaveLayoutOptions::select_all_cells ()
 {
   m_all_cells = true;
   m_cells.clear ();
-  m_implied_childred.clear ();
+  m_implied_children.clear ();
 }
 
 void 
@@ -340,21 +340,75 @@ SaveLayoutOptions::get_valid_layers (const db::Layout &layout, std::vector <std:
   }
 }
 
+static void
+collect_called_cells_unskipped (db::cell_index_type ci, const db::Layout &layout, std::set<cell_index_type> &called)
+{
+  const db::Cell &c = layout.cell (ci);
+  if (c.can_skip_replica ()) {
+    return;
+  }
+
+  for (auto cc = c.begin_child_cells (); ! cc.at_end (); ++cc) {
+    if (called.find (*cc) == called.end () && layout.is_valid_cell_index (*cc)) {
+      called.insert (*cc);
+      collect_called_cells_unskipped (*cc, layout, called);
+    }
+  }
+}
+
 void 
 SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index_type> &cells, const std::vector <std::pair <unsigned int, db::LayerProperties> > &valid_layers, bool require_unique_names) const
 {
+  bool has_context = m_write_context_info;
+  for (tl::Registrar<db::StreamFormatDeclaration>::iterator fmt = tl::Registrar<db::StreamFormatDeclaration>::begin (); fmt != tl::Registrar<db::StreamFormatDeclaration>::end (); ++fmt) {
+    if (fmt->format_name () == m_format) {
+      if (! fmt->supports_context ()) {
+        has_context = false;
+      }
+      break;
+    }
+  }
+
   if (m_all_cells) {
 
-    for (db::Layout::const_iterator cell = layout.begin (); cell != layout.end (); ++cell) {
-      cells.insert (cell->cell_index ());
+    bool has_skipped_replica = false;
+
+    //  check if we have skipped replicas
+    if (has_context) {
+      for (db::Layout::const_iterator cell = layout.begin (); cell != layout.end () && ! has_skipped_replica; ++cell) {
+        has_skipped_replica = cell->can_skip_replica ();
+      }
+    }
+
+    //  with skipped replicas start again and skip child cells of such cells
+    //  unless they are needed in other places.
+    if (has_skipped_replica) {
+
+      for (db::Layout::const_iterator cell = layout.begin (); cell != layout.end (); ++cell) {
+        if (cell->is_top ()) {
+          cells.insert (cell->cell_index ());
+          collect_called_cells_unskipped (cell->cell_index (), layout, cells);
+        }
+      }
+
+    } else {
+
+      for (db::Layout::const_iterator cell = layout.begin (); cell != layout.end () && ! has_skipped_replica; ++cell) {
+        cells.insert (cell->cell_index ());
+      }
+
     }
 
   } else {
 
     for (std::set <db::cell_index_type>::const_iterator c = m_cells.begin (); c != m_cells.end (); ++c) {
       cells.insert (*c);
-      if (m_implied_childred.find (*c) != m_implied_childred.end ()) {
-        layout.cell (*c).collect_called_cells (cells);
+      if (m_implied_children.find (*c) != m_implied_children.end ()) {
+        if (has_context) {
+          collect_called_cells_unskipped (*c, layout, cells);
+        } else {
+          layout.cell (*c).collect_called_cells (cells);
+        }
       }
     }
 

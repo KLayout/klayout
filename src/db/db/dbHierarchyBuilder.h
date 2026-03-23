@@ -315,6 +315,25 @@ public:
   }
 
   /**
+   *  @brief Sets the "sparse array" limit
+   *
+   *  Sparse arrays are instance arrays whose bounding box is no longer a
+   *  good approximation of the covered area. The "sparse array ratio" is
+   *  the area of the bounding box divided by the area of the bounding box
+   *  of a single instance.
+   *
+   *  Arrays above this limit will be resolved into single instances.
+   *
+   *  Setting this value to 0 will resolve all arrays. Setting this
+   *  value to a negative value will never split arrays. The latter
+   *  is the default.
+   */
+  void set_sparse_array_limit (double l)
+  {
+    m_sparse_array_limit = l;
+  }
+
+  /**
    *  @brief Reset the builder - performs a new initial pass
    */
   void reset ();
@@ -440,6 +459,8 @@ private:
   db::Cell *mp_initial_cell;
 
   db::ICplxTrans m_trans;
+
+  double m_sparse_array_limit;
 };
 
 }

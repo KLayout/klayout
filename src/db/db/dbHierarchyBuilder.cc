@@ -152,14 +152,14 @@ static std::pair<bool, std::set<db::Box> > compute_clip_variant (const db::Box &
 }
 
 HierarchyBuilder::HierarchyBuilder (db::Layout *target, unsigned int target_layer, const db::ICplxTrans &trans, HierarchyBuilderShapeReceiver *pipe)
-  : mp_target (target), m_target_layer (target_layer), m_wants_all_cells (false), m_trans (trans)
+  : mp_target (target), m_target_layer (target_layer), m_wants_all_cells (false), m_trans (trans), m_sparse_array_limit (-1.0)
 {
   set_shape_receiver (pipe);
   reset ();
 }
 
 HierarchyBuilder::HierarchyBuilder (db::Layout *target, const db::ICplxTrans &trans, HierarchyBuilderShapeReceiver *pipe)
-  : mp_target (target), m_target_layer (0), m_wants_all_cells (false), m_trans (trans)
+  : mp_target (target), m_target_layer (0), m_wants_all_cells (false), m_trans (trans), m_sparse_array_limit (-1.0)
 {
   set_shape_receiver (pipe);
   reset ();
@@ -397,19 +397,23 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
     //  for new cells, create this instance
     if (m_cell_stack.back ().first || m_cm_new_entry) {
 
-      // @@@
-      //  check if the cell array is "sparse"
+      //  check if the cell array is "sparse" according to
+      //  "sparse_array_limit" and resolve into single instances if so
       bool resolve = false;
-      if (m_source.layout () && inst.size () > 1) {
-        db::box_convert<db::CellInst> bc (*m_source.layout ());
-        auto a1 = bc (inst.object ()).area ();
-        auto aa = inst.bbox (bc).area ();
-        double area_ratio = 10.0; // @@@
-        if (a1 * area_ratio < aa) {
+      if (m_sparse_array_limit >= 0.0 && inst.size () > 1) {
+
+        if (m_sparse_array_limit == 0.0) {
           resolve = true;
+        } else {
+          db::box_convert<db::CellInst> bc (*iter->layout ());
+          auto a1 = bc (inst.object ()).area ();
+          auto aa = inst.bbox (bc).area ();
+          if (a1 * m_sparse_array_limit < aa) {
+            resolve = true;
+          }
         }
+
       }
-      // @@@
 
       if (resolve) {
 

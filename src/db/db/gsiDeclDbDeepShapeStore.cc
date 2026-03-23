@@ -126,6 +126,26 @@ Class<db::DeepShapeStore> decl_dbDeepShapeStore ("db", "DeepShapeStore",
     "@brief Gets a flag wether to copy the full hierarchy for the working layouts\n"
     "This attribute has been introduced in version 0.28.10."
   ) +
+  gsi::method ("sparse_array_limit=", &db::DeepShapeStore::set_sparse_array_limit, gsi::arg ("limit"),
+    "@brief Sets the \"sparse array\" limit\n"
+    "\n"
+    "Sparse arrays are instance arrays whose bounding box is no longer a\n"
+    "good approximation of the covered area. The \"sparse array ratio\" is\n"
+    "the area of the bounding box divided by the area of the bounding box\n"
+    "of a single instance.\n"
+    "\n"
+    "Arrays above this limit will be resolved into single instances.\n"
+    "\n"
+    "Setting this value to 0 will resolve all arrays. Setting this\n"
+    "value to a negative value will never split arrays. The latter\n"
+    "is the default.\n"
+    "\n"
+    "This attribute has been introduced in version 0.30.8."
+  ) +
+  gsi::method ("sparse_array_limit", &db::DeepShapeStore::sparse_array_limit,
+    "@brief Gets the \"sparse array\" limit\n"
+    "This attribute has been introduced in version 0.30.8."
+  ) +
   gsi::method ("reject_odd_polygons=", &db::DeepShapeStore::set_reject_odd_polygons, gsi::arg ("count"),
     "@brief Sets a flag indicating whether to reject odd polygons\n"
     "\n"

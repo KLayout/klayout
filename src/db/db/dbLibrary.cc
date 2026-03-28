@@ -108,10 +108,12 @@ Library::unregister_proxy (db::LibraryProxy *lib_proxy, db::Layout *ly)
     if (! --c->second) {
       db::cell_index_type ci = c->first;
       m_refcount.erase (c);
-      //  remove cells which are itself proxies and are no longer used
-      db::Cell *lib_cell = &layout ().cell (ci);
-      if (lib_cell && lib_cell->is_proxy () && lib_cell->parent_cells () == 0) {
-        layout ().delete_cell (ci);
+      if (layout ().is_valid_cell_index (ci)) {
+        //  remove cells which are itself proxies and are no longer used
+        db::Cell *lib_cell = &layout ().cell (ci);
+        if (lib_cell && lib_cell->is_proxy () && lib_cell->parent_cells () == 0) {
+          layout ().delete_cell (ci);
+        }
       }
     }
     retired_state_changed_event ();
@@ -196,9 +198,9 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
     std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> > pcells_to_map;
     std::vector<db::LibraryProxy *> lib_cells_to_map;
 
-    for (db::Layout::iterator c = r->first->begin (); c != r->first->end (); ++c) {
+    for (auto ci = r->first->begin_top_down (); ci != r->first->end_top_down (); ++ci) {
 
-      db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (&*c);
+      db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (&r->first->cell (*ci));
       if (lib_proxy && lib_proxy->lib_id () == get_id ()) {
 
         db::Cell *lib_cell = &original_layout->cell (lib_proxy->library_cell_index ());
@@ -274,7 +276,7 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
 
       std::pair<bool, cell_index_type> cn (false, 0);
       if (other) {
-        cn = other->layout ().cell_by_name (original_layout->cell ((*lp)->library_cell_index ()).get_basic_name ().c_str ());
+        cn = other->layout ().cell_by_name (original_layout->cell_name ((*lp)->library_cell_index ()));
       }
 
       if (! cn.first) {

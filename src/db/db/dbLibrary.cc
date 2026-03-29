@@ -26,6 +26,7 @@
 #include "dbPCellDeclaration.h"
 #include "dbPCellVariant.h"
 #include "dbLibraryManager.h"
+#include "tlTimer.h"
 
 #include <limits>
 
@@ -166,14 +167,36 @@ Library::rename (const std::string &name)
 void
 Library::refresh ()
 {
-  //  save a copy of the layout, so we can refer to it
-  std::unique_ptr<db::Layout> org_layout (new db::Layout (layout ()));
+  refresh_without_restore ();
 
-  std::string name = reload ();
-  rename (name);
+  //  proxies need to be restored in a special case when a library has a proxy to itself.
+  //  The layout readers will not be able to create library references in this case.
+  layout ().restore_proxies ();
+}
+
+void
+Library::refresh_without_restore ()
+{
+  db::LibraryManager::instance ().unregister_lib (this);
+
+  try {
+
+    m_name = reload ();
+
+  } catch (...) {
+
+    //  fallback - leave the library, but with empty layout
+    layout ().clear ();
+    db::LibraryManager::instance ().register_lib (this);
+
+    throw;
+
+  }
 
   layout ().refresh ();
-  remap_to (this, org_layout.get ());
+
+  //  re-register, potentially under the new name
+  db::LibraryManager::instance ().register_lib (this);
 }
 
 void
@@ -198,9 +221,9 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
     std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> > pcells_to_map;
     std::vector<db::LibraryProxy *> lib_cells_to_map;
 
-    for (auto ci = r->first->begin_top_down (); ci != r->first->end_top_down (); ++ci) {
+    for (auto c = r->first->begin (); c != r->first->end (); ++c) {
 
-      db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (&r->first->cell (*ci));
+      db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (c.operator-> ());
       if (lib_proxy && lib_proxy->lib_id () == get_id ()) {
 
         db::Cell *lib_cell = &original_layout->cell (lib_proxy->library_cell_index ());
@@ -217,7 +240,7 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
 
     }
 
-    //  We do PCell resolution before the library proxy resolution. The reason is that 
+    //  We do PCell resolution before the library proxy resolution. The reason is that
     //  PCells may generate library proxies in their instantiation. Hence we must instantiate
     //  the PCells before we can resolve them.
     for (std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> >::const_iterator lp = pcells_to_map.begin (); lp != pcells_to_map.end (); ++lp) {

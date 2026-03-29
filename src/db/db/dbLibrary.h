@@ -226,6 +226,13 @@ public:
   void refresh ();
 
   /**
+   *  @brief Refreshes the library on all clients without restoring proxies
+   *
+   *  This method is intended to be used internally for bulk refreshes.
+   */
+  void refresh_without_restore ();
+
+  /**
    *  @brief Renames the library
    *
    *  Unlike "set_name", this method will take care of properly re-registering the library

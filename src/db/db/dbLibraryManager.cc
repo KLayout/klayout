@@ -284,9 +284,27 @@ LibraryManager::lib_internal (lib_id_type id) const
 void
 LibraryManager::refresh_all ()
 {
+  //  NOTE: libraries may get deleted during the refresh, so better use weak pointers here
+  //  to track lifetime. Libraries appearing are not considered.
+
+  std::vector<tl::weak_ptr<Library> > libs;
+  libs.reserve (m_libs.size ());
+  for (auto l = m_libs.begin (); l != m_libs.end (); ++l) {
+    libs.push_back (tl::weak_ptr<Library> (*l));
+  }
+
+  for (auto l = libs.begin (); l != libs.end (); ++l) {
+    if (l->get ()) {
+      (*l)->refresh_without_restore ();
+    }
+  }
+
+  //  restore proxies on all libraries - as the refresh happens in random order, dependencies
+  //  are not necessarily resolved. This is done here.
+
   for (std::vector<Library *>::iterator l = m_libs.begin (); l != m_libs.end (); ++l) {
     if (*l) {
-      (*l)->refresh ();
+      (*l)->layout ().restore_proxies ();
     }
   }
 }

@@ -1115,7 +1115,16 @@ public:
    *  Library updates may enabled lost connections which are help in cold proxies. This method will recover
    *  these connections.
    */
-  void restore_proxies(ImportLayerMapping *layer_mapping = 0);
+  void restore_proxies (ImportLayerMapping *layer_mapping = 0);
+
+  /**
+   *  @brief Restores proxies as far as possible, no cleanup included
+   *
+   *  This method is equivalent to "restore_proxies", but does not include a cleanup.
+   *  Instead it returns a value of true, indicating that something got changed
+   *  and a cleanup is required.
+   */
+  bool restore_proxies_without_cleanup (ImportLayerMapping *layer_mapping = 0);
 
   /**
    *  @brief Replaces the given cell index with the new cell

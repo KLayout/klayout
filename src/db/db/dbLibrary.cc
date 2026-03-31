@@ -208,110 +208,128 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
 
   //  Hint: in the loop over the referrers we might unregister (delete from m_referrers) a referrer because no more cells refer to us.
   //  Hence we must not directly iterate of m_referrers.
-  std::vector<std::pair<db::Layout *, int> > referrers;
+  std::vector<db::Layout *> referrers;
   for (std::map<db::Layout *, int>::const_iterator r = m_referrers.begin (); r != m_referrers.end (); ++r) {
-    referrers.push_back (*r);
+    referrers.push_back (r->first);
   }
+
+  //  Sort for deterministic order of resolution
+  std::sort (referrers.begin (), referrers.end (), tl::sort_by_id ());
 
   //  Remember the layouts that will finally need a cleanup
   std::set<db::Layout *> needs_cleanup;
 
-  for (std::vector<std::pair<db::Layout *, int> >::const_iterator r = referrers.begin (); r != referrers.end (); ++r) {
+  //  NOTE: resolution may create new references due to replicas.
+  //  Hence, loop until no further references are resolved.
+  bool any = true;
+  while (any) {
 
-    std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> > pcells_to_map;
-    std::vector<db::LibraryProxy *> lib_cells_to_map;
+    any = false;
 
-    for (auto c = r->first->begin (); c != r->first->end (); ++c) {
+    for (std::vector<db::Layout *>::const_iterator r = referrers.begin (); r != referrers.end (); ++r) {
 
-      db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (c.operator-> ());
-      if (lib_proxy && lib_proxy->lib_id () == get_id ()) {
+      std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> > pcells_to_map;
+      std::vector<db::LibraryProxy *> lib_cells_to_map;
 
-        db::Cell *lib_cell = &original_layout->cell (lib_proxy->library_cell_index ());
-        db::PCellVariant *lib_pcell = dynamic_cast <db::PCellVariant *> (lib_cell);
-        if (lib_pcell) {
-          pcells_to_map.push_back (std::make_pair (lib_proxy, lib_pcell));
-        } else {
-          lib_cells_to_map.push_back (lib_proxy);
+      for (auto c = (*r)->begin (); c != (*r)->end (); ++c) {
+
+        db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (c.operator-> ());
+        if (lib_proxy && lib_proxy->lib_id () == get_id ()) {
+
+          if (! original_layout->is_valid_cell_index (lib_proxy->library_cell_index ())) {
+            //  safety feature, should not happen
+            continue;
+          }
+
+          db::Cell *lib_cell = &original_layout->cell (lib_proxy->library_cell_index ());
+          db::PCellVariant *lib_pcell = dynamic_cast <db::PCellVariant *> (lib_cell);
+          if (lib_pcell) {
+            pcells_to_map.push_back (std::make_pair (lib_proxy, lib_pcell));
+          } else {
+            lib_cells_to_map.push_back (lib_proxy);
+          }
+
+          needs_cleanup.insert (*r);
+          any = true;
+
         }
 
-        needs_cleanup.insert (r->first);
-
       }
 
-    }
+      //  We do PCell resolution before the library proxy resolution. The reason is that
+      //  PCells may generate library proxies in their instantiation. Hence we must instantiate
+      //  the PCells before we can resolve them.
+      for (std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> >::const_iterator lp = pcells_to_map.begin (); lp != pcells_to_map.end (); ++lp) {
 
-    //  We do PCell resolution before the library proxy resolution. The reason is that
-    //  PCells may generate library proxies in their instantiation. Hence we must instantiate
-    //  the PCells before we can resolve them.
-    for (std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> >::const_iterator lp = pcells_to_map.begin (); lp != pcells_to_map.end (); ++lp) {
+        db::cell_index_type ci = lp->first->Cell::cell_index ();
+        db::PCellVariant *lib_pcell = lp->second;
 
-      db::cell_index_type ci = lp->first->Cell::cell_index ();
-      db::PCellVariant *lib_pcell = lp->second;
+        std::pair<bool, pcell_id_type> pn (false, 0);
+        if (other) {
+          pn = other->layout ().pcell_by_name (original_layout->cell (lp->first->library_cell_index ()).get_basic_name ().c_str ());
+        }
 
-      std::pair<bool, pcell_id_type> pn (false, 0);
-      if (other) {
-        pn = other->layout ().pcell_by_name (original_layout->cell (lp->first->library_cell_index ()).get_basic_name ().c_str ());
-      }
-
-      if (! pn.first) {
-
-        //  substitute by a cold proxy
-        db::LayoutOrCellContextInfo info;
-        r->first->get_context_info (ci, info);
-        r->first->create_cold_proxy_as (info, ci);
-
-      } else {
-
-        const db::PCellDeclaration *old_pcell_decl = original_layout->pcell_declaration (lib_pcell->pcell_id ());
-        const db::PCellDeclaration *new_pcell_decl = other->layout ().pcell_declaration (pn.second);
-        if (! old_pcell_decl || ! new_pcell_decl) {
+        if (! pn.first) {
 
           //  substitute by a cold proxy
           db::LayoutOrCellContextInfo info;
-          r->first->get_context_info (ci, info);
-          r->first->create_cold_proxy_as (info, ci);
+          (*r)->get_context_info (ci, info);
+          (*r)->create_cold_proxy_as (info, ci);
 
         } else {
 
-          db::pcell_parameters_type new_parameters = new_pcell_decl->map_parameters (lib_pcell->parameters_by_name ());
+          const db::PCellDeclaration *old_pcell_decl = original_layout->pcell_declaration (lib_pcell->pcell_id ());
+          const db::PCellDeclaration *new_pcell_decl = other->layout ().pcell_declaration (pn.second);
+          if (! old_pcell_decl || ! new_pcell_decl) {
 
-          //  coerce the new parameters if requested
-          try {
-            db::pcell_parameters_type plist = new_parameters;
-            new_pcell_decl->coerce_parameters (other->layout (), plist);
-            plist.swap (new_parameters);
-          } catch (tl::Exception &ex) {
-            //  ignore exception - we will do that again on update() to establish an error message
-            tl::error << ex.msg ();
+            //  substitute by a cold proxy
+            db::LayoutOrCellContextInfo info;
+            (*r)->get_context_info (ci, info);
+            (*r)->create_cold_proxy_as (info, ci);
+
+          } else {
+
+            db::pcell_parameters_type new_parameters = new_pcell_decl->map_parameters (lib_pcell->parameters_by_name ());
+
+            //  coerce the new parameters if requested
+            try {
+              db::pcell_parameters_type plist = new_parameters;
+              new_pcell_decl->coerce_parameters (other->layout (), plist);
+              plist.swap (new_parameters);
+            } catch (tl::Exception &ex) {
+              //  ignore exception - we will do that again on update() to establish an error message
+              tl::error << ex.msg ();
+            }
+
+            lp->first->remap (other->get_id (), other->layout ().get_pcell_variant (pn.second, new_parameters));
+
           }
-
-          lp->first->remap (other->get_id (), other->layout ().get_pcell_variant (pn.second, new_parameters));
 
         }
 
       }
 
-    }
+      for (std::vector<db::LibraryProxy *>::const_iterator lp = lib_cells_to_map.begin (); lp != lib_cells_to_map.end (); ++lp) {
 
-    for (std::vector<db::LibraryProxy *>::const_iterator lp = lib_cells_to_map.begin (); lp != lib_cells_to_map.end (); ++lp) {
+        db::cell_index_type ci = (*lp)->Cell::cell_index ();
 
-      db::cell_index_type ci = (*lp)->Cell::cell_index ();
+        std::pair<bool, cell_index_type> cn (false, 0);
+        if (other) {
+          cn = other->layout ().cell_by_name (original_layout->cell_name ((*lp)->library_cell_index ()));
+        }
 
-      std::pair<bool, cell_index_type> cn (false, 0);
-      if (other) {
-        cn = other->layout ().cell_by_name (original_layout->cell_name ((*lp)->library_cell_index ()));
-      }
+        if (! cn.first) {
 
-      if (! cn.first) {
+          //  substitute by a cold proxy
+          db::LayoutOrCellContextInfo info;
+          (*r)->get_context_info (ci, info);
+          (*r)->create_cold_proxy_as (info, ci);
 
-        //  substitute by a cold proxy
-        db::LayoutOrCellContextInfo info;
-        r->first->get_context_info (ci, info);
-        r->first->create_cold_proxy_as (info, ci);
+        } else {
 
-      } else {
+          (*lp)->remap (other->get_id (), cn.second);
 
-        (*lp)->remap (other->get_id (), cn.second);
+        }
 
       }
 

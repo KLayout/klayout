@@ -37,6 +37,11 @@ FileBasedLibrary::FileBasedLibrary (const std::string &path, const std::string &
   : db::Library (), m_name (name), m_path (path), m_is_loaded (false)
 {
   set_description (tl::filename (path));
+
+  //  preliminary name, may be replaced later
+  if (! name.empty ()) {
+    set_name (name);
+  }
 }
 
 void

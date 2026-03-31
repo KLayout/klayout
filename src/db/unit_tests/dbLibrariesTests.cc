@@ -32,6 +32,8 @@
 #include "dbReader.h"
 #include "dbLayoutDiff.h"
 #include "dbTestSupport.h"
+#include "dbFileBasedLibrary.h"
+#include "dbColdProxy.h"
 #include "tlStream.h"
 #include "tlStaticObjects.h"
 #include "tlUnitTest.h"
@@ -697,4 +699,138 @@ TEST(6_issue996)
   //  updated now
   CHECKPOINT ();
   db::compare_layouts (this, ly, tl::testdata () + "/gds/lib_test6b.gds", db::NormalizationMode (db::WriteGDS2 + db::NoContext));
+}
+
+static size_t num_top_cells (const db::Layout &layout)
+{
+  size_t n = 0;
+  for (auto t = layout.begin_top_down (); t != layout.end_top_cells (); ++t) {
+    ++n;
+  }
+  return n;
+}
+
+static size_t num_cells (const db::Layout &layout)
+{
+  size_t n = 0;
+  for (auto t = layout.begin_top_down (); t != layout.end_top_down (); ++t) {
+    ++n;
+  }
+  return n;
+}
+
+static size_t num_defunct (const db::Layout &layout)
+{
+  size_t ndefunct = 0;
+  for (auto c = layout.begin (); c != layout.end (); ++c) {
+    if (dynamic_cast<const db::ColdProxy *> (c.operator-> ())) {
+      ++ndefunct;
+    }
+  }
+  return ndefunct;
+}
+
+//  monster lib refresh issue
+//  (monster lib is a layout with manifold library references to existing and non-existing libraries)
+TEST(7_monsterlib)
+{
+  std::pair<bool, db::lib_id_type> lib;
+
+  //  tabula rasa
+  lib = db::LibraryManager::instance ().lib_by_name ("EX");
+  if (lib.first) {
+    db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (lib.second));
+  }
+  lib = db::LibraryManager::instance ().lib_by_name ("EX2");
+  if (lib.first) {
+    db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (lib.second));
+  }
+  lib = db::LibraryManager::instance ().lib_by_name ("NOEX");
+  if (lib.first) {
+    db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (lib.second));
+  }
+  lib = db::LibraryManager::instance ().lib_by_name ("NOEX2");
+  if (lib.first) {
+    db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (lib.second));
+  }
+
+  //  first, read the layout with only EX and EX2 in place
+
+  db::FileBasedLibrary *lib_ex = new db::FileBasedLibrary (tl::testsrc () + "/testdata/libman/libs/EX.gds", "EX");
+  lib_ex->load ();
+  db::LibraryManager::instance ().register_lib (lib_ex);
+  db::FileBasedLibrary *lib_ex2 = new db::FileBasedLibrary (tl::testsrc () + "/testdata/libman/libs/EX2.gds", "EX2");
+  lib_ex2->load ();
+  db::LibraryManager::instance ().register_lib (lib_ex2);
+
+  db::Layout layout;
+  layout.do_cleanup (true);
+
+  {
+    tl::InputStream is (tl::testsrc () + "/testdata/libman/design.gds");
+    db::Reader reader (is);
+    reader.read (layout);
+  }
+
+  //  as NOEX and NOEX2 are not present, a number of references are defunct (aka cold proxies)
+  EXPECT_EQ (num_defunct (layout), size_t (15));
+  EXPECT_EQ (num_cells (layout), size_t (46));
+  EXPECT_EQ (num_top_cells (layout), size_t (1));
+
+  //  NOTE: normalization would spoil the layout, so don't do it
+  //  The golden layout is a spoiled version that uses preliminary cell versions for the
+  //  unresolved references of NOEX and NOEX2. This is intentional to test the replication.
+  //  Also note, that the golden file has static cells.
+  db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au1.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
+
+  //  then, establish NOEX and NOEX2 too - this will update the libraries in the layout that was read
+
+  db::FileBasedLibrary *lib_noex = new db::FileBasedLibrary (tl::testsrc () + "/testdata/libman/libs/NOEX.gds", "NOEX");
+  lib_noex->load ();
+  db::LibraryManager::instance ().register_lib (lib_noex);
+  db::FileBasedLibrary *lib_noex2 = new db::FileBasedLibrary (tl::testsrc () + "/testdata/libman/libs/NOEX2.gds", "NOEX2");
+  lib_noex2->load ();
+  db::LibraryManager::instance ().register_lib (lib_noex2);
+
+  //  all references now need to be resolved
+  EXPECT_EQ (num_defunct (layout), size_t (0));
+  EXPECT_EQ (num_cells (layout), size_t (34));
+  EXPECT_EQ (num_top_cells (layout), size_t (1));
+
+  db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au2.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
+
+  //  refresh must not change the layout
+  lib_ex->refresh ();
+  lib_ex2->refresh ();
+  lib_noex->refresh ();
+  lib_noex2->refresh ();
+
+  //  all references now need to be resolved
+  EXPECT_EQ (num_defunct (layout), size_t (0));
+  EXPECT_EQ (num_cells (layout), size_t (29));
+  EXPECT_EQ (num_top_cells (layout), size_t (1));
+
+  db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au3.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
+
+  db::LibraryManager::instance ().delete_lib (lib_noex);
+  db::LibraryManager::instance ().delete_lib (lib_noex2);
+
+  //  after removing the libraries, we have defunct cells again
+  EXPECT_EQ (num_defunct (layout), size_t (8));
+  EXPECT_EQ (num_cells (layout), size_t (29));
+  EXPECT_EQ (num_top_cells (layout), size_t (1));
+
+  //  but the layout did not change
+  db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au4.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
+
+  db::LibraryManager::instance ().delete_lib (lib_ex);
+  db::LibraryManager::instance ().delete_lib (lib_ex2);
+
+  //  after removing all libraries, we have even more defunct cells (i.e. all, except top)
+  EXPECT_EQ (num_defunct (layout), size_t (16));
+  EXPECT_EQ (num_cells (layout), size_t (29));
+  EXPECT_EQ (num_top_cells (layout), size_t (1));
+
+  //  but the layout did not change
+  db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au5.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
 }

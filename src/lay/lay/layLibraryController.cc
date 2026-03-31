@@ -289,22 +289,30 @@ LibraryController::sync_files ()
   }
 
   for (std::map<std::string, LibInfo>::const_iterator lf = m_lib_files.begin (); lf != m_lib_files.end (); ++lf) {
+
+    std::pair<bool, db::lib_id_type> li = db::LibraryManager::instance ().lib_by_name (lf->second.name, lf->second.tech);
+    if (! li.first) {
+      continue;  //  should not happen
+    }
+
+    db::Library *lib = db::LibraryManager::instance ().lib (li.second);
+
     if (new_names.find (lf->second.name) == new_names.end ()) {
+
       try {
-        std::pair<bool, db::lib_id_type> li = db::LibraryManager::instance ().lib_by_name (lf->second.name, lf->second.tech);
-        if (li.first) {
-          if (! lf->second.tech.empty ()) {
-            tl::log << "Unregistering lib '" << lf->second.name << "' for technology '" << *lf->second.tech.begin () << "' as the file no longer exists: " << lf->first;
-          } else {
-            tl::log << "Unregistering lib '" << lf->second.name << "' as the file no longer exists: " << lf->first;
-          }
-          db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (li.second));
+        if (! lf->second.tech.empty ()) {
+          tl::log << "Unregistering lib '" << lf->second.name << "' for technology '" << *lf->second.tech.begin () << "' as the file no longer exists: " << lf->first;
+        } else {
+          tl::log << "Unregistering lib '" << lf->second.name << "' as the file no longer exists: " << lf->first;
         }
+        db::LibraryManager::instance ().delete_lib (lib);
       } catch (tl::Exception &ex) {
         tl::error << ex.msg ();
       } catch (...) {
       }
+
     }
+
   }
 
   //  establish the new libraries

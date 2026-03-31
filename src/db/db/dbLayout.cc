@@ -2988,6 +2988,14 @@ Layout::fill_meta_info_from_context (cell_index_type cell_index, const LayoutOrC
 void
 Layout::restore_proxies (ImportLayerMapping *layer_mapping)
 {
+  if (restore_proxies_without_cleanup (layer_mapping)) {
+    cleanup ();
+  }
+}
+
+bool
+Layout::restore_proxies_without_cleanup (ImportLayerMapping *layer_mapping)
+{
   std::vector<db::ColdProxy *> cold_proxies;
 
   for (iterator c = begin (); c != end (); ++c) {
@@ -3004,9 +3012,7 @@ Layout::restore_proxies (ImportLayerMapping *layer_mapping)
     }
   }
 
-  if (needs_cleanup) {
-    cleanup ();
-  }
+  return needs_cleanup;
 }
 
 bool

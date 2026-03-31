@@ -249,13 +249,38 @@ LibraryManager::register_lib (Library *library)
   //  "restore_proxies" takes care not to re-substitute cold proxies.
 
   const tl::weak_collection<db::ColdProxy> &cold_proxies = db::ColdProxy::cold_proxies_per_lib_name (library->get_name ());
-  std::set<db::Layout *> to_refresh;
+
+  std::set<db::Layout *> to_refresh_set;
   for (tl::weak_collection<db::ColdProxy>::const_iterator p = cold_proxies.begin (); p != cold_proxies.end (); ++p) {
-    to_refresh.insert (const_cast<db::Layout *> (p->layout ()));
+    to_refresh_set.insert (const_cast<db::Layout *> (p->layout ()));
   }
 
-  for (std::set<db::Layout *>::const_iterator l = to_refresh.begin (); l != to_refresh.end (); ++l) {
-    (*l)->restore_proxies (0);
+  //  Sort for deterministic order of resolution
+  std::vector<db::Layout *> to_refresh (to_refresh_set.begin (), to_refresh_set.end ());
+  std::sort (to_refresh.begin (), to_refresh.end (), tl::sort_by_id ());
+
+  std::set<db::Layout *> needs_cleanup;
+
+  //  NOTE: "restore proxies" can create new proxies, because indirect references.
+  //  Hence we need to repeat the process.
+  bool any = true;
+  while (any) {
+
+    any = false;
+
+    for (auto l = to_refresh.begin (); l != to_refresh.end (); ++l) {
+      if ((*l)->restore_proxies_without_cleanup ()) {
+        any = true;
+        needs_cleanup.insert (*l);
+      }
+
+    }
+
+  }
+
+  //  do the cleanup
+  for (auto l = needs_cleanup.begin (); l != needs_cleanup.end (); ++l) {
+    (*l)->cleanup ();
   }
 
   //  issue the change notification

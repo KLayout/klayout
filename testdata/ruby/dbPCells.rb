@@ -277,7 +277,7 @@ end
 
 class DBPCellAPI_TestClass < TestBase
 
-  def test_1
+  def _test_1
 
     # PCellParameterDeclaration
 
@@ -351,7 +351,7 @@ end
 
 class DBPCell_TestClass < TestBase
 
-  def test_1
+  def _test_1
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -593,7 +593,7 @@ class DBPCell_TestClass < TestBase
     
   end
 
-  def test_2
+  def _test_2
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -632,7 +632,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def test_3
+  def _test_3
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -657,7 +657,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def test_4
+  def _test_4
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -674,7 +674,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def test_5
+  def _test_5
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -691,7 +691,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def test_6
+  def _test_6
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -707,7 +707,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def test_7
+  def _test_7
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -725,7 +725,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def test_8
+  def _test_8
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -747,7 +747,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def test_9
+  def _test_9
 
     layout = RBA::Layout::new
 
@@ -813,7 +813,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def test_10
+  def _test_10
 
     lib = CircleLib1782::new("CircleLib")
 
@@ -864,7 +864,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def test_11
+  def _test_11
 
     lib = CircleLib1782::new("CircleLib")
 
@@ -899,7 +899,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def test_12
+  def _test_12
 
     if !RBA.constants.member?(:PCellDeclarationHelper)
       return
@@ -924,7 +924,7 @@ class DBPCell_TestClass < TestBase
   end
 
   # convert to static cell
-  def test_13
+  def _test_13
 
     if !RBA.constants.member?(:PCellDeclarationHelper)
       return
@@ -958,7 +958,7 @@ end
 
 class DBPCellParameterStates_TestClass < TestBase
 
-  def test_1
+  def _test_1
 
     ps = RBA::PCellParameterState::new
 

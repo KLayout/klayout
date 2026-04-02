@@ -250,7 +250,6 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
           }
 
           needs_cleanup.insert (*r);
-          any = true;
 
         }
 
@@ -326,6 +325,11 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
           (*r)->create_cold_proxy_as (info, ci);
 
         } else {
+
+          if ((*lp)->lib_id () != other->get_id () || (*lp)->library_cell_index () != cn.second) {
+            //  we potentially need another iteration
+            any = true;
+          }
 
           (*lp)->remap (other->get_id (), cn.second);
 

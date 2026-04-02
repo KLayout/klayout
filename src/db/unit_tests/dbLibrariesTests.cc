@@ -773,8 +773,8 @@ TEST(7_monsterlib)
   }
 
   //  as NOEX and NOEX2 are not present, a number of references are defunct (aka cold proxies)
-  EXPECT_EQ (num_defunct (layout), size_t (15));
-  EXPECT_EQ (num_cells (layout), size_t (46));
+  EXPECT_EQ (num_defunct (layout), size_t (6));
+  EXPECT_EQ (num_cells (layout), size_t (25));
   EXPECT_EQ (num_top_cells (layout), size_t (1));
 
   //  NOTE: normalization would spoil the layout, so don't do it
@@ -794,7 +794,7 @@ TEST(7_monsterlib)
 
   //  all references now need to be resolved
   EXPECT_EQ (num_defunct (layout), size_t (0));
-  EXPECT_EQ (num_cells (layout), size_t (36));
+  EXPECT_EQ (num_cells (layout), size_t (25));
   EXPECT_EQ (num_top_cells (layout), size_t (1));
 
   db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au2.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
@@ -807,7 +807,7 @@ TEST(7_monsterlib)
 
   //  all references now need to be resolved
   EXPECT_EQ (num_defunct (layout), size_t (0));
-  EXPECT_EQ (num_cells (layout), size_t (32));
+  EXPECT_EQ (num_cells (layout), size_t (25));
   EXPECT_EQ (num_top_cells (layout), size_t (1));
 
   db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au3.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
@@ -816,8 +816,8 @@ TEST(7_monsterlib)
   db::LibraryManager::instance ().delete_lib (lib_noex2);
 
   //  after removing the libraries, we have defunct cells again
-  EXPECT_EQ (num_defunct (layout), size_t (11));
-  EXPECT_EQ (num_cells (layout), size_t (32));
+  EXPECT_EQ (num_defunct (layout), size_t (6));
+  EXPECT_EQ (num_cells (layout), size_t (25));
   EXPECT_EQ (num_top_cells (layout), size_t (1));
 
   //  but the layout did not change
@@ -827,8 +827,8 @@ TEST(7_monsterlib)
   db::LibraryManager::instance ().delete_lib (lib_ex2);
 
   //  after removing all libraries, we have even more defunct cells (i.e. all, except top)
-  EXPECT_EQ (num_defunct (layout), size_t (19));
-  EXPECT_EQ (num_cells (layout), size_t (32));
+  EXPECT_EQ (num_defunct (layout), size_t (12));
+  EXPECT_EQ (num_cells (layout), size_t (25));
   EXPECT_EQ (num_top_cells (layout), size_t (1));
 
   //  but the layout did not change

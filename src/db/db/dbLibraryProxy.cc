@@ -221,14 +221,25 @@ LibraryProxy::update (db::ImportLayerMapping *layer_mapping)
       real_lib = db::LibraryManager::instance ().lib (lp->lib_id ());
     }
 
-    inst.object ().cell_index (layout ()->get_lib_proxy (real_lib, real_cil));
-
     ColdProxy *cp = dynamic_cast<ColdProxy *> (&real_lib->layout ().cell (real_cil));
     if (cp) {
+
       //  The final item is a cold proxy ("<defunct>" cell) - treat it like
       //  a library proxy as it may become one in the future, but replace it
       //  by a cold proxy now.
-      layout ()->create_cold_proxy_as (cp->context_info (), inst.object ().cell_index ());
+
+      auto p = layout ()->find_cold_proxy (cp->context_info ());
+      if (p.first) {
+        //  reuse existing proxy
+        inst.object ().cell_index (p.second);
+      } else {
+        //  create a new proxy, reusing the first library proxy's replica
+        inst.object ().cell_index (layout ()->get_lib_proxy (real_lib, real_cil));
+        layout ()->create_cold_proxy_as (cp->context_info (), inst.object ().cell_index ());
+      }
+
+    } else {
+      inst.object ().cell_index (layout ()->get_lib_proxy (real_lib, real_cil));
     }
 
     inst.transform_into (db::ICplxTrans (lib->layout ().dbu () / layout ()->dbu ()));

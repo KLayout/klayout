@@ -129,12 +129,12 @@ public:
   /**
    *  @brief Reimplemented from Cell: unregisters the proxy at the layout
    */
-  void unregister ();
+  virtual void unregister ();
 
   /**
    *  @brief Reimplemented from Cell: reregisters the proxy at the layout
    */
-  void reregister ();
+  virtual void reregister ();
 
 private:
   lib_id_type m_lib_id;

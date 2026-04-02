@@ -337,6 +337,37 @@ private:
 // -----------------------------------------------------------------
 //  Implementation of the ProxyContextInfo class
 
+bool
+LayoutOrCellContextInfo::operator== (const LayoutOrCellContextInfo &other) const
+{
+  return lib_name == other.lib_name &&
+         cell_name == other.cell_name &&
+         pcell_name == other.pcell_name &&
+         pcell_parameters == other.pcell_parameters &&
+         meta_info == other.meta_info;
+}
+
+bool
+LayoutOrCellContextInfo::operator< (const LayoutOrCellContextInfo &other) const
+{
+  if (lib_name != other.lib_name) {
+    return lib_name < other.lib_name;
+  }
+  if (cell_name != other.cell_name) {
+    return cell_name < other.cell_name;
+  }
+  if (pcell_name != other.pcell_name) {
+    return pcell_name < other.pcell_name;
+  }
+  if (pcell_parameters != other.pcell_parameters) {
+    return pcell_parameters < other.pcell_parameters;
+  }
+  if (meta_info != other.meta_info) {
+    return meta_info < other.meta_info;
+  }
+  return false;
+}
+
 LayoutOrCellContextInfo
 LayoutOrCellContextInfo::deserialize (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to)
 {
@@ -540,6 +571,7 @@ Layout::clear ()
   m_pcell_ids.clear ();
 
   m_lib_proxy_map.clear ();
+  m_cold_proxy_map.clear ();
   m_meta_info.clear ();
 }
 
@@ -568,6 +600,7 @@ Layout::operator= (const Layout &d)
     }
 
     m_lib_proxy_map = d.m_lib_proxy_map;
+    m_cold_proxy_map = d.m_cold_proxy_map;
 
     m_cell_ptrs.resize (d.m_cell_ptrs.size (), 0);
 
@@ -809,6 +842,7 @@ Layout::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat
   db::mem_stat (stat, purpose, cat, m_pcells, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_pcell_ids, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_lib_proxy_map, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_cold_proxy_map, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_meta_info, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_shape_repository, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_array_repository, true, (void *) this);
@@ -1505,6 +1539,11 @@ Layout::register_cell_name (const char *name, cell_index_type ci)
 void
 Layout::rename_cell (cell_index_type id, const char *name)
 {
+  static const char *anonymous_name = "";
+  if (! name) {
+    name = anonymous_name;
+  }
+
   tl_assert (id < m_cell_names.size ());
 
   if (strcmp (m_cell_names [id], name) != 0) {
@@ -1521,7 +1560,10 @@ Layout::rename_cell (cell_index_type id, const char *name)
     delete [] m_cell_names [id];
     m_cell_names [id] = cp;
 
-    m_cell_map.insert (std::make_pair (cp, id));
+    //  NOTE: anonymous cells (empty name string) are not registered in the cell name map
+    if (*cp != 0) {
+      m_cell_map.insert (std::make_pair (cp, id));
+    }
 
     //  to enforce a redraw and a rebuild
     cell_name_changed ();
@@ -1690,20 +1732,85 @@ Layout::cleanup (const std::set<db::cell_index_type> &keep)
     return;
   }
 
+  if (tl::verbosity () >= 30) {
+    tl::info << "Cleaning up layout ..";
+  }
+
+  //  Do some polishing of the proxies - sometimes, specifically when resolving indirect library references,
+  //  different proxies to the same library object exist. We can identify them and clean them up, so there
+  //  is a single reference. We can also try to ensure that cell names reflect the library cell names.
+  //  The latter is good for LVS for example.
+
+  {
+    db::LayoutLocker locker (this);
+
+    //  join library proxies pointing to the same object
+
+    for (auto c = m_lib_proxy_map.begin (); c != m_lib_proxy_map.end (); ) {
+
+      auto c0 = c++;
+      size_t n = 1;
+      while (c != m_lib_proxy_map.end () && c->first == c0->first) {
+        ++n;
+        ++c;
+      }
+
+      if (n > 1) {
+        auto cc = c0;
+        ++cc;
+        while (cc != c) {
+          if (keep.find (cc->second) == keep.end ()) {
+            if (tl::verbosity () >= 30) {
+              tl::info << "Joining lib proxy " << cell_name (cc->second) << " into " << cell_name (c0->second);
+            }
+            replace_instances_of (cc->second, c0->second);
+          }
+          ++cc;
+        }
+      }
+
+    }
+
+    //  join cold proxies pointing to the same object
+
+    for (auto c = m_cold_proxy_map.begin (); c != m_cold_proxy_map.end (); ) {
+
+      auto c0 = c++;
+      size_t n = 1;
+      while (c != m_cold_proxy_map.end () && c->first == c0->first) {
+        ++n;
+        ++c;
+      }
+
+      if (n > 1) {
+        auto cc = c0;
+        ++cc;
+        while (cc != c) {
+          if (keep.find (cc->second) == keep.end ()) {
+            if (tl::verbosity () >= 30) {
+              tl::info << "Joining cold proxy " << cell_name (cc->second) << " into " << cell_name (c0->second);
+            }
+            replace_instances_of (cc->second, c0->second);
+          }
+          ++cc;
+        }
+      }
+
+    }
+
+  }
+
+  std::set<cell_index_type> cells_to_delete;
+
   //  deleting cells may create new top cells which need to be deleted as well, hence we iterate
   //  until there are no more cells to delete
   while (true) {
 
     //  delete all cells that are top cells and are proxies. Those cells are proxies no longer required.
-    std::set<cell_index_type> cells_to_delete;
     for (top_down_iterator c = begin_top_down (); c != end_top_cells (); ++c) {
-      if (cell (*c).is_proxy ()) {
+      if (cell (*c).is_proxy () && keep.find (*c) == keep.end ()) {
         cells_to_delete.insert (*c);
       }
-    }
-
-    for (std::set<db::cell_index_type>::const_iterator k = keep.begin (); k != keep.end (); ++k) {
-      cells_to_delete.erase (*k);
     }
 
     if (cells_to_delete.empty ()) {
@@ -1711,6 +1818,33 @@ Layout::cleanup (const std::set<db::cell_index_type> &keep)
     }
 
     delete_cells (cells_to_delete);
+    cells_to_delete.clear ();
+
+  }
+
+  //  Try to ensure that cell names reflect the library cell names. The latter is good for LVS for example.
+
+  for (auto c = m_lib_proxy_map.begin (); c != m_lib_proxy_map.end (); ++c) {
+
+    std::string bn = cell (c->second).get_basic_name ();
+    if (bn != cell_name (c->second) && ! cell_by_name (bn.c_str ()).first) {
+      if (tl::verbosity () >= 30) {
+        tl::info << "Renaming lib proxy " << cell_name (c->second) << " to " << bn;
+      }
+      rename_cell (c->second, bn.c_str ());
+    }
+
+  }
+
+  for (auto c = m_cold_proxy_map.begin (); c != m_cold_proxy_map.end (); ++c) {
+
+    std::string bn = cell (c->second).get_basic_name ();
+    if (bn != cell_name (c->second) && ! cell_by_name (bn.c_str ()).first) {
+      if (tl::verbosity () >= 30) {
+        tl::info << "Renaming cold proxy " << cell_name (c->second) << " to " << bn;
+      }
+      rename_cell (c->second, bn.c_str ());
+    }
 
   }
 }
@@ -3151,13 +3285,32 @@ Layout::variant_name (cell_index_type cell_index) const
 void
 Layout::register_lib_proxy (db::LibraryProxy *lib_proxy)
 {
-  m_lib_proxy_map.insert (std::make_pair (std::make_pair (lib_proxy->lib_id (), lib_proxy->library_cell_index ()), lib_proxy->Cell::cell_index ()));
+  auto key = std::make_pair (lib_proxy->lib_id (), lib_proxy->library_cell_index ());
+
+  auto l = m_lib_proxy_map.find (key);
+  while (l != m_lib_proxy_map.end () && l->first == key) {
+    if (l->second == lib_proxy->Cell::cell_index ()) {
+      return;
+    }
+    ++l;
+  }
+
+  m_lib_proxy_map.insert (std::make_pair (key, lib_proxy->Cell::cell_index ()));
 }
 
 void
 Layout::unregister_lib_proxy (db::LibraryProxy *lib_proxy)
 {
-  m_lib_proxy_map.erase (std::make_pair (lib_proxy->lib_id (), lib_proxy->library_cell_index ()));
+  auto key = std::make_pair (lib_proxy->lib_id (), lib_proxy->library_cell_index ());
+
+  auto l = m_lib_proxy_map.find (key);
+  while (l != m_lib_proxy_map.end () && l->first == key) {
+    if (l->second == lib_proxy->Cell::cell_index ()) {
+      m_lib_proxy_map.erase (l);
+      break;
+    }
+    ++l;
+  }
 }
 
 void
@@ -3177,9 +3330,13 @@ Layout::get_lib_proxy_as (Library *lib, cell_index_type cell_index, cell_index_t
 cell_index_type
 Layout::get_lib_proxy (Library *lib, cell_index_type cell_index)
 {
-  lib_proxy_map::const_iterator lp = m_lib_proxy_map.find (std::make_pair (lib->get_id (), cell_index));
-  if (lp != m_lib_proxy_map.end ()) {
+  auto key = std::make_pair (lib->get_id (), cell_index);
+
+  lib_proxy_map::const_iterator lp = m_lib_proxy_map.find (key);
+  if (lp != m_lib_proxy_map.end () && lp->first == key) {
+
     return lp->second;
+
   } else {
 
     //  create a new unique name
@@ -3210,35 +3367,82 @@ Layout::get_lib_proxy (Library *lib, cell_index_type cell_index)
   }
 }
 
+void
+Layout::register_cold_proxy (db::ColdProxy *cold_proxy)
+{
+  auto l = m_cold_proxy_map.find (cold_proxy->context_info ());
+  while (l != m_cold_proxy_map.end () && l->first == cold_proxy->context_info ()) {
+    if (l->second == cold_proxy->Cell::cell_index ()) {
+      return;
+    }
+    ++l;
+  }
+
+  m_cold_proxy_map.insert (std::make_pair (cold_proxy->context_info (), cold_proxy->Cell::cell_index ()));
+}
+
+void
+Layout::unregister_cold_proxy (db::ColdProxy *cold_proxy)
+{
+  auto l = m_cold_proxy_map.find (cold_proxy->context_info ());
+  while (l != m_cold_proxy_map.end () && l->first == cold_proxy->context_info ()) {
+    if (l->second == cold_proxy->Cell::cell_index ()) {
+      m_cold_proxy_map.erase (l);
+      break;
+    }
+    ++l;
+  }
+}
+
+std::pair<bool, cell_index_type>
+Layout::find_cold_proxy (const db::LayoutOrCellContextInfo &info)
+{
+  cold_proxy_map::const_iterator lp = m_cold_proxy_map.find (info);
+  if (lp != m_cold_proxy_map.end () && lp->first == info) {
+    return std::make_pair (true, lp->second);
+  } else {
+    return std::make_pair (false, 0);
+  }
+}
+
 cell_index_type
 Layout::create_cold_proxy (const db::LayoutOrCellContextInfo &info)
 {
-  //  create a new unique name
-  std::string b;
-  if (! info.cell_name.empty ()) {
-    b = info.cell_name;
-  } else if (! info.pcell_name.empty ()) {
-    b = info.pcell_name;
+  cold_proxy_map::const_iterator lp = m_cold_proxy_map.find (info);
+  if (lp != m_cold_proxy_map.end () && lp->first == info) {
+
+    return lp->second;
+
+  } else {
+
+    //  create a new unique name
+    std::string b;
+    if (! info.cell_name.empty ()) {
+      b = info.cell_name;
+    } else if (! info.pcell_name.empty ()) {
+      b = info.pcell_name;
+    }
+    if (m_cell_map.find (b.c_str ()) != m_cell_map.end ()) {
+      b = uniquify_cell_name (b.c_str ());
+    }
+
+    //  create a new cell (a LibraryProxy)
+    cell_index_type new_index = allocate_new_cell ();
+
+    ColdProxy *proxy = new ColdProxy (new_index, *this, info);
+    m_cells.push_back_ptr (proxy);
+    m_cell_ptrs [new_index] = proxy;
+
+    //  enter its index and cell_name
+    register_cell_name (b.c_str (), new_index);
+
+    if (manager () && manager ()->transacting ()) {
+      manager ()->queue (this, new NewRemoveCellOp (new_index, m_cell_names [new_index], false /*new*/, 0));
+    }
+
+    return new_index;
+
   }
-  if (m_cell_map.find (b.c_str ()) != m_cell_map.end ()) {
-    b = uniquify_cell_name (b.c_str ());
-  }
-
-  //  create a new cell (a LibraryProxy)
-  cell_index_type new_index = allocate_new_cell ();
-
-  ColdProxy *proxy = new ColdProxy (new_index, *this, info);
-  m_cells.push_back_ptr (proxy);
-  m_cell_ptrs [new_index] = proxy;
-
-  //  enter its index and cell_name
-  register_cell_name (b.c_str (), new_index);
-
-  if (manager () && manager ()->transacting ()) {
-    manager ()->queue (this, new NewRemoveCellOp (new_index, m_cell_names [new_index], false /*new*/, 0));
-  }
-
-  return new_index;
 }
 
 void

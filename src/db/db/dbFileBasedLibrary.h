@@ -89,6 +89,16 @@ public:
     m_other_paths = other_paths;
   }
 
+  /**
+   *  @brief Gets a value indicating whether the library is for the given path
+   */
+  bool is_for_path (const std::string &path);
+
+  /**
+   *  @brief Gets a value indicating whether the library is for the given path
+   */
+  bool is_for_paths (const std::vector<std::string> &paths);
+
 private:
   std::string m_name;
   std::string m_path;

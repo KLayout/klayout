@@ -53,6 +53,27 @@ FileBasedLibrary::merge_with_other_layout (const std::string &path)
   }
 }
 
+bool
+FileBasedLibrary::is_for_path (const std::string &path)
+{
+  return m_other_paths.empty () && m_path == path;
+}
+
+bool
+FileBasedLibrary::is_for_paths (const std::vector<std::string> &paths)
+{
+  if (paths.size () != m_other_paths.size () + 1) {
+    return false;
+  }
+
+  //  this check is purely based on path strings
+  std::set<std::string> p1 (paths.begin (), paths.end ());
+  std::set<std::string> p2;
+  p2.insert (m_path);
+  p2.insert (m_other_paths.begin (), m_other_paths.end ());
+  return p1 == p2;
+}
+
 std::string
 FileBasedLibrary::load ()
 {

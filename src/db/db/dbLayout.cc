@@ -1742,6 +1742,7 @@ Layout::cleanup (const std::set<db::cell_index_type> &keep)
   //  The latter is good for LVS for example.
 
   {
+    update();
     db::LayoutLocker locker (this);
 
     //  join library proxies pointing to the same object

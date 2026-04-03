@@ -193,10 +193,12 @@ Library::refresh_without_restore ()
 
   }
 
-  layout ().refresh ();
-
   //  re-register, potentially under the new name
   db::LibraryManager::instance ().register_lib (this);
+
+  //  This is basically only needed for coerce_parameters in a persistent way.
+  //  During "register_lib", this is already called in PCell update, but cannot be persisted then.
+  remap_to (this);
 }
 
 void

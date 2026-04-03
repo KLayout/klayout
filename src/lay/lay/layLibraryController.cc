@@ -320,12 +320,17 @@ public:
       for (auto k = kwargs->begin (); k != kwargs->end (); ++k) {
 
         static const std::string replicate_key ("replicate");
+        static const std::string description_key ("description");
         static const std::string technology_key ("technology");
         static const std::string technologies_key ("technologies");
 
         if (k->first == replicate_key) {
 
           fi.replicate = k->second.to_bool ();
+
+        } else if (k->first == description_key) {
+
+          fi.description = k->second.to_string ();
 
         } else if (k->first == technology_key) {
 
@@ -465,6 +470,7 @@ LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> 
 
         std::unique_ptr<db::FileBasedLibrary> lib (new db::FileBasedLibrary (lib_path, im->name));
         lib->set_technologies (im->tech);
+        lib->set_description (im->description);
         lib->set_replicate (im->replicate);
 
         tl::log << "Reading library '" << lib_path << "'";
@@ -493,6 +499,7 @@ LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> 
           LibInfo li;
           li.name = libname;
           li.time = fi.lastModified ();
+          li.description = im->description;
           li.tech = im->tech;
           li.replicate = im->replicate;
           new_lib_files.insert (std::make_pair (lib_path, li));

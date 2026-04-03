@@ -61,6 +61,7 @@ public:
   {
     LibFileInfo () : name (), path (), replicate (true) { }
     std::string name;
+    std::string description;
     std::string path;
     std::set<std::string> tech;
     bool replicate;
@@ -135,8 +136,9 @@ private slots:
 private:
   struct LibInfo
   {
-    LibInfo () : name (), time (), tech (), replicate (true) { }
+    LibInfo () : name (), description (), time (), tech (), replicate (true) { }
     std::string name;
+    std::string description;
     QDateTime time;
     std::set<std::string> tech;
     bool replicate;

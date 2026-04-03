@@ -37,11 +37,13 @@ TEST (1)
   EXPECT_EQ (file_info[0].name, "");
   EXPECT_EQ (file_info[0].path, tl::combine_path (tl::absolute_path (lib_file), "noname.gds"));
   EXPECT_EQ (file_info[0].replicate, true);
+  EXPECT_EQ (file_info[0].description, "");
   EXPECT_EQ (tl::join (file_info[0].tech.begin (), file_info[0].tech.end (), ","), "T1");
 
   EXPECT_EQ (file_info[1].name, "L2");
   EXPECT_EQ (file_info[1].path, tl::absolute_file_path (lib_file) + ".zzz");
   EXPECT_EQ (file_info[1].replicate, true);
+  EXPECT_EQ (file_info[1].description, "Library L2");
   EXPECT_EQ (file_info[1].tech.size (), size_t (0));
 
   EXPECT_EQ (file_info[2].name, "L3");

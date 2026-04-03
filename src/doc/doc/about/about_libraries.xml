@@ -253,6 +253,15 @@ define("B", "b.gds");</pre>
 
     </li>
 
+    <li>
+
+      <p><b>description</b>: Specifies a description for that library.
+      </p>
+
+      <pre>define("A", "a.gds", description="Library A");</pre>
+
+    </li>
+
   </ul>
 
 </doc>

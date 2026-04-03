@@ -113,6 +113,13 @@ public:
   bool can_exit (lay::Dispatcher *root) const;
 
   /**
+   *  @brief Synchronize files
+   *
+   *  If "always" is set, all files are synchronized unconditionally.
+   */
+  void sync_files (bool always);
+
+  /**
    *  @brief Gets the singleton instance for this object
    */
   static LibraryController *instance ();
@@ -147,9 +154,11 @@ private:
   tl::FileSystemWatcher *m_file_watcher;
   tl::DeferredMethod<LibraryController> dm_sync_files;
   std::map<std::string, LibInfo> m_lib_files;
+  bool m_sync;
+  bool m_sync_once;
 
-  void sync_files ();
-  void read_libs (const std::vector<LibFileInfo> &file_info, std::map<std::string, LibInfo> &new_lib_files);
+  void sync_files_maybe ();
+  void read_libs (const std::vector<LibFileInfo> &file_info, std::map<std::string, LibInfo> &new_lib_files, bool always);
 };
 
 }

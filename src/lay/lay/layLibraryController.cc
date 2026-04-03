@@ -25,7 +25,6 @@
 #include "layApplication.h"
 #include "laySaltController.h"
 #include "layConfig.h"
-#include "layMainWindow.h"
 #include "layQtTools.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
@@ -44,7 +43,8 @@ namespace lay
 
 LibraryController::LibraryController ()
   : m_file_watcher (0),
-    dm_sync_files (this, &LibraryController::sync_files)
+    dm_sync_files (this, &LibraryController::sync_files_maybe),
+    m_sync (false), m_sync_once (false)
 {
 }
 
@@ -53,7 +53,7 @@ LibraryController::initialize (lay::Dispatcher * /*root*/)
 {
   //  NOTE: we initialize the libraries in the stage once to have them available for the autorun
   //  macros. We'll do that later again in order to pull in the libraries from the packages.
-  sync_files ();
+  sync_files (false);
 }
 
 void
@@ -69,7 +69,7 @@ LibraryController::initialized (lay::Dispatcher * /*root*/)
     connect (m_file_watcher, SIGNAL (fileRemoved (const QString &)), this, SLOT (file_watcher_triggered ()));
   }
 
-  sync_files ();
+  sync_files (false);
 }
 
 void
@@ -88,9 +88,9 @@ LibraryController::uninitialize (lay::Dispatcher * /*root*/)
 }
 
 void
-LibraryController::get_options (std::vector < std::pair<std::string, std::string> > & /*options*/) const
+LibraryController::get_options (std::vector < std::pair<std::string, std::string> > &options) const
 {
-  //  .. nothing yet ..
+  options.push_back (std::pair<std::string, std::string> (cfg_auto_sync_libraries, "false"));
 }
 
 void
@@ -100,8 +100,21 @@ LibraryController::get_menu_entries (std::vector<lay::MenuEntry> & /*menu_entrie
 }
 
 bool
-LibraryController::configure (const std::string & /*name*/, const std::string & /*value*/)
+LibraryController::configure (const std::string &name, const std::string &value)
 {
+  if (name == cfg_auto_sync_libraries) {
+
+    bool sync = false;
+    tl::from_string (value, sync);
+
+    m_sync = sync;
+    if (sync) {
+      dm_sync_files ();
+    }
+
+  }
+
+  //  don't consume
   return false;
 }
 
@@ -119,8 +132,24 @@ LibraryController::can_exit (lay::Dispatcher * /*root*/) const
 }
 
 void
-LibraryController::sync_files ()
+LibraryController::sync_files_maybe ()
 {
+  sync_files (false);
+}
+
+void
+LibraryController::sync_files (bool always)
+{
+  if (tl::verbosity () >= 20) {
+    if (always) {
+      tl::info << tl::to_string (tr ("Synchronize library files unconditionally"));
+    } else {
+      tl::info << tl::to_string (tr ("Synchronize library files"));
+    }
+  }
+
+  m_sync_once = false;
+
   if (m_file_watcher) {
     m_file_watcher->clear ();
     m_file_watcher->enable (false);
@@ -179,7 +208,7 @@ LibraryController::sync_files ()
       std::vector<LibFileInfo> libs;
       read_lib_file (lf->first, lf->second, libs);
 
-      read_libs (libs, new_lib_files);
+      read_libs (libs, new_lib_files, always);
 
       if (m_file_watcher) {
         m_file_watcher->add_file (tl::absolute_file_path (lf->first));
@@ -222,7 +251,7 @@ LibraryController::sync_files ()
         }
       }
 
-      read_libs (libs, new_lib_files);
+      read_libs (libs, new_lib_files, always);
 
     }
 
@@ -424,9 +453,9 @@ LibraryController::read_lib_file (const std::string &lib_file, const std::string
 }
 
 void
-LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> &libs, std::map<std::string, LibraryController::LibInfo> &new_lib_files)
+LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> &libs, std::map<std::string, LibraryController::LibInfo> &new_lib_files, bool always)
 {
-  bool needs_load = false;
+  bool needs_load = always;
 
   for (auto im = libs.begin (); im != libs.end () && ! needs_load; ++im) {
 
@@ -532,14 +561,17 @@ void
 LibraryController::sync_with_external_sources ()
 {
   tl::log << tl::to_string (tr ("Package updates - updating libraries"));
+  m_sync_once = true;
   dm_sync_files ();
 }
 
 void
 LibraryController::file_watcher_triggered ()
 {
-  tl::log << tl::to_string (tr ("Detected file system change in libraries - updating"));
-  dm_sync_files ();
+  if (m_sync) {
+    tl::log << tl::to_string (tr ("Detected file system change in libraries - updating"));
+    dm_sync_files ();
+  }
 }
 
 LibraryController *

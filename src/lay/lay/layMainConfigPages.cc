@@ -197,6 +197,10 @@ MainConfigPage7::setup (lay::Dispatcher *root)
   root->config_get (cfg_layout_file_watcher_enabled, en);
   mp_ui->check_for_updates->setChecked (en);
 
+  bool asl = false;
+  root->config_get (cfg_auto_sync_libraries, asl);
+  mp_ui->auto_sync_libraries->setChecked (asl);
+
   int kb = 0;
   root->config_get (cfg_keep_backups, kb);
   mp_ui->keep_backups->setValue (kb);
@@ -211,6 +215,7 @@ MainConfigPage7::commit (lay::Dispatcher *root)
 {
   try {
     root->config_set (cfg_layout_file_watcher_enabled, mp_ui->check_for_updates->isChecked ());
+    root->config_set (cfg_auto_sync_libraries, mp_ui->auto_sync_libraries->isChecked ());
     root->config_set (cfg_keep_backups, mp_ui->keep_backups->value ());
     root->config_set (cfg_always_exit_without_saving, mp_ui->always_exit_without_saving->isChecked ());
   } catch (...) { }

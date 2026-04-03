@@ -51,12 +51,21 @@ class MainWindow;
  *  By making the controller a PluginDeclaration it will receive
  *  initialization and configuration calls.
  */
-class LibraryController
+class LAY_PUBLIC LibraryController
   : public lay::PluginDeclaration, public tl::Object
 {
 Q_OBJECT
 
 public:
+  struct LibFileInfo
+  {
+    LibFileInfo () : name (), path (), replicate (true) { }
+    std::string name;
+    std::string path;
+    std::set<std::string> tech;
+    bool replicate;
+  };
+
   /**
    *  @brief Default constructor
    */
@@ -107,6 +116,11 @@ public:
    */
   static LibraryController *instance ();
 
+  /**
+   *  @brief Provided for test purposes
+   */
+  static void read_lib_file (const std::string &lib_file, const std::string &tech, std::vector<LibFileInfo> &file_info);
+
 private slots:
   /**
    *  @brief Called when the file watcher detects a change in the file system
@@ -121,10 +135,11 @@ private slots:
 private:
   struct LibInfo
   {
-    LibInfo () : name (), time (), tech () { }
+    LibInfo () : name (), time (), tech (), replicate (true) { }
     std::string name;
     QDateTime time;
     std::set<std::string> tech;
+    bool replicate;
   };
 
   tl::FileSystemWatcher *m_file_watcher;
@@ -132,6 +147,7 @@ private:
   std::map<std::string, LibInfo> m_lib_files;
 
   void sync_files ();
+  void read_libs (const std::vector<LibFileInfo> &file_info, std::map<std::string, LibInfo> &new_lib_files);
 };
 
 }

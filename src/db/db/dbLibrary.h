@@ -53,12 +53,12 @@ public:
   /**
    *  @brief The constructor
    */
-  Library();
+  Library ();
 
   /**
    *  @brief Copy constructor
    */
-  Library(const Library &);
+  Library (const Library &);
 
   /**
    *  @brief The destructor
@@ -139,6 +139,13 @@ public:
   bool for_technologies () const;
 
   /**
+   *  @brief Sets the technology names this library is associated with
+   *
+   *  This will reset the list of technologies to this set.
+   */
+  void set_technologies (const std::set<std::string> &t);
+
+  /**
    *  @brief Sets the technology name this library is associated with
    *
    *  This will reset the list of technologies to this one.
@@ -170,6 +177,27 @@ public:
   void set_description (const std::string &description) 
   {
     m_description = description;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether the library produces replicas
+   *
+   *  If this value is true (the default), layout written will include the
+   *  actual layout of a library cell (replica). With this, it is possible
+   *  to regenerate the layout without actually having the library at the
+   *  cost of additional bytes in the file.
+   *
+   *  Setting this flag to false avoids this replication, but a layout
+   *  cannot be regenerated without having this library.
+   */
+  void set_replicate (bool f);
+
+  /**
+   *  @brief Gets a value indicating whether the library produces replicas
+   */
+  bool replicate () const
+  {
+    return m_replicate;
   }
 
   /**
@@ -263,6 +291,7 @@ private:
   db::Layout m_layout;
   std::map<db::Layout *, int> m_referrers;
   std::map<db::cell_index_type, int> m_refcount, m_retired_count;
+  bool m_replicate;
 
   // no copying.
   Library &operator=(const Library &);

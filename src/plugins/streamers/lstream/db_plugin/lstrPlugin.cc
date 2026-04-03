@@ -105,6 +105,14 @@ class LStreamFormatDeclaration
     return true;
   }
 
+  /**
+   *  @brief Returns a value indicating whether context information is supported
+   */
+  virtual bool supports_context () const
+  {
+    return true;
+  }
+
   virtual tl::XMLElementBase *xml_writer_options_element () const
   {
     return new db::WriterOptionsXMLElement<lstr::WriterOptions> ("lstream",

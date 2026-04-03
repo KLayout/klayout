@@ -1206,6 +1206,11 @@ class GerberFormatDeclaration
   {
     return false;
   }
+
+  virtual bool supports_context () const
+  {
+    return false;
+  }
 };
 
 static tl::RegisteredClass<db::StreamFormatDeclaration> format_decl (new GerberFormatDeclaration (), 1000, "GerberPCB");

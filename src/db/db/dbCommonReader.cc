@@ -692,6 +692,11 @@ public:
     return false;
   }
 
+  virtual bool supports_context () const
+  {
+    return false;
+  }
+
   virtual tl::XMLElementBase *xml_reader_options_element () const
   {
     return new db::ReaderOptionsXMLElement<db::CommonReaderOptions> ("common",

@@ -114,7 +114,7 @@ private:
   void make_cell_hierarchy_tree (stream::library::CellHierarchyTree::Builder cell_tree);
   void make_meta_data (const db::Cell *cell, stream::metaData::MetaData::Builder meta_data);
 
-  void write_cell (db::cell_index_type ci, kj::BufferedOutputStream &os);
+  void write_cell (db::cell_index_type ci, kj::BufferedOutputStream &os, bool skip_body);
   void write_layout_view (db::cell_index_type ci, kj::BufferedOutputStream &os);
   void write_meta_data_view (db::cell_index_type ci, kj::BufferedOutputStream &os);
   void make_repetition (const RegularArray &array, stream::repetition::Repetition::Builder builder);

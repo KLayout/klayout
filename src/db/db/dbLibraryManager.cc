@@ -38,7 +38,7 @@ namespace db
 
 static LibraryManager *sp_instance (0);
 
-LibraryManager &
+DB_PUBLIC LibraryManager &
 LibraryManager::instance ()
 {
   if (sp_instance == 0) {
@@ -177,9 +177,6 @@ LibraryManager::delete_lib (Library *library)
 lib_id_type 
 LibraryManager::register_lib (Library *library)
 {
-  if (library->get_name () == "PCellTestLib2") {
-    tl::info << "@@@ BANG!";
-  }
   lib_id_type id = std::numeric_limits<size_t>::max ();
   Library *old_lib = 0;
 

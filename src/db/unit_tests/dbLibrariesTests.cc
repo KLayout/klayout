@@ -506,6 +506,16 @@ TEST(3)
   std::unique_ptr<LIBT_B> lib_b (new LIBT_B ());
   db::LibraryManager::instance ().register_lib (lib_b.get ());
 
+  EXPECT_EQ (lib_a->is_for_technology ("X"), false);
+  EXPECT_EQ (lib_a->is_for_technology ("*"), false);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").second, lib_a->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").second, lib_a->get_id ());
+
   //  This test tests the ability to reference libraries out of other libraries ("B" references "A"),
   //  the ability to persist that and whether this survives a write/read cycle.
 
@@ -545,6 +555,15 @@ TEST(4)
   std::unique_ptr<LIBT_A> lib_a1_inst (new LIBT_A ());
   tl::weak_ptr<LIBT_A> lib_a1 (lib_a1_inst.get ());
   lib_a1->add_technology ("X");
+  EXPECT_EQ (lib_a1->is_for_technology ("Z"), false);
+  EXPECT_EQ (lib_a1->is_for_technology ("X"), true);
+  EXPECT_EQ (lib_a1->is_for_technology ("XX"), false);
+  EXPECT_EQ (lib_a1->is_for_technology ("*"), true);
+  lib_a1->add_technology ("XX");
+  EXPECT_EQ (lib_a1->is_for_technology ("Z"), false);
+  EXPECT_EQ (lib_a1->is_for_technology ("X"), true);
+  EXPECT_EQ (lib_a1->is_for_technology ("XX"), true);
+  EXPECT_EQ (lib_a1->is_for_technology ("*"), true);
 
   std::unique_ptr<LIBT_A> lib_a2_inst (new LIBT_A ());
   tl::weak_ptr<LIBT_A> lib_a2 (lib_a2_inst.get ());
@@ -552,12 +571,15 @@ TEST(4)
 
   std::unique_ptr<LIBT_A> lib_a3_inst (new LIBT_A ());
   tl::weak_ptr<LIBT_A> lib_a3 (lib_a3_inst.get ());
+  //  same technologies as a1, so it can entirely replace it:
   lib_a3->add_technology ("X");
+  lib_a3->add_technology ("XX");
 
   std::unique_ptr<LIBT_A> lib_a4_inst (new LIBT_A ());
   tl::weak_ptr<LIBT_A> lib_a4 (lib_a4_inst.get ());
 
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, false);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, false);
@@ -565,20 +587,25 @@ TEST(4)
   db::LibraryManager::instance ().register_lib (lib_a1.get ());
 
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, false);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").first, true);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a1->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "XX").second, lib_a1->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").second, lib_a1->get_id ());
 
   db::LibraryManager::instance ().register_lib (lib_a2.get ());
 
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, false);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").first, true);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a1->get_id ());
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").first, true);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").second, lib_a2->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").second, lib_a2->get_id ());
 
   db::LibraryManager::instance ().register_lib (lib_a3.get ());
   //  lib_a3 replaces lib_a1

@@ -55,7 +55,7 @@ Library::~Library ()
 bool
 Library::is_for_technology (const std::string &name) const
 {
-  return m_technologies.find (name) != m_technologies.end ();
+  return (! m_technologies.empty () && name == "*") || m_technologies.find (name) != m_technologies.end ();
 }
 
 bool

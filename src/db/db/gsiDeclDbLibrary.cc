@@ -165,10 +165,13 @@ LibraryClass<db::Library> decl_Library ("db", "LibraryBase",
     "@brief Gets a library by name\n"
     "Returns the library object for the given name. If the name is not a valid library name, nil is returned.\n"
     "\n"
-    "Different libraries can be registered under the same names for different technologies. When a technology name is given in 'for_technologies', "
-    "the first library matching this technology is returned. If no technology is given, the first library is returned.\n"
+    "Different libraries can be registered under the same names for different technologies. By specifying a technology, this method\n"
+    "will return the first library matching both name and the given technology. It will also return libraries not bound to a specific\n"
+    "technology in that case. Without a technology name given ('unspecific'), only libraries not bound to a technology are returned.\n"
+    "You can also specify '*' for the technology - in that case, the first library with the given name is returned, regardless whether\n"
+    "it is bound to a technology or not.\n"
     "\n"
-    "The technology selector has been introduced in version 0.27."
+    "The technology selector has been introduced in version 0.27. The '*' option for the technology has been added in version 0.30.8."
   ) +
   gsi::method ("library_by_id", &library_by_id, gsi::arg ("id"),
     "@brief Gets the library object for the given ID\n"
@@ -274,8 +277,10 @@ LibraryClass<db::Library> decl_Library ("db", "LibraryBase",
   gsi::method ("is_for_technology", &db::Library::is_for_technology, gsi::arg ("tech"),
     "@brief Returns a value indicating whether the library is associated with the given technology.\n"
     "The method is equivalent to checking whether the \\technologies list is empty.\n"
+    "As a special case, you can pass '*' for the 'tech' argument. In that case, this method\n"
+    "will return true, if the library is bound to any technology.\n"
     "\n"
-    "This method has been introduced in version 0.27"
+    "This method has been introduced in version 0.27. The '*' option for the technology has been added in version 0.30.8."
   ) +
   gsi::method ("for_technologies", &db::Library::for_technologies,
     "@brief Returns a value indicating whether the library is associated with any technology.\n"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # KLayout Layout Viewer
@@ -516,10 +516,6 @@ fi
 if [ $HAVE_LSTREAM != 0 ]; then
   echo "    Includes LStream plugin"
 fi
-if [ "$RPATH" = "" ]; then
-  RPATH="$BIN"
-fi
-
 # Check Ruby installation
 if [ "$RUBYINCLUDE" != "" ]; then
   HAVE_RUBY=1
@@ -574,6 +570,20 @@ if [ "$BIN" = "" ]; then
   BIN=$CURR_DIR/bin-$CONFIG
 fi
 
+# qmake needs absolute paths, so we get them now:
+#   OSX does not have `readlink -f` command. Use equivalent Perl script.
+if [ "$IS_MAC" = "no" ]; then
+  BUILD=`readlink -f $BUILD`
+  BIN=`readlink -f $BIN`
+else
+  BUILD=`perl -MCwd -le 'print Cwd::abs_path(shift)' $BUILD`
+  BIN=`perl -MCwd -le 'print Cwd::abs_path(shift)' $BIN`
+fi
+
+if [ "$RPATH" = "" ]; then
+  RPATH="$BIN:$BUILD"
+fi
+
 if [ "$QMAKE_CCACHE" = 1 ]; then
   echo "    Compilation caching is activated."
 else
@@ -607,16 +617,6 @@ mkdir -p $BUILD
 
 # source the version script
 . $(dirname $(which $0))/version.sh
-
-# qmake needs absolute paths, so we get them now:
-#   OSX does not have `readlink -f` command. Use equivalent Perl script.
-if [ "$IS_MAC" = "no" ]; then
-  BUILD=`readlink -f $BUILD`
-  BIN=`readlink -f $BIN`
-else
-  BUILD=`perl -MCwd -le 'print Cwd::abs_path(shift)' $BUILD`
-  BIN=`perl -MCwd -le 'print Cwd::abs_path(shift)' $BIN`
-fi
 
 if [ "$IS_MAC" = "no" ]; then
   if ( gmake -v >/dev/null 2>/dev/null ); then

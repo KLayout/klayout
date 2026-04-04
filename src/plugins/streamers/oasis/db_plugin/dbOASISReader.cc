@@ -206,11 +206,33 @@ OASISReader::get_str (std::string &s)
   size_t l = 0;
   get_size (l);
 
-  char *b = (char *) m_stream.get (l);
-  if (b) {
+  const size_t chunk_size = 32767;
+
+  if (l <= chunk_size) {
+    char *b = (char *) m_stream.get (l);
+    if (! b) {
+      s.clear ();
+      return;
+    }
     s.assign (b, l);
-  } else {
-    s = std::string ();
+    return;
+  }
+
+  s.clear ();
+  s.reserve (l);
+
+  size_t remaining = l;
+  while (remaining > 0) {
+    // InflateFilter can only expose less than half of its ring buffer as
+    // one contiguous chunk, so large CBLOCK strings need chunked reads.
+    size_t n = std::min (remaining, chunk_size);
+    char *b = (char *) m_stream.get (n);
+    if (! b) {
+      s.clear ();
+      return;
+    }
+    s.append (b, n);
+    remaining -= n;
   }
 }
 
@@ -3655,4 +3677,3 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
 }
 
 }
-

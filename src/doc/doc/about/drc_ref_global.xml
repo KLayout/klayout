@@ -2024,6 +2024,27 @@ See <a href="#enclosing">enclosing</a> for more details about the various ways t
 </tr>
 </table>
 </p>
+<a name="sparse_array_limit"/><h2>"sparse_array_limit" - Gets or sets the sparse array singularization limit</h2>
+<keyword name="sparse_array_limit"/>
+<p>Usage:</p>
+<ul>
+<li><tt>sparse_array_limit(limit)</tt></li>
+<li><tt>sparse_array_limit</tt></li>
+</ul>
+<p>
+In deep mode, array instances with a bad ratio of overall bounding box area
+vs. actually covered area, induce a performance penalty, because their bounding
+box is not longer a good approximation for their footprint.
+The "sparse array limit" defines the ratio of array instance bounding box area
+vs. sum of bounding box areas of the individual instances, above which the array
+is resolved into single instances.
+</p><p>
+Use this method without an argument to get the current value.
+</p><p>
+By default, this feature is off (the sparse array limit value is negative). 
+If your design uses many arrays with a bad coverage, you can set the sparse
+array limit to a value of 10 for example.
+</p>
 <a name="squares"/><h2>"squares" - Selects all polygons which are squares</h2>
 <keyword name="squares"/>
 <p>Usage:</p>

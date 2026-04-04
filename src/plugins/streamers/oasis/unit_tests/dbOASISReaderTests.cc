@@ -23,6 +23,7 @@
 
 #include "dbOASISReader.h"
 #include "dbOASISWriter.h"
+#include "dbLayoutDiff.h"
 #include "dbTextWriter.h"
 #include "dbTestSupport.h"
 #include "tlLog.h"
@@ -695,4 +696,42 @@ TEST(BlendCrash)
 
   std::string fn_au (tl::testdata () + "/oasis/blend_crash_au.gds.gz");
   db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+
+TEST(CBlockLargePropertyString)
+{
+  db::Manager m (false);
+  db::Layout layout_org (&m);
+
+  unsigned int layer = layout_org.insert_layer (db::LayerProperties (1, 0));
+  db::Cell &top = layout_org.cell (layout_org.add_cell ("TOP"));
+
+  std::string large_value (42000, 'a');
+
+  db::PropertiesSet ps;
+  ps.insert (db::property_names_id (tl::Variant ("blob")), tl::Variant (large_value));
+
+  top.shapes (layer).insert (db::BoxWithProperties (db::Box (0, 0, 100, 100), db::properties_id (ps)));
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_OASISReaderLargeString.oas");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    db::OASISWriterOptions &oasis_options = options.get_options<db::OASISWriterOptions> ();
+    oasis_options.write_cblocks = true;
+    oasis_options.strict_mode = false;
+    db::OASISWriter writer;
+    writer.write (layout_org, out, options);
+  }
+
+  db::Layout layout_read;
+
+  {
+    tl::InputStream in (tmp_file);
+    db::OASISReader reader (in);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (db::compare_layouts (layout_org, layout_read, db::layout_diff::f_verbose, 0), true);
 }

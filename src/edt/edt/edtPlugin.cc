@@ -367,7 +367,7 @@ public:
 
     lay::Action *combine_menu = mp->menu ()->action ("@toolbar.combine_mode");
 
-    if (cm != CM_Add && combine_menu->is_visible ()) {
+    if (cm != CM_Add && combine_menu->is_visible () && mp->menu_parent_widget ()->isVisible ()) {
       lay::TipDialog td (QApplication::activeWindow (), 
                     tl::to_string (tr ("The background combination mode of the shape editor is set to some other mode than 'Add'.\n"
                                        "This can be confusing, because a shape may not be drawn as expected.\n\nTo switch back to normal mode, choose 'Add' for the background combination mode in the toolbar.")),

@@ -1,85 +1,86 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>LayoutViewConfigPage5</class>
- <widget class="QFrame" name="LayoutViewConfigPage5" >
-  <property name="geometry" >
+ <widget class="QFrame" name="LayoutViewConfigPage5">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>694</width>
-    <height>301</height>
+    <height>453</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Application Settings</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="margin" stdset="0">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QGroupBox" name="lyp_file_gbx" >
-     <property name="title" >
+    <widget class="QGroupBox" name="lyp_file_gbx">
+     <property name="title">
       <string>Use default layer properties file</string>
      </property>
-     <property name="checkable" >
+     <property name="checkable">
       <bool>true</bool>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="margin" stdset="0">
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="1" column="1" >
-       <widget class="QToolButton" name="browse_pb" >
-        <property name="text" >
+      <item row="1" column="1">
+       <widget class="QToolButton" name="browse_pb">
+        <property name="text">
          <string>...</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="0" colspan="2" >
-       <widget class="QCheckBox" name="add_other_layers_cb" >
-        <property name="text" >
+      <item row="4" column="0" colspan="2">
+       <widget class="QCheckBox" name="add_other_layers_cb">
+        <property name="text">
          <string>Automatically add other layers</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLineEdit" name="lyp_file_le" />
+      <item row="1" column="0">
+       <widget class="QLineEdit" name="lyp_file_le"/>
       </item>
-      <item row="2" column="0" colspan="2" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
-         <string>&lt;html>&lt;body>&lt;b>Hint&lt;/b>: a technology or reader specific layer properties file (i.e. for PCB import) will override this setting.&lt;/p>&lt;/body>&lt;/html></string>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>&lt;html&gt;&lt;body&gt;&lt;b&gt;Hint&lt;/b&gt;: a technology or reader specific layer properties file (i.e. for PCB import) will override this setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="wordWrap" >
+        <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" colspan="2" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label">
+        <property name="text">
          <string>The following layer properties file is loaded into the layer view list every time a layout is opened or created:</string>
         </property>
-        <property name="wordWrap" >
+        <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
+      <item row="3" column="0">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>5</height>
@@ -91,35 +92,61 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Layer properties display</string>
      </property>
-     <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QVBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
+      <property name="margin" stdset="0">
+       <number>9</number>
+      </property>
       <item>
-       <widget class="QCheckBox" name="source_display_cb" >
-        <property name="text" >
+       <widget class="QCheckBox" name="source_display_cb">
+        <property name="text">
          <string>Always show layer source in layer list</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="ld_display_cb" >
-        <property name="text" >
+       <widget class="QCheckBox" name="ld_display_cb">
+        <property name="text">
          <string>Always show layer and datatype together with database name in layer source</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="ly_index_cb" >
-        <property name="text" >
+       <widget class="QCheckBox" name="ly_index_cb">
+        <property name="text">
          <string>Always show layout index in layer source</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>On new layers</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>New layers are created implicitly when new content is pasted or instances are placed.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="auto_create_new_layers_cb">
+        <property name="text">
+         <string>New layers are automatically added to the layer list</string>
         </property>
        </widget>
       </item>
@@ -128,7 +155,7 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <tabstops>
   <tabstop>lyp_file_gbx</tabstop>
   <tabstop>lyp_file_le</tabstop>

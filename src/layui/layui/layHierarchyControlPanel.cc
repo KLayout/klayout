@@ -1214,7 +1214,9 @@ HierarchyControlPanel::paste ()
 
   //  Add new layers to the view if required.
   if (! new_layers.empty ()) {
-    mp_view->add_new_layers (new_layers, m_active_index);
+    if (mp_view->auto_create_new_layers ()) {
+      mp_view->add_new_layers (new_layers, m_active_index);
+    }
     mp_view->update_content ();
   }
 

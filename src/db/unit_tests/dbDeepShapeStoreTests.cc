@@ -376,3 +376,111 @@ TEST(8_RestoreWithCellSelection3)
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_bug3_au.gds");
 }
 
+TEST(9_sparse_array_limit)
+{
+  db::Layout ly;
+
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/dss_sparse_array.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l12 = ly.get_layer (db::LayerProperties (12, 0));
+  unsigned int l11 = ly.get_layer (db::LayerProperties (11, 0));
+
+  db::Cell &top_cell = ly.cell (*ly.begin_top_down ());
+
+  db::RecursiveShapeIterator in_it1 (ly, top_cell, l1);
+  db::RecursiveShapeIterator in_it2 (ly, top_cell, l2);
+
+  {
+    db::DeepShapeStore dss;
+    EXPECT_EQ (dss.sparse_array_limit (), -1.0);
+
+    db::Region in_region1 (in_it1, dss);
+    db::Region in_region2 (in_it2, dss);
+
+    const db::Layout &dss_ly = dss.layout (0);
+    const db::Cell &dss_top_cell = dss_ly.cell (*dss_ly.begin_top_down ());
+    size_t n_inst = 0;
+    size_t n_total = 0;
+    for (auto i = dss_top_cell.begin (); ! i.at_end (); ++i) {
+      ++n_inst;
+      n_total += i->size ();
+    }
+
+    //  2 arrays, 1 single inst
+    EXPECT_EQ (n_inst, size_t (3));
+    EXPECT_EQ (n_total, size_t (19));
+
+    in_region1.sized (1000).insert_into (&ly, top_cell.cell_index (), l11);
+    in_region2.sized (1000).insert_into (&ly, top_cell.cell_index (), l12);
+
+    db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_sparse_array_au1.gds");
+  }
+
+  ly.clear_layer (l11);
+  ly.clear_layer (l12);
+
+  {
+    db::DeepShapeStore dss;
+    dss.set_sparse_array_limit (8.0);
+    EXPECT_EQ (dss.sparse_array_limit (), 8.0);
+
+    db::Region in_region1 (in_it1, dss);
+    db::Region in_region2 (in_it2, dss);
+
+    const db::Layout &dss_ly = dss.layout (0);
+    const db::Cell &dss_top_cell = dss_ly.cell (*dss_ly.begin_top_down ());
+    size_t n_inst = 0;
+    size_t n_total = 0;
+    for (auto i = dss_top_cell.begin (); ! i.at_end (); ++i) {
+      ++n_inst;
+      n_total += i->size ();
+    }
+
+    //  1 array, 1 single inst, 1 3x3 array resolved (=9)
+    EXPECT_EQ (n_inst, size_t (11));
+    EXPECT_EQ (n_total, size_t (19));
+
+    in_region1.sized (1000).insert_into (&ly, top_cell.cell_index (), l11);
+    in_region2.sized (1000).insert_into (&ly, top_cell.cell_index (), l12);
+
+    db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_sparse_array_au1.gds");
+  }
+
+  ly.clear_layer (l11);
+  ly.clear_layer (l12);
+
+  {
+    db::DeepShapeStore dss;
+    dss.set_sparse_array_limit (1.1);
+
+    db::Region in_region1 (in_it1, dss);
+    db::Region in_region2 (in_it2, dss);
+
+    const db::Layout &dss_ly = dss.layout (0);
+    const db::Cell &dss_top_cell = dss_ly.cell (*dss_ly.begin_top_down ());
+    size_t n_inst = 0;
+    size_t n_total = 0;
+    for (auto i = dss_top_cell.begin (); ! i.at_end (); ++i) {
+      ++n_inst;
+      n_total += i->size ();
+    }
+
+    //  2 3x3 arrays resolved, 1 single inst
+    EXPECT_EQ (n_inst, size_t (19));
+    EXPECT_EQ (n_total, size_t (19));
+
+    in_region1.sized (1000).insert_into (&ly, top_cell.cell_index (), l11);
+    in_region2.sized (1000).insert_into (&ly, top_cell.cell_index (), l12);
+
+    db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_sparse_array_au1.gds");
+  }
+}
+

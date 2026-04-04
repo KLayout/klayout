@@ -408,7 +408,7 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
           db::box_convert<db::CellInst> bc (*iter->layout ());
           auto a1 = bc (inst.object ()).area ();
           auto aa = inst.bbox (bc).area ();
-          if (a1 * m_sparse_array_limit < aa) {
+          if (a1 * m_sparse_array_limit * inst.size () < aa) {
             resolve = true;
           }
         }

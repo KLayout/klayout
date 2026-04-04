@@ -246,7 +246,7 @@ InflateFilter::~InflateFilter ()
 const char * 
 InflateFilter::get (size_t n)
 {
-  tl_assert (n < sizeof (m_buffer) / 2);
+  tl_assert (n <= max_blen ());
 
   while ((m_b_insert + sizeof (m_buffer) - m_b_read) % sizeof (m_buffer) < n) {
     if (! process ()) {
@@ -558,4 +558,3 @@ DeflateFilter::flush ()
 }
 
 }
-

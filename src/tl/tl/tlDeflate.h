@@ -211,9 +211,17 @@ public:
    *  @brief Get the next byte(s)
    *  
    *  This method returns a contiguous block of decoded bytes with the given length.
-   *  The maximum size of the block available is half the buffer size.
+   *  The maximum size of the block available is given by max_blen().
    */
   const char *get (size_t n);
+
+  /**
+   *  @brief Obtain the maximum number of bytes available for a single get() call
+   */
+  size_t max_blen () const
+  {
+    return sizeof (m_buffer) / 2 - 1;
+  }
 
   /**
    *  @brief Undo the last "get" operation

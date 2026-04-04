@@ -604,6 +604,12 @@ InputStream::get (size_t n, bool bypass_inflate)
   }
 }
 
+size_t
+InputStream::max_blen () const
+{
+  return mp_inflate ? mp_inflate->max_blen () : std::numeric_limits<size_t>::max ();
+}
+
 void
 InputStream::unget (size_t n)
 {

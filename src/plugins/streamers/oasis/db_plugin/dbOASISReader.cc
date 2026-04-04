@@ -206,7 +206,7 @@ OASISReader::get_str (std::string &s)
   size_t l = 0;
   get_size (l);
 
-  const size_t chunk_size = 32767;
+  const size_t chunk_size = m_stream.max_blen ();
 
   if (l <= chunk_size) {
     char *b = (char *) m_stream.get (l);
@@ -3677,3 +3677,4 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
 }
 
 }
+

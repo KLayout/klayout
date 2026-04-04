@@ -33,6 +33,7 @@
 #include <sstream>
 #include <cstdio>
 #include <cstring>
+#include <limits>
 
 
 namespace tl
@@ -497,6 +498,15 @@ public:
   {
     return m_blen;
   }
+
+  /**
+   *  @brief Obtain the maximum number of bytes available for a single get() call
+   *
+   *  This is an API limit, not the actual number of bytes available right now.
+   *  For inflating streams this reports the maximum contiguous chunk size the
+   *  inflating filter can provide in one get() call.
+   */
+  size_t max_blen () const;
 
   /**
    *  @brief Get the source specification (the file name)

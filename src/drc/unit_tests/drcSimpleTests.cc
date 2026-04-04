@@ -2108,3 +2108,8 @@ TEST(147_MeasureNetsWithL2N)
   compare_text_files (output, au_output);
 }
 
+TEST(148_sparse_array_limit)
+{
+  run_test (_this, "148", true);
+}
+

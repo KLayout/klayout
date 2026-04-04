@@ -1,0 +1,39 @@
+
+# Breaking
+
+source($drc_test_source, "TOP")
+target($drc_test_target)
+
+sparse_array_limit(10.0)
+if sparse_array_limit != 10.0
+  raise("sparse array limit is not 10.0!")
+end
+
+deep
+
+# can still set sparse_array_limit before the first input statement
+self.sparse_array_limit = 5.0
+if self.sparse_array_limit != 5.0
+  raise("sparse array limit is not 5.0!")
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+error = false
+begin
+  self.sparse_array_limit = 2.0
+rescue
+  error = true
+end
+error || raise("sparse_array_limit must throw an exception after 'deep'")
+
+if @dss.sparse_array_limit != 5.0
+  raise("sparse array limit of DSS is not 5.0!")
+end
+
+l1.output(1, 0)
+l2.output(2, 0)
+l1.sized(1.um).output(11, 0)
+l2.sized(1.um).output(12, 0)
+

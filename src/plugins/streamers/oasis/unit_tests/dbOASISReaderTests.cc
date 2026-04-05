@@ -26,6 +26,7 @@
 #include "dbLayoutDiff.h"
 #include "dbTextWriter.h"
 #include "dbTestSupport.h"
+#include "tlDeflate.h"
 #include "tlLog.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
@@ -706,7 +707,7 @@ TEST(CBlockLargePropertyString)
   unsigned int layer = layout_org.insert_layer (db::LayerProperties (1, 0));
   db::Cell &top = layout_org.cell (layout_org.add_cell ("TOP"));
 
-  std::string large_value (42000, 'a');
+  std::string large_value (tl::InflateFilter::max_blen () + 1, 'a');
 
   db::PropertiesSet ps;
   ps.insert (db::property_names_id (tl::Variant ("blob")), tl::Variant (large_value));

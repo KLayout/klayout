@@ -195,6 +195,8 @@ private:
 class TL_PUBLIC InflateFilter
 {
 public:
+  static constexpr size_t buffer_size = 65536;
+
   /**
    *  @brief Constructor
    *
@@ -218,9 +220,9 @@ public:
   /**
    *  @brief Obtain the maximum number of bytes available for a single get() call
    */
-  size_t max_blen () const
+  static constexpr size_t max_blen ()
   {
-    return sizeof (m_buffer) / 2 - 1;
+    return buffer_size / 2 - 1;
   }
 
   /**
@@ -240,7 +242,7 @@ public:
 private:
   BitStream m_input;
 
-  char m_buffer[65536];
+  char m_buffer[buffer_size];
   unsigned int m_b_insert;
   unsigned int m_b_read;
   bool m_at_end;

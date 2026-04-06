@@ -102,3 +102,17 @@ TEST(1)
   EXPECT_EQ (opt.get_option_by_name ("mywriter_value").to_string (), "17");
 }
 
+TEST(2)
+{
+  db::SaveLayoutOptions opt;
+  auto ff = opt.set_format_from_filename ("/home/xyz/test.def");
+  EXPECT_EQ (ff.first, true);
+  EXPECT_EQ (ff.second, "/home/xyz/test.def");
+  EXPECT_EQ (opt.format (), "LEFDEF");
+
+  opt = db::SaveLayoutOptions ();
+  ff = opt.set_format_from_filename ("/home/xyz/test.txt[def]");
+  EXPECT_EQ (ff.first, true);
+  EXPECT_EQ (ff.second, "/home/xyz/test.txt");
+  EXPECT_EQ (opt.format (), "LEFDEF");
+}

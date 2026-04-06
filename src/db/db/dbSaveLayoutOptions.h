@@ -268,7 +268,7 @@ public:
    *
    *  Returns true, if the suffix indicates a known format.
    */
-  bool set_format_from_filename (const std::string &fn);
+  std::pair<bool, std::string> set_format_from_filename(const std::string &fn);
 
   /**
    *  @brief Sets specific options for the given format

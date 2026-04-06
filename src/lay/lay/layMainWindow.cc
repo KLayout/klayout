@@ -2270,7 +2270,7 @@ MainWindow::cm_save_current_cell_as ()
 
           db::SaveLayoutOptions options (cv->save_options ());
           options.set_dbu (cv->layout ().dbu ());
-          options.set_format_from_filename (fn);
+          fn = options.set_format_from_filename (fn).second;
 
           tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
           if (mp_layout_save_as_options->get_options (current_view (), cv_index, fn, om, options)) {
@@ -2370,7 +2370,7 @@ MainWindow::do_save (bool as)
           db::SaveLayoutOptions options = get_save_options_from_cv (cv);
 
           if (as || options.format ().empty ()) {
-            options.set_format_from_filename (fn);
+            fn = options.set_format_from_filename (fn).second;
           }
 
           tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
@@ -2419,7 +2419,7 @@ MainWindow::cm_save_all ()
         db::SaveLayoutOptions options = get_save_options_from_cv (cv);
 
         if (options.format ().empty ()) {
-          options.set_format_from_filename (fn);
+          fn = options.set_format_from_filename (fn).second;
         }
 
         tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;

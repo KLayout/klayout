@@ -152,6 +152,7 @@ SOURCES = \
   gsiDeclDbRecursiveInstanceIterator.cc \
   gsiDeclDbRecursiveShapeIterator.cc \
   gsiDeclDbRegion.cc \
+  gsiDeclDbSaveLayoutOptions.cc \
   gsiDeclDbShape.cc \
   gsiDeclDbShapeProcessor.cc \
   gsiDeclDbShapes.cc \

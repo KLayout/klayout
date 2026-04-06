@@ -142,9 +142,8 @@ Region::write (const std::string &fn) const
   unsigned int li = layout.insert_layer (db::LayerProperties (0, 0));
   insert_into (&layout, top.cell_index (), li);
 
-  tl::OutputStream os (fn);
   db::SaveLayoutOptions opt;
-  opt.set_format_from_filename (fn);
+  tl::OutputStream os (opt.set_format_from_filename (fn).second);
   db::Writer writer (opt);
   writer.write (layout, os);
 }

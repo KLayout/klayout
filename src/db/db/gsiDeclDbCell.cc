@@ -1310,10 +1310,10 @@ write_simple (const db::Cell *cell, const std::string &filename)
   db::SaveLayoutOptions options;
   options.clear_cells ();
   options.add_cell (cell->cell_index ());
-  options.set_format_from_filename (filename);
+  std::string fn = options.set_format_from_filename (filename).second;
 
   db::Writer writer (options);
-  tl::OutputStream stream (filename);
+  tl::OutputStream stream (fn);
   writer.write (*layout, stream);
 }
 

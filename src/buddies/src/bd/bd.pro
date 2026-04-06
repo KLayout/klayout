@@ -41,7 +41,9 @@ INCLUDEPATH += $$RBA_INC
 DEPENDPATH += $$RBA_INC
 
 equals(HAVE_RUBY, "1") {
-  LIBS += -lklayout_rba
+  INCLUDEPATH += $$DRC_INC $$LVS_INC
+  DEPENDPATH += $$DRC_INC $$LVS_INC
+  LIBS += -lklayout_rba -lklayout_drc -lklayout_lvs
 } else {
   LIBS += -lklayout_rbastub
 }

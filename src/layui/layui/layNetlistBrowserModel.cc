@@ -3025,9 +3025,9 @@ NetlistBrowserModel::index_from_subcircuit (const std::pair<const db::SubCircuit
 }
 
 QModelIndex
-NetlistBrowserModel::index_from_circuit (const db::Circuit *net) const
+NetlistBrowserModel::index_from_circuit (const db::Circuit *circuit) const
 {
-  return index_from_circuit (std::make_pair (net, mp_indexer->second_circuit_for (net)));
+  return index_from_circuit (std::make_pair (circuit, mp_indexer->second_circuit_for (circuit)));
 }
 
 std::pair<const db::Circuit *, const db::Circuit *>

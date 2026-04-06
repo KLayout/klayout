@@ -232,7 +232,8 @@ public:
 private:
   BitStream m_input;
 
-  char m_buffer[65536];
+  char *m_buffer;
+  size_t m_blen;
   unsigned int m_b_insert;
   unsigned int m_b_read;
   bool m_at_end;

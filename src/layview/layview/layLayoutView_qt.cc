@@ -139,10 +139,14 @@ LayoutViewNotificationWidget::LayoutViewNotificationWidget (LayoutViewWidget *pa
 void
 LayoutViewNotificationWidget::action_triggered ()
 {
+  BEGIN_PROTECTED
+
   auto a = m_action_buttons.find (sender ());
   if (a != m_action_buttons.end ()) {
     mp_parent->notification_action (*mp_notification, a->second);
   }
+
+  END_PROTECTED_W (this)
 }
 
 void

@@ -26,6 +26,7 @@
 #include "tlAssert.h"
 
 #include <algorithm>
+#include <cstring>
 
 #include <zlib.h>
 
@@ -227,9 +228,12 @@ InflateFilter::InflateFilter (tl::InputStream &input)
     m_last_block (false), 
     m_uncompressed_length (0)  //  this forces a new block on "process()"
 {
-  for (size_t i = 0; i < sizeof (m_buffer) / sizeof (m_buffer [0]); ++i) {
-    m_buffer[i] = 0;
-  }
+  //  NOTE: the minimum buffer size of 65536 corresponds to the maximum block size
+  //  of the block repetition decoder
+  m_blen = 65536; //  initially
+
+  m_buffer = new char [m_blen];
+  std::memset (m_buffer, 0, m_blen);
 
   mp_dist_decoder = new HuffmannDecoder ();
   mp_lit_decoder = new HuffmannDecoder ();
@@ -237,6 +241,9 @@ InflateFilter::InflateFilter (tl::InputStream &input)
 
 InflateFilter::~InflateFilter ()
 {
+  delete[] m_buffer;
+  m_buffer = 0;
+  m_blen = 0;
   delete mp_dist_decoder;
   mp_dist_decoder = 0;
   delete mp_lit_decoder;
@@ -246,9 +253,36 @@ InflateFilter::~InflateFilter ()
 const char * 
 InflateFilter::get (size_t n)
 {
-  tl_assert (n < sizeof (m_buffer) / 2);
+  size_t blen = m_blen;
+  while (n >= blen / 2)  {
+    blen *= 2;
+  }
 
-  while ((m_b_insert + sizeof (m_buffer) - m_b_read) % sizeof (m_buffer) < n) {
+  //  buffer needs to be enlarged - reallocate
+  if (blen != m_blen) {
+
+    //  NOTE: the deflate implementation actually looks back past the read pointer
+    //  (in put_byte_dist), so we have to maintain the bytes between m_b_read
+    //  and m_b_insert too.
+
+    char *new_buffer = new char[blen];
+
+    //  place the current block twice at start and end of the block
+    std::memcpy (new_buffer, m_buffer, m_blen);
+    std::memcpy (new_buffer + blen - m_blen, m_buffer, m_blen);
+
+    //  adjust read pointer if the stored byte array wrapped around the buffer
+    if (m_b_insert < m_b_read) {
+      m_b_read += blen - m_blen;
+    }
+
+    delete[] m_buffer;
+    m_buffer = new_buffer;
+    m_blen = blen;
+
+  }
+
+  while ((m_b_insert + m_blen - m_b_read) % m_blen < n) {
     if (! process ()) {
       throw tl::Exception (tl::to_string (tr ("Unexpected end of file (DEFLATE implementation)")));
     }
@@ -257,14 +291,14 @@ InflateFilter::get (size_t n)
   tl_assert (m_b_read != m_b_insert);
 
   //  ensure the block is accessible as a coherent chunk:
-  if (m_b_read + n >= sizeof (m_buffer)) {
-    std::rotate (m_buffer, m_buffer + m_b_read, m_buffer + sizeof (m_buffer));
-    m_b_insert = (m_b_insert - m_b_read + sizeof (m_buffer)) % sizeof (m_buffer);
+  if (m_b_read + n >= m_blen) {
+    std::rotate (m_buffer, m_buffer + m_b_read, m_buffer + m_blen);
+    m_b_insert = (m_b_insert - m_b_read + m_blen) % m_blen;
     m_b_read = 0;
   }
 
   const char *r = m_buffer + m_b_read;
-  m_b_read = (m_b_read + n) % sizeof (m_buffer);
+  m_b_read = (m_b_read + n) % m_blen;
   return r;
 }
 
@@ -290,13 +324,16 @@ void
 InflateFilter::put_byte (char b) 
 {
   m_buffer [m_b_insert] = b;
-  m_b_insert = (m_b_insert + 1) % sizeof (m_buffer);
+  m_b_insert = (m_b_insert + 1) % m_blen;
+  //  buffer overrun
+  tl_assert (m_b_insert != m_b_read);
 }
 
 void 
 InflateFilter::put_byte_dist (unsigned int d) 
 {
-  put_byte (m_buffer [(m_b_insert - d) % sizeof (m_buffer)]);
+  tl_assert (d < m_blen);
+  put_byte (m_buffer [(m_b_insert + m_blen - d) % m_blen]);
 }
 
 bool 

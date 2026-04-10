@@ -241,9 +241,10 @@
  <tabstops>
   <tabstop>text_group</tabstop>
   <tabstop>text_font_cb</tabstop>
-  <tabstop>text_apply_trans_scale_cbx</tabstop>
-  <tabstop>text_def_size_edit</tabstop>
   <tabstop>text_color_pb</tabstop>
+  <tabstop>text_def_size_edit</tabstop>
+  <tabstop>text_apply_trans_scale_cbx</tabstop>
+  <tabstop>text_apply_trans_rotate_cbx</tabstop>
   <tabstop>show_properties_cbx</tabstop>
  </tabstops>
  <resources/>

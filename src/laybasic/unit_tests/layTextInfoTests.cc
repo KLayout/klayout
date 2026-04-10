@@ -128,8 +128,8 @@ TEST(1)
   lv.apply_text_trans (true);
   lv.apply_text_trans_mode (1);
   ti = lay::TextInfo (&lv);
-  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(12,20.6;36.4,34.2)");
-  //  with apply_text_trans false, the global transformation does change the text
+  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(12,15;134,83)");
+  //  with apply_text_trans_mode not including rotation, the global transformation does change the text
   //  bounding box.
   EXPECT_EQ (ti.bbox (text, db::DCplxTrans ()).to_string (), "(12,20.6;24,27)");
   EXPECT_EQ (ti.bbox (text, db::DCplxTrans (2.0)).to_string (), "(11,19.6;23,26)");
@@ -139,10 +139,9 @@ TEST(1)
   lv.apply_text_trans (true);
   lv.apply_text_trans_mode (2);
   ti = lay::TextInfo (&lv);
-  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(12,20.6;36.4,34.2)");
-  //  with apply_text_trans false, the global transformation does change the text
-  //  bounding box.
+  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(-4.2,22;9.4,46.4)");
+  //  with apply_text_trans including rotation, the global transformation changes the text bounding box
   EXPECT_EQ (ti.bbox (text, db::DCplxTrans ()).to_string (), "(12,20.6;24,27)");
   EXPECT_EQ (ti.bbox (text, db::DCplxTrans (2.0)).to_string (), "(11,19.6;23,26)");
-  EXPECT_EQ (ti.bbox (text, db::DCplxTrans (db::DFTrans (1))).to_string (), "(10.6,6;17,18)");
+  EXPECT_EQ (ti.bbox (text, db::DCplxTrans (db::DFTrans (1))).to_string (), "(12,20.6;24,27)");
 }

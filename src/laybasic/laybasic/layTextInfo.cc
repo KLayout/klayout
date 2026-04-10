@@ -56,7 +56,7 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
   if ((m_apply_text_trans_mode & 2) != 0 && font != db::NoFont && font != db::DefaultFont) {
     tt = text.trans ();
   } else {
-    tt = db::DTrans (vp_trans.fp_trans ().inverted ().angle (), tt.disp ());
+    tt = db::DTrans (vp_trans.fp_trans ().inverted ().angle (), text.trans ().disp ());
   }
   if (((m_apply_text_trans_mode & 1) != 0) && font != db::NoFont && font != db::DefaultFont) {
     h = text.size () > 0 ? text.size () : m_default_text_size;

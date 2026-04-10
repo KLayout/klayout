@@ -81,8 +81,6 @@ MainService::MainService (db::Manager *manager, lay::LayoutViewBase *view, lay::
     m_distribute_vmode (1), m_distribute_vpitch (0.0), m_distribute_vspace (0.0),
     m_distribute_visible_layers (false),
     m_origin_mode_x (-1), m_origin_mode_y (-1), m_origin_visible_layers_for_bbox (false),
-    m_array_a (0.0, 1.0), m_array_b (1.0, 0.0),
-    m_array_na (1), m_array_nb (1),
     m_router (0.0), m_rinner (0.0), m_npoints (64), m_undo_before_apply (true)
 {
 #if defined(HAVE_QT)
@@ -2251,32 +2249,66 @@ MainService::cm_make_array ()
   tl_assert (false); // see TODO
 #endif
 
-  size_t n = 0;
   check_no_guiding_shapes ();
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
 
-  for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (EditableSelectionIterator s = (*es)->begin_selection (); ! s.at_end (); ++s) {
-      ++n;
-    }
+  bool any = false;
+  for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end () && ! any; ++es) {
+    any = ! (*es)->begin_selection ().at_end ();
   }
-
-  if (n == 0) {
+  if (! any) {
     throw tl::Exception (tl::to_string (tr ("Nothing selected to make arrays of")));
   }
 
 #if defined(HAVE_QT)
   //  TODO: make parameters persistent so we can set them externally
-  if (! make_array_options_dialog ()->exec_dialog (m_array_a, m_array_na, m_array_b, m_array_nb)) {
+  if (! make_array_options_dialog ()->exec_dialog (m_array_options)) {
     return;
   }
 #endif
 
+  unsigned int na = m_array_options.na;
+  unsigned int nb = m_array_options.nb;
+  db::DVector a = m_array_options.a;
+  db::DVector b = m_array_options.b;
+
+  if (m_array_options.mode == ArrayOptions::Spaced) {
+
+    db::DBox bbox;
+
+    //  get the selection bbox
+    for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+      for (EditableSelectionIterator s = (*es)->begin_selection (); ! s.at_end (); ++s) {
+
+        const db::Layout &layout = view ()->cellview (s->cv_index ())->layout ();
+        db::CplxTrans tr = db::CplxTrans (layout.dbu ()) * s->trans ();
+
+        if (! s->is_cell_inst ()) {
+          bbox += tr * s->shape ().bbox ();
+        } else {
+          bbox += inst_bbox (tr, view (), s->cv_index (), s->back (), m_array_options.use_visible_layers);
+        }
+
+      }
+    }
+
+    //  compute pitch vectors
+    a = db::DVector (0.0, m_array_options.space.y () + bbox.height ());   //  row-pitch
+    b = db::DVector (m_array_options.space.x () + bbox.width (), 0.0);    //  column-pitch
+
+  }
+
+  make_array (na, nb, a, b);
+}
+
+void
+MainService::make_array (unsigned int na, unsigned int nb, const db::DVector &a, const db::DVector &b)
+{
   view ()->cancel_edits ();
 
   //  undo support for small arrays only
-  bool has_undo = (m_array_na * m_array_nb < 1000);
+  bool has_undo = (na * nb < 1000);
 
   //  No undo support currently - the undo buffering is pretty inefficient right now.
   if (manager ()) {
@@ -2287,7 +2319,17 @@ MainService::cm_make_array ()
     }
   }
 
-  tl::RelativeProgress progress (tl::to_string (tr ("Make array")), (size_t (m_array_na) * size_t (m_array_nb) - 1) * n, 1000);
+  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+
+  //  count selected items for progress
+  size_t n = 0;
+  for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+    for (EditableSelectionIterator s = (*es)->begin_selection (); ! s.at_end (); ++s) {
+      ++n;
+    }
+  }
+
+  tl::RelativeProgress progress (tl::to_string (tr ("Make array")), (size_t (na) * size_t (nb) - 1) * n, 1000);
 
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
@@ -2302,15 +2344,15 @@ MainService::cm_make_array ()
 
       if (s->is_cell_inst ()) {
 
-        for (unsigned int ia = 0; ia < m_array_na; ++ia) {
-          for (unsigned int ib = 0; ib < m_array_nb; ++ib) {
+        for (unsigned int ia = 0; ia < na; ++ia) {
+          for (unsigned int ib = 0; ib < nb; ++ib) {
 
             //  don't create a copy
             if (ia == 0 && ib == 0) {
               continue;
             }
 
-            db::DCplxTrans dtrans (m_array_a * double (ia) + m_array_b * double (ib));
+            db::DCplxTrans dtrans (a * double (ia) + b * double (ib));
             db::ICplxTrans itrans (db::DCplxTrans (s->trans ()).inverted () * db::DCplxTrans (1.0 / cv->layout ().dbu ()) * dtrans * db::DCplxTrans (cv->layout ().dbu ()) * db::DCplxTrans (s->trans ()));
 
             db::Instance new_inst = target_cell.insert (s->back ().inst_ptr);
@@ -2326,15 +2368,15 @@ MainService::cm_make_array ()
 
         db::Shapes &target_shapes = target_cell.shapes (s->layer ());
 
-        for (unsigned int ia = 0; ia < m_array_na; ++ia) {
-          for (unsigned int ib = 0; ib < m_array_nb; ++ib) {
+        for (unsigned int ia = 0; ia < na; ++ia) {
+          for (unsigned int ib = 0; ib < nb; ++ib) {
 
             //  don't create a copy
             if (ia == 0 && ib == 0) {
               continue;
             }
 
-            db::DCplxTrans dtrans (m_array_a * double (ia) + m_array_b * double (ib));
+            db::DCplxTrans dtrans (a * double (ia) + b * double (ib));
             db::ICplxTrans itrans (db::DCplxTrans (s->trans ()).inverted () * db::DCplxTrans (1.0 / cv->layout ().dbu ()) * dtrans * db::DCplxTrans (cv->layout ().dbu ()) * db::DCplxTrans (s->trans ()));
 
             db::Shape new_shape = target_shapes.insert (s->shape ());

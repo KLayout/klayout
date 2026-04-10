@@ -26,6 +26,7 @@
 #include "dbLayout.h"
 
 #include "edtDialogs.h"
+#include "edtMainService.h"
 #include "layEditorUtils.h"
 #include "layObjectInstPath.h"
 #include "layCellView.h"
@@ -646,29 +647,41 @@ MakeArrayOptionsDialog::MakeArrayOptionsDialog (QWidget *parent)
 }
 
 bool 
-MakeArrayOptionsDialog::exec_dialog (db::DVector &a, unsigned int &na, db::DVector &b, unsigned int &nb)
+MakeArrayOptionsDialog::exec_dialog (ArrayOptions &options)
 {
-  rows_le->setText (tl::to_qstring (tl::to_string (na)));
-  columns_le->setText (tl::to_qstring (tl::to_string (nb)));
-  row_x_le->setText (tl::to_qstring (tl::micron_to_string (a.x ())));
-  row_y_le->setText (tl::to_qstring (tl::micron_to_string (a.y ())));
-  column_x_le->setText (tl::to_qstring (tl::micron_to_string (b.x ())));
-  column_y_le->setText (tl::to_qstring (tl::micron_to_string (b.y ())));
+  rows_le->setText (tl::to_qstring (tl::to_string (options.na)));
+  columns_le->setText (tl::to_qstring (tl::to_string (options.nb)));
+  row_x_le->setText (tl::to_qstring (tl::micron_to_string (options.a.x ())));
+  row_y_le->setText (tl::to_qstring (tl::micron_to_string (options.a.y ())));
+  column_x_le->setText (tl::to_qstring (tl::micron_to_string (options.b.x ())));
+  column_y_le->setText (tl::to_qstring (tl::micron_to_string (options.b.y ())));
+  space_x_le->setText (tl::to_qstring (tl::micron_to_string (options.space.x ())));
+  space_y_le->setText (tl::to_qstring (tl::micron_to_string (options.space.y ())));
+
+  mode_tab->setCurrentIndex (options.mode == ArrayOptions::PitchVectors ? 0 : 1);
+  vis_only_cbx->setChecked (options.use_visible_layers);
 
   if (QDialog::exec ()) {
 
+    options.mode = mode_tab->currentIndex () == 0 ? ArrayOptions::PitchVectors : ArrayOptions::Spaced;
+    options.use_visible_layers = vis_only_cbx->isChecked ();
+
     double bx = 0.0, by = 0.0;
     double ax = 0.0, ay = 0.0;
+    double sx = 0.0, sy = 0.0;
 
     tl::from_string_ext (tl::to_string (column_x_le->text ()), bx);
     tl::from_string_ext (tl::to_string (column_y_le->text ()), by);
-    tl::from_string_ext (tl::to_string (columns_le->text ()), nb);
+    tl::from_string_ext (tl::to_string (columns_le->text ()), options.nb);
     tl::from_string_ext (tl::to_string (row_x_le->text ()), ax);
     tl::from_string_ext (tl::to_string (row_y_le->text ()), ay);
-    tl::from_string_ext (tl::to_string (rows_le->text ()), na);
+    tl::from_string_ext (tl::to_string (rows_le->text ()), options.na);
+    tl::from_string_ext (tl::to_string (space_x_le->text ()), sx);
+    tl::from_string_ext (tl::to_string (space_y_le->text ()), sy);
 
-    a = db::DVector (ax, ay);
-    b = db::DVector (bx, by);
+    options.a = db::DVector (ax, ay);
+    options.b = db::DVector (bx, by);
+    options.space = db::DVector (sx, sy);
 
     return true;
 
@@ -758,7 +771,7 @@ popup_tap_layer_menu (lay::LayoutViewBase *view, const std::set<db::LayerPropert
   std::set<std::pair<unsigned int, unsigned int> > layers_in_selection;
 
   for (lay::ShapeFinder::iterator f = finder.begin (); f != finder.end (); ++f) {
-    if (cv_index < 0 || f->cv_index () == cv_index) {
+    if (cv_index < 0 || int (f->cv_index ()) == cv_index) {
       const db::Layout &ly = view->cellview (f->cv_index ())->layout ();
       //  ignore guiding shapes and only provide layers from the filter
       if (f->layer () != ly.guiding_shape_layer ()

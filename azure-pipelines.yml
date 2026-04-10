@@ -14,18 +14,6 @@ jobs:
     vmImage: 'windows-2022' # other options: 'macOS-10.13', 'ubuntu-16.04'
   strategy:
     matrix:
-      cp36-cp36m-win_amd64.whl:
-        python.version: '3.6'
-        python.architecture: 'x64'
-      cp37-cp37m-win_amd64.whl:
-        python.version: '3.7'
-        python.architecture: 'x64'
-      cp38-cp38-win_amd64.whl:
-        python.version: '3.8'
-        python.architecture: 'x64'
-      cp39-cp39-win_amd64.whl:
-        python.version: '3.9'
-        python.architecture: 'x64'
       cp310-cp310-win_amd64.whl:
         python.version: '3.10'
         python.architecture: 'x64'
@@ -41,18 +29,6 @@ jobs:
       cp314-cp314-win_amd64.whl:
         python.version: '3.14'
         python.architecture: 'x64'
-      cp36-cp36m-win32.whl:
-        python.version: '3.6'
-        python.architecture: 'x86'
-      cp37-cp37m-win32.whl:
-        python.version: '3.7'
-        python.architecture: 'x86'
-      cp38-cp38-win32.whl:
-        python.version: '3.8'
-        python.architecture: 'x86'
-      cp39-cp39-win32.whl:
-        python.version: '3.9'
-        python.architecture: 'x86'
       cp310-cp310-win32.whl:
         python.version: '3.10'
         python.architecture: 'x86'

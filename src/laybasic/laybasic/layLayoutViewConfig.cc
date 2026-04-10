@@ -67,6 +67,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_bitmap_caching, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_show_properties, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_apply_text_trans, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_apply_text_trans_mode, "3"));
     options.push_back (std::pair<std::string, std::string> (cfg_global_trans, "r0"));
     options.push_back (std::pair<std::string, std::string> (cfg_default_text_size, "0.1"));
     options.push_back (std::pair<std::string, std::string> (cfg_text_point_mode, "false"));

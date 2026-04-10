@@ -2288,7 +2288,7 @@ bool
 PartialService::key_event (unsigned int key, unsigned int buttons)
 {
   if (m_moving && buttons == 0 && (key == lay::KeyEnter || key == lay::KeyReturn)) {
-    mp_view->move_service ()->end_move ();
+    mp_view->move_service ()->finish_move ();
     return true;
   } else {
     return false;

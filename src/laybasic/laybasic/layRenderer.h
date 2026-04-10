@@ -164,19 +164,23 @@ public:
   }
 
   /**
-   *  @brief Apply text transformations to text or not for draw(db::Text..).
+   *  @brief How to apply text transformations for draw(db::Text..).
+   *
+   *  This is a bit field:
+   *  - bit 0: apply scaling
+   *  - bit 1: apply rotation
    */
-  void apply_text_trans (bool f)
+  void apply_text_trans_mode (unsigned int m)
   {
-    m_apply_text_trans = f;
+    m_apply_text_trans_mode = m;
   }
 
   /**
-   *  @brief Get the flag which determines to apply text transformations for draw(db::Text..)
+   *  @brief Get the value indicating how to apply text transformation for draw(db::Text..).
    */
-  bool apply_text_trans () const
+  unsigned int apply_text_trans_mode () const
   {
-    return m_apply_text_trans;
+    return m_apply_text_trans_mode;
   }
 
   /**
@@ -415,7 +419,7 @@ protected:
   bool m_draw_description_property;
   db::DCoord m_default_text_size;
   double m_default_text_size_dbl;
-  bool m_apply_text_trans;
+  unsigned int m_apply_text_trans_mode;
   bool m_precise;
   bool m_xfill;
   db::Font m_font;

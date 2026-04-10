@@ -103,6 +103,7 @@ static const std::string cfg_text_lazy_rendering ("text-lazy-rendering");
 static const std::string cfg_bitmap_caching ("bitmap-caching");
 static const std::string cfg_show_properties ("show-properties");
 static const std::string cfg_apply_text_trans ("apply-text-trans");
+static const std::string cfg_apply_text_trans_mode ("apply-text-trans-mode");
 static const std::string cfg_global_trans ("global-trans");
 static const std::string cfg_no_stipple ("no-stipple");
 static const std::string cfg_stipple_offset ("stipple-offset");

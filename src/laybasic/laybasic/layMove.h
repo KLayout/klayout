@@ -45,7 +45,7 @@ public:
   ~MoveService ();
 
   bool start_move (db::Transaction *transaction = 0, bool transient_selection = false);
-  void end_move ();
+  void finish_move ();
 
   bool configure (const std::string &name, const std::string &value);
   void function (const std::string &name, const std::string &value);

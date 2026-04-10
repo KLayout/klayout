@@ -32,7 +32,7 @@ namespace lay
 TextInfo::TextInfo (const LayoutViewBase *view)
   : m_default_text_size (view->default_text_size ()),
     m_default_font (db::Font (view->text_font ())),
-    m_apply_text_trans (view->apply_text_trans ()),
+    m_apply_text_trans_mode (view->apply_text_trans_mode ()),
     m_resolution (view->canvas ()->font_resolution ()),
     m_point_mode (view->text_point_mode ())
 {
@@ -49,14 +49,18 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
   //  offset in pixels (space between origin and text)
   const double offset = 2.0 / vp_trans.mag ();
 
-  db::DTrans tt = text.trans ();
+  db::DTrans tt;
   db::DCoord h;
   db::Font font = text.font () == db::NoFont ? m_default_font : text.font ();
 
-  if (m_apply_text_trans && font != db::NoFont && font != db::DefaultFont) {
-    h = text.size () > 0 ? text.size () : m_default_text_size;
+  if ((m_apply_text_trans_mode & 2) != 0 && font != db::NoFont && font != db::DefaultFont) {
+    tt = text.trans ();
   } else {
     tt = db::DTrans (vp_trans.fp_trans ().inverted ().angle (), tt.disp ());
+  }
+  if (((m_apply_text_trans_mode & 1) != 0) && font != db::NoFont && font != db::DefaultFont) {
+    h = text.size () > 0 ? text.size () : m_default_text_size;
+  } else {
     h = m_default_text_size;
   }
 

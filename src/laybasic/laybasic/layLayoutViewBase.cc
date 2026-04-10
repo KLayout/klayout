@@ -351,6 +351,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_bitmap_caching = true;
   m_show_properties = false;
   m_apply_text_trans = true;
+  m_apply_text_trans_mode = 3;
   m_default_text_size = 0.1;
   m_text_point_mode = false;
   m_text_font = 0;
@@ -1027,6 +1028,13 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
     bool flag;
     tl::from_string (value, flag);
     apply_text_trans (flag);
+    return true;
+
+  } else if (name == cfg_apply_text_trans_mode) {
+
+    unsigned int mode;
+    tl::from_string (value, mode);
+    apply_text_trans_mode (mode);
     return true;
 
   } else if (name == cfg_markers_visible) {
@@ -5541,7 +5549,16 @@ LayoutViewBase::apply_text_trans (bool f)
   }
 }
   
-void 
+void
+LayoutViewBase::apply_text_trans_mode (unsigned int m)
+{
+  if (m_apply_text_trans_mode != m) {
+    m_apply_text_trans_mode = m;
+    redraw ();
+  }
+}
+
+void
 LayoutViewBase::offset_stipples (bool f)
 {
   if (m_stipple_offset != f) {

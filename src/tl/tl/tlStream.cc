@@ -48,6 +48,7 @@
 #include "tlString.h"
 #include "tlUri.h"
 #include "tlHttpStream.h"
+#include "tlGlobPattern.h"
 
 #if defined(HAVE_QT)
 #  include <QByteArray>
@@ -304,6 +305,9 @@ InputStream::InputStream (InputStreamBase &delegate)
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
   mp_buffer = new char [m_bcap];
+
+  m_explicit_suffix = false;
+  m_suffix = tl::extension (delegate.filename ());
 }
 
 InputStream::InputStream (InputStreamBase *delegate)
@@ -312,9 +316,14 @@ InputStream::InputStream (InputStreamBase *delegate)
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
   mp_buffer = new char [m_bcap];
+
+  m_explicit_suffix = false;
+  if (delegate) {
+    m_suffix = tl::extension (delegate->filename ());
+  }
 }
 
-InputStream::InputStream (const std::string &abstract_path)
+InputStream::InputStream (const std::string &abstract_path_in, bool allow_explicit_suffix)
   : m_pos (0), mp_bptr (0), mp_delegate (0), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false), m_stop_after_inflate (false)
 { 
   m_bcap = 4096; // initial buffer capacity
@@ -322,6 +331,22 @@ InputStream::InputStream (const std::string &abstract_path)
   mp_buffer = 0;
 
   bool needs_inflate = false;
+
+  std::string abstract_path = abstract_path_in;
+  m_explicit_suffix = false;
+
+  //  extract override suffix if needed
+  if (allow_explicit_suffix) {
+
+    tl::GlobPattern pat ("(*)\\[(*)\\]");
+    std::vector<std::string> pat_parts;
+    if (pat.match (abstract_path_in, pat_parts) && pat_parts.size () == 2) {
+      abstract_path = pat_parts[0];
+      m_suffix = pat_parts[1];
+      m_explicit_suffix = true;
+    }
+
+  }
 
   tl::Extractor ex (abstract_path.c_str ());
 
@@ -403,6 +428,10 @@ InputStream::InputStream (const std::string &abstract_path)
   }
 
   m_owns_delegate = true;
+
+  if (mp_delegate && ! m_explicit_suffix) {
+    m_suffix = tl::extension (mp_delegate->filename ());
+  }
 
   if (needs_inflate) {
     inflate_always ();
@@ -1696,7 +1725,7 @@ match_filename_to_format (const std::string &fn, const std::string &fmt)
     while (*fpp && *fpp != ' ' && *fpp != ')') {
       ++fpp;
     }
-    if (fn.size () > (unsigned int) (fpp - fp) && strncmp (fn.c_str () + fn.size () - (fpp - fp), fp, fpp - fp) == 0) {
+    if (fn.size () >= (unsigned int) (fpp - fp) && strncmp (fn.c_str () + fn.size () - (fpp - fp), fp, fpp - fp) == 0) {
       return true;
     }
     fp = fpp;

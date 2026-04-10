@@ -408,9 +408,14 @@ public:
    *  This will automatically create the appropriate delegate and 
    *  delete it later.
    *
-   *  The abstract path
+   *  @param abstract_path The abstract path (can be "pipe:<cmd>", "data:<base64-data>", "file:...", "http(s):...".
+   *  @param allow_explicit_suffix If true, extracts the suffix from the abstract path
+   *
+   *  With explicit suffix, the abstract path can be appended an override suffix in the
+   *  form "path[suffix]" (e.g. "file.any[gds]"). The override suffix can be accessed with
+   *  the "suffix" accessor. If an explicit suffix is given, "is_explicit_suffix" is true.
    */
-  InputStream (const std::string &abstract_path);
+  InputStream (const std::string &abstract_path, bool allow_explicit_suffix = true);
 
   /**
    *  @brief Destructor
@@ -529,6 +534,25 @@ public:
   }
 
   /**
+   *  @brief Gets the suffix
+   *
+   *  The suffix is either the override suffix or the
+   *  filename's suffix if no override is given.
+   */
+  const std::string &suffix () const
+  {
+    return m_suffix;
+  }
+
+  /**
+   *  @brief Gets a value indicating if an explicit suffix is given
+   */
+  bool is_explicit_suffix () const
+  {
+    return m_explicit_suffix;
+  }
+
+  /**
    *  @brief Reset to the initial position
    */
   virtual void reset ();
@@ -592,6 +616,9 @@ private:
   char *mp_bptr;
   InputStreamBase *mp_delegate;
   bool m_owns_delegate;
+
+  std::string m_suffix;
+  bool m_explicit_suffix;
 
   //  inflate support 
   InflateFilter *mp_inflate;

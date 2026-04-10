@@ -124,10 +124,14 @@ MacroEditorNotificationWidget::MacroEditorNotificationWidget (MacroEditorPage *p
 void
 MacroEditorNotificationWidget::action_triggered ()
 {
+  BEGIN_PROTECTED
+
   auto a = m_action_buttons.find (sender ());
   if (a != m_action_buttons.end ()) {
     mp_parent->notification_action (*mp_notification, a->second);
   }
+
+  END_PROTECTED_W (this)
 }
 
 void
@@ -544,7 +548,9 @@ void MacroEditorSidePanel::paintEvent (QPaintEvent *)
 //  MacroEditorPage implementation
 
 MacroEditorPage::MacroEditorPage (QWidget * /*parent*/, MacroEditorHighlighters *highlighters)
-  : mp_macro (0), mp_highlighters (highlighters), mp_highlighter (0), m_error_line (-1), m_ntab (8), m_nindent (2), m_ignore_cursor_changed_event (false)
+  : mp_macro (0), mp_highlighters (highlighters), mp_highlighter (0),
+    m_error_line (-1), m_ntab (8), m_nindent (2), m_ignore_cursor_changed_event (false),
+    dm_run_mode_changed (this, &MacroEditorPage::do_run_mode_changed)
 {
   mp_layout = new QVBoxLayout (this);
   mp_layout->setContentsMargins (0, 0, 0, 0);
@@ -658,6 +664,11 @@ void MacroEditorPage::current_line_changed ()
 }
 
 void MacroEditorPage::run_mode_changed ()
+{
+  dm_run_mode_changed ();
+}
+
+void MacroEditorPage::do_run_mode_changed ()
 {
   //  this prevents recursion when the following lines trigger anything that routes through the interpreter
   bool bl = mp_exec_model->blockSignals (true);

@@ -164,7 +164,7 @@ module DRC
   
     def initialize
 
-      cv = RBA::CellView::active
+      cv = RBA.const_defined?(:CellView) && RBA::CellView::active
 
       @time = Time::now
       @force_gc = ($drc_force_gc == true)   # for testing, $drc_force_gc can be set to true
@@ -1444,7 +1444,7 @@ module DRC
           
             if arg =~ /^@(\d+)/
               n = $1.to_i - 1
-              view = RBA::LayoutView::current
+              view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
               view || raise("No view open")
               (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
               cv = view.cellview(n)
@@ -1543,7 +1543,7 @@ module DRC
           
             if arg =~ /^@(\d+)/
               n = $1.to_i - 1
-              view = RBA::LayoutView::current
+              view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
               view || raise("No view open")
               (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
               cv = view.cellview(n)
@@ -1608,7 +1608,7 @@ module DRC
       self._context("report") do
 
         # finish what we got so far
-        view = RBA::LayoutView::current
+        view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
         @def_output && @def_output.finish(false, view)
 
         @def_output = nil
@@ -2925,7 +2925,7 @@ CODE
     def _start(job_description)
     
       # clearing the selection avoids some nasty problems
-      view = RBA::LayoutView::current
+      view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
       view && view.cancel
       
       @total_timer = RBA::Timer::new
@@ -2950,7 +2950,7 @@ CODE
 
         _flush    
 
-        view = RBA::LayoutView::current
+        view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
 
         @def_output && @def_output.finish(final, view)
 
@@ -3484,7 +3484,7 @@ CODE
       
       output_rdb_index = nil
 
-      view = RBA::LayoutView::current
+      view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
       if view
         if self._rdb_index
           output_rdb = RBA::ReportDatabase::new("")   # reuse existing name
@@ -3518,7 +3518,7 @@ CODE
       
         if arg =~ /^@(\d+|\+)/
 
-          view = RBA::LayoutView::current
+          view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
           view || raise("No view open")
           if $1 == "+"
             prev_cv = view.active_cellview_index

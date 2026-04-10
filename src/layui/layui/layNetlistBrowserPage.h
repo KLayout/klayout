@@ -170,6 +170,11 @@ public:
   void update_highlights ();
 
   /**
+   *  @brief Adjusts the view depending on the current settings
+   */
+  void adjust_view ();
+
+  /**
    *  @brief Gets the current object's path
    */
   const lay::NetlistObjectsPath &current_path () const
@@ -255,7 +260,6 @@ private:
   void setup_trees ();
   void add_to_history (const QModelIndex &index, bool fwd);
   void navigate_to (const QModelIndex &index, bool forward = true);
-  void adjust_view ();
   void clear_markers ();
   void highlight (const NetlistObjectsPath &current_path, const std::vector<NetlistObjectsPath> &selected_paths);
   void clear_highlights ();

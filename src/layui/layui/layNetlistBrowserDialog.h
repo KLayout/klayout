@@ -78,9 +78,24 @@ public:
   db::LayoutToNetlist *db ();
 
   /**
+   *  @brief Gets the index of the currently selected database in the view
+   */
+  int l2n_index ();
+
+  /**
    *  @brief Gets the current object's path
    */
   const lay::NetlistObjectsPath &current_path () const;
+
+  /**
+   *  @brief Sets the current object's path
+   *
+   *  This will make the given netlist object the current one and change the
+   *  selection to this one.
+   *
+   *  Passing a null path will clear the selection.
+   */
+  void set_current_path (const lay::NetlistObjectsPath &path);
 
   /**
    *  @brief Gets the selected nets

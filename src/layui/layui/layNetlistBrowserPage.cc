@@ -502,9 +502,9 @@ NetlistBrowserPage::select_path (const lay::NetlistObjectsPath &path)
 {
   if (path.is_null ()) {
 
-    nl_directory_tree->clearSelection ();
-    sch_directory_tree->clearSelection ();
-    xref_directory_tree->clearSelection ();
+    nl_directory_tree->setCurrentIndex (QModelIndex ());
+    sch_directory_tree->setCurrentIndex (QModelIndex ());
+    xref_directory_tree->setCurrentIndex (QModelIndex ());
 
   } else {
 
@@ -514,17 +514,33 @@ NetlistBrowserPage::select_path (const lay::NetlistObjectsPath &path)
 
     model = dynamic_cast<NetlistBrowserModel *> (nl_directory_tree->model ());
     if (model) {
-      nl_directory_tree->setCurrentIndex (model->index_from_path (path));
+      if (lvsdb && lvsdb->cross_ref () && ! path.root.first) {
+        lay::NetlistObjectsPath nl_path = lay::NetlistObjectsPath::from_first (path.second ());
+        //  Note: translation helps generating a layout-netlist index to
+        //  naviate to the layout netlist in case of schematic probing for example (only
+        //  works if all path components can be translated)
+        if (lay::NetlistObjectsPath::translate (nl_path, *lvsdb->cross_ref ())) {
+          nl_directory_tree->setCurrentIndex (model->index_from_path (nl_path));
+        }
+      } else {
+        nl_directory_tree->setCurrentIndex (model->index_from_path (path));
+      }
     }
 
     model = dynamic_cast<NetlistBrowserModel *> (sch_directory_tree->model ());
     if (model && lvsdb && lvsdb->cross_ref ()) {
-      lay::NetlistObjectsPath sch_path = path;
-      //  Note: translation helps generating a schematic-netlist index to
-      //  naviate to the schematic netlist in case of probing for example (only
-      //  works if all path components can be translated)
-      if (lay::NetlistObjectsPath::translate (sch_path, *lvsdb->cross_ref ())) {
+      if (! path.root.first) {
+        //  No first path given: use second one for schematic directly.
+        lay::NetlistObjectsPath sch_path = lay::NetlistObjectsPath::from_first (path.second ());
         sch_directory_tree->setCurrentIndex (model->index_from_path (sch_path));
+      } else {
+        lay::NetlistObjectsPath sch_path = path;
+        //  Note: translation helps generating a schematic-netlist index to
+        //  naviate to the schematic netlist in case of probing for example (only
+        //  works if all path components can be translated)
+        if (lay::NetlistObjectsPath::translate (sch_path, *lvsdb->cross_ref ())) {
+          sch_directory_tree->setCurrentIndex (model->index_from_path (sch_path));
+        }
       }
     }
 
@@ -1315,7 +1331,7 @@ NetlistBrowserPage::clear_highlights ()
 void
 NetlistBrowserPage::highlight (const NetlistObjectsPath &current_path, const std::vector<NetlistObjectsPath> &selected_paths)
 {
-  if (current_path != m_current_path && selected_paths != m_selected_paths) {
+  if (current_path != m_current_path || selected_paths != m_selected_paths) {
 
     m_current_path = current_path;
     m_selected_paths = selected_paths;

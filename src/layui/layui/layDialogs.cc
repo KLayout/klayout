@@ -384,11 +384,11 @@ END_PROTECTED;
 LayoutViewFunctionDialog::LayoutViewFunctionDialog (QWidget *parent, const QString &title, const QString &label)
   : QDialog (parent)
 {
-  setObjectName (QString::fromUtf8 ("layout_view_function_dialog"));
-  setWindowTitle (title);
-
   mp_ui = new Ui::LayoutViewFunctionDialog ();
   mp_ui->setupUi (this);
+
+  setObjectName (QString::fromUtf8 ("layout_view_function_dialog"));
+  setWindowTitle (title);
 
   mp_ui->label->setText (label);
 

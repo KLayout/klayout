@@ -33,13 +33,16 @@
 #include "pya.h"
 #include "gsi.h"
 #include "gsiExpression.h"
+#include "lymMacro.h"
+#include "lymMacroCollection.h"
+
 #include "libForceLink.h"
 #include "rdbForceLink.h"
 #include "pexForceLink.h"
-#include "drcForceLink.h"
-#include "lvsForceLink.h"
-#include "lymMacro.h"
-#include "lymMacroCollection.h"
+#if defined(HAVE_RUBY)
+#  include "drcForceLink.h"
+#  include "lvsForceLink.h"
+#endif
 
 struct RunnerData
 {

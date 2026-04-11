@@ -248,6 +248,8 @@ public:
   virtual RegionDelegate *add (const Region &other) const = 0;
   virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &other, PropertyConstraint prop_constraint) const = 0;
 
+  virtual RegionDelegate *peel (double complexity_factor) const = 0;
+
   virtual RegionDelegate *selected_outside (const Region &other) const = 0;
   virtual RegionDelegate *selected_not_outside (const Region &other) const = 0;
   virtual std::pair<RegionDelegate *, RegionDelegate *> selected_outside_pair (const Region &other) const = 0;

@@ -3290,3 +3290,54 @@ TEST(processed_delivers_polygon_refs)
 
   EXPECT_EQ (rx.to_string (), "(0,0;0,2000;2000,2000;2000,0);(0,0;0,2000;2000,2000;2000,0/200,200;1800,200;1800,1800;200,1800){n=>42}");
 }
+
+TEST(deep_region_peel)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_peel.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::RecursiveShapeIterator si1 (ly, top_cell, l1);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::RecursiveShapeIterator si2 (ly, top_cell, l2);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::Region r1 (si1, dss);
+  db::Region r2 (si2, dss);
+
+  unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
+  unsigned int l1002 = ly.get_layer (db::LayerProperties (1002, 0));
+  unsigned int l1011 = ly.get_layer (db::LayerProperties (1011, 0));
+  unsigned int l1012 = ly.get_layer (db::LayerProperties (1012, 0));
+  unsigned int l1021 = ly.get_layer (db::LayerProperties (1021, 0));
+  unsigned int l1022 = ly.get_layer (db::LayerProperties (1022, 0));
+  unsigned int l1031 = ly.get_layer (db::LayerProperties (1031, 0));
+  unsigned int l1032 = ly.get_layer (db::LayerProperties (1032, 0));
+
+  db::Region (r1).peel (-1.0).insert_into (&ly, top_cell_index, l1001);
+  db::Region (r2).peel (-1.0).insert_into (&ly, top_cell_index, l1002);
+  db::Region (r1).peel (0.0).insert_into (&ly, top_cell_index, l1011);
+  db::Region (r2).peel (0.0).insert_into (&ly, top_cell_index, l1012);
+  db::Region (r1).peel (2.0).insert_into (&ly, top_cell_index, l1021);
+  db::Region (r2).peel (2.0).insert_into (&ly, top_cell_index, l1022);
+  db::Region (r1).peel (4.0).insert_into (&ly, top_cell_index, l1031);
+  db::Region (r2).peel (4.0).insert_into (&ly, top_cell_index, l1032);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_peel_au.gds");
+}
+

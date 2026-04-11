@@ -111,6 +111,8 @@ public:
   virtual RegionDelegate *add_in_place (const Region &other);
   virtual RegionDelegate *add (const Region &other) const;
 
+  virtual RegionDelegate *peel (double /*complexity_factor*/) const { return new EmptyRegion (); }
+
   virtual RegionDelegate *selected_outside (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_outside (const Region &) const { return new EmptyRegion (); }
   virtual std::pair<RegionDelegate *, RegionDelegate *> selected_outside_pair (const Region &) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }

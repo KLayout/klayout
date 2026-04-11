@@ -3912,18 +3912,34 @@ LayoutViewBase::full_box () const
   db::DBox bbox;
 
   auto tv = cv_transform_variants_with_empty ();
+
+  //  first, use the bounding box of actual drawn layout (issue #2326)
   for (auto i = tv.begin (); i != tv.end (); ++i) {
     const lay::CellView &cv = cellview (i->second);
     if (cv.is_valid ()) {
       double dbu = cv->layout ().dbu ();
-      bbox += (i->first * db::CplxTrans (dbu) * cv.context_trans ()) * cv.cell ()->bbox_with_empty ();
+      bbox += (i->first * db::CplxTrans (dbu) * cv.context_trans ()) * cv.cell ()->bbox ();
     }
   }
 
+  //  if that is empty, use the bounding box computed while treating empty cells as
+  //  dots at the origin of the cells
+  if (bbox.empty ()) {
+    for (auto i = tv.begin (); i != tv.end (); ++i) {
+      const lay::CellView &cv = cellview (i->second);
+      if (cv.is_valid ()) {
+        double dbu = cv->layout ().dbu ();
+        bbox += (i->first * db::CplxTrans (dbu) * cv.context_trans ()) * cv.cell ()->bbox_with_empty ();
+      }
+    }
+  }
+
+  //  add annotations
   for (lay::AnnotationShapes::iterator a = annotation_shapes ().begin (); ! a.at_end (); ++a) {
     bbox += a->box ();
   }
 
+  //  produce a default if still empty and enlarge by some small amount to have a border
   if (bbox.empty ()) {
     bbox = db::DBox (0, 0, 0, 0); // default box
   } else {

@@ -401,6 +401,13 @@ DeepRegion::begin_merged () const
   }
 }
 
+RegionIteratorDelegate *
+DeepRegion::begin_unmerged () const
+{
+  ensure_unmerged_polygons_valid ();
+  return begin ();
+}
+
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
 DeepRegion::begin_iter () const
 {
@@ -443,6 +450,13 @@ DeepRegion::begin_merged_iter () const
     }
 
   }
+}
+
+std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
+DeepRegion::begin_unmerged_iter () const
+{
+  ensure_unmerged_polygons_valid ();
+  return begin_iter ();
 }
 
 bool
@@ -788,6 +802,46 @@ DeepRegion::ensure_merged_polygons_valid () const
 }
 
 void
+DeepRegion::ensure_unmerged_polygons_valid () const
+{
+  if (! m_is_merged ||
+      (deep_layer ().store ()->max_area_ratio () == 0.0 && deep_layer ().store ()->max_vertex_count () == 0)) {
+    return;
+  }
+
+  m_merged_polygons = deep_layer ().derived ();
+  db::DeepLayer &polygons = const_cast<db::DeepLayer &> (deep_layer ());
+
+  m_merged_polygons_valid = true;
+  m_is_merged = false;
+  m_merged_polygons_boc_hash = deep_layer ().breakout_cells_hash ();
+
+  db::Layout &layout = polygons.layout ();
+  polygons.swap (m_merged_polygons);
+
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    db::Shapes &st = c->shapes (deep_layer ().layer ());
+
+    db::PolygonRefToShapesGenerator pr (&layout, &st);
+    db::PolygonSplitter splitter (pr, polygons.store ()->max_area_ratio (), polygons.store ()->max_vertex_count ());
+
+    splitter.start ();
+    for (auto p = s.begin (db::ShapeIterator::All); ! p.at_end (); ++p) {
+      if (p->is_polygon ()) {
+        pr.set_prop_id (p->prop_id ());
+        db::Polygon poly;
+        p->polygon (poly);
+        splitter.put (poly);
+      }
+    }
+    splitter.flush ();
+
+  }
+}
+
+void
 DeepRegion::set_is_merged (bool f)
 {
   m_is_merged = f;
@@ -824,6 +878,140 @@ DeepRegion::nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Var
   net_builder.build_nets (nets, lmap, prop_mode, net_prop_name);
 
   return new db::DeepRegion (result);
+}
+
+namespace {
+
+/**
+ *  @brief Implements a boolean AND or NOT operation with property handling
+ */
+class DB_PUBLIC PushHierLocalOperationWithProperties
+  : public local_operation<db::object_with_properties<db::PolygonRef>, db::object_with_properties<db::PolygonRef>, db::object_with_properties<db::PolygonRef> >
+{
+public:
+  PushHierLocalOperationWithProperties (double complexity_factor)
+    : local_operation<db::object_with_properties<db::PolygonRef>, db::object_with_properties<db::PolygonRef>, db::object_with_properties<db::PolygonRef> > (),
+      m_complexity_factor (complexity_factor)
+  {
+    //  .. nothing yet ..
+  }
+
+  OnEmptyIntruderHint on_empty_intruder_hint () const { return Copy; }
+
+  std::string description () const
+  {
+    return tl::to_string (tr ("'peel' operation"));
+  }
+
+
+  virtual void do_compute_local (db::Layout *layout, db::Cell * /*subject_cell*/, const shape_interactions<db::object_with_properties<db::PolygonRef>, db::object_with_properties<db::PolygonRef> > &interactions, std::vector<std::unordered_set<db::object_with_properties<db::PolygonRef> > > &results, const db::LocalProcessorBase *proc) const
+  {
+    tl_assert (results.size () == 1);
+    auto &result = results.front ();
+
+    db::EdgeProcessor ep;
+
+    for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+
+      const auto &subject = interactions.subject_shape (i->first);
+      db::properties_id_type prop_id = subject.properties_id ();
+
+      if (i->second.empty ()) {
+
+        result.insert (subject);
+
+      } else {
+
+        ep.clear ();
+
+        const auto &subject = interactions.subject_shape (i->first);
+        for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, 0);
+        }
+
+        size_t p2 = 1;
+        for (auto ii = i->second.begin (); ii != i->second.end (); ++ii) {
+          const auto &intruder = interactions.intruder_shape (*ii);
+          for (auto e = intruder.second.begin_edge (); ! e.at_end(); ++e) {
+            ep.insert (*e, p2);
+          }
+          p2 += 2;
+        }
+
+        std::unordered_set<db::object_with_properties<db::PolygonRef> > result1;
+
+        db::BooleanOp op (db::BooleanOp::ANotB);
+        db::polygon_ref_generator_with_properties<db::object_with_properties<db::PolygonRef> > pr (layout, result1, prop_id);
+        db::PolygonSplitter splitter (pr, proc->area_ratio (), proc->max_vertex_count ());
+        db::PolygonGenerator pg (splitter, true, true);
+        ep.set_base_verbosity (50);
+        ep.process (pg, op);
+
+        if (result1.empty ()) {
+
+          //  shortcut: nothing to do
+
+        } else if (m_complexity_factor < 0.0) {
+
+          //  no complexity limit
+          result.insert (result1.begin (), result1.end ());
+
+        } else if (m_complexity_factor == 0.0) {
+
+          //  only remove shape if it is really entirely covered in this case
+          result.insert (subject);
+
+        } else {
+
+          size_t vertices_before = subject.vertices ();
+          size_t vertices_after = 0;
+          for (auto r = result1.begin (); r != result1.end (); ++r) {
+            vertices_after += r->vertices ();
+          }
+
+          if (floor (0.5 + m_complexity_factor * vertices_before) >= vertices_after) {
+            result.insert (result1.begin (), result1.end ());
+          } else {
+            result.insert (subject);
+          }
+
+        }
+
+      }
+
+    }
+  }
+
+private:
+  double m_complexity_factor;
+};
+
+}
+
+RegionDelegate *
+DeepRegion::peel (double complexity_factor) const
+{
+  if (empty ()) {
+    //  we can return "this", as this method is only intended for in-place execution inside Region
+    return const_cast<DeepRegion *> (this);
+  }
+
+  DeepLayer dl_out (deep_layer ().derived ());
+
+  PushHierLocalOperationWithProperties op (complexity_factor);
+
+  db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), deep_layer ().breakout_cells ());
+  configure_proc (proc);
+  proc.set_threads (deep_layer ().store ()->threads ());
+  proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
+  proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
+
+  //  with this setting, only top-down interactions are considered
+  proc.set_top_down (true);
+
+  proc.run (&op, deep_layer ().layer (), deep_layer ().layer (), dl_out.layer ());
+
+  return new DeepRegion (dl_out);
 }
 
 RegionDelegate *
@@ -922,6 +1110,10 @@ DeepRegion::andnot_with (const Region &other, PropertyConstraint property_constr
 DeepLayer
 DeepRegion::and_with_impl (const DeepRegion *other, db::PropertyConstraint property_constraint) const
 {
+  //  booleans run better on simple polygons
+  ensure_unmerged_polygons_valid ();
+  other->ensure_unmerged_polygons_valid ();
+
   DeepLayer dl_out (deep_layer ().derived ());
 
   if (pc_skip (property_constraint)) {
@@ -956,6 +1148,10 @@ DeepRegion::and_with_impl (const DeepRegion *other, db::PropertyConstraint prope
 DeepLayer
 DeepRegion::not_with_impl (const DeepRegion *other, db::PropertyConstraint property_constraint) const
 {
+  //  booleans run better on simple polygons
+  ensure_unmerged_polygons_valid ();
+  other->ensure_unmerged_polygons_valid ();
+
   DeepLayer dl_out (deep_layer ().derived ());
   DeepLayer dl_prep;
 
@@ -1059,6 +1255,10 @@ DeepRegion::not_with_impl (const DeepRegion *other, db::PropertyConstraint prope
 std::pair<DeepLayer, DeepLayer>
 DeepRegion::and_and_not_with (const DeepRegion *other, PropertyConstraint property_constraint) const
 {
+  //  booleans run better on simple polygons
+  ensure_unmerged_polygons_valid ();
+  other->ensure_unmerged_polygons_valid ();
+
   DeepLayer dl_out1 (deep_layer ().derived ());
   DeepLayer dl_out2 (deep_layer ().derived ());
 
@@ -1178,6 +1378,10 @@ DeepRegion::add_in_place (const Region &other)
 
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
   if (other_deep) {
+
+    //  NOTE: as we don't benefit from merged shapes here, we prefer unmerged ones
+    //  for potentially better performance.
+    other_deep->ensure_unmerged_polygons_valid ();
 
     deep_layer ().add_from (other_deep->deep_layer ());
 
@@ -1885,6 +2089,10 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
     return clone ();
   }
 
+  //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
+  //  overlap after size and are not necessarily merged)
+  bool will_be_merged = (d < 0 && (merged_semantics () || is_merged ()));
+
   const db::DeepLayer &polygons = merged_deep_layer ();
 
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
@@ -1904,7 +2112,8 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
     db::PolygonRefToShapesGenerator pr (&layout, &st);
-    db::PolygonGenerator pg2 (pr, false /*don't resolve holes*/, true /*min. coherence*/);
+    db::PolygonSplitter splitter (pr, will_be_merged ? 0.0 : polygons.store ()->max_area_ratio (), will_be_merged ? 0 : polygons.store ()->max_vertex_count ());
+    db::PolygonGenerator pg2 (splitter, false /*don't resolve holes*/, true /*min. coherence*/);
     db::SizingPolygonFilter siz (pg2, d_with_mag, d_with_mag, mode);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
@@ -1916,11 +2125,7 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
 
   }
 
-  //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
-  //  overlap after size and are not necessarily merged)
-  if (d < 0 && (merged_semantics () || is_merged ())) {
-    res->set_is_merged (true);
-  }
+  res->set_is_merged (will_be_merged);
 
   return res.release ();
 }
@@ -1937,6 +2142,10 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
   if (dx == dy) {
     return sized (dx, mode);
   }
+
+  //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
+  //  overlap after size and are not necessarily merged)
+  bool will_be_merged = (dx < 0 && dy < 0 && (merged_semantics () || is_merged ()));
 
   const db::DeepLayer &polygons = merged_deep_layer ();
 
@@ -1964,7 +2173,8 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
     db::PolygonRefToShapesGenerator pr (&layout, &st);
-    db::PolygonGenerator pg2 (pr, false /*don't resolve holes*/, true /*min. coherence*/);
+    db::PolygonSplitter splitter (pr, will_be_merged ? 0.0 : polygons.store ()->max_area_ratio (), will_be_merged ? 0 : polygons.store ()->max_vertex_count ());
+    db::PolygonGenerator pg2 (splitter, false /*don't resolve holes*/, true /*min. coherence*/);
     db::SizingPolygonFilter siz (pg2, dx_with_mag, dy_with_mag, mode);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
@@ -1976,11 +2186,7 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 
   }
 
-  //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
-  //  overlap after size and are not necessarily merged)
-  if (dx < 0 && dy < 0 && (merged_semantics () || is_merged ())) {
-    res->set_is_merged (true);
-  }
+  res->set_is_merged (will_be_merged);
 
   return res.release ();
 }

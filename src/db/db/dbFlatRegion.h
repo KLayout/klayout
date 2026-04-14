@@ -51,10 +51,10 @@ public:
   typedef db::layer<db::PolygonWithProperties, db::unstable_layer_tag> polygon_layer_wp_type;
   typedef polygon_layer_wp_type::iterator polygon_iterator_wp_type;
 
-  FlatRegion ();
-  FlatRegion (const db::Shapes &polygons, bool is_merged = false);
-  FlatRegion (const db::Shapes &polygons, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged = false);
-  FlatRegion (bool is_merged);
+  FlatRegion (double area_ratio = 0.0, size_t max_vertex_count = 0);
+  FlatRegion (const db::Shapes &polygons, bool is_merged = false, double area_ratio = 0.0, size_t max_vertex_count = 0);
+  FlatRegion (const db::Shapes &polygons, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged = false, double area_ratio = 0.0, size_t max_vertex_count = 0);
+  FlatRegion (bool is_merged, double area_ratio = 0.0, size_t max_vertex_count = 0);
 
   FlatRegion (const FlatRegion &other);
 
@@ -69,9 +69,11 @@ public:
 
   virtual RegionIteratorDelegate *begin () const;
   virtual RegionIteratorDelegate *begin_merged () const;
+  virtual RegionIteratorDelegate *begin_unmerged () const;
 
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const;
+  virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_unmerged_iter () const;
 
   virtual bool empty () const;
   virtual size_t count () const;
@@ -143,13 +145,16 @@ private:
 
   FlatRegion &operator= (const FlatRegion &other);
 
-  bool m_is_merged;
+  mutable bool m_is_merged;
   mutable tl::copy_on_write_ptr<db::Shapes> mp_polygons;
   mutable tl::copy_on_write_ptr<db::Shapes> mp_merged_polygons;
   mutable bool m_merged_polygons_valid;
+  double m_area_ratio;
+  size_t m_max_vertex_count;
 
   void init ();
   void ensure_merged_polygons_valid () const;
+  void ensure_unmerged_polygons_valid () const;
 
   template <class Trans>
   void transform_generic (const Trans &trans)

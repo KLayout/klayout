@@ -465,6 +465,16 @@ public:
     return m_nthreads;
   }
 
+  void set_top_down (bool f)
+  {
+    m_top_down = f;
+  }
+
+  bool top_down () const
+  {
+    return m_top_down;
+  }
+
   void set_max_vertex_count (size_t max_vertex_count)
   {
     m_max_vertex_count = max_vertex_count;
@@ -525,6 +535,7 @@ private:
   unsigned int m_nthreads;
   size_t m_max_vertex_count;
   double m_area_ratio;
+  bool m_top_down;
   bool m_boolean_core;
   int m_base_verbosity;
   const db::VariantsCollectorBase *mp_vars;

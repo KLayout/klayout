@@ -197,10 +197,11 @@ module DRC
       @total_timer = nil
       @drc_progress = nil
       
-      # initialize the defaults for max_area_ratio, max_vertex_count
+      # initialize the defaults for max_area_ratio, max_vertex_count, sparse_array_limit
       dss = RBA::DeepShapeStore::new
       @max_area_ratio = dss.max_area_ratio
       @max_vertex_count = dss.max_vertex_count
+      @sparse_array_limit = dss.sparse_array_limit
       @deep_reject_odd_polygons = dss.reject_odd_polygons
       dss._destroy
 
@@ -1307,6 +1308,43 @@ module DRC
 
     def max_vertex_count=(count)
       self.max_vertex_count(count)
+    end
+
+    # %DRC%
+    # @name sparse_array_limit
+    # @brief Gets or sets the sparse array singularization limit
+    # @synopsis sparse_array_limit(limit)
+    # @synopsis sparse_array_limit
+    #
+    # In deep mode, array instances with a bad ratio of overall bounding box area
+    # vs. actually covered area, induce a performance penalty, because their bounding
+    # box is not longer a good approximation for their footprint.
+    # The "sparse array limit" defines the ratio of array instance bounding box area
+    # vs. sum of bounding box areas of the individual instances, above which the array
+    # is resolved into single instances.
+    #
+    # Use this method without an argument to get the current value.
+    #
+    # By default, this feature is off (the sparse array limit value is negative). 
+    # If your design uses many arrays with a bad coverage, you can set the sparse
+    # array limit to a value of 10 for example.
+ 
+    def sparse_array_limit(sal = nil)
+      if sal
+        if @dss
+          raise("sparse_array_limit must be set before the first 'input' statement in deep mode")
+        end
+        if sal.is_a?(1.0.class) || sal.is_a?(1.class)
+          @sparse_array_limit = sal
+        else
+          raise("Argument is not numerical in sparse_array_limit")
+        end
+      end
+      @sparse_array_limit
+    end
+
+    def sparse_array_limit=(sal)
+      self.sparse_array_limit(sal)
     end
 
     # %DRC%
@@ -3305,6 +3343,7 @@ CODE
           @dss.reject_odd_polygons = @deep_reject_odd_polygons
           @dss.max_vertex_count = @max_vertex_count
           @dss.max_area_ratio = @max_area_ratio
+          @dss.sparse_array_limit = @sparse_array_limit
 
           r = cls.new(iter, @dss, RBA::ICplxTrans::new(sf.to_f))
 

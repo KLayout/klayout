@@ -42,15 +42,15 @@ namespace db
 /**
  *  @brief A utility class for the box scanner implementation
  */
-template <class BoxConvert, class Obj, class Prop, class SideOp>
+template <class BoxConvertAdaptor, class Obj, class Prop, class SideOp>
 struct bs_side_compare_func
 #if __cplusplus < 201703L
   : std::binary_function<std::pair<const Obj *, Prop>, std::pair<const Obj *, Prop>, bool>
 #endif
 {
-  typedef typename BoxConvert::box_type box_type;
+  typedef typename BoxConvertAdaptor::box_type box_type;
 
-  bs_side_compare_func (const BoxConvert &bc)
+  bs_side_compare_func (const BoxConvertAdaptor &bc)
     : m_bc (bc)
   {
     //  .. nothing yet ..
@@ -59,26 +59,26 @@ struct bs_side_compare_func
   bool operator() (const std::pair<const Obj *, Prop> &a, const std::pair<const Obj *, Prop> &b) const
   {
     SideOp sideop;
-    return sideop (m_bc (*a.first)) < sideop (m_bc (*b.first));
+    return sideop (m_bc (a)) < sideop (m_bc (b));
   }
 
 private:
-  BoxConvert m_bc;
+  BoxConvertAdaptor m_bc;
 };
 
 /**
  *  @brief A utility class for the box scanner implementation
  */
-template <class BoxConvert, class Obj, class Prop, class SideOp>
+template <class BoxConvertAdaptor, class Obj, class Prop, class SideOp>
 struct bs_side_compare_vs_const_func
 #if __cplusplus < 201703L
         : std::unary_function<std::pair<const Obj *, Prop>, bool>
 #endif
 {
-  typedef typename BoxConvert::box_type box_type;
+  typedef typename BoxConvertAdaptor::box_type box_type;
   typedef typename box_type::coord_type coord_type;
 
-  bs_side_compare_vs_const_func (const BoxConvert &bc, coord_type c)
+  bs_side_compare_vs_const_func (const BoxConvertAdaptor &bc, coord_type c)
     : m_bc (bc), m_c (c)
   {
     //  .. nothing yet ..
@@ -87,11 +87,11 @@ struct bs_side_compare_vs_const_func
   bool operator() (const std::pair<const Obj *, Prop> &a) const
   {
     SideOp sideop;
-    return sideop (m_bc (*a.first)) < m_c;
+    return sideop (m_bc (a)) < m_c;
   }
 
 private:
-  BoxConvert m_bc;
+  BoxConvertAdaptor m_bc;
   coord_type m_c;
 };
 
@@ -185,6 +185,34 @@ public:
   typedef Prop property_type;
   typedef std::vector<std::pair<const Obj *, Prop> > container_type;
   typedef typename container_type::iterator iterator_type;
+
+  template <class BoxConvert>
+  struct box_convert_adaptor_take_first
+  {
+    typedef typename BoxConvert::box_type box_type;
+
+    box_convert_adaptor_take_first (const BoxConvert &bc)
+      : m_bc (bc)
+    { }
+
+    box_type operator() (const std::pair<const Obj *, Prop> &p) const
+    {
+      return m_bc (*p.first);
+    }
+
+  private:
+    const BoxConvert &m_bc;
+  };
+
+  struct BoxConvertAdaptorTakeSecond
+  {
+    typedef Prop box_type;
+
+    const box_type &operator() (const std::pair<const Obj *, Prop> &p) const
+    {
+      return p.second;
+    }
+  };
 
   /**
    *  @brief Default ctor
@@ -288,7 +316,22 @@ public:
   bool process (Rec &rec, typename BoxConvert::box_type::coord_type enl, const BoxConvert &bc = BoxConvert ())
   {
     rec.initialize ();
-    bool ret = do_process (rec, enl, bc);
+    bool ret = do_process (rec, enl, box_convert_adaptor_take_first<BoxConvert> (bc));
+    rec.finalize (ret);
+    return ret;
+  }
+
+  /**
+   *  @brief Same as "process", but allows specfying a box convert adaptor
+   *
+   *  This version is useful for use with BoxConvertAdaptorTakeSecond. In that case, "Prop" needs to be
+   *  a box type and is used directly as the bounding box.
+   */
+  template <class Rec, class BoxConvertAdaptor = BoxConvertAdaptorTakeSecond>
+  bool process_with_adaptor (Rec &rec, typename BoxConvertAdaptor::box_type::coord_type enl, const BoxConvertAdaptor &bca = BoxConvertAdaptor ())
+  {
+    rec.initialize ();
+    bool ret = do_process (rec, enl, bca);
     rec.finalize (ret);
     return ret;
   }
@@ -300,21 +343,21 @@ private:
   bool m_report_progress;
   std::string m_progress_desc;
 
-  template <class Rec, class BoxConvert>
-  bool do_process (Rec &rec, typename BoxConvert::box_type::coord_type enl, const BoxConvert &bc = BoxConvert ())
+  template <class Rec, class BoxConvertAdaptor>
+  bool do_process (Rec &rec, typename BoxConvertAdaptor::box_type::coord_type enl, const BoxConvertAdaptor &bc = BoxConvertAdaptor ())
   {
-    typedef typename BoxConvert::box_type box_type;
+    typedef typename BoxConvertAdaptor::box_type box_type;
     typedef typename box_type::coord_type coord_type;
-    typedef bs_side_compare_func<BoxConvert, Obj, Prop, box_bottom<Box> > bottom_side_compare_func;
-    typedef bs_side_compare_func<BoxConvert, Obj, Prop, box_left<Box> > left_side_compare_func;
-    typedef bs_side_compare_vs_const_func<BoxConvert, Obj, Prop, box_top<Box> > below_func;
-    typedef bs_side_compare_vs_const_func<BoxConvert, Obj, Prop, box_right<Box> > left_func;
+    typedef bs_side_compare_func<BoxConvertAdaptor, Obj, Prop, box_bottom<Box> > bottom_side_compare_func;
+    typedef bs_side_compare_func<BoxConvertAdaptor, Obj, Prop, box_left<Box> > left_side_compare_func;
+    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor, Obj, Prop, box_top<Box> > below_func;
+    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor, Obj, Prop, box_right<Box> > left_func;
 
     //  sort out the entries with an empty bbox (we must not put that into sort)
 
     typename container_type::iterator wi = m_pp.begin ();
     for (typename container_type::iterator ri = m_pp.begin (); ri != m_pp.end (); ++ri) {
-      if (! bc (*ri->first).empty ()) {
+      if (! bc (*ri).empty ()) {
         if (wi != ri) {
           *wi = *ri;
         }
@@ -334,9 +377,9 @@ private:
       //  below m_scanner_thr elements use the brute force approach which is faster in that case
 
       for (iterator_type i = m_pp.begin (); i != m_pp.end (); ++i) {
-        box_type b1 = bc (*i->first);
+        box_type b1 = bc (*i);
         for (iterator_type j = i + 1; j != m_pp.end (); ++j) {
-          if (bs_boxes_overlap (b1, bc (*j->first), enl)) {
+          if (bs_boxes_overlap (b1, bc (*j), enl)) {
             rec.add (i->first, i->second, j->first, j->second);
             if (rec.stop ()) {
               return false;
@@ -355,7 +398,7 @@ private:
 
       std::sort (m_pp.begin (), m_pp.end (), bottom_side_compare_func (bc));
 
-      coord_type y = bc (*m_pp.front ().first).bottom ();
+      coord_type y = bc (m_pp.front ()).bottom ();
 
       iterator_type current = m_pp.begin ();
       iterator_type future = m_pp.begin ();
@@ -389,10 +432,10 @@ private:
         typename std::iterator_traits<iterator_type>::difference_type min_band_size = size_t ((future - current) * m_fill_factor);
         coord_type yy = y;
         do {
-          yy = bc (*future->first).bottom ();
+          yy = bc (*future).bottom ();
           do {
             ++future;
-          } while (future != m_pp.end () && bc (*future->first).bottom () == yy);
+          } while (future != m_pp.end () && bc (*future).bottom () == yy);
         } while (future != m_pp.end () && future - current < min_band_size);
 
         std::sort (current, future, left_side_compare_func (bc));
@@ -400,7 +443,7 @@ private:
         iterator_type c = current;
         iterator_type f = current;
 
-        coord_type x = bc (*c->first).left ();
+        coord_type x = bc (*c).left ();
 
         while (f != future) {
 
@@ -412,10 +455,10 @@ private:
           typename std::iterator_traits<iterator_type>::difference_type min_box_size = size_t ((f - c) * m_fill_factor);
           coord_type xx = x;
           do {
-            xx = bc (*f->first).left ();
+            xx = bc (*f).left ();
             do {
               ++f;
-            } while (f != future && bc (*f->first).left () == xx);
+            } while (f != future && bc (*f).left () == xx);
           } while (f != future && f - c < min_box_size);
 
           if (m_report_progress) {
@@ -425,9 +468,13 @@ private:
 
           for (iterator_type i = f0; i != f; ++i) {
             for (iterator_type j = c; j < i; ++j) {
-              if (bs_boxes_overlap (bc (*i->first), bc (*j->first), enl)) {
-                if (seen.find (std::make_pair (i->first, j->first)) == seen.end () && seen.find (std::make_pair (j->first, i->first)) == seen.end ()) {
-                  seen.insert (std::make_pair (i->first, j->first));
+              if (bs_boxes_overlap (bc (*i), bc (*j), enl)) {
+                std::pair<const Obj *, const Obj *> k (i->first, j->first);
+                if (k.first < k.second) {
+                  std::swap (k.first, k.second);
+                }
+                if (seen.find (k) == seen.end ()) {
+                  seen.insert (k);
                   rec.add (i->first, i->second, j->first, j->second);
                   if (rec.stop ()) {
                     return false;
@@ -533,6 +580,62 @@ public:
   typedef std::vector<std::pair<const Obj2 *, Prop2> > container_type2;
   typedef typename container_type1::iterator iterator_type1;
   typedef typename container_type2::iterator iterator_type2;
+
+  template <class BoxConvert>
+  struct box_convert_adaptor_take_first1
+  {
+    typedef typename BoxConvert::box_type box_type;
+
+    box_convert_adaptor_take_first1 (const BoxConvert &bc)
+      : m_bc (bc)
+    { }
+
+    box_type operator() (const std::pair<const Obj1 *, Prop1> &p) const
+    {
+      return m_bc (*p.first);
+    }
+
+  private:
+    const BoxConvert &m_bc;
+  };
+
+  template <class BoxConvert>
+  struct box_convert_adaptor_take_first2
+  {
+    typedef typename BoxConvert::box_type box_type;
+
+    box_convert_adaptor_take_first2 (const BoxConvert &bc)
+      : m_bc (bc)
+    { }
+
+    box_type operator() (const std::pair<const Obj2 *, Prop2> &p) const
+    {
+      return m_bc (*p.first);
+    }
+
+  private:
+    const BoxConvert &m_bc;
+  };
+
+  struct BoxConvertAdaptorTakeSecond1
+  {
+    typedef Prop1 box_type;
+
+    const box_type &operator() (const std::pair<const Obj1 *, Prop1> &p) const
+    {
+      return p.second;
+    }
+  };
+
+  struct BoxConvertAdaptorTakeSecond2
+  {
+    typedef Prop2 box_type;
+
+    const box_type &operator() (const std::pair<const Obj2 *, Prop2> &p) const
+    {
+      return p.second;
+    }
+  };
 
   /**
    *  @brief Default ctor
@@ -678,7 +781,22 @@ public:
   bool process (Rec &rec, typename BoxConvert1::box_type::coord_type enl, const BoxConvert1 &bc1 = BoxConvert1 (), const BoxConvert2 &bc2 = BoxConvert2 ())
   {
     rec.initialize ();
-    bool ret = do_process (rec, enl, bc1, bc2);
+    bool ret = do_process (rec, enl, box_convert_adaptor_take_first1<BoxConvert1> (bc1), box_convert_adaptor_take_first2<BoxConvert2> (bc2));
+    rec.finalize (ret);
+    return ret;
+  }
+
+  /**
+   *  @brief Same as "process", but allows specfying a box convert adaptor
+   *
+   *  This version is useful for use with BoxConvertAdaptorTakeSecond. In that case, "Prop" needs to be
+   *  a box type and is used directly as the bounding box.
+   */
+  template <class Rec, class BoxConvertAdaptor1 = BoxConvertAdaptorTakeSecond1, class BoxConvertAdaptor2 = BoxConvertAdaptorTakeSecond2>
+  bool process_with_adaptor (Rec &rec, typename BoxConvertAdaptor1::box_type::coord_type enl, const BoxConvertAdaptor1 &bca1 = BoxConvertAdaptor1 (), const BoxConvertAdaptor2 &bca2 = BoxConvertAdaptor2 ())
+  {
+    rec.initialize ();
+    bool ret = do_process (rec, enl, bca1, bca2);
     rec.finalize (ret);
     return ret;
   }
@@ -691,25 +809,25 @@ private:
   bool m_report_progress;
   std::string m_progress_desc;
 
-  template <class Rec, class BoxConvert1, class BoxConvert2>
-  bool do_process (Rec &rec, typename BoxConvert1::box_type::coord_type enl, const BoxConvert1 &bc1 = BoxConvert1 (), const BoxConvert2 &bc2 = BoxConvert2 ())
+  template <class Rec, class BoxConvertAdaptor1, class BoxConvertAdaptor2>
+  bool do_process (Rec &rec, typename BoxConvertAdaptor1::box_type::coord_type enl, const BoxConvertAdaptor1 &bc1 = BoxConvertAdaptor1 (), const BoxConvertAdaptor2 &bc2 = BoxConvertAdaptor2 ())
   {
-    typedef typename BoxConvert1::box_type box_type; //  must be same as BoxConvert2::box_type
+    typedef typename BoxConvertAdaptor1::box_type box_type; //  must be same as BoxConvert2::box_type
     typedef typename box_type::coord_type coord_type;
-    typedef bs_side_compare_func<BoxConvert1, Obj1, Prop1, box_bottom<Box> > bottom_side_compare_func1;
-    typedef bs_side_compare_func<BoxConvert1, Obj1, Prop1, box_left<Box> > left_side_compare_func1;
-    typedef bs_side_compare_vs_const_func<BoxConvert1, Obj1, Prop1, box_top<Box> > below_func1;
-    typedef bs_side_compare_vs_const_func<BoxConvert1, Obj1, Prop1, box_right<Box> > left_func1;
-    typedef bs_side_compare_func<BoxConvert2, Obj2, Prop2, box_bottom<Box> > bottom_side_compare_func2;
-    typedef bs_side_compare_func<BoxConvert2, Obj2, Prop2, box_left<Box> > left_side_compare_func2;
-    typedef bs_side_compare_vs_const_func<BoxConvert2, Obj2, Prop2, box_top<Box> > below_func2;
-    typedef bs_side_compare_vs_const_func<BoxConvert2, Obj2, Prop2, box_right<Box> > left_func2;
+    typedef bs_side_compare_func<BoxConvertAdaptor1, Obj1, Prop1, box_bottom<Box> > bottom_side_compare_func1;
+    typedef bs_side_compare_func<BoxConvertAdaptor1, Obj1, Prop1, box_left<Box> > left_side_compare_func1;
+    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor1, Obj1, Prop1, box_top<Box> > below_func1;
+    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor1, Obj1, Prop1, box_right<Box> > left_func1;
+    typedef bs_side_compare_func<BoxConvertAdaptor2, Obj2, Prop2, box_bottom<Box> > bottom_side_compare_func2;
+    typedef bs_side_compare_func<BoxConvertAdaptor2, Obj2, Prop2, box_left<Box> > left_side_compare_func2;
+    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor2, Obj2, Prop2, box_top<Box> > below_func2;
+    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor2, Obj2, Prop2, box_right<Box> > left_func2;
 
     //  sort out the entries with an empty bbox (we must not put that into sort)
 
     typename container_type1::iterator wi1 = m_pp1.begin ();
     for (typename container_type1::iterator ri1 = m_pp1.begin (); ri1 != m_pp1.end (); ++ri1) {
-      if (! bc1 (*ri1->first).empty ()) {
+      if (! bc1 (*ri1).empty ()) {
         if (wi1 != ri1) {
           *wi1 = *ri1;
         }
@@ -726,7 +844,7 @@ private:
 
     typename container_type2::iterator wi2 = m_pp2.begin ();
     for (typename container_type2::iterator ri2 = m_pp2.begin (); ri2 != m_pp2.end (); ++ri2) {
-      if (! bc2 (*ri2->first).empty ()) {
+      if (! bc2 (*ri2).empty ()) {
         if (wi2 != ri2) {
           *wi2 = *ri2;
         }
@@ -757,9 +875,9 @@ private:
       //  below m_scanner_thr elements use the brute force approach which is faster in that case
 
       for (iterator_type1 i = m_pp1.begin (); i != m_pp1.end (); ++i) {
-        box_type b1 = bc1 (*i->first);
+        box_type b1 = bc1 (*i);
         for (iterator_type2 j = m_pp2.begin (); j != m_pp2.end (); ++j) {
-          if (bs_boxes_overlap (b1, bc2 (*j->first), enl)) {
+          if (bs_boxes_overlap (b1, bc2 (*j), enl)) {
             rec.add (i->first, i->second, j->first, j->second);
             if (rec.stop ()) {
               return false;
@@ -783,7 +901,7 @@ private:
       std::sort (m_pp1.begin (), m_pp1.end (), bottom_side_compare_func1 (bc1));
       std::sort (m_pp2.begin (), m_pp2.end (), bottom_side_compare_func2 (bc2));
 
-      coord_type y = std::min (bc1 (*m_pp1.front ().first).bottom (), bc2 (*m_pp2.front ().first).bottom ());
+      coord_type y = std::min (bc1 (m_pp1.front ()).bottom (), bc2 (m_pp2.front ()).bottom ());
 
       iterator_type1 current1 = m_pp1.begin ();
       iterator_type1 future1 = m_pp1.begin ();
@@ -833,16 +951,16 @@ private:
         coord_type yy = y;
         do {
           if (future1 != m_pp1.end () && future2 != m_pp2.end ()) {
-            yy = std::min (bc1 (*future1->first).bottom (), bc2 (*future2->first).bottom ());
+            yy = std::min (bc1 (*future1).bottom (), bc2 (*future2).bottom ());
           } else if (future1 != m_pp1.end ()) {
-            yy = bc1 (*future1->first).bottom ();
+            yy = bc1 (*future1).bottom ();
           } else {
-            yy = bc2 (*future2->first).bottom ();
+            yy = bc2 (*future2).bottom ();
           }
-          while (future1 != m_pp1.end () && bc1 (*future1->first).bottom () == yy) {
+          while (future1 != m_pp1.end () && bc1 (*future1).bottom () == yy) {
             ++future1;
           }
-          while (future2 != m_pp2.end () && bc2 (*future2->first).bottom () == yy) {
+          while (future2 != m_pp2.end () && bc2 (*future2).bottom () == yy) {
             ++future2;
           }
         } while ((future1 != m_pp1.end () || future2 != m_pp2.end ()) && size_t (future1 - current1) + size_t (future2 - current2) < min_band_size);
@@ -857,7 +975,7 @@ private:
           iterator_type2 c2 = current2;
           iterator_type2 f2 = current2;
 
-          coord_type x = std::min (bc1 (*c1->first).left (), bc2 (*c2->first).left ());
+          coord_type x = std::min (bc1 (*c1).left (), bc2 (*c2).left ());
 
           while (f1 != future1 || f2 != future2) {
 
@@ -869,16 +987,16 @@ private:
             coord_type xx = x;
             do {
               if (f1 != future1 && f2 != future2) {
-                xx = std::min (bc1 (*f1->first).left (), bc2 (*f2->first).left ());
+                xx = std::min (bc1 (*f1).left (), bc2 (*f2).left ());
               } else if (f1 != future1) {
-                xx = bc1 (*f1->first).left ();
+                xx = bc1 (*f1).left ();
               } else if (f2 != future2) {
-                xx = bc2 (*f2->first).left ();
+                xx = bc2 (*f2).left ();
               }
-              while (f1 != future1 && bc1 (*f1->first).left () == xx) {
+              while (f1 != future1 && bc1 (*f1).left () == xx) {
                 ++f1;
               }
-              while (f2 != future2 && bc2 (*f2->first).left () == xx) {
+              while (f2 != future2 && bc2 (*f2).left () == xx) {
                 ++f2;
               }
             } while ((f1 != future1 || f2 != future2) && size_t (f1 - c1) + size_t (f2 - c2) < min_box_size);
@@ -886,7 +1004,7 @@ private:
             if (c1 != f1 && c2 != f2) {
               for (iterator_type1 i = c1; i != f1; ++i) {
                 for (iterator_type2 j = c2; j < f2; ++j) {
-                  if (bs_boxes_overlap (bc1 (*i->first), bc2 (*j->first), enl)) {
+                  if (bs_boxes_overlap (bc1 (*i), bc2 (*j), enl)) {
                     if (seen1.insert (std::make_pair (i->first, j->first)).second) {
                       seen2.insert (std::make_pair (j->first, i->first));
                       rec.add (i->first, i->second, j->first, j->second);

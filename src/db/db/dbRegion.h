@@ -350,6 +350,17 @@ public:
   }
 
   /**
+   *  @brief Returns the unmerged polygons
+   *
+   *  "unmerged" polygons are polygons which are optimized for local operations,
+   *  specifically broken according to the area ratio and max vertex count.
+   */
+  const_iterator begin_unmerged () const
+  {
+    return RegionIterator (mp_delegate->begin_unmerged ());
+  }
+
+  /**
    *  @brief Delivers a RecursiveShapeIterator pointing to the polygons plus the necessary transformation
    */
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const
@@ -363,6 +374,14 @@ public:
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const
   {
     return mp_delegate->begin_merged_iter ();
+  }
+
+  /**
+   *  @brief Delivers a RecursiveShapeIterator pointing to the unmerged polygons plus the necessary transformation
+   */
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_unmerged_iter () const
+  {
+    return mp_delegate->begin_unmerged_iter ();
   }
 
   /**
@@ -1310,6 +1329,25 @@ public:
   {
     std::pair<RegionDelegate *, RegionDelegate *> res = mp_delegate->andnot_with (other, prop_constraint);
     return std::make_pair (Region (res.first), Region (res.second));
+  }
+
+  /**
+   *  @brief For deep regions, remove parts of shapes which are covered by child cell shapes (push shapes into hierarchy)
+   *
+   *  This will reduce the hierarchical load. This means that shapes that do not add information
+   *  will be removed, so their interactions with child cells does not need to be considered.
+   *  These shapes are - maybe partially - "peeled" from upper hierarchy layers.
+   *
+   *  The complexity factor indicates by how much the complexity of the resulting polygons
+   *  (counted in terms of vertexes) can increase before a shape is left as it was.
+   *  A negative complexity factor indicates, that no such limit exists. A zero complexity factor
+   *  means that only shapes are removed if they are covered entirely by shapes from below the
+   *  hierarchy.
+   */
+  Region &peel (double complexity_factor = 0.0)
+  {
+    set_delegate (mp_delegate->peel (complexity_factor));
+    return *this;
   }
 
   /**

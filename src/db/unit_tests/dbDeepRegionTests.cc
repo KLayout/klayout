@@ -3158,3 +3158,186 @@ TEST(deep_region_merged_with_pseudo_labels)
   rr2.merge ();
   EXPECT_EQ (rr2.to_string (), "(0,0;0,2000;2000,2000;2000,0){A=>17,B=>42};(998,2998;998,3002;1002,3002;1002,2998)");
 }
+
+namespace {
+
+class AttachPropertiesProcessor
+  : public db::PolygonProcessorBase
+{
+public:
+  AttachPropertiesProcessor (db::properties_id_type pid)
+    : m_pid (pid)
+  { }
+
+  virtual void process (const db::PolygonWithProperties &s, std::vector<db::PolygonWithProperties> &res) const
+  {
+    res.push_back (db::PolygonWithProperties (s, m_pid));
+  }
+
+  virtual bool result_is_merged () const
+  {
+    return true;
+  }
+
+private:
+  db::properties_id_type m_pid;
+};
+
+}
+
+TEST(deep_unmerged_regions)
+{
+  db::Layout ly;
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.insert_layer (db::LayerProperties (2, 0));
+
+  top.shapes (l1).insert (db::Box (0, 0, 2000, 2000));
+  top.shapes (l2).insert (db::Box (200, 200, 1800, 1800));
+
+  db::DeepShapeStore dss;
+  dss.set_max_area_ratio (2.0);
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top, l1), dss);
+  db::Region r2 (db::RecursiveShapeIterator (ly, top, l2), dss);
+
+  db::DeepRegion *r1_deep = dynamic_cast<db::DeepRegion *> (r1.delegate ());
+  EXPECT_EQ (r1_deep->is_merged (), false);
+  EXPECT_EQ (r1_deep->merged_polygons_available (), false);
+
+  db::Region r12 = (r1 - r2).merged ();
+  EXPECT_EQ (r12.to_string (), "(0,0;0,2000;2000,2000;2000,0/200,200;1800,200;1800,1800;200,1800)");
+  db::DeepRegion *r12_deep = dynamic_cast<db::DeepRegion *> (r12.delegate ());
+
+  EXPECT_EQ (r12_deep->is_merged (), true);
+  EXPECT_EQ (r12_deep->merged_polygons_available (), true);
+
+  //  this will force r12 back into unmerged state, but merged polygons are still available
+  db::Region rx = r1 | r12;
+
+  EXPECT_EQ (r12_deep->is_merged (), false);
+  EXPECT_EQ (r12_deep->merged_polygons_available (), true);
+  EXPECT_EQ (r12.to_string (), "(200,0;200,200;2000,200;2000,0);(1800,200;1800,1000;2000,1000;2000,200);(0,0;0,1000;200,1000;200,0);(1800,1000;1800,2000;2000,2000;2000,1000);(0,1000;0,1800;200,1800;200,1000);(0,1800;0,2000;1800,2000;1800,1800)");
+  EXPECT_EQ (rx.to_string (), "(0,0;0,2000;2000,2000;2000,0)");
+
+  //  repeat with properties
+
+  db::PropertiesSet ps;
+  ps.insert (tl::Variant ("n"), tl::Variant (42));
+  auto pid = db::properties_id (ps);
+  AttachPropertiesProcessor ap (pid);
+  r12 = (r1 - r2).merged ().processed (ap);
+
+  EXPECT_EQ (r12.to_string (), "(0,0;0,2000;2000,2000;2000,0/200,200;1800,200;1800,1800;200,1800){n=>42}");
+  r12_deep = dynamic_cast<db::DeepRegion *> (r12.delegate ());
+
+  EXPECT_EQ (r12_deep->is_merged (), true);
+  EXPECT_EQ (r12_deep->merged_polygons_available (), true);
+
+  rx = r1 | r12;
+
+  EXPECT_EQ (r12_deep->is_merged (), false);
+  EXPECT_EQ (r12_deep->merged_polygons_available (), true);
+  EXPECT_EQ (r12.to_string (), "(200,0;200,200;2000,200;2000,0){n=>42};(1800,200;1800,1000;2000,1000;2000,200){n=>42};(0,0;0,1000;200,1000;200,0){n=>42};(1800,1000;1800,2000;2000,2000;2000,1000){n=>42};(0,1000;0,1800;200,1800;200,1000){n=>42};(0,1800;0,2000;1800,2000;1800,1800){n=>42}");
+  EXPECT_EQ (rx.to_string (), "(0,0;0,2000;2000,2000;2000,0);(0,0;0,2000;2000,2000;2000,0/200,200;1800,200;1800,1800;200,1800){n=>42}");
+
+  //  now with "+" instead of "|"
+
+  db::Region r12p = (r1 - r2).merged ();
+  db::DeepRegion *r12p_deep = dynamic_cast<db::DeepRegion *> (r12p.delegate ());
+
+  EXPECT_EQ (r12p_deep->is_merged (), true);
+  EXPECT_EQ (r12p_deep->merged_polygons_available (), true);
+
+  //  this will also force r12 back into unmerged state, but merged polygons are still available
+  db::Region ry = (r1 + r12p).merged ();
+
+  EXPECT_EQ (r12p_deep->is_merged (), false);
+  EXPECT_EQ (r12p_deep->merged_polygons_available (), true);
+  EXPECT_EQ (r12p.to_string (), "(200,0;200,200;2000,200;2000,0);(1800,200;1800,1000;2000,1000;2000,200);(0,0;0,1000;200,1000;200,0);(1800,1000;1800,2000;2000,2000;2000,1000);(0,1000;0,1800;200,1800;200,1000);(0,1800;0,2000;1800,2000;1800,1800)");
+  EXPECT_EQ (ry.to_string (), "(0,0;0,2000;2000,2000;2000,0)");
+}
+
+TEST(processed_delivers_polygon_refs)
+{
+  db::Layout ly;
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.insert_layer (db::LayerProperties (2, 0));
+
+  top.shapes (l1).insert (db::Box (0, 0, 2000, 2000));
+  top.shapes (l2).insert (db::Box (200, 200, 1800, 1800));
+
+  db::DeepShapeStore dss;
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top, l1), dss);
+  db::Region r2 (db::RecursiveShapeIterator (ly, top, l2), dss);
+
+  db::PropertiesSet ps;
+  ps.insert (tl::Variant ("n"), tl::Variant (42));
+  auto pid = db::properties_id (ps);
+  AttachPropertiesProcessor ap (pid);
+
+  db::Region r12 = (r1 - r2).merged ().processed (ap);
+
+  r12.set_join_properties_on_merge (true);
+
+  db::Region rx = r1 | r12;
+
+  EXPECT_EQ (rx.to_string (), "(0,0;0,2000;2000,2000;2000,0);(0,0;0,2000;2000,2000;2000,0/200,200;1800,200;1800,1800;200,1800){n=>42}");
+}
+
+TEST(deep_region_peel)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_peel.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::RecursiveShapeIterator si1 (ly, top_cell, l1);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::RecursiveShapeIterator si2 (ly, top_cell, l2);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::Region r1 (si1, dss);
+  db::Region r2 (si2, dss);
+
+  unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
+  unsigned int l1002 = ly.get_layer (db::LayerProperties (1002, 0));
+  unsigned int l1011 = ly.get_layer (db::LayerProperties (1011, 0));
+  unsigned int l1012 = ly.get_layer (db::LayerProperties (1012, 0));
+  unsigned int l1021 = ly.get_layer (db::LayerProperties (1021, 0));
+  unsigned int l1022 = ly.get_layer (db::LayerProperties (1022, 0));
+  unsigned int l1031 = ly.get_layer (db::LayerProperties (1031, 0));
+  unsigned int l1032 = ly.get_layer (db::LayerProperties (1032, 0));
+
+  db::Region (r1).peel (-1.0).insert_into (&ly, top_cell_index, l1001);
+  db::Region (r2).peel (-1.0).insert_into (&ly, top_cell_index, l1002);
+  db::Region (r1).peel (0.0).insert_into (&ly, top_cell_index, l1011);
+  db::Region (r2).peel (0.0).insert_into (&ly, top_cell_index, l1012);
+  db::Region (r1).peel (2.0).insert_into (&ly, top_cell_index, l1021);
+  db::Region (r2).peel (2.0).insert_into (&ly, top_cell_index, l1022);
+  db::Region (r1).peel (4.0).insert_into (&ly, top_cell_index, l1031);
+  db::Region (r2).peel (4.0).insert_into (&ly, top_cell_index, l1032);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_peel_au.gds");
+}
+

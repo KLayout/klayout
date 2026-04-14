@@ -2732,6 +2732,20 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.29.3."
   ) +
+  method ("peel", &db::Region::peel, gsi::arg ("complexity_factor", -1.0, "unlimited"),
+    "@brief Removes shapes parts which are overlapping with child cell shapes, reducing hierarchical load.\n"
+    "\n"
+    "This method will reduce the hierarchical load. This means that shapes that do not add information\n"
+    "will be removed, so their interactions with child cells does not need to be considered.\n"
+    "These shapes are - maybe partially - \"peeled\" from upper hierarchy layers.\n"
+    "\n"
+    "The complexity factor determines if the subtraction is rejected when the complexity - measured as polygon "
+    "vertex count - increases by more than the given factor. This allows trading off hierarchical complexity vs. "
+    "polygon complexity. A negative factor means no rejection. A factor of zero means that only shapes are removed "
+    "which are entirely covered by shapes from below the hierarchy.\n"
+    "\n"
+    "This method has been introduced in version 0.30.8."
+  ) +
   method_ext ("andnot", &andnot, gsi::arg ("other"), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"),
     "@brief Returns the boolean AND and NOT between self and the other region\n"
     "\n"

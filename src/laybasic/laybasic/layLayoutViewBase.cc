@@ -363,6 +363,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_clear_ruler_new_cell = false;
   m_dbu_coordinates = false;
   m_absolute_coordinates = false;
+  m_auto_create_new_layers = true;
   m_drop_small_cells = false;
   m_drop_small_cells_value = 10;
   m_drop_small_cells_cond = DSC_Max;
@@ -1105,6 +1106,13 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
     bool flag;
     tl::from_string (value, flag);
     absolute_coordinates (flag);
+    return true;
+
+  } else if (name == cfg_auto_create_new_layers) {
+
+    bool flag;
+    tl::from_string (value, flag);
+    auto_create_new_layers (flag);
     return true;
 
   } else if (name == cfg_guiding_shape_visible) {
@@ -4989,7 +4997,13 @@ LayoutViewBase::absolute_coordinates (bool f)
   m_absolute_coordinates = f;
 }
 
-void 
+void
+LayoutViewBase::auto_create_new_layers (bool f)
+{
+  m_auto_create_new_layers = f;
+}
+
+void
 LayoutViewBase::select_cellviews_fit (const std::list <CellView> &cvs)
 {
   if (m_cellviews != cvs) {

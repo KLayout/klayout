@@ -794,7 +794,7 @@ public:
   /**
    *  @brief Set the transformation matrix
    *
-   *  This transformation matrix converts pixel coordinates (0,0 being the lower left corner and each pixel having the dimension of pixel_width and pixel_height)
+   *  This transformation matrix converts pixel coordinates (0,0 being the center and each pixel having the dimension of pixel_width and pixel_height)
    *  to micron coordinates. The coordinate of the pixel is the lower left corner of the pixel.
    */
   void set_matrix (const db::Matrix3d &trans);
@@ -802,7 +802,7 @@ public:
   /**
    *  @brief Return the pixel-to-micron transformation
    *
-   *  This transformation converts pixel coordinates (0,0 being the lower left corner and each pixel having the dimension of pixel_width and pixel_height)
+   *  This transformation converts pixel coordinates (0,0 being the center and each pixel having the dimension of pixel_width and pixel_height)
    *  to micron coordinates. The coordinate of the pixel is the lower left corner of the pixel.
    */
   const db::Matrix3d &matrix () const

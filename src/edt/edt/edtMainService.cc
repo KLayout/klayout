@@ -2727,7 +2727,9 @@ MainService::paste ()
     }
 
     //  Add new layers to the view if required.
-    view ()->add_new_layers (new_layers, cv_index);
+    if (mp_view->auto_create_new_layers ()) {
+      view ()->add_new_layers (new_layers, cv_index);
+    }
     view ()->update_content ();
 
   }

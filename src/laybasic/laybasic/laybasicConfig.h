@@ -120,6 +120,7 @@ static const std::string cfg_stipple_palette ("stipple-palette");
 static const std::string cfg_line_style_palette ("line-style-palette");
 static const std::string cfg_dbu_units ("dbu-units");
 static const std::string cfg_abs_units ("absolute-units");
+static const std::string cfg_auto_create_new_layers ("auto-create-new-layers");
 static const std::string cfg_drawing_workers ("drawing-workers");
 static const std::string cfg_drop_small_cells ("drop-small-cells");
 static const std::string cfg_drop_small_cells_cond ("drop-small-cells-condition");

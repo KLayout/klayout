@@ -586,7 +586,7 @@ private:
   /**
    *  @brief Display a message about the current selection
    */
-  void display_status (bool transient);
+  void display_status (bool transient, const std::string &data_string = std::string ());
 
   /**
    *  @brief Gets a value indicating the (new) top z position

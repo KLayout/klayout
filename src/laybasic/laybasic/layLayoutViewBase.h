@@ -1905,6 +1905,22 @@ public:
   void absolute_coordinates (bool f);
 
   /**
+   *  @brief Gets a value indicating whether new layer entries shall be created in the view
+   *
+   *  Certain operations such as paste or creation of instances establish new layers.
+   *  This flag controls whether such new layers are automatically added to the layer list.
+   */
+  bool auto_create_new_layers () const
+  {
+    return m_auto_create_new_layers;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether new layer entries shall be created in the view
+   */
+  void auto_create_new_layers (bool f);
+
+  /**
    *  @brief Gets the canvas object (where the layout is drawn and view objects are placed)
    */
   lay::LayoutCanvas *canvas ()
@@ -3113,6 +3129,7 @@ private:
   bool m_clear_ruler_new_cell;
   bool m_dbu_coordinates;
   bool m_absolute_coordinates;
+  bool m_auto_create_new_layers;
 
   bool m_dirty;
   bool m_prop_changed;

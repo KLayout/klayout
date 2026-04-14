@@ -1295,7 +1295,6 @@ Object::box () const
 
   // include landmarks
   for (std::vector <db::DPoint>::const_iterator l = m_landmarks.begin (); l != m_landmarks.end (); ++l) {
-    
     b += m_trans * *l;
   }
   

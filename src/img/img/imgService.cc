@@ -1309,6 +1309,7 @@ Service::transient_select (const db::DPoint &pos)
   clear_transient_selection ();
 
   bool any_selected = false;
+  std::string data_string;
 
   //  compute search box
   double l = catch_distance ();
@@ -1336,12 +1337,41 @@ Service::transient_select (const db::DPoint &pos)
       mp_transient_view = new img::View (this, imin, img::View::mode_transient);
     }
 
+    if (mp_transient_view->image_object ()) {
+
+      const img::Object *image = mp_transient_view->image_object ();
+
+      db::DPoint pixel = image->matrix ().inverted ().trans (pos);
+      if (pixel.x () > image->width () * -0.5 - 0.5 + db::epsilon && pixel.x () < image->width () * 0.5 + 0.5 - db::epsilon &&
+          pixel.y () > image->height () * -0.5 - 0.5 + db::epsilon && pixel.y () < image->height () * 0.5 + 0.5 - db::epsilon) {
+
+        db::Point pixel_index = db::Point (pixel + db::DVector (image->width () * 0.5 - 0.5, image->height () * 0.5 - 0.5));
+
+        //  check once again to account to rounding issues
+        if (pixel_index.x () >= 0 && pixel_index.x () < image->width () &&
+            pixel_index.y () >= 0 && pixel_index.y () < image->height ()) {
+
+          if (image->is_color ()) {
+            data_string = tl::sprintf ("RGB: %.5g,%.5g,%.5g",
+                                       image->pixel (pixel_index.x (), pixel_index.y (), 0),
+                                       image->pixel (pixel_index.x (), pixel_index.y (), 1),
+                                       image->pixel (pixel_index.x (), pixel_index.y (), 2));
+          } else {
+            data_string = tl::sprintf ("%.5g", image->pixel (pixel_index.x (), pixel_index.y ()));
+          }
+
+        }
+
+      }
+
+    }
+
     any_selected = true;
 
   }
 
   if (any_selected && ! editables ()->has_selection ()) {
-    display_status (true);
+    display_status (true, data_string);
   }
 
   return any_selected;
@@ -1464,11 +1494,13 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 }
 
 void 
-Service::display_status (bool transient)
+Service::display_status (bool transient, const std::string &data_string)
 {
   View *selected_view = transient ? mp_transient_view : (m_selected_image_views.size () == 1 ? m_selected_image_views [0] : 0);
   if (! selected_view) {
+
     view ()->message (std::string ());
+
   } else {
 
     const img::Object *image = selected_view->image_object ();
@@ -1478,6 +1510,9 @@ Service::display_status (bool transient)
       msg = tl::to_string (tr ("selected: "));
     }
     msg += tl::sprintf (tl::to_string (tr ("image(%dx%d)")), image->width (), image->height ());
+    if (! data_string.empty ()) {
+      msg += " [" + data_string + "]";
+    }
     view ()->message (msg);
 
   }

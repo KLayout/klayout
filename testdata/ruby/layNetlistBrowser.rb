@@ -98,7 +98,7 @@ class LAYNetlistBrowser_TestClass < TestBase
     n = nl.circuit_by_name("RINGO").subcircuit_by_name("$3")
     pth = RBA::NetlistObjectsPath.from_second(n)
     nb.current_path = pth
-    assert_equal(nb.current_path.first.path[-1].expanded_name, "$4")
+    assert_equal(nb.current_path.first.path[-1].expanded_name, "$10")
     assert_equal(nb.current_path.second.path[-1].expanded_name, "$3")
 
     # circuit

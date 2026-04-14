@@ -11,6 +11,7 @@ SOURCES = \
   dbCompoundOperationTests.cc \
   dbEdgeNeighborhoodTests.cc \
   dbFillToolTests.cc \
+  dbLibraryTests.cc \
   dbLogTests.cc \
   dbObjectWithPropertiesTests.cc \
   dbPLCConvexDecompositionTests.cc \

@@ -464,6 +464,11 @@ public:
     return true;
   }
 
+  virtual bool supports_context () const
+  {
+    return true;
+  }
+
   virtual tl::XMLElementBase *xml_writer_options_element () const
   {
     return new db::WriterOptionsXMLElement<db::OASISWriterOptions> ("oasis",

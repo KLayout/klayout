@@ -94,6 +94,7 @@
 #include "laySettingsForm.h"
 #include "laySelectCellViewForm.h"
 #include "layTechnologyController.h"
+#include "layLibraryController.h"
 #include "laySaltController.h"
 #include "layTipDialog.h"
 #include "layMacroController.h"
@@ -2612,6 +2613,10 @@ MainWindow::cm_writer_options ()
 void
 MainWindow::cm_refresh ()
 {
+  if (lay::LibraryController::instance ()) {
+    lay::LibraryController::instance ()->sync_files (false);
+  }
+
   db::LibraryManager::instance ().refresh_all ();
 }
 

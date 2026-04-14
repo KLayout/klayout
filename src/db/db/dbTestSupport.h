@@ -59,7 +59,8 @@ enum NormalizationMode
   NoContext = 8,          //  write tmp file without context
   AsPolygons = 16,        //  paths and boxes are treated as polygons
   WithArrays = 32,        //  do not flatten arrays
-  WithMeta = 64           //  with meta info
+  WithMeta = 64,          //  with meta info
+  WithoutCellNames = 128  //  smart cell name mapping
 };
 
 /**

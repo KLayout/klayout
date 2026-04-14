@@ -1727,18 +1727,23 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
       write_props (cref.prop_id ());
     }
 
-    //  instances
-    if (cref.cell_instances () > 0) {
-      write_insts (cell_set);
-    }
+    bool skip_body = options.write_context_info () && cref.can_skip_replica ();
+    if (! skip_body) {
 
-    //  shapes
-    for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-      const db::Shapes &shapes = cref.shapes (l->first);
-      if (! shapes.empty ()) {
-        write_shapes (l->second, shapes);
-        m_progress.set (mp_stream->pos ());
+      //  instances
+      if (cref.cell_instances () > 0) {
+        write_insts (cell_set);
       }
+
+      //  shapes
+      for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+        const db::Shapes &shapes = cref.shapes (l->first);
+        if (! shapes.empty ()) {
+          write_shapes (l->second, shapes);
+          m_progress.set (mp_stream->pos ());
+        }
+      }
+
     }
 
     //  end CBLOCK if required

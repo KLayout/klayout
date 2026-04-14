@@ -51,12 +51,22 @@ class MainWindow;
  *  By making the controller a PluginDeclaration it will receive
  *  initialization and configuration calls.
  */
-class LibraryController
+class LAY_PUBLIC LibraryController
   : public lay::PluginDeclaration, public tl::Object
 {
 Q_OBJECT
 
 public:
+  struct LibFileInfo
+  {
+    LibFileInfo () : name (), path (), replicate (true) { }
+    std::string name;
+    std::string description;
+    std::string path;
+    std::set<std::string> tech;
+    bool replicate;
+  };
+
   /**
    *  @brief Default constructor
    */
@@ -103,9 +113,21 @@ public:
   bool can_exit (lay::Dispatcher *root) const;
 
   /**
+   *  @brief Synchronize files
+   *
+   *  If "always" is set, all files are synchronized unconditionally.
+   */
+  void sync_files (bool always);
+
+  /**
    *  @brief Gets the singleton instance for this object
    */
   static LibraryController *instance ();
+
+  /**
+   *  @brief Provided for test purposes
+   */
+  static void read_lib_file (const std::string &lib_file, const std::string &tech, std::vector<LibFileInfo> &file_info);
 
 private slots:
   /**
@@ -121,17 +143,22 @@ private slots:
 private:
   struct LibInfo
   {
-    LibInfo () : name (), time (), tech () { }
+    LibInfo () : name (), description (), time (), tech (), replicate (true) { }
     std::string name;
+    std::string description;
     QDateTime time;
     std::set<std::string> tech;
+    bool replicate;
   };
 
   tl::FileSystemWatcher *m_file_watcher;
   tl::DeferredMethod<LibraryController> dm_sync_files;
   std::map<std::string, LibInfo> m_lib_files;
+  bool m_sync;
+  bool m_sync_once;
 
-  void sync_files ();
+  void sync_files_maybe ();
+  void read_libs (const std::vector<LibFileInfo> &file_info, std::map<std::string, LibInfo> &new_lib_files, bool always);
 };
 
 }

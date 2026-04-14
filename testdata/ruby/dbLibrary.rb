@@ -265,6 +265,70 @@ class DBLibrary_TestClass < TestBase
 
   end
 
+  def test_8_file_based_library
+
+    # clean up before
+    [ "RBA-unit-test" ].each do |name|
+      l = RBA::Library::library_by_name(name)
+      l && l.unregister
+    end
+
+    lylib = RBA::Layout::new 
+    lylib.read(File.join($ut_testsrc, "testdata", "gds", "lib_a.gds"))
+
+    tmp = File::join($ut_testtmp, "rba_dbLibrary_8.gds")
+    lylib.write(tmp)
+
+    lib = RBA::Library::library_from_file(tmp, "RBA-unit-test")
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    a = ly.create_cell("A", "RBA-unit-test")
+    top.insert(RBA::CellInstArray::new(a, RBA::Trans::new))
+
+    assert_equal(top.dbbox.to_s, "(0,0;2,2)")
+
+    lylib.clear
+    lylib.read(File.join($ut_testsrc, "testdata", "gds", "lib_b.gds"))
+    lylib.write(tmp)
+
+    lib.refresh
+
+    assert_equal(top.dbbox.to_s, "(-1,-1;1,1)")
+
+  end
+
+  def test_9_file_based_library_multiple_files
+
+    # clean up before
+    [ "RBA-unit-test" ].each do |name|
+      l = RBA::Library::library_by_name(name)
+      l && l.unregister
+    end
+
+    files = [
+      File.join($ut_testsrc, "testdata", "gds", "lib_a.gds"),
+      File.join($ut_testsrc, "testdata", "gds", "lib_b.gds")
+    ]
+
+    lib = RBA::Library::library_from_files(files, "RBA-unit-test")
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    a = ly.create_cell("A", "RBA-unit-test")
+    top.insert(RBA::CellInstArray::new(a, RBA::Trans::new))
+
+    assert_equal(top.dbbox.to_s, "(0,0;2,2)")
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    z = ly.create_cell("Z", "RBA-unit-test")
+    top.insert(RBA::CellInstArray::new(z, RBA::Trans::new))
+
+    assert_equal(top.dbbox.to_s, "(0,0;0.1,0.1)")
+
+  end
+
 end
 
 load("test_epilogue.rb")

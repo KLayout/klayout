@@ -60,12 +60,34 @@ ColdProxy::ColdProxy (db::cell_index_type ci, db::Layout &layout, const LayoutOr
     }
     i->second->push_back (this);
   }
+
+  layout.register_cold_proxy (this);
 }
 
 ColdProxy::~ColdProxy ()
 {
+  if (layout ()) {
+    layout ()->unregister_cold_proxy (this);
+  }
+
   delete mp_context_info;
   mp_context_info = 0;
+}
+
+void
+ColdProxy::unregister ()
+{
+  if (layout ()) {
+    layout ()->unregister_cold_proxy (this);
+  }
+}
+
+void
+ColdProxy::reregister ()
+{
+  if (layout ()) {
+    layout ()->register_cold_proxy (this);
+  }
 }
 
 Cell *

@@ -135,13 +135,52 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
       db::Reader reader (stream);
       reader.read (layout_au, options);
 
-      equal = db::compare_layouts (*subject, layout_au,
-                                     (n > 0 ? db::layout_diff::f_silent : db::layout_diff::f_verbose)
-                                     | ((norm & AsPolygons) != 0 ? db::layout_diff::f_boxes_as_polygons + db::layout_diff::f_paths_as_polygons : 0)
-                                     | ((norm & WithArrays) != 0 ? 0 : db::layout_diff::f_flatten_array_insts)
-                                     | ((norm & WithMeta) == 0 ? 0 : db::layout_diff::f_with_meta)
-                                   /*| db::layout_diff::f_no_text_details | db::layout_diff::f_no_text_orientation*/
-                                   , tolerance, 100 /*max diff lines*/);
+      if ((norm & WithoutCellNames) != 0) {
+
+        //  in this case, the layouts need to have one top cell
+
+        db::cell_index_type top_subject = 0, top_au = 0;
+        size_t n_top_subject = 0, n_top_au = 0;
+
+        for (auto t = subject->begin_top_down (); t != subject->end_top_cells (); ++t) {
+          top_subject = *t;
+          ++n_top_subject;
+        }
+
+        for (auto t = layout_au.begin_top_down (); t != layout_au.end_top_cells (); ++t) {
+          top_au = *t;
+          ++n_top_au;
+        }
+
+        if (n_top_subject != 1) {
+          throw tl::Exception (tl::sprintf ("With smart cell mapping, the subject layout must have a single top cell"));
+        }
+        if (n_top_au != 1) {
+          throw tl::Exception (tl::sprintf ("With smart cell mapping, the reference layout must have a single top cell"));
+        }
+
+        equal = db::compare_layouts (*subject, top_subject, layout_au, top_au,
+                                       (n > 0 ? db::layout_diff::f_silent : db::layout_diff::f_verbose)
+                                       | ((norm & AsPolygons) != 0 ? db::layout_diff::f_boxes_as_polygons + db::layout_diff::f_paths_as_polygons : 0)
+                                       | ((norm & WithArrays) != 0 ? 0 : db::layout_diff::f_flatten_array_insts)
+                                       | ((norm & WithMeta) == 0 ? 0 : db::layout_diff::f_with_meta
+                                       | db::layout_diff::f_smart_cell_mapping)
+                                     /*| db::layout_diff::f_no_text_details | db::layout_diff::f_no_text_orientation*/
+                                     , tolerance, 100 /*max diff lines*/);
+
+
+      } else {
+
+        equal = db::compare_layouts (*subject, layout_au,
+                                       (n > 0 ? db::layout_diff::f_silent : db::layout_diff::f_verbose)
+                                       | ((norm & AsPolygons) != 0 ? db::layout_diff::f_boxes_as_polygons + db::layout_diff::f_paths_as_polygons : 0)
+                                       | ((norm & WithArrays) != 0 ? 0 : db::layout_diff::f_flatten_array_insts)
+                                       | ((norm & WithMeta) == 0 ? 0 : db::layout_diff::f_with_meta)
+                                     /*| db::layout_diff::f_no_text_details | db::layout_diff::f_no_text_orientation*/
+                                     , tolerance, 100 /*max diff lines*/);
+
+      }
+
       if (equal && n > 0) {
         tl::info << tl::sprintf ("Found match on golden reference variant %s", fn);
       }

@@ -22,6 +22,7 @@
 
 
 #include "dbLibraryProxy.h"
+#include "dbColdProxy.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
 #include "dbLayout.h"
@@ -187,25 +188,6 @@ LibraryProxy::get_layer_indices (db::Layout &layout, db::ImportLayerMapping *lay
   return m_layer_indices;
 }
 
-class LibraryCellIndexMapper
-{
-public:
-  LibraryCellIndexMapper (Layout &layout, Library *lib)
-    : mp_lib (lib), mp_layout (&layout)
-  {
-    // .. nothing yet ..
-  }
-
-  cell_index_type operator() (cell_index_type cell_index_in_lib)
-  {
-    return mp_layout->get_lib_proxy (mp_lib, cell_index_in_lib);
-  }
-
-private:
-  Library *mp_lib;
-  Layout *mp_layout;
-};
-
 void 
 LibraryProxy::update (db::ImportLayerMapping *layer_mapping)
 {
@@ -215,30 +197,63 @@ LibraryProxy::update (db::ImportLayerMapping *layer_mapping)
   Library *lib = LibraryManager::instance ().lib (lib_id ());
   const db::Cell &source_cell = lib->layout ().cell (library_cell_index ());
 
-  db::ICplxTrans tr;
-  bool need_transform = false;
-  if (fabs (layout ()->dbu () - lib->layout ().dbu ()) > 1e-6) {
-    need_transform = true;
-    tr = db::ICplxTrans (lib->layout ().dbu () / layout ()->dbu ());
-  }
-
   clear_shapes ();
   clear_insts ();
 
   for (unsigned int l = 0; l < lib->layout ().layers (); ++l) {
     if (layer_indices [l] >= 0) {
-      shapes ((unsigned int) layer_indices [l]).assign_transformed (source_cell.shapes (l), tr);
+      shapes ((unsigned int) layer_indices [l]).assign_transformed (source_cell.shapes (l), db::ICplxTrans (lib->layout ().dbu () / layout ()->dbu ()));
     }
   }
 
-  LibraryCellIndexMapper cell_index_mapper (*layout (), lib);
+  for (Cell::const_iterator i = source_cell.begin (); ! i.at_end (); ++i) {
 
-  for (Cell::const_iterator inst = source_cell.begin (); !inst.at_end (); ++inst) {
-    db::Instance new_inst = insert (*inst, cell_index_mapper);
-    if (need_transform) {
-      replace (new_inst, new_inst.cell_inst ().transformed_into (tr));
+    db::CellInstArray inst = i->cell_inst ();
+
+    Library *real_lib = lib;
+    cell_index_type real_cil = inst.object ().cell_index ();
+
+    //  use the "final lib", so we refer to the actual lib instead
+    //  of building chains of lib references
+    LibraryProxy *lp;
+    while ((lp = dynamic_cast<LibraryProxy *> (&real_lib->layout ().cell (real_cil))) != 0) {
+      real_cil = lp->library_cell_index ();
+      real_lib = db::LibraryManager::instance ().lib (lp->lib_id ());
     }
+
+    ColdProxy *cp = dynamic_cast<ColdProxy *> (&real_lib->layout ().cell (real_cil));
+    if (cp) {
+
+      //  The final item is a cold proxy ("<defunct>" cell) - treat it like
+      //  a library proxy as it may become one in the future, but replace it
+      //  by a cold proxy now.
+
+      auto p = layout ()->find_cold_proxy (cp->context_info ());
+      if (p.first) {
+        //  reuse existing proxy
+        inst.object ().cell_index (p.second);
+      } else {
+        //  create a new proxy, reusing the first library proxy's replica
+        inst.object ().cell_index (layout ()->get_lib_proxy (real_lib, real_cil));
+        layout ()->create_cold_proxy_as (cp->context_info (), inst.object ().cell_index ());
+      }
+
+    } else {
+      inst.object ().cell_index (layout ()->get_lib_proxy (real_lib, real_cil));
+    }
+
+    inst.transform_into (db::ICplxTrans (lib->layout ().dbu () / layout ()->dbu ()));
+
+    insert (inst);
+
   }
+}
+
+bool
+LibraryProxy::can_skip_replica () const
+{
+  const Library *lib = LibraryManager::instance ().lib (lib_id ());
+  return lib && ! lib->replicate ();
 }
 
 std::string 

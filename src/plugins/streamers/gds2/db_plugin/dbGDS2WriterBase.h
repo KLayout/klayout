@@ -181,7 +181,7 @@ private:
   void write_context_cell (db::Layout &layout, const short *time_data, const std::vector<cell_index_type> &cells);
   void write_context_string (size_t n, const std::string &s);
   void write_cell (db::Layout &layout, const db::Cell &cref, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers,
-                   const std::set <db::cell_index_type> &cell_set, double sf, short *time_data);
+                   const std::set <db::cell_index_type> &cell_set, double sf, short *time_data, bool skip_body);
   void write_shape (const db::Layout &layout, int layer, int datatype, const db::Shape &shape, double sf);
 };
 

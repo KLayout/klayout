@@ -29,6 +29,7 @@
 #include "dbPCellDeclaration.h"
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
+#include "dbFileBasedLibrary.h"
 #include "tlLog.h"
 
 namespace gsi
@@ -156,11 +157,91 @@ static LibraryImpl *new_lib ()
   return new LibraryImpl ();
 }
 
+static db::Library *library_from_file (const std::string &path, const std::string &name, const std::string &for_technology)
+{
+  //  Check if a library with this specification already is installed and reuse in that case.
+  if (! name.empty ()) {
+
+    db::FileBasedLibrary *old_lib = dynamic_cast<db::FileBasedLibrary *> (library_by_name (name, for_technology));
+    if (old_lib && old_lib->is_for_path (path)) {
+      old_lib->load ();
+      return old_lib;
+    }
+
+  }
+
+  std::unique_ptr<db::FileBasedLibrary> lib (new db::FileBasedLibrary (path, name));
+  lib->set_technology (for_technology);
+
+  std::string n = lib->load ();
+  db::Library *ret = lib.get ();
+  register_lib (lib.release (), n);
+
+  return ret;
+}
+
+static  db::Library *library_from_files (const std::vector<std::string> &paths, const std::string &name, const std::string &for_technology)
+{
+  if (paths.empty ()) {
+    throw tl::Exception (tl::to_string (tr ("At least one path must be given")));
+  }
+
+  //  Check if a library with this specification already is installed and reuse in that case.
+  if (! name.empty ()) {
+
+    db::FileBasedLibrary *old_lib = dynamic_cast<db::FileBasedLibrary *> (library_by_name (name, for_technology));
+    if (old_lib && old_lib->is_for_paths (paths)) {
+      old_lib->load ();
+      return old_lib;
+    }
+
+  }
+
+  std::unique_ptr<db::FileBasedLibrary> lib (new db::FileBasedLibrary (paths.front (), name));
+  for (auto i = paths.begin () + 1; i != paths.end (); ++i) {
+    lib->merge_with_other_layout (*i);
+  }
+
+  lib->set_technology (for_technology);
+
+  std::string n = lib->load ();
+  db::Library *ret = lib.get ();
+  register_lib (lib.release (), n);
+
+  return ret;
+}
+
 /**
  *  @brief A basic implementation of the library
  */
 
 LibraryClass<db::Library> decl_Library ("db", "LibraryBase",
+  gsi::method ("library_from_file", &library_from_file, gsi::arg ("path"), gsi::arg ("name", std::string (), "auto"), gsi::arg ("for_technology", std::string (), "none"),
+    "@brief Creates a library from a file\n"
+    "@param path The path to the file from which to create the library from.\n"
+    "@param name The name of the library. If empty, the name will be derived from the GDS LIBNAME or the file name.\n"
+    "@return The library object created. It is already registered with the name given or derived from the file.\n"
+    "\n"
+    "This method will create a \\Library object which is tied to a specific file. This object supports "
+    "automatic reloading when the \\Library#refresh method is called.\n"
+    "\n"
+    "If a file-based library with the same name and path is registered already, this method will not reload again "
+    "and return the library that was already registered.\n"
+    "\n"
+    "This convenience method has been added in version 0.30.8.\n"
+  ) +
+  gsi::method ("library_from_files", &library_from_files, gsi::arg ("paths"), gsi::arg ("name", std::string (), "auto"), gsi::arg ("for_technology", std::string (), "none"),
+    "@brief Creates a library from a set of files\n"
+    "@param paths The paths to the files from which to create the library from. At least one file needs to be given.\n"
+    "@param name The name of the library. If empty, the name will be derived from the GDS LIBNAME or the file name.\n"
+    "@return The library object created. It is already registered with the name given or derived from the file.\n"
+    "\n"
+    "This method will create a \\Library object which is tied to several files. This object supports "
+    "automatic reloading when the \\Library#refresh method is called. The content of the files is merged "
+    "into the library. This is useful for example to create one library from a collection of files.\n"
+    "\n"
+    "This convenience method has been added in version 0.30.8.\n"
+  ) +
   gsi::method ("library_by_name", &library_by_name, gsi::arg ("name"), gsi::arg ("for_technology", std::string (), "unspecific"),
     "@brief Gets a library by name\n"
     "Returns the library object for the given name. If the name is not a valid library name, nil is returned.\n"
@@ -212,6 +293,26 @@ LibraryClass<db::Library> decl_Library ("db", "LibraryBase",
     "using this library and make them 'defunct'.\n"
     "\n"
     "This method has been introduced in version 0.30.5."
+  ) +
+  gsi::method ("replicate=", &db::Library::set_replicate, gsi::arg ("flag"),
+    "@brief Sets a value indicating whether the library produces replicas\n"
+    "\n"
+    "If this value is true (the default), layout written will include the\n"
+    "actual layout of a library cell (replica). With this, it is possible\n"
+    "to regenerate the layout without actually having the library at the\n"
+    "cost of additional bytes in the file.\n"
+    "\n"
+    "Setting this flag to false avoids this replication, but a layout\n"
+    "cannot be regenerated without having this library.\n"
+    "\n"
+    "This attribute has been introduced in version 0.30.8."
+  ) +
+  gsi::method ("replicate", &db::Library::replicate,
+    "@brief Gets a value indicating whether the library produces replicas\n"
+    "\n"
+    "See \\replicate= for a description of this attribute.\n"
+    "\n"
+    "This attribute has been introduced in version 0.30.8."
   ) +
   gsi::method ("rename", &db::Library::rename, gsi::arg ("name"),
     "@brief Renames the library\n"

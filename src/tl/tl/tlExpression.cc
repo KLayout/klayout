@@ -4108,8 +4108,6 @@ Eval::parse (Expression &expr, const std::string &s, bool top)
 void 
 Eval::parse (Expression &expr, tl::Extractor &ex, bool top)
 {
-  ex.skip ();
-
   expr = Expression (this, ex.get ());
 
   tl::Extractor ex0 = ex;

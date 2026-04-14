@@ -94,6 +94,14 @@ public:
   }
 
   /**
+   *  @brief Gets a value indicating that this cell is a replica that can be skipped
+   *
+   *  This attribute is evaluated by file writers to skip cell replicas for
+   *  library cells that do not want to replicated.
+   */
+  virtual bool can_skip_replica () const;
+
+  /**
    *  @brief Gets the basic name
    *
    *  This returns the basic name of the proxy target
@@ -129,12 +137,12 @@ public:
   /**
    *  @brief Reimplemented from Cell: unregisters the proxy at the layout
    */
-  void unregister ();
+  virtual void unregister ();
 
   /**
    *  @brief Reimplemented from Cell: reregisters the proxy at the layout
    */
-  void reregister ();
+  virtual void reregister ();
 
 private:
   lib_id_type m_lib_id;

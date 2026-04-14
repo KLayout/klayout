@@ -449,7 +449,7 @@ private:
   std::string m_format;
   std::map<unsigned int, db::LayerProperties> m_layers;
   std::set<db::cell_index_type> m_cells;
-  std::set<db::cell_index_type> m_implied_childred;
+  std::set<db::cell_index_type> m_implied_children;
   bool m_all_layers;
   bool m_all_cells;
   double m_dbu;

@@ -25,15 +25,14 @@
 #include "layApplication.h"
 #include "laySaltController.h"
 #include "layConfig.h"
-#include "layMainWindow.h"
 #include "layQtTools.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
-#include "dbReader.h"
-#include "dbCellMapping.h"
+#include "dbFileBasedLibrary.h"
 #include "tlLog.h"
 #include "tlStream.h"
 #include "tlFileUtils.h"
+#include "tlEnv.h"
 
 #include <QDir>
 
@@ -42,84 +41,10 @@ namespace lay
 
 // -------------------------------------------------------------------------------------------
 
-class FileBasedLibrary
-  : public db::Library
-{
-public:
-  FileBasedLibrary (const std::string &path)
-    : db::Library (), m_path (path)
-  {
-    set_description (tl::filename (path));
-  }
-
-  void merge_with_other_layout (const std::string &path)
-  {
-    m_other_paths.push_back (path);
-    merge_impl (path);
-  }
-
-  virtual std::string reload ()
-  {
-    std::string name = tl::basename (m_path);
-
-    layout ().clear ();
-
-    tl::InputStream stream (m_path);
-    db::Reader reader (stream);
-    reader.read (layout ());
-
-    //  Use the libname if there is one
-    db::Layout::meta_info_name_id_type libname_name_id = layout ().meta_info_name_id ("libname");
-    for (db::Layout::meta_info_iterator m = layout ().begin_meta (); m != layout ().end_meta (); ++m) {
-      if (m->first == libname_name_id && ! m->second.value.is_nil ()) {
-        name = m->second.value.to_string ();
-        break;
-      }
-    }
-
-    for (auto p = m_other_paths.begin (); p != m_other_paths.end (); ++p) {
-      merge_impl (*p);
-    }
-
-    return name;
-  }
-
-private:
-  std::string m_path;
-  std::list<std::string> m_other_paths;
-
-  void merge_impl (const std::string &path)
-  {
-    db::Layout ly;
-
-    tl::InputStream stream (path);
-    db::Reader reader (stream);
-    reader.read (ly);
-
-    std::vector<db::cell_index_type> target_cells, source_cells;
-
-    //  collect the cells to pull in (all top cells of the library layout)
-    //  NOTE: cells are not overwritten - the first layout wins, in terms
-    //  of cell names and also in terms of database unit.
-    for (auto c = ly.begin_top_down (); c != ly.end_top_cells (); ++c) {
-      std::string cn = ly.cell_name (*c);
-      if (! layout ().has_cell (cn.c_str ())) {
-        source_cells.push_back (*c);
-        target_cells.push_back (layout ().add_cell (cn.c_str ()));
-      }
-    }
-
-    db::CellMapping cm;
-    cm.create_multi_mapping_full (layout (), target_cells, ly, source_cells);
-    layout ().copy_tree_shapes (ly, cm);
-  }
-};
-
-// -------------------------------------------------------------------------------------------
-
 LibraryController::LibraryController ()
   : m_file_watcher (0),
-    dm_sync_files (this, &LibraryController::sync_files)
+    dm_sync_files (this, &LibraryController::sync_files_maybe),
+    m_sync (false), m_sync_once (false)
 {
 }
 
@@ -128,7 +53,7 @@ LibraryController::initialize (lay::Dispatcher * /*root*/)
 {
   //  NOTE: we initialize the libraries in the stage once to have them available for the autorun
   //  macros. We'll do that later again in order to pull in the libraries from the packages.
-  sync_files ();
+  sync_files (false);
 }
 
 void
@@ -144,7 +69,7 @@ LibraryController::initialized (lay::Dispatcher * /*root*/)
     connect (m_file_watcher, SIGNAL (fileRemoved (const QString &)), this, SLOT (file_watcher_triggered ()));
   }
 
-  sync_files ();
+  sync_files (false);
 }
 
 void
@@ -163,9 +88,9 @@ LibraryController::uninitialize (lay::Dispatcher * /*root*/)
 }
 
 void
-LibraryController::get_options (std::vector < std::pair<std::string, std::string> > & /*options*/) const
+LibraryController::get_options (std::vector < std::pair<std::string, std::string> > &options) const
 {
-  //  .. nothing yet ..
+  options.push_back (std::pair<std::string, std::string> (cfg_auto_sync_libraries, "false"));
 }
 
 void
@@ -175,8 +100,21 @@ LibraryController::get_menu_entries (std::vector<lay::MenuEntry> & /*menu_entrie
 }
 
 bool
-LibraryController::configure (const std::string & /*name*/, const std::string & /*value*/)
+LibraryController::configure (const std::string &name, const std::string &value)
 {
+  if (name == cfg_auto_sync_libraries) {
+
+    bool sync = false;
+    tl::from_string (value, sync);
+
+    m_sync = sync;
+    if (sync) {
+      dm_sync_files ();
+    }
+
+  }
+
+  //  don't consume
   return false;
 }
 
@@ -194,8 +132,24 @@ LibraryController::can_exit (lay::Dispatcher * /*root*/) const
 }
 
 void
-LibraryController::sync_files ()
+LibraryController::sync_files_maybe ()
 {
+  sync_files (false);
+}
+
+void
+LibraryController::sync_files (bool always)
+{
+  if (tl::verbosity () >= 20) {
+    if (always) {
+      tl::info << tl::to_string (tr ("Synchronize library files unconditionally"));
+    } else {
+      tl::info << tl::to_string (tr ("Synchronize library files"));
+    }
+  }
+
+  m_sync_once = false;
+
   if (m_file_watcher) {
     m_file_watcher->clear ();
     m_file_watcher->enable (false);
@@ -228,6 +182,45 @@ LibraryController::sync_files ()
     }
   }
 
+  //  scan for library definition files
+
+  std::string lib_file = tl::get_env ("KLAYOUT_LIB");
+
+  std::vector <std::pair<std::string, std::string> > lib_files;
+
+  if (lib_file.empty ()) {
+    for (std::vector <std::pair<std::string, std::string> >::const_iterator p = paths.begin (); p != paths.end (); ++p) {
+      std::string lf = tl::combine_path (p->first, "klayout.lib");
+      if (tl::is_readable (lf)) {
+        lib_files.push_back (std::make_pair (lf, p->second));
+      }
+    }
+  } else if (tl::is_readable (lib_file)) {
+    lib_files.push_back (std::make_pair (lib_file, std::string ()));
+  }
+
+  for (auto lf = lib_files.begin (); lf != lib_files.end (); ++lf) {
+
+    tl::log << "Reading lib file '" << lf->first << "'";
+
+    try {
+
+      std::vector<LibFileInfo> libs;
+      read_lib_file (lf->first, lf->second, libs);
+
+      read_libs (libs, new_lib_files, always);
+
+      if (m_file_watcher) {
+        m_file_watcher->add_file (tl::absolute_file_path (lf->first));
+      }
+
+    } catch (tl::Exception &ex) {
+      tl::error << tl::to_string (tr ("Error reading lib file")) << " " << lf->first << ":" << tl::endl << ex.msg ();
+    } catch (...) {
+    }
+
+  }
+
   //  scan for libraries
 
   for (std::vector <std::pair<std::string, std::string> >::const_iterator p = paths.begin (); p != paths.end (); ++p) {
@@ -245,108 +238,20 @@ LibraryController::sync_files ()
       name_filters << QString::fromUtf8 ("*");
 
       //  NOTE: this should return a list sorted by name
-      QStringList libs = lp.entryList (name_filters, QDir::Files);
+      QStringList entries = lp.entryList (name_filters, QDir::Files);
 
-      bool needs_load = false;
+      std::vector<LibFileInfo> libs;
+      libs.reserve (entries.size ());
 
-      for (QStringList::const_iterator im = libs.begin (); im != libs.end () && ! needs_load; ++im) {
-
-        std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
-        QFileInfo fi (tl::to_qstring (lib_path));
-
-        auto ll = m_lib_files.find (lib_path);
-        if (ll == m_lib_files.end ()) {
-          needs_load = true;
-        } else if (fi.lastModified () > ll->second.time) {
-          needs_load = true;
+      for (auto e = entries.begin (); e != entries.end (); ++e) {
+        libs.push_back (LibFileInfo ());
+        libs.back ().path = tl::to_string (lp.absoluteFilePath (*e));
+        if (! p->second.empty ()) {
+          libs.back ().tech.insert (p->second);
         }
-
       }
 
-      if (! needs_load) {
-
-        //  If not reloading, register the existing files as known ones - this allows detecting if
-        //  a file got removed.
-        for (QStringList::const_iterator im = libs.begin (); im != libs.end () && ! needs_load; ++im) {
-
-          std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
-          auto ll = m_lib_files.find (lib_path);
-          if (ll != m_lib_files.end ()) {
-            new_lib_files.insert (*ll);
-          }
-
-        }
-
-      } else {
-
-        std::map<std::string, FileBasedLibrary *> libs_by_name_here;
-
-        //  Reload all files
-        for (QStringList::const_iterator im = libs.begin (); im != libs.end (); ++im) {
-
-          std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
-          QFileInfo fi (tl::to_qstring (lib_path));
-
-          try {
-
-            std::unique_ptr<FileBasedLibrary> lib (new FileBasedLibrary (lib_path));
-            if (! p->second.empty ()) {
-              lib->set_technology (p->second);
-            }
-
-            tl::log << "Reading library '" << lib_path << "'";
-            std::string libname = lib->reload ();
-
-            //  merge with existing lib if there is already one in this folder with the right name
-            auto il = libs_by_name_here.find (libname);
-            if (il != libs_by_name_here.end ()) {
-
-              tl::log << "Merging with other library file with the same name: " << libname;
-
-              il->second->merge_with_other_layout (lib_path);
-
-              //  now, we can forget the new library as it is included in the first one
-
-            } else {
-
-              //  otherwise register the new library
-
-              if (! p->second.empty ()) {
-                tl::log << "Registering as '" << libname << "' for tech '" << p->second << "'";
-              } else {
-                tl::log << "Registering as '" << libname << "'";
-              }
-
-              LibInfo li;
-              li.name = libname;
-              li.time = fi.lastModified ();
-              if (! p->second.empty ()) {
-                li.tech.insert (p->second);
-              }
-              new_lib_files.insert (std::make_pair (lib_path, li));
-
-              lib->set_name (libname);
-              libs_by_name_here.insert (std::make_pair (libname, lib.release ()));
-
-            }
-
-          } catch (tl::Exception &ex) {
-            tl::error << ex.msg ();
-          }
-
-        }
-
-        //  Register the libs (NOTE: this needs to happen after the merge)
-        for (auto l = libs_by_name_here.begin (); l != libs_by_name_here.end (); ++l) {
-          try {
-            db::LibraryManager::instance ().register_lib (l->second);
-          } catch (tl::Exception &ex) {
-            tl::error << ex.msg ();
-          } catch (...) {
-          }
-        }
-
-      }
+      read_libs (libs, new_lib_files, always);
 
     }
 
@@ -365,22 +270,30 @@ LibraryController::sync_files ()
   }
 
   for (std::map<std::string, LibInfo>::const_iterator lf = m_lib_files.begin (); lf != m_lib_files.end (); ++lf) {
+
+    std::pair<bool, db::lib_id_type> li = db::LibraryManager::instance ().lib_by_name (lf->second.name, lf->second.tech);
+    if (! li.first) {
+      continue;  //  should not happen
+    }
+
+    db::Library *lib = db::LibraryManager::instance ().lib (li.second);
+
     if (new_names.find (lf->second.name) == new_names.end ()) {
+
       try {
-        std::pair<bool, db::lib_id_type> li = db::LibraryManager::instance ().lib_by_name (lf->second.name, lf->second.tech);
-        if (li.first) {
-          if (! lf->second.tech.empty ()) {
-            tl::log << "Unregistering lib '" << lf->second.name << "' for technology '" << *lf->second.tech.begin () << "' as the file no longer exists: " << lf->first;
-          } else {
-            tl::log << "Unregistering lib '" << lf->second.name << "' as the file no longer exists: " << lf->first;
-          }
-          db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (li.second));
+        if (! lf->second.tech.empty ()) {
+          tl::log << "Unregistering lib '" << lf->second.name << "' for technology '" << *lf->second.tech.begin () << "' as the file no longer exists: " << lf->first;
+        } else {
+          tl::log << "Unregistering lib '" << lf->second.name << "' as the file no longer exists: " << lf->first;
         }
+        db::LibraryManager::instance ().delete_lib (lib);
       } catch (tl::Exception &ex) {
         tl::error << ex.msg ();
       } catch (...) {
       }
+
     }
+
   }
 
   //  establish the new libraries
@@ -388,18 +301,277 @@ LibraryController::sync_files ()
   m_lib_files = new_lib_files;
 }
 
+namespace
+{
+
+struct LibFileFunctionContext
+{
+  std::string lib_file;
+  std::string tech;
+  std::vector<LibraryController::LibFileInfo> *lib_files;
+};
+
+static void do_read_lib_file (LibFileFunctionContext &fc);
+
+class DefineFunction
+  : public tl::EvalFunction
+{
+public:
+  DefineFunction (LibFileFunctionContext *fc)
+    : mp_fc (fc)
+  { }
+
+  virtual bool supports_keyword_parameters () const { return true; }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant & /*out*/, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
+  {
+    if (args.size () < 1 || args.size () > 2) {
+      throw tl::EvalError (tl::to_string (tr ("'define' function needs one or two arguments (a path or a name and path)")), context);
+    }
+
+    std::string lf, name;
+    if (args.size () == 1) {
+      lf = args[0].to_string ();
+    } else {
+      name = args[0].to_string ();
+      lf = args[1].to_string ();
+    }
+
+    LibraryController::LibFileInfo fi;
+    fi.name = name;
+    fi.path = tl::is_absolute (lf) ? lf : tl::combine_path (tl::absolute_path (mp_fc->lib_file), lf);
+    if (! mp_fc->tech.empty ()) {
+      fi.tech.insert (mp_fc->tech);
+    }
+
+    if (kwargs) {
+
+      for (auto k = kwargs->begin (); k != kwargs->end (); ++k) {
+
+        static const std::string replicate_key ("replicate");
+        static const std::string description_key ("description");
+        static const std::string technology_key ("technology");
+        static const std::string technologies_key ("technologies");
+
+        if (k->first == replicate_key) {
+
+          fi.replicate = k->second.to_bool ();
+
+        } else if (k->first == description_key) {
+
+          fi.description = k->second.to_string ();
+
+        } else if (k->first == technology_key) {
+
+          fi.tech.clear ();
+          std::string tn = k->second.to_string ();
+          if (! tn.empty () && tn != "*") {
+            fi.tech.insert (tn);
+          }
+
+        } else if (k->first == technologies_key) {
+
+          fi.tech.clear ();
+          if (k->second.is_list ()) {
+            for (auto t = k->second.begin (); t != k->second.end (); ++t) {
+              fi.tech.insert (t->to_string ());
+            }
+          }
+
+        } else {
+
+          throw tl::EvalError (tl::sprintf (tl::to_string (tr ("Unknown keyword argument '%s' for 'define' function - the only allowed keyword arguments are 'replicate', 'technology' and 'technologies")), k->first), context);
+
+        }
+
+      }
+
+    }
+
+    mp_fc->lib_files->push_back (fi);
+
+  }
+
+private:
+  LibFileFunctionContext *mp_fc;
+};
+
+class IncludeFunction
+  : public tl::EvalFunction
+{
+public:
+  IncludeFunction (LibFileFunctionContext *fc)
+    : mp_fc (fc)
+  { }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant & /*out*/, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+  {
+    if (args.size () != 1) {
+      throw tl::EvalError (tl::to_string (tr ("'include' function needs exactly one argument (the include file path)")), context);
+    }
+
+    std::string lf = args[0].to_string ();
+
+    LibFileFunctionContext fc = *mp_fc;
+    fc.lib_file = tl::is_absolute (lf) ? lf : tl::combine_path (tl::absolute_path (mp_fc->lib_file), lf);
+
+    do_read_lib_file (fc);
+  }
+
+private:
+  LibFileFunctionContext *mp_fc;
+};
+
+static void
+do_read_lib_file (LibFileFunctionContext &fc)
+{
+  tl::Eval eval;
+
+  eval.define_function ("define", new DefineFunction (&fc));
+  eval.define_function ("include", new IncludeFunction (&fc));
+  eval.set_var ("file", fc.lib_file);
+  eval.set_var ("tech", fc.tech);
+
+  tl::InputStream is (fc.lib_file);
+  std::string lib_file = tl::TextInputStream (is).read_all ();
+
+  tl::Extractor ex (lib_file.c_str ());
+  eval.parse (ex).execute ();
+}
+
+}
+
+void
+LibraryController::read_lib_file (const std::string &lib_file, const std::string &tech, std::vector<LibraryController::LibFileInfo> &file_info)
+{
+  LibFileFunctionContext fc;
+  fc.tech = tech;
+  fc.lib_file = tl::absolute_file_path (lib_file);
+  fc.lib_files = &file_info;
+
+  do_read_lib_file (fc);
+}
+
+void
+LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> &libs, std::map<std::string, LibraryController::LibInfo> &new_lib_files, bool always)
+{
+  bool needs_load = always;
+
+  for (auto im = libs.begin (); im != libs.end () && ! needs_load; ++im) {
+
+    const std::string &lib_path = im->path;
+    QFileInfo fi (tl::to_qstring (lib_path));
+
+    auto ll = m_lib_files.find (lib_path);
+    if (ll == m_lib_files.end ()) {
+      needs_load = true;
+    } else if (fi.lastModified () > ll->second.time || im->tech != ll->second.tech || im->replicate != ll->second.replicate) {
+      needs_load = true;
+    }
+
+  }
+
+  if (! needs_load) {
+
+    //  If not reloading, register the existing files as known ones - this allows detecting if
+    //  a file got removed.
+    for (auto im = libs.begin (); im != libs.end () && ! needs_load; ++im) {
+
+      const std::string &lib_path = im->path;
+      auto ll = m_lib_files.find (lib_path);
+      if (ll != m_lib_files.end ()) {
+        new_lib_files.insert (*ll);
+      }
+
+    }
+
+  } else {
+
+    std::map<std::string, db::FileBasedLibrary *> libs_by_name_here;
+
+    //  Reload all files
+    for (auto im = libs.begin (); im != libs.end (); ++im) {
+
+      const std::string &lib_path = im->path;
+      QFileInfo fi (tl::to_qstring (lib_path));
+
+      try {
+
+        std::unique_ptr<db::FileBasedLibrary> lib (new db::FileBasedLibrary (lib_path, im->name));
+        lib->set_technologies (im->tech);
+        lib->set_description (im->description);
+        lib->set_replicate (im->replicate);
+
+        tl::log << "Reading library '" << lib_path << "'";
+        std::string libname = lib->load ();
+
+        //  merge with existing lib if there is already one in this folder with the right name
+        auto il = libs_by_name_here.find (libname);
+        if (il != libs_by_name_here.end ()) {
+
+          tl::log << "Merging with other library file with the same name: " << libname;
+
+          il->second->merge_with_other_layout (lib_path);
+
+          //  now, we can forget the new library as it is included in the first one
+
+        } else {
+
+          //  otherwise register the new library
+
+          if (! im->tech.empty ()) {
+            tl::log << "Registering as '" << libname << "' for tech '" << tl::join (im->tech.begin (), im->tech.end (), ",") << "'";
+          } else {
+            tl::log << "Registering as '" << libname << "'";
+          }
+
+          LibInfo li;
+          li.name = libname;
+          li.time = fi.lastModified ();
+          li.description = im->description;
+          li.tech = im->tech;
+          li.replicate = im->replicate;
+          new_lib_files.insert (std::make_pair (lib_path, li));
+
+          lib->set_name (libname);
+          libs_by_name_here.insert (std::make_pair (libname, lib.release ()));
+
+        }
+
+      } catch (tl::Exception &ex) {
+        tl::error << ex.msg ();
+      }
+
+    }
+
+    //  Register the libs (NOTE: this needs to happen after the merge)
+    for (auto l = libs_by_name_here.begin (); l != libs_by_name_here.end (); ++l) {
+      try {
+        db::LibraryManager::instance ().register_lib (l->second);
+      } catch (tl::Exception &ex) {
+        tl::error << ex.msg ();
+      } catch (...) {
+      }
+    }
+
+  }
+}
+
 void
 LibraryController::sync_with_external_sources ()
 {
   tl::log << tl::to_string (tr ("Package updates - updating libraries"));
+  m_sync_once = true;
   dm_sync_files ();
 }
 
 void
 LibraryController::file_watcher_triggered ()
 {
-  tl::log << tl::to_string (tr ("Detected file system change in libraries - updating"));
-  dm_sync_files ();
+  if (m_sync) {
+    tl::log << tl::to_string (tr ("Detected file system change in libraries - updating"));
+    dm_sync_files ();
+  }
 }
 
 LibraryController *

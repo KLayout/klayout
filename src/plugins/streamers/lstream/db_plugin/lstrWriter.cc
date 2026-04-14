@@ -150,7 +150,8 @@ Writer::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayou
   for (auto c = mp_layout->begin_top_down (); c != mp_layout->end_top_down (); ++c) {
     if (m_cells_to_write.find (*c) != m_cells_to_write.end ()) {
       m_cellname = layout.cell_name (*c);
-      write_cell (*c, kj_stream);
+      bool skip_body = options.write_context_info () && mp_layout->cell (*c).can_skip_replica ();
+      write_cell (*c, kj_stream, skip_body);
       m_cellname.clear ();
     }
   }
@@ -911,9 +912,9 @@ Writer::make_meta_data (const db::Cell *cell, stream::metaData::MetaData::Builde
  *  This method generates a single-view cell message (the view is only a layout view).
  */
 void 
-Writer::write_cell (db::cell_index_type ci, kj::BufferedOutputStream &os)
+Writer::write_cell (db::cell_index_type ci, kj::BufferedOutputStream &os, bool skip_body)
 {
-  bool needs_layout_view = ! mp_layout->cell (ci).is_real_ghost_cell ();
+  bool needs_layout_view = ! mp_layout->cell (ci).is_real_ghost_cell () && ! skip_body;
   bool needs_meta_data_view = mp_layout->begin_meta (ci) != mp_layout->end_meta (ci);
 
   capnp::MallocMessageBuilder message;

@@ -62,6 +62,7 @@ class PCellDeclaration;
 class PCellHeader;
 class Library;
 class LibraryProxy;
+class ColdProxy;
 class CellMapping;
 class LayerMapping;
 class Region;
@@ -427,6 +428,9 @@ struct DB_PUBLIC LayoutOrCellContextInfo
   std::map<std::string, tl::Variant> pcell_parameters;
   std::map<std::string, std::pair<tl::Variant, std::string> > meta_info;
 
+  bool operator== (const LayoutOrCellContextInfo &other) const;
+  bool operator< (const LayoutOrCellContextInfo &other) const;
+
   static LayoutOrCellContextInfo deserialize (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to);
   void serialize (std::vector<std::string> &strings);
 
@@ -469,7 +473,8 @@ public:
   typedef db::pcell_id_type pcell_id_type;
   typedef std::map<std::string, pcell_id_type> pcell_name_map;
   typedef pcell_name_map::const_iterator pcell_iterator;
-  typedef std::map<std::pair<lib_id_type, cell_index_type>, cell_index_type> lib_proxy_map;
+  typedef std::multimap<std::pair<lib_id_type, cell_index_type>, cell_index_type> lib_proxy_map;
+  typedef std::multimap<db::LayoutOrCellContextInfo, cell_index_type> cold_proxy_map;
   typedef LayerIterator layer_iterator;
   typedef size_t meta_info_name_id_type;
   typedef std::map<meta_info_name_id_type, MetaInfo> meta_info_map;
@@ -1004,6 +1009,12 @@ public:
   void get_lib_proxy_as (Library *lib, cell_index_type cell_index, cell_index_type target_cell_index, ImportLayerMapping *layer_mapping = 0, bool retain_layout = false);
 
   /**
+   *  @brief Find an existing cold proxy for a given context
+   *  @return A pair of success flag and cell index of the proxy
+   */
+  std::pair<bool, cell_index_type> find_cold_proxy (const db::LayoutOrCellContextInfo &info);
+
+  /**
    *  @brief Creates a cold proxy representing the given context information
    */
   cell_index_type create_cold_proxy (const db::LayoutOrCellContextInfo &info);
@@ -1115,7 +1126,16 @@ public:
    *  Library updates may enabled lost connections which are help in cold proxies. This method will recover
    *  these connections.
    */
-  void restore_proxies(ImportLayerMapping *layer_mapping = 0);
+  void restore_proxies (ImportLayerMapping *layer_mapping = 0);
+
+  /**
+   *  @brief Restores proxies as far as possible, no cleanup included
+   *
+   *  This method is equivalent to "restore_proxies", but does not include a cleanup.
+   *  Instead it returns a value of true, indicating that something got changed
+   *  and a cleanup is required.
+   */
+  bool restore_proxies_without_cleanup (ImportLayerMapping *layer_mapping = 0);
 
   /**
    *  @brief Replaces the given cell index with the new cell
@@ -1831,6 +1851,20 @@ public:
   void unregister_lib_proxy (db::LibraryProxy *lib_proxy);
 
   /**
+   *  @brief Register a cold proxy
+   *
+   *  This method is used by ColdProxy to register itself.
+   */
+  void register_cold_proxy (db::ColdProxy *cold_proxy);
+
+  /**
+   *  @brief Unregister a cold proxy
+   *
+   *  This method is used by ColdProxy to unregister itself.
+   */
+  void unregister_cold_proxy (db::ColdProxy *cold_proxy);
+
+  /**
    *  @brief Gets the editable status of this layout
    *
    *  If this value is true, the layout is editable, i.e. shapes and properties
@@ -2144,6 +2178,7 @@ private:
   std::vector<pcell_header_type *> m_pcells;
   pcell_name_map m_pcell_ids;
   lib_proxy_map m_lib_proxy_map;
+  cold_proxy_map m_cold_proxy_map;
   bool m_do_cleanup;
   bool m_editable;
   std::map<std::string, meta_info_name_id_type> m_meta_info_name_map;

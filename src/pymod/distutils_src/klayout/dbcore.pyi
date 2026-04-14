@@ -15695,8 +15695,7 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: float
     r"""
@@ -18071,6 +18070,27 @@ class DeepShapeStore:
 
     This attribute has been introduced in version 0.27.
     """
+    sparse_array_limit: float
+    r"""
+    Getter:
+    @brief Gets the "sparse array" limit
+    This attribute has been introduced in version 0.30.8.
+    Setter:
+    @brief Sets the "sparse array" limit
+
+    Sparse arrays are instance arrays whose bounding box is no longer a
+    good approximation of the covered area. The "sparse array ratio" is
+    the area of the bounding box divided by the area of the bounding box
+    of a single instance.
+
+    Arrays above this limit will be resolved into single instances.
+
+    Setting this value to 0 will resolve all arrays. Setting this
+    value to a negative value will never split arrays. The latter
+    is the default.
+
+    This attribute has been introduced in version 0.30.8.
+    """
     subcircuit_hierarchy_for_nets: bool
     r"""
     Getter:
@@ -18295,6 +18315,11 @@ class DeepShapeStore:
         @brief Gets a value indicating whether there is a single layout variant
 
         Specifically for network extraction, singular DSS objects are required. Multiple layouts may be present if different sources of layouts have been used. Such DSS objects are not usable for network extraction.
+        """
+        ...
+    def layout(self, index: int) -> Layout:
+        r"""
+        @hide
         """
         ...
     def pop_state(self) -> None:
@@ -35857,11 +35882,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis in micrometer units
+    @brief Sets the displacement vector for the 'a' axis
 
-    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     b: Vector
     r"""
@@ -35870,11 +35895,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'b' axis in micrometer units
+    @brief Sets the displacement vector for the 'b' axis
 
-    Like \b= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     cell: Cell
     r"""
@@ -36415,7 +36440,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
         ...
     @overload
@@ -36423,7 +36448,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
         ...
     def pcell_declaration(self) -> PCellDeclaration_Native:
@@ -44062,6 +44087,27 @@ class LibraryBase:
     Setter:
     @brief Sets the libraries' description text
     """
+    replicate: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the library produces replicas
+
+    See \replicate= for a description of this attribute.
+
+    This attribute has been introduced in version 0.30.8.
+    Setter:
+    @brief Sets a value indicating whether the library produces replicas
+
+    If this value is true (the default), layout written will include the
+    actual layout of a library cell (replica). With this, it is possible
+    to regenerate the layout without actually having the library at the
+    cost of additional bytes in the file.
+
+    Setting this flag to false avoids this replication, but a layout
+    cannot be regenerated without having this library.
+
+    This attribute has been introduced in version 0.30.8.
+    """
     technology: str
     r"""
     Getter:
@@ -44089,9 +44135,41 @@ class LibraryBase:
         @brief Gets a library by name
         Returns the library object for the given name. If the name is not a valid library name, nil is returned.
 
-        Different libraries can be registered under the same names for different technologies. When a technology name is given in 'for_technologies', the first library matching this technology is returned. If no technology is given, the first library is returned.
+        Different libraries can be registered under the same names for different technologies. By specifying a technology, this method
+        will return the first library matching both name and the given technology. It will also return libraries not bound to a specific
+        technology in that case. Without a technology name given ('unspecific'), only libraries not bound to a technology are returned.
+        You can also specify '*' for the technology - in that case, the first library with the given name is returned, regardless whether
+        it is bound to a technology or not.
 
-        The technology selector has been introduced in version 0.27.
+        The technology selector has been introduced in version 0.27. The '*' option for the technology has been added in version 0.30.8.
+        """
+        ...
+    @classmethod
+    def library_from_file(cls, path: str, name: Optional[str] = ..., for_technology: Optional[str] = ...) -> LibraryBase:
+        r"""
+        @brief Creates a library from a file
+        @param path The path to the file from which to create the library from.
+        @param name The name of the library. If empty, the name will be derived from the GDS LIBNAME or the file name.
+        @return The library object created. It is already registered with the name given or derived from the file.
+
+        This method will create a \Library object which is tied to a specific file. This object supports automatic reloading when the \Library#refresh method is called.
+
+        If a file-based library with the same name and path is registered already, this method will not reload again and return the library that was already registered.
+
+        This convenience method has been added in version 0.30.8.
+        """
+        ...
+    @classmethod
+    def library_from_files(cls, paths: Sequence[str], name: Optional[str] = ..., for_technology: Optional[str] = ...) -> LibraryBase:
+        r"""
+        @brief Creates a library from a set of files
+        @param paths The paths to the files from which to create the library from. At least one file needs to be given.
+        @param name The name of the library. If empty, the name will be derived from the GDS LIBNAME or the file name.
+        @return The library object created. It is already registered with the name given or derived from the file.
+
+        This method will create a \Library object which is tied to several files. This object supports automatic reloading when the \Library#refresh method is called. The content of the files is merged into the library. This is useful for example to create one library from a collection of files.
+
+        This convenience method has been added in version 0.30.8.
         """
         ...
     @classmethod
@@ -44273,8 +44351,10 @@ class LibraryBase:
         r"""
         @brief Returns a value indicating whether the library is associated with the given technology.
         The method is equivalent to checking whether the \technologies list is empty.
+        As a special case, you can pass '*' for the 'tech' argument. In that case, this method
+        will return true, if the library is bound to any technology.
 
-        This method has been introduced in version 0.27
+        This method has been introduced in version 0.27. The '*' option for the technology has been added in version 0.30.8.
         """
         ...
     def layout(self) -> Layout:
@@ -45030,6 +45110,204 @@ class LoadLayoutOptions:
 
     This method has been added in version 0.30.2.
     """
+    mebes_boundary_datatype: int
+    r"""
+    Getter:
+    @brief Gets the datatype number of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the datatype number of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_boundary_layer: int
+    r"""
+    Getter:
+    @brief Gets the layer number of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the layer number of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_boundary_name: str
+    r"""
+    Getter:
+    @brief Gets the name of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the name of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_create_other_layers: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether other layers shall be created
+    @return True, if other layers will be created.
+    This attribute acts together with a layer map (see \mebes_layer_map=). Layers not listed in this map are created as well when \mebes_create_other_layers? is true. Otherwise they are ignored.
+
+    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
+    Setter:
+    @brief Specifies whether other layers shall be created
+    @param create True, if other layers will be created.
+    See \mebes_create_other_layers? for a description of this attribute.
+
+    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
+    """
+    mebes_data_datatype: int
+    r"""
+    Getter:
+    @brief Gets the datatype number of the data layer to produce
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the datatype number of the data layer to produce
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_data_layer: int
+    r"""
+    Getter:
+    @brief Gets the layer number of the data layer to produce
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the layer number of the data layer to produce
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_data_name: str
+    r"""
+    Getter:
+    @brief Gets the name of the data layer to produce
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the name of the data layer to produce
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_invert: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether to invert the MEBES pattern
+    If this property is set to true, the pattern will be inverted.
+
+    This property has been added in version 0.22.
+
+    Setter:
+    @brief Specify whether to invert the MEBES pattern
+    If this property is set to true, the pattern will be inverted.
+
+    This property has been added in version 0.22.
+    """
+    mebes_layer_map: LayerMap
+    r"""
+    Getter:
+    @brief Gets the layer map
+    @return The layer map.
+
+    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
+    Setter:
+    @brief Sets the layer map
+    This sets a layer mapping for the reader. Unlike \mebes_set_layer_map, the 'create_other_layers' flag is not changed.
+    @param map The layer map to set.
+
+    This convenience method has been added in version 0.26.2.
+    """
+    mebes_num_shapes_per_cell: int
+    r"""
+    Getter:
+    @brief Gets the number of stripes collected per cell
+    See \mebes_num_stripes_per_cell= for details about this property.
+
+    This property has been added in version 0.24.5.
+
+    Setter:
+    @brief Specify the number of stripes collected per cell
+    See \mebes_num_stripes_per_cell= for details about this property.
+
+    This property has been added in version 0.24.5.
+    """
+    mebes_num_stripes_per_cell: int
+    r"""
+    Getter:
+    @brief Gets the number of stripes collected per cell
+    See \mebes_num_stripes_per_cell= for details about this property.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Specify the number of stripes collected per cell
+    This property specifies how many stripes will be collected into one cell.
+    A smaller value means less but bigger cells. The default value is 64.
+    New cells will be formed whenever more than this number of stripes has been read
+    or a new segment is started and the number of shapes given by \mebes_num_shapes_per_cell
+    is exceeded.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_produce_boundary: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether a boundary layer will be produced
+    See \mebes_produce_boundary= for details about this property.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Specify whether to produce a boundary layer
+    If this property is set to true, the pattern boundary will be written to the layer and datatype specified with \mebes_boundary_name, \mebes_boundary_layer and \mebes_boundary_datatype.
+    By default, the boundary layer is produced.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_subresolution: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether to invert the MEBES pattern
+    See \subresolution= for details about this property.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Specify whether subresolution trapezoids are supported
+    If this property is set to true, subresolution trapezoid vertices are supported.
+    In order to implement support, the reader will create magnified instances with a magnification of 1/16.
+    By default this property is enabled.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_top_cell_index: int
+    r"""
+    Getter:
+    @brief Gets the cell index for the top cell to use
+    See \mebes_top_cell_index= for a description of this property.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Specify the cell index for the top cell to use
+    If this property is set to a valid cell index, the MEBES reader will put the subcells and shapes into this cell.
+
+    This property has been added in version 0.23.10.
+    """
     oasis_expect_strict_mode: int
     r"""
     Getter:
@@ -45289,6 +45567,26 @@ class LoadLayoutOptions:
         Layer maps can also be used to map the named MALY mask layers to GDS layer/datatypes.
 
         This method has been added in version 0.30.2.
+        """
+        ...
+    def mebes_select_all_layers(self) -> None:
+        r"""
+        @brief Selects all layers and disables the layer map
+
+        This disables any layer map and enables reading of all layers.
+        New layers will be created when required.
+
+        This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
+        """
+        ...
+    def mebes_set_layer_map(self, map: LayerMap, create_other_layers: bool) -> None:
+        r"""
+        @brief Sets the layer map
+        This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers.
+        @param map The layer map to set.
+        @param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.
+
+        This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
         """
         ...
     def select_all_layers(self) -> None:
@@ -47848,17 +48146,17 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def device_class(self) -> DeviceClass:
@@ -48854,17 +49152,17 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
+        @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
+        @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -49148,7 +49446,7 @@ class Netlist:
     @overload
     def top_circuit(self) -> Circuit:
         r"""
-        @brief Gets the top circuit.
+        @brief Gets the top circuit (const version).
         This method will return nil, if there is no top circuit. It will raise an error, if there is more than a single top circuit.
 
         This convenience method has been added in version 0.29.5.
@@ -49157,7 +49455,7 @@ class Netlist:
     @overload
     def top_circuit(self) -> Circuit:
         r"""
-        @brief Gets the top circuit (const version).
+        @brief Gets the top circuit.
         This method will return nil, if there is no top circuit. It will raise an error, if there is more than a single top circuit.
 
         This convenience method has been added in version 0.29.5.
@@ -62013,6 +62311,19 @@ class Region(ShapeCollection):
         The count options have been introduced in version 0.27.
         """
         ...
+    def peel(self, complexity_factor: Optional[float] = ...) -> Region:
+        r"""
+        @brief Removes shapes parts which are overlapping with child cell shapes, reducing hierarchical load.
+
+        This method will reduce the hierarchical load. This means that shapes that do not add information
+        will be removed, so their interactions with child cells does not need to be considered.
+        These shapes are - maybe partially - "peeled" from upper hierarchy layers.
+
+        The complexity factor determines if the subtraction is rejected when the complexity - measured as polygon vertex count - increases by more than the given factor. This allows trading off hierarchical complexity vs. polygon complexity. A negative factor means no rejection. A factor of zero means that only shapes are removed which are entirely covered by shapes from below the hierarchy.
+
+        This method has been introduced in version 0.30.8.
+        """
+        ...
     @overload
     def perimeter(self) -> int:
         r"""
@@ -64313,13 +64624,15 @@ class SaveLayoutOptions:
         This method has been added in version 0.23.
         """
         ...
-    def set_format_from_filename(self, filename: str) -> bool:
+    def set_format_from_filename(self, filename: str) -> str:
         r"""
         @brief Select a format from the given file name
 
         This method will set the format according to the file's extension.
 
         This method has been introduced in version 0.22. Beginning with version 0.23, this method always returns true, since the only consumer for the return value, Layout#write, now ignores that parameter and automatically determines the compression mode from the file name.
+
+        Starting with version 0.30.8, this method allows specifying the desired format's extension in square brackets after the file name (e.g. 'file.txt[def]'). This allows writing files with non-standard extensions. The return value of this function now is the actual file name used without the square brackets ('file.txt' in the example case).
         """
         ...
     ...
@@ -65187,10 +65500,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a text.
     Setter:
-    @brief Replaces the shape by the given text (in micrometer units)
-    This method replaces the shape by the given text, like \text= with a \Text argument does. This version translates the text from micrometer units to database units internally.
+    @brief Replaces the shape by the given text object
+    This method replaces the shape by the given text object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     text_dpos: DVector
     r"""
@@ -69406,16 +69720,16 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit (non-const version).
-
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit referenced by the subcircuit (non-const version).
+
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
@@ -69461,17 +69775,17 @@ class SubCircuit(NetlistObject):
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit.
+        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
         If the pin is not connected, nil is returned for the net.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
+        @brief Gets the net connected to the specified pin of the subcircuit.
         If the pin is not connected, nil is returned for the net.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     ...

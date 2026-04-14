@@ -151,7 +151,7 @@ RedrawThreadWorker::RedrawThreadWorker (RedrawThread *redraw_thread)
   m_text_lazy_rendering = false;
   m_bitmap_caching = false;
   m_show_properties = false;
-  m_apply_text_trans = false;
+  m_apply_text_trans_mode = 0;
   m_default_text_size = 0.0;
   m_drop_small_cells = false;
   m_drop_small_cells_value = 0;
@@ -291,7 +291,7 @@ RedrawThreadWorker::perform_task (tl::Task *task)
           mp_renderer->draw_description_property (false);
           mp_renderer->default_text_size (m_default_text_size / mp_layout->dbu ());
           mp_renderer->set_font (db::Font (m_text_font));
-          mp_renderer->apply_text_trans (m_apply_text_trans);
+          mp_renderer->apply_text_trans_mode (m_apply_text_trans_mode);
 
           for (std::vector<db::DCplxTrans>::const_iterator t = li.trans.begin (); t != li.trans.end (); ++t) {
             db::CplxTrans trans = m_vp_trans * *t * db::CplxTrans (mp_layout->dbu ());
@@ -533,7 +533,7 @@ RedrawThreadWorker::perform_task (tl::Task *task)
         mp_renderer->draw_description_property (true);
         mp_renderer->default_text_size (db::Coord (m_default_text_size / mp_layout->dbu ()));
         mp_renderer->set_font (db::Font (m_text_font));
-        mp_renderer->apply_text_trans (m_apply_text_trans);
+        mp_renderer->apply_text_trans_mode (m_apply_text_trans_mode);
 
         bool f = m_text_lazy_rendering;
 
@@ -693,7 +693,7 @@ RedrawThreadWorker::setup (LayoutViewBase *view, RedrawThreadCanvas *canvas, con
   m_text_lazy_rendering = view->text_lazy_rendering ();
   m_bitmap_caching = view->bitmap_caching ();
   m_show_properties = view->show_properties_as_text ();
-  m_apply_text_trans = view->apply_text_trans ();
+  m_apply_text_trans_mode = view->apply_text_trans_mode ();
   m_default_text_size = view->default_text_size ();
   m_drop_small_cells = view->drop_small_cells ();
   m_drop_small_cells_value = view->drop_small_cells_value ();

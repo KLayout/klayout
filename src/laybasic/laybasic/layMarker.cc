@@ -640,7 +640,7 @@ ShapeMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
   lay::Renderer &r = canvas.renderer ();
 
   r.set_font (db::Font (view ()->text_font ()));
-  r.apply_text_trans (view ()->apply_text_trans ());
+  r.apply_text_trans_mode (view ()->apply_text_trans_mode ());
   r.default_text_size (view ()->default_text_size () / ly->dbu ());
   r.set_precise (true);
 
@@ -1171,7 +1171,7 @@ Marker::render (const Viewport &vp, ViewObjectCanvas &canvas)
   lay::Renderer &r = canvas.renderer ();
 
   r.set_font (db::Font (view ()->text_font ()));
-  r.apply_text_trans (view ()->apply_text_trans ());
+  r.apply_text_trans_mode (view ()->apply_text_trans_mode ());
   r.default_text_size (view ()->default_text_size () / dbu ());
   r.set_precise (true);
 
@@ -1319,7 +1319,7 @@ DMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
   lay::Renderer &r = canvas.renderer ();
 
   r.set_font (db::Font (view ()->text_font ()));
-  r.apply_text_trans (view ()->apply_text_trans ());
+  r.apply_text_trans_mode (view ()->apply_text_trans_mode ());
   r.default_text_size_dbl (view ()->default_text_size ());
   r.set_precise (true);
 

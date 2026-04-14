@@ -1401,6 +1401,26 @@ public:
   }
   
   /**
+   *  @brief Sets the mode how to apply the text transformation
+   *
+   *  The mode value has two bits:
+   *  - bit 0: apply scaling
+   *  - bit 1: apply rotation
+   *
+   *  The default is mode "3" (scaling and rotation).
+   *  The mode is effective only if "apply_text_trans" is true.
+   */
+  void apply_text_trans_mode (unsigned int m);
+
+  /**
+   *  @brief Gets the mode how to apply the text transformation
+   */
+  unsigned int apply_text_trans_mode () const
+  {
+    return m_apply_text_trans ? m_apply_text_trans_mode : 0;
+  }
+
+  /**
    *  @brief Text object color
    */
   void text_color (tl::Color c);
@@ -3074,6 +3094,7 @@ private:
   bool m_show_properties;
   tl::Color m_text_color;
   bool m_apply_text_trans;
+  unsigned int m_apply_text_trans_mode;
   double m_default_text_size;
   bool m_text_point_mode;
   unsigned int m_text_font;

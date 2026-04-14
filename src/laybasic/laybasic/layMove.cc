@@ -118,7 +118,7 @@ MoveService::key_event (unsigned int key, unsigned int buttons)
   }
 
   if (buttons == 0 && (key == lay::KeyEnter || key == lay::KeyReturn)) {
-    end_move ();
+    finish_move ();
     return true;
   }
 
@@ -378,7 +378,7 @@ MoveService::start_move (db::Transaction *transaction, bool transient_selection)
 }
 
 void
-MoveService::end_move ()
+MoveService::finish_move ()
 {
   if (m_dragging) {
     handle_click (m_mouse_pos, 0, false, 0);

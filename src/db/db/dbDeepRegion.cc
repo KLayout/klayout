@@ -883,9 +883,9 @@ DeepRegion::nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Var
 namespace {
 
 /**
- *  @brief Implements a boolean AND or NOT operation with property handling
+ *  @brief Implements a boolean, top-down NOT operation with property handling for the "peel" feature
  */
-class DB_PUBLIC PushHierLocalOperationWithProperties
+class PushHierLocalOperationWithProperties
   : public local_operation<db::object_with_properties<db::PolygonRef>, db::object_with_properties<db::PolygonRef>, db::object_with_properties<db::PolygonRef> >
 {
 public:

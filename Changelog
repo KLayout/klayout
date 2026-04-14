@@ -1,18 +1,18 @@
 0.30.8           (2026-04-14):
+* Enhancement: %GITHUB%/issues/2248 Switch layouts but without losing the handle
 * Bugfix: %GITHUB%/issues/2299 gf180mcu DRC performance regression.
   This patch contains some other enhancements which improve performance of DRC, 
   although in certain cases only.
-* Enhancement: %GITHUB%/issues/2248 Switch layouts but without losing the handle
 * Enhancement: %GITHUB%/issues/2300 More options to set layout format, specifically on LEF/DEF
+* Bugfix: %GITHUB%/2301 UI freezes permanently with open Macro Development window and event listening plugin
 * Bugfix: %GITHUB%/issues/2305 Library reloading problems
 * Enhancement: %GITHUB%/2306 Feature Request: API-access to a setter for the selected entry in the Netlist Database Browser
-* Enhancement: %GITHUB%/2316 Edit/Selection/Make Array: support both pitch and spacing
 * Bugfix: %GITHUB%/2311 Tip window is shown although running in non-GUI modebug
+* Bugfix: %GITHUB%/2315 Edit/Layout/Scale causes confusing
+* Enhancement: %GITHUB%/2316 Edit/Selection/Make Array: support both pitch and spacing
 * Bugfix: %GITHUB%/2320 Failure to read OASIS files with large property strings
-* Bugfix: %GITHUB%/2301 UI freezes permanently with open Macro Development window and event listening plugin
 * Enhancement: %GITHUB%/2322 Options(text): split text scaling and rotation into two separate options
 * Enhancement: %GITHUB%/2326 Fit shouldn't take bbox of "empty" struct into account
-* Bugfix: %GITHUB%/2315 Edit/Layout/Scale causes confusing
 * Enhancement: "strmrun" now can run DRC and LVS scripts
 * Enhancement: "Library#library_by_name" now can be used with "*" for technology 
 * Bugfix: PCell "coerce_parameters" and "callback" was called with the client layout

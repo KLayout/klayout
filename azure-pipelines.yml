@@ -151,26 +151,6 @@ jobs:
         artifactName: 'wheel-3.10.x64'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.9.x64'
-      inputs:
-        artifactName: 'wheel-3.9.x64'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.8.x64'
-      inputs:
-        artifactName: 'wheel-3.8.x64'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.7.x64'
-      inputs:
-        artifactName: 'wheel-3.7.x64'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.6.x64'
-      inputs:
-        artifactName: 'wheel-3.6.x64'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
       displayName: 'Download Build Artifacts wheel-3.14.x86'
       inputs:
         artifactName: 'wheel-3.14.x86'
@@ -194,26 +174,6 @@ jobs:
       displayName: 'Download Build Artifacts wheel-3.10.x86'
       inputs:
         artifactName: 'wheel-3.10.x86'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.9.x86'
-      inputs:
-        artifactName: 'wheel-3.9.x86'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.8.x86'
-      inputs:
-        artifactName: 'wheel-3.8.x86'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.7.x86'
-      inputs:
-        artifactName: 'wheel-3.7.x86'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.6.x86'
-      inputs:
-        artifactName: 'wheel-3.6.x86'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: CopyFiles@2
       condition: always()

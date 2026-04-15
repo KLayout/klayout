@@ -13,6 +13,7 @@
 * Bugfix: %GITHUB%/2320 Failure to read OASIS files with large property strings
 * Enhancement: %GITHUB%/2322 Options(text): split text scaling and rotation into two separate options
 * Enhancement: %GITHUB%/2326 Fit shouldn't take bbox of "empty" struct into account
+* Bugfix: %GITHUB%/2331 Screen size error (Assertion tlPixelBuffer.cc:260 n < m_height was not true)
 * Enhancement: "strmrun" now can run DRC and LVS scripts
 * Enhancement: "Library#library_by_name" now can be used with "*" for technology 
 * Bugfix: PCell "coerce_parameters" and "callback" was called with the client layout

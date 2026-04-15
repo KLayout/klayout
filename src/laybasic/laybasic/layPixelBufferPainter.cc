@@ -163,10 +163,10 @@ PixelBufferPainter::draw_text (const char *t, const db::Point &p, tl::Color c, i
     const uint32_t *dc = ff.data () + size_t (ch - ff.first_char ()) * ff.height () * ff.stride ();
     for (unsigned int i = 0; i < ff.height (); ++i, dc += ff.stride ()) {
 
-      int iy = y - ff.height () + i + 1;
-      if (iy >= 0 || iy < int (mp_img->height ())) {
+      int iy = y - ff.height () + i;
+      if (iy >= 0 && iy < int (mp_img->height ())) {
 
-        uint32_t *d = (uint32_t *) mp_img->scan_line (y - ff.height () + i);
+        uint32_t *d = (uint32_t *) mp_img->scan_line (iy);
         uint32_t m = 1;
         int ix = x;
         const uint32_t *ds = dc;

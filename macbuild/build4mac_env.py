@@ -328,7 +328,7 @@ RubyTahoe        = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions
 #  install with 'sudo port install ruby34'
 # [Key Type Name] = 'MP34'
 Ruby34MacPorts  = { 'exe': '/opt/local/bin/ruby3.4',
-                    'inc': '/opt/local/include/ruby-3.4.8',
+                    'inc': '/opt/local/include/ruby-3.4.9',
                     'lib': '/opt/local/lib/libruby.3.4.dylib'
                   }
 
@@ -567,8 +567,8 @@ if _have_Homebrew_Python:
 # [4] KLayout executables including buddy tools
 #-----------------------------------------------------
 KLayoutExecs  = [ 'klayout' ]
-KLayoutExecs += [ 'strm2cif', 'strm2dxf', 'strm2gds', 'strm2gdstxt', 'strm2mag', 'strm2oas' ]
-KLayoutExecs += [ 'strm2txt', 'strmclip', 'strmcmp',  'strmrun',     'strmxor'  ]
+KLayoutExecs += [ 'strm2cif', 'strm2dxf', 'strm2gds', 'strm2gdstxt', 'strm2lstr', 'strm2mag' ]
+KLayoutExecs += [ 'strm2oas', 'strm2txt', 'strmclip', 'strmcmp',     'strmrun',   'strmxor'  ]
 
 #----------------
 # End of File

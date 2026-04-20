@@ -1658,6 +1658,12 @@ GuiApplication::event (QEvent *event)
   return QApplication::event(event);
 }
 
+static void atexit_handler ()
+{
+  if (lay::ApplicationBase::instance ()) {
+    lay::ApplicationBase::instance ()->shutdown ();
+  }
+}
 
 int
 GuiApplication::exec ()
@@ -1692,6 +1698,10 @@ GuiApplication::exec ()
     tl::info << "";
 
   }
+
+  //  register an exit handler to shutdown cleanly in case of an explicit exit
+  //  inside the code
+  ::atexit (&atexit_handler);
 
   return QApplication::exec ();
 }

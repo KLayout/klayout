@@ -49,6 +49,7 @@ class ConfigureAction;
  *  @brief A delegate by which the dispatcher can submit notification events
  */
 class LAYBASIC_PUBLIC DispatcherDelegate
+  : public tl::Object
 {
 public:
   /**
@@ -271,7 +272,7 @@ private:
 #if defined(HAVE_QT)
   QWidget *mp_menu_parent_widget;
 #endif
-  DispatcherDelegate *mp_delegate;
+  tl::weak_ptr<DispatcherDelegate> mp_delegate;
 };
 
 }

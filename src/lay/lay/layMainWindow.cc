@@ -165,7 +165,6 @@ show_dock_widget (QDockWidget *dock_widget, bool visible)
 
 MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
     : QMainWindow (0),
-      tl::Object (),
       lay::DispatcherDelegate (),
       m_dispatcher (this),
       m_text_progress (this, 10 /*verbosity threshold*/),

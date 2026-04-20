@@ -106,6 +106,15 @@ public:
   void exit (int result);
 
   /**
+   *  @brief Shut down the application
+   *
+   *  Calling this function will close the main window and
+   *  prepare for exit. Unlike "exit", it dows not actually exit
+   *  the process.
+   */
+  virtual void shutdown ();
+
+  /**
    *  @brief Return the program's version
    */
   static std::string version ();
@@ -330,7 +339,6 @@ public:
 
 protected:
   virtual void setup () = 0;
-  virtual void shutdown ();
   virtual void prepare_recording (const std::string &gtf_record, bool gtf_record_incremental);
   virtual void start_recording ();
   virtual lay::Dispatcher *dispatcher () const = 0;

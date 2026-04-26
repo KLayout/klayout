@@ -1920,17 +1920,32 @@ static void map_databases (rdb::Database &self, const rdb::Database &other,
                            std::map<id_type, id_type> &rev_tag2tag,
                            bool create_missing)
 {
+  std::list<std::pair<rdb::Cell *, const rdb::Cell *> > new_cells;
+
   for (auto c = other.cells ().begin (); c != other.cells ().end (); ++c) {
     //  TODO: do we have a consistent scheme of naming variants? What requirements
     //  exist towards detecting variant specific waivers
     rdb::Cell *this_cell = self.cell_by_qname_non_const (c->qname ());
     if (! this_cell && create_missing) {
       this_cell = self.create_cell (c->name (), c->variant (), c->layout_name ());
-      this_cell->import_references (c->references ());
+      new_cells.push_back (std::make_pair (this_cell, c.operator-> ()));
     }
     if (this_cell) {
       cell2cell.insert (std::make_pair (this_cell->id (), c->id ()));
       rev_cell2cell.insert (std::make_pair (c->id (), this_cell->id ()));
+    }
+  }
+
+  //  import and map references for new cells
+  for (auto cp = new_cells.begin (); cp != new_cells.end (); ++cp) {
+    auto &new_refs = cp->first->references ();
+    for (auto r = cp->second->references ().begin (); r != cp->second->references ().end (); ++r) {
+      rdb::Reference rnew = *r;
+      auto cid = rev_cell2cell.find (rnew.parent_cell_id ());
+      if (cid != rev_cell2cell.end ()) {
+        rnew.set_parent_cell_id (cid->second);
+        new_refs.insert (rnew);
+      }
     }
   }
 

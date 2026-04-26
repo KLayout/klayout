@@ -2225,6 +2225,14 @@ public:
     return pi;
   }
 
+  /**
+   *  @brief Gets the active plugin
+   */
+  lay::Plugin *active_plugin () const
+  {
+    return mp_active_plugin;
+  }
+
   /** 
    *  @brief Create a plugin of the given type
    *
@@ -3213,11 +3221,6 @@ protected:
   LayoutViewBase (lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
 
   void init (db::Manager *mgr);
-
-  lay::Plugin *active_plugin () const
-  {
-    return mp_active_plugin;
-  }
 
   virtual LayoutView *get_ui ();
 

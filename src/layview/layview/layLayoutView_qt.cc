@@ -404,6 +404,16 @@ void LayoutViewSignalConnector::layer_order_changed ()
   mp_view->layer_order_changed ();
 }
 
+void LayoutViewSignalConnector::layer_search_options_edited ()
+{
+  mp_view->layer_search_options_edited ();
+}
+
+void LayoutViewSignalConnector::cell_search_options_edited ()
+{
+  mp_view->cell_search_options_edited ();
+}
+
 void LayoutViewSignalConnector::min_hier_changed (int i)
 {
   mp_view->min_hier_changed (i);
@@ -573,6 +583,7 @@ LayoutView::init_ui (db::Manager *mgr)
       mp_hierarchy_panel = new lay::HierarchyControlPanel (this, hierarchy_frame, "hcp");
       left_frame_ly->addWidget (mp_hierarchy_panel, 1 /*stretch*/);
 
+      QObject::connect (mp_hierarchy_panel, SIGNAL (search_options_changed ()), mp_connector, SLOT (cell_search_options_edited ()));
       QObject::connect (mp_hierarchy_panel, SIGNAL (cell_selected (cell_path_type, int)), mp_connector, SLOT (select_cell_dispatch (cell_path_type, int)));
       QObject::connect (mp_hierarchy_panel, SIGNAL (active_cellview_changed (int)), mp_connector, SLOT (active_cellview_changed (int)));
       QObject::connect (mp_hierarchy_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
@@ -655,6 +666,7 @@ LayoutView::init_ui (db::Manager *mgr)
       mp_control_frame = mp_control_panel;
 
       QObject::connect (mp_control_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
+      QObject::connect (mp_control_frame, SIGNAL (search_options_changed ()), mp_connector, SLOT (layer_search_options_edited ()));
       QObject::connect (mp_control_panel, SIGNAL (tab_changed ()), mp_connector, SLOT (layer_tab_changed ()));
       QObject::connect (mp_control_panel, SIGNAL (order_changed ()), mp_connector, SLOT (layer_order_changed ()));
       QObject::connect (mp_control_panel, SIGNAL (current_layer_changed (const lay::LayerPropertiesConstIterator &)), mp_connector, SLOT (current_layer_changed_slot (const lay::LayerPropertiesConstIterator &)));
@@ -1041,6 +1053,60 @@ LayoutView::configure (const std::string &name, const std::string &value)
     }
     return true;
 
+  } else if (name == cfg_layer_search_as_expressions) {
+
+    bool f;
+    tl::from_string (value, f);
+    if (mp_control_panel) {
+      mp_control_panel->set_search_as_expression (f);
+    }
+    return true;
+
+  } else if (name == cfg_layer_search_as_filter) {
+
+    bool f;
+    tl::from_string (value, f);
+    if (mp_control_panel) {
+      mp_control_panel->set_search_as_filter (f);
+    }
+    return true;
+
+  } else if (name == cfg_layer_search_case_sensitive) {
+
+    bool f;
+    tl::from_string (value, f);
+    if (mp_control_panel) {
+      mp_control_panel->set_search_case_sensitive (f);
+    }
+    return true;
+
+  } else if (name == cfg_cell_search_as_expressions) {
+
+    bool f;
+    tl::from_string (value, f);
+    if (mp_hierarchy_panel) {
+      mp_hierarchy_panel->set_search_as_expression (f);
+    }
+    return true;
+
+  } else if (name == cfg_cell_search_as_filter) {
+
+    bool f;
+    tl::from_string (value, f);
+    if (mp_hierarchy_panel) {
+      mp_hierarchy_panel->set_search_as_filter (f);
+    }
+    return true;
+
+  } else if (name == cfg_cell_search_case_sensitive) {
+
+    bool f;
+    tl::from_string (value, f);
+    if (mp_hierarchy_panel) {
+      mp_hierarchy_panel->set_search_case_sensitive (f);
+    }
+    return true;
+
   } else if (name == cfg_layers_always_show_source) {
 
     bool a = false;
@@ -1297,6 +1363,26 @@ LayoutView::max_hier_changed (int i)
 {
   mp_min_hier_spbx->setMaximum (i);
   set_hier_levels (std::make_pair (get_hier_levels ().first, i));
+}
+
+void
+LayoutView::layer_search_options_edited ()
+{
+  if (mp_control_panel) {
+    dispatcher ()->config_set (cfg_layer_search_as_expressions, mp_control_panel->search_as_expression ());
+    dispatcher ()->config_set (cfg_layer_search_case_sensitive, mp_control_panel->search_case_sensitive ());
+    dispatcher ()->config_set (cfg_layer_search_as_filter, mp_control_panel->search_as_filter ());
+  }
+}
+
+void
+LayoutView::cell_search_options_edited ()
+{
+  if (mp_hierarchy_panel) {
+    dispatcher ()->config_set (cfg_cell_search_as_expressions, mp_hierarchy_panel->search_as_expression ());
+    dispatcher ()->config_set (cfg_cell_search_case_sensitive, mp_hierarchy_panel->search_case_sensitive ());
+    dispatcher ()->config_set (cfg_cell_search_as_filter, mp_hierarchy_panel->search_as_filter ());
+  }
 }
 
 tl::Color

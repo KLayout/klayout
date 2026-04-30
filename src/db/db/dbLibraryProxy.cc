@@ -244,7 +244,11 @@ LibraryProxy::update (db::ImportLayerMapping *layer_mapping)
 
     inst.transform_into (db::ICplxTrans (lib->layout ().dbu () / layout ()->dbu ()));
 
-    insert (inst);
+    if (i->has_prop_id ()) {
+      insert (db::CellInstArrayWithProperties (inst, i->prop_id ()));
+    } else {
+      insert (inst);
+    }
 
   }
 }

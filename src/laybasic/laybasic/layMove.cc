@@ -437,9 +437,12 @@ MoveService::drag_cancel ()
 {
   m_shift = db::DPoint ();
   if (m_dragging) {
+
     show_toolbox (false);
     ui ()->ungrab_mouse (this);
+
     m_dragging = false;
+
   }
 }
 

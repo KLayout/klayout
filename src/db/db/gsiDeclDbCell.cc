@@ -3318,7 +3318,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +  
-  gsi::method_ext ("library_name", &library_cell_name,
+  gsi::method_ext ("library_cell_name", &library_cell_name,
     "@brief Returns the cell name inside the library from which the cell is imported\n"
     "If the cell is not imported from a library, the return value is an empty string.\n"
     "This method is basically a convenience function, equivalent to taking the name\n"

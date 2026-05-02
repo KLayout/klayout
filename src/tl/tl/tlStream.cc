@@ -1469,7 +1469,39 @@ OutputStream::put_raw (const char *b, size_t n)
 } 
 
 void
-OutputStream::put_native (const char *s, size_t n)
+OutputStream::seek (size_t pos)
+{
+  flush ();
+
+  if (mp_delegate) {
+    mp_delegate->seek (pos);
+  }
+  m_pos = pos;
+}
+
+// ---------------------------------------------------------------
+//  BinaryOutputStream implementation
+
+BinaryOutputStream::BinaryOutputStream (OutputStreamBase &delegate)
+  : OutputStream (delegate, false)
+{
+  //  .. nothing yet ..
+}
+
+BinaryOutputStream::BinaryOutputStream (OutputStreamBase *delegate)
+  : OutputStream (delegate, false)
+{
+  //  .. nothing yet ..
+}
+
+BinaryOutputStream::BinaryOutputStream (const std::string &abstract_path, OutputStreamMode om, int keep_backups)
+  : OutputStream (abstract_path, om, false, keep_backups)
+{
+  //  .. nothing yet ..
+}
+
+void
+BinaryOutputStream::put_native (const char *s, size_t n)
 {
   //  the native format for a string is a length field (uint64_t) and the bytes
   //  TODO: for now we assume that the memory layout is the same for all platforms
@@ -1479,7 +1511,7 @@ OutputStream::put_native (const char *s, size_t n)
 }
 
 void
-OutputStream::put_native (const std::string &s)
+BinaryOutputStream::put_native (const std::string &s)
 {
   //  the native format for a string is a length field (uint64_t) and the bytes
   //  TODO: for now we assume that the memory layout is the same for all platforms
@@ -1489,89 +1521,78 @@ OutputStream::put_native (const std::string &s)
 }
 
 void
-OutputStream::put_native (double v)
+BinaryOutputStream::put_native (double v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 8);
 }
 
 void
-OutputStream::put_native (float v)
+BinaryOutputStream::put_native (float v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 4);
 }
 
 void
-OutputStream::put_native (bool v)
+BinaryOutputStream::put_native (bool v)
 {
   char c = v ? 1 : 0;
   put_raw (&c, 1);
 }
 
 void
-OutputStream::put_native (uint8_t v)
+BinaryOutputStream::put_native (uint8_t v)
 {
   put_raw ((const char *) &v, 1);
 }
 
 void
-OutputStream::put_native (int8_t v)
+BinaryOutputStream::put_native (int8_t v)
 {
   put_raw ((const char *) &v, 1);
 }
 
 void
-OutputStream::put_native (uint16_t v)
+BinaryOutputStream::put_native (uint16_t v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 2);
 }
 
 void
-OutputStream::put_native (int16_t v)
+BinaryOutputStream::put_native (int16_t v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 2);
 }
 
 void
-OutputStream::put_native (uint32_t v)
+BinaryOutputStream::put_native (uint32_t v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 4);
 }
 
 void
-OutputStream::put_native (int32_t v)
+BinaryOutputStream::put_native (int32_t v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 4);
 }
 
 void
-OutputStream::put_native (uint64_t v)
+BinaryOutputStream::put_native (uint64_t v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 8);
 }
 
 void
-OutputStream::put_native (int64_t v)
+BinaryOutputStream::put_native (int64_t v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 8);
-}
-
-void
-OutputStream::seek (size_t pos)
-{
-  flush ();
-
-  if (mp_delegate) {
-    mp_delegate->seek (pos);
-  }
-  m_pos = pos;
 }
 
 // ---------------------------------------------------------------

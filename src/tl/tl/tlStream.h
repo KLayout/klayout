@@ -1431,11 +1431,7 @@ public:
    */
   OutputStream &operator<< (const char *s)
   {
-    if (m_as_text) {
-      put (s, strlen (s));
-    } else {
-      put_native (s, strlen (s));
-    }
+    put (s, strlen (s));
     return *this;
   }
 
@@ -1447,11 +1443,7 @@ public:
    */
   OutputStream &operator<< (const std::string &s)
   {
-    if (m_as_text) {
-      put (s);
-    } else {
-      put_native (s);
-    }
+    put (s);
     return *this;
   }
 
@@ -1461,11 +1453,7 @@ public:
   template <class T>
   OutputStream &operator<< (const T &t)
   {
-    if (m_as_text) {
-      put (tl::to_string (t));
-    } else {
-      put_native (t);
-    }
+    put (tl::to_string (t));
     return *this;
   }
 
@@ -1544,6 +1532,95 @@ private:
   size_t m_buffer_capacity, m_buffer_pos;
   std::string m_path;
 
+  //  No copying currently
+  OutputStream (const OutputStream &);
+  OutputStream &operator= (const OutputStream &);
+};
+
+// ---------------------------------------------------------------------------------
+
+/**
+ *  @brief An output stream specialized on binary representation
+ */
+
+class TL_PUBLIC BinaryOutputStream
+  : public OutputStream
+{
+public:
+  /**
+   *  @brief Default constructor
+   *
+   *  This constructor takes a delegate object.
+   */
+  BinaryOutputStream (OutputStreamBase &delegate);
+
+  /**
+   *  @brief Default constructor
+   *
+   *  This constructor takes a delegate object. The stream will own the delegate.
+   */
+  BinaryOutputStream (OutputStreamBase *delegate);
+
+  /**
+   *  @brief Open an output stream with the given path and stream mode
+   *
+   *  This will automatically create a delegate object and delete it later.
+   */
+  BinaryOutputStream (const std::string &abstract_path, OutputStreamMode om = OM_Auto, int keep_backups = 0);
+
+  /**
+   *  @brief << operator: inserts character
+   */
+  OutputStream &operator<< (char s)
+  {
+    put (&s, 1);
+    return *this;
+  }
+
+  /**
+   *  @brief << operator: inserts a character
+   */
+  OutputStream &operator<< (unsigned char s)
+  {
+    put ((const char *) &s, 1);
+    return *this;
+  }
+
+  /**
+   *  @brief << operator: inserts a string
+   *
+   *  In binary mode, the string is inserted as a length/data
+   *  combination. That matches the extraction in BinaryInputStream.
+   */
+  BinaryOutputStream &operator<< (const char *s)
+  {
+    put_native (s, strlen (s));
+    return *this;
+  }
+
+  /**
+   *  @brief << operator: inserts a string
+   *
+   *  In binary mode, the string is inserted as a length/data
+   *  combination. That matches the extraction in BinaryInputStream.
+   */
+  BinaryOutputStream &operator<< (const std::string &s)
+  {
+    put_native (s);
+    return *this;
+  }
+
+  /**
+   *  @brief << operator: inserts an object supported by "put_native".
+   */
+  template <class T>
+  BinaryOutputStream &operator<< (const T &t)
+  {
+    put_native (t);
+    return *this;
+  }
+
+private:
   void put_native (const std::string &s);
   void put_native (const char *s, size_t n);
   void put_native (double v);
@@ -1558,9 +1635,11 @@ private:
   void put_native (uint64_t v);
   void put_native (int64_t v);
 
+  void set_as_text (bool f);
+
   //  No copying currently
-  OutputStream (const OutputStream &);
-  OutputStream &operator= (const OutputStream &);
+  BinaryOutputStream (const BinaryOutputStream &);
+  BinaryOutputStream &operator= (const BinaryOutputStream &);
 };
 
 }

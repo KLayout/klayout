@@ -192,7 +192,7 @@ struct edge_pair_defs
       "This string can be turned into an edge pair again by using \\from_bytes\n. "
       "\n"
       "This method has been added in version 0.30.9.\n"
-    );
+    ) +
     method ("bbox", &C::bbox,
       "@brief Gets the bounding box of the edge pair\n"
     ) +

@@ -727,7 +727,7 @@ struct simple_polygon_defs
       "This string can be turned into a polygon again by using \\from_bytes\n. "
       "\n"
       "This method has been added in version 0.30.9.\n"
-    );
+    ) +
     method_ext ("round_corners", &round_corners, gsi::arg ("rinner"), gsi::arg ("router"), gsi::arg ("n"),
       "@brief Rounds the corners of the polygon\n"
       "\n"
@@ -1904,7 +1904,7 @@ struct polygon_defs
       "This string can be turned into a polygon again by using \\from_bytes\n. "
       "\n"
       "This method has been added in version 0.30.9.\n"
-    );
+    ) +
     method_ext ("round_corners", &round_corners, gsi::arg ("rinner"), gsi::arg ("router"), gsi::arg ("n"),
       "@brief Rounds the corners of the polygon\n"
       "\n"

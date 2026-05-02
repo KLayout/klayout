@@ -543,7 +543,7 @@ struct trans_defs
       "This string can be turned into an object again by using \\from_bytes\n. "
       "\n"
       "This method has been added in version 0.30.9.\n"
-    );
+    ) +
     method ("disp", (const vector_type &(C::*) () const) &C::disp,
       "@brief Gets to the displacement vector\n"
       "\n"
@@ -1189,7 +1189,7 @@ struct cplx_trans_defs
       "This string can be turned into an object again by using \\from_bytes\n. "
       "\n"
       "This method has been added in version 0.30.9.\n"
-    );
+    ) +
     method ("disp", (displacement_type (C::*)() const) &C::disp,
       "@brief Gets the displacement\n"
     ) +

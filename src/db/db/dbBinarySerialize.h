@@ -46,45 +46,45 @@ namespace db
 //  Stream inserters
 
 template<class C>
-tl::OutputStream &write_coord (tl::OutputStream &s, C c)
+tl::BinaryOutputStream &write_coord (tl::BinaryOutputStream &s, C c)
 {
   return s << c;
 }
 
-inline tl::OutputStream &write_coord (tl::OutputStream &s, db::Coord c)
+inline tl::BinaryOutputStream &write_coord (tl::BinaryOutputStream &s, db::Coord c)
 {
   //  NOTE: for compatibility across different builds we use 64 bit coordinates always
   return s << (int64_t) c;
 }
 
 template<class C>
-tl::OutputStream &write_binary (tl::OutputStream &s, const db::point<C> &pt)
+tl::BinaryOutputStream &write_binary (tl::BinaryOutputStream &s, const db::point<C> &pt)
 {
   return write_coord (write_coord (s, pt.x ()), pt.y ());
 }
 
 template<class C>
-tl::OutputStream &write_binary (tl::OutputStream &s, const db::vector<C> &v)
+tl::BinaryOutputStream &write_binary (tl::BinaryOutputStream &s, const db::vector<C> &v)
 {
   return write_coord (write_coord (s, v.x ()), v.y ());
 }
 
 template<class C>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::point<C> &pt)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::point<C> &pt)
 {
   s << (uint16_t) 1; // version
   return write_binary (s, pt);
 }
 
 template<class C>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::vector<C> &v)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::vector<C> &v)
 {
   s << (uint16_t) 1; // version
   return write_binary (s, v);
 }
 
 template<class C>
-tl::OutputStream &write_binary (tl::OutputStream &s, const db::edge<C> &e)
+tl::BinaryOutputStream &write_binary (tl::BinaryOutputStream &s, const db::edge<C> &e)
 {
   write_binary (s, e.p1 ());
   write_binary (s, e.p2 ());
@@ -92,14 +92,14 @@ tl::OutputStream &write_binary (tl::OutputStream &s, const db::edge<C> &e)
 }
 
 template<class C>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::edge<C> &e)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::edge<C> &e)
 {
   s << (uint16_t) 1; // version
   return write_binary (s, e);
 }
 
 template<class C>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::box<C> &b)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::box<C> &b)
 {
   s << (uint16_t) 1; // version
   write_binary (s, b.p1 ());
@@ -108,7 +108,7 @@ tl::OutputStream &operator<< (tl::OutputStream &s, const db::box<C> &b)
 }
 
 template<class C>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::edge_pair<C> &ep)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::edge_pair<C> &ep)
 {
   s << (uint16_t) 1; // version
   write_binary (s, ep.first ());
@@ -117,17 +117,17 @@ tl::OutputStream &operator<< (tl::OutputStream &s, const db::edge_pair<C> &ep)
 }
 
 template<class C>
-tl::OutputStream &write_binary (tl::OutputStream &s, const db::polygon_contour<C> &c)
+tl::BinaryOutputStream &write_binary (tl::BinaryOutputStream &s, const db::polygon_contour<C> &c)
 {
   s << (uint64_t) c.size ();
   for (auto i = c.begin (); i != c.end (); ++i) {
-    s << *i;
+    write_binary (s, *i);
   }
   return s;
 }
 
 template<class C>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::polygon<C> &p)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::polygon<C> &p)
 {
   s << (uint16_t) 1; // version
   s << (uint64_t) (p.holes () + 1);
@@ -138,7 +138,7 @@ tl::OutputStream &operator<< (tl::OutputStream &s, const db::polygon<C> &p)
 }
 
 template<class C>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::simple_polygon<C> &p)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::simple_polygon<C> &p)
 {
   //  NOTE: the format of polygon and simple polygon are compatible
   s << (uint16_t) 1; // version
@@ -148,14 +148,14 @@ tl::OutputStream &operator<< (tl::OutputStream &s, const db::simple_polygon<C> &
 }
 
 template<class C>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::unit_trans<C> &)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::unit_trans<C> &)
 {
   s << (uint16_t) 1; // version
   return s;
 }
 
 template<class C>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::disp_trans<C> &t)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::disp_trans<C> &t)
 {
   s << (uint16_t) 1; // version
   write_binary (s, t.disp ());
@@ -163,7 +163,7 @@ tl::OutputStream &operator<< (tl::OutputStream &s, const db::disp_trans<C> &t)
 }
 
 template<class C>
-tl::OutputStream &write_binary (tl::OutputStream &s, const db::simple_trans<C> &t)
+tl::BinaryOutputStream &write_binary (tl::BinaryOutputStream &s, const db::simple_trans<C> &t)
 {
   s << (uint16_t) t.rot ();
   write_binary (s, t.disp ());
@@ -171,22 +171,22 @@ tl::OutputStream &write_binary (tl::OutputStream &s, const db::simple_trans<C> &
 }
 
 template<class C>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::simple_trans<C> &t)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::simple_trans<C> &t)
 {
   s << (uint16_t) 1; // version
   return write_binary (s, t);
 }
 
 template<class C, class D, class R>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::complex_trans<C, D, R> &t)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::complex_trans<C, D, R> &t)
 {
   s << (uint16_t) 1; // version
   write_binary (s, t.disp ());
-  return s << (double) t.msin () << (double) t.mcos () << (double) t.mag ();
+  return s << (double) t.msin () << (double) t.mcos () << (double) (t.is_mirror () ? -t.mag () : t.mag ());
 }
 
 template<class C>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::text<C> &t)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::text<C> &t)
 {
   s << (uint16_t) 1; // version
   s << t.string ();
@@ -196,7 +196,7 @@ tl::OutputStream &operator<< (tl::OutputStream &s, const db::text<C> &t)
 }
 
 template<class C>
-tl::OutputStream &operator<< (tl::OutputStream &s, const db::path<C> &p)
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::path<C> &p)
 {
   s << (uint16_t) 1; // version
   s << (uint64_t) p.points ();
@@ -206,7 +206,7 @@ tl::OutputStream &operator<< (tl::OutputStream &s, const db::path<C> &p)
   write_coord (s, p.width ());
   write_coord (s, p.bgn_ext ());
   write_coord (s, p.end_ext ());
-  write_coord (s, p.round ());
+  s << p.round ();
   return s;
 }
 
@@ -333,7 +333,7 @@ tl::BinaryInputStream &operator>> (tl::BinaryInputStream &s, db::edge_pair<C> &e
 }
 
 template<class C>
-tl::BinaryInputStream &read_binary (tl::BinaryInputStream &s, db::polygon_contour<C> &c)
+tl::BinaryInputStream &read_binary (tl::BinaryInputStream &s, db::polygon_contour<C> &c, bool hole)
 {
   uint64_t n = 0;
   s >> n;
@@ -346,7 +346,7 @@ tl::BinaryInputStream &read_binary (tl::BinaryInputStream &s, db::polygon_contou
   }
 
   //  NOTE: not normalization or modification is applied
-  c.assign (pts.begin (), pts.end (), false, false, false);
+  c.assign (pts.begin (), pts.end (), hole, false, false, false);
 
   return s;
 }
@@ -364,10 +364,13 @@ tl::BinaryInputStream &operator>> (tl::BinaryInputStream &s, db::polygon<C> &p)
   s >> n;
 
   p = db::polygon<C> ();
+  if (n > 0) {
+    p.reserve_holes (n - 1);
+  }
 
   db::polygon_contour<C> ctr;
   for (uint64_t h = 0; h < n; ++h) {
-    read_binary (s, ctr);
+    read_binary (s, ctr, h > 0);
     if (h == 0) {
       p.assign_hull (ctr);
     } else {
@@ -392,7 +395,7 @@ tl::BinaryInputStream &operator>> (tl::BinaryInputStream &s, db::simple_polygon<
   tl_assert (n == (uint64_t) 1);
 
   db::polygon_contour<C> ctr;
-  read_binary (s, ctr);
+  read_binary (s, ctr, false);
   p.assign_hull (ctr);
 
   return s;
@@ -516,7 +519,9 @@ tl::BinaryInputStream &operator>> (tl::BinaryInputStream &s, db::path<C> &p)
   }
 
   C width, bgn_ext, end_ext;
-  s >> width >> bgn_ext >> end_ext;
+  read_coord (s, width);
+  read_coord (s, bgn_ext);
+  read_coord (s, end_ext);
 
   bool round;
   s >> round;
@@ -533,7 +538,7 @@ std::vector<char> to_bytes (const T &t)
 {
   tl::OutputMemoryStream osm;
   {
-    tl::OutputStream os (osm, false /*binary*/);
+    tl::BinaryOutputStream os (osm);
     os << t;
   }
   return std::vector<char> (osm.data (), osm.data () + osm.size ());
@@ -544,7 +549,7 @@ std::string to_bytes_str (const T &t)
 {
   tl::OutputMemoryStream osm;
   {
-    tl::OutputStream os (osm, false /*binary*/);
+    tl::BinaryOutputStream os (osm);
     os << t;
   }
   return std::string (osm.data (), osm.size ());

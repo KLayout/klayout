@@ -471,7 +471,7 @@ struct edge_defs
       "This string can be turned into an edge again by using \\from_bytes\n. "
       "\n"
       "This method has been added in version 0.30.9.\n"
-    );
+    ) +
     method ("is_parallel?", &C::parallel, gsi::arg ("e"),
       "@brief Test for being parallel\n"
       "\n"

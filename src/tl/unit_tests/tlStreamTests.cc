@@ -642,7 +642,7 @@ std::string s2string (tl::OutputMemoryStream &osm)
 TEST(BinaryStreams1)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << (double) 0.17;
 
@@ -662,7 +662,7 @@ TEST(BinaryStreams1)
 TEST(BinaryStreams2)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << (float) 0.17;
 
@@ -682,7 +682,7 @@ TEST(BinaryStreams2)
 TEST(BinaryStreams3)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << std::string ("ABC");
 
@@ -702,7 +702,7 @@ TEST(BinaryStreams3)
 TEST(BinaryStreams4)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << "ABC";
 
@@ -722,7 +722,7 @@ TEST(BinaryStreams4)
 TEST(BinaryStreams5)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << uint8_t (17);
 
@@ -742,7 +742,7 @@ TEST(BinaryStreams5)
 TEST(BinaryStreams6)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << int8_t (17);
 
@@ -762,7 +762,7 @@ TEST(BinaryStreams6)
 TEST(BinaryStreams7)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << uint16_t (1742);
 
@@ -782,7 +782,7 @@ TEST(BinaryStreams7)
 TEST(BinaryStreams8)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << int16_t (1742);
 
@@ -802,7 +802,7 @@ TEST(BinaryStreams8)
 TEST(BinaryStreams9)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << uint32_t (17420000);
 
@@ -822,7 +822,7 @@ TEST(BinaryStreams9)
 TEST(BinaryStreams10)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << int32_t (17420000);
 
@@ -842,7 +842,7 @@ TEST(BinaryStreams10)
 TEST(BinaryStreams11)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << uint64_t (174200000000l);
 
@@ -862,7 +862,7 @@ TEST(BinaryStreams11)
 TEST(BinaryStreams12)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << int64_t (174200000000l);
 
@@ -882,7 +882,7 @@ TEST(BinaryStreams12)
 TEST(BinaryStreams13)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << true;
   os << false;
@@ -904,7 +904,7 @@ TEST(BinaryStreams13)
 TEST(BinaryStreamsCombined)
 {
   tl::OutputMemoryStream osm;
-  tl::OutputStream os (osm, false /*binary*/);
+  tl::BinaryOutputStream os (osm);
 
   os << "ABC" << 17.0 << "XUV" << (int32_t) 42;
 

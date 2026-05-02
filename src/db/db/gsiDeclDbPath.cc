@@ -309,7 +309,7 @@ struct path_defs
       "This string can be turned into a path again by using \\from_bytes\n. "
       "\n"
       "This method has been added in version 0.30.9.\n"
-    );
+    ) +
     method ("simple_polygon", &C::simple_polygon,
       "@brief Convert the path to a simple polygon\n"
       "The returned polygon is not guaranteed to be non-selfoverlapping. This may happen if the path overlaps "

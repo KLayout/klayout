@@ -335,38 +335,35 @@ class DBLayoutTests1_TestClass < TestBase
     c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
     assert_equal(c0.is_empty?, false)
 
+    c0_index = c0.cell_index
+
     assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
 
-    c0_index = c0.cell_index
+    ll = l.dup
     assert_equal(l.is_valid_cell_index?(c0_index), true)
-    l.delete_cell(c0.cell_index)
+    l.delete_cell(c0_index)
     assert_equal(l.is_valid_cell_index?(c0_index), false)
 
     assert_equal(collect_hier(l), "[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c2)(C=)");
     assert_equal(c3.is_empty?, true)
 
-    l = RBA::Layout.new
-    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-    c0 = l.cell(l.add_cell("c0"))
-    c1 = l.cell(l.add_cell("c1"))
-    c2 = l.cell(l.add_cell("c2"))
-    c3 = l.cell(l.add_cell("c3"))
-    assert_equal(c0.is_empty?, true)
+    l = ll
+    ll = l.dup
 
-    tt = RBA::Trans.new
-    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
-    assert_equal(c0.is_empty?, false)
-
-    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
-
-    c0_index = c0.cell_index
     assert_equal(l.is_valid_cell_index?(c0_index), true)
     l.cell(c0_index).delete
     assert_equal(l.is_valid_cell_index?(c0_index), false)
 
+    assert_equal(collect_hier(l), "[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c2)(C=)");
+    assert_equal(c3.is_empty?, true)
+
+    l = ll
+    ll = l.dup
+
+    assert_equal(l.is_valid_cell_index?(c0_index), true)
+    # with cell object
+    l.delete_cell(l.cell(c0_index))
+    assert_equal(l.is_valid_cell_index?(c0_index), false)
     assert_equal(collect_hier(l), "[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c2)(C=)");
     assert_equal(c3.is_empty?, true)
 
@@ -413,8 +410,15 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(collect_hier(l), "[c1](P=)(C=)/[c3](P=)(C=)");
 
     l = ll
+    ll = l.dup
     # Hint: even though we deleted c0 and c2, their indices are still valid
     l.delete_cells([c2_index, c0_index])
+    assert_equal(collect_hier(l), "[c1](P=)(C=)/[c3](P=)(C=)");
+
+    l = ll
+    ll = l.dup
+    # with cell objects
+    l.delete_cells([l.cell(c2_index), l.cell(c0_index)])
     assert_equal(collect_hier(l), "[c1](P=)(C=)/[c3](P=)(C=)");
 
   end
@@ -487,6 +491,7 @@ class DBLayoutTests1_TestClass < TestBase
 
     c0_index = c0.cell_index
     c2_index = c2.cell_index
+    c3_index = c3.cell_index
 
     ll = l.dup
 
@@ -498,6 +503,42 @@ class DBLayoutTests1_TestClass < TestBase
     # Hint: even though we deleted c0 and c2, their indices are still valid
     l.cell(c2_index).prune_cell(-1)
     assert_equal(collect_hier(l), "[c0](P=)(C=c1,c3)/[c1](P=c0)(C=)/[c3](P=c0)(C=)");
+
+    l = ll
+    ll = l.dup
+    # As method of Layout
+    l.prune_cell(c2_index, -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c3)/[c1](P=c0)(C=)/[c3](P=c0)(C=)");
+
+    l = ll
+    ll = l.dup
+    # As method of Layout with default argument
+    l.prune_cell(c2_index)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c3)/[c1](P=c0)(C=)/[c3](P=c0)(C=)");
+
+    l = ll
+    ll = l.dup
+    # As method of Layout with cell object
+    l.prune_cell(l.cell(c2_index), -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c3)/[c1](P=c0)(C=)/[c3](P=c0)(C=)");
+
+    l = ll
+    ll = l.dup
+    # As method of Layout with cell object and default argument
+    l.prune_cell(l.cell(c2_index), -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c3)/[c1](P=c0)(C=)/[c3](P=c0)(C=)");
+
+    l = ll
+    ll = l.dup
+    # prune c2 and c3
+    l.prune_cells([ c2_index, c3_index ], -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1)/[c1](P=c0)(C=)");
+
+    l = ll
+    ll = l.dup
+    # prune c2 and c3 with cell objects
+    l.prune_cells([ l.cell(c2_index), l.cell(c3_index) ], -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1)/[c1](P=c0)(C=)");
 
   end
 
@@ -546,6 +587,12 @@ class DBLayoutTests1_TestClass < TestBase
     l.delete_cell_rec(c2_index)
     assert_equal(collect_hier(l), "[c0](P=)(C=c1)/[c1](P=c0)(C=)");
 
+    l = ll
+    ll = l.dup
+    # with cell object
+    l.delete_cell_rec(l.cell(c2_index))
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1)/[c1](P=c0)(C=)");
+
   end
 
   def test_5f
@@ -589,11 +636,37 @@ class DBLayoutTests1_TestClass < TestBase
 
     l = ll
     ll = l.dup
-    l.flatten(c0_index, -1, true)
+    l.flatten(c0_index)
     assert_equal(collect_hier(l), "[c0](P=)(C=)");
 
     ii = l.begin_shapes(c0_index, 0);
     assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](1200,0;2200,1100)/[c0](-1200,0;-100,1000)");
+
+    l = ll
+    ll = l.dup
+    c0flat = l.create_cell("c0flat")
+    l.flatten_into(c0_index, c0flat.cell_index)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)/[c0flat](P=)(C=)");
+
+    ii = l.begin_shapes(c0flat, 0);
+    assert_equal(collect(ii, l), "[c0flat](0,100;1000,1200)/[c0flat](0,100;1000,1200)/[c0flat](100,0;1100,1100)/[c0flat](1200,0;2200,1100)/[c0flat](-1200,0;-100,1000)");
+
+    l = ll
+    ll = l.dup
+    l.flatten(l.cell(c0_index), -1, true)  # with cell object
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
+
+    ii = l.begin_shapes(c0_index, 0);
+    assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](1200,0;2200,1100)/[c0](-1200,0;-100,1000)");
+
+    l = ll
+    ll = l.dup
+    c0flat = l.create_cell("c0flat")
+    l.flatten_into(l.cell(c0_index), c0flat, RBA::ICplxTrans::new(2.0), -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)/[c0flat](P=)(C=)");
+
+    ii = l.begin_shapes(c0flat, 0);
+    assert_equal(collect(ii, l), "[c0flat](0,200;2000,2400)/[c0flat](0,200;2000,2400)/[c0flat](200,0;2200,2200)/[c0flat](2400,0;4400,2200)/[c0flat](-2400,0;-200,2000)");
 
     l = ll
     ll = l.dup
@@ -748,8 +821,57 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=)/[c3](P=c0)(C=)");
 
     l = ll
+    ll = l.dup
     # Hint: even though we deleted c0 and c2, their indices are still valid
     l.cell(c0_index).prune_subcells(1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
+
+    l = ll
+    ll = l.dup
+    # As method of Layout
+    l.prune_subcells(c0_index, -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
+
+    l = ll
+    ll = l.dup
+    # As method of Layout with default argument
+    l.prune_subcells(c0_index)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
+
+    l = ll
+    ll = l.dup
+    # As method of Layout with Cell object
+    l.prune_subcells(l.cell(c0_index), -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
+
+    l = ll
+    ll = l.dup
+    # As method of Layout with Cell object and default argument
+    l.prune_subcells(l.cell(c0_index))
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
+
+    l = ll
+    ll = l.dup
+    # As method of Layout with multiple cells
+    l.prune_subcells([ c0_index ], -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
+
+    l = ll
+    ll = l.dup
+    # As method of Layout with multiple cells and default argument
+    l.prune_subcells([ c0_index ])
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
+
+    l = ll
+    ll = l.dup
+    # As method of Layout with multiple cells and Cell object
+    l.prune_subcells([ l.cell(c0_index) ], -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
+
+    l = ll
+    ll = l.dup
+    # As method of Layout with multiple cells and Cell object and default argument
+    l.prune_subcells([ l.cell(c0_index) ])
     assert_equal(collect_hier(l), "[c0](P=)(C=)");
 
   end
@@ -2365,7 +2487,7 @@ class DBLayoutTests1_TestClass < TestBase
   end
 
   # Properties IDs
-  def test_issue1549
+  def test_propertyIDs
 
     ly = RBA::Layout::new
 

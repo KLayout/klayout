@@ -33,6 +33,7 @@ class DBPath_TestClass < TestBase
     assert_equal( a.area.to_s, "0.0" )
     assert_equal( a.length.to_s, "0.0" )
     assert_equal( RBA::DPath::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DPath::from_bytes(a.to_bytes).to_s, a.to_s )
 
     b = a.dup 
     a = RBA::DPath::new( [ RBA::DPoint::new( 0, 1 ), RBA::DPoint::new( 1, 5 ) ], 2.5 )
@@ -40,6 +41,7 @@ class DBPath_TestClass < TestBase
     assert_equal( "%.3f" % a.area, "10.308" )
     assert_equal( "%.3f" % a.length, "4.123" )
     assert_equal( RBA::DPath::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DPath::from_bytes(a.to_bytes).to_s, a.to_s )
     c = a.dup 
 
     assert_equal( a == b, false )
@@ -55,6 +57,7 @@ class DBPath_TestClass < TestBase
     a = RBA::DPath::new( [ RBA::DPoint::new( 0, 1 ), RBA::DPoint::new( 1, 5 ) ], 2.5, -0.5, 1.5 )
     assert_equal( a.to_s, "(0,1;1,5) w=2.5 bx=-0.5 ex=1.5 r=false" )
     assert_equal( RBA::DPath::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DPath::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( "%.3f" % a.length, "5.123" )
     assert_equal( RBA::Path::new(a).to_s, "(0,1;1,5) w=3 bx=-1 ex=2 r=false" )
 
@@ -122,6 +125,7 @@ class DBPath_TestClass < TestBase
     assert_equal( a.area.to_f.to_s, "0.0" )
     assert_equal( a.length.to_s, "0" )
     assert_equal( RBA::Path::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Path::from_bytes(a.to_bytes).to_s, a.to_s )
 
     b = a.dup 
     a = RBA::Path::new( [ RBA::Point::new( 0, 10 ), RBA::Point::new( 10, 50 ) ], 25 )
@@ -129,6 +133,7 @@ class DBPath_TestClass < TestBase
     assert_equal( a.area.to_f.to_s, "1025.0" )
     assert_equal( a.length.to_s, "41" )
     assert_equal( RBA::Path::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Path::from_bytes(a.to_bytes).to_s, a.to_s )
     c = a.dup 
 
     assert_equal( a == b, false )
@@ -144,6 +149,7 @@ class DBPath_TestClass < TestBase
     assert_equal( a.to_s, "(0,10;10,50) w=25 bx=-5 ex=15 r=false" )
     assert_equal( a.length.to_s, "51" )
     assert_equal( RBA::Path::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Path::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( RBA::DPath::new(a).to_s, "(0,10;10,50) w=25 bx=-5 ex=15 r=false" )
 
     a.bgn_ext = 5

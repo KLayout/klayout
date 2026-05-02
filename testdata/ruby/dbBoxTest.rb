@@ -41,6 +41,7 @@ class DBBox_TestClass < TestBase
     a = RBA::DBox::new( -10, 21, 11, 17 )
     assert_equal( a.to_s, "(-10,17;11,21)" )
     assert_equal( RBA::DBox::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DBox::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( (a*0.5).to_s, "(-5,8.5;5.5,10.5)" )
 
     b = a
@@ -263,6 +264,7 @@ class DBBox_TestClass < TestBase
     a = RBA::Box::new( -10, 21, 11, 17 )
     assert_equal( a.to_s, "(-10,17;11,21)" )
     assert_equal( RBA::Box::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Box::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( (a*2).to_s, "(-20,34;22,42)" )
 
     b = a

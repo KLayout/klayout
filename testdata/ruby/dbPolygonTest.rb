@@ -31,6 +31,7 @@ class DBPolygon_TestClass < TestBase
     a = RBA::DPolygon::new
     assert_equal( a.to_s, "()" )
     assert_equal( RBA::DPolygon::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DPolygon::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( a.is_box?, false )
     assert_equal( a.is_empty?, true )
     assert_equal( a.is_rectilinear?, false )
@@ -41,6 +42,7 @@ class DBPolygon_TestClass < TestBase
     assert_equal( a.to_s, "(0,1;1,5;5,5)" )
     assert_equal( (a * 2).to_s, "(0,2;2,10;10,10)" )
     assert_equal( RBA::DPolygon::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DPolygon::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( a.is_box?, false )
     assert_equal( a.num_points_hull, 3 )
     assert_equal( a.is_empty?, false )
@@ -101,6 +103,7 @@ class DBPolygon_TestClass < TestBase
     a.insert_hole( [ RBA::DPoint::new( 1, 2 ), RBA::DPoint::new( 2, 2 ), RBA::DPoint::new( 2, 6 ) ] )
     assert_equal( a.to_s, "(0,1;1,5;1,1/1,2;2,2;2,6)" )
     assert_equal( RBA::DPolygon::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DPolygon::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( a.area, 0 )
     assert_equal( a.num_points_hole(0), 3 )
     assert_equal( a.holes, 1 )
@@ -172,6 +175,7 @@ class DBPolygon_TestClass < TestBase
     a = RBA::Polygon::new
     assert_equal( a.to_s, "()" )
     assert_equal( RBA::Polygon::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Polygon::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( a.is_box?, false )
 
     b = a.dup 
@@ -179,6 +183,7 @@ class DBPolygon_TestClass < TestBase
     assert_equal( a.to_s, "(0,1;1,5;5,5)" )
     assert_equal( (a * 2).to_s, "(0,2;2,10;10,10)" )
     assert_equal( RBA::Polygon::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Polygon::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( a.num_points_hull, 3 )
     c = a.dup 
 
@@ -226,6 +231,7 @@ class DBPolygon_TestClass < TestBase
     a.insert_hole( [ RBA::Point::new( 1, 2 ), RBA::Point::new( 2, 2 ), RBA::Point::new( 2, 6 ) ] )
     assert_equal( a.to_s, "(0,1;1,5;1,1/1,2;2,2;2,6)" )
     assert_equal( RBA::Polygon::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Polygon::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( a.area, 0 )
     assert_equal( a.num_points_hole(0), 3 )
     assert_equal( a.holes, 1 )

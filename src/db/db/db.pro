@@ -8,6 +8,7 @@ DEFINES += MAKE_DB_LIBRARY
 
 SOURCES = \
   dbArray.cc \
+  dbBinarySerialize.cc \
   dbBox.cc \
   dbBoxConvert.cc \
   dbBoxScanner.cc \
@@ -248,6 +249,7 @@ SOURCES = \
 
 HEADERS = \
   dbArray.h \
+  dbBinarySerialize.h \
   dbBoxConvert.h \
   dbBox.h \
   dbBoxScanner.h \

@@ -66,7 +66,7 @@ TEST(OutputPipe1)
   {
     tl::OutputPipe pipe ("cat >" + tf);
     tl::OutputStream str (pipe);
-    str << "Hello, world!";
+    str.put ("Hello, world!");
   }
 
   {
@@ -82,7 +82,7 @@ TEST(TextOutputStream)
 
   {
     tl::OutputStream os (fn, tl::OutputStream::OM_Auto, false);
-    os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
+    os.put ("Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.");
   }
 
   {
@@ -140,7 +140,7 @@ TEST(TextInputStream)
 
   {
     tl::OutputStream os (fn, tl::OutputStream::OM_Auto, false);
-    os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
+    os.put ("Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.");
   }
 
   {
@@ -242,7 +242,7 @@ TEST(SafeOutput)
 
   {
     tl::OutputStream os (tp);
-    os << "blabla\n";
+    os.put ("blabla\n");
   }
 
   EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -252,7 +252,7 @@ TEST(SafeOutput)
     tl::OutputStream os (tp);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "Hello, world!\n";
+    os.put ("Hello, world!\n");
   }
 
   EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -268,7 +268,7 @@ TEST(SafeOutput)
     tl::OutputStream os (broken);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "Hi!\n";
+    os.put ("Hi!\n");
     os.flush ();   //  raises the exception
     EXPECT_EQ (true, false);
   } catch (...) {
@@ -291,7 +291,7 @@ TEST(SafeOutput)
     tl::OutputStream os (broken);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "Hi!\n";
+    os.put ("Hi!\n");
     os.flush ();   //  raises the exception
     EXPECT_EQ (true, false);
   } catch (...) {
@@ -323,7 +323,7 @@ TEST(SafeOutput2)
 
     {
       tl::OutputStream os (tp);
-      os << "blabla\n";
+      os.put ("blabla\n");
     }
 
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -333,7 +333,7 @@ TEST(SafeOutput2)
       tl::OutputStream os (tp);
       EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
       EXPECT_EQ (tl::file_exists (tp), true);
-      os << "Hello, world!\n";
+      os.put ("Hello, world!\n");
     }
 
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -358,7 +358,7 @@ TEST(Backups)
 
   {
     tl::OutputStream os (tp, tl::OutputStream::OM_Auto, false, 2);
-    os << "1\n";
+    os.put ("1\n");
   }
 
   EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -376,7 +376,7 @@ TEST(Backups)
     tl::OutputStream os (tp, tl::OutputStream::OM_Auto, false, 2);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "2\n";
+    os.put ("2\n");
   }
 
   EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -399,7 +399,7 @@ TEST(Backups)
     tl::OutputStream os (tp, tl::OutputStream::OM_Auto, false, 2);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "3\n";
+    os.put ("3\n");
   }
 
   EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -427,7 +427,7 @@ TEST(Backups)
     tl::OutputStream os (tp, tl::OutputStream::OM_Auto, false, 2);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "4\n";
+    os.put ("4\n");
   }
 
   EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -456,7 +456,7 @@ TEST(Backups)
     tl::OutputStream os (broken);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "5!\n";
+    os.put ("5!\n");
     os.flush ();   //  raises the exception
     EXPECT_EQ (true, false);
   } catch (...) {
@@ -623,4 +623,305 @@ TEST(MatchFormat)
   EXPECT_EQ (tl::match_filename_to_format ("abc.TXT", "Text files (*.txt *.TXT)"), true);
   EXPECT_EQ (tl::match_filename_to_format ("abc.TEXT", "Text files (*.txt *.TXT)"), false);
   EXPECT_EQ (tl::match_filename_to_format ("abc.TEXT", "Text files (*)"), true);
+}
+
+std::string s2string (tl::OutputMemoryStream &osm)
+{
+  std::string res;
+  size_t n = osm.size ();
+  const char *d = osm.data ();
+  for (size_t i = 0; i < n; ++i, ++d) {
+    if (i > 0) {
+      res += ",";
+    }
+    res += tl::sprintf ("0x%02x", int ((unsigned char) *d));
+  }
+  return res;
+}
+
+TEST(BinaryStreams1)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << (double) 0.17;
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0xc3,0xf5,0x28,0x5c,0x8f,0xc2,0xc5,0x3f");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  double x = 0.0;
+  bis >> x;
+
+  EXPECT_EQ (tl::to_string (x), "0.17");
+}
+
+TEST(BinaryStreams2)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << (float) 0.17;
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0x7b,0x14,0x2e,0x3e");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  float x = 0.0;
+  bis >> x;
+
+  EXPECT_EQ (tl::to_string (x), "0.17");
+}
+
+TEST(BinaryStreams3)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << std::string ("ABC");
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x41,0x42,0x43");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  std::string x;
+  bis >> x;
+
+  EXPECT_EQ (x, "ABC");
+}
+
+TEST(BinaryStreams4)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << "ABC";
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x41,0x42,0x43");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  std::string x;
+  bis >> x;
+
+  EXPECT_EQ (x, "ABC");
+}
+
+TEST(BinaryStreams5)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << uint8_t (17);
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0x11");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  uint8_t x;
+  bis >> x;
+
+  EXPECT_EQ (x, 17);
+}
+
+TEST(BinaryStreams6)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << int8_t (17);
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0x11");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  int8_t x;
+  bis >> x;
+
+  EXPECT_EQ (x, 17);
+}
+
+TEST(BinaryStreams7)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << uint16_t (1742);
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0xce,0x06");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  uint16_t x;
+  bis >> x;
+
+  EXPECT_EQ (x, 1742);
+}
+
+TEST(BinaryStreams8)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << int16_t (1742);
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0xce,0x06");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  int16_t x;
+  bis >> x;
+
+  EXPECT_EQ (x, 1742);
+}
+
+TEST(BinaryStreams9)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << uint32_t (17420000);
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0xe0,0xce,0x09,0x01");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  uint32_t x;
+  bis >> x;
+
+  EXPECT_EQ (x, 17420000u);
+}
+
+TEST(BinaryStreams10)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << int32_t (17420000);
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0xe0,0xce,0x09,0x01");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  int32_t x;
+  bis >> x;
+
+  EXPECT_EQ (x, 17420000);
+}
+
+TEST(BinaryStreams11)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << uint64_t (174200000000l);
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0x00,0x0e,0x21,0x8f,0x28,0x00,0x00,0x00");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  uint64_t x;
+  bis >> x;
+
+  EXPECT_EQ (x, 174200000000lu);
+}
+
+TEST(BinaryStreams12)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << int64_t (174200000000l);
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0x00,0x0e,0x21,0x8f,0x28,0x00,0x00,0x00");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  int64_t x;
+  bis >> x;
+
+  EXPECT_EQ (x, 174200000000l);
+}
+
+TEST(BinaryStreams13)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << true;
+  os << false;
+
+  os.flush ();
+  EXPECT_EQ (s2string (osm), "0x01,0x00");
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  bool x = false, y = false;
+  bis >> x >> y;
+
+  EXPECT_EQ (x, true);
+  EXPECT_EQ (y, false);
+}
+
+TEST(BinaryStreamsCombined)
+{
+  tl::OutputMemoryStream osm;
+  tl::OutputStream os (osm, false /*binary*/);
+
+  os << "ABC" << 17.0 << "XUV" << (int32_t) 42;
+
+  os.flush ();
+
+  tl::InputMemoryStream ism (osm.data (), osm.size ());
+  tl::InputStream is (ism);
+  tl::BinaryInputStream bis (is);
+
+  std::string a, c;
+  double b = 0.0;
+  int32_t d = 0;
+
+  bis >> a >> b >> c >> d;
+
+  EXPECT_EQ (a, "ABC");
+  EXPECT_EQ (b, 17.0);
+  EXPECT_EQ (c, "XUV");
+  EXPECT_EQ (d, 42);
 }

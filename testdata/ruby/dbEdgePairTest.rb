@@ -40,6 +40,9 @@ class DBEdgePair_TestClass < TestBase
     assert_equal(ep.to_s, "(0,0;10,20)/(-10,0;-10,30)")
     assert_equal(ep.bbox.to_s, "(-10,0;10,30)")
 
+    assert_equal(RBA::EdgePair::from_s(ep.to_s).to_s, ep.to_s)
+    assert_equal(RBA::EdgePair::from_bytes(ep.to_bytes).to_s, ep.to_s)
+
     assert_equal(RBA::EdgePair::new(ep.first, ep.second).to_s, "(0,0;10,20)/(-10,0;-10,30)")
 
     ep2 = RBA::EdgePair::new
@@ -90,6 +93,9 @@ class DBEdgePair_TestClass < TestBase
     ep.second = RBA::DEdge::new(-10, 0, -10, 30)
     assert_equal(ep.to_s, "(0,0;10,20)/(-10,0;-10,30)")
     assert_equal(ep.bbox.to_s, "(-10,0;10,30)")
+
+    assert_equal(RBA::DEdgePair::from_s(ep.to_s).to_s, ep.to_s)
+    assert_equal(RBA::DEdgePair::from_bytes(ep.to_bytes).to_s, ep.to_s)
 
     assert_equal(RBA::DEdgePair::new(ep.first, ep.second).to_s, "(0,0;10,20)/(-10,0;-10,30)")
 

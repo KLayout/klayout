@@ -2253,7 +2253,7 @@ TEST(52_PropertiesDeep)
   EXPECT_EQ (s.at_end (), false);
 
   //  polygons are merged with "maximum" property value
-  EXPECT_EQ (db::PolygonWithProperties (*s, s.prop_id ()).to_string (), "(0,0;0,200;1,200;1,202;10,202;10,220;110,220;110,212;111,212;111,12;101,12;101,2;100,2;100,0) props={id=>42}");
+  EXPECT_EQ (db::PolygonWithProperties (*s, s.prop_id ()).to_string (), "(0,0;0,200;1,200;1,202;10,202;10,220;110,220;110,212;111,212;111,12;101,12;101,2;100,2;100,0) props={'id'=>#42}");
   ++s;
 
   EXPECT_EQ (s.at_end (), true);
@@ -2395,7 +2395,7 @@ TEST(53_PropertiesDeepFromLayout)
   EXPECT_EQ (s.at_end (), false);
 
   //  polygons are merged with "maximum" property value
-  EXPECT_EQ (db::PolygonWithProperties (*s, s.prop_id ()).to_string (), "(0,0;0,200;1,200;1,202;10,202;10,220;110,220;110,212;111,212;111,12;101,12;101,2;100,2;100,0) props={VALUE=>42}");
+  EXPECT_EQ (db::PolygonWithProperties (*s, s.prop_id ()).to_string (), "(0,0;0,200;1,200;1,202;10,202;10,220;110,220;110,212;111,212;111,12;101,12;101,2;100,2;100,0) props={'VALUE'=>#42}");
   ++s;
 
   EXPECT_EQ (s.at_end (), true);

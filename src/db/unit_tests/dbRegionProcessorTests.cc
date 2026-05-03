@@ -84,5 +84,5 @@ TEST(1_RegionToEdgesProcessor)
 
   result.clear ();
   db::PolygonToEdgeProcessor (db::PolygonToEdgeProcessor::StepIn).process (poly, result);
-  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(0,1000;1000,1000) props={net=>17};(2000,2000;2000,1000) props={net=>17}");
+  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(0,1000;1000,1000) props={'net'=>#17};(2000,2000;2000,1000) props={'net'=>#17}");
 }

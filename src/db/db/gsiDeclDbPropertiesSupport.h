@@ -35,6 +35,15 @@ namespace gsi
 {
 
 template <class T>
+static T *from_string (const std::string &s)
+{
+  tl::Extractor ex (s);
+  std::unique_ptr<T> t (new T ());
+  ex.read (*t.get ());
+  return t.release ();
+}
+
+template <class T>
 static T *from_bytes (const std::vector<char> &s)
 {
   std::unique_ptr<T> t (new T ());
@@ -264,6 +273,12 @@ static gsi::Methods properties_support_methods ()
     "This method is a convenience method that gets the user property with the given key. "
     "If no property with that key does not exist, it will return nil. Using that method is more "
     "convenient than using the layout object and the properties ID to retrieve the property value. "
+  ) +
+  gsi::constructor ("from_s", &from_string<T>, gsi::arg ("s"),
+    "@brief Creates an object from a binary serialization\n"
+    "Creates the object from a binary representation (as returned by \\to_bytes)\n"
+    "\n"
+    "This method has been added in version 0.30.9.\n"
   ) +
   gsi::method ("to_s", (std::string (T::*) () const) &T::to_string,
     "@brief Returns a string representing the object\n"

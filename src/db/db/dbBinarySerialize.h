@@ -35,6 +35,7 @@
 #include "dbPath.h"
 #include "dbTrans.h"
 #include "dbText.h"
+#include "dbObjectWithProperties.h"
 
 #include "tlBinaryStream.h"
 #include "tlException.h"
@@ -207,6 +208,23 @@ tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::path<C>
   write_coord (s, p.bgn_ext ());
   write_coord (s, p.end_ext ());
   s << p.round ();
+  return s;
+}
+
+template<class T>
+tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::object_with_properties<T> &o)
+{
+  s << (uint16_t) 1; // version
+
+  s << (const T &) o;
+
+  const auto &ps = db::properties (o.properties_id ());
+
+  s << (uint64_t) ps.size ();
+  for (auto i = ps.begin (); i != ps.end (); ++i) {
+    s << db::property_name (i->first) << db::property_value (i->second);
+  }
+
   return s;
 }
 
@@ -527,6 +545,33 @@ tl::BinaryInputStream &operator>> (tl::BinaryInputStream &s, db::path<C> &p)
   s >> round;
 
   p = db::path<C> (pts.begin (), pts.end (), width, bgn_ext, end_ext, round);
+  return s;
+}
+
+template<class T>
+tl::BinaryInputStream &operator>> (tl::BinaryInputStream &s, db::object_with_properties<T> &o)
+{
+  uint16_t fmt = 0;
+  s >> fmt;
+  if (fmt > 1) {
+    throw FutureBinarySerializationFormatException ();
+  }
+
+  s >> (T &) o;
+
+  uint64_t n = 0;
+  s >> n;
+
+  db::PropertiesSet ps;
+
+  while (n-- > 0) {
+    tl::Variant name, value;
+    s >> name >> value;
+    ps.insert (name, value);
+  }
+
+  o.properties_id (db::properties_id (ps));
+
   return s;
 }
 

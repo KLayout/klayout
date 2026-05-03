@@ -990,6 +990,24 @@ class DBPolygon_TestClass < TestBase
     assert_equal(s.class.to_s, "RBA::DSimplePolygonWithProperties")
     assert_equal(s.downcast.class.to_s, "RBA::DSimplePolygon")
 
+    # binary serialization
+    s = RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), {})
+    assert_equal(RBA::PolygonWithProperties::from_bytes(s.to_bytes).to_s, s.to_s)
+    s = RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one", "key" => 17 })
+    assert_equal(RBA::PolygonWithProperties::from_bytes(s.to_bytes).to_s, s.to_s)
+    s = RBA::DPolygonWithProperties::new(RBA::DBox::new(0, 0, 100, 200), {})
+    assert_equal(RBA::DPolygonWithProperties::from_bytes(s.to_bytes).to_s, s.to_s)
+    s = RBA::DPolygonWithProperties::new(RBA::DBox::new(0, 0, 100, 200), { 1 => "one", "key" => 17 })
+    assert_equal(RBA::DPolygonWithProperties::from_bytes(s.to_bytes).to_s, s.to_s)
+    s = RBA::SimplePolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), {})
+    assert_equal(RBA::SimplePolygonWithProperties::from_bytes(s.to_bytes).to_s, s.to_s)
+    s = RBA::SimplePolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one", "key" => 17 })
+    assert_equal(RBA::SimplePolygonWithProperties::from_bytes(s.to_bytes).to_s, s.to_s)
+    s = RBA::DSimplePolygonWithProperties::new(RBA::DBox::new(0, 0, 100, 200), {})
+    assert_equal(RBA::DSimplePolygonWithProperties::from_bytes(s.to_bytes).to_s, s.to_s)
+    s = RBA::DSimplePolygonWithProperties::new(RBA::DBox::new(0, 0, 100, 200), { 1 => "one", "key" => 17 })
+    assert_equal(RBA::DSimplePolygonWithProperties::from_bytes(s.to_bytes).to_s, s.to_s)
+
   end
 
   def test_triangulation

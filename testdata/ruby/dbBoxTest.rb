@@ -552,6 +552,20 @@ class DBBox_TestClass < TestBase
     assert_equal(s.to_s, "(0,0;100,200) props={}")
     assert_equal(s.property(1), nil)
 
+    # binary serialization
+
+    s = RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), {})
+    assert_equal(RBA::BoxWithProperties::from_bytes(s.to_bytes).to_s, s.to_s)
+
+    s = RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one", "key" => 17 })
+    assert_equal(RBA::BoxWithProperties::from_bytes(s.to_bytes).to_s, s.to_s)
+
+    s = RBA::DBoxWithProperties::new(RBA::DBox::new(0, 0, 100, 200), {})
+    assert_equal(RBA::DBoxWithProperties::from_bytes(s.to_bytes).to_s, s.to_s)
+
+    s = RBA::DBoxWithProperties::new(RBA::DBox::new(0, 0, 100, 200), { 1 => "one", "key" => 17 })
+    assert_equal(RBA::DBoxWithProperties::from_bytes(s.to_bytes).to_s, s.to_s)
+
   end
 
 end

@@ -251,7 +251,7 @@ static gsi::Methods properties_support_methods ()
     "convenient than using the layout object and the properties ID to retrieve the property value. "
   ) +
   gsi::method ("to_s", (std::string (T::*) () const) &T::to_string,
-    "@brief Returns a string representing the polygon\n"
+    "@brief Returns a string representing the object\n"
   ) +
   gsi::method_ext ("properties", &get_properties_meth_impl<T>,
     "@brief Gets the user properties\n"

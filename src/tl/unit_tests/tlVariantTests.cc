@@ -97,7 +97,45 @@ TEST(1)
   EXPECT_EQ (v.is_ulong (), false);
   EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.to_string (), "nil");
   EXPECT_EQ (v.to_parsable_string (), "nil");
+  vv = v;
+  EXPECT_EQ (vv == v, true);
+  EXPECT_EQ (vv != v, false);
+  tl::Variant vx;
+  std::string s (v.to_parsable_string ());
+  tl::Extractor ex (s.c_str ());
+  ex.read (vx);
+  ex.expect_end ();
+  EXPECT_EQ (vx == v, true);
+  }
+
+  {
+  tl::Variant v ((char) '\033');
+#if defined(HAVE_QT)
+  EXPECT_EQ (tl::to_string (v.to_qvariant ().toString ()), "27");
+#endif
+  EXPECT_EQ (v.is_nil (), false);
+  EXPECT_EQ (v.is_list (), false);
+  EXPECT_EQ (v.is_cstring (), false);
+  EXPECT_EQ (v.is_id (), false);
+  EXPECT_EQ (v.is<short> (), false);
+  EXPECT_EQ (v.is<unsigned short> (), false);
+  EXPECT_EQ (v.is<int> (), false);
+  EXPECT_EQ (v.is<unsigned int> (), false);
+  EXPECT_EQ (v.is<short> (), false);
+  EXPECT_EQ (v.is<unsigned short> (), false);
+  EXPECT_EQ (v.is<unsigned char> (), false);
+  EXPECT_EQ (v.is<signed char> (), false);
+  EXPECT_EQ (v.is<long> (), false);
+  EXPECT_EQ (v.is_char (), true);
+  EXPECT_EQ (v.is_long (), false);
+  EXPECT_EQ (v.is_longlong (), false);
+  EXPECT_EQ (v.is_ulong (), false);
+  EXPECT_EQ (v.is_ulonglong (), false);
+  EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.to_string (), "\033");
+  EXPECT_EQ (v.to_parsable_string (), "'\\033'c");
   vv = v;
   EXPECT_EQ (vv == v, true);
   EXPECT_EQ (vv != v, false);
@@ -123,6 +161,7 @@ TEST(1)
   EXPECT_EQ (v.is_long (), false);
   EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.to_string (), "1");
   EXPECT_EQ (v.to_parsable_string (), "#u1");
   EXPECT_EQ (v.to_long (), 1l);
   EXPECT_EQ (v.to_longlong (), 1l);
@@ -161,6 +200,7 @@ TEST(1)
   EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_id (), false);
   EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.to_string (), "2");
   EXPECT_EQ (v.to_parsable_string (), "#u2");
   EXPECT_EQ (v.to_long (), 2l);
   EXPECT_EQ (v.to_longlong (), 2l);
@@ -196,6 +236,7 @@ TEST(1)
   EXPECT_EQ (v.is<int> (), true);
   EXPECT_EQ (v.is<unsigned int> (), false);
   EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.to_string (), "1");
   EXPECT_EQ (v.to_parsable_string (), "#1");
   EXPECT_EQ (v.to_long (), 1l);
   EXPECT_EQ (v.to_longlong (), 1l);
@@ -236,6 +277,7 @@ TEST(1)
   EXPECT_EQ (v.is<unsigned int> (), false);
   EXPECT_EQ (v.is<unsigned char> (), false);
   EXPECT_EQ (v.is<signed char> (), false);
+  EXPECT_EQ (v.to_string (), "2");
   EXPECT_EQ (v.to_parsable_string (), "#2");
   EXPECT_EQ (v.to_long (), 2l);
   EXPECT_EQ (v.to_longlong (), 2l);
@@ -279,6 +321,7 @@ TEST(1)
   EXPECT_EQ (v.is<unsigned char> (), false);
   EXPECT_EQ (v.is<signed char> (), false);
   EXPECT_EQ (v.is_id (), false);
+  EXPECT_EQ (v.to_string (), "5");
   EXPECT_EQ (v.to_parsable_string (), "##5");
   EXPECT_EQ (v.to_double (), 5.0);
   EXPECT_EQ (v.to_float (), 5.0);
@@ -327,6 +370,7 @@ TEST(1)
   EXPECT_EQ (v.is<unsigned char> (), false);
   EXPECT_EQ (v.is<signed char> (), false);
   EXPECT_EQ (v.is_id (), false);
+  EXPECT_EQ (v.to_string (), "5");
   EXPECT_EQ (v.to_parsable_string (), "##5");
   EXPECT_EQ (v.to_double (), 5.0);
   EXPECT_EQ (v.to_long (), 5);
@@ -386,6 +430,7 @@ TEST(1)
   EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.to_string (), "2");
   EXPECT_EQ (v.to_parsable_string (), "#2");
   vv = v;
   EXPECT_EQ (vv == v, true);
@@ -419,6 +464,8 @@ TEST(1)
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
+  EXPECT_EQ (v.is_bytearray (), false);
+  EXPECT_EQ (v.is_a_bytearray (), false);
   EXPECT_EQ (v.is_id (), false);
   EXPECT_EQ (v.is_char (), false);
   EXPECT_EQ (v.is_long (), false);
@@ -432,6 +479,7 @@ TEST(1)
   EXPECT_EQ (v.is<signed char> (), false);
   EXPECT_EQ (v.is<long> (), false);
   EXPECT_EQ (v.is<unsigned long> (), false);
+  EXPECT_EQ (v.to_string (), "2");
   EXPECT_EQ (v.to_parsable_string (), "#u2");
   vv = v;
   EXPECT_EQ (vv == v, true);
@@ -452,6 +500,39 @@ TEST(1)
   EXPECT_EQ (v.is_ulong (), true);
   EXPECT_EQ (*(long *)vx.native_ptr(), 2);
   EXPECT_EQ (*(long *)v.native_ptr(), 2);
+  }
+
+  {
+  std::vector<char> bytes = { '"', 'h', 0, '\033', 'a', 'l', 'l', 'O', '"' };
+  tl::Variant v (std::move (bytes));
+#if defined(HAVE_QT)
+  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "'\"h\\000\\033allO\"'b");
+#endif
+  EXPECT_EQ (v.is_nil (), false);
+  EXPECT_EQ (v.is_list (), false);
+  EXPECT_EQ (v.is_cstring (), false);
+  EXPECT_EQ (v.is_bytearray (), true);
+  EXPECT_EQ (v.is_a_bytearray (), true);
+  EXPECT_EQ (v.is_long (), false);
+  EXPECT_EQ (v.is_ulong (), false);
+  EXPECT_EQ (v.is_longlong (), false);
+  EXPECT_EQ (v.is_ulonglong (), false);
+  EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.is_id (), false);
+  EXPECT_EQ (v.to_parsable_string (), "'\"h\\000\\033allO\"'b");
+  EXPECT_EQ (v.to_stdstring (), std::string ("\"h\000\033allO\"", 9));
+  EXPECT_EQ (vv == v, false);
+  EXPECT_EQ (vv != v, true);
+  vv = v;
+  EXPECT_EQ (vv == v, true);
+  EXPECT_EQ (vv != v, false);
+  tl::Variant vx;
+  std::string s (v.to_parsable_string ());
+  tl::Extractor ex (s.c_str ());
+  ex.read (vx);
+  ex.expect_end ();
+  EXPECT_EQ (vx.is_bytearray (), true);
+  EXPECT_EQ (vx == v, true);
   }
 
   {
@@ -534,6 +615,7 @@ TEST(1)
   EXPECT_EQ (v.is_id (), false);
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.to_string (), "(1,5,25)");
   EXPECT_EQ (v.to_parsable_string (), "(#1,#5,#25)");
   EXPECT_EQ (v.get_list ().size (), size_t (3));
   EXPECT_EQ (v.begin ()->is_long (), true);
@@ -571,6 +653,7 @@ TEST(1)
   EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.to_string (), "17");
   EXPECT_EQ (v.to_parsable_string (), "#l17");
   tl::Variant vx;
   std::string s (v.to_parsable_string ());
@@ -595,6 +678,7 @@ TEST(1)
   EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.to_string (), "17");
   EXPECT_EQ (v.to_parsable_string (), "#lu17");
   tl::Variant vx;
   std::string s (v.to_parsable_string ());
@@ -619,6 +703,7 @@ TEST(1)
   EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.to_string (), "[id17]");
   EXPECT_EQ (v.to_parsable_string (), "[id17]");
   }
 
@@ -642,6 +727,7 @@ TEST(1)
   v.insert (tl::Variant (1), tl::Variant ("A"));
   EXPECT_EQ (v.to_parsable_string (), "{#1=>\'A\'}");
   v.insert (tl::Variant ("B"), tl::Variant (17));
+  EXPECT_EQ (v.to_string (), "{1=>A,B=>17}");
   EXPECT_EQ (v.to_parsable_string (), "{#1=>\'A\',\'B\'=>#17}");
 #if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "{\'1\'=>\'A\',\'B\'=>#17}");
@@ -1138,7 +1224,7 @@ TEST(8)
   v = tl::Variant (QByteArray ());
   EXPECT_EQ (v.to_parsable_string (), "nil");
   v = tl::Variant (QByteArray ("abc"));
-  EXPECT_EQ (v.to_parsable_string (), "'abc'");
+  EXPECT_EQ (v.to_parsable_string (), "'abc'b");
   v = QByteArray ();
   EXPECT_EQ (v.to_parsable_string (), "nil");
 #endif

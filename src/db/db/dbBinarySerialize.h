@@ -36,7 +36,7 @@
 #include "dbTrans.h"
 #include "dbText.h"
 
-#include "tlStream.h"
+#include "tlBinaryStream.h"
 #include "tlException.h"
 
 namespace db

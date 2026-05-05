@@ -133,6 +133,13 @@ Region::Region (DeepShapeStore &dss)
 }
 
 void
+Region::convert_to_deep (const db::DeepLayer &layer)
+{
+  tl_assert (mp_delegate->deep () == 0);
+  set_delegate (new db::DeepRegion (layer));
+}
+
+void
 Region::write (const std::string &fn) const
 {
   //  method provided for debugging purposes

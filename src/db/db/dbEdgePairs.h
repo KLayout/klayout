@@ -205,6 +205,11 @@ public:
   explicit EdgePairs (DeepShapeStore &dss);
 
   /**
+   *  @brief Converts the shape collection to a deep one using the specified layer
+   */
+  virtual void convert_to_deep (const db::DeepLayer &layer);
+
+  /**
    *  @brief Writes the edge pair collection to a file
    *
    *  This method is provided for debugging purposes. A flat image of the

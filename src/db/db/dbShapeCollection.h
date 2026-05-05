@@ -103,6 +103,11 @@ public:
   virtual ShapeCollectionDelegateBase *get_delegate () const = 0;
 
   /**
+   *  @brief Converts the shape collection to a deep one using the specified layer
+   */
+  virtual void convert_to_deep (const db::DeepLayer &layer) = 0;
+
+  /**
    *  @brief Applies a PropertyTranslator
    *
    *  This method will translate the property IDs according to the given property translator.

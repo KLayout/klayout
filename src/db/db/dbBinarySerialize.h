@@ -442,7 +442,7 @@ tl::BinaryInputStream &operator>> (tl::BinaryInputStream &s, db::disp_trans<C> &
 
   db::vector<C> d;
   read_binary (s, d);
-  t = db::disp_trans (d);
+  t = db::disp_trans<C> (d);
 
   return s;
 }
@@ -456,7 +456,7 @@ tl::BinaryInputStream &read_binary (tl::BinaryInputStream &s, db::simple_trans<C
   db::vector<C> d;
   read_binary (s, d);
 
-  t = db::simple_trans (r, d);
+  t = db::simple_trans<C> (r, d);
   return s;
 }
 
@@ -513,7 +513,7 @@ tl::BinaryInputStream &operator>> (tl::BinaryInputStream &s, db::text<C> &t)
   int32_t font, halign, valign;
   s >> font >> halign >> valign;
 
-  t = db::text (txt, tr, size, db::Font (font), db::HAlign (halign), db::VAlign (valign));
+  t = db::text<C> (txt, tr, size, db::Font (font), db::HAlign (halign), db::VAlign (valign));
   return s;
 }
 

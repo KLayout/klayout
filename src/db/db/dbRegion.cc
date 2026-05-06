@@ -136,7 +136,7 @@ void
 Region::convert_to_deep (const db::DeepLayer &layer)
 {
   tl_assert (mp_delegate->deep () == 0);
-  set_delegate (new db::DeepRegion (layer));
+  set_delegate (copy_data_id (new db::DeepRegion (layer)));
 }
 
 void

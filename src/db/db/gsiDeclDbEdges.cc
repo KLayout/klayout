@@ -892,9 +892,9 @@ static db::Edges *new_texts_as_dots2 (const db::RecursiveShapeIterator &si, db::
   return new db::Edges (db::Region (si).texts_as_dots (pat, pattern, dss));
 }
 
-static size_t id (const db::Edges *e)
+static size_t data_id (const db::Edges *e)
 {
-  return tl::id_of (e->delegate ());
+  return e->delegate ()->data_id ();
 }
 
 static std::vector<db::Edges> andnot_with_edges (const db::Edges *r, const db::Edges &other)
@@ -2572,7 +2572,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "This method has been added in version 0.26."
   ) +
-  method_ext ("data_id", &id,
+  method_ext ("data_id", &data_id,
     "@brief Returns the data ID (a unique identifier for the underlying data storage)\n"
     "\n"
     "This method has been added in version 0.26."

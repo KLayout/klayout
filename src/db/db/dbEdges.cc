@@ -118,7 +118,7 @@ void
 Edges::convert_to_deep (const db::DeepLayer &layer)
 {
   tl_assert (mp_delegate->deep () == 0);
-  set_delegate (new db::DeepEdges (layer));
+  set_delegate (copy_data_id (new db::DeepEdges (layer)));
 }
 
 const db::RecursiveShapeIterator &

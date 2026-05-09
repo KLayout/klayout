@@ -101,6 +101,7 @@ private:
   void invalidate ();
   void init ();
   void get_xmin_xmax (double &xmin, double &xmax, bool &has_error_out);
+  bool update_controls ();
 };
 
 }

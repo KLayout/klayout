@@ -168,12 +168,14 @@ BEGIN_PROTECTED
 
   } else if (rb_shapes->isChecked ()) {
 
+    lay::CellView ccv = view ()->cellview (cb_layer->cv_index ());
     int sel_layer = cb_layer->current_layer ();
-    if (sel_layer < 0 || ! cv->layout ().is_valid_layer (sel_layer)) {
+
+    if (! ccv.is_valid () || sel_layer < 0 || ! ccv->layout ().is_valid_layer (sel_layer)) {
       throw tl::Exception (tl::to_string (QObject::tr ("No valid layer selected to get clip boxes from")));
     }
 
-    db::collect_clip_boxes (cv->layout (), cv.cell_index (), (unsigned int) sel_layer, clip_boxes);
+    db::collect_clip_boxes (ccv->layout (), ccv.cell_index (), (unsigned int) sel_layer, clip_boxes);
 
   }
 

@@ -135,27 +135,33 @@ DensityMapDialog::~DensityMapDialog ()
   //  .. nothing yet ..
 }
 
-// @@@@
-class TileRec
-  : public db::TileOutputReceiver
+namespace
 {
-public:
-  TileRec (img::Object *img)
-    : mp_img (img)
-  {
-    //  .. nothing yet ..
-  }
 
-  virtual void put (size_t ix, size_t iy, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double /*dbu*/, const db::ICplxTrans & /*trans*/, bool /*clip*/)
+  class DensityMapTileReceiver
+    : public db::TileOutputReceiver
   {
-    tl::info << "@@@ " << ix << "," << iy << " -> " << obj.to_string () << " -- " << tile.to_string ();
-    mp_img->set_pixel (ix, iy, obj.to_double ());
-  }
+  public:
+    DensityMapTileReceiver (img::Object *img)
+      : mp_img (img)
+    {
+      //  .. nothing yet ..
+    }
 
-private:
-  img::Object *mp_img;
-};
-// @@@
+    virtual void put (size_t ix, size_t iy, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double /*dbu*/, const db::ICplxTrans & /*trans*/, bool /*clip*/)
+    {
+      if (tl::verbosity () >= 30) {
+        tl::info << "Density map value: " << ix << "," << iy << " " << tile.to_string () << " -> " << obj.to_string ();
+      }
+
+      mp_img->set_pixel (ix, iy, obj.to_double ());
+    }
+
+  private:
+    img::Object *mp_img;
+  };
+
+}
 
 void 
 DensityMapDialog::accept ()
@@ -326,8 +332,7 @@ BEGIN_PROTECTED
   img::Service *img_service = view ()->get_plugin <img::Service> ();
   if (img_service) {
 
-    //  TODO: we could selectively clear all images that are used for density maps (-> needs a property that identifies them)
-    img_service->clear_images ();
+    const std::string img_tag = "density-map-image";
 
     img::DataMapping dm;
     dm.false_color_nodes.clear ();
@@ -337,15 +342,25 @@ BEGIN_PROTECTED
     dm.false_color_nodes.push_back (std::make_pair (0.0, std::make_pair (0x0000ff, 0x0000ff)));
     dm.false_color_nodes.push_back (std::make_pair (1.0, std::make_pair (0xff0000, 0xff0000)));
 
+    for (auto i = img_service->begin_images (); ! i.at_end (); ++i) {
+      if (i->tag () == img_tag) {
+        //  inherit data mapping from previous image
+        dm = i->data_mapping ();
+        img_service->erase_image_by_id (i->id ());
+        break;
+      }
+    }
+
     img::Object img (nx, ny, db::DCplxTrans (pixel_size, 0.0, false, region.center () - db::DPoint ()), false, false);
     img.set_data_mapping (dm);
+    img.set_tag (img_tag);
 
     img_object = img_service->insert_image (img);
 
   }
 
   tl_assert (img_object);
-  tp.output ("dens", 0, new TileRec (img_object), db::ICplxTrans ());
+  tp.output ("dens", 0, new DensityMapTileReceiver (img_object), db::ICplxTrans ());
 
   //  Execute the tiling processor
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>657</width>
-    <height>425</height>
+    <height>480</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -64,10 +64,47 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="le_window_size">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="2">
        <widget class="QLabel" name="label_8">
         <property name="text">
          <string>µm</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QSpinBox" name="sb_threads">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>Averaging window size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Threads</string>
         </property>
        </widget>
       </item>
@@ -84,24 +121,51 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="1">
-       <widget class="QSpinBox" name="sb_threads">
+      <item row="1" column="2" colspan="2">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>µm (a multiple of the pixel size or empty)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>Boundary mode</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="3">
+       <widget class="QComboBox" name="cb_boundary_mode">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="minimum">
-         <number>1</number>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_9">
-        <property name="text">
-         <string>Threads</string>
-        </property>
+        <item>
+         <property name="text">
+          <string>Periodic (repeat region seamlessly)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Use zero density outside</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Use 100% density outside</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Use average density outside</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
@@ -473,7 +537,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Close|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>

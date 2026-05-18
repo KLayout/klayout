@@ -30,6 +30,11 @@
 #include "layBrowser.h"
 #include "layMarker.h"
 
+namespace img
+{
+  class Object;
+}
+
 namespace lay
 {
 
@@ -65,6 +70,12 @@ private:
     //  The pixel size
     double pixel_size;
 
+    //  The window size or zero for "no window"
+    double window_size;
+
+    //  The boundary mode
+    std::string boundary_mode;
+
     //  The number of threads to use
     int threads;
   };
@@ -77,6 +88,7 @@ private:
 
   void make_density_map ();
   void compute_density_map (const DensityMapParameters &par);
+  void average_window (img::Object &img_object, const std::string boundary_mode, int nw);
 
 };
 

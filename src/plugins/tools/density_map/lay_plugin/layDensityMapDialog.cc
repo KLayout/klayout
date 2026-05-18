@@ -58,9 +58,19 @@ static const std::vector<std::string> region_modes = {
   region_mode_by_rulers
 };
 
+static const std::string boundary_mode_periodic ("boundary-mode-periodic");
+static const std::string boundary_mode_zero ("boundary-mode-zero");
+static const std::string boundary_mode_one ("boundary-mode-one");
+static const std::string boundary_mode_average ("boundary-mode-average");
+
+//  items in boundary_mode_cb
+static const std::vector<std::string> boundary_modes = { boundary_mode_periodic, boundary_mode_zero, boundary_mode_one, boundary_mode_average };
+
 static const std::string cfg_density_map_region_mode ("density-map-region-mode");
 static const std::string cfg_density_map_layer_mode ("density-map-layer-mode");
 static const std::string cfg_density_map_pixel_size ("density-map-pixel-size");
+static const std::string cfg_density_map_window_size ("density-map-window-size");
+static const std::string cfg_density_map_boundary_mode ("density-map-boundary-mode");
 static const std::string cfg_density_map_threads ("density-map-threads");
 static const std::string cfg_density_map_source_layer ("density-map-source-layer");
 static const std::string cfg_density_map_box_layer ("density-map-box-layer");
@@ -78,6 +88,8 @@ public:
     options.push_back (std::make_pair (cfg_density_map_layer_mode, layer_mode_specific));
     options.push_back (std::make_pair (cfg_density_map_region_mode, region_mode_global_bbox));
     options.push_back (std::make_pair (cfg_density_map_pixel_size, "100"));
+    options.push_back (std::make_pair (cfg_density_map_window_size, "0"));
+    options.push_back (std::make_pair (cfg_density_map_boundary_mode, boundary_mode_periodic));
     options.push_back (std::make_pair (cfg_density_map_threads, "1"));
   }
 
@@ -269,6 +281,32 @@ DensityMapDialog::configure (const std::string &name, const std::string &value)
     }
     return true;
 
+  } else if (name == cfg_density_map_window_size) {
+
+    double ws = 0.0;
+    try {
+      tl::from_string (value, ws);
+      if (ws > 0) {
+        le_window_size->setText (tl::to_qstring (tl::to_string (ws)));
+      } else {
+        le_window_size->setText (QString ());
+      }
+    } catch (...) {
+    }
+    return true;
+
+  } else if (name == cfg_density_map_boundary_mode) {
+
+    int mode = 0;
+    for (size_t i = 0; i < boundary_modes.size (); ++i) {
+      if (boundary_modes[i] == value) {
+        mode = int (i);
+      }
+    }
+
+    cb_boundary_mode->setCurrentIndex (mode);
+    return true;
+
   } else if (name == cfg_density_map_threads) {
 
     int thr = 1;
@@ -335,8 +373,22 @@ DensityMapDialog::make_density_map ()
   tl::from_string_ext (tl::to_string (le_pixel_size->text ()), par.pixel_size);
 
   if (par.pixel_size < 1e-6) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Pixel size must be positive and not zero")));
+    throw tl::Exception (tl::to_string (QObject::tr ("The pixel size must be positive and not zero")));
   }
+
+  par.window_size = 0.0;
+  if (! le_window_size->text ().simplified ().isEmpty ()) {
+    tl::from_string_ext (tl::to_string (le_window_size->text ()), par.window_size);
+    if (par.window_size < 1e-6) {
+      throw tl::Exception (tl::to_string (QObject::tr ("The window size must be positive and not zero or empty")));
+    }
+  }
+
+  int boundary_mode = cb_boundary_mode->currentIndex ();
+  if (boundary_mode < 0 || boundary_mode >= int (boundary_modes.size ())) {
+    return;
+  }
+  par.boundary_mode = boundary_modes [boundary_mode];
 
   int region_mode = region_cb->currentIndex ();
   if (region_mode < 0 || region_mode >= int (region_modes.size ())) {
@@ -461,8 +513,10 @@ DensityMapDialog::make_density_map ()
   //  Commit the parameters
   dispatcher ()->config_set (cfg_density_map_layer_mode, lm);
   dispatcher ()->config_set (cfg_density_map_region_mode, rm);
+  dispatcher ()->config_set (cfg_density_map_boundary_mode, par.boundary_mode);
   dispatcher ()->config_set (cfg_density_map_threads, tl::to_string (par.threads));
   dispatcher ()->config_set (cfg_density_map_pixel_size, tl::to_string (par.pixel_size));
+  dispatcher ()->config_set (cfg_density_map_window_size, tl::to_string (par.window_size));
 
   if (lm == layer_mode_specific) {
     dispatcher ()->config_set (cfg_density_map_source_layer, source_layer.to_string ());
@@ -584,6 +638,127 @@ DensityMapDialog::compute_density_map (const DensityMapParameters &par)
   //  Execute the tiling processor
 
   tp.execute (tl::to_string (tr ("Computing density map")));
+
+  //  Do the averaging if requested
+
+  unsigned int nw = (unsigned int) (std::max (0.0, std::min (1000.0, floor (par.window_size / par.pixel_size + 0.5))));
+
+  if (nw > 1) {
+    average_window (*img_object, par.boundary_mode, nw);
+  }
+}
+
+inline int safe_mod (int a, int b)
+{
+  if (a < 0) {
+    return b - (-a % b);
+  } else {
+    return a % b;
+  }
+}
+
+void
+DensityMapDialog::average_window (img::Object &img_object, const std::string boundary_mode, int nw)
+{
+  bool periodic = (boundary_mode == boundary_mode_periodic);
+
+  int nx = img_object.width ();
+  int ny = img_object.height ();
+
+  //  compute the outside value if not periodic
+  double outside = 0.0;
+  if (boundary_mode == boundary_mode_one) {
+
+    outside = 1.0;
+
+  } else if (boundary_mode == boundary_mode_average) {
+
+    double outside = 0.0;
+    const float *d = img_object.float_data ();
+    for (size_t i = size_t (nx) * size_t (ny); i > 0; --i) {
+      outside += *d++;
+    }
+    outside /= double (nx) * double (ny);
+
+  }
+
+  std::vector<double> vavg_data;
+  vavg_data.resize (size_t (nx) * size_t (ny), 0.0);
+
+  //  vertical sum
+
+  for (int y = 0; y < ny; ++y) {
+
+    int wh = nw / 2;
+    double fb = (nw % 2 == 0) ? 0.5 : 1.0;
+
+    for (int dy = -wh; dy <= wh; ++dy) {
+
+      //  top and bottom row count half in case of even nw
+      double f = (dy == -wh || dy == wh) ? fb : 1.0;
+
+      std::vector<double>::iterator d = vavg_data.begin () + y * nx;
+      if (periodic || (y + dy >= 0 && y + dy < ny)) {
+        const float *s = img_object.float_data () + safe_mod (y + dy, ny) * nx;
+        for (int ix = 0; ix < nx; ++ix) {
+          *d++ += f * *s++;
+        }
+      } else {
+        for (int ix = 0; ix < nx; ++ix) {
+          *d++ += f * outside;
+        }
+      }
+
+    }
+
+  }
+
+  //  horizontal sum
+
+  outside *= nw;   //  because we do normalization later
+
+  //  TODO: transposing the image would make things more efficient
+
+  std::vector<double> havg_data;
+  havg_data.resize (size_t (nx) * size_t (ny), 0.0);
+
+  for (int x = 0; x < nx; ++x) {
+
+    int wh = nw / 2;
+    double fb = (nw % 2 == 0) ? 0.5 : 1.0;
+
+    for (int dx = -wh; dx <= wh; ++dx) {
+
+      //  top and bottom row count half in case of even nw
+      double f = (dx == -wh || dx == wh) ? fb : 1.0;
+
+      std::vector<double>::iterator d = havg_data.begin () + x;
+
+      if (periodic || (x + dx >= 0 && x + dx < nx)) {
+        std::vector<double>::const_iterator s = vavg_data.begin () + safe_mod (x + dx, nx);
+        for (int iy = 0; iy < ny; ++iy) {
+          *d += f * *s;
+          d += nx;
+          s += nx;
+        }
+      } else {
+        for (int iy = 0; iy < ny; ++iy) {
+          *d += f * outside;
+          d += nx;
+        }
+      }
+
+    }
+
+  }
+
+  //  take the average
+  double s = 1.0 / (double (nw) * double (nw));
+  for (auto i = havg_data.begin (); i != havg_data.end (); ++i) {
+    *i *= s;
+  }
+
+  img_object.set_data (nx, ny, havg_data);
 }
 
 }

@@ -36,6 +36,36 @@
 namespace lay
 {
 
+static const std::string layer_mode_specific ("layer-mode-specific");
+static const std::string layer_mode_visible ("layer-mode-visible");
+static const std::string layer_mode_selected ("layer-mode-selected");
+
+//  items in layer_cb
+static const std::vector<std::string> layer_modes = { layer_mode_specific, layer_mode_visible, layer_mode_selected };
+
+static const std::string region_mode_global_bbox ("region-mode-global-bbox");
+static const std::string region_mode_layer_bbox ("region-mode-layer-bbox");
+static const std::string region_mode_single_box ("region-mode-single-box");
+static const std::string region_mode_visible_region ("region-mode-visible-region");
+static const std::string region_mode_by_rulers ("region-mode-by-rulers");
+
+//  items in region_cb
+static const std::vector<std::string> region_modes = {
+  region_mode_global_bbox,
+  region_mode_layer_bbox,
+  region_mode_single_box,
+  region_mode_visible_region,
+  region_mode_by_rulers
+};
+
+static const std::string cfg_density_map_region_mode ("density-map-region-mode");
+static const std::string cfg_density_map_layer_mode ("density-map-layer-mode");
+static const std::string cfg_density_map_pixel_size ("density-map-pixel-size");
+static const std::string cfg_density_map_threads ("density-map-threads");
+static const std::string cfg_density_map_source_layer ("density-map-source-layer");
+static const std::string cfg_density_map_box_layer ("density-map-box-layer");
+static const std::string cfg_density_map_single_box ("density-map-single-box");
+
 // ------------------------------------------------------------
 //  Declaration of the configuration options
 
@@ -43,9 +73,12 @@ class DensityMapDialogPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > & /*options*/) const
+  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
   {
-    //  .. no options yet ..
+    options.push_back (std::make_pair (cfg_density_map_layer_mode, layer_mode_specific));
+    options.push_back (std::make_pair (cfg_density_map_region_mode, region_mode_global_bbox));
+    options.push_back (std::make_pair (cfg_density_map_pixel_size, "100"));
+    options.push_back (std::make_pair (cfg_density_map_threads, "1"));
   }
 
   virtual lay::ConfigPage *config_page (QWidget * /*parent*/, std::string & /*title*/) const
@@ -80,34 +113,45 @@ DensityMapDialog::DensityMapDialog (lay::Dispatcher *root, LayoutViewBase *vw)
 {
   Ui::DensityMapDialog::setupUi (this);
 
-  connect (rb_box1, SIGNAL (clicked ()), this, SLOT (box_selection_clicked ()));
-  connect (rb_rulers, SIGNAL (clicked ()), this, SLOT (box_selection_clicked ()));
-  connect (rb_whole_layout, SIGNAL (clicked ()), this, SLOT (box_selection_clicked ()));
-  connect (rb_layer_bbox, SIGNAL (clicked ()), this, SLOT (box_selection_clicked ()));
-  connect (rb_visible, SIGNAL (clicked ()), this, SLOT (box_selection_clicked ()));
+  connect (layer_cb, SIGNAL (activated (int)), SLOT (layer_mode_changed (int)));
+  connect (region_cb, SIGNAL (activated (int)), SLOT (region_mode_changed (int)));
 
-  connect (rb_visible_layers, SIGNAL (clicked ()), this, SLOT (source_selection_clicked ()));
-  connect (rb_of_layer, SIGNAL (clicked ()), this, SLOT (source_selection_clicked ()));
+  connect (button_box->button (QDialogButtonBox::Apply), SIGNAL (clicked ()), this, SLOT (apply ()));
+
+  region_mode_changed (region_cb->currentIndex ());
+  layer_mode_changed (layer_cb->currentIndex ());
 }
 
 void
-DensityMapDialog::box_selection_clicked ()
+DensityMapDialog::region_mode_changed (int mode)
 {
-  rb_box1->setChecked (sender () == rb_box1);
-  grp_box1->setEnabled (sender () == rb_box1);
-  rb_rulers->setChecked (sender () == rb_rulers);
-  rb_whole_layout->setChecked (sender () == rb_whole_layout);
-  rb_layer_bbox->setChecked (sender () == rb_layer_bbox);
-  cb_box_layer->setEnabled (sender () == rb_layer_bbox);
-  rb_visible->setChecked (sender () == rb_visible);
+  if (mode < 0 || mode >= int (region_modes.size ())) {
+    return;
+  }
+
+  const auto &rm = region_modes [mode];
+  if (rm == region_mode_layer_bbox) {
+    region_stack->setCurrentIndex (0);
+  } else if (rm == region_mode_single_box) {
+    region_stack->setCurrentIndex (1);
+  } else {
+    region_stack->setCurrentIndex (2);
+  }
 }
 
 void
-DensityMapDialog::source_selection_clicked ()
+DensityMapDialog::layer_mode_changed (int mode)
 {
-  rb_visible_layers->setChecked (sender () == rb_visible_layers);
-  cb_source_layer->setEnabled (sender () == rb_of_layer);
-  rb_of_layer->setChecked (sender () == rb_of_layer);
+  if (mode < 0 || mode >= int (layer_modes.size ())) {
+    return;
+  }
+
+  const auto &lm = layer_modes [mode];
+  if (lm == layer_mode_specific) {
+    layer_stack->setCurrentIndex (0);
+  } else {
+    layer_stack->setCurrentIndex (1);
+  }
 }
 
 void 
@@ -163,26 +207,153 @@ namespace
 
 }
 
-void 
+void
+DensityMapDialog::apply ()
+{
+BEGIN_PROTECTED
+
+  make_density_map ();
+
+END_PROTECTED
+}
+
+void
 DensityMapDialog::accept ()
 {
 BEGIN_PROTECTED
 
-  //  Collects all cv_index/layer index pairs used for input
-  std::vector<std::pair<unsigned int, unsigned int> > input_layers;
+  make_density_map ();
 
-  int threads = std::max (1, sb_threads->value ());
+  //  close this dialog
+  QDialog::accept ();
 
-  double pixel_size = 0.0;
-  tl::from_string_ext (tl::to_string (le_pixel_size->text ()), pixel_size);
+END_PROTECTED
+}
 
-  if (pixel_size < 1e-6) {
+bool
+DensityMapDialog::configure (const std::string &name, const std::string &value)
+{
+  if (name == cfg_density_map_layer_mode) {
+
+    int mode = 0;
+    for (size_t i = 0; i < layer_modes.size (); ++i) {
+      if (layer_modes[i] == value) {
+        mode = int (i);
+      }
+    }
+
+    layer_cb->setCurrentIndex (mode);
+    layer_mode_changed (mode);
+    return true;
+
+  } else if (name == cfg_density_map_region_mode) {
+
+    int mode = 0;
+    for (size_t i = 0; i < region_modes.size (); ++i) {
+      if (region_modes[i] == value) {
+        mode = int (i);
+      }
+    }
+
+    region_cb->setCurrentIndex (mode);
+    region_mode_changed (mode);
+    return true;
+
+  } else if (name == cfg_density_map_pixel_size) {
+
+    double px = 100.0;
+    try {
+      tl::from_string (value, px);
+      le_pixel_size->setText (tl::to_qstring (tl::to_string (px)));
+    } catch (...) {
+    }
+    return true;
+
+  } else if (name == cfg_density_map_threads) {
+
+    int thr = 1;
+    try {
+      tl::from_string (value, thr);
+      sb_threads->setValue (thr);
+    } catch (...) {
+    }
+    return true;
+
+  } else if (name == cfg_density_map_source_layer) {
+
+    db::LayerProperties lp;
+    try {
+      tl::from_string (value, lp);
+      cb_source_layer->set_current_layer (lp);
+    } catch (...) {
+    }
+    return true;
+
+  } else if (name == cfg_density_map_box_layer) {
+
+    db::LayerProperties lp;
+    try {
+      tl::from_string (value, lp);
+      cb_box_layer->set_current_layer (lp);
+    } catch (...) {
+    }
+    return true;
+
+  } else if (name == cfg_density_map_single_box) {
+
+    db::DBox bx;
+    try {
+      tl::from_string (value, bx);
+      if (bx.empty ()) {
+        le_x1->setText (QString ());
+        le_y1->setText (QString ());
+        le_x2->setText (QString ());
+        le_y2->setText (QString ());
+      } else {
+        le_x1->setText (tl::to_qstring (tl::to_string (bx.left ())));
+        le_y1->setText (tl::to_qstring (tl::to_string (bx.bottom ())));
+        le_x2->setText (tl::to_qstring (tl::to_string (bx.right ())));
+        le_y2->setText (tl::to_qstring (tl::to_string (bx.top ())));
+      }
+    } catch (...) {
+    }
+    return true;
+
+  } else {
+    return false;
+  }
+}
+
+void
+DensityMapDialog::make_density_map ()
+{
+  DensityMapParameters par;
+
+  par.threads = std::max (1, sb_threads->value ());
+
+  par.pixel_size = 0.0;
+  tl::from_string_ext (tl::to_string (le_pixel_size->text ()), par.pixel_size);
+
+  if (par.pixel_size < 1e-6) {
     throw tl::Exception (tl::to_string (QObject::tr ("Pixel size must be positive and not zero")));
   }
 
-  db::DBox region;
+  int region_mode = region_cb->currentIndex ();
+  if (region_mode < 0 || region_mode >= int (region_modes.size ())) {
+    return;
+  }
+  const auto &rm = region_modes [region_mode];
 
-  if (rb_box1->isChecked ()) {
+  int layer_mode = layer_cb->currentIndex ();
+  if (layer_mode < 0 || layer_mode >= int (layer_modes.size ())) {
+    return;
+  }
+  const auto &lm = layer_modes [layer_mode];
+
+  db::LayerProperties region_layer;
+  db::LayerProperties source_layer;
+
+  if (rm == region_mode_single_box) {
 
     if (le_x1->text ().isEmpty () || le_x2->text ().isEmpty () ||
         le_y1->text ().isEmpty () || le_y2->text ().isEmpty ()) {
@@ -196,54 +367,58 @@ BEGIN_PROTECTED
     tl::from_string_ext (tl::to_string (le_y1->text ()), y1);
     tl::from_string_ext (tl::to_string (le_y2->text ()), y2);
 
-    region = db::DBox (db::DPoint (x1, y1), db::DPoint (x2, y2));
+    par.region = db::DBox (db::DPoint (x1, y1), db::DPoint (x2, y2));
 
-  } else if (rb_rulers->isChecked ()) {
+  } else if (rm == region_mode_by_rulers) {
 
     ant::Service *ant_service = view ()->get_plugin <ant::Service> ();
     if (ant_service) {
       ant::AnnotationIterator ant = ant_service->begin_annotations ();
       while (! ant.at_end ()) {
-        region += db::DBox (ant->p1 (), ant->p2 ());
+        par.region += db::DBox (ant->p1 (), ant->p2 ());
         ++ant;
       }
     }
 
-  } else if (rb_layer_bbox->isChecked ()) {
+  } else if (rm == region_mode_layer_bbox) {
 
     lay::CellView ccv = view ()->cellview (cb_box_layer->cv_index ());
     int sel_layer = cb_box_layer->current_layer ();
 
+    region_layer = cb_box_layer->current_layer_props ();
+
     if (! ccv.is_valid () || sel_layer < 0 || ! ccv->layout ().is_valid_layer (sel_layer)) {
       throw tl::Exception (tl::to_string (QObject::tr ("No valid layer selected to get clip boxes from")));
     }
 
-    region = db::CplxTrans (ccv->layout ().dbu ()) * ccv->layout ().cell (ccv.cell_index ()).bbox (sel_layer);
+    par.region = db::CplxTrans (ccv->layout ().dbu ()) * ccv->layout ().cell (ccv.cell_index ()).bbox (sel_layer);
 
-  } else if (rb_visible->isChecked ()) {
+  } else if (rm == region_mode_visible_region) {
 
-    region = view ()->box ();
+    par.region = view ()->box ();
 
   } else {
 
     lay::CellView cv = view ()->cellview (view ()->active_cellview_index ());
-    region = db::CplxTrans (cv->layout ().dbu ()) * cv->layout ().cell (cv.cell_index ()).bbox ();
+    par.region = db::CplxTrans (cv->layout ().dbu ()) * cv->layout ().cell (cv.cell_index ()).bbox ();
 
   }
 
-  if (rb_of_layer->isChecked ()) {
+  if (lm == layer_mode_specific) {
 
-    int cvi = cb_box_layer->cv_index ();
+    int cvi = cb_source_layer->cv_index ();
     lay::CellView ccv = view ()->cellview (cvi);
-    int sel_layer = cb_box_layer->current_layer ();
+    int sel_layer = cb_source_layer->current_layer ();
+
+    source_layer = cb_source_layer->current_layer_props ();
 
     if (! ccv.is_valid () || sel_layer < 0 || ! ccv->layout ().is_valid_layer (sel_layer)) {
       throw tl::Exception (tl::to_string (QObject::tr ("No valid layer selected to get clip boxes from")));
     }
 
-    input_layers.push_back (std::make_pair (cvi, sel_layer));
+    par.input_layers.push_back (std::make_pair (cvi, sel_layer));
 
-  } else {
+  } else if (lm == layer_mode_visible) {
 
     for (auto l = view ()->begin_layers (); !l.at_end (); ++l) {
 
@@ -254,7 +429,27 @@ BEGIN_PROTECTED
         int li = l->layer_index ();
 
         if (ccv.is_valid () || li >= 0 || ! ccv->layout ().is_valid_layer (li)) {
-          input_layers.push_back (std::make_pair (cvi, li));
+          par.input_layers.push_back (std::make_pair (cvi, li));
+        }
+
+      }
+
+    }
+
+  } else if (lm == layer_mode_selected) {
+
+    auto sel = view ()->selected_layers ();
+    for (auto s = sel.begin (); s != sel.end (); ++s) {
+
+      auto l = *s;
+      if (! l->has_children ()) {
+
+        int cvi = (l->cellview_index () >= 0) ? l->cellview_index () : 0;
+        lay::CellView ccv = view ()->cellview (cvi);
+        int li = l->layer_index ();
+
+        if (ccv.is_valid () || li >= 0 || ! ccv->layout ().is_valid_layer (li)) {
+          par.input_layers.push_back (std::make_pair (cvi, li));
         }
 
       }
@@ -263,11 +458,35 @@ BEGIN_PROTECTED
 
   }
 
-  if (region.empty ()) {
+  //  Commit the parameters
+  dispatcher ()->config_set (cfg_density_map_layer_mode, lm);
+  dispatcher ()->config_set (cfg_density_map_region_mode, rm);
+  dispatcher ()->config_set (cfg_density_map_threads, tl::to_string (par.threads));
+  dispatcher ()->config_set (cfg_density_map_pixel_size, tl::to_string (par.pixel_size));
+
+  if (lm == layer_mode_specific) {
+    dispatcher ()->config_set (cfg_density_map_source_layer, source_layer.to_string ());
+  }
+
+  if (rm == region_mode_layer_bbox) {
+    dispatcher ()->config_set (cfg_density_map_box_layer, region_layer.to_string ());
+  } else if (rm == region_mode_single_box) {
+    dispatcher ()->config_set (cfg_density_map_single_box, par.region.to_string ());
+  }
+
+  dispatcher ()->config_setup ();
+
+  compute_density_map (par);
+}
+
+void
+DensityMapDialog::compute_density_map (const DensityMapParameters &par)
+{
+  if (par.region.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Density map region is empty")));
   }
 
-  if (input_layers.empty ()) {
+  if (par.input_layers.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No input layers given")));
   }
 
@@ -276,8 +495,8 @@ BEGIN_PROTECTED
   const double max_wh = 100000.0;
   const int max_pixels = 100000000;
 
-  double dnx = std::max (1.0, ceil (region.width () / pixel_size - db::epsilon));
-  double dny = std::max (1.0, ceil (region.height () / pixel_size - db::epsilon));
+  double dnx = std::max (1.0, ceil (par.region.width () / par.pixel_size - db::epsilon));
+  double dny = std::max (1.0, ceil (par.region.height () / par.pixel_size - db::epsilon));
   if (dnx > max_wh || dny > max_wh) {
     throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Density map dimensions exceed maximum limit of %g pixels in one direction"))), max_wh);
   }
@@ -288,10 +507,10 @@ BEGIN_PROTECTED
     throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Density map array exceed maximum limit of %d pixels in total"))), max_pixels);
   }
 
-  double x0 = region.center ().x () - nx * 0.5 * pixel_size;
-  double y0 = region.center ().y () - ny * 0.5 * pixel_size;
+  double x0 = par.region.center ().x () - nx * 0.5 * par.pixel_size;
+  double y0 = par.region.center ().y () - ny * 0.5 * par.pixel_size;
 
-  double dbu = view ()->cellview (input_layers.front ().first)->layout ().dbu ();
+  double dbu = view ()->cellview (par.input_layers.front ().first)->layout ().dbu ();
 
   //  Set up the tiling processor
 
@@ -299,15 +518,15 @@ BEGIN_PROTECTED
 
   tp.tiles (nx, ny);
   tp.tile_origin (x0, y0);
-  tp.tile_size (pixel_size, pixel_size);
+  tp.tile_size (par.pixel_size, par.pixel_size);
 
-  tp.set_threads (threads);
+  tp.set_threads (par.threads);
   tp.set_dbu (dbu);
 
   int ninput = 1;
   std::string in_expr;
 
-  for (auto i = input_layers.begin (); i != input_layers.end (); ++i, ++ninput) {
+  for (auto i = par.input_layers.begin (); i != par.input_layers.end (); ++i, ++ninput) {
 
     const lay::CellView &cv = view ()->cellview (i->first);
     const db::Layout &ly = cv->layout ();
@@ -351,7 +570,7 @@ BEGIN_PROTECTED
       }
     }
 
-    img::Object img (nx, ny, db::DCplxTrans (pixel_size, 0.0, false, region.center () - db::DPoint ()), false, false);
+    img::Object img (nx, ny, db::DCplxTrans (par.pixel_size, 0.0, false, par.region.center () - db::DPoint ()), false, false);
     img.set_data_mapping (dm);
     img.set_tag (img_tag);
 
@@ -365,18 +584,6 @@ BEGIN_PROTECTED
   //  Execute the tiling processor
 
   tp.execute (tl::to_string (tr ("Computing density map")));
-
-  //  close this dialog
-  QDialog::accept ();
-
-END_PROTECTED
-}
-
-bool 
-DensityMapDialog::configure (const std::string & /*name*/, const std::string & /*value*/)
-{
-  //  .. nothing yet ..
-  return false;
 }
 
 }

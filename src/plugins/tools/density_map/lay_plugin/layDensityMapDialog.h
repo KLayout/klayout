@@ -44,16 +44,39 @@ public:
   ~DensityMapDialog ();
 
 public slots:
-  void box_selection_clicked ();
-  void source_selection_clicked ();
+  void layer_mode_changed (int);
+  void region_mode_changed (int);
   void accept ();
+  void apply ();
 
 private:
+  struct DensityMapParameters
+  {
+    DensityMapParameters ()
+      : pixel_size (100.0), threads (1)
+    { }
+
+    //  Collects all cv_index/layer index pairs used for input
+    std::vector<std::pair<unsigned int, unsigned int> > input_layers;
+
+    //  The region to compute the density map from
+    db::DBox region;
+
+    //  The pixel size
+    double pixel_size;
+
+    //  The number of threads to use
+    int threads;
+  };
+
   //  implementation of the lay::Plugin interface
   virtual bool configure (const std::string &name, const std::string &value);
 
   //  implementation of the lay::Plugin interface
   void menu_activated (const std::string &symbol);
+
+  void make_density_map ();
+  void compute_density_map (const DensityMapParameters &par);
 
 };
 

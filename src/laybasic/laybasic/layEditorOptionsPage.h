@@ -252,7 +252,7 @@ public:
   /**
    *  @brief Gets a value indicating whether the page is for that specific plugin (given by a declaration object)
    */
-  bool for_plugin_declaration (const lay::PluginDeclaration *pd)
+  bool for_plugin_declaration (const lay::PluginDeclaration *pd) const
   {
     return m_plugin_declarations.find (pd) != m_plugin_declarations.end ();
   }

@@ -120,8 +120,13 @@ EditorOptionsPages::editor_options_pages ()
 bool
 EditorOptionsPages::has_content () const
 {
+  lay::Plugin *plugin = mp_view->active_plugin ();
+  if (! plugin) {
+    return false;
+  }
+
   for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if (p->active () && ! p->is_modal_page () && ! p->is_toolbox_widget ()) {
+    if (! p->is_modal_page () && ! p->is_toolbox_widget () && p->for_plugin_declaration (plugin->plugin_declaration ())) {
       return true;
     }
   }
@@ -131,8 +136,13 @@ EditorOptionsPages::has_content () const
 bool
 EditorOptionsPages::has_modal_content () const
 {
+  lay::Plugin *plugin = mp_view->active_plugin ();
+  if (! plugin) {
+    return false;
+  }
+
   for (auto p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if (p->active () && p->is_modal_page () && ! p->is_toolbox_widget ()) {
+    if (p->is_modal_page () && ! p->is_toolbox_widget () && p->for_plugin_declaration (plugin->plugin_declaration ())) {
       return true;
     }
   }
@@ -173,7 +183,7 @@ EditorOptionsPages::activate (const lay::Plugin *plugin)
     bool is_active = plugin && op->for_plugin_declaration (plugin->plugin_declaration ());
 
     //  The zero order page is picked as the initial one
-    if (is_active && ! op->active () && op->order () == 0 && page == 0) {
+    if (is_active && ! op->active () && (op->order () == 0 || page == 0)) {
       page = op.operator-> ();
     }
 

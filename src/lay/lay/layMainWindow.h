@@ -94,7 +94,6 @@ class ProgressWidget;
  */
 class LAY_PUBLIC MainWindow
   : public QMainWindow,
-    public tl::Object,
     public gsi::ObjectBase,
     public lay::DispatcherDelegate
 {

@@ -48,6 +48,12 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_layers_always_show_ld, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_layers_always_show_layout_index, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_test_shapes_in_view, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_layer_search_as_expressions, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_layer_search_as_filter, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_layer_search_case_sensitive, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_cell_search_as_expressions, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_cell_search_as_filter, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_cell_search_case_sensitive, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_flat_cell_list, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_split_cell_list, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_cell_list_sorting, "by-name"));

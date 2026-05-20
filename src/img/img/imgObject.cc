@@ -1009,6 +1009,7 @@ Object::operator= (const img::Object &d)
 
     m_trans = d.m_trans;
     m_filename = d.m_filename;
+    m_tag = d.m_tag;
 
     mp_data = d.mp_data;
     if (mp_data) {
@@ -1963,6 +1964,7 @@ void
 Object::swap (Object &other)
 {
   m_filename.swap (other.m_filename);
+  m_tag.swap (other.m_tag);
   std::swap (m_trans, other.m_trans);
   std::swap (mp_data, other.mp_data);
   std::swap (m_id, other.m_id);
@@ -1977,6 +1979,12 @@ Object::swap (Object &other)
   std::swap (m_z_position, other.m_z_position);
   std::swap (m_layer_binding, other.m_layer_binding);
   std::swap (m_updates_enabled, other.m_updates_enabled);
+}
+
+void
+Object::set_tag (const std::string &tag)
+{
+  m_tag = tag;
 }
 
 size_t 

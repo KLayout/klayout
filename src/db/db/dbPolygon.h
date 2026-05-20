@@ -1581,7 +1581,7 @@ public:
   void translate (const polygon<C> &d, const T &t, db::generic_repository<C> &, db::ArrayRepository &)
   {
     *this = d;
-    transform (t);
+    transform (t, false);
   }
 
   /**

@@ -1009,3 +1009,34 @@ TEST(100_UndoOfDeleteLayer)
   EXPECT_EQ (l.get_properties (li).to_string (), "1/0");
   EXPECT_EQ (l.get_properties (li2).to_string (), "2/0");
 }
+
+//  issue #2343
+TEST(101_CopyTreeDoesNotModifyPolygons)
+{
+  db::Manager m;
+  db::Layout l (&m);
+  db::Cell &top = l.cell (l.add_cell ("TOP"));
+  l.insert_layer (db::LayerProperties (1, 0));
+
+  std::unique_ptr<db::Layout> t (new db::Layout ());
+  db::Cell &ttop = t->cell (t->add_cell ("TOP"));
+  unsigned int tl1 = t->insert_layer (db::LayerProperties (1, 0));
+
+  std::vector<db::Point> pts = {
+    { 0, 0 }, { 0, 1000 }, { 500, 1000 }, { 1500, 1000 }, { 1000, 1000 }, { 1000, 0 }
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (pts.begin (), pts.end (), false /*don't compress*/, false /*don't remove reflected*/);
+  ttop.shapes (tl1).insert (poly);
+
+  EXPECT_EQ (l2s (*t), "begin_lib 0.001\nbegin_cell {TOP}\nboundary 1 0 {0 0} {0 1000} {500 1000} {1500 1000} {1000 1000} {1000 0} {0 0}\nend_cell\nend_lib\n");
+
+  db::CellMapping cm;
+  cm.create_single_mapping (l, top.cell_index (), *t, ttop.cell_index ());
+  l.copy_tree_shapes (*t, cm);
+
+  //  polygon is still not normalized
+  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {TOP}\nboundary 1 0 {0 0} {0 1000} {500 1000} {1500 1000} {1000 1000} {1000 0} {0 0}\nend_cell\nend_lib\n");
+}
+

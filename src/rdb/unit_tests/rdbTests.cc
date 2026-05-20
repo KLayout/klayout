@@ -979,16 +979,18 @@ TEST(22_MergeCells)
   }
 
   {
+    rdb::Cell *cell1, *cell2, *cell3;
+    cell1 = db2.create_cell ("B");
+    cell2 = db2.create_cell ("A");
+    cell3 = db2.create_cell ("A", "VAR2", "ALAY");
+
+    //  NOTE: db2 parent is at a different position (issue #2339)
     rdb::Cell *parent;
     parent = db2.create_cell ("TOP");
 
-    rdb::Cell *cell;
-    cell = db2.create_cell ("B");
-    cell->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, 0.0)), parent->id ()));
-    cell = db2.create_cell ("A");
-    cell->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, 2.5)), parent->id ()));  //  reference not taken!
-    cell = db2.create_cell ("A", "VAR2", "ALAY");
-    cell->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, -1.0)), parent->id ()));
+    cell1->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, 0.0)), parent->id ()));
+    cell2->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, 2.5)), parent->id ()));  //  reference not taken as cell will be taken from db1
+    cell3->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, -1.0)), parent->id ()));
   }
 
   db1.merge (db2);
@@ -996,13 +998,13 @@ TEST(22_MergeCells)
   std::set<std::string> cells;
   for (auto c = db1.cells ().begin (); c != db1.cells ().end (); ++c) {
     if (c->references ().begin () != c->references ().end ()) {
-      cells.insert (c->qname () + "[" + c->references ().begin ()->trans_str () + "]");
+      cells.insert (c->qname () + "[" + c->references ().begin ()->trans_str () + ":" + db1.cell_by_id (c->references ().begin ()->parent_cell_id ())->qname () + "]");
     } else {
       cells.insert (c->qname ());
     }
   }
 
-  EXPECT_EQ (tl::join (cells.begin (), cells.end (), ";"), "A:1[r0 *1 1,2];A:VAR1[r0 *1 1,-2];A:VAR2[r0 *1 1,-1];B[r0 *1 1,0];TOP");
+  EXPECT_EQ (tl::join (cells.begin (), cells.end (), ";"), "A:1[r0 *1 1,2:TOP];A:VAR1[r0 *1 1,-2:TOP];A:VAR2[r0 *1 1,-1:TOP];B[r0 *1 1,0:TOP];TOP");
 }
 
 TEST(23_MergeTags)

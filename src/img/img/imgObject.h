@@ -582,6 +582,22 @@ public:
   }
 
   /**
+   *  @brief Sets the tag string
+   *
+   *  The tag string is an arbitrary string that can be used to identify
+   *  the image. It is not persisted and it not considered for equality or sorting.
+   */
+  void set_tag (const std::string &tag);
+
+  /**
+   *  @brief Gets the tag string
+   */
+  const std::string tag () const
+  {
+    return m_tag;
+  }
+
+  /**
    *  @brief Accessor to the width property
    */
   size_t width () const;
@@ -1036,6 +1052,7 @@ protected:
 
 private:
   std::string m_filename;
+  std::string m_tag;
   db::Matrix3d m_trans;
   DataHeader *mp_data;
   size_t m_id;

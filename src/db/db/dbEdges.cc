@@ -114,6 +114,13 @@ Edges::Edges (DeepShapeStore &dss)
   mp_delegate = new DeepEdges (DeepLayer (&dss, layout_index, dss.layout (layout_index).insert_layer ()));
 }
 
+void
+Edges::convert_to_deep (const db::DeepLayer &layer)
+{
+  tl_assert (mp_delegate->deep () == 0);
+  set_delegate (copy_data_id (new db::DeepEdges (layer)));
+}
+
 const db::RecursiveShapeIterator &
 Edges::iter () const
 {

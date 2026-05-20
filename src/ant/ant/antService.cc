@@ -1541,6 +1541,19 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
   }
 }
 
+static int snap_prio (lay::PointSnapToObjectResult::ObjectSnap os)
+{
+  if (os == lay::PointSnapToObjectResult::ObjectVertex) {
+    return 3;
+  } else if (os == lay::PointSnapToObjectResult::ObjectEdge) {
+    return 2;
+  } else if (os == lay::PointSnapToObjectResult::ObjectUnspecific) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 void
 Service::snap_rulers (lay::angle_constraint_type ac)
 {
@@ -1566,7 +1579,7 @@ Service::snap_rulers (lay::angle_constraint_type ac)
     auto snp = snap2_details (org1, p1, ruler, ac);
     double dist = p1.distance (snp.snapped_point);
 
-    if (min_dist < 0 || dist < min_dist) {
+    if (min_dist < 0 || snap_prio (snp.object_snap) > snap_prio (min_snp.object_snap) || (snap_prio (snp.object_snap) == snap_prio (min_snp.object_snap) && dist < min_dist)) {
       min_snp = snp;
       min_dist = dist;
       min_delta = snp.snapped_point - p1;
@@ -1575,7 +1588,7 @@ Service::snap_rulers (lay::angle_constraint_type ac)
     snp = snap2_details (org2, p2, ruler, ac);
     dist = p2.distance (snp.snapped_point);
 
-    if (min_dist < 0 || dist < min_dist) {
+    if (min_dist < 0 || snap_prio (snp.object_snap) > snap_prio (min_snp.object_snap) || (snap_prio (snp.object_snap) == snap_prio (min_snp.object_snap) && dist < min_dist)) {
       min_snp = snp;
       min_dist = dist;
       min_delta = snp.snapped_point - p2;
@@ -1631,9 +1644,9 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
 
     m_trans = db::DTrans (dp + (m_p1 - db::DPoint ()) - m_trans.disp ()) * m_trans * db::DTrans (db::DPoint () - m_p1);
 
-    propose_move_transformation (m_trans, 1);
-
     snap_rulers (ac_eff);
+
+    propose_move_transformation (m_trans, 1);
 
     for (std::vector<ant::View *>::iterator r = m_rulers.begin (); r != m_rulers.end (); ++r) {
       (*r)->transform_by (db::DCplxTrans (m_trans));
@@ -1834,6 +1847,7 @@ Service::edit_cancel ()
     m_move_mode = MoveNone;
     m_selected.clear ();
     selection_to_view ();
+    clear_mouse_cursors ();
 
   }
 }

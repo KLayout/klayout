@@ -216,6 +216,51 @@ public:
   }
 
   /**
+   *  @brief Sets the "as_filter" flag for the search feature
+   *
+   *  If this flag is set, search expressions are applied as filter
+   */
+  void set_search_as_filter (bool f);
+
+  /**
+   *  @brief Gets the "search_as_filter" flag
+   */
+  bool search_as_filter ()
+  {
+    return mp_filter->isChecked ();
+  }
+
+  /**
+   *  @brief Sets the "case_sensitive" flag for the search feature
+   *
+   *  If this flag is set, search expressions are case sensitive
+   */
+  void set_search_case_sensitive (bool f);
+
+  /**
+   *  @brief Gets the "case_sensitive" flag for the search feature
+   */
+  bool search_case_sensitive ()
+  {
+    return mp_case_sensitive->isChecked ();
+  }
+
+  /**
+   *  @brief Sets the "as_expression" flag for the search feature
+   *
+   *  If this flag is set, search expressions are handled as glob expressions
+   */
+  void set_search_as_expression (bool f);
+
+  /**
+   *  @brief Gets the "as_expression" flag for the search feature
+   */
+  bool search_as_expression ()
+  {
+    return mp_use_regular_expressions->isChecked ();
+  }
+
+  /**
    *  @brief Set the animation phase
    */
   void set_phase (int phase);
@@ -297,6 +342,7 @@ signals:
   void tab_changed ();
   void current_layer_changed (const lay::LayerPropertiesConstIterator &iter);
   void selected_layers_changed ();
+  void search_options_changed ();
 
 public slots:
   void cm_new_tab ();
@@ -344,6 +390,7 @@ public slots:
   void downdown_clicked ();
   void search_triggered (const QString &t);
   void search_edited ();
+  void search_edited_no_signal ();
   void search_editing_finished ();
   void search_next ();
   void search_prev ();

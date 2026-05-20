@@ -34,6 +34,7 @@
 #include "dbTestSupport.h"
 #include "dbFileBasedLibrary.h"
 #include "dbColdProxy.h"
+#include "dbTextWriter.h"
 #include "tlStream.h"
 #include "tlStaticObjects.h"
 #include "tlUnitTest.h"
@@ -861,3 +862,64 @@ TEST(7_monsterlib)
   //  but the layout did not change
   db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au5.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
 }
+
+namespace {
+
+class PCellWithChildDeclaration :
+  public db::PCellDeclaration
+{
+  void produce (const db::Layout &layout, const std::vector<unsigned int> & /*layer_ids*/, const db::pcell_parameters_type & /*parameters*/, db::Cell &cell) const
+  {
+    auto cid = const_cast<db::Layout &> (layout).add_cell ("CHILD");
+
+    db::PropertiesSet ps;
+    ps.insert ("id", tl::Variant ("my_id"));
+
+    auto ps_id = db::properties_id (ps);
+    cell.insert (db::CellInstArrayWithProperties (db::CellInstArray (cid, db::Trans ()), ps_id));
+  }
+};
+
+}
+
+static std::string l2s (const db::Layout &layout)
+{
+  tl::OutputStringStream os;
+  tl::OutputStream ostream (os);
+  db::TextWriter writer (ostream);
+  writer.write (layout);
+  return os.string ();
+}
+
+//  PCells with subcells with properties
+TEST(8_issue2344)
+{
+  std::unique_ptr<db::Library> lib (new db::Library ());
+  lib->set_name ("__PCellLibrary");
+  lib->layout ().register_pcell ("PCell1", new PCellWithChildDeclaration ());
+  db::LibraryManager::instance ().register_lib (lib.get ());
+
+  db::Layout ly;
+  std::pair<bool, db::pcell_id_type> pc = lib->layout ().pcell_by_name ("PCell1");
+  tl_assert (pc.first);
+
+  db::cell_index_type lib_cell = lib->layout ().get_pcell_variant_dict (pc.second, std::map<std::string, tl::Variant> ());
+  ly.get_lib_proxy (lib.get (), lib_cell);
+
+  EXPECT_EQ (l2s (ly),
+    "begin_lib 0.001\n"
+    "begin_cell {CHILD}\n"
+    "end_cell\n"
+    "begin_cell {PCell1}\n"
+    "set props {\n"
+    "  {{id} {my_id}}\n"
+    "}\n"
+    "srefp $props {CHILD} 0 0 1 {0 0}\n"
+    "end_cell\n"
+    "end_lib\n"
+  );
+
+  db::LibraryManager::instance ().delete_lib (lib.release ());
+  EXPECT (true);
+}
+

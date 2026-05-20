@@ -135,6 +135,13 @@ static const std::string cfg_layers_always_show_layout_index ("layers-always-sho
 static const std::string cfg_reader_options_show_always ("reader-options-show-always");
 static const std::string cfg_tip_window_hidden ("tip-window-hidden");
 
+static const std::string cfg_layer_search_as_expressions ("layer-search-as-expressions");
+static const std::string cfg_layer_search_as_filter ("layer-search-as-filter");
+static const std::string cfg_layer_search_case_sensitive ("layer-search-case-sensitive");
+static const std::string cfg_cell_search_as_expressions ("cell-search-as-expressions");
+static const std::string cfg_cell_search_as_filter ("cell-search-as-filter");
+static const std::string cfg_cell_search_case_sensitive ("cell-search-case-sensitive");
+
 static const std::string cfg_bitmap_oversampling ("bitmap-oversampling");
 static const std::string cfg_highres_mode ("highres-mode");
 static const std::string cfg_subres_mode ("subres-mode");

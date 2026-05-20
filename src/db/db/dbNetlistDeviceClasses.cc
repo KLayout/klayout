@@ -114,8 +114,8 @@ class ResistorDeviceCombiner
 public:
   void parallel (Device *a, Device *b) const
   {
-    double va = a->parameter_value (0);
-    double vb = b->parameter_value (0);
+    double va = a->parameter_value (0).to_double ();
+    double vb = b->parameter_value (0).to_double ();
     a->set_parameter_value (0, va + vb < 1e-30 ? 0.0 : va * vb / (va + vb));
 
     //  parallel width is sum of both, length is the one that gives the same value of resistance
@@ -124,10 +124,10 @@ public:
     //    R1 = L1/W1
     //    R2 = L2/W2
     //  -> L = (L1*L2*(W1+W2))/(L2*W1+L1*W2))
-    double l1 = a->parameter_value (1);
-    double w1 = a->parameter_value (2);
-    double l2 = b->parameter_value (1);
-    double w2 = b->parameter_value (2);
+    double l1 = a->parameter_value (1).to_double ();
+    double w1 = a->parameter_value (2).to_double ();
+    double l2 = b->parameter_value (1).to_double ();
+    double w2 = b->parameter_value (2).to_double ();
     double dnom = (l2 * w1 + l1 * w2);
     if (fabs (dnom) > 1e-15) {
       a->set_parameter_value (1, (l1 * l2 * (w1 + w2)) / dnom);
@@ -135,20 +135,20 @@ public:
     a->set_parameter_value (2, w1 + w2);
 
     //  TODO: does this implementation make sense? (area)
-    double aa = a->parameter_value (3);
-    double ab = b->parameter_value (3);
+    double aa = a->parameter_value (3).to_double ();
+    double ab = b->parameter_value (3).to_double ();
     a->set_parameter_value (3, aa + ab);
 
     //  TODO: does this implementation make sense? (perimeter)
-    double pa = a->parameter_value (4);
-    double pb = b->parameter_value (4);
+    double pa = a->parameter_value (4).to_double ();
+    double pb = b->parameter_value (4).to_double ();
     a->set_parameter_value (4, pa + pb);
   }
 
   void serial (Device *a, Device *b) const
   {
-    double va = a->parameter_value (0);
-    double vb = b->parameter_value (0);
+    double va = a->parameter_value (0).to_double ();
+    double vb = b->parameter_value (0).to_double ();
     a->set_parameter_value (0, va + vb);
 
     //  parallel length is sum of both, width is the one that gives the same value of resistance
@@ -158,22 +158,22 @@ public:
     //    R1 = L1/W1
     //    R2 = L2/W2
     //  -> W = ((L1+L2)*W1*W2)/(W1*L2+W2*L1)
-    double l1 = a->parameter_value (1);
-    double w1 = a->parameter_value (2);
-    double l2 = b->parameter_value (1);
-    double w2 = b->parameter_value (2);
+    double l1 = a->parameter_value (1).to_double ();
+    double w1 = a->parameter_value (2).to_double ();
+    double l2 = b->parameter_value (1).to_double ();
+    double w2 = b->parameter_value (2).to_double ();
     a->set_parameter_value (1, l1 + l2);
     double dnom = (l2 * w1 + l1 * w2);
     if (fabs (dnom) > 1e-15) {
       a->set_parameter_value (2, (w1 * w2 * (l1 + l2)) / dnom);
     }
 
-    double aa = a->parameter_value (3);
-    double ab = b->parameter_value (3);
+    double aa = a->parameter_value (3).to_double ();
+    double ab = b->parameter_value (3).to_double ();
     a->set_parameter_value (3, aa + ab);
 
-    double pa = a->parameter_value (4);
-    double pb = b->parameter_value (4);
+    double pa = a->parameter_value (4).to_double ();
+    double pb = b->parameter_value (4).to_double ();
     a->set_parameter_value (4, pa + pb);
   }
 };
@@ -202,33 +202,33 @@ class CapacitorDeviceCombiner
 public:
   void serial (Device *a, Device *b) const
   {
-    double va = a->parameter_value (0);
-    double vb = b->parameter_value (0);
+    double va = a->parameter_value (0).to_double ();
+    double vb = b->parameter_value (0).to_double ();
     a->set_parameter_value (0, va + vb < 1e-30 ? 0.0 : va * vb / (va + vb));
 
     //  TODO: does this implementation make sense?
-    double aa = a->parameter_value (1);
-    double ab = b->parameter_value (1);
+    double aa = a->parameter_value (1).to_double ();
+    double ab = b->parameter_value (1).to_double ();
     a->set_parameter_value (1, aa + ab);
 
     //  TODO: does this implementation make sense?
-    double pa = a->parameter_value (2);
-    double pb = b->parameter_value (2);
+    double pa = a->parameter_value (2).to_double ();
+    double pb = b->parameter_value (2).to_double ();
     a->set_parameter_value (2, pa + pb);
   }
 
   void parallel (Device *a, Device *b) const
   {
-    double va = a->parameter_value (0);
-    double vb = b->parameter_value (0);
+    double va = a->parameter_value (0).to_double ();
+    double vb = b->parameter_value (0).to_double ();
     a->set_parameter_value (0, va + vb);
 
-    double aa = a->parameter_value (1);
-    double ab = b->parameter_value (1);
+    double aa = a->parameter_value (1).to_double ();
+    double ab = b->parameter_value (1).to_double ();
     a->set_parameter_value (1, aa + ab);
 
-    double pa = a->parameter_value (2);
-    double pb = b->parameter_value (2);
+    double pa = a->parameter_value (2).to_double ();
+    double pb = b->parameter_value (2).to_double ();
     a->set_parameter_value (2, pa + pb);
   }
 };
@@ -257,15 +257,15 @@ class InductorDeviceCombiner
 public:
   void parallel (Device *a, Device *b) const
   {
-    double va = a->parameter_value (0);
-    double vb = b->parameter_value (0);
+    double va = a->parameter_value (0).to_double ();
+    double vb = b->parameter_value (0).to_double ();
     a->set_parameter_value (0, va + vb < 1e-30 ? 0.0 : va * vb / (va + vb));
   }
 
   void serial (Device *a, Device *b) const
   {
-    double va = a->parameter_value (0);
-    double vb = b->parameter_value (0);
+    double va = a->parameter_value (0).to_double ();
+    double vb = b->parameter_value (0).to_double ();
     a->set_parameter_value (0, va + vb);
   }
 };
@@ -284,8 +284,8 @@ public:
     //  only parallel diodes can be combined and their areas will add
     if (na1 == nb1 && na2 == nb2) {
 
-      a->set_parameter_value (0, a->parameter_value (0) + b->parameter_value (0));
-      a->set_parameter_value (1, a->parameter_value (1) + b->parameter_value (1));
+      a->set_parameter_value (0, a->parameter_value (0).to_double () + b->parameter_value (0).to_double ());
+      a->set_parameter_value (1, a->parameter_value (1).to_double () + b->parameter_value (1).to_double ());
 
       a->join_terminals (0, b, 0);
       a->join_terminals (1, b, 1);
@@ -340,11 +340,11 @@ public:
 
   void combine_parameters (Device *a, Device *b) const
   {
-    a->set_parameter_value (1, a->parameter_value (1) + b->parameter_value (1));
-    a->set_parameter_value (2, a->parameter_value (2) + b->parameter_value (2));
-    a->set_parameter_value (3, a->parameter_value (3) + b->parameter_value (3));
-    a->set_parameter_value (4, a->parameter_value (4) + b->parameter_value (4));
-    a->set_parameter_value (5, a->parameter_value (5) + b->parameter_value (5));
+    a->set_parameter_value (1, a->parameter_value (1).to_double () + b->parameter_value (1).to_double ());
+    a->set_parameter_value (2, a->parameter_value (2).to_double () + b->parameter_value (2).to_double ());
+    a->set_parameter_value (3, a->parameter_value (3).to_double () + b->parameter_value (3).to_double ());
+    a->set_parameter_value (4, a->parameter_value (4).to_double () + b->parameter_value (4).to_double ());
+    a->set_parameter_value (5, a->parameter_value (5).to_double () + b->parameter_value (5).to_double ());
   }
 };
 
@@ -423,9 +423,9 @@ public:
 
   void combine_parameters (Device *a, Device *b) const
   {
-    a->set_parameter_value (DeviceClassBJT3Transistor::param_id_AE, a->parameter_value (DeviceClassBJT3Transistor::param_id_AE) + b->parameter_value (DeviceClassBJT3Transistor::param_id_AE));
-    a->set_parameter_value (DeviceClassBJT3Transistor::param_id_PE, a->parameter_value (DeviceClassBJT3Transistor::param_id_PE) + b->parameter_value (DeviceClassBJT3Transistor::param_id_PE));
-    a->set_parameter_value (DeviceClassBJT3Transistor::param_id_NE, a->parameter_value (DeviceClassBJT3Transistor::param_id_NE) + b->parameter_value (DeviceClassBJT3Transistor::param_id_NE));
+    a->set_parameter_value (DeviceClassBJT3Transistor::param_id_AE, a->parameter_value (DeviceClassBJT3Transistor::param_id_AE).to_double () + b->parameter_value (DeviceClassBJT3Transistor::param_id_AE).to_double ());
+    a->set_parameter_value (DeviceClassBJT3Transistor::param_id_PE, a->parameter_value (DeviceClassBJT3Transistor::param_id_PE).to_double () + b->parameter_value (DeviceClassBJT3Transistor::param_id_PE).to_double ());
+    a->set_parameter_value (DeviceClassBJT3Transistor::param_id_NE, a->parameter_value (DeviceClassBJT3Transistor::param_id_NE).to_double () + b->parameter_value (DeviceClassBJT3Transistor::param_id_NE).to_double ());
   }
 };
 
@@ -639,7 +639,7 @@ DeviceClassMOS3Transistor::is_drain_terminal (size_t tid) const
 bool
 DeviceClassMOS3Transistor::lengths_are_identical (const db::Device *a, const db::Device *b)
 {
-  return (fabs (a->parameter_value (DeviceClassMOS3Transistor::param_id_L) - b->parameter_value (DeviceClassMOS3Transistor::param_id_L)) < 1e-6);
+  return (fabs (a->parameter_value (DeviceClassMOS3Transistor::param_id_L).to_double () - b->parameter_value (DeviceClassMOS3Transistor::param_id_L).to_double ()) < 1e-6);
 }
 
 bool

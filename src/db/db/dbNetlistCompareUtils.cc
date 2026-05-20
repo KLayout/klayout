@@ -326,11 +326,11 @@ DeviceFilter::filter (const db::Device *device) const
   const db::DeviceClassCapacitor *cap = dynamic_cast<const db::DeviceClassCapacitor *> (device->device_class ());
 
   if (res) {
-    if (m_res_threshold > 0.0 && device->parameter_value (db::DeviceClassResistor::param_id_R) > m_res_threshold) {
+    if (m_res_threshold > 0.0 && device->parameter_value (db::DeviceClassResistor::param_id_R).to_double () > m_res_threshold) {
       return false;
     }
   } else if (cap) {
-    if (m_cap_threshold > 0.0 && device->parameter_value (db::DeviceClassCapacitor::param_id_C) < m_cap_threshold) {
+    if (m_cap_threshold > 0.0 && device->parameter_value (db::DeviceClassCapacitor::param_id_C).to_double () < m_cap_threshold) {
       return false;
     }
   }

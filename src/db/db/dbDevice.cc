@@ -163,7 +163,7 @@ void Device::connect_terminal (size_t terminal_id, Net *net)
   }
 }
 
-double Device::parameter_value (size_t param_id) const
+const tl::Variant &Device::parameter_value (size_t param_id) const
 {
   if (m_parameters.size () > param_id) {
     return m_parameters [param_id];
@@ -173,10 +173,11 @@ double Device::parameter_value (size_t param_id) const
       return pd->default_value ();
     }
   }
-  return 0.0;
+  static tl::Variant dummy_value (0.0);
+  return dummy_value;
 }
 
-void Device::set_parameter_value (size_t param_id, double v)
+void Device::set_parameter_value (size_t param_id, const tl::Variant &v)
 {
   if (m_parameters.size () <= param_id) {
 
@@ -198,15 +199,23 @@ void Device::set_parameter_value (size_t param_id, double v)
   m_parameters [param_id] = v;
 }
 
-double Device::parameter_value (const std::string &name) const
+const tl::Variant &Device::parameter_value (const std::string &name) const
 {
-  return device_class () ? parameter_value (device_class ()->parameter_id_for_name (name)) : 0.0;
+  static tl::Variant dummy_value (0.0);
+  return device_class () ? parameter_value (device_class ()->parameter_id_for_name (name)) : dummy_value;
 }
 
-void Device::set_parameter_value (const std::string &name, double v)
+void Device::set_parameter_value (const std::string &name, const tl::Variant &v)
 {
   if (device_class ()) {
     set_parameter_value (device_class ()->parameter_id_for_name (name), v);
+  }
+}
+
+void Device::set_parameter_value_create (const std::string &name, const tl::Variant &v, bool primary, const tl::Variant &def_value)
+{
+  if (device_class ()) {
+    set_parameter_value (device_class ()->parameter_id_for_name_create (name, primary, def_value), v);
   }
 }
 

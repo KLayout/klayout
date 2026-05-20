@@ -163,6 +163,15 @@ namespace db
  *  [template-param]:
  *    param(<name> <primary> <default-value>)    - defines a template parameter [short key: E]
  *                                    ('primary' is a value: 0 or 1, 'default_value' is a float)
+ *    param-int(<name> <primary> <default-value>)    - defines a template parameter [short key: EI]
+ *                                    ('primary' is a value: 0 or 1, 'default_value' is an int)
+ *    param-string(<name> <primary> <default-value>)    - defines a template parameter [short key: ES]
+ *                                    ('primary' is a value: 0 or 1, 'default_value' is a string)
+ *    param-var(<name> <primary> <default-value>)    - defines a template parameter [short key: EV]
+ *                                    ('primary' is a value: 0 or 1, 'default_value' is a string encoding the default
+ *                                    value in KLayout variant notation)
+ *    param-nil(<name> <primary>)    - defines a template parameter [short key: EN]
+ *                                    ('primary' is a value: 0 or 1)
  *
  *  [template-terminal]:
  *    terminal(<name>)              - defines a terminal [short key: T]
@@ -172,7 +181,11 @@ namespace db
  *                                  - specifies the terminal geometry [short key: T]
  *
  *  [param]:
- *    param(<name> <value>)         - defines a parameter [short key: E]
+ *    param(<name> <value>)         - defines a parameter with a default value [short key: E]
+ *    param-int(<name> <value>)     - defines a parameter with an int value [short key: EI]
+ *    param-nil(<name>)             - defines a parameter with a nil value [short key: EN]
+ *    param-string(<name> <value>)  - defines a parameter with a string value [short key: ES]
+ *    param-var(<name> <value>)     - defines a parameter with a variant value [short key: EV]
  *
  *  [device-terminal]:
  *    terminal(<terminal-name> <net-id>)
@@ -246,6 +259,10 @@ namespace l2n_std_format
     static std::string terminal_key;
     static std::string abstract_key;
     static std::string param_key;
+    static std::string param_int_key;
+    static std::string param_string_key;
+    static std::string param_var_key;
+    static std::string param_nil_key;
     static std::string location_key;
     static std::string rotation_key;
     static std::string mirror_key;
@@ -287,6 +304,10 @@ namespace l2n_std_format
     static std::string terminal_key;
     static std::string abstract_key;
     static std::string param_key;
+    static std::string param_int_key;
+    static std::string param_string_key;
+    static std::string param_var_key;
+    static std::string param_nil_key;
     static std::string location_key;
     static std::string rotation_key;
     static std::string mirror_key;

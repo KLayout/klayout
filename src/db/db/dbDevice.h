@@ -283,24 +283,33 @@ public:
   /**
    *  @brief Gets the value for the parameter with the given ID
    */
-  double parameter_value (size_t param_id) const;
+  const tl::Variant &parameter_value (size_t param_id) const;
 
   /**
    *  @brief Sets the value for the parameter with the given ID
    */
-  void set_parameter_value (size_t param_id, double v);
+  void set_parameter_value (size_t param_id, const tl::Variant &v);
 
   /**
    *  @brief Gets the value for the parameter with the given name
    *  If the name is not valid, an exception is thrown.
    */
-  double parameter_value (const std::string &name) const;
+  const tl::Variant &parameter_value (const std::string &name) const;
 
   /**
    *  @brief Sets the value for the parameter with the given name
    *  If the name is not valid, an exception is thrown.
    */
-  void set_parameter_value (const std::string &name, double v);
+  void set_parameter_value (const std::string &name, const tl::Variant &v);
+
+  /**
+   *  @brief Sets the value for the parameter with the given name
+   *
+   *  If the name is not valid, the parameter is created with the given primary
+   *  flag and default value. The default value also defines the type of the
+   *  parameter.
+   */
+  void set_parameter_value_create (const std::string &name, const tl::Variant &v, bool primary, const tl::Variant &def_value);
 
   /**
    *  @brief Used for device combination: join terminals with other device
@@ -402,7 +411,7 @@ private:
   std::string m_name;
   db::DCplxTrans m_trans;
   std::vector<Net::terminal_iterator> m_terminal_refs;
-  std::vector<double> m_parameters;
+  std::vector<tl::Variant> m_parameters;
   size_t m_id;
   Circuit *mp_circuit;
   std::vector<DeviceAbstractRef> m_other_abstracts;

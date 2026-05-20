@@ -587,8 +587,11 @@ NetlistSpiceReaderDelegate::apply_parameter_scaling (db::Device *device) const
 
   const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
   for (auto i = pd.begin (); i != pd.end (); ++i) {
-    double pv = device->parameter_value (i->id ());
-    device->set_parameter_value (i->id (), pv / i->si_scaling () * pow (m_options.scale, i->geo_scaling_exponent ()));
+    const tl::Variant &pv = device->parameter_value (i->id ());
+    //  @@@ only in case of double???
+    if (pv.is_double ()) {
+      device->set_parameter_value (i->id (), pv.to_double () / i->si_scaling () * pow (m_options.scale, i->geo_scaling_exponent ()));
+    }
   }
 }
 

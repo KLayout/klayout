@@ -136,6 +136,8 @@ protected:
   void read_word_or_quoted (std::string &s);
   int read_int ();
   bool try_read_int (int &i);
+  long read_long ();
+  bool try_read_long (long &i);
   db::Coord read_coord ();
   double read_double ();
   bool at_end ();

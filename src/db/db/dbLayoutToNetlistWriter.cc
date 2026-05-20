@@ -324,7 +324,18 @@ void std_writer_impl<Keys>::write_device_class (TokenizedOutput &stream, const d
       if (! any_def) {
         out << endl;
       }
-      TokenizedOutput (out, Keys::param_key) << tl::to_word_or_quoted_string (p->name ()) << tl::to_string (p->is_primary () ? 1 : 0) << tl::to_string (p->default_value ());
+      const tl::Variant &def = p->default_value ();
+      if (def.is_double ()) {
+        TokenizedOutput (out, Keys::param_key) << tl::to_word_or_quoted_string (p->name ()) << tl::to_string (p->is_primary () ? 1 : 0) << def.to_string ();
+      } else if (def.is_long () || def.is_ulong ()) {
+        TokenizedOutput (out, Keys::param_int_key) << tl::to_word_or_quoted_string (p->name ()) << tl::to_string (p->is_primary () ? 1 : 0) << def.to_string ();
+      } else if (def.is_a_string ()) {
+        TokenizedOutput (out, Keys::param_string_key) << tl::to_word_or_quoted_string (p->name ()) << tl::to_string (p->is_primary () ? 1 : 0) << tl::to_quoted_string (def.to_string ());
+      } else if (def.is_nil ()) {
+        TokenizedOutput (out, Keys::param_nil_key) << tl::to_word_or_quoted_string (p->name ()) << tl::to_string (p->is_primary () ? 1 : 0);
+      } else {
+        TokenizedOutput (out, Keys::param_var_key) << tl::to_word_or_quoted_string (p->name ()) << tl::to_string (p->is_primary () ? 1 : 0) << tl::to_quoted_string (def.to_parsable_string ());
+      }
       any_def = true;
     }
   }
@@ -906,7 +917,19 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Device &de
   }
 
   for (std::vector<DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-    TokenizedOutput (out, Keys::param_key) << tl::to_word_or_quoted_string (i->name ()) << tl::sprintf ("%.12g", device.parameter_value (i->id ()));
+
+    const tl::Variant &value = device.parameter_value (i->id ());
+    if (value.is_double ()) {
+      TokenizedOutput (out, Keys::param_key) << tl::to_word_or_quoted_string (i->name ()) << value.to_string ();
+    } else if (value.is_long () || value.is_ulong ()) {
+      TokenizedOutput (out, Keys::param_int_key) << tl::to_word_or_quoted_string (i->name ()) << value.to_string ();
+    } else if (value.is_a_string ()) {
+      TokenizedOutput (out, Keys::param_string_key) << tl::to_word_or_quoted_string (i->name ()) << tl::to_quoted_string (value.to_string ());
+    } else if (value.is_nil ()) {
+      TokenizedOutput (out, Keys::param_nil_key) << tl::to_word_or_quoted_string (i->name ());
+    } else {
+      TokenizedOutput (out, Keys::param_var_key) << tl::to_word_or_quoted_string (i->name ()) << tl::to_quoted_string (value.to_parsable_string ());
+    }
   }
 
   for (std::vector<DeviceTerminalDefinition>::const_iterator i = td.begin (); i != td.end (); ++i) {

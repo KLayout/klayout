@@ -460,7 +460,7 @@ private:
     }
 
     std::map<size_t, std::map<unsigned int, std::set<db::NetShape> > > geometry;
-    std::map<size_t, double> parameters;
+    std::map<size_t, tl::Variant> parameters;
   };
 
   typedef std::map<unsigned int, std::vector<db::NetShape> > geometry_per_layer_type;

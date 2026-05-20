@@ -53,6 +53,10 @@ namespace l2n_std_format
   DB_PUBLIC std::string LongKeys::terminal_key ("terminal");
   DB_PUBLIC std::string LongKeys::abstract_key ("abstract");
   DB_PUBLIC std::string LongKeys::param_key ("param");
+  DB_PUBLIC std::string LongKeys::param_int_key ("param-int");
+  DB_PUBLIC std::string LongKeys::param_string_key ("param-string");
+  DB_PUBLIC std::string LongKeys::param_var_key ("param-var");
+  DB_PUBLIC std::string LongKeys::param_nil_key ("param-nil");
   DB_PUBLIC std::string LongKeys::location_key ("location");
   DB_PUBLIC std::string LongKeys::rotation_key ("rotation");
   DB_PUBLIC std::string LongKeys::mirror_key ("mirror");
@@ -88,6 +92,10 @@ namespace l2n_std_format
   DB_PUBLIC std::string ShortKeys::terminal_key ("T");
   DB_PUBLIC std::string ShortKeys::abstract_key ("A");
   DB_PUBLIC std::string ShortKeys::param_key ("E");
+  DB_PUBLIC std::string ShortKeys::param_int_key ("EI");
+  DB_PUBLIC std::string ShortKeys::param_string_key ("ES");
+  DB_PUBLIC std::string ShortKeys::param_var_key ("EV");
+  DB_PUBLIC std::string ShortKeys::param_nil_key ("EN");
   DB_PUBLIC std::string ShortKeys::location_key ("Y");
   DB_PUBLIC std::string ShortKeys::rotation_key ("O");
   DB_PUBLIC std::string ShortKeys::mirror_key ("M");

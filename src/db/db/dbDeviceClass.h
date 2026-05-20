@@ -154,7 +154,7 @@ public:
   /**
    *  @brief Creates a device parameter definition with the given name and description
    */
-  DeviceParameterDefinition (const std::string &name, const std::string &description, double default_value = 0.0, bool is_primary = true, double si_scaling = 1.0, double geo_scaling = 0.0)
+  DeviceParameterDefinition (const std::string &name, const std::string &description, tl::Variant default_value = tl::Variant (0.0), bool is_primary = true, double si_scaling = 1.0, double geo_scaling = 0.0)
     : m_name (name), m_description (description), m_default_value (default_value), m_id (0), m_is_primary (is_primary), m_si_scaling (si_scaling), m_geo_scaling (geo_scaling)
   {
     //  .. nothing yet ..
@@ -234,7 +234,7 @@ public:
   /**
    *  @brief Gets the parameter default value
    */
-  double default_value () const
+  const tl::Variant &default_value () const
   {
     return m_default_value;
   }
@@ -242,7 +242,7 @@ public:
   /**
    *  @brief Sets the parameter default value
    */
-  void set_default_value (double d)
+  void set_default_value (const tl::Variant &d)
   {
     m_default_value = d;
   }
@@ -291,7 +291,7 @@ private:
   friend class DeviceClass;
 
   std::string m_name, m_description;
-  double m_default_value;
+  tl::Variant m_default_value;
   size_t m_id;
   bool m_is_primary;
   double m_si_scaling;
@@ -577,6 +577,19 @@ public:
    *  If the name is invalid, an exception is thrown.
    */
   size_t parameter_id_for_name (const std::string &name) const;
+
+  /**
+   *  @brief Returns the parameter ID for the parameter with the given name
+   *
+   *  A new parameter definition is created, if the parameter does not exist yes.
+   *
+   *  @param name The name of the parameter
+   *  @param primary The primary flag of the new parameter, if it does not exist yet
+   *  @param default_value The default value of the new parameter, if it does not exist yet
+   *
+   *  The default value also declares the type.
+   */
+  size_t parameter_id_for_name_create (const std::string &name, bool primary, const tl::Variant &default_value) const;
 
   /**
    *  @brief Returns true, if the device has a terminal with the given name

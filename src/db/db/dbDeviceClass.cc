@@ -121,9 +121,17 @@ std::string EqualDeviceParameters::to_string () const
 bool EqualDeviceParameters::less (const db::Device &a, const db::Device &b) const
 {
   for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
-    int cmp = compare_parameters (a.parameter_value (c->first), b.parameter_value (c->first), c->second.first, c->second.second);
-    if (cmp != 0) {
-      return cmp < 0;
+    const tl::Variant &va = a.parameter_value (c->first);
+    const tl::Variant &vb = b.parameter_value (c->first);
+    if (va.is_double () && vb.is_double ()) {
+      int cmp = compare_parameters (va.to_double (), vb.to_double (), c->second.first, c->second.second);
+      if (cmp != 0) {
+        return cmp < 0;
+      }
+    } else {
+      if (va != vb) {
+        return va < vb;
+      }
     }
   }
 
@@ -137,9 +145,17 @@ bool EqualDeviceParameters::less (const db::Device &a, const db::Device &b) cons
   const std::vector<db::DeviceParameterDefinition> &pd = primary_device_class (a, b)->parameter_definitions ();
   for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
     if (p->is_primary () && seen.find (p->id ()) == seen.end ()) {
-      int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()));
-      if (cmp != 0) {
-        return cmp < 0;
+      const tl::Variant &va = a.parameter_value (p->id ());
+      const tl::Variant &vb = b.parameter_value (p->id ());
+      if (va.is_double () && vb.is_double ()) {
+        int cmp = compare_parameters (va.to_double (), vb.to_double ());
+        if (cmp != 0) {
+          return cmp < 0;
+        }
+      } else {
+        if (va != vb) {
+          return va < vb;
+        }
       }
     }
   }
@@ -168,9 +184,17 @@ bool AllDeviceParametersAreEqual::less (const db::Device &a, const db::Device &b
 {
   const std::vector<db::DeviceParameterDefinition> &parameters = a.device_class ()->parameter_definitions ();
   for (std::vector<db::DeviceParameterDefinition>::const_iterator c = parameters.begin (); c != parameters.end (); ++c) {
-    int cmp = compare_parameters (a.parameter_value (c->id ()), b.parameter_value (c->id ()), 0.0, m_relative);
-    if (cmp != 0) {
-      return cmp < 0;
+    const tl::Variant &va = a.parameter_value (c->id ());
+    const tl::Variant &vb = b.parameter_value (c->id ());
+    if (va.is_double () && vb.is_double ()) {
+      int cmp = compare_parameters (va.to_double (), vb.to_double (), 0.0, m_relative);
+      if (cmp != 0) {
+        return cmp < 0;
+      }
+    } else {
+      if (va != vb) {
+        return va < vb;
+      }
     }
   }
 

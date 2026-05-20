@@ -231,12 +231,13 @@ std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, si
       double sis = i->si_scaling ();
       os << " " << i->name () << "=";
       //  for compatibility
+      //  @@@ other parameter types!!!
       if (fabs (sis * 1e6 - 1.0) < 1e-10) {
         os << tl::to_string (dev.parameter_value (i->id ())) << "U";
       } else if (fabs (sis * 1e12 - 1.0) < 1e-10) {
         os << tl::to_string (dev.parameter_value (i->id ())) << "P";
       } else {
-        os << tl::to_string (dev.parameter_value (i->id ()) * sis);
+        os << tl::to_string (dev.parameter_value (i->id ()).to_double () * sis);
       }
     }
   }

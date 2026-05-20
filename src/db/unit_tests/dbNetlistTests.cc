@@ -507,20 +507,20 @@ TEST(4_CircuitDevices)
   EXPECT_EQ (c->device_by_name (d2a->name ()) == d2a, true);
   EXPECT_EQ (c->device_by_name ("doesnt_exist") == 0, true);
 
-  EXPECT_EQ (d1->parameter_value (0), 1.0);
-  EXPECT_EQ (d1->parameter_value (1), 2.0);
-  EXPECT_EQ (d2a->parameter_value (0), 2.0);
-  EXPECT_EQ (d2a->parameter_value (1), 1.0);
+  EXPECT_EQ (d1->parameter_value (0).to_double (), 1.0);
+  EXPECT_EQ (d1->parameter_value (1).to_double (), 2.0);
+  EXPECT_EQ (d2a->parameter_value (0).to_double (), 2.0);
+  EXPECT_EQ (d2a->parameter_value (1).to_double (), 1.0);
   d1->set_parameter_value (1, 1.5);
-  EXPECT_EQ (d1->parameter_value (0), 1.0);
-  EXPECT_EQ (d1->parameter_value (1), 1.5);
+  EXPECT_EQ (d1->parameter_value (0).to_double (), 1.0);
+  EXPECT_EQ (d1->parameter_value (1).to_double (), 1.5);
   d1->set_parameter_value (0, 0.5);
-  EXPECT_EQ (d1->parameter_value (0), 0.5);
-  EXPECT_EQ (d1->parameter_value (1), 1.5);
+  EXPECT_EQ (d1->parameter_value (0).to_double (), 0.5);
+  EXPECT_EQ (d1->parameter_value (1).to_double (), 1.5);
 
   d2a->set_parameter_value (0, -1.0);
-  EXPECT_EQ (d2a->parameter_value (0), -1.0);
-  EXPECT_EQ (d2a->parameter_value (1), 1.0);
+  EXPECT_EQ (d2a->parameter_value (0).to_double (), -1.0);
+  EXPECT_EQ (d2a->parameter_value (1).to_double (), 1.0);
 
   EXPECT_EQ (netlist2 (*c),
     "c:\n"

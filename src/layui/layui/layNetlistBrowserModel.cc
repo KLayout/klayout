@@ -263,6 +263,16 @@ std::string formatted_value (double v)
 }
 
 static
+std::string formatted_value (const tl::Variant &v)
+{
+  if (v.is_double ()) {
+    return formatted_value (v.to_double ());
+  } else {
+    return v.to_string ();
+  }
+}
+
+static
 std::string device_parameter_string (const db::Device *device)
 {
   std::string s;
@@ -277,7 +287,6 @@ std::string device_parameter_string (const db::Device *device)
 
   for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
     if (p->is_primary ()) {
-      double v = device->parameter_value (p->id ());
       if (first) {
         s += " [";
       } else {
@@ -285,7 +294,7 @@ std::string device_parameter_string (const db::Device *device)
       }
       s += p->name ();
       s += "=";
-      s += formatted_value (v);
+      s += formatted_value (device->parameter_value (p->id ()));
       term = "]";
       first = false;
     }
@@ -294,8 +303,7 @@ std::string device_parameter_string (const db::Device *device)
   bool first_sec = true;
 
   for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-    double v = device->parameter_value (p->id ());
-    std::string vs = formatted_value (v);
+    std::string vs = formatted_value (device->parameter_value (p->id ()));
     std::string vs_def = formatted_value (p->default_value ());
     if (! p->is_primary () && vs != vs_def) {
       if (first) {

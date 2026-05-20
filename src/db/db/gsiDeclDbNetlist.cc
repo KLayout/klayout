@@ -432,17 +432,18 @@ Class<db::Device> decl_dbDevice (decl_dbNetlistObject, "db", "Device",
     "@brief Disconnects the given terminal from any net.\n"
     "This version accepts a terminal name. If the name is not a valid terminal name, an exception is raised."
   ) +
-  gsi::method ("parameter", (double (db::Device::*) (size_t) const) &db::Device::parameter_value, gsi::arg ("param_id"),
+  gsi::method ("parameter", (const tl::Variant &(db::Device::*) (size_t) const) &db::Device::parameter_value, gsi::arg ("param_id"),
     "@brief Gets the parameter value for the given parameter ID."
   ) +
-  gsi::method ("set_parameter", (void (db::Device::*) (size_t, double)) &db::Device::set_parameter_value, gsi::arg ("param_id"), gsi::arg ("value"),
+  gsi::method ("set_parameter", (void (db::Device::*) (size_t, const tl::Variant &)) &db::Device::set_parameter_value, gsi::arg ("param_id"), gsi::arg ("value"),
     "@brief Sets the parameter value for the given parameter ID."
   ) +
-  gsi::method ("parameter", (double (db::Device::*) (const std::string &) const) &db::Device::parameter_value, gsi::arg ("param_name"),
+  gsi::method ("parameter", (const tl::Variant &(db::Device::*) (const std::string &) const) &db::Device::parameter_value, gsi::arg ("param_name"),
     "@brief Gets the parameter value for the given parameter name.\n"
     "If the parameter name is not valid, an exception is thrown."
   ) +
-  gsi::method ("set_parameter", (void (db::Device::*) (const std::string &, double)) &db::Device::set_parameter_value, gsi::arg ("param_name"), gsi::arg ("value"),
+  //  @@@ set_parameter_create!!!
+  gsi::method ("set_parameter", (void (db::Device::*) (const std::string &, const tl::Variant &)) &db::Device::set_parameter_value, gsi::arg ("param_name"), gsi::arg ("value"),
     "@brief Sets the parameter value for the given parameter name.\n"
     "If the parameter name is not valid, an exception is thrown."
   ),

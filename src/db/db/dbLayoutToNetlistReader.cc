@@ -104,6 +104,21 @@ LayoutToNetlistStandardReader::try_read_int (int &i)
   return m_ex.try_read (i);
 }
 
+long
+LayoutToNetlistStandardReader::read_long ()
+{
+  long i = 0;
+  m_ex.read (i);
+  return i;
+}
+
+bool
+LayoutToNetlistStandardReader::try_read_long (long &i)
+{
+  i = 0;
+  return m_ex.try_read (i);
+}
+
 db::Coord
 LayoutToNetlistStandardReader::read_coord ()
 {
@@ -322,6 +337,21 @@ static db::Region &layer_by_name (db::LayoutToNetlist *l2n, const std::string &n
   return *l;
 }
 
+static void make_parameter (db::DeviceClass *dc, const std::string &param_name, bool primary, const tl::Variant &default_value)
+{
+  if (! dc->has_parameter_with_name (param_name)) {
+    db::DeviceParameterDefinition pd;
+    pd.set_name (param_name);
+    pd.set_is_primary (primary);
+    pd.set_default_value (default_value);
+    dc->add_parameter_definition (pd);
+  } else {
+    db::DeviceParameterDefinition *pd = dc->parameter_definition_non_const (dc->parameter_id_for_name (param_name));
+    pd->set_default_value (default_value);
+    pd->set_is_primary (primary);
+  }
+}
+
 void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::LayoutToNetlist *l2n, LayoutToNetlistStandardReader::Brace *nested, std::map<const db::Circuit *, ObjectMap> *map_per_circuit)
 {
   m_dbu = 0.001;
@@ -459,17 +489,62 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
           read_word_or_quoted (param_name);
           int primary = read_int ();
           double default_value = read_double ();
-          if (! dc->has_parameter_with_name (param_name)) {
-            db::DeviceParameterDefinition pd;
-            pd.set_name (param_name);
-            pd.set_is_primary (primary);
-            pd.set_default_value (default_value);
-            dc->add_parameter_definition (pd);
-          } else {
-            db::DeviceParameterDefinition *pd = dc->parameter_definition_non_const (dc->parameter_id_for_name (param_name));
-            pd->set_default_value (default_value);
-            pd->set_is_primary (primary);
-          }
+          make_parameter (dc, param_name, primary, default_value);
+
+          br.done ();
+
+        } else if (test (skeys::param_int_key) || test (lkeys::param_int_key)) {
+
+          Brace br (this);
+
+          std::string param_name;
+          read_word_or_quoted (param_name);
+          int primary = read_int ();
+          int default_value = read_int ();
+          make_parameter (dc, param_name, primary, default_value);
+
+          br.done ();
+
+        } else if (test (skeys::param_string_key) || test (lkeys::param_string_key)) {
+
+          Brace br (this);
+
+          std::string param_name;
+          read_word_or_quoted (param_name);
+          int primary = read_int ();
+          std::string default_value;
+          read_word_or_quoted (default_value);
+          make_parameter (dc, param_name, primary, default_value);
+
+          br.done ();
+
+        } else if (test (skeys::param_var_key) || test (lkeys::param_var_key)) {
+
+          Brace br (this);
+
+          std::string param_name;
+          read_word_or_quoted (param_name);
+
+          int primary = read_int ();
+
+          std::string default_value_str;
+          read_word_or_quoted (default_value_str);
+          tl::Variant default_value;
+          tl::Extractor ex (default_value_str.c_str ());
+          ex.read (default_value);
+
+          make_parameter (dc, param_name, primary, default_value);
+
+          br.done ();
+
+        } else if (test (skeys::param_nil_key) || test (lkeys::param_nil_key)) {
+
+          Brace br (this);
+
+          std::string param_name;
+          read_word_or_quoted (param_name);
+          int primary = read_int ();
+          make_parameter (dc, param_name, primary, tl::Variant ());
 
           br.done ();
 
@@ -1052,23 +1127,57 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       double value = read_double ();
       br2.done ();
 
-      size_t pid = std::numeric_limits<size_t>::max ();
-      const std::vector<db::DeviceParameterDefinition> &pd = dm.second->parameter_definitions ();
-      for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-        if (p->name () == pname) {
-          pid = p->id ();
-          break;
-        }
-      }
-
-      //  if no parameter with this name exists, create one
-      if (pid == std::numeric_limits<size_t>::max ()) {
-        //  TODO: this should only happen for generic devices
-        db::DeviceClass *dc = const_cast<db::DeviceClass *> (dm.second);
-        pid = dc->add_parameter_definition (db::DeviceParameterDefinition (pname, std::string ())).id ();
-      }
-
+      size_t pid = dm.second->parameter_id_for_name_create (pname, false, 0.0);
       device->set_parameter_value (pid, value);
+
+    } else if (test (skeys::param_int_key) || test (lkeys::param_int_key)) {
+
+      Brace br2 (this);
+      std::string pname;
+      read_word_or_quoted (pname);
+      long value = read_long ();
+      br2.done ();
+
+      size_t pid = dm.second->parameter_id_for_name_create (pname, false, long (0));
+      device->set_parameter_value (pid, value);
+
+    } else if (test (skeys::param_string_key) || test (lkeys::param_string_key)) {
+
+      Brace br2 (this);
+      std::string pname;
+      read_word_or_quoted (pname);
+      std::string value;
+      read_word_or_quoted (value);
+      br2.done ();
+
+      size_t pid = dm.second->parameter_id_for_name_create (pname, false, std::string ());
+      device->set_parameter_value (pid, value);
+
+    } else if (test (skeys::param_var_key) || test (lkeys::param_var_key)) {
+
+      Brace br2 (this);
+      std::string pname;
+      read_word_or_quoted (pname);
+      std::string value_str;
+      read_word_or_quoted (value_str);
+      br2.done ();
+
+      tl::Variant value;
+      tl::Extractor ex (value_str.c_str ());
+      ex.read (value);
+
+      size_t pid = dm.second->parameter_id_for_name_create (pname, false, tl::Variant ());
+      device->set_parameter_value (pid, value);
+
+    } else if (test (skeys::param_nil_key) || test (lkeys::param_nil_key)) {
+
+      Brace br2 (this);
+      std::string pname;
+      read_word_or_quoted (pname);
+      br2.done ();
+
+      size_t pid = dm.second->parameter_id_for_name_create (pname, false, tl::Variant ());
+      device->set_parameter_value (pid, tl::Variant ());
 
     } else if (at_end ()) {
       throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside device definition (location, scale, mirror, rotation, param or terminal expected)")));

@@ -227,19 +227,31 @@ std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, si
 
   const std::vector<db::DeviceParameterDefinition> &pd = dev.device_class ()->parameter_definitions ();
   for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+
     if (i->id () != without_id && (! only_primary || i->is_primary ())) {
-      double sis = i->si_scaling ();
+
       os << " " << i->name () << "=";
-      //  for compatibility
-      //  @@@ other parameter types!!!
-      if (fabs (sis * 1e6 - 1.0) < 1e-10) {
-        os << tl::to_string (dev.parameter_value (i->id ())) << "U";
-      } else if (fabs (sis * 1e12 - 1.0) < 1e-10) {
-        os << tl::to_string (dev.parameter_value (i->id ())) << "P";
+
+      const tl::Variant &v = dev.parameter_value (i->id ());
+      if (v.is_double ()) {
+
+        double sis = i->si_scaling ();
+        //  for compatibility
+        //  @@@ TODO: only for double???
+        if (fabs (sis * 1e6 - 1.0) < db::epsilon) {
+          os << tl::to_string (v) << "U";
+        } else if (fabs (sis * 1e12 - 1.0) < db::epsilon) {
+          os << tl::to_string (v) << "P";
+        } else {
+          os << tl::to_string (v.to_double () * sis);
+        }
+
       } else {
-        os << tl::to_string (dev.parameter_value (i->id ()).to_double () * sis);
+        os << tl::to_word_or_quoted_string (v.to_string ());
       }
+
     }
+
   }
 
   return os.str ();

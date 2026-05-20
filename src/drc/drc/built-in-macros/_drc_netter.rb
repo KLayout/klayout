@@ -323,7 +323,9 @@ module DRC
     # 
     # If layers are not named, they will be given a name made from the 
     # \name_prefix and an incremental number when the layer is used for the
-    # first time. 
+    # first time. As the default name prefix is "l", you may can name conflicts
+    # with auto-named layers, if you register explicit layer names like "l5". 
+    # Consider changing the name prefix in that case to some prefix you are not using.
     #
     # \name can only be used once on a layer and the layer names must be 
     # unique (not taken by another layer).

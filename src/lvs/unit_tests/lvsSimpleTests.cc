@@ -362,3 +362,9 @@ TEST(63_FlagMissingPorts)
   run_test (_this, "flag_missing_ports", "flag_missing_ports.gds", false, true, "TOP");
 }
 
+//  Split substrate - marker and global connection (issue #2345)
+TEST(64_SplitSubstrate)
+{
+  run_test (_this, "split_substrate", "split_substrate.gds", true, false /*no LVS*/);
+}
+

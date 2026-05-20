@@ -1288,9 +1288,9 @@ static bool is_deep (const db::Region *region)
   return dynamic_cast<const db::DeepRegion *> (region->delegate ()) != 0;
 }
 
-static size_t id (const db::Region *r)
+static size_t data_id (const db::Region *r)
 {
-  return tl::id_of (r->delegate ());
+  return r->delegate ()->data_id ();
 }
 
 
@@ -4214,7 +4214,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been added in version 0.26."
   ) +
-  method_ext ("data_id", &id,
+  method_ext ("data_id", &data_id,
     "@brief Returns the data ID (a unique identifier for the underlying data storage)\n"
     "\n"
     "This method has been added in version 0.26."

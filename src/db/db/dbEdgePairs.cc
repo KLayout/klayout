@@ -104,6 +104,13 @@ EdgePairs::EdgePairs (DeepShapeStore &dss)
 }
 
 void
+EdgePairs::convert_to_deep (const db::DeepLayer &layer)
+{
+  tl_assert (mp_delegate->deep () == 0);
+  set_delegate (copy_data_id (new db::DeepEdgePairs (layer)));
+}
+
+void
 EdgePairs::write (const std::string &fn) const
 {
   //  method provided for debugging purposes

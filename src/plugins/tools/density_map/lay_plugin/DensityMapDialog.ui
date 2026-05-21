@@ -552,6 +552,8 @@
  </customwidgets>
  <tabstops>
   <tabstop>le_pixel_size</tabstop>
+  <tabstop>le_window_size</tabstop>
+  <tabstop>cb_boundary_mode</tabstop>
   <tabstop>sb_threads</tabstop>
   <tabstop>layer_cb</tabstop>
   <tabstop>cb_source_layer</tabstop>

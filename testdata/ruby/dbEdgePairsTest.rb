@@ -622,7 +622,7 @@ class DBEdgePairs_TestClass < TestBase
 
     r = RBA::EdgePairs::new([ RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)), { 1 => "one" }) ])
     assert_equal(r.to_s, "(0,0;100,100)/(200,300;200,500){1=>one}")
-    assert_equal(r[0].to_s, "(0,0;100,100)/(200,300;200,500) props={1=>one}")
+    assert_equal(r[0].to_s, "(0,0;100,100)/(200,300;200,500) props={#1=>'one'}")
 
     r = RBA::EdgePairs::new([])
     assert_equal(r.to_s, "")
@@ -638,7 +638,7 @@ class DBEdgePairs_TestClass < TestBase
     r.insert(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)), { 1 => "one" }))
     r.insert(RBA::EdgePair::new(RBA::Edge::new(0, 10, 100, 110), RBA::Edge::new(220, 300, 220, 500)))
     s = r.each.collect(&:to_s).join(";")
-    assert_equal(s, "(0,10;100,110)/(220,300;220,500) props={};(0,0;100,100)/(200,300;200,500) props={1=>one}")
+    assert_equal(s, "(0,10;100,110)/(220,300;220,500) props={};(0,0;100,100)/(200,300;200,500) props={#1=>'one'}")
 
   end
 

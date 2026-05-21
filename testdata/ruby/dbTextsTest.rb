@@ -229,7 +229,7 @@ class DBTexts_TestClass < TestBase
 
     r = RBA::Texts::new
     r.insert(RBA::TextWithProperties::new(RBA::Text::new("string", RBA::Trans::new), { 1 => "value" }))
-    assert_equal(r[0].to_s, "('string',r0 0,0) props={1=>value}")
+    assert_equal(r[0].to_s, "('string',r0 0,0) props={#1=>'value'}")
     
     dss = RBA::DeepShapeStore::new
     r = RBA::Texts::new(ly.begin_shapes(c1.cell_index, l1), dss)
@@ -477,7 +477,7 @@ class DBTexts_TestClass < TestBase
     r.insert(RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::new), { 1 => "one" }))
     r.insert(RBA::Text::new("xuv", RBA::Trans::new))
     s = r.each.collect(&:to_s).join(";")
-    assert_equal(s, "('xuv',r0 0,0) props={};('abc',r0 0,0) props={1=>one}")
+    assert_equal(s, "('xuv',r0 0,0) props={};('abc',r0 0,0) props={#1=>'one'}")
 
   end
 

@@ -34,6 +34,7 @@ class DBPoint_TestClass < TestBase
 
     assert_equal( a.to_s, "1,-17" )
     assert_equal( RBA::DPoint::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DPoint::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( (-a).to_s, "-1,17" )
     assert_equal( b.to_s, "0,0" )
     assert_equal( c.to_s, "5,11" )
@@ -84,6 +85,7 @@ class DBPoint_TestClass < TestBase
 
     assert_equal( a.to_s, "1,-17" )
     assert_equal( RBA::Point::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Point::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( (-a).to_s, "-1,17" )
     assert_equal( b.to_s, "0,0" )
     assert_equal( c.to_s, "5,11" )

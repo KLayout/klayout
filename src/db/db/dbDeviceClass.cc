@@ -330,6 +330,46 @@ size_t DeviceClass::terminal_id_for_name (const std::string &name) const
   throw tl::Exception (tl::to_string (tr ("Invalid terminal name")) + ": '" + name + "'");
 }
 
+// @@@ GSI bindings for SPICE profile
+void DeviceClass::set_spice_profile (const std::string &name, const SpiceProfile &profile)
+{
+  m_spice_profiles [name] = profile;
+}
+
+bool DeviceClass::has_spice_profile (const std::string &name) const
+{
+  auto p = m_spice_profiles.find (name);
+  if (p == m_spice_profiles.end ()) {
+    p = m_spice_profiles.find ("*");
+  }
+  return p != m_spice_profiles.end ();
+}
+
+const DeviceClass::SpiceProfile &DeviceClass::spice_profile (const std::string &name) const
+{
+  auto p = m_spice_profiles.find (name);
+  if (p == m_spice_profiles.end ()) {
+    p = m_spice_profiles.find ("*");
+  }
+
+  if (p != m_spice_profiles.end ()) {
+    return p->second;
+  } else {
+    static DeviceClass::SpiceProfile def_profile;
+    return def_profile;
+  }
+}
+
+void DeviceClass::clear_spice_profiles ()
+{
+  m_spice_profiles.clear ();
+}
+
+void DeviceClass::remove_spice_profile (const std::string &name)
+{
+  m_spice_profiles.erase (name);
+}
+
 //  The default compare delegate
 static EqualDeviceParameters default_compare;
 

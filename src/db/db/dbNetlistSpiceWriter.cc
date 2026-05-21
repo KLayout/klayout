@@ -237,7 +237,6 @@ std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, si
 
         double sis = i->si_scaling ();
         //  for compatibility
-        //  @@@ TODO: only for double???
         if (fabs (sis * 1e6 - 1.0) < db::epsilon) {
           os << tl::to_string (v) << "U";
         } else if (fabs (sis * 1e12 - 1.0) < db::epsilon) {
@@ -246,6 +245,8 @@ std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, si
           os << tl::to_string (v.to_double () * sis);
         }
 
+      } else if (v.is_long () || v.is_ulong ()) {
+        os << v.to_string ();
       } else {
         os << tl::to_word_or_quoted_string (v.to_string ());
       }

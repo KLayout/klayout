@@ -408,6 +408,17 @@ class DB_PUBLIC DeviceClass
   : public gsi::ObjectBase, public tl::Object, public tl::UniqueId
 {
 public:
+  /**
+   *  @brief The SPICE profile
+   *
+   *  See \set_spice_profile for a description
+   */
+  struct SpiceProfile
+  {
+    std::string element;
+    std::vector<std::string> terminal_order;
+  };
+
   typedef size_t terminal_id_type;
 
   /**
@@ -690,6 +701,45 @@ public:
   }
 
   /**
+   *  @brief Sets a SPICE profile
+   *
+   *  A Spice profile is a declaration, how a device is serialized to SPICE format
+   *  by default. There can be multiple profiles for different flavors of SPICE
+   *  files (e.g. for simulation etc.).
+   *  A profile has a name and is specified in the SPICE reader or writer.
+   *
+   *  If a device has an entry for a specific profile name, it can specify:
+   *  * The SPICE element (e.g. "X" or "M")
+   *  * The terminal order (a list of terminal names)
+   *
+   *  Using "*" for the profile name installs a fallback profile which is
+   *  used if no other profile applies.
+   */
+  void set_spice_profile (const std::string &name, const SpiceProfile &profile);
+
+  /**
+   *  @brief Gets a value indicating whether a profile is available for the given name
+   */
+  bool has_spice_profile (const std::string &name) const;
+
+  /**
+   *  @brief Gets a SPICE profile with a given name
+   */
+  const SpiceProfile &spice_profile (const std::string &name) const;
+
+  /**
+   *  @brief Clears the SPICE profiles
+   */
+  void clear_spice_profiles ();
+
+  /**
+   *  @brief Removes a SPICE profile with the given name
+   *
+   *  The name can be "*" to remove the fallback profile.
+   */
+  void remove_spice_profile (const std::string &name);
+
+  /**
    *  @brief Compares the parameters of the devices a and b
    *
    *  a and b are expected to originate from this or an equivalent device class having
@@ -805,6 +855,15 @@ public:
     db::mem_stat (stat, purpose, cat, m_description, true, (void *) this);
     db::mem_stat (stat, purpose, cat, m_terminal_definitions, true, (void *) this);
     db::mem_stat (stat, purpose, cat, m_parameter_definitions, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_spice_profiles, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_equivalent_terminal_ids, true, (void *) this);
+
+    if (mp_pc_delegate.get ()) {
+      db::mem_stat (stat, purpose, cat, *mp_pc_delegate, true, (void *) this);
+    }
+    if (mp_device_combiner.get ()) {
+      db::mem_stat (stat, purpose, cat, *mp_device_combiner, true, (void *) this);
+    }
   }
 
 private:
@@ -813,6 +872,7 @@ private:
   std::string m_name, m_description;
   std::vector<DeviceTerminalDefinition> m_terminal_definitions;
   std::vector<DeviceParameterDefinition> m_parameter_definitions;
+  std::map<std::string, SpiceProfile> m_spice_profiles;
   bool m_strict;
   db::Netlist *mp_netlist;
   tl::shared_ptr<db::DeviceParameterCompareDelegate> mp_pc_delegate;

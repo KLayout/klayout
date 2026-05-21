@@ -44,8 +44,10 @@ struct DB_PUBLIC NetlistSpiceReaderOptions
 {
   NetlistSpiceReaderOptions ();
 
+  std::string profile;  // @@@ GSI binding
   double scale;
-  double defad, defas, defw, defl;
+  std::map<std::string, std::map<std::string, double> > default_values;
+  bool all_parameters; //  @@@ GSI binding
 };
 
 /**
@@ -137,7 +139,7 @@ public:
    *  @param nn Out parameter: the net names
    *  @param pv Out parameter: the parameter values (key/value pairs)
    */
-  virtual void parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, tl::Variant> &pv, const std::map<std::string, tl::Variant> &params);
+  virtual void parse_element (const std::string &s, std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, tl::Variant> &pv, const std::map<std::string, tl::Variant> &params);
 
   /**
    *  @brief Produces an error with the given message
@@ -187,8 +189,10 @@ public:
 private:
   db::Netlist *mp_netlist;
   NetlistSpiceReaderOptions m_options;
+  std::map<std::pair<std::string, std::string>, const db::DeviceClass *> m_spice_profiles;
 
   void def_values_per_element (const std::string &element, std::map<std::string, tl::Variant> &pv);
+  double get_multiplier (const std::map<std::string, tl::Variant> &pv);
 };
 
 }

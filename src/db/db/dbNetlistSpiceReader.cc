@@ -794,19 +794,19 @@ SpiceCircuitDict::read_options (tl::Extractor &ex)
       }
     } else if (n == "defad") {
       if (v > min_value) {
-        mp_delegate->options ().defad = v;
+        mp_delegate->options ().default_values ["M"]["AD"] = v;
       }
     } else if (n == "defas") {
       if (v > min_value) {
-        mp_delegate->options ().defas = v;
+        mp_delegate->options ().default_values ["M"]["AS"] = v;
       }
     } else if (n == "defl") {
       if (v > min_value) {
-        mp_delegate->options ().defl = v;
+        mp_delegate->options ().default_values ["M"]["L"] = v;
       }
     } else if (n == "defw") {
       if (v > min_value) {
-        mp_delegate->options ().defw = v;
+        mp_delegate->options ().default_values ["M"]["W"] = v;
       }
     }
 
@@ -1196,9 +1196,10 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
   std::vector<std::string> nn;
   NetlistSpiceReader::parameters_type pv;
   std::string model;
+  std::string element = prefix;
   double value = 0.0;
 
-  mp_delegate->parse_element (ex.skip (), prefix, model, value, nn, pv, m_variables);
+  mp_delegate->parse_element (ex.skip (), element, model, value, nn, pv, m_variables);
 
   model = mp_netlist->normalize_name (model);
 
@@ -1207,7 +1208,7 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
     nets.push_back (make_net (mp_delegate->translate_net_name (*i)));
   }
 
-  if (prefix == "X" && ! subcircuit_captured (model)) {
+  if (element == "X" && ! subcircuit_captured (model)) {
 
     const db::SpiceCachedCircuit *cc = mp_dict->cached_circuit (model);
     if (! cc) {
@@ -1251,7 +1252,7 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
     return true;
 
   } else {
-    return mp_delegate->element (mp_netlist_circuit, prefix, name, model, value, nets, pv);
+    return mp_delegate->element (mp_netlist_circuit, element, name, model, value, nets, pv);
   }
 }
 

@@ -442,10 +442,17 @@ Class<db::Device> decl_dbDevice (decl_dbNetlistObject, "db", "Device",
     "@brief Gets the parameter value for the given parameter name.\n"
     "If the parameter name is not valid, an exception is thrown."
   ) +
-  //  @@@ set_parameter_create!!!
   gsi::method ("set_parameter", (void (db::Device::*) (const std::string &, const tl::Variant &)) &db::Device::set_parameter_value, gsi::arg ("param_name"), gsi::arg ("value"),
     "@brief Sets the parameter value for the given parameter name.\n"
     "If the parameter name is not valid, an exception is thrown."
+  ) +
+  gsi::method ("set_parameter_create", (void (db::Device::*) (const std::string &, const tl::Variant &, bool, const tl::Variant &)) &db::Device::set_parameter_value_create, gsi::arg ("param_name"), gsi::arg ("value"), gsi::arg ("primary", true), gsi::arg ("default_value", tl::Variant (0.0), "none"),
+    "@brief Sets the parameter value for the given parameter name and creates a new parameter if no parameter is present with this name.\n"
+    "If no parameter with the given name exists in the device class's parameter table, a new parameter is created. "
+    "\\primary indicates that this parameter will be a primary one and \\default_value is the default value for this parameter. "
+    "The default value also implicitly defines the type of the parameter. A float value will create a float-type parameter, a string value for default will create a string-type parameter.\n"
+    "\n"
+    "This method has been introduced in version 0.31.0."
   ),
   "@brief A device inside a circuit.\n"
   "Device object represent atomic devices such as resistors, diodes or transistors. "
@@ -887,10 +894,12 @@ Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "De
   gsi::method ("si_scaling", &db::DeviceParameterDefinition::si_scaling,
     "@brief Gets the scaling factor to SI units.\n"
     "For parameters in micrometers - for example W and L of MOS devices - this factor can be set to 1e-6 to reflect "
-    "the unit."
+    "the unit. SI unit scaling is only applied to parameters of the 'float' type. It is not applied to integer-type "
+    "or string parameters."
   ) +
   gsi::method ("si_scaling=", &db::DeviceParameterDefinition::set_si_scaling, gsi::arg ("flag"),
     "@brief Sets the scaling factor to SI units.\n"
+    "See \\si_scaling for details.\n"
     "\n"
     "This setter has been added in version 0.28.6."
   ) +
@@ -898,6 +907,8 @@ Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "De
     "@brief Gets the geometry scaling exponent.\n"
     "This value is used when applying '.options scale' in the SPICE reader for example. "
     "It is zero for 'no scaling', 1.0 for linear scaling and 2.0 for quadratic scaling.\n"
+    "Geometric scaling is only applied to parameters of the 'float' type. It is not applied to integer-type "
+    "or string parameters.\n"
     "\n"
     "This attribute has been added in version 0.28.6."
   ) +
@@ -2545,6 +2556,9 @@ class ParseElementData
 public:
   ParseElementData () : m_value (0.0) { }
 
+  const std::string &element_name () const { return m_element; }
+  std::string &element_name_nc () { return m_element; }
+  void set_element_name (const std::string &element) { m_element = element; }
   const std::string &model_name () const { return m_model; }
   std::string &model_name_nc () { return m_model; }
   void set_model_name (const std::string &model) { m_model = model; }
@@ -2559,7 +2573,7 @@ public:
   void set_parameters (const db::NetlistSpiceReader::parameters_type &parameters) { m_parameters = parameters; }
 
 private:
-  std::string m_model;
+  std::string m_model, m_element;
   double m_value;
   std::vector<std::string> m_net_names;
   db::NetlistSpiceReader::parameters_type m_parameters;
@@ -2702,12 +2716,15 @@ public:
 
   ParseElementData parse_element_helper (const std::string &s, const std::string &element)
   {
+    //  NOTE: this way of treating the element name is compatible with the old way and
+    //  the new way in which the element name can be modified by "parse_element".
     ParseElementData data;
-    db::NetlistSpiceReaderDelegate::parse_element (s, element, data.model_name_nc (), data.value_nc (), data.net_names_nc (), data.parameters_nc (), variables ());
+    data.set_element_name (element);
+    db::NetlistSpiceReaderDelegate::parse_element (s, data.element_name_nc (), data.model_name_nc (), data.value_nc (), data.net_names_nc (), data.parameters_nc (), variables ());
     return data;
   }
 
-  virtual void parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, db::NetlistSpiceReader::parameters_type &pv, const db::NetlistSpiceReader::parameters_type &variables)
+  virtual void parse_element (const std::string &s, std::string &element, std::string &model, double &value, std::vector<std::string> &nn, db::NetlistSpiceReader::parameters_type &pv, const db::NetlistSpiceReader::parameters_type &variables)
   {
     try {
 
@@ -2721,6 +2738,7 @@ public:
         data = parse_element_helper (s, element);
       }
 
+      element = data.element_name ();
       model = data.model_name ();
       value = data.value ();
       nn = data.net_names ();
@@ -2865,6 +2883,14 @@ Class<ParseElementData> db_ParseElementData ("db", "ParseElementData",
   ) +
   gsi::method ("model_name=", &ParseElementData::set_model_name, gsi::arg ("m"),
     "@brief Sets the model name\n"
+  ) +
+  gsi::method ("element_name", &ParseElementData::element_name,
+    "@brief Gets the element name\n"
+    "This attribute is available since version 0.31.0.\n"
+  ) +
+  gsi::method ("element_name=", &ParseElementData::set_element_name, gsi::arg ("e"),
+    "@brief Sets the element name\n"
+    "This attribute is available since version 0.31.0.\n"
   ) +
   gsi::method ("net_names", &ParseElementData::net_names,
     "@brief Gets the net names\n"

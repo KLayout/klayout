@@ -25,6 +25,7 @@
 #include "layConverters.h"
 #include "layDispatcher.h"
 #include "layAbstractMenu.h"
+#include "layLayoutViewBase.h"
 #include "tlColor.h"
 #include "tlLog.h"
 #if defined(HAVE_QT)
@@ -139,11 +140,10 @@ PluginDeclaration::create_plugin (db::Manager *manager, lay::Dispatcher *, lay::
 }
 
 std::vector<std::string>
-PluginDeclaration::additional_editor_options_pages () const
+PluginDeclaration::additional_editor_options_pages (lay::LayoutViewBase * /*view*/) const
 {
   std::vector<std::string> names;
-  //  TODO: provide in a central place instead of borrowing from the edt module
-  names.push_back ("GenericEditorOptions");
+  names.push_back ("ant::RulerOptions");
   return names;
 }
 

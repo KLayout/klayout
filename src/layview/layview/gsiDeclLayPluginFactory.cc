@@ -318,7 +318,7 @@ public:
     m_additional_editor_options_pages.push_back (name);
   }
 
-  virtual std::vector<std::string> additional_editor_options_pages () const
+  virtual std::vector<std::string> additional_editor_options_pages (lay::LayoutViewBase *) const
   {
     return m_additional_editor_options_pages;
   }

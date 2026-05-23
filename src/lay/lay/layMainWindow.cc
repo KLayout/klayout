@@ -290,7 +290,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   connect (mp_libs_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_libs_visible = true;
 
-  mp_eo_dock_widget = new QDockWidget (QObject::tr ("Editor Options"), this);
+  mp_eo_dock_widget = new QDockWidget (QObject::tr ("Tool Options"), this);
   mp_eo_dock_widget->setObjectName (QString::fromUtf8 ("eo_dock_widget"));
   mp_eo_dock_widget->setMinimumHeight (150);
   mp_eo_stack = new ControlWidgetStack (mp_eo_dock_widget, "eo_stack");
@@ -4502,7 +4502,7 @@ public:
 
     at = "edit_menu.end";
     menu_entries.push_back (lay::separator ("edit_options_group:edit_mode", "edit_menu.end"));
-    menu_entries.push_back (lay::menu_item ("cm_edit_options", "edit_options:edit_mode", "edit_menu.end", tl::to_string (QObject::tr ("Editor Options")) + "(F3)"));
+    menu_entries.push_back (lay::menu_item ("cm_edit_options", "edit_options:edit_mode", "edit_menu.end", tl::to_string (QObject::tr ("Tool Options")) + "(F3)"));
 
     at = "file_menu.end";
     menu_entries.push_back (lay::menu_item ("cm_new_layout", "new_layout:edit:edit_mode", at, tl::to_string (QObject::tr ("New Layout"))));

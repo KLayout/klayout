@@ -482,7 +482,7 @@ EditorOptionsModalPages::update_title ()
   if (mp_single_page) {
     setWindowTitle (tl::to_qstring (mp_single_page->title ()));
   } else {
-    setWindowTitle (tr ("Editor Options"));
+    setWindowTitle (tr ("Tool Options"));
   }
 }
 

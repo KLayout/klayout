@@ -1314,13 +1314,33 @@ NetlistSpiceReader::~NetlistSpiceReader ()
   //  .. nothing yet ..
 }
 
+const std::string &NetlistSpiceReader::profile () const
+{
+  return m_profile;
+}
+
+void NetlistSpiceReader::set_profile (const std::string &profile)
+{
+  m_profile = profile;
+}
+
+NetlistSpiceReaderDelegate *NetlistSpiceReader::delegate ()
+{
+  return mp_delegate.get ();
+}
+
+const NetlistSpiceReaderDelegate *NetlistSpiceReader::delegate () const
+{
+  return mp_delegate.get ();
+}
+
 void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading netlist ")) + stream.source ());
 
   try {
 
-    mp_delegate->set_netlist (&netlist);
+    mp_delegate->set_netlist (&netlist, profile ());
 
     //  SPICE netlists are case insensitive
     netlist.set_case_sensitive (false);
@@ -1338,10 +1358,10 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
     builder.set_strict (m_strict);
     builder.build ();
 
-    mp_delegate->set_netlist (0);
+    mp_delegate->set_netlist (0, std::string ());
 
   } catch (...) {
-    mp_delegate->set_netlist (0);
+    mp_delegate->set_netlist (0, std::string ());
     throw;
   }
 }

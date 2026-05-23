@@ -42,13 +42,12 @@ NetlistSpiceReaderOptions::NetlistSpiceReaderOptions ()
   default_values["M"]["L"] = 100e-6;
 
   scale = 1.0;
-  all_parameters = false;
 }
 
 // ------------------------------------------------------------------------------------------------------
 
 NetlistSpiceReaderDelegate::NetlistSpiceReaderDelegate ()
-  : mp_netlist (0), m_options ()
+  : mp_netlist (0), m_options (), m_profile (), m_read_all_parameters (true)
 {
   //  .. nothing yet ..
 }
@@ -58,10 +57,23 @@ NetlistSpiceReaderDelegate::~NetlistSpiceReaderDelegate ()
   //  .. nothing yet ..
 }
 
-void NetlistSpiceReaderDelegate::set_netlist (db::Netlist *netlist)
+bool
+NetlistSpiceReaderDelegate::read_all_parameters () const
+{
+  return m_read_all_parameters;
+}
+
+void
+NetlistSpiceReaderDelegate::set_read_all_parameters (bool f)
+{
+  m_read_all_parameters = f;
+}
+
+void NetlistSpiceReaderDelegate::set_netlist (db::Netlist *netlist, const std::string &profile)
 {
   m_options = NetlistSpiceReaderOptions ();
   mp_netlist = netlist;
+  m_profile = profile;
 }
 
 void NetlistSpiceReaderDelegate::do_start ()
@@ -72,12 +84,12 @@ void NetlistSpiceReaderDelegate::do_start ()
   for (auto dc = mp_netlist->begin_device_classes (); dc != mp_netlist->end_device_classes (); ++dc) {
 
     const db::DeviceClass *dcc = dc.operator-> ();
-    if (dcc->has_spice_profile (m_options.profile)) {
+    if (dcc->has_spice_profile (m_profile)) {
 
-      const db::DeviceClass::SpiceProfile &pf = dcc->spice_profile (m_options.profile);
+      const db::DeviceClass::SpiceProfile &pf = dcc->spice_profile (m_profile);
       if (! pf.element.empty ()) {
         if (m_spice_profiles.find (std::make_pair (pf.element, dcc->name ())) != m_spice_profiles.end ()) {
-          tl::warn << tl::sprintf (tl::to_string (tr ("Duplicate model name %s bound to element %s in profile %s")), dcc->name (), pf.element, m_options.profile);
+          tl::warn << tl::sprintf (tl::to_string (tr ("Duplicate model name %s bound to element %s in profile %s")), dcc->name (), pf.element, m_profile);
         }
         m_spice_profiles.insert (std::make_pair (std::make_pair (pf.element, dcc->name ()), dcc));
       }
@@ -109,9 +121,9 @@ bool NetlistSpiceReaderDelegate::control_statement (const std::string & /*line*/
   return false;
 }
 
-bool NetlistSpiceReaderDelegate::wants_subcircuit (const std::string & /*circuit_name*/)
+bool NetlistSpiceReaderDelegate::wants_subcircuit (const std::string &circuit_name)
 {
-  return false;
+  return m_spice_profiles.find (std::make_pair ("X", circuit_name)) != m_spice_profiles.end ();
 }
 
 std::string NetlistSpiceReaderDelegate::translate_net_name (const std::string &nn)
@@ -227,11 +239,11 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, std::strin
     //  indicates that we must not use the element name further
     element.clear ();
 
-    const std::vector<std::string> &to = dp->second->spice_profile (m_options.profile).terminal_order;
+    const std::vector<std::string> &to = dp->second->spice_profile (m_profile).terminal_order;
 
     if (nn.size () != to.size ()) {
       error (tl::sprintf (tl::to_string (tr ("Element '%s' bound to model '%s' in SPICE profile '%s' requires %d terminals, but got %d")),
-                          element, model, m_options.profile, int (to.size ()), int (nn.size ())));
+                          element, model, m_profile, int (to.size ()), int (nn.size ())));
     }
 
     //  reorder the terminals according to the terminal order
@@ -248,7 +260,7 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, std::strin
       if (ti < 0) {
         std::string tos = tl::join (to, ",");
         error (tl::sprintf (tl::to_string (tr ("Element '%s' bound to model '%s' in SPICE profile '%s' terminal order (%s) does not provide a binding for terminal '%s'")),
-                            element, model, m_options.profile, tos, t->name ()));
+                            element, model, m_profile, tos, t->name ()));
       }
       nn_ordered.push_back (nn[ti]);
     }
@@ -650,7 +662,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
       device->set_parameter_value (p->first, p->second);
 
-    } else if (m_options.all_parameters) {
+    } else if (m_read_all_parameters) {
 
       //  if requested, create the parameter
       if (p->second.is_long () || p->second.is_ulong ()) {

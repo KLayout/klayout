@@ -25,6 +25,7 @@
 
 #include "dbCommon.h"
 #include "dbNetlistWriter.h"
+#include "dbDeviceClass.h"
 #include "tlObject.h"
 
 #include <string>
@@ -34,7 +35,6 @@
 namespace db
 {
 
-class DeviceClass;
 class Device;
 class Net;
 class NetlistSpiceWriter;
@@ -54,6 +54,9 @@ public:
   NetlistSpiceWriterDelegate ();
   virtual ~NetlistSpiceWriterDelegate ();
 
+  bool write_all_parameters () const { return m_write_all_parameters; }
+  void set_write_all_parameters (bool f) { m_write_all_parameters = f; }
+
   virtual void write_header () const;
   virtual void write_device_intro (const db::DeviceClass &cls) const;
   virtual void write_device (const db::Device &dev) const;
@@ -63,14 +66,19 @@ public:
   void emit_comment (const std::string &comment) const;
   std::string format_name (const std::string &s) const;
   std::string format_terminals (const db::Device &dev, size_t max_terminals = std::numeric_limits<size_t>::max ()) const;
-  std::string format_params (const db::Device &dev, size_t without_id = std::numeric_limits<size_t>::max (), bool only_primary = false) const;
+  std::string format_terminals_with_order (const db::Device &dev, const std::vector<std::string> &terminal_order) const;
+  std::string format_params (const db::Device &dev, size_t without_id = std::numeric_limits<size_t>::max ()) const;
 
 private:
   friend class NetlistSpiceWriter;
 
   NetlistSpiceWriter *mp_writer;
+  const Netlist *mp_netlist;
+  bool m_write_all_parameters;
 
-  void attach_writer (NetlistSpiceWriter *writer);
+  void attach_writer (NetlistSpiceWriter *writer, const Netlist *netlist);
+  void write_device_default (const db::Device &dev) const;
+  void write_device_profile (const db::Device &dev, const db::DeviceClass::SpiceProfile &profile) const;
 };
 
 /**
@@ -87,13 +95,69 @@ public:
 
   virtual void write (tl::OutputStream &stream, const db::Netlist &netlist, const std::string &description);
 
+  /**
+   *  @brief Sets the SPICE profile name
+   */
+  void set_profile (const std::string &profile);
+
+  /**
+   *  @brief Gets the SPICE profile name
+   *
+   *  The SPICE profile name is used to collect SPICE reader settings from the
+   *  device classes.
+   */
+  const std::string &profile () const
+  {
+    return m_profile;
+  }
+
+  /**
+   *  @brief Sets a string listing the allowed characters in names (beside alphanumeric)
+   */
+  void set_allowed_name_chars (const std::string &a);
+
+  /**
+   *  @brief Gets a string listing the allowed characters in names
+   */
+  const std::string &allowed_name_chars () const
+  {
+    return m_allowed_name_chars;
+  }
+
+  /**
+   *  @brief Sets the prefix for "not connected" nets
+   */
+  void set_not_connect_prefix (const std::string &p);
+
+  /**
+   *  @brief Gets the prefix for "not connected" nets
+   */
+  const std::string &not_connect_prefix () const
+  {
+    return m_not_connect_prefix;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether to use net names
+   */
   void set_use_net_names (bool use_net_names);
+
+  /**
+   *  @brief Gets a value indicating whether to use net names
+   */
   bool use_net_names () const
   {
     return m_use_net_names;
   }
 
+  /**
+   *  @brief Sets a value indicating whether to use comments
+   */
   void set_with_comments (bool f);
+
+  /**
+   *  @brief Gets a value indicating whether to use comments
+   */
   bool with_comments () const
   {
     return m_with_comments;
@@ -110,6 +174,10 @@ private:
   mutable size_t m_next_net_id;
   bool m_use_net_names;
   bool m_with_comments;
+  std::string m_profile;
+  std::string m_allowed_name_chars;
+  std::string m_not_connect_prefix;
+
 
   void do_write (const std::string &description);
 

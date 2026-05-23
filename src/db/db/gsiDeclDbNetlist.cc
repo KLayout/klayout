@@ -2437,14 +2437,18 @@ private:
 
 }
 
-db::NetlistSpiceWriter *new_spice_writer ()
+db::NetlistSpiceWriter *new_spice_writer (const std::string &profile)
 {
-  return new db::NetlistSpiceWriter ();
+  auto *writer = new db::NetlistSpiceWriter ();
+  writer->set_profile (profile);
+  return writer;
 }
 
-db::NetlistSpiceWriter *new_spice_writer2 (NetlistSpiceWriterDelegateImpl *delegate)
+db::NetlistSpiceWriter *new_spice_writer2 (NetlistSpiceWriterDelegateImpl *delegate, const std::string &profile)
 {
-  return new NetlistSpiceWriterWithOwnership (delegate);
+  auto *writer = new NetlistSpiceWriterWithOwnership (delegate);
+  writer->set_profile (profile);
+  return writer;
 }
 
 Class<db::NetlistWriter> db_NetlistWriter ("db", "NetlistWriter",
@@ -2456,11 +2460,45 @@ Class<db::NetlistWriter> db_NetlistWriter ("db", "NetlistWriter",
 );
 
 Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "NetlistSpiceWriter",
-  gsi::constructor ("new", &new_spice_writer,
+  gsi::constructor ("new", &new_spice_writer, gsi::arg ("profile", std::string ()),
     "@brief Creates a new writer without delegate.\n"
+    "The profile string gives the name of the SPICE profile to use, when taking the SPICE representation "
+    "from the device classes in the netlist.\n"
+    "\n"
+    "The profile argument has been added in version 0.31.0."
   ) +
-  gsi::constructor ("new", &new_spice_writer2, gsi::arg ("delegate"),
+  gsi::constructor ("new", &new_spice_writer2, gsi::arg ("delegate"), gsi::arg ("profile", std::string ()),
     "@brief Creates a new writer with a delegate.\n"
+    "The profile string gives the name of the SPICE profile to use, when taking the SPICE representation "
+    "from the device classes in the netlist.\n"
+    "\n"
+    "The profile argument has been added in version 0.31.0."
+  ) +
+  gsi::method ("not_connect_prefix", &db::NetlistSpiceWriter::not_connect_prefix,
+    "@brief Gets the prefix used for terminals or pins which are not connected.\n"
+    "See \\not_connect_prefix= for details.\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
+  ) +
+  gsi::method ("not_connect_prefix=", &db::NetlistSpiceWriter::set_not_connect_prefix, gsi::arg ("s"),
+    "@brief Sets the prefix used for terminals or pins which are not connected.\n"
+    "By default, the prefix is 'nc_'."
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
+  ) +
+  gsi::method ("allowed_name_characters", &db::NetlistSpiceWriter::allowed_name_chars,
+    "@brief Gets a string listing the allowed characters for names (beside alphanumeric).\n"
+    "See \\allowed_name_characters= for details.\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
+  ) +
+  gsi::method ("allowed_name_characters=", &db::NetlistSpiceWriter::set_allowed_name_chars, gsi::arg ("s"),
+    "@brief Sets a string listing the allowed characters for names (beside alphanumeric).\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
+  ) +
+  gsi::method ("use_net_names?", &db::NetlistSpiceWriter::use_net_names,
+    "@brief Gets a value indicating whether to use net names (true) or net numbers (false).\n"
   ) +
   gsi::method ("use_net_names=", &db::NetlistSpiceWriter::set_use_net_names, gsi::arg ("f"),
     "@brief Sets a value indicating whether to use net names (true) or net numbers (false).\n"
@@ -2537,7 +2575,8 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   "netlist.write(path, writer)\n"
   "@/code\n"
   "\n"
-  "This class has been introduced in version 0.26."
+  "This class has been introduced in version 0.26. "
+  "SPICE profiles have been added to device classes in version 0.31.0."
 );
 
 Class<db::NetlistReader> db_NetlistReader ("db", "NetlistReader",
@@ -3041,7 +3080,7 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
   "\n"
   "See \\NetlistSpiceReader for more details.\n"
   "\n"
-  "This class has been introduced in version 0.26."
+  "This class has been introduced in version 0.26. Profiles have been added to the device classes in version 0.31.0."
 );
 
 namespace {
@@ -3064,22 +3103,65 @@ private:
 
 }
 
-db::NetlistSpiceReader *new_spice_reader ()
+db::NetlistSpiceReader *new_spice_reader (const std::string &profile)
 {
-  return new db::NetlistSpiceReader ();
+  auto *reader = new db::NetlistSpiceReader ();
+  reader->set_profile (profile);
+  return reader;
 }
 
-db::NetlistSpiceReader *new_spice_reader2 (NetlistSpiceReaderDelegateImpl *delegate)
+db::NetlistSpiceReader *new_spice_reader2 (NetlistSpiceReaderDelegateImpl *delegate, const std::string &profile)
 {
-  return new NetlistSpiceReaderWithOwnership (delegate);
+  auto *reader = new NetlistSpiceReaderWithOwnership (delegate);
+  reader->set_profile (profile);
+  return reader;
 }
+
+static bool read_all_parameters (const db::NetlistSpiceReader *reader)
+{
+  return reader->delegate () ? reader->delegate ()->read_all_parameters () : false;
+}
+
+static void set_read_all_parameters (db::NetlistSpiceReader *reader, bool f)
+{
+  if (reader->delegate ()) {
+    reader->delegate ()->set_read_all_parameters (f);
+  }
+}
+
 
 Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "NetlistSpiceReader",
-  gsi::constructor ("new", &new_spice_reader,
+  gsi::constructor ("new", &new_spice_reader, gsi::arg ("profile", std::string ()),
     "@brief Creates a new reader.\n"
+    "The profile string defines the SPICE profile to use for picking default SPICE mappings from the "
+    "device classes declared in the netlist to read.\n"
+    "\n"
+    "The profile string argument has been added in version 0.31.0."
   ) +
-  gsi::constructor ("new", &new_spice_reader2, gsi::arg ("delegate"),
+  gsi::constructor ("new", &new_spice_reader2, gsi::arg ("delegate"), gsi::arg ("profile", std::string ()),
     "@brief Creates a new reader with a delegate.\n"
+    "The profile string defines the SPICE profile to use for picking default SPICE mappings from the "
+    "device classes declared in the netlist to read.\n"
+    "\n"
+    "The profile string argument has been added in version 0.31.0."
+  ) +
+  gsi::method_ext ("read_all_parameters", &read_all_parameters,
+    "@brief Gets a flag indicating whether all parameters shall be read\n"
+    "\n"
+    "With this flag set to false, only those parameters which\n"
+    "are declared in the device classes of the netlist are read.\n"
+    "If set to true (the default), additional parameters are added to the device classes\n"
+    "and their values are stored in the device objects.\n"
+    "Note that this behavior can be changed in reimplementations of the\n"
+    "SPICE reader delegate class.\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
+  ) +
+  gsi::method_ext ("read_all_parameters=", &set_read_all_parameters, gsi::arg ("f"),
+    "@brief Sets a flag indicating whether all parameters shall be read\n"
+    "See \\read_all_parameters for details.\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
   ),
   "@brief Implements a netlist Reader for the SPICE format.\n"
   "Use the SPICE reader like this:\n"
@@ -3090,8 +3172,9 @@ Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "Ne
   "netlist.read(path, reader)\n"
   "@/code\n"
   "\n"
-  "The translation of SPICE elements can be tailored by providing a \\NetlistSpiceReaderDelegate class. "
-  "This allows translating of device parameters and mapping of some subcircuits to devices.\n"
+  "The translation of SPICE elements can be tailored by providing a \\NetlistSpiceReaderDelegate class or by "
+  "supplying device classes in the netlist that declare their SPICe representation in a SPICE profile.\n"
+  //  @@@ TODO: example for profiles in device classes
   "\n"
   "The following example is a delegate that turns subcircuits called HVNMOS and HVPMOS into "
   "MOS4 devices with the parameters scaled by 1.5:\n"
@@ -3162,7 +3245,8 @@ Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "Ne
   "end\n"
   "@/code\n"
   "\n"
-  "This class has been introduced in version 0.26. It has been extended in version 0.27.1."
+  "This class has been introduced in version 0.26. It has been extended in version 0.27.1. "
+  "Profiles have been added to the device classes in version 0.31.0."
 );
 
 }

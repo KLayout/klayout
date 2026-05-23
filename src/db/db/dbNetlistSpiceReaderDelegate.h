@@ -44,19 +44,26 @@ struct DB_PUBLIC NetlistSpiceReaderOptions
 {
   NetlistSpiceReaderOptions ();
 
-  std::string profile;  // @@@ GSI binding
   double scale;
   std::map<std::string, std::map<std::string, double> > default_values;
-  bool all_parameters; //  @@@ GSI binding
 };
 
 /**
  *  @brief A delegate to handle various forms of devices and translates them
  *
- *  The reader delegate can be configured to receive subcircuit elements too.
- *  In this case, parameters are allowed.
+ *  The default behavior is controlled by the device classes that
+ *  are defined inside the netlist object, before it is passed to the
+ *  "start" method. The device class may define rules which are
+ *  selected by the "SPICE profile" string. These rules include the
+ *  SPICE element that is used for a device and the terminal order.
+ *
+ *  Instead of using the device profiles, the SPICE reader delegate
+ *  can also be customized by re-implementing methods that control
+ *  the parsing of SPICE lines and creation of devices from them.
+ *
  *  For receiving subcircuit elements, the delegate needs to indicate
- *  this by returning true upon "wants_subcircuit".
+ *  this by returning true upon "wants_subcircuit" or by declaring
+ *  device classes with "X" elements in their SPICE profile.
  */
 class DB_PUBLIC NetlistSpiceReaderDelegate
   : public tl::Object
@@ -67,6 +74,9 @@ public:
 
   /**
    *  @brief Gets the reader options
+   *
+   *  The reader options are settings collected during the parsing of the SPICE file,
+   *  such as the scale value etc.
    */
   const NetlistSpiceReaderOptions &options () const
   {
@@ -80,6 +90,21 @@ public:
   {
     return m_options;
   }
+
+  /**
+   *  @brief Gets a flag indicating whether all parameters shall be read
+   *
+   *  With this flag set to false (the default), only those parameters which
+   *  are declared in the device classes of the netlist are read.
+   *  Otherwise, additional parameters are added to the device classes
+   *  and their values are stored in the device objects.
+   */
+  bool read_all_parameters () const;
+
+  /**
+   *  @brief Sets a flag indicating whether all parameters shall be read
+   */
+  void set_read_all_parameters (bool f);
 
   /**
    *  @brief Called when the netlist reading starts
@@ -177,9 +202,9 @@ public:
   void do_finish ();
 
   /**
-   *  @brief Sets the netlist
+   *  @brief Sets the netlist and the SPICE profile to be used
    */
-  void set_netlist (db::Netlist *netlist);
+  void set_netlist (db::Netlist *netlist, const std::string &profile);
 
   /**
    *  @brief Applies SI and geometry scaling to the device parameters
@@ -189,6 +214,8 @@ public:
 private:
   db::Netlist *mp_netlist;
   NetlistSpiceReaderOptions m_options;
+  std::string m_profile;
+  bool m_read_all_parameters;
   std::map<std::pair<std::string, std::string>, const db::DeviceClass *> m_spice_profiles;
 
   void def_values_per_element (const std::string &element, std::map<std::string, tl::Variant> &pv);

@@ -56,6 +56,29 @@ public:
   virtual void read (tl::InputStream &stream, db::Netlist &netlist);
 
   /**
+   *  @brief Gets the SPICE profile name
+   *
+   *  The SPICE profile name is used to collect SPICE reader settings from the
+   *  device classes.
+   */
+  const std::string &profile () const;
+
+  /**
+   *  @brief Sets the SPICE profile name
+   */
+  void set_profile (const std::string &profile);
+
+  /**
+   *  @brief Gets the SPICE reader delegate
+   */
+  NetlistSpiceReaderDelegate *delegate ();
+
+  /**
+   *  @brief Gets the SPICE reader delegate (const version)
+   */
+  const NetlistSpiceReaderDelegate *delegate () const;
+
+  /**
    *  @brief Sets or resets strict mode
    *  In strict mode, all subcircuits need to be present in the net list for example.
    */
@@ -82,15 +105,11 @@ public:
    */
   static std::string parse_component (tl::Extractor &ex);
 
-  /**
-   *  @brief Reads a component name
-   *  Scans over a component name and returns the
-   */
-
 private:
   tl::weak_ptr<NetlistSpiceReaderDelegate> mp_delegate;
   std::unique_ptr<NetlistSpiceReaderDelegate> mp_default_delegate;
   bool m_strict;
+  std::string m_profile;
 };
 
 }

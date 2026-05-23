@@ -35,13 +35,16 @@
 namespace db
 {
 
-static const char *allowed_name_chars = "_.:,!+$/&\\#[]<>";
-static const char *not_connect_prefix = "nc_";
+//  default allowed name characters
+static const char *s_allowed_name_chars = "_.:,!+$/&\\#[]<>";
+
+//  default prefix for "not connected" terminals
+static const char *s_not_connect_prefix = "nc_";
 
 // --------------------------------------------------------------------------------
 
 NetlistSpiceWriterDelegate::NetlistSpiceWriterDelegate ()
-  : mp_writer (0)
+  : mp_writer (0), mp_netlist (0), m_write_all_parameters (true)
 {
   //  .. nothing yet ..
 }
@@ -75,9 +78,10 @@ void NetlistSpiceWriterDelegate::emit_comment (const std::string &comment) const
   mp_writer->emit_comment (comment);
 }
 
-void NetlistSpiceWriterDelegate::attach_writer (NetlistSpiceWriter *writer)
+void NetlistSpiceWriterDelegate::attach_writer (NetlistSpiceWriter *writer, const db::Netlist *netlist)
 {
   mp_writer = writer;
+  mp_netlist = netlist;
 }
 
 void NetlistSpiceWriterDelegate::write_header () const
@@ -93,6 +97,36 @@ void NetlistSpiceWriterDelegate::write_device_intro (const db::DeviceClass &) co
 void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
 {
   const db::DeviceClass *dc = dev.device_class ();
+
+  const db::DeviceClass::SpiceProfile &profile = dc->spice_profile (mp_writer->profile ());
+  if (! profile.element.empty ()) {
+    write_device_profile (dev, profile);
+  } else {
+    write_device_default (dev);
+  }
+}
+
+void NetlistSpiceWriterDelegate::write_device_profile (const db::Device &dev, const db::DeviceClass::SpiceProfile &profile) const
+{
+  std::ostringstream os;
+
+  os << profile.element;
+  os << format_name (dev.expanded_name ());
+  os << format_terminals_with_order (dev, profile.terminal_order);
+  os << " ";
+  if (! dev.device_class ()->name ().empty ()) {
+    os << " ";
+    os << format_name (dev.device_class ()->name ());
+  }
+  os << format_params (dev);
+
+  emit_line (os.str ());
+}
+
+void NetlistSpiceWriterDelegate::write_device_default (const db::Device &dev) const
+{
+  const db::DeviceClass *dc = dev.device_class ();
+
   const db::DeviceClassCapacitor *cap = dynamic_cast<const db::DeviceClassCapacitor *> (dc);
   const db::DeviceClassCapacitor *cap3 = dynamic_cast<const db::DeviceClassCapacitorWithBulk *> (dc);
   const db::DeviceClassInductor *ind = dynamic_cast<const db::DeviceClassInductor *> (dc);
@@ -117,7 +151,8 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
       os << " ";
       os << format_name (dev.device_class ()->name ());
     }
-    os << format_params (dev, db::DeviceClassCapacitor::param_id_C, true);
+
+    os << format_params (dev, db::DeviceClassCapacitor::param_id_C);
 
   } else if (ind) {
 
@@ -130,7 +165,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
       os << " ";
       os << format_name (dev.device_class ()->name ());
     }
-    os << format_params (dev, db::DeviceClassInductor::param_id_L, true);
+    os << format_params (dev, db::DeviceClassInductor::param_id_L);
 
   } else if (res || res3) {
 
@@ -143,7 +178,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
       os << " ";
       os << format_name (dev.device_class ()->name ());
     }
-    os << format_params (dev, db::DeviceClassResistor::param_id_R, true);
+    os << format_params (dev, db::DeviceClassResistor::param_id_R);
 
   } else if (diode) {
 
@@ -168,7 +203,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
     os << net_to_string (dev.net_for_terminal (db::DeviceClassMOS3Transistor::terminal_id_G));
     os << " ";
     os << net_to_string (dev.net_for_terminal (db::DeviceClassMOS3Transistor::terminal_id_S));
-      os << " ";
+    os << " ";
 
     if (! mos4) {
       //  we assume for the MOS3 type the bulk is connected to Source
@@ -221,8 +256,23 @@ std::string NetlistSpiceWriterDelegate::format_terminals (const db::Device &dev,
   return os.str ();
 }
 
-std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, size_t without_id, bool only_primary) const
+std::string NetlistSpiceWriterDelegate::format_terminals_with_order (const db::Device &dev, const std::vector<std::string> &terminal_order) const
 {
+  std::ostringstream os;
+
+  for (auto t = terminal_order.begin (); t != terminal_order.end (); ++t) {
+    if (! dev.device_class ()->has_terminal_with_name (*t)) {
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid terminal name '%s' for device of class '%s' in SPICE profile '%s")), *t, dev.device_class ()->name (), mp_writer->profile ()));
+    }
+    os << " " << net_to_string (dev.net_for_terminal (dev.device_class ()->terminal_id_for_name (*t)));
+  }
+
+  return os.str ();
+}
+
+std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, size_t without_id) const
+{
+  bool only_primary = ! m_write_all_parameters;
   std::ostringstream os;
 
   const std::vector<db::DeviceParameterDefinition> &pd = dev.device_class ()->parameter_definitions ();
@@ -263,6 +313,9 @@ std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, si
 NetlistSpiceWriter::NetlistSpiceWriter (NetlistSpiceWriterDelegate *delegate)
   : mp_netlist (0), mp_stream (0), mp_delegate (delegate), m_next_net_id (0), m_use_net_names (false), m_with_comments (true)
 {
+  m_allowed_name_chars = s_allowed_name_chars;
+  m_not_connect_prefix = s_not_connect_prefix;
+
   static NetlistSpiceWriterDelegate std_delegate;
   if (! delegate) {
     mp_delegate.reset (&std_delegate);
@@ -272,6 +325,21 @@ NetlistSpiceWriter::NetlistSpiceWriter (NetlistSpiceWriterDelegate *delegate)
 NetlistSpiceWriter::~NetlistSpiceWriter ()
 {
   //  .. nothing yet ..
+}
+
+void NetlistSpiceWriter::set_profile (const std::string &profile)
+{
+  m_profile = profile;
+}
+
+void NetlistSpiceWriter::set_allowed_name_chars (const std::string &a)
+{
+  m_allowed_name_chars = a;
+}
+
+void NetlistSpiceWriter::set_not_connect_prefix (const std::string &p)
+{
+  m_not_connect_prefix = p;
 }
 
 void NetlistSpiceWriter::set_use_net_names (bool use_net_names)
@@ -290,7 +358,7 @@ void NetlistSpiceWriter::write (tl::OutputStream &stream, const db::Netlist &net
 
   mp_stream = &stream;
   mp_netlist = &netlist;
-  mp_delegate->attach_writer (this);
+  mp_delegate->attach_writer (this, &netlist);
 
   try {
 
@@ -298,13 +366,13 @@ void NetlistSpiceWriter::write (tl::OutputStream &stream, const db::Netlist &net
 
     mp_stream = 0;
     mp_netlist = 0;
-    mp_delegate->attach_writer (0);
+    mp_delegate->attach_writer (0, 0);
 
   } catch (...) {
 
     mp_stream = 0;
     mp_netlist = 0;
-    mp_delegate->attach_writer (0);
+    mp_delegate->attach_writer (0, 0);
     throw;
 
   }
@@ -316,7 +384,7 @@ std::string NetlistSpiceWriter::net_to_string (const db::Net *net) const
 
     if (! net) {
 
-      return std::string (not_connect_prefix) + tl::to_string (++m_next_net_id);
+      return std::string (m_not_connect_prefix) + tl::to_string (++m_next_net_id);
 
     } else {
 
@@ -334,7 +402,7 @@ std::string NetlistSpiceWriter::net_to_string (const db::Net *net) const
         nn += "\\";
       }
       for (const char *cp = n.c_str (); *cp; ++cp) {
-        if (! isalnum (*cp) && strchr (allowed_name_chars, *cp) == 0) {
+        if (! isalnum (*cp) && strchr (m_allowed_name_chars.c_str (), *cp) == 0) {
           nn += tl::sprintf ("\\x%02x", (unsigned char) *cp);
         } else if (*cp == ',') {
           nn += "|";
@@ -459,10 +527,10 @@ void NetlistSpiceWriter::do_write (const std::string &description)
 
       //  determine the next net id for non-connected nets such that there is no clash with
       //  existing names
-      size_t prefix_len = strlen (not_connect_prefix);
+      size_t prefix_len = m_not_connect_prefix.size ();
 
       for (std::set<std::string>::const_iterator n = names.begin (); n != names.end (); ++n) {
-        if (n->find (not_connect_prefix) == 0 && n->size () > prefix_len) {
+        if (n->find (m_not_connect_prefix) == 0 && n->size () > prefix_len) {
           size_t num = 0;
           tl::from_string (n->c_str () + prefix_len, num);
           m_next_net_id = std::max (m_next_net_id, num);

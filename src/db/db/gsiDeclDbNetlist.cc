@@ -1155,12 +1155,100 @@ static void dc_add_parameter_definition (db::DeviceClass *cls, db::DeviceParamet
   }
 }
 
+static bool dc_has_spice_profile (const db::DeviceClass *cls, const std::string &name)
+{
+  return cls->has_spice_profile (name);
+}
+
+static void dc_remove_spice_profile (db::DeviceClass *cls, const std::string &name)
+{
+  cls->remove_spice_profile (name);
+}
+
+static void dc_clear_spice_profiles (db::DeviceClass *cls)
+{
+  cls->clear_spice_profiles ();
+}
+
+static std::string dc_get_element_name (const db::DeviceClass *cls, const std::string &name)
+{
+  return cls->spice_profile (name).element;
+}
+
+static void dc_set_element_name (db::DeviceClass *cls, const std::string &name, const std::string &element)
+{
+  db::DeviceClass::SpiceProfile profile = cls->spice_profile (name);
+  profile.element = element;
+  cls->set_spice_profile (name, profile);
+}
+
+static std::vector<std::string> dc_get_terminal_order (const db::DeviceClass *cls, const std::string &name)
+{
+  return cls->spice_profile (name).terminal_order;
+}
+
+static void dc_set_terminal_order (db::DeviceClass *cls, const std::string &name, const std::vector<std::string> &to)
+{
+  db::DeviceClass::SpiceProfile profile = cls->spice_profile (name);
+  profile.terminal_order = to;
+  cls->set_spice_profile (name, profile);
+}
+
 Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   gsi::method ("name", &db::DeviceClass::name,
     "@brief Gets the name of the device class."
   ) +
   gsi::method ("name=", &db::DeviceClass::set_name, gsi::arg ("name"),
     "@brief Sets the name of the device class."
+  ) +
+  gsi::method_ext ("has_spice_profile?", &dc_has_spice_profile, gsi::arg ("name"),
+    "@brief Gets a value indicating whether a device class supports a specific SPICE profile.\n"
+    "SPICE profiles are a way to declare SPICE representations for a specific device. "
+    "Each device class can support multiple profiles. An empty name declares the default profile, "
+    "'*' is the fallback profile used when there is no profile with a requested name. Profiles "
+    "are requested by the SPICE reader or writer, unless they use delegates to implement "
+    "a customized SPICE representation.\n"
+    "\n"
+    "SPICE profiles can declare element names for example or specify the terminal count and order in SPICE files.\n"
+    "\n"
+    "SPICE profiles have been introduced in version 0.31.0."
+  ) +
+  gsi::method_ext ("remove_spice_profile", &dc_remove_spice_profile, gsi::arg ("name"),
+    "@brief Removes a SPICE profile with the given name.\n"
+    "See \\has_spice_profile? for a description of the SPICE profile concept.\n"
+    "\n"
+    "SPICE profiles have been introduced in version 0.31.0."
+  ) +
+  gsi::method_ext ("clear_spice_profiles", &dc_clear_spice_profiles,
+    "@brief Removes all SPICE profiles from the device class.\n"
+    "See \\has_spice_profile? for a description of the SPICE profile concept.\n"
+    "\n"
+    "SPICE profiles have been introduced in version 0.31.0."
+  ) +
+  gsi::method_ext ("set_terminal_order", &dc_set_terminal_order, gsi::arg ("profile_name"), gsi::arg ("terminal_names"),
+    "@brief Defines the order the terminals are written to SPICE or read from SPICE.\n"
+    "See \\has_spice_profile? for a description of the SPICE profile concept.\n"
+    "\n"
+    "SPICE profiles have been introduced in version 0.31.0."
+  ) +
+  gsi::method_ext ("terminal_order", &dc_get_terminal_order, gsi::arg ("profile_name"),
+    "@brief Gets a list of strings, defining the order the terminals are written to SPICE or read from SPICE.\n"
+    "See \\has_spice_profile? for a description of the SPICE profile concept.\n"
+    "\n"
+    "SPICE profiles have been introduced in version 0.31.0."
+  ) +
+  gsi::method_ext ("set_element_name", &dc_set_element_name, gsi::arg ("profile_name"), gsi::arg ("element_name"),
+    "@brief Sets the element by which this device is represented in SPICE.\n"
+    "See \\has_spice_profile? for a description of the SPICE profile concept.\n"
+    "The element name is 'X' or 'M' for example.\n"
+    "\n"
+    "SPICE profiles have been introduced in version 0.31.0."
+  ) +
+  gsi::method_ext ("element_name", &dc_get_element_name, gsi::arg ("profile_name"),
+    "@brief Gets the element by which this device is represented in SPICE.\n"
+    "See \\has_spice_profile? for a description of the SPICE profile concept.\n"
+    "\n"
+    "SPICE profiles have been introduced in version 0.31.0."
   ) +
   gsi::method ("strict?", &db::DeviceClass::is_strict,
     "@brief Gets a value indicating whether this class performs strict terminal mapping\n"

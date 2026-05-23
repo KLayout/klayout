@@ -338,11 +338,7 @@ void DeviceClass::set_spice_profile (const std::string &name, const SpiceProfile
 
 bool DeviceClass::has_spice_profile (const std::string &name) const
 {
-  auto p = m_spice_profiles.find (name);
-  if (p == m_spice_profiles.end ()) {
-    p = m_spice_profiles.find ("*");
-  }
-  return p != m_spice_profiles.end ();
+  return m_spice_profiles.find (name) != m_spice_profiles.end ();
 }
 
 const DeviceClass::SpiceProfile &DeviceClass::spice_profile (const std::string &name) const

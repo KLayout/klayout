@@ -84,7 +84,7 @@ void NetlistSpiceReaderDelegate::do_start ()
   for (auto dc = mp_netlist->begin_device_classes (); dc != mp_netlist->end_device_classes (); ++dc) {
 
     const db::DeviceClass *dcc = dc.operator-> ();
-    if (dcc->has_spice_profile (m_profile)) {
+    if (dcc->has_spice_profile (m_profile) || dcc->has_spice_profile ("*")) {
 
       const db::DeviceClass::SpiceProfile &pf = dcc->spice_profile (m_profile);
       if (! pf.element.empty ()) {

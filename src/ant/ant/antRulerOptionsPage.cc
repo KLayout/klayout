@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "antRulerOptionsPage.h"
 #include "antConfig.h"
 #include "laySnap.h"
@@ -112,3 +114,6 @@ RulerOptionsPage::setup (lay::Dispatcher *root)
 static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_ruler_options (new lay::EditorOptionsPageFactory<RulerOptionsPage> ("ant::RulerOptions"), 0);
 
 }
+
+#endif
+

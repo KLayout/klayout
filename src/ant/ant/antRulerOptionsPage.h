@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_antRulerOptionsPage
 #define HDR_antRulerOptionsPage
@@ -60,3 +61,6 @@ private:
 }
 
 #endif
+
+#endif
+

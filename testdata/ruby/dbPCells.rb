@@ -277,7 +277,7 @@ end
 
 class DBPCellAPI_TestClass < TestBase
 
-  def _test_1
+  def test_1
 
     # PCellParameterDeclaration
 
@@ -351,7 +351,7 @@ end
 
 class DBPCell_TestClass < TestBase
 
-  def _test_1
+  def test_1
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -593,7 +593,7 @@ class DBPCell_TestClass < TestBase
     
   end
 
-  def _test_2
+  def test_2
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -632,7 +632,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def _test_3
+  def test_3
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -657,7 +657,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def _test_4
+  def test_4
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -674,7 +674,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def _test_5
+  def test_5
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -691,7 +691,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def _test_6
+  def test_6
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -707,7 +707,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def _test_7
+  def test_7
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -725,7 +725,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def _test_8
+  def test_8
 
     # instantiate and register the library
     tl = PCellTestLib::new
@@ -747,7 +747,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def _test_9
+  def test_9
 
     layout = RBA::Layout::new
 
@@ -813,7 +813,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def _test_10
+  def test_10
 
     lib = CircleLib1782::new("CircleLib")
 
@@ -864,7 +864,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def _test_11
+  def test_11
 
     lib = CircleLib1782::new("CircleLib")
 
@@ -899,7 +899,7 @@ class DBPCell_TestClass < TestBase
 
   end
 
-  def _test_12
+  def test_12
 
     if !RBA.constants.member?(:PCellDeclarationHelper)
       return
@@ -924,7 +924,7 @@ class DBPCell_TestClass < TestBase
   end
 
   # convert to static cell
-  def _test_13
+  def test_13
 
     if !RBA.constants.member?(:PCellDeclarationHelper)
       return
@@ -954,11 +954,69 @@ class DBPCell_TestClass < TestBase
 
   end
 
+  # cold proxies
+  def test_14
+
+    # instantiate and register the library
+    tl = PCellTestLib::new
+
+    ly = RBA::Layout::new(true)
+    ly.dbu = 0.01
+
+    li1 = ly.layer(1, 0)
+
+    scell = ly.create_cell("A")
+
+    param = { "w" => 4.0, "h" => 8.0, "l" => RBA::LayerInfo::new(1, 0) }
+    cell = ly.create_cell("Box", "PCellTestLib", param)
+    cell.name = "B"
+
+    assert_equal(scell.is_proxy?, false)
+    assert_equal(scell.is_library_cell?, false)
+    assert_equal(scell.is_cold_proxy?, false)
+    assert_equal(scell.pcell_parameter("h").to_s, "")
+    assert_equal(scell.pcell_parameter("x").to_s, "")
+    assert_equal(scell.pcell_parameters_by_name.to_s, "{}")
+    assert_equal(scell.pcell_name, "")
+    assert_equal(scell.library_name, "")
+    assert_equal(scell.library_cell_name, "")
+
+    assert_equal(cell.is_proxy?, true)
+    assert_equal(cell.is_library_cell?, true)
+    assert_equal(cell.is_cold_proxy?, false)
+    assert_equal(cell.pcell_parameter("h").to_s, "8.0")
+    assert_equal(cell.pcell_parameter("x").to_s, "")
+    assert_equal(cell.pcell_parameters_by_name.to_s, "{\"h\"=>8.0, \"l\"=><1/0>, \"w\"=>4.0}")
+    assert_equal(cell.pcell_name, "Box")
+    assert_equal(cell.library_cell_name, "Box_L1d0_W4p000_H8p000")  # it's the library's PCell proxy
+    assert_equal(cell.library_name, "PCellTestLib")
+    assert_equal(cell.display_title, "PCellTestLib.Box(L=1/0,W=4.000,H=8.000)")
+
+    tl._destroy
+
+    # the cell got destroyed and replaced by a cold proxy
+    assert_equal(cell._destroyed?, true)
+
+    cell = ly.cell("B")
+
+    assert_equal(cell.is_proxy?, true)
+    assert_equal(cell.is_library_cell?, false)
+    assert_equal(cell.is_cold_proxy?, true)
+    assert_equal(cell.pcell_parameter("h").to_s, "8.0")
+    assert_equal(cell.pcell_parameter("x").to_s, "")
+    assert_equal(cell.pcell_parameters_by_name.to_s, "{\"h\"=>8.0, \"l\"=><1/0>, \"w\"=>4.0}")
+    assert_equal(cell.pcell_name, "Box")
+    assert_equal(cell.library_cell_name, "")   # it's not a static library cell
+    assert_equal(cell.library_name, "PCellTestLib")
+    assert_equal(cell.display_title, "<defunct>PCellTestLib.Box")
+
+  end
+
 end
 
 class DBPCellParameterStates_TestClass < TestBase
 
-  def _test_1
+  def test_1
 
     ps = RBA::PCellParameterState::new
 

@@ -642,12 +642,22 @@ static tl::Variant get_property_from_id (db::properties_id_type id, const tl::Va
 }
 
 static void
-delete_cells (db::Layout *layout, const std::vector<db::cell_index_type> &cell_indices)
+delete_cells (db::Layout *layout, const std::vector<db::cell_index_type> &cell_indexes)
 {
-  for (auto ci = cell_indices.begin (); ci != cell_indices.end (); ++ci) {
+  for (auto ci = cell_indexes.begin (); ci != cell_indexes.end (); ++ci) {
     check_cell_index (layout, *ci);
   }
-  layout->delete_cells (cell_indices.begin (), cell_indices.end ());
+  layout->delete_cells (cell_indexes.begin (), cell_indexes.end ());
+}
+
+static void
+delete_cells_ptr (db::Layout *layout, const std::vector<db::Cell *> &cells)
+{
+  std::set<db::cell_index_type> cell_indexes;
+  for (auto c = cells.begin (); c != cells.end (); ++c) {
+    cell_indexes.insert ((*c)->cell_index ());
+  }
+  layout->delete_cells (cell_indexes);
 }
 
 static void
@@ -657,18 +667,74 @@ delete_cell_rec (db::Layout *layout, db::cell_index_type cell_index)
   layout->delete_cell_rec (cell_index);
 }
 
-static void 
+static void
+delete_cell_rec_ptr (db::Layout *layout, db::Cell *cell)
+{
+  layout->delete_cell_rec (cell->cell_index ());
+}
+
+static void
 prune_cell (db::Layout *layout, db::cell_index_type cell_index, int levels)
 {
   check_cell_index (layout, cell_index);
   layout->prune_cell (cell_index, levels);
 }
 
-static void 
+static void
+prune_cell_ptr (db::Layout *layout, db::Cell *cell, int levels)
+{
+  layout->prune_cell (cell->cell_index (), levels);
+}
+
+static void
+prune_cells (db::Layout *layout, const std::vector<db::cell_index_type> &cell_indexes, int levels)
+{
+  for (auto ci = cell_indexes.begin (); ci != cell_indexes.end (); ++ci) {
+    check_cell_index (layout, *ci);
+  }
+  layout->prune_cells (cell_indexes.begin (), cell_indexes.end (), levels);
+}
+
+static void
+prune_cells_ptr (db::Layout *layout, const std::vector<db::Cell *> &cells, int levels)
+{
+  std::set<db::cell_index_type> cell_indexes;
+  for (auto c = cells.begin (); c != cells.end (); ++c) {
+    cell_indexes.insert ((*c)->cell_index ());
+  }
+  layout->prune_cells (cell_indexes, levels);
+}
+
+static void
 prune_subcells (db::Layout *layout, db::cell_index_type cell_index, int levels)
 {
   check_cell_index (layout, cell_index);
   layout->prune_subcells (cell_index, levels);
+}
+
+static void
+prune_subcells_ptr (db::Layout *layout, db::Cell *cell, int levels)
+{
+  layout->prune_subcells (cell->cell_index (), levels);
+}
+
+static void
+prune_subcells_many (db::Layout *layout, const std::vector<db::cell_index_type> &cell_indexes, int levels)
+{
+  for (auto ci = cell_indexes.begin (); ci != cell_indexes.end (); ++ci) {
+    check_cell_index (layout, *ci);
+  }
+  layout->prune_subcells (cell_indexes.begin (), cell_indexes.end (), levels);
+}
+
+static void
+prune_subcells_many_ptr (db::Layout *layout, const std::vector<db::Cell *> &cells, int levels)
+{
+  std::set<db::cell_index_type> cell_indexes;
+  for (auto c = cells.begin (); c != cells.end (); ++c) {
+    cell_indexes.insert ((*c)->cell_index ());
+  }
+  layout->prune_subcells (cell_indexes, levels);
 }
 
 static void 
@@ -678,7 +744,16 @@ flatten (db::Layout *layout, db::cell_index_type cell_index, int levels, bool pr
   layout->flatten (layout->cell (cell_index), levels, prune);
 }
 
-static void 
+static void
+flatten_ptr (db::Layout *layout, db::Cell *cell, int levels, bool prune)
+{
+  if (! cell) {
+    return;
+  }
+  layout->flatten (*cell, levels, prune);
+}
+
+static void
 flatten_into (db::Layout *layout, db::cell_index_type cell_index, db::cell_index_type target_cell_index, const db::ICplxTrans &t, int levels)
 {
   check_cell_index (layout, cell_index);
@@ -686,7 +761,16 @@ flatten_into (db::Layout *layout, db::cell_index_type cell_index, db::cell_index
   layout->flatten (layout->cell (cell_index), layout->cell (target_cell_index), t, levels);
 }
 
-static void 
+static void
+flatten_into_ptr (db::Layout *layout, db::Cell *cell, db::Cell *target_cell, const db::ICplxTrans &t, int levels)
+{
+  if (! cell || ! target_cell) {
+    return;
+  }
+  layout->flatten (*cell, *target_cell, t, levels);
+}
+
+static void
 write_simple (db::Layout *layout, const std::string &filename)
 {
   db::SaveLayoutOptions options;
@@ -864,6 +948,11 @@ static void delete_cell (db::Layout *ly, db::cell_index_type ci)
 {
   check_cell_index (ly, ci);
   ly->delete_cell (ci);
+}
+
+static void delete_cell_ptr (db::Layout *ly, db::Cell *cell)
+{
+  ly->delete_cell (cell->cell_index ());
 }
 
 static void rename_cell (db::Layout *ly, db::cell_index_type ci, const std::string &name)
@@ -1655,6 +1744,20 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.20.\n"
   ) +
+  gsi::method_ext ("delete_cell", &delete_cell_ptr, gsi::arg ("cell"),
+    "@brief Deletes a cell\n"
+    "\n"
+    "This deletes a cell but not the sub cells of the cell.\n"
+    "These subcells will likely become new top cells unless they are used\n"
+    "otherwise.\n"
+    "All instances of this cell are deleted as well.\n"
+    "Hint: to delete multiple cells, use \"delete_cells\" which is \n"
+    "far more efficient in this case.\n"
+    "\n"
+    "@param cell The cell to delete\n"
+    "\n"
+    "This convenience variant taking a cell object has been introduced in version 0.30.9.\n"
+  ) +
   gsi::method_ext ("delete_cells", &delete_cells, gsi::arg ("cell_index_list"),
     "@brief Deletes multiple cells\n"
     "\n"
@@ -1667,19 +1770,73 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.20.\n"
   ) +
-  gsi::method_ext ("prune_subcells", &prune_subcells, gsi::arg ("cell_index"), gsi::arg ("levels"),
+  gsi::method_ext ("delete_cells", &delete_cells_ptr, gsi::arg ("cell_list"),
+    "@brief Deletes multiple cells\n"
+    "\n"
+    "This deletes the cells but not the sub cells of these cells.\n"
+    "These subcells will likely become new top cells unless they are used\n"
+    "otherwise.\n"
+    "All instances of these cells are deleted as well.\n"
+    "\n"
+    "@param cell_list An list of cells to delete\n"
+    "\n"
+    "This convenience variant taking a list of cell objects has been introduced in version 0.30.9.\n"
+  ) +
+  gsi::method_ext ("prune_subcells", &prune_subcells, gsi::arg ("cell_index"), gsi::arg ("levels", -1),
     "@brief Deletes all sub cells of the cell which are not used otherwise down to the specified level of hierarchy\n"
     "\n"
     "This deletes all sub cells of the cell which are not used otherwise.\n"
     "All instances of the deleted cells are deleted as well.\n"
     "It is possible to specify how many levels of hierarchy below the given root cell are considered.\n"
     "\n"
+    "A variant exists that takes a list of cell indexes and which is more efficient than calling\n"
+    "'prune_subcells' multiple times on a single cell.\n"
+    "\n"
     "@param cell_index The root cell from which to delete a sub cells\n"
     "@param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)\n"
     "\n"
     "This method has been introduced in version 0.20.\n"
   ) +
-  gsi::method_ext ("prune_cell", &prune_cell, gsi::arg ("cell_index"), gsi::arg ("levels"),
+  gsi::method_ext ("prune_subcells", &prune_subcells_ptr, gsi::arg ("cell"), gsi::arg ("levels", -1),
+    "@brief Deletes all sub cells of the cell which are not used otherwise down to the specified level of hierarchy\n"
+    "\n"
+    "This deletes all sub cells of the cell which are not used otherwise.\n"
+    "All instances of the deleted cells are deleted as well.\n"
+    "It is possible to specify how many levels of hierarchy below the given root cell are considered.\n"
+    "\n"
+    "A variant exists that takes a list of cells and which is more efficient than calling\n"
+    "'prune_subcells' multiple times on a single cell.\n"
+    "\n"
+    "@param cell The root cell from which to delete a sub cells\n"
+    "@param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)\n"
+    "\n"
+    "This convenience variant taking a list of cell objects has been introduced in version 0.30.9.\n"
+  ) +
+  gsi::method_ext ("prune_subcells", &prune_subcells_many, gsi::arg ("cell_index_list"), gsi::arg ("levels", -1),
+    "@brief Deletes all sub cells of the given cells which are not used otherwise down to the specified level of hierarchy\n"
+    "\n"
+    "This deletes all sub cells of the given cells which are not used otherwise.\n"
+    "All instances of the deleted cells are deleted as well.\n"
+    "It is possible to specify how many levels of hierarchy below the given root cell are considered.\n"
+    "\n"
+    "@param cell_index_list The root cells from which to delete the sub cells\n"
+    "@param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)\n"
+    "\n"
+    "This method has been introduced in version 0.30.9.\n"
+  ) +
+  gsi::method_ext ("prune_subcells", &prune_subcells_many_ptr, gsi::arg ("cell_list"), gsi::arg ("levels", -1),
+    "@brief Deletes all sub cells of the given cells which are not used otherwise down to the specified level of hierarchy\n"
+    "\n"
+    "This deletes all sub cells of the given cells which are not used otherwise.\n"
+    "All instances of the deleted cells are deleted as well.\n"
+    "It is possible to specify how many levels of hierarchy below the given root cell are considered.\n"
+    "\n"
+    "@param cell_list The root cells from which to delete the sub cells\n"
+    "@param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)\n"
+    "\n"
+    "This method has been introduced in version 0.30.9.\n"
+  ) +
+  gsi::method_ext ("prune_cell", &prune_cell, gsi::arg ("cell_index"), gsi::arg ("levels", -1),
     "@brief Deletes a cell plus subcells not used otherwise\n"
     "\n"
     "This deletes a cell and also all sub cells of the cell which are not used otherwise.\n"
@@ -1687,10 +1844,53 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "only the direct children of the cell are deleted with the cell itself.\n"
     "All instances of this cell are deleted as well.\n"
     "\n"
+    "A version that allows pruning multiple cells in one call is \\prune_cells.\n"
+    "\n"
     "@param cell_index The index of the cell to delete\n"
     "@param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)\n"
     "\n"
-    "This method has been introduced in version 0.20.\n"
+    "This method has been introduced in version 0.20. The 'levels' argument was made optional in version 0.30.9.\n"
+  ) +
+  gsi::method_ext ("prune_cell", &prune_cell_ptr, gsi::arg ("cell"), gsi::arg ("levels", -1),
+    "@brief Deletes a cell plus subcells not used otherwise\n"
+    "\n"
+    "This deletes a cell and also all sub cells of the cell which are not used otherwise.\n"
+    "The number of hierarchy levels to consider can be specified as well. One level of hierarchy means that "
+    "only the direct children of the cell are deleted with the cell itself.\n"
+    "All instances of this cell are deleted as well.\n"
+    "\n"
+    "A version that allows pruning multiple cells in one call is \\prune_cells.\n"
+    "\n"
+    "@param cell The cell to delete\n"
+    "@param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)\n"
+    "\n"
+    "This convenience variant taking a cell object has been introduced in version 0.30.9.\n"
+  ) +
+  gsi::method_ext ("prune_cells", &prune_cells, gsi::arg ("cell_indexes"), gsi::arg ("levels", -1),
+    "@brief Deletes cells plus subcells not used otherwise\n"
+    "\n"
+    "This deletes the given cells and also all sub cells of the cells which are not used otherwise.\n"
+    "The number of hierarchy levels to consider can be specified as well. One level of hierarchy means that "
+    "only the direct children of the cell are deleted with the cell itself.\n"
+    "All instances of the pruned cells are deleted as well.\n"
+    "\n"
+    "@param cell_indexes The indexes of the cells to delete\n"
+    "@param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)\n"
+    "\n"
+    "This method has been introduced in version 0.30.9.\n"
+  ) +
+  gsi::method_ext ("prune_cells", &prune_cells_ptr, gsi::arg ("cells"), gsi::arg ("levels", -1),
+    "@brief Deletes cells plus subcells not used otherwise\n"
+    "\n"
+    "This deletes the given cells and also all sub cells of the cells which are not used otherwise.\n"
+    "The number of hierarchy levels to consider can be specified as well. One level of hierarchy means that "
+    "only the direct children of the cell are deleted with the cell itself.\n"
+    "All instances of the pruned cells are deleted as well.\n"
+    "\n"
+    "@param cells The cells to delete\n"
+    "@param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)\n"
+    "\n"
+    "This method has been introduced in version 0.30.9.\n"
   ) +
   gsi::method_ext ("delete_cell_rec", &delete_cell_rec, gsi::arg ("cell_index"),
     "@brief Deletes a cell plus all subcells\n"
@@ -1701,6 +1901,16 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@param cell_index The index of the cell to delete\n"
     "\n"
     "This method has been introduced in version 0.20.\n"
+  ) +
+  gsi::method_ext ("delete_cell_rec", &delete_cell_rec_ptr, gsi::arg ("cell"),
+    "@brief Deletes a cell plus all subcells\n"
+    "\n"
+    "This deletes a cell and also all sub cells of the cell.\n"
+    "In contrast to \\prune_cell, all cells are deleted together with their instances even if they are used otherwise.\n"
+    "\n"
+    "@param cell The cell to delete\n"
+    "\n"
+    "This convenience variant taking a cell object has been introduced in version 0.30.9.\n"
   ) +
   gsi::method_ext ("insert", &insert_region,
     gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("region"),
@@ -1750,7 +1960,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
-  gsi::method_ext ("flatten", &flatten, gsi::arg ("cell_index"), gsi::arg ("levels"), gsi::arg ("prune"),
+  gsi::method_ext ("flatten", &flatten, gsi::arg ("cell_index"), gsi::arg ("levels", -1), gsi::arg ("prune", true),
     "@brief Flattens the given cell\n"
     "\n"
     "This method propagates all shapes and instances from the specified number of hierarchy levels below into the given cell.\n"
@@ -1761,9 +1971,22 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@param levels The number of hierarchy levels to flatten (-1: all, 0: none, 1: one level etc.)\n"
     "@param prune Set to true to remove orphan cells.\n"
     "\n"
-    "This method has been introduced in version 0.20.\n"
+    "This method has been introduced in version 0.20. The 'levels' and 'prune' arguments have been made optional in version 0.30.9.\n"
   ) +
-  gsi::method_ext ("flatten_into", &flatten_into, gsi::arg ("source_cell_index"), gsi::arg ("target_cell_index"), gsi::arg ("trans"), gsi::arg ("levels"),
+  gsi::method_ext ("flatten", &flatten_ptr, gsi::arg ("cell"), gsi::arg ("levels", -1), gsi::arg ("prune", true),
+    "@brief Flattens the given cell\n"
+    "\n"
+    "This method propagates all shapes and instances from the specified number of hierarchy levels below into the given cell.\n"
+    "It also removes the instances of the cells from which the shapes came from, but does not remove the cells themselves if prune is set to false.\n"
+    "If prune is set to true, these cells are removed if not used otherwise.\n"
+    "\n"
+    "@param cell The cell which should be flattened\n"
+    "@param levels The number of hierarchy levels to flatten (-1: all, 0: none, 1: one level etc.)\n"
+    "@param prune Set to true to remove orphan cells.\n"
+    "\n"
+    "This convenience variant taking a cell object has been introduced in version 0.30.9.\n"
+  ) +
+  gsi::method_ext ("flatten_into", &flatten_into, gsi::arg ("source_cell_index"), gsi::arg ("target_cell_index"), gsi::arg ("trans", db::ICplxTrans (), "unity"), gsi::arg ("levels", -1),
     "@brief Flattens the given cell into another cell\n"
     "\n"
     "This method works like 'flatten', but allows specification of a target cell which can be different from the source cell plus "
@@ -1776,7 +1999,22 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@param trans The transformation to apply on the output shapes and instances\n"
     "@param levels The number of hierarchy levels to flatten (-1: all, 0: none, 1: one level etc.)\n"
     "\n"
-    "This method has been introduced in version 0.24.\n"
+    "This method has been introduced in version 0.24. The 'trans' and 'levels' arguments have been made optional is version 0.30.9.\n"
+  ) +
+  gsi::method_ext ("flatten_into", &flatten_into_ptr, gsi::arg ("source_cell"), gsi::arg ("target_cell"), gsi::arg ("trans", db::ICplxTrans (), "unity"), gsi::arg ("levels", -1),
+    "@brief Flattens the given cell into another cell\n"
+    "\n"
+    "This method works like 'flatten', but allows specification of a target cell which can be different from the source cell plus "
+    "a transformation which is applied for all shapes and instances in the target cell.\n"
+    "\n"
+    "In contrast to the 'flatten' method, the source cell is not modified.\n"
+    "\n"
+    "@param source_cell The source cell which should be flattened\n"
+    "@param target_cell The target cell into which the resulting objects are written\n"
+    "@param trans The transformation to apply on the output shapes and instances\n"
+    "@param levels The number of hierarchy levels to flatten (-1: all, 0: none, 1: one level etc.)\n"
+    "\n"
+    "This convenience variant taking a cell objects has been introduced in version 0.30.9.\n"
   ) +
   gsi::method ("start_changes", &db::Layout::start_changes,
     "@brief Signals the start of an operation bringing the layout into invalid state\n"

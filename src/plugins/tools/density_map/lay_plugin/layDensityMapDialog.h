@@ -76,6 +76,9 @@ private:
     //  The boundary mode
     std::string boundary_mode;
 
+    //  The averaging mode
+    std::string averaging_mode;
+
     //  The number of threads to use
     int threads;
   };
@@ -88,7 +91,7 @@ private:
 
   void make_density_map ();
   void compute_density_map (const DensityMapParameters &par);
-  void average_window (img::Object &img_object, const std::string boundary_mode, int nw);
+  void average_window (img::Object &img_object, const std::string boundary_mode, int wh, const std::vector<double> &weights);
 
 };
 

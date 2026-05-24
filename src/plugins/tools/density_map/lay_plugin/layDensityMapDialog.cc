@@ -66,10 +66,17 @@ static const std::string boundary_mode_average ("boundary-mode-average");
 //  items in boundary_mode_cb
 static const std::vector<std::string> boundary_modes = { boundary_mode_periodic, boundary_mode_zero, boundary_mode_one, boundary_mode_average };
 
+static const std::string averaging_mode_square ("averaging-mode-square");
+static const std::string averaging_mode_gaussian ("averaging-mode-gaussian");
+
+//  items in average_mode_cb
+static const std::vector<std::string> averaging_modes = { averaging_mode_square, averaging_mode_gaussian };
+
 static const std::string cfg_density_map_region_mode ("density-map-region-mode");
 static const std::string cfg_density_map_layer_mode ("density-map-layer-mode");
 static const std::string cfg_density_map_pixel_size ("density-map-pixel-size");
 static const std::string cfg_density_map_window_size ("density-map-window-size");
+static const std::string cfg_density_map_averaging_mode ("density-map-averaging-mode");
 static const std::string cfg_density_map_boundary_mode ("density-map-boundary-mode");
 static const std::string cfg_density_map_threads ("density-map-threads");
 static const std::string cfg_density_map_source_layer ("density-map-source-layer");
@@ -90,6 +97,7 @@ public:
     options.push_back (std::make_pair (cfg_density_map_pixel_size, "100"));
     options.push_back (std::make_pair (cfg_density_map_window_size, "0"));
     options.push_back (std::make_pair (cfg_density_map_boundary_mode, boundary_mode_periodic));
+    options.push_back (std::make_pair (cfg_density_map_averaging_mode, averaging_mode_square));
     options.push_back (std::make_pair (cfg_density_map_threads, "1"));
   }
 
@@ -307,6 +315,18 @@ DensityMapDialog::configure (const std::string &name, const std::string &value)
     cb_boundary_mode->setCurrentIndex (mode);
     return true;
 
+  } else if (name == cfg_density_map_averaging_mode) {
+
+    int mode = 0;
+    for (size_t i = 0; i < averaging_modes.size (); ++i) {
+      if (averaging_modes[i] == value) {
+        mode = int (i);
+      }
+    }
+
+    cb_averaging_mode->setCurrentIndex (mode);
+    return true;
+
   } else if (name == cfg_density_map_threads) {
 
     int thr = 1;
@@ -389,6 +409,12 @@ DensityMapDialog::make_density_map ()
     return;
   }
   par.boundary_mode = boundary_modes [boundary_mode];
+
+  int averaging_mode = cb_averaging_mode->currentIndex ();
+  if (averaging_mode < 0 || averaging_mode >= int (averaging_modes.size ())) {
+    return;
+  }
+  par.averaging_mode = averaging_modes [averaging_mode];
 
   int region_mode = region_cb->currentIndex ();
   if (region_mode < 0 || region_mode >= int (region_modes.size ())) {
@@ -514,6 +540,7 @@ DensityMapDialog::make_density_map ()
   dispatcher ()->config_set (cfg_density_map_layer_mode, lm);
   dispatcher ()->config_set (cfg_density_map_region_mode, rm);
   dispatcher ()->config_set (cfg_density_map_boundary_mode, par.boundary_mode);
+  dispatcher ()->config_set (cfg_density_map_averaging_mode, par.averaging_mode);
   dispatcher ()->config_set (cfg_density_map_threads, tl::to_string (par.threads));
   dispatcher ()->config_set (cfg_density_map_pixel_size, tl::to_string (par.pixel_size));
   dispatcher ()->config_set (cfg_density_map_window_size, tl::to_string (par.window_size));
@@ -644,7 +671,39 @@ DensityMapDialog::compute_density_map (const DensityMapParameters &par)
   unsigned int nw = (unsigned int) (std::max (0.0, std::min (1000.0, floor (par.window_size / par.pixel_size + 0.5))));
 
   if (nw > 1) {
-    average_window (*img_object, par.boundary_mode, nw);
+
+    if (par.averaging_mode == averaging_mode_square) {
+
+      std::vector<double> weights;
+
+      int wh = nw / 2;
+      weights.resize (wh * 2 + 1, 1.0);
+      if (nw % 2 == 0) {
+        weights.front () = weights.back () = 0.5;
+      }
+
+      average_window (*img_object, par.boundary_mode, wh, weights);
+
+    } else if (par.averaging_mode == averaging_mode_gaussian) {
+
+      std::vector<double> weights;
+
+      int wh = nw * 3 / 2;
+
+      //  Note: the averaging kernel (f = exp(-r^2) = exp(-(x^2+y^2)) can be decomposed
+      //  into f = f(x)*f(y); f(x) = exp(-x^2); f(y) = exp(-y^2).
+      //  Hence we can use a 1d-kernel here and average vertically first, then horizontally.
+
+      weights.reserve (wh * 2 + 1);
+      for (int i = -wh; i <= wh; ++i) {
+        double x = double (i) / (nw * 0.5);
+        weights.push_back (exp (-x * x));
+      }
+
+      average_window (*img_object, par.boundary_mode, wh, weights);
+
+    }
+
   }
 }
 
@@ -658,8 +717,15 @@ inline int safe_mod (int a, int b)
 }
 
 void
-DensityMapDialog::average_window (img::Object &img_object, const std::string boundary_mode, int nw)
+DensityMapDialog::average_window (img::Object &img_object, const std::string boundary_mode, int wh, const std::vector<double> &weights)
 {
+  tl_assert (weights.size () == size_t (wh * 2 + 1));
+
+  double ws = 0.0;
+  for (auto i = weights.begin (); i != weights.end (); ++i) {
+    ws += *i;
+  }
+
   bool periodic = (boundary_mode == boundary_mode_periodic);
 
   int nx = img_object.width ();
@@ -673,7 +739,6 @@ DensityMapDialog::average_window (img::Object &img_object, const std::string bou
 
   } else if (boundary_mode == boundary_mode_average) {
 
-    double outside = 0.0;
     const float *d = img_object.float_data ();
     for (size_t i = size_t (nx) * size_t (ny); i > 0; --i) {
       outside += *d++;
@@ -689,13 +754,10 @@ DensityMapDialog::average_window (img::Object &img_object, const std::string bou
 
   for (int y = 0; y < ny; ++y) {
 
-    int wh = nw / 2;
-    double fb = (nw % 2 == 0) ? 0.5 : 1.0;
-
     for (int dy = -wh; dy <= wh; ++dy) {
 
       //  top and bottom row count half in case of even nw
-      double f = (dy == -wh || dy == wh) ? fb : 1.0;
+      double f = weights [dy + wh];
 
       std::vector<double>::iterator d = vavg_data.begin () + y * nx;
       if (periodic || (y + dy >= 0 && y + dy < ny)) {
@@ -715,7 +777,7 @@ DensityMapDialog::average_window (img::Object &img_object, const std::string bou
 
   //  horizontal sum
 
-  outside *= nw;   //  because we do normalization later
+  outside *= ws;   //  because we do normalization later
 
   //  TODO: transposing the image would make things more efficient
 
@@ -724,13 +786,10 @@ DensityMapDialog::average_window (img::Object &img_object, const std::string bou
 
   for (int x = 0; x < nx; ++x) {
 
-    int wh = nw / 2;
-    double fb = (nw % 2 == 0) ? 0.5 : 1.0;
-
     for (int dx = -wh; dx <= wh; ++dx) {
 
       //  top and bottom row count half in case of even nw
-      double f = (dx == -wh || dx == wh) ? fb : 1.0;
+      double f = weights [dx + wh];
 
       std::vector<double>::iterator d = havg_data.begin () + x;
 
@@ -753,7 +812,7 @@ DensityMapDialog::average_window (img::Object &img_object, const std::string bou
   }
 
   //  take the average
-  double s = 1.0 / (double (nw) * double (nw));
+  double s = 1.0 / (ws * ws);
   for (auto i = havg_data.begin (); i != havg_data.end (); ++i) {
     *i *= s;
   }

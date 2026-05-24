@@ -3032,12 +3032,7 @@ Layout::has_context_info (cell_index_type cell_index) const
     }
   }
 
-  const db::Cell &cref = cell (cell_index);
-  if (cref.is_proxy () && ! cref.is_top ()) {
-    return true;
-  } else {
-    return false;
-  }
+  return cell (cell_index).is_proxy ();
 }
 
 bool

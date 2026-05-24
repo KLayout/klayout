@@ -56,6 +56,7 @@ static const std::string cfg_show_hierarchy_panel ("show-hierarchy-panel");
 static const std::string cfg_show_libraries_view ("show-libraries-view");
 static const std::string cfg_show_bookmarks_view ("show-bookmarks-view");
 static const std::string cfg_show_layer_panel ("show-layer-panel");
+static const std::string cfg_show_tool_options ("show-tool-options");
 static const std::string cfg_window_state ("window-state");
 static const std::string cfg_layout_file_watcher_enabled ("layout-file-watcher-enabled");
 static const std::string cfg_window_geometry ("window-geometry");

@@ -48,6 +48,65 @@ namespace img
 {
 
 // --------------------------------------------------------------------------------------
+
+namespace
+{
+
+struct compare_first_of_node
+{
+  bool operator() (const std::pair <double, std::pair<tl::Color, tl::Color> > &a, const std::pair <double, std::pair<tl::Color, tl::Color> > &b) const
+  {
+    return a.first < b.first;
+  }
+};
+
+}
+
+static tl::Color
+interpolated_color2 (const std::pair<double, std::pair<tl::Color, tl::Color> > &n1, const std::pair<double, std::pair<tl::Color, tl::Color> > &n2, double x)
+{
+  double x1 = n1.first;
+  double x2 = n2.first;
+
+  unsigned int h1 = 0, s1 = 0, v1 = 0;
+  n1.second.second.get_hsv (h1, s1, v1);
+
+  unsigned int h2 = 0, s2 = 0, v2 = 0;
+  n2.second.first.get_hsv (h2, s2, v2);
+
+  int h = int (0.5 + h1 + double(x - x1) * double (int (h2) - int (h1)) / double(x2 - x1));
+  int s = int (0.5 + s1 + double(x - x1) * double (int (s2) - int (s1)) / double(x2 - x1));
+  int v = int (0.5 + v1 + double(x - x1) * double (int (v2) - int (v1)) / double(x2 - x1));
+
+  return tl::Color::from_hsv ((unsigned int) h, (unsigned int) s, (unsigned int) v);
+}
+
+tl::Color
+interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x)
+{
+  if (nodes.size () < 1) {
+
+    return tl::Color ();
+
+  } else if (nodes.size () < 2) {
+
+    return x < nodes[0].first ? nodes[0].second.first : nodes[0].second.second;
+
+  } else {
+
+    std::vector<std::pair<double, std::pair<tl::Color, tl::Color> > >::const_iterator p = std::lower_bound (nodes.begin (), nodes.end (), std::make_pair (x, std::make_pair (tl::Color (), tl::Color ())), compare_first_of_node ());
+    if (p == nodes.end ()) {
+      return nodes.back ().second.second;
+    } else if (p == nodes.begin ()) {
+      return nodes.front ().second.first;
+    } else {
+      return interpolated_color2 (p[-1], *p, x);
+    }
+
+  }
+}
+
+// --------------------------------------------------------------------------------------
 //  img::DataMapping implementation
 
 DataMapping::DataMapping ()
@@ -153,6 +212,21 @@ DataMapping::operator< (const DataMapping &d) const
   return false;
 }
 
+static inline double color_to_channel_value (const tl::Color &c, unsigned int channel)
+{
+  double y = 0.0;
+
+  if (channel == 0) {
+    y = c.red ();
+  } else if (channel == 1) {
+    y = c.green ();
+  } else if (channel == 2) {
+    y = c.blue ();
+  }
+
+  return y / 255.0;
+}
+
 tl::DataMappingBase *
 DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, unsigned int channel) const
 {
@@ -191,6 +265,8 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
   if (monochrome && false_color_nodes.size () > 1) {
 
     tl::TableDataMapping *gray_to_color = new tl::TableDataMapping ();
+    double xfence = false_color_nodes.front ().first - 1.0;
+    double xeps = 1e-5;
 
     for (unsigned int i = 1; i < false_color_nodes.size (); ++i) {
 
@@ -212,35 +288,35 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
 
       for (int j = 0; j < n; ++j) {
 
-        tl::Color c = interpolated_color (false_color_nodes, x);
+        tl::Color c = interpolated_color2 (false_color_nodes [i - 1], false_color_nodes [i], x);
 
-        double y = 0.0;
-        if (channel == 0) {
-          y = c.red ();
-        } else if (channel == 1) {
-          y = c.green ();
-        } else if (channel == 2) {
-          y = c.blue ();
-        }
-
-        gray_to_color->push_back (x, y / 255.0);
+        double xx = std::max (xfence * (1.0 + xeps), x);
+        xfence = xx;
+        double y = color_to_channel_value (c, channel);
+        gray_to_color->push_back (xx, y);
 
         x += dx;
 
       }
 
+      //  on discontinuous colors add another entry that manifests the discontinuity
+      if (i + 1 < false_color_nodes.size () && false_color_nodes [i].second.first != false_color_nodes [i].second.second) {
+
+        double x = false_color_nodes [i].first;
+        double xx = std::max (xfence * (1.0 + xeps), x);
+        xfence = xx;
+        double y = color_to_channel_value (false_color_nodes [i].second.first, channel);
+        gray_to_color->push_back (xx, y);
+
+      }
+
     }
 
-    double ylast = 0.0;
-    if (channel == 0) {
-      ylast = false_color_nodes.back ().second.second.red ();
-    } else if (channel == 1) {
-      ylast = false_color_nodes.back ().second.second.green ();
-    } else if (channel == 2) {
-      ylast = false_color_nodes.back ().second.second.blue ();
-    }
-
-    gray_to_color->push_back (false_color_nodes.back ().first, ylast / 255.0);
+    double x = false_color_nodes.back ().first;
+    double xx = std::max (xfence * (1.0 + xeps), x);
+    xfence = xx;
+    double ylast = color_to_channel_value (false_color_nodes.back ().second.first, channel);
+    gray_to_color->push_back (xx, ylast);
 
     dm = new tl::CombinedDataMapping (
                 to_pixel, 
@@ -264,57 +340,6 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
   }
 
   return dm;
-}
-
-// --------------------------------------------------------------------------------------
-
-namespace
-{
-
-struct compare_first_of_node
-{
-  bool operator() (const std::pair <double, std::pair<tl::Color, tl::Color> > &a, const std::pair <double, std::pair<tl::Color, tl::Color> > &b) const
-  {
-    return a.first < b.first;
-  }
-};
-
-}
-
-tl::Color
-interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x)
-{
-  if (nodes.size () < 1) {
-    return tl::Color ();
-  } else if (nodes.size () < 2) {
-    return x < nodes[0].first ? nodes[0].second.first : nodes[0].second.second;
-  } else {
-
-    std::vector<std::pair<double, std::pair<tl::Color, tl::Color> > >::const_iterator p = std::lower_bound (nodes.begin (), nodes.end (), std::make_pair (x, std::make_pair (tl::Color (), tl::Color ())), compare_first_of_node ());
-    if (p == nodes.end ()) {
-      return nodes.back ().second.second;
-    } else if (p == nodes.begin ()) {
-      return nodes.front ().second.first;
-    } else {
-
-      double x1 = p[-1].first;
-      double x2 = p->first;
-
-      unsigned int h1 = 0, s1 = 0, v1 = 0;
-      p[-1].second.second.get_hsv (h1, s1, v1);
-
-      unsigned int h2 = 0, s2 = 0, v2 = 0;
-      p->second.first.get_hsv (h2, s2, v2);
-
-      int h = int (0.5 + h1 + double(x - x1) * double (int (h2) - int (h1)) / double(x2 - x1));
-      int s = int (0.5 + s1 + double(x - x1) * double (int (s2) - int (s1)) / double(x2 - x1));
-      int v = int (0.5 + v1 + double(x - x1) * double (int (v2) - int (v1)) / double(x2 - x1));
-
-      return tl::Color::from_hsv ((unsigned int) h, (unsigned int) s, (unsigned int) v);
-
-    }
-
-  }
 }
 
 // --------------------------------------------------------------------------------------

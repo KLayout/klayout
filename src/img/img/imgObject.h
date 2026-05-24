@@ -145,7 +145,7 @@ public:
 /**
  *  @brief A helper function to interpolate a color in the color bar at a given x
  */
-tl::Color interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x);
+IMG_PUBLIC tl::Color interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x);
 
 /**
  *  @brief A image object

@@ -354,7 +354,7 @@ public:
    *  In addition to providing pages through "get_editor_options_pages", the plugin can request pages
    *  from globally registered factories by name.
    */
-  virtual std::vector<std::string> additional_editor_options_pages () const
+  virtual std::vector<std::string> additional_editor_options_pages (lay::LayoutViewBase * /*view*/) const
   {
     return std::vector<std::string> ();
   }

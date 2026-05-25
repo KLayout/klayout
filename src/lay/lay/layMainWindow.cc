@@ -274,6 +274,34 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   connect (action, SIGNAL (triggered ()), this, SLOT (clone ()));
   mp_tab_bar->addAction (action);
 
+  mp_view_stack = new ViewWidgetStack (mp_main_frame);
+  mp_view_stack->setObjectName (QString::fromUtf8 ("view_stack"));
+  vbl->addWidget (mp_view_stack);
+
+  mp_navigator_dock_widget = new QDockWidget (QObject::tr ("Navigator"), this);
+  mp_navigator_dock_widget->setObjectName (QString::fromUtf8 ("navigator_dock_widget"));
+  mp_navigator = new Navigator (this);
+  mp_navigator_dock_widget->setWidget (mp_navigator);
+  mp_navigator_dock_widget->setFocusProxy (mp_navigator);
+  connect (mp_navigator_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
+  m_navigator_visible = true;
+
+  mp_lp_dock_widget = new QDockWidget (QObject::tr ("Layers"), this);
+  mp_lp_dock_widget->setObjectName (QString::fromUtf8 ("lp_dock_widget"));
+  mp_lp_stack = new ControlWidgetStack (mp_lp_dock_widget, "lp_stack");
+  mp_lp_dock_widget->setWidget (mp_lp_stack);
+  mp_lp_dock_widget->setFocusProxy (mp_lp_stack);
+  connect (mp_lp_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
+  m_lp_visible = true;
+
+  mp_layer_toolbox_dock_widget = new QDockWidget (QObject::tr ("Layer Toolbox"), this);
+  mp_layer_toolbox_dock_widget->setObjectName (QString::fromUtf8 ("lt_dock_widget"));
+  mp_layer_toolbox_stack = new ControlWidgetStack (mp_layer_toolbox_dock_widget, "layer_toolbox_stack", true);
+  mp_layer_toolbox_dock_widget->setWidget (mp_layer_toolbox_stack);
+  mp_layer_toolbox_dock_widget->setFocusProxy (mp_layer_toolbox_stack);
+  connect (mp_layer_toolbox_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
+  m_layer_toolbox_visible = true;
+
   mp_hp_dock_widget = new QDockWidget (QObject::tr ("Cells"), this);
   mp_hp_dock_widget->setObjectName (QString::fromUtf8 ("hp_dock_widget"));
   mp_hp_stack = new ControlWidgetStack (mp_hp_dock_widget, "hp_stack");
@@ -290,15 +318,6 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   connect (mp_libs_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_libs_visible = true;
 
-  mp_eo_dock_widget = new QDockWidget (QObject::tr ("Editor Options"), this);
-  mp_eo_dock_widget->setObjectName (QString::fromUtf8 ("eo_dock_widget"));
-  mp_eo_dock_widget->setMinimumHeight (150);
-  mp_eo_stack = new ControlWidgetStack (mp_eo_dock_widget, "eo_stack");
-  mp_eo_dock_widget->setWidget (mp_eo_stack);
-  mp_eo_dock_widget->setFocusProxy (mp_eo_stack);
-  connect (mp_eo_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
-  m_eo_visible = true;
-
   mp_bm_dock_widget = new QDockWidget (QObject::tr ("Bookmarks"), this);
   mp_bm_dock_widget->setObjectName (QString::fromUtf8 ("bookmarks_dock_widget"));
   mp_bm_stack = new ControlWidgetStack (mp_bm_dock_widget, "bookmarks_stack");
@@ -307,33 +326,14 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   connect (mp_bm_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_bm_visible = true;
 
-  mp_view_stack = new ViewWidgetStack (mp_main_frame);
-  mp_view_stack->setObjectName (QString::fromUtf8 ("view_stack"));
-  vbl->addWidget (mp_view_stack);
-
-  mp_layer_toolbox_dock_widget = new QDockWidget (QObject::tr ("Layer Toolbox"), this);
-  mp_layer_toolbox_dock_widget->setObjectName (QString::fromUtf8 ("lt_dock_widget"));
-  mp_layer_toolbox_stack = new ControlWidgetStack (mp_layer_toolbox_dock_widget, "layer_toolbox_stack", true);
-  mp_layer_toolbox_dock_widget->setWidget (mp_layer_toolbox_stack);
-  mp_layer_toolbox_dock_widget->setFocusProxy (mp_layer_toolbox_stack);
-  connect (mp_layer_toolbox_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
-  m_layer_toolbox_visible = true;
-
-  mp_lp_dock_widget = new QDockWidget (QObject::tr ("Layers"), this);
-  mp_lp_dock_widget->setObjectName (QString::fromUtf8 ("lp_dock_widget"));
-  mp_lp_stack = new ControlWidgetStack (mp_lp_dock_widget, "lp_stack");
-  mp_lp_dock_widget->setWidget (mp_lp_stack);
-  mp_lp_dock_widget->setFocusProxy (mp_lp_stack);
-  connect (mp_lp_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
-  m_lp_visible = true;
-
-  mp_navigator_dock_widget = new QDockWidget (QObject::tr ("Navigator"), this);
-  mp_navigator_dock_widget->setObjectName (QString::fromUtf8 ("navigator_dock_widget"));
-  mp_navigator = new Navigator (this);
-  mp_navigator_dock_widget->setWidget (mp_navigator);
-  mp_navigator_dock_widget->setFocusProxy (mp_navigator);
-  connect (mp_navigator_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
-  m_navigator_visible = true;
+  mp_eo_dock_widget = new QDockWidget (QObject::tr ("Tool Options"), this);
+  mp_eo_dock_widget->setObjectName (QString::fromUtf8 ("eo_dock_widget"));
+  mp_eo_dock_widget->setMinimumHeight (150);
+  mp_eo_stack = new ControlWidgetStack (mp_eo_dock_widget, "eo_stack");
+  mp_eo_dock_widget->setWidget (mp_eo_stack);
+  mp_eo_dock_widget->setFocusProxy (mp_eo_stack);
+  connect (mp_eo_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
+  m_eo_visible = true;
 
   //  Add dock widgets
 #if QT_VERSION >= 0x040500
@@ -567,7 +567,7 @@ MainWindow::technology_changed ()
 }
 
 void
-MainWindow::dock_widget_visibility_changed (bool visible)
+MainWindow::dock_widget_visibility_changed (bool /*visible*/)
 {
   if (sender () == mp_lp_dock_widget) {
     dispatcher ()->config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
@@ -582,7 +582,7 @@ MainWindow::dock_widget_visibility_changed (bool visible)
   } else if (sender () == mp_layer_toolbox_dock_widget) {
     dispatcher ()->config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
   } else if (sender () == mp_eo_dock_widget) {
-    m_eo_visible = visible;
+    dispatcher ()->config_set (cfg_show_tool_options, tl::to_string (!mp_eo_dock_widget->isHidden ()));
   }
 }
 
@@ -1133,6 +1133,17 @@ MainWindow::configure (const std::string &name, const std::string &value)
 
     return true;
 
+  } else if (name == cfg_show_tool_options) {
+
+    tl::from_string (value, m_eo_visible);
+    if (m_eo_visible) {
+      mp_eo_dock_widget->show ();
+    } else {
+      mp_eo_dock_widget->hide ();
+    }
+
+    return true;
+
   } else if (name == cfg_navigator_show_images) {
 
     bool flag = false;
@@ -1321,6 +1332,7 @@ MainWindow::read_dock_widget_state ()
   dispatcher ()->config_set (cfg_show_bookmarks_view, tl::to_string (!mp_bm_dock_widget->isHidden ()));
   dispatcher ()->config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
   dispatcher ()->config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
+  dispatcher ()->config_set (cfg_show_tool_options, tl::to_string (!mp_eo_dock_widget->isHidden ()));
 }
 
 void
@@ -1699,38 +1711,6 @@ MainWindow::select_mode (int m)
       }
     }
 
-    update_editor_options_dock ();
-
-  }
-}
-
-void
-MainWindow::update_editor_options_dock ()
-{
-  //  if the current mode supports editing, show the editor options panel
-
-  const lay::PluginDeclaration *pd_sel = 0;
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    const lay::PluginDeclaration *pd = cls.operator-> ();
-    if (pd->id () == m_mode) {
-      pd_sel = pd;
-    }
-  }
-
-  bool eo_visible = false;
-  if (mp_eo_stack && pd_sel) {
-    eo_visible = pd_sel->editable_enabled ();
-  }
-  if (current_view () && eo_visible) {
-    lay::EditorOptionsPageCollection *eo_pages = current_view ()->editor_options_pages ();
-    if (! eo_pages || ! eo_pages->has_content ()) {
-      eo_visible = false;
-    }
-  }
-
-  if (eo_visible != m_eo_visible) {
-    m_eo_visible = eo_visible;
-    show_dock_widget (mp_eo_dock_widget, m_eo_visible);
   }
 }
 
@@ -2499,7 +2479,6 @@ MainWindow::select_view (int index)
 
     current_view_changed ();
 
-    update_editor_options_dock ();
     clear_current_pos ();
     edits_enabled_changed ();
     clear_messages ();
@@ -4502,7 +4481,6 @@ public:
 
     at = "edit_menu.end";
     menu_entries.push_back (lay::separator ("edit_options_group:edit_mode", "edit_menu.end"));
-    menu_entries.push_back (lay::menu_item ("cm_edit_options", "edit_options:edit_mode", "edit_menu.end", tl::to_string (QObject::tr ("Editor Options")) + "(F3)"));
 
     at = "file_menu.end";
     menu_entries.push_back (lay::menu_item ("cm_new_layout", "new_layout:edit:edit_mode", at, tl::to_string (QObject::tr ("New Layout"))));
@@ -4568,6 +4546,7 @@ public:
     menu_entries.push_back (lay::config_menu_item ("show_hierarchy_panel", at, tl::to_string (QObject::tr ("Cells")), cfg_show_hierarchy_panel, "?"));
     menu_entries.push_back (lay::config_menu_item ("show_libraries_view", at, tl::to_string (QObject::tr ("Libraries")), cfg_show_libraries_view, "?"));
     menu_entries.push_back (lay::config_menu_item ("show_bookmarks_view", at, tl::to_string (QObject::tr ("Bookmarks")), cfg_show_bookmarks_view, "?"));
+    menu_entries.push_back (lay::config_menu_item ("show_tool_options", at, tl::to_string (QObject::tr ("Tool Options(F3)")), cfg_show_tool_options, "?"));
     menu_entries.push_back (lay::menu_item ("cm_reset_window_state", "reset_window_state", at, tl::to_string (QObject::tr ("Restore Window")))),
     menu_entries.push_back (lay::separator ("selection_group", at));
     menu_entries.push_back (lay::config_menu_item ("transient_selection", at, tl::to_string (QObject::tr ("Highlight Object Under Mouse")), cfg_sel_transient_mode, "?"));

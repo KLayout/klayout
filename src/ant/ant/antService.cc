@@ -1610,7 +1610,7 @@ Service::move_transform (const db::DPoint & /*p*/, db::DFTrans tr, lay::angle_co
     return;
   }
 
-  auto ac_eff = ac == lay::AC_Global ? m_snap_mode : ac;
+  auto ac_eff = ac == lay::AC_Global ? lay::AC_Any : ac;
   clear_mouse_cursors ();
 
   if (m_move_mode == MoveSelected) {
@@ -1634,10 +1634,11 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
     return;
   }
 
-  auto ac_eff = ac == lay::AC_Global ? m_snap_mode : ac;
   clear_mouse_cursors ();
 
   if (m_move_mode == MoveSelected) {
+
+    auto ac_eff = ac == lay::AC_Global ? lay::AC_Any : ac;
 
     db::DVector dp = p - m_p1;
     dp = lay::snap_angle (dp, ac_eff);
@@ -1656,7 +1657,28 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
 
   } else if (m_move_mode != MoveNone) {
 
-    db::DPoint ps = snap2_visual (m_p1, p, &m_current, ac);
+    db::DPoint ps;
+
+    if (m_move_mode == MoveP1 && m_current.segments () == 1) {
+
+      //  when moving p1 in a normal ruler, observe the currently active angle constraints and use p2 as reference
+      db::DPoint pref = m_current.seg_p2 (m_seg_index);
+      ps = snap2_visual (pref, p, &m_current, ac);
+
+    } else if (m_move_mode == MoveP2 && m_current.segments () == 1) {
+
+      //  when moving p2 in a normal ruler, observe the currently active angle constraints and use p1 as reference
+      db::DPoint pref = m_current.seg_p1 (m_seg_index);
+      ps = snap2_visual (pref, p, &m_current, ac);
+
+    } else {
+
+      //  other move modes use the angle constraint imposed by the modifier buttons
+      //  and the start point for reference
+      ps = snap2_visual (m_p1, p, &m_current, ac == lay::AC_Global ? lay::AC_Any : ac);
+
+    }
+
     m_trans = db::DTrans (ps - m_p1);
 
     apply_partial_move (ps);

@@ -482,11 +482,15 @@ public:
     return new MoveService (view);
   }
 
-  virtual std::vector<std::string> additional_editor_options_pages () const
+  virtual std::vector<std::string> additional_editor_options_pages (lay::LayoutViewBase *view) const
   {
     std::vector<std::string> names;
-    //  TODO: provide in a central place instead of borrowing from the edt module
-    names.push_back ("GenericEditorOptions");
+    if (view->is_editable ()) {
+      //  TODO: provide in a central place instead of borrowing from the edt module
+      names.push_back ("GenericEditorOptions");
+    }
+    //  TODO: provide in a central place instead of borrowing from the ant module
+    names.push_back ("ant::RulerOptions");
     return names;
   }
 };

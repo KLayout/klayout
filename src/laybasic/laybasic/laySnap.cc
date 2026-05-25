@@ -554,7 +554,7 @@ private:
       }
     }
 
-    if (! any_point) {
+    if (! any_point && ! m_projection_constraint) {
     
       //  no certain direction to look into:
       //  compute the projection of the point and if within a 

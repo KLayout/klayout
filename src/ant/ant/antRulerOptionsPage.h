@@ -20,28 +20,47 @@
 
 */
 
+#if defined(HAVE_QT)
 
-#ifndef HDR_imgPlugin
-#define HDR_imgPlugin
+#ifndef HDR_antRulerOptionsPage
+#define HDR_antRulerOptionsPage
 
-#include "layPlugin.h"
+#include "antCommon.h"
 
-namespace img
+#include "layEditorOptionsPageWidget.h"
+
+namespace Ui
+{
+  class RulerOptions;
+}
+
+namespace ant
 {
 
-extern const std::string cfg_images_visible;
-
-class PluginDeclaration
-  : public lay::PluginDeclaration
+/**
+ *  @brief The generic properties page
+ */
+class RulerOptionsPage
+  : public lay::EditorOptionsPageWidget
 {
+Q_OBJECT
+
 public:
-  virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const;
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutViewBase *view) const;
-  virtual bool implements_editable (std::string &title) const;
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
+  RulerOptionsPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  ~RulerOptionsPage ();
+
+  virtual std::string title () const;
+  virtual int order () const { return -10; }
+  void apply (lay::Dispatcher *root);
+  void setup (lay::Dispatcher *root);
+
+private:
+  Ui::RulerOptions *mp_ui;
 };
 
 }
+
+#endif
 
 #endif
 

@@ -574,7 +574,9 @@ in <a href="#connect">connect</a>, <a href="#soft_connect">soft_connect</a>, <a 
 </p><p>
 If layers are not named, they will be given a name made from the 
 <a href="#name_prefix">name_prefix</a> and an incremental number when the layer is used for the
-first time. 
+first time. As the default name prefix is "l", you may can name conflicts
+with auto-named layers, if you register explicit layer names like "l5". 
+Consider changing the name prefix in that case to some prefix you are not using.
 </p><p>
 <a href="#name">name</a> can only be used once on a layer and the layer names must be 
 unique (not taken by another layer).

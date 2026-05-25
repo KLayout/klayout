@@ -1389,7 +1389,6 @@ namespace
   {
   public:
     DeepShapeStoreToShapeTransformer (const DeepShapeStore &dss, const db::Layout &layout)
-      : mp_layout (& layout)
     {
       //  gets the text annotation property ID -
       //  this is how the texts are passed for annotating the net names
@@ -1445,7 +1444,6 @@ namespace
 
   private:
     std::pair<bool, db::property_names_id_type> m_text_annot_name_id;
-    const db::Layout *mp_layout;
   };
 }
 

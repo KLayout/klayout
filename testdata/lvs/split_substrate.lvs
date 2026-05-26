@@ -102,6 +102,7 @@ connect_global(iosub, "IOSUB")
 # for debugging: _make_soft_connection_diodes(true)
 netlist
 
+netlist.make_top_level_pins(false)
 netlist.simplify
 
 

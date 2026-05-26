@@ -70,7 +70,7 @@ connect_global(ptie, "SUBSTRATE")
 
 netlist.flatten_circuit("INVCHAIN")
 
-netlist.make_top_level_pins
+netlist.make_top_level_pins(false)
 netlist.purge
 netlist.combine_devices
 netlist.purge_nets

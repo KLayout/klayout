@@ -2240,11 +2240,14 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "For example, serial or parallel resistors can be combined into "
     "a single resistor.\n"
   ) +
-  gsi::method ("make_top_level_pins", &db::Netlist::make_top_level_pins,
+  gsi::method ("make_top_level_pins", &db::Netlist::make_top_level_pins, gsi::arg ("sorted_by_name", true),
     "@brief Creates pins for top-level circuits.\n"
     "This method will turn all named nets of top-level circuits (such that are not "
     "referenced by subcircuits) into pins. This method can be used before purge to "
-    "avoid that purge will remove nets which are directly connecting to subcircuits."
+    "avoid that purge will remove nets which are directly connecting to subcircuits.\n"
+    "\n"
+    "Starting from version 0.30.9, the pins will be sorted by name by default. Sorting can be "
+    "disabled by setting \\sorted_by_name to false for backward compatibility."
   ) +
   gsi::method ("purge", &db::Netlist::purge,
     "@brief Purge unused nets, circuits and subcircuits.\n"

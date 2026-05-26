@@ -87,6 +87,7 @@ soft_connect_global(ptie, "SUBSTRATE")
 # Netlist section (NOTE: we only check log here)
 netlist
 
+netlist.make_top_level_pins(false)
 netlist.simplify
 
 

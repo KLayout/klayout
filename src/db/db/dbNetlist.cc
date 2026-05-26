@@ -626,7 +626,26 @@ void Netlist::purge_devices ()
   }
 }
 
-void Netlist::make_top_level_pins ()
+namespace {
+
+  struct CompareNetByName
+  {
+    CompareNetByName (const db::Netlist *netlist)
+      : mp_netlist (netlist)
+    { }
+
+    bool operator() (const db::Net *a, const db::Net *b)
+    {
+      return mp_netlist->normalize_name (a->name ()) < mp_netlist->normalize_name (b->name ());
+    }
+
+  private:
+    const db::Netlist *mp_netlist;
+  };
+
+}
+
+void Netlist::make_top_level_pins (bool sort_by_name)
 {
   size_t ntop = top_circuit_count ();
   for (top_down_circuit_iterator c = begin_top_down (); c != end_top_down () && ntop > 0; ++c, --ntop) {
@@ -635,12 +654,23 @@ void Netlist::make_top_level_pins ()
 
     if (circuit->pin_count () == 0) {
 
+      std::vector<db::Net *> nets_for_pins;
+
       //  create pins for the named nets and connect them
       for (Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
         if (! n->name ().empty () && n->terminal_count () + n->subcircuit_pin_count () > 0) {
-          Pin pin = circuit->add_pin (n->name ());
-          circuit->connect_pin (pin.id (), n.operator-> ());
+          nets_for_pins.push_back (n.operator-> ());
         }
+      }
+
+      if (sort_by_name) {
+        std::stable_sort (nets_for_pins.begin (), nets_for_pins.end (), CompareNetByName (this));
+      }
+
+      //  create pins for the named nets and connect them
+      for (auto n = nets_for_pins.begin (); n != nets_for_pins.end (); ++n) {
+        Pin pin = circuit->add_pin ((*n)->name ());
+        circuit->connect_pin (pin.id (), *n);
       }
 
     }

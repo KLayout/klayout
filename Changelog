@@ -24,6 +24,7 @@
     docks. The "Edit/Editor Options" entry moved to "View/Tool Options". It turns
     on or off the tool options dock, which is populated with pages depending on the tool.
     The default key binding (F3) will now show or hide this dock.
+* Enhancement: %GITHUB%/issues/2360 Sort ports by name in "make_top_level_pins"
 * Enhancement: A feature to compute a density map. It is found inside Tools/Density Map.
   The density map can be computed from one or multiple layers, the region can be 
   specified in terms of visible region, rulers or bounding boxes of certain layers

@@ -70,6 +70,7 @@ connect(layer.btp, layer.bm1)
 connect(layer.bdpPad, layer.bm1)
 
 blank_circuit("*TEST")
+netlist.make_top_level_pins(false)
 netlist.simplify
 
 compare

@@ -96,6 +96,7 @@ ok || raise("ptie layer already used - this is an error")
 
 # Compare section
 
+netlist.make_top_level_pins(false)
 netlist.simplify
 align
 

@@ -130,6 +130,7 @@ connect_implicit("DOESNOTEXIST", "DOESNOTEXIST")
 
 # Compare section
 
+netlist.make_top_level_pins(false)
 netlist.simplify
 align
 

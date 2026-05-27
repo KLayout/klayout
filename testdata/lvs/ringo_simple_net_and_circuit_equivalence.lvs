@@ -76,6 +76,7 @@ same_circuits("INV", $change_case ? "invX1" : "INVX1")
 same_circuits("DOESNOTEXIST", "DOESNOTEXIST2")
 same_nets("DOESNOTEXIST", "ENABLE", "DOESNOTEXIST2", "ENABLE")
 
+netlist.make_top_level_pins(false)
 netlist.simplify
 
 compare

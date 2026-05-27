@@ -16124,7 +16124,8 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: float
     r"""
@@ -50159,10 +50160,12 @@ class Netlist:
         In that case, only const methods may be called on self.
         """
         ...
-    def make_top_level_pins(self) -> None:
+    def make_top_level_pins(self, sorted_by_name: Optional[bool] = ...) -> None:
         r"""
         @brief Creates pins for top-level circuits.
         This method will turn all named nets of top-level circuits (such that are not referenced by subcircuits) into pins. This method can be used before purge to avoid that purge will remove nets which are directly connecting to subcircuits.
+
+        Starting from version 0.30.9, the pins will be sorted by name by default. Sorting can be disabled by setting \sorted_by_name to false for backward compatibility.
         """
         ...
     @overload
@@ -71390,7 +71393,8 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: int
     r"""

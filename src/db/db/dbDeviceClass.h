@@ -600,7 +600,7 @@ public:
    *
    *  The default value also declares the type.
    */
-  size_t parameter_id_for_name_create (const std::string &name, bool primary, const tl::Variant &default_value) const;
+  size_t parameter_id_for_name_create (const std::string &name, bool primary, const tl::Variant &default_value);
 
   /**
    *  @brief Returns true, if the device has a terminal with the given name

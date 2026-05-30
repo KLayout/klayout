@@ -108,7 +108,7 @@ protected:
 
   void read_netlist (Netlist *netlist, db::LayoutToNetlist *l2n, Brace *nested = 0, std::map<const db::Circuit *, ObjectMap> *map_per_circuit = 0);
   static size_t terminal_id (const db::DeviceClass *device_class, const std::string &tname);
-  static std::pair<db::DeviceAbstract *, const db::DeviceClass *> device_model_by_name (db::Netlist *netlist, const std::string &dmname);
+  static std::pair<db::DeviceAbstract *, db::DeviceClass *> device_model_by_name (db::Netlist *netlist, const std::string &dmname);
   bool read_message (std::string &msg);
   bool read_severity (Severity &severity);
 

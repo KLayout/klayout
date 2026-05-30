@@ -998,12 +998,13 @@ LayoutToNetlistStandardReader::terminal_id (const db::DeviceClass *device_class,
   throw tl::Exception (tl::to_string (tr ("Not a valid terminal name: ")) + tname + tl::to_string (tr (" for device class: ")) + device_class->name ());
 }
 
-std::pair<db::DeviceAbstract *, const db::DeviceClass *>
+std::pair<db::DeviceAbstract *, db::DeviceClass *>
 LayoutToNetlistStandardReader::device_model_by_name (db::Netlist *netlist, const std::string &dmname)
 {
   for (db::Netlist::device_abstract_iterator i = netlist->begin_device_abstracts (); i != netlist->end_device_abstracts (); ++i) {
     if (i->name () == dmname) {
-      return std::make_pair (i.operator-> (), i->device_class ());
+      //  TODO: get rid of the const cast
+      return std::make_pair (i.operator-> (), const_cast<db::DeviceClass *> (i->device_class ()));
     }
   }
 
@@ -1027,7 +1028,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
   std::string dmname;
   read_word_or_quoted (dmname);
 
-  std::pair<db::DeviceAbstract *, const db::DeviceClass *> dm = device_model_by_name (netlist, dmname);
+  std::pair<db::DeviceAbstract *, db::DeviceClass *> dm = device_model_by_name (netlist, dmname);
 
   std::unique_ptr<db::Device> device (new db::Device ());
   device->set_device_class (const_cast<db::DeviceClass *> (dm.second));

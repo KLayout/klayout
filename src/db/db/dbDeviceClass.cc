@@ -308,6 +308,27 @@ size_t DeviceClass::parameter_id_for_name (const std::string &name) const
   throw tl::Exception (tl::to_string (tr ("Invalid parameter name")) + ": '" + name + "'");
 }
 
+size_t DeviceClass::parameter_id_for_name_create (const std::string &name, bool primary, const tl::Variant &default_value)
+{
+  const std::vector<db::DeviceParameterDefinition> &pd = parameter_definitions ();
+  for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+    if (i->name () == name) {
+      return i->id ();
+    }
+  }
+
+  m_parameter_definitions.push_back (db::DeviceParameterDefinition ());
+
+  db::DeviceParameterDefinition &pdef = m_parameter_definitions.back ();
+  pdef.set_id (m_parameter_definitions.size () - 1);
+
+  pdef.set_name (name);
+  pdef.set_default_value (default_value);
+  pdef.set_is_primary (primary);
+
+  return pdef.id ();
+}
+
 bool DeviceClass::has_terminal_with_name (const std::string &name) const
 {
   const std::vector<db::DeviceTerminalDefinition> &td = terminal_definitions ();

@@ -215,7 +215,7 @@ void Device::set_parameter_value (const std::string &name, const tl::Variant &v)
 void Device::set_parameter_value_create (const std::string &name, const tl::Variant &v, bool primary, const tl::Variant &def_value)
 {
   if (device_class ()) {
-    set_parameter_value (device_class ()->parameter_id_for_name_create (name, primary, def_value), v);
+    set_parameter_value (mp_device_class->parameter_id_for_name_create (name, primary, def_value), v);
   }
 }
 

@@ -1683,6 +1683,19 @@ public:
   void cleanup (const std::set<db::cell_index_type> &keep = std::set<db::cell_index_type> ());
 
   /**
+   *  @brief Gets a list of cells which are cleanup candidates
+   *
+   *  The returned list also includes cells that are indirectly cleaned up.
+   *  The cleanup only removes top cells which represent unused proxies
+   *  with some exceptions - for example proxies that are single top cells
+   *  are retained.
+   *
+   *  However, removing the top cells should not produce new top cells
+   *  of proxies, so these cells need to be removed as well.
+   */
+  std::set<db::cell_index_type> cells_to_cleanup (const std::set<db::cell_index_type> &keep = std::set<db::cell_index_type> ()) const;
+
+  /**
    *  @brief Calls "update" on all cells of the layout
    *
    *  This will update PCells stored inside this layout, but will *not* update

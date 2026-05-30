@@ -73,6 +73,15 @@ class Box:
     @brief Sets the top coordinate of the box
     """
     @classmethod
+    def from_bytes(cls, s: bytes) -> Box:
+        r"""
+        @brief Creates a box object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
     def from_dbox(cls, dbox: DBox) -> Box:
         r"""
         @brief Creates an integer coordinate box from a floating-point coordinate box
@@ -728,6 +737,15 @@ class Box:
         This method has been introduced in version 0.23.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this box
+
+        This string can be turned into a box again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_dtype(self, dbu: Optional[float] = ...) -> DBox:
         r"""
         @brief Converts the box to a floating-point coordinate box
@@ -809,6 +827,24 @@ class BoxWithProperties(Box):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> BoxWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> BoxWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, box: Box, properties: Dict[Any, Any]) -> BoxWithProperties:
@@ -844,7 +880,7 @@ class BoxWithProperties(Box):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> BoxWithProperties:
@@ -856,7 +892,7 @@ class BoxWithProperties(Box):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: Box) -> None:
@@ -1010,9 +1046,18 @@ class BoxWithProperties(Box):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -2183,6 +2228,23 @@ class Cell:
         It has been added in version 0.16.
         """
         ...
+    def is_cold_proxy(self) -> bool:
+        r"""
+        @brief Returns true, if the cell is a 'cold proxy'
+        Cold proxies are cells that refer to a library cell or PCell variant, but can temporarily not be resolved -
+        for example, because the library is not installed. Such cells are basically placeholders
+        for library references and also carry PCell parameter information needed to establish
+        the link to the library PCell, once the library is available again.
+
+        You can use \library_name to obtain the name of the library the proxy points to, \library_cell_name to obtain the cell name in that library, \pcell_name to obtain the PCell name if it is a PCell proxy, and \pcell_parameter or \pcell_parameters_by_name to obtain the PCell parameters.
+
+        Cold proxies cannot be created or modified. Cold proxies are basically error indicators and should be fixed by installing the respective library. Their layout state
+        reflects the last version of the layout when the cell was functional and properly
+        linked to a library. Still, they can be used in read-only applications.
+
+        This method has been introduced in version 0.30.9.
+        """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
@@ -2271,7 +2333,7 @@ class Cell:
         ...
     def is_proxy(self) -> bool:
         r"""
-        @brief Returns true, if the cell presents some external entity   
+        @brief Returns true, if the cell presents some external entity
         A cell may represent some data which is imported from some other source, i.e.
         a library. Such cells are called "proxy cells". For a library reference, the
         proxy cell is some kind of pointer to the library and the cell within the library.
@@ -2279,8 +2341,9 @@ class Cell:
         For PCells, this data can even be computed through some script.
         A PCell proxy represents all instances with a given set of parameters.
 
-        Proxy cells cannot be modified, except that pcell parameters can be modified
-        and PCell instances can be recomputed.
+        Proxy cells should not be modified directly - i.e. the shapes or instances should not
+        be touched. However, you can change PCell parameters (\change_pcell_parameter, \change_pcell_parameters)
+        or change the library reference (\change_ref).
 
         This method has been introduced in version 0.22.
         """
@@ -2318,7 +2381,7 @@ class Cell:
     def library(self) -> LibraryBase:
         r"""
         @brief Returns a reference to the library from which the cell is imported
-        if the cell is not imported from a library, this reference is nil.
+        If the cell is not imported from a library, this reference is nil.
 
         This method has been introduced in version 0.22.
         """
@@ -2338,6 +2401,31 @@ class Cell:
         are proxies to a pcell.
 
         This method has been introduced in version 0.22.
+        """
+        ...
+    def library_cell_name(self) -> str:
+        r"""
+        @brief Returns the cell name inside the library from which the cell is imported
+        If the cell is not imported from a library, the return value is an empty string.
+        This method is basically a convenience function, equivalent to taking the name
+        from \library and \library_cell_index.
+        Note that for PCells, 'library_cell_name' is the name of the PCell proxy cell inside the library, not the name of the PCell.
+
+        However, this method also works for 'cold proxies' (see \is_cold_proxy?)
+        for which it delivers the name of cell inside the (missing) library.
+
+        This method has been introduced in version 0.30.8.
+        """
+        ...
+    def library_name(self) -> str:
+        r"""
+        @brief Returns the name of the library from which the cell is imported
+        If the cell is not imported from a library, the return value is an empty string.
+        This method is basically a convenience function, equivalent to taking the name
+        from \library. However, this method also works for 'cold proxies' (see \is_cold_proxy?)
+        for which it delivers the name of the (missing) library.
+
+        This method has been introduced in version 0.30.8.
         """
         ...
     def merge_meta_info(self, other: Cell) -> None:
@@ -2541,6 +2629,17 @@ class Cell:
         This method has been introduced in version 0.22.
         """
         ...
+    def pcell_name(self) -> str:
+        r"""
+        @brief Returns the PCell name if the cell is a PCell variant
+        If this cell is not a PCell variant, this method returns an empty string.
+        This method is basically a convenience function, equivalent to taking the name
+        from \pcell_declaration. However, this method also works for 'cold proxies' (see \is_cold_proxy?)
+        for which it delivers the name of the (missing) PCell.
+
+        This method has been introduced in version 0.30.9.
+        """
+        ...
     @overload
     def pcell_parameter(self, instance: Instance, name: str) -> Any:
         r"""
@@ -2559,6 +2658,9 @@ class Cell:
         @brief Gets a PCell parameter by name if the cell is a PCell variant
         If the cell is a PCell variant, this method returns the parameter with the given name.
         If the cell is not a PCell variant or the name is not a valid PCell parameter name, the return value is nil.
+
+        This method also works for 'cold proxies' (see \is_cold_proxy?)
+        for which it delivers the value of the given stored PCell parameter.
 
         This method has been introduced in version 0.25.
         """
@@ -2594,6 +2696,9 @@ class Cell:
         values for the PCell parameters with the parameter names as the keys. If the cell is not a PCell variant, this
         method returns an empty dictionary. This method also returns the PCell parameters if
         the cell is a PCell imported from a library.
+
+        This method also works for 'cold proxies' (see \is_cold_proxy?)
+        for which it delivers the names and values of the stored PCell parameters.
 
         This method has been introduced in version 0.24.
         """
@@ -6314,6 +6419,15 @@ class CplxTrans:
     "mirroring" describes a reflection at the x-axis which is included in the transformation prior to rotation.@param m The new mirror flag
     """
     @classmethod
+    def from_bytes(cls, s: bytes) -> CplxTrans:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
     def from_dtrans(cls, trans: DCplxTrans, dbu: Optional[float] = ...) -> CplxTrans:
         r"""
         @brief Creates an integer-to-floating-point coordinate transformation from another coordinate flavour
@@ -7253,6 +7367,15 @@ class CplxTrans:
         Rotation angles are rounded down to multiples of 90 degree. Magnification is fixed to 1.0.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_itrans(self, dbu: Optional[float] = ...) -> ICplxTrans:
         r"""
         @brief Converts the transformation to another transformation with integer input and output coordinates
@@ -7555,6 +7678,15 @@ class DBox:
     Setter:
     @brief Sets the top coordinate of the box
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DBox:
+        r"""
+        @brief Creates a box object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @classmethod
     def from_ibox(cls, box: Box) -> DBox:
         r"""
@@ -8211,6 +8343,15 @@ class DBox:
         This method has been introduced in version 0.23.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this box
+
+        This string can be turned into a box again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_itype(self, dbu: Optional[float] = ...) -> Box:
         r"""
         @brief Converts the box to an integer coordinate box
@@ -8292,6 +8433,24 @@ class DBoxWithProperties(DBox):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DBoxWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> DBoxWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, box: DBox, properties: Dict[Any, Any]) -> DBoxWithProperties:
@@ -8327,7 +8486,7 @@ class DBoxWithProperties(DBox):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> DBoxWithProperties:
@@ -8339,7 +8498,7 @@ class DBoxWithProperties(DBox):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: DBox) -> None:
@@ -8493,9 +8652,18 @@ class DBoxWithProperties(DBox):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -9274,6 +9442,15 @@ class DCplxTrans:
     @brief Sets the mirror flag
     "mirroring" describes a reflection at the x-axis which is included in the transformation prior to rotation.@param m The new mirror flag
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DCplxTrans:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @classmethod
     def from_itrans(cls, trans: CplxTrans, dbu: Optional[float] = ...) -> DCplxTrans:
         r"""
@@ -10203,6 +10380,15 @@ class DCplxTrans:
         Rotation angles are rounded down to multiples of 90 degree. Magnification is fixed to 1.0.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_itrans(self, dbu: Optional[float] = ...) -> ICplxTrans:
         r"""
         @brief Converts the transformation to another transformation with integer input and output coordinates
@@ -10505,6 +10691,15 @@ class DEdge:
     @brief Sets p2.y
     This method has been added in version 0.23.
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DEdge:
+        r"""
+        @brief Creates an edge object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @classmethod
     def from_iedge(cls, edge: Edge) -> DEdge:
         r"""
@@ -11210,6 +11405,15 @@ class DEdge:
         This method has been introduced in version 0.23.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this edge
+
+        This string can be turned into an edge again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_itype(self, dbu: Optional[float] = ...) -> Edge:
         r"""
         @brief Converts the edge to an integer coordinate edge
@@ -11317,6 +11521,15 @@ class DEdgePair:
 
     Symmetric edge pairs have been introduced in version 0.27.
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DEdgePair:
+        r"""
+        @brief Creates an edge pair object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @classmethod
     def from_s(cls, s: str) -> DEdgePair:
         r"""
@@ -11613,6 +11826,15 @@ class DEdgePair:
         @param e The enlargement (set to zero for exact representation)
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this edge pair
+
+        This string can be turned into an edge pair again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_itype(self, dbu: Optional[float] = ...) -> EdgePair:
         r"""
         @brief Converts the edge pair to an integer coordinate edge pair
@@ -11685,6 +11907,24 @@ class DEdgePairWithProperties(DEdgePair):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DEdgePairWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> DEdgePairWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, edge_pair: DEdgePair, properties: Dict[Any, Any]) -> DEdgePairWithProperties:
@@ -11720,7 +11960,7 @@ class DEdgePairWithProperties(DEdgePair):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> DEdgePairWithProperties:
@@ -11732,7 +11972,7 @@ class DEdgePairWithProperties(DEdgePair):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: DEdgePair) -> None:
@@ -11886,9 +12126,18 @@ class DEdgePairWithProperties(DEdgePair):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -11944,6 +12193,24 @@ class DEdgeWithProperties(DEdge):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DEdgeWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> DEdgeWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, edge: DEdge, properties: Dict[Any, Any]) -> DEdgeWithProperties:
@@ -11979,7 +12246,7 @@ class DEdgeWithProperties(DEdge):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> DEdgeWithProperties:
@@ -11991,7 +12258,7 @@ class DEdgeWithProperties(DEdge):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: DEdge) -> None:
@@ -12145,9 +12412,18 @@ class DEdgeWithProperties(DEdge):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -12239,6 +12515,15 @@ class DPath:
     Setter:
     @brief Set the width
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DPath:
+        r"""
+        @brief Creates a path object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @classmethod
     def from_ipath(cls, path: Path) -> DPath:
         r"""
@@ -12683,6 +12968,15 @@ class DPath:
         The returned polygon is not guaranteed to be non-selfoverlapping. This may happen if the path overlaps itself or contains very short segments.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this path
+
+        This string can be turned into a path again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_itype(self, dbu: Optional[float] = ...) -> Path:
         r"""
         @brief Converts the path to an integer coordinate path
@@ -12764,6 +13058,24 @@ class DPathWithProperties(DPath):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DPathWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> DPathWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, path: DPath, properties: Dict[Any, Any]) -> DPathWithProperties:
@@ -12799,7 +13111,7 @@ class DPathWithProperties(DPath):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> DPathWithProperties:
@@ -12811,7 +13123,7 @@ class DPathWithProperties(DPath):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: DPath) -> None:
@@ -12965,9 +13277,18 @@ class DPathWithProperties(DPath):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -13031,6 +13352,15 @@ class DPoint:
     Setter:
     @brief Write accessor to the y coordinate
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DPoint:
+        r"""
+        @brief Creates a point object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @classmethod
     def from_ipoint(cls, point: Point) -> DPoint:
         r"""
@@ -13442,6 +13772,15 @@ class DPoint:
         @param d The other point to compute the distance to.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this point
+
+        This string can be turned into a point again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_itype(self, dbu: Optional[float] = ...) -> Point:
         r"""
         @brief Converts the point to an integer coordinate point
@@ -13526,6 +13865,15 @@ class DPolygon:
         @param n The number of points that will be used to approximate the ellipse
 
         This method has been introduced in version 0.23.
+        """
+        ...
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DPolygon:
+        r"""
+        @brief Creates a polygon object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
         """
         ...
     @classmethod
@@ -14277,6 +14625,15 @@ class DPolygon:
         This method has been introduced in version 0.25.3.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this polygon
+
+        This string can be turned into a polygon again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_itype(self, dbu: Optional[float] = ...) -> Polygon:
         r"""
         @brief Converts the polygon to an integer coordinate polygon
@@ -14424,6 +14781,24 @@ class DPolygonWithProperties(DPolygon):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DPolygonWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> DPolygonWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, polygon: DPolygon, properties: Dict[Any, Any]) -> DPolygonWithProperties:
@@ -14459,7 +14834,7 @@ class DPolygonWithProperties(DPolygon):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> DPolygonWithProperties:
@@ -14471,7 +14846,7 @@ class DPolygonWithProperties(DPolygon):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: DPolygon) -> None:
@@ -14625,9 +15000,18 @@ class DPolygonWithProperties(DPolygon):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -14706,6 +15090,15 @@ class DSimplePolygon:
         @param n The number of points that will be used to approximate the ellipse
 
         This method has been introduced in version 0.23.
+        """
+        ...
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DSimplePolygon:
+        r"""
+        @brief Creates a polygon object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
         """
         ...
     @classmethod
@@ -15242,6 +15635,15 @@ class DSimplePolygon:
         This method has been introduced in version 0.25.3.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this polygon
+
+        This string can be turned into a polygon again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_itype(self, dbu: Optional[float] = ...) -> SimplePolygon:
         r"""
         @brief Converts the polygon to an integer coordinate polygon
@@ -15387,6 +15789,24 @@ class DSimplePolygonWithProperties(DSimplePolygon):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, polygon: DSimplePolygon, properties: Dict[Any, Any]) -> DSimplePolygonWithProperties:
@@ -15422,7 +15842,7 @@ class DSimplePolygonWithProperties(DSimplePolygon):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> DSimplePolygonWithProperties:
@@ -15434,7 +15854,7 @@ class DSimplePolygonWithProperties(DSimplePolygon):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: DSimplePolygon) -> None:
@@ -15588,9 +16008,18 @@ class DSimplePolygonWithProperties(DSimplePolygon):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -15695,7 +16124,8 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: float
     r"""
@@ -15758,6 +16188,15 @@ class DText:
 
     This method has been introduced in version 0.23.
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DText:
+        r"""
+        @brief Creates a text object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @classmethod
     def from_s(cls, s: str) -> DText:
         r"""
@@ -16099,6 +16538,15 @@ class DText:
         This convenience method has been added in version 0.28.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this text object
+
+        This string can be turned into a text object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_itype(self, dbu: Optional[float] = ...) -> Text:
         r"""
         @brief Converts the text to an integer coordinate text
@@ -16165,6 +16613,24 @@ class DTextWithProperties(DText):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DTextWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> DTextWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, text: DText, properties: Dict[Any, Any]) -> DTextWithProperties:
@@ -16200,7 +16666,7 @@ class DTextWithProperties(DText):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> DTextWithProperties:
@@ -16212,7 +16678,7 @@ class DTextWithProperties(DText):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: DText) -> None:
@@ -16366,9 +16832,18 @@ class DTextWithProperties(DText):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -16521,6 +16996,15 @@ class DTrans:
 
     This method was introduced in version 0.20.
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DTrans:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @classmethod
     def from_itrans(cls, trans: Trans) -> DTrans:
         r"""
@@ -17367,6 +17851,15 @@ class DTrans:
         If this property is true, the transformation is composed of a mirroring at the x-axis followed by a rotation by the angle given by the \angle property. 
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_itype(self, dbu: Optional[float] = ...) -> Trans:
         r"""
         @brief Converts the transformation to an integer coordinate transformation
@@ -17622,6 +18115,15 @@ class DVector:
     Setter:
     @brief Write accessor to the y coordinate
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> DVector:
+        r"""
+        @brief Creates a vector object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @classmethod
     def from_s(cls, s: str) -> DVector:
         r"""
@@ -17975,6 +18477,15 @@ class DVector:
         r"""
         @brief The square length of the vector
         'sq_abs' is an alias provided for compatibility with the former point type.
+        """
+        ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this vector
+
+        This string can be turned into a vector again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
         """
         ...
     def to_itype(self, dbu: Optional[float] = ...) -> Vector:
@@ -22058,6 +22569,15 @@ class Edge:
     This method has been added in version 0.23.
     """
     @classmethod
+    def from_bytes(cls, s: bytes) -> Edge:
+        r"""
+        @brief Creates an edge object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
     def from_dedge(cls, dedge: DEdge) -> Edge:
         r"""
         @brief Creates an integer coordinate edge from a floating-point coordinate edge
@@ -22760,6 +23280,15 @@ class Edge:
         Swapping the points basically reverses the direction of the edge.
 
         This method has been introduced in version 0.23.
+        """
+        ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this edge
+
+        This string can be turned into an edge again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
         """
         ...
     def to_dtype(self, dbu: Optional[float] = ...) -> DEdge:
@@ -23860,6 +24389,15 @@ class EdgePair:
     Symmetric edge pairs have been introduced in version 0.27.
     """
     @classmethod
+    def from_bytes(cls, s: bytes) -> EdgePair:
+        r"""
+        @brief Creates an edge pair object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
     def from_s(cls, s: str) -> EdgePair:
         r"""
         @brief Creates an object from a string
@@ -24153,6 +24691,15 @@ class EdgePair:
 
         Another version for converting edge pairs to polygons is \polygon which renders a \Polygon object.
         @param e The enlargement (set to zero for exact representation)
+        """
+        ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this edge pair
+
+        This string can be turned into an edge pair again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
         """
         ...
     def to_dtype(self, dbu: Optional[float] = ...) -> DEdgePair:
@@ -25421,6 +25968,24 @@ class EdgePairWithProperties(EdgePair):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> EdgePairWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> EdgePairWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, edge_pair: EdgePair, properties: Dict[Any, Any]) -> EdgePairWithProperties:
@@ -25456,7 +26021,7 @@ class EdgePairWithProperties(EdgePair):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> EdgePairWithProperties:
@@ -25468,7 +26033,7 @@ class EdgePairWithProperties(EdgePair):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: EdgePair) -> None:
@@ -25622,9 +26187,18 @@ class EdgePairWithProperties(EdgePair):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -29222,6 +29796,24 @@ class EdgeWithProperties(Edge):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> EdgeWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> EdgeWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, edge: Edge, properties: Dict[Any, Any]) -> EdgeWithProperties:
@@ -29257,7 +29849,7 @@ class EdgeWithProperties(Edge):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> DEdgeWithProperties:
@@ -29269,7 +29861,7 @@ class EdgeWithProperties(Edge):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: Edge) -> None:
@@ -29423,9 +30015,18 @@ class EdgeWithProperties(Edge):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -33467,6 +34068,15 @@ class ICplxTrans:
     "mirroring" describes a reflection at the x-axis which is included in the transformation prior to rotation.@param m The new mirror flag
     """
     @classmethod
+    def from_bytes(cls, s: bytes) -> ICplxTrans:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
     def from_dtrans(cls, trans: DCplxTrans, dbu: Optional[float] = ...) -> ICplxTrans:
         r"""
         @brief Creates an integer coordinate transformation from another coordinate flavour
@@ -34410,6 +35020,15 @@ class ICplxTrans:
 
         The simple transformation part does not reflect magnification or arbitrary angles.
         Rotation angles are rounded down to multiples of 90 degree. Magnification is fixed to 1.0.
+        """
+        ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
         """
         ...
     def to_itrans(self, dbu: Optional[float] = ...) -> DCplxTrans:
@@ -35882,11 +36501,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis
+    @brief Sets the displacement vector for the 'a' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     b: Vector
     r"""
@@ -35895,11 +36514,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'b' axis
+    @brief Sets the displacement vector for the 'b' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \b= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     cell: Cell
     r"""
@@ -35942,10 +36561,9 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
-    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
+    @brief Sets the complex transformation of the instance or the first instance in the array
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     da: DVector
     r"""
@@ -36440,7 +37058,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
         ...
     @overload
@@ -36448,7 +37066,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
         ...
     def pcell_declaration(self) -> PCellDeclaration_Native:
@@ -39833,6 +40451,24 @@ class Layout:
         This method has been introduce in version 0.24.
         """
         ...
+    @overload
+    def delete_cell(self, cell: Cell) -> None:
+        r"""
+        @brief Deletes a cell
+
+        This deletes a cell but not the sub cells of the cell.
+        These subcells will likely become new top cells unless they are used
+        otherwise.
+        All instances of this cell are deleted as well.
+        Hint: to delete multiple cells, use "delete_cells" which is 
+        far more efficient in this case.
+
+        @param cell The cell to delete
+
+        This convenience variant taking a cell object has been introduced in version 0.30.9.
+        """
+        ...
+    @overload
     def delete_cell(self, cell_index: int) -> None:
         r"""
         @brief Deletes a cell 
@@ -39849,6 +40485,20 @@ class Layout:
         This method has been introduced in version 0.20.
         """
         ...
+    @overload
+    def delete_cell_rec(self, cell: Cell) -> None:
+        r"""
+        @brief Deletes a cell plus all subcells
+
+        This deletes a cell and also all sub cells of the cell.
+        In contrast to \prune_cell, all cells are deleted together with their instances even if they are used otherwise.
+
+        @param cell The cell to delete
+
+        This convenience variant taking a cell object has been introduced in version 0.30.9.
+        """
+        ...
+    @overload
     def delete_cell_rec(self, cell_index: int) -> None:
         r"""
         @brief Deletes a cell plus all subcells
@@ -39861,6 +40511,7 @@ class Layout:
         This method has been introduced in version 0.20.
         """
         ...
+    @overload
     def delete_cells(self, cell_index_list: Sequence[int]) -> None:
         r"""
         @brief Deletes multiple cells
@@ -39873,6 +40524,21 @@ class Layout:
         @param cell_index_list An array of cell indices of the cells to delete
 
         This method has been introduced in version 0.20.
+        """
+        ...
+    @overload
+    def delete_cells(self, cell_list: Sequence[Cell]) -> None:
+        r"""
+        @brief Deletes multiple cells
+
+        This deletes the cells but not the sub cells of these cells.
+        These subcells will likely become new top cells unless they are used
+        otherwise.
+        All instances of these cells are deleted as well.
+
+        @param cell_list An list of cells to delete
+
+        This convenience variant taking a list of cell objects has been introduced in version 0.30.9.
         """
         ...
     @overload
@@ -40046,7 +40712,24 @@ class Layout:
         This method has been introduced in version 0.23 and has been extended to name queries in version 0.28.11.
         """
         ...
-    def flatten(self, cell_index: int, levels: int, prune: bool) -> None:
+    @overload
+    def flatten(self, cell: Cell, levels: Optional[int] = ..., prune: Optional[bool] = ...) -> None:
+        r"""
+        @brief Flattens the given cell
+
+        This method propagates all shapes and instances from the specified number of hierarchy levels below into the given cell.
+        It also removes the instances of the cells from which the shapes came from, but does not remove the cells themselves if prune is set to false.
+        If prune is set to true, these cells are removed if not used otherwise.
+
+        @param cell The cell which should be flattened
+        @param levels The number of hierarchy levels to flatten (-1: all, 0: none, 1: one level etc.)
+        @param prune Set to true to remove orphan cells.
+
+        This convenience variant taking a cell object has been introduced in version 0.30.9.
+        """
+        ...
+    @overload
+    def flatten(self, cell_index: int, levels: Optional[int] = ..., prune: Optional[bool] = ...) -> None:
         r"""
         @brief Flattens the given cell
 
@@ -40058,10 +40741,28 @@ class Layout:
         @param levels The number of hierarchy levels to flatten (-1: all, 0: none, 1: one level etc.)
         @param prune Set to true to remove orphan cells.
 
-        This method has been introduced in version 0.20.
+        This method has been introduced in version 0.20. The 'levels' and 'prune' arguments have been made optional in version 0.30.9.
         """
         ...
-    def flatten_into(self, source_cell_index: int, target_cell_index: int, trans: ICplxTrans, levels: int) -> None:
+    @overload
+    def flatten_into(self, source_cell: Cell, target_cell: Cell, trans: Optional[ICplxTrans] = ..., levels: Optional[int] = ...) -> None:
+        r"""
+        @brief Flattens the given cell into another cell
+
+        This method works like 'flatten', but allows specification of a target cell which can be different from the source cell plus a transformation which is applied for all shapes and instances in the target cell.
+
+        In contrast to the 'flatten' method, the source cell is not modified.
+
+        @param source_cell The source cell which should be flattened
+        @param target_cell The target cell into which the resulting objects are written
+        @param trans The transformation to apply on the output shapes and instances
+        @param levels The number of hierarchy levels to flatten (-1: all, 0: none, 1: one level etc.)
+
+        This convenience variant taking a cell objects has been introduced in version 0.30.9.
+        """
+        ...
+    @overload
+    def flatten_into(self, source_cell_index: int, target_cell_index: int, trans: Optional[ICplxTrans] = ..., levels: Optional[int] = ...) -> None:
         r"""
         @brief Flattens the given cell into another cell
 
@@ -40074,7 +40775,7 @@ class Layout:
         @param trans The transformation to apply on the output shapes and instances
         @param levels The number of hierarchy levels to flatten (-1: all, 0: none, 1: one level etc.)
 
-        This method has been introduced in version 0.24.
+        This method has been introduced in version 0.24. The 'trans' and 'levels' arguments have been made optional is version 0.30.9.
         """
         ...
     def get_info(self, index: int) -> LayerInfo:
@@ -40598,7 +41299,8 @@ class Layout:
         This method has been introduced in version 0.24.
         """
         ...
-    def prune_cell(self, cell_index: int, levels: int) -> None:
+    @overload
+    def prune_cell(self, cell: Cell, levels: Optional[int] = ...) -> None:
         r"""
         @brief Deletes a cell plus subcells not used otherwise
 
@@ -40606,13 +41308,63 @@ class Layout:
         The number of hierarchy levels to consider can be specified as well. One level of hierarchy means that only the direct children of the cell are deleted with the cell itself.
         All instances of this cell are deleted as well.
 
+        A version that allows pruning multiple cells in one call is \prune_cells.
+
+        @param cell The cell to delete
+        @param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)
+
+        This convenience variant taking a cell object has been introduced in version 0.30.9.
+        """
+        ...
+    @overload
+    def prune_cell(self, cell_index: int, levels: Optional[int] = ...) -> None:
+        r"""
+        @brief Deletes a cell plus subcells not used otherwise
+
+        This deletes a cell and also all sub cells of the cell which are not used otherwise.
+        The number of hierarchy levels to consider can be specified as well. One level of hierarchy means that only the direct children of the cell are deleted with the cell itself.
+        All instances of this cell are deleted as well.
+
+        A version that allows pruning multiple cells in one call is \prune_cells.
+
         @param cell_index The index of the cell to delete
         @param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)
 
-        This method has been introduced in version 0.20.
+        This method has been introduced in version 0.20. The 'levels' argument was made optional in version 0.30.9.
         """
         ...
-    def prune_subcells(self, cell_index: int, levels: int) -> None:
+    @overload
+    def prune_cells(self, cell_indexes: Sequence[int], levels: Optional[int] = ...) -> None:
+        r"""
+        @brief Deletes cells plus subcells not used otherwise
+
+        This deletes the given cells and also all sub cells of the cells which are not used otherwise.
+        The number of hierarchy levels to consider can be specified as well. One level of hierarchy means that only the direct children of the cell are deleted with the cell itself.
+        All instances of the pruned cells are deleted as well.
+
+        @param cell_indexes The indexes of the cells to delete
+        @param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)
+
+        This method has been introduced in version 0.30.9.
+        """
+        ...
+    @overload
+    def prune_cells(self, cells: Sequence[Cell], levels: Optional[int] = ...) -> None:
+        r"""
+        @brief Deletes cells plus subcells not used otherwise
+
+        This deletes the given cells and also all sub cells of the cells which are not used otherwise.
+        The number of hierarchy levels to consider can be specified as well. One level of hierarchy means that only the direct children of the cell are deleted with the cell itself.
+        All instances of the pruned cells are deleted as well.
+
+        @param cells The cells to delete
+        @param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)
+
+        This method has been introduced in version 0.30.9.
+        """
+        ...
+    @overload
+    def prune_subcells(self, cell: Cell, levels: Optional[int] = ...) -> None:
         r"""
         @brief Deletes all sub cells of the cell which are not used otherwise down to the specified level of hierarchy
 
@@ -40620,10 +41372,61 @@ class Layout:
         All instances of the deleted cells are deleted as well.
         It is possible to specify how many levels of hierarchy below the given root cell are considered.
 
+        A variant exists that takes a list of cells and which is more efficient than calling
+        'prune_subcells' multiple times on a single cell.
+
+        @param cell The root cell from which to delete a sub cells
+        @param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)
+
+        This convenience variant taking a list of cell objects has been introduced in version 0.30.9.
+        """
+        ...
+    @overload
+    def prune_subcells(self, cell_index: int, levels: Optional[int] = ...) -> None:
+        r"""
+        @brief Deletes all sub cells of the cell which are not used otherwise down to the specified level of hierarchy
+
+        This deletes all sub cells of the cell which are not used otherwise.
+        All instances of the deleted cells are deleted as well.
+        It is possible to specify how many levels of hierarchy below the given root cell are considered.
+
+        A variant exists that takes a list of cell indexes and which is more efficient than calling
+        'prune_subcells' multiple times on a single cell.
+
         @param cell_index The root cell from which to delete a sub cells
         @param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)
 
         This method has been introduced in version 0.20.
+        """
+        ...
+    @overload
+    def prune_subcells(self, cell_index_list: Sequence[int], levels: Optional[int] = ...) -> None:
+        r"""
+        @brief Deletes all sub cells of the given cells which are not used otherwise down to the specified level of hierarchy
+
+        This deletes all sub cells of the given cells which are not used otherwise.
+        All instances of the deleted cells are deleted as well.
+        It is possible to specify how many levels of hierarchy below the given root cell are considered.
+
+        @param cell_index_list The root cells from which to delete the sub cells
+        @param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)
+
+        This method has been introduced in version 0.30.9.
+        """
+        ...
+    @overload
+    def prune_subcells(self, cell_list: Sequence[Cell], levels: Optional[int] = ...) -> None:
+        r"""
+        @brief Deletes all sub cells of the given cells which are not used otherwise down to the specified level of hierarchy
+
+        This deletes all sub cells of the given cells which are not used otherwise.
+        All instances of the deleted cells are deleted as well.
+        It is possible to specify how many levels of hierarchy below the given root cell are considered.
+
+        @param cell_list The root cells from which to delete the sub cells
+        @param levels The number of hierarchy levels to consider (-1: all, 0: none, 1: one level etc.)
+
+        This method has been introduced in version 0.30.9.
         """
         ...
     @overload
@@ -48146,17 +48949,17 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     def device_class(self) -> DeviceClass:
@@ -49152,17 +49955,17 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
+        @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
+        @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -49357,10 +50160,12 @@ class Netlist:
         In that case, only const methods may be called on self.
         """
         ...
-    def make_top_level_pins(self) -> None:
+    def make_top_level_pins(self, sorted_by_name: Optional[bool] = ...) -> None:
         r"""
         @brief Creates pins for top-level circuits.
         This method will turn all named nets of top-level circuits (such that are not referenced by subcircuits) into pins. This method can be used before purge to avoid that purge will remove nets which are directly connecting to subcircuits.
+
+        Starting from version 0.30.9, the pins will be sorted by name by default. Sorting can be disabled by setting \sorted_by_name to false for backward compatibility.
         """
         ...
     @overload
@@ -49446,7 +50251,7 @@ class Netlist:
     @overload
     def top_circuit(self) -> Circuit:
         r"""
-        @brief Gets the top circuit (const version).
+        @brief Gets the top circuit.
         This method will return nil, if there is no top circuit. It will raise an error, if there is more than a single top circuit.
 
         This convenience method has been added in version 0.29.5.
@@ -49455,7 +50260,7 @@ class Netlist:
     @overload
     def top_circuit(self) -> Circuit:
         r"""
-        @brief Gets the top circuit.
+        @brief Gets the top circuit (const version).
         This method will return nil, if there is no top circuit. It will raise an error, if there is more than a single top circuit.
 
         This convenience method has been added in version 0.29.5.
@@ -53335,6 +54140,15 @@ class Path:
     @brief Set the width
     """
     @classmethod
+    def from_bytes(cls, s: bytes) -> Path:
+        r"""
+        @brief Creates a path object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
     def from_dpath(cls, dpath: DPath) -> Path:
         r"""
         @brief Creates an integer coordinate path from a floating-point coordinate path
@@ -53775,6 +54589,15 @@ class Path:
         The returned polygon is not guaranteed to be non-selfoverlapping. This may happen if the path overlaps itself or contains very short segments.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this path
+
+        This string can be turned into a path again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_dtype(self, dbu: Optional[float] = ...) -> DPath:
         r"""
         @brief Converts the path to a floating-point coordinate path
@@ -53859,6 +54682,24 @@ class PathWithProperties(Path):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> PathWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> PathWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, path: Path, properties: Dict[Any, Any]) -> PathWithProperties:
@@ -53894,7 +54735,7 @@ class PathWithProperties(Path):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> DPathWithProperties:
@@ -53906,7 +54747,7 @@ class PathWithProperties(Path):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: Path) -> None:
@@ -54060,9 +54901,18 @@ class PathWithProperties(Path):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -54217,6 +55067,15 @@ class Point:
     Setter:
     @brief Write accessor to the y coordinate
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> Point:
+        r"""
+        @brief Creates a point object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @classmethod
     def from_dpoint(cls, dpoint: DPoint) -> Point:
         r"""
@@ -54628,6 +55487,15 @@ class Point:
         @param d The other point to compute the distance to.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this point
+
+        This string can be turned into a point again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_dtype(self, dbu: Optional[float] = ...) -> DPoint:
         r"""
         @brief Converts the point to a floating-point coordinate point
@@ -54759,6 +55627,15 @@ class Polygon:
         @param n The number of points that will be used to approximate the ellipse
 
         This method has been introduced in version 0.23.
+        """
+        ...
+    @classmethod
+    def from_bytes(cls, s: bytes) -> Polygon:
+        r"""
+        @brief Creates a polygon object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
         """
         ...
     @classmethod
@@ -55691,6 +56568,15 @@ class Polygon:
         The intended use for this method is a iteratively split polygons until the satisfy some maximum number of points limit.
 
         This method has been introduced in version 0.25.3.
+        """
+        ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this polygon
+
+        This string can be turned into a polygon again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
         """
         ...
     def to_dtype(self, dbu: Optional[float] = ...) -> DPolygon:
@@ -57404,6 +58290,24 @@ class PolygonWithProperties(Polygon):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> PolygonWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> PolygonWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, polygon: Polygon, properties: Dict[Any, Any]) -> PolygonWithProperties:
@@ -57439,7 +58343,7 @@ class PolygonWithProperties(Polygon):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> DPolygonWithProperties:
@@ -57451,7 +58355,7 @@ class PolygonWithProperties(Polygon):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: Polygon) -> None:
@@ -57605,9 +58509,18 @@ class PolygonWithProperties(Polygon):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -68559,6 +69472,15 @@ class SimplePolygon:
         """
         ...
     @classmethod
+    def from_bytes(cls, s: bytes) -> SimplePolygon:
+        r"""
+        @brief Creates a polygon object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
     def from_dpoly(cls, dpolygon: DSimplePolygon) -> SimplePolygon:
         r"""
         @brief Creates an integer coordinate polygon from a floating-point coordinate polygon
@@ -69206,6 +70128,15 @@ class SimplePolygon:
         This method has been introduced in version 0.25.3.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this polygon
+
+        This string can be turned into a polygon again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_dtype(self, dbu: Optional[float] = ...) -> DSimplePolygon:
         r"""
         @brief Converts the polygon to a floating-point coordinate polygon
@@ -69356,6 +70287,24 @@ class SimplePolygonWithProperties(SimplePolygon):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> SimplePolygonWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> SimplePolygonWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, polygon: SimplePolygon, properties: Dict[Any, Any]) -> SimplePolygonWithProperties:
@@ -69391,7 +70340,7 @@ class SimplePolygonWithProperties(SimplePolygon):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> DSimplePolygonWithProperties:
@@ -69403,7 +70352,7 @@ class SimplePolygonWithProperties(SimplePolygon):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: SimplePolygon) -> None:
@@ -69557,9 +70506,18 @@ class SimplePolygonWithProperties(SimplePolygon):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -69704,23 +70662,17 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in (non-const version).
-        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-
-        This constness variant has been introduced in version 0.26.8
-        """
-        ...
-    @overload
-    def circuit(self) -> Circuit:
-        r"""
         @brief Gets the circuit the subcircuit lives in.
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
         """
         ...
     @overload
-    def circuit_ref(self) -> Circuit:
+    def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit the subcircuit lives in (non-const version).
+        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
@@ -69730,6 +70682,12 @@ class SubCircuit(NetlistObject):
 
 
         This constness variant has been introduced in version 0.26.8
+        """
+        ...
+    @overload
+    def circuit_ref(self) -> Circuit:
+        r"""
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
@@ -69775,17 +70733,17 @@ class SubCircuit(NetlistObject):
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
+        @brief Gets the net connected to the specified pin of the subcircuit.
         If the pin is not connected, nil is returned for the net.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit.
+        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
         If the pin is not connected, nil is returned for the net.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     ...
@@ -70463,6 +71421,15 @@ class Text:
     This method has been introduced in version 0.23.
     """
     @classmethod
+    def from_bytes(cls, s: bytes) -> Text:
+        r"""
+        @brief Creates a text object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
     def from_s(cls, s: str) -> Text:
         r"""
         @brief Creates an object from a string
@@ -70799,6 +71766,15 @@ class Text:
         @brief Gets the position of the text
 
         This convenience method has been added in version 0.28.
+        """
+        ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this text object
+
+        This string can be turned into a text object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
         """
         ...
     def to_dtype(self, dbu: Optional[float] = ...) -> DText:
@@ -72145,6 +73121,24 @@ class TextWithProperties(Text):
     Setter:
     @brief Sets the properties ID of the object
     """
+    @classmethod
+    def from_bytes(cls, s: bytes) -> TextWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
+    def from_s(cls, s: str) -> TextWithProperties:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, text: Text, properties: Dict[Any, Any]) -> TextWithProperties:
@@ -72180,7 +73174,7 @@ class TextWithProperties(Text):
         ...
     def __repr__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def __rmul__(self, f: float) -> DTextWithProperties:
@@ -72192,7 +73186,7 @@ class TextWithProperties(Text):
         ...
     def __str__(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     def _assign(self, other: Text) -> None:
@@ -72346,9 +73340,18 @@ class TextWithProperties(Text):
         This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_s(self) -> str:
         r"""
-        @brief Returns a string representing the polygon
+        @brief Returns a string representing the object
         """
         ...
     @overload
@@ -74192,6 +75195,15 @@ class Trans:
     This method was introduced in version 0.20.
     """
     @classmethod
+    def from_bytes(cls, s: bytes) -> Trans:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
     def from_dtrans(cls, dtrans: DTrans) -> Trans:
         r"""
         @brief Creates an integer coordinate transformation from a floating-point coordinate transformation
@@ -75035,6 +76047,15 @@ class Trans:
         @brief Gets the mirror flag
 
         If this property is true, the transformation is composed of a mirroring at the x-axis followed by a rotation by the angle given by the \angle property. 
+        """
+        ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
         """
         ...
     def to_dtype(self, dbu: Optional[float] = ...) -> DTrans:
@@ -76006,6 +77027,15 @@ class VCplxTrans:
     "mirroring" describes a reflection at the x-axis which is included in the transformation prior to rotation.@param m The new mirror flag
     """
     @classmethod
+    def from_bytes(cls, s: bytes) -> VCplxTrans:
+        r"""
+        @brief Creates an object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
     def from_s(cls, s: str) -> VCplxTrans:
         r"""
         @brief Creates an object from a string
@@ -76942,6 +77972,15 @@ class VCplxTrans:
         Rotation angles are rounded down to multiples of 90 degree. Magnification is fixed to 1.0.
         """
         ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this object
+
+        This string can be turned into an object again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
+        """
+        ...
     def to_itrans(self, dbu: Optional[float] = ...) -> DCplxTrans:
         r"""
         @brief Converts the transformation to another transformation with floating-point output coordinates
@@ -77452,6 +78491,15 @@ class Vector:
     @brief Write accessor to the y coordinate
     """
     @classmethod
+    def from_bytes(cls, s: bytes) -> Vector:
+        r"""
+        @brief Creates a vector object from a binary serialization
+        Creates the object from a binary representation (as returned by \to_bytes)
+
+        This method has been added in version 0.30.9.
+        """
+        ...
+    @classmethod
     def from_s(cls, s: str) -> Vector:
         r"""
         @brief Creates an object from a string
@@ -77804,6 +78852,15 @@ class Vector:
         r"""
         @brief The square length of the vector
         'sq_abs' is an alias provided for compatibility with the former point type.
+        """
+        ...
+    def to_bytes(self) -> bytes:
+        r"""
+        @brief Returns a binary string representing this vector
+
+        This string can be turned into a vector again by using \from_bytes
+        . 
+        This method has been added in version 0.30.9.
         """
         ...
     def to_dtype(self, dbu: Optional[float] = ...) -> DVector:

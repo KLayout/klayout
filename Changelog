@@ -1,3 +1,70 @@
+0.30.9           (2026-05-25):
+* Bugfix: %GITHUB%/issues/2331 Screen size error (Assertion tlPixelBuffer.cc:260 n < m_height was not true)
+* Enhancement: %GITHUB%/issues/2335 Editor Options (F3) behaviour has changed
+* Enhancement: %GITHUB%/issues/2337 [Feature Request] Add to_bytes and from_bytes to shape classes
+* Bugfix: %GITHUB%/issues/2339 Ruby ReportDatabase merging can lead to internal error
+* Bugfix: %GITHUB%/issues/2343 copy_tree implicitly drops collinear points
+* Bugfix: %GITHUB%/issues/2344 Instance properties inside a PCell are not preserved in KLayout
+* Bugfix: %GITHUB%/issues/2345 Substrate sequestration
+  Although this ticket was more a discussion, this enhancement fixes the behavior of
+  empty layers in deep mode, which allows placing device terminals on them.
+  This eliminates the need for the workaround mentioned in the ticket.
+* Bugfix: %GITHUB%/issues/2350 strm2oas klayout/testdata/gds/issue_1835.gds a.oas, a.oas is empty
+  With this fix, it is possible to save and load layouts that use a single library references
+  or PCell variants as top cell. This is not strictly a supported use model, but may be 
+  useful in some cases. The "strm2xxx" tools now allow translating such files from OASIS
+  to GDS and back.
+* Bugfix: %GITHUB%/issues/2356 Edit options always shown, even for klayout -ne
+* Enhancement: because of issue #2356 and #2335, the "Editor Options" dock was overhauled
+  * It is called "Tool Options" now as it hosts not just shape editor options
+  * The Ruler tool got its own page as the original page was not functional and
+    rulers have other options. This replicates some settings from the "Ruler
+    and annotations setup" page.
+  * The dock widget's visibility can be controlled in the same way than the other
+    docks. The "Edit/Editor Options" entry moved to "View/Tool Options". It turns
+    on or off the tool options dock, which is populated with pages depending on the tool.
+    The default key binding (F3) will now show or hide this dock.
+* Enhancement: %GITHUB%/issues/2360 Sort ports by name in "make_top_level_pins"
+* Enhancement: A feature to compute a density map. It is found inside Tools/Density Map.
+  The density map can be computed from one or multiple layers, the region can be 
+  specified in terms of visible region, rulers or bounding boxes of certain layers
+  or the whole cell. The tool will generate an image overlay over the layout
+  holding the density data.
+* Bugfix: using "xkill" on a KLayout instance ended in a crash
+* Enhancement: settings of search features are persisted (see discussion 2868)
+* Enhancement: when moving rulers with "snap to objects", all points of the
+  rulers snap to edges or vertexes now.
+* Bugfix: false color maps in images where incorrectly interpolated in some
+  cases.
+* Bugfix: small bugfix in L2N/LVSDB reader - default values of parameters were
+  treated as int.
+* Bugfix: properties on objects with properties (such as BoxWithProperties) where
+  not properly serialized. Specifically their representation did not include the
+  type. Hence it was not possible to retrieve properties on deserialization with
+  "from_s". The fix is to annotate the property values with type information.
+  NOTE: this is a change that is not backward-compatible.
+* Bugfix: snapping rulers to edges parallel to the allowed ruler direction resulted
+  in skew rulers.
+* Enhancement: renamed ruler option for more clarity - changed 
+  'snap to objects (unless disabled in template)' to 'never snap to object' (inverted)
+* Enhancement: enhancements in the script API
+  * Cell#is_cold_proxy?: indicates if a cell is a "defunc" library reference
+  * Cell#library_cell_name: gets the library cell name for a "defunc" reference
+  * Cell#library_name: gets the library name for a "defunc" reference
+  * Cell#pcell_name: gets the pcell name for a "defunct" reference
+  * Layout#delete_cells: now available with a list of cell object
+  * Layout#delete_cell_rec: now available with a cell object
+  * Layout#prune_cell: now available with a cell object
+  * Layout#prune_cells: for pruning multiple cells in one call
+  * Layout#prune_subcells: now with a cell object
+  * Layout#prune_subcells: now with multiple root cells
+  * Layout#flatten: now with a cell object
+  * Layout#flatten_into: now with cell objects
+  * Layout#delete_cell: now with a cell object
+  * Default value "all" for "levels" argument in "prune_subcells" and "prune_cell"
+  * Default value "all" for "levels" and "true" for "prune" argument in "flatten"
+  * Default value "all" for "levels" and "unity" for "trans" argument in "flatten_into"
+
 0.30.8           (2026-04-14):
 * Enhancement: %GITHUB%/issues/2248 Switch layouts but without losing the handle
 * Bugfix: %GITHUB%/issues/2299 gf180mcu DRC performance regression.

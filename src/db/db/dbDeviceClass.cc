@@ -330,7 +330,6 @@ size_t DeviceClass::terminal_id_for_name (const std::string &name) const
   throw tl::Exception (tl::to_string (tr ("Invalid terminal name")) + ": '" + name + "'");
 }
 
-// @@@ GSI bindings for SPICE profile
 void DeviceClass::set_spice_profile (const std::string &name, const SpiceProfile &profile)
 {
   m_spice_profiles [name] = profile;

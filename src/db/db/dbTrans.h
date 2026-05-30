@@ -1626,6 +1626,17 @@ public:
   }
 
   /**
+   *  @brief Native constructor
+   *
+   *  This constructor creates the objects from the native parameters (max, acos, asin and displacement)
+   */
+  complex_trans (const vector<R> &disp, R asin, R acos, R mag)
+    : m_u (disp), m_sin (asin), m_cos (acos), m_mag (mag)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
    *  @brief Migration constructor from a simple transformation to a complex transformation
    *
    *  This constructor is supposed to support migration from a simple to a complex transformation

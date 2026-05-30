@@ -651,7 +651,7 @@ to_quoted_string (const std::string &s)
   std::string r;
   r.reserve (s.size () + 2);
   r += '\'';
-  for (const char *c = s.c_str (); *c; ++c) {
+  for (auto c = s.begin (); c != s.end (); ++c) {
     if (*c == '\'' || *c == '\\') {
       r += '\\';
       r += *c;

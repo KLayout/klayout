@@ -328,3 +328,46 @@ TEST(3)
   EXPECT_EQ (image.mask (1, 2), false);
 }
 
+//  color interpolation
+TEST(4)
+{
+  img::DataMapping::false_color_nodes_type nodes;
+
+  nodes.push_back (std::make_pair (0.0, std::make_pair (tl::color_t (0xff0000), tl::color_t (0xff0000))));
+  nodes.push_back (std::make_pair (1.0, std::make_pair (tl::color_t (0x0000ff), tl::color_t (0xffffff))));
+  nodes.push_back (std::make_pair (2.0, std::make_pair (tl::color_t (0x000000), tl::color_t (0xffffff))));
+
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 0.0)).to_string (), "#ff0000");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 0.001)).to_string (), "#ff0000");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 0.5)).to_string (), "#00ff00");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 0.999)).to_string (), "#0000ff");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 1.0)).to_string (), "#0000ff");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 1.001)).to_string (), "#ffffff");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 1.5)).to_string (), "#808080");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 1.999)).to_string (), "#000000");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 2.0)).to_string (), "#000000");
+
+  nodes.clear ();
+
+  nodes.push_back (std::make_pair (0.0, std::make_pair (tl::color_t (0xff0000), tl::color_t (0xff0000))));
+  nodes.push_back (std::make_pair (1.0, std::make_pair (tl::color_t (0xff0000), tl::color_t (0x0000ff))));
+  nodes.push_back (std::make_pair (2.0, std::make_pair (tl::color_t (0x0000ff), tl::color_t (0x0000ff))));
+
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 0.0)).to_string (), "#ff0000");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 0.5)).to_string (), "#ff0000");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 0.999)).to_string (), "#ff0000");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 1.0)).to_string (), "#ff0000");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 1.001)).to_string (), "#0000ff");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 1.5)).to_string (), "#0000ff");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 1.999)).to_string (), "#0000ff");
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 2.0)).to_string (), "#0000ff");
+
+  nodes.clear ();
+
+  nodes.push_back (std::make_pair (0.0, std::make_pair (tl::color_t (0x0000ff), tl::color_t (0x0000ff))));
+  nodes.push_back (std::make_pair (0.275591, std::make_pair (tl::color_t (0x0000ff), tl::color_t (0x000000))));
+  nodes.push_back (std::make_pair (0.643701, std::make_pair (tl::color_t (0xffffff), tl::color_t (0xff0000))));
+  nodes.push_back (std::make_pair (1.0, std::make_pair (tl::color_t (0xff0000), tl::color_t (0xff0000))));
+
+  EXPECT_EQ (tl::Color (img::interpolated_color (nodes, 0.7)).to_string (), "#ff0000");
+}

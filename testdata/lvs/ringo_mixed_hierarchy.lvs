@@ -68,6 +68,7 @@ connect_global(ptie, "SUBSTRATE")
 
 # Compare section
 
+netlist.make_top_level_pins(false)
 netlist.simplify
 
 align

@@ -1437,12 +1437,6 @@ OASISWriter::write_layername_table (size_t &layernames_table_pos, const std::vec
   end_table (layernames_table_pos);
 }
 
-static bool must_write_cell (const db::Cell &cref)
-{
-  //  Don't write proxy cells which are not employed
-  return ! cref.is_proxy () || ! cref.is_top ();
-}
-
 void
 OASISWriter::create_cell_nstrings (const db::Layout &layout, const std::set <db::cell_index_type> &cell_set)
 {
@@ -1511,13 +1505,13 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
   cells_by_index.reserve (cell_set.size ());
 
   for (db::Layout::bottom_up_const_iterator cell = layout.begin_bottom_up (); cell != layout.end_bottom_up (); ++cell) {
-    if (cell_set.find (*cell) != cell_set.end () && must_write_cell (layout.cell (*cell))) {
+    if (cell_set.find (*cell) != cell_set.end ()) {
       cells.push_back (*cell);
     }
   }
 
   for (db::Layout::const_iterator cell = layout.begin (); cell != layout.end (); ++cell) {
-    if (cell_set.find (cell->cell_index ()) != cell_set.end () && must_write_cell (layout.cell (cell->cell_index ()))) {
+    if (cell_set.find (cell->cell_index ()) != cell_set.end ()) {
       cells_by_index.push_back (cell->cell_index ());
     }
   }

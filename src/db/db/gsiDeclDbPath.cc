@@ -26,6 +26,7 @@
 #include "dbPoint.h"
 #include "dbPath.h"
 #include "dbHash.h"
+#include "dbBinarySerialize.h"
 
 namespace gsi
 {
@@ -57,6 +58,18 @@ struct path_defs
     std::unique_ptr<C> c (new C ());
     ex.read (*c.get ());
     return c.release ();
+  }
+
+  static C *from_bytes (const std::vector<char> &s)
+  {
+    std::unique_ptr<C> c (new C ());
+    db::from_bytes (s, *c);
+    return c.release ();
+  }
+
+  static std::vector<char> to_bytes (const C *c)
+  {
+    return db::to_bytes (*c);
   }
 
   static C *new_v ()
@@ -283,6 +296,19 @@ struct path_defs
     ) +
     method ("to_s", (std::string (C::*) () const) &C::to_string,
       "@brief Convert to a string\n"
+    ) +
+    constructor ("from_bytes", &from_bytes, gsi::arg ("s"),
+      "@brief Creates a path object from a binary serialization\n"
+      "Creates the object from a binary representation (as returned by \\to_bytes)\n"
+      "\n"
+      "This method has been added in version 0.30.9.\n"
+    ) +
+    method_ext ("to_bytes", &to_bytes,
+      "@brief Returns a binary string representing this path\n"
+      "\n"
+      "This string can be turned into a path again by using \\from_bytes\n. "
+      "\n"
+      "This method has been added in version 0.30.9.\n"
     ) +
     method ("simple_polygon", &C::simple_polygon,
       "@brief Convert the path to a simple polygon\n"

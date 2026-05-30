@@ -8,6 +8,7 @@ DEFINES += MAKE_DB_LIBRARY
 
 SOURCES = \
   dbArray.cc \
+  dbBinarySerialize.cc \
   dbBox.cc \
   dbBoxConvert.cc \
   dbBoxScanner.cc \
@@ -145,6 +146,15 @@ SOURCES = \
   gsiDeclDbMatrix.cc \
   gsiDeclDbMeasureHelpers.cc \
   gsiDeclDbMetaInfo.cc \
+  gsiDeclDbNetlistCircuit.cc \
+  gsiDeclDbNetlistDevice.cc \
+  gsiDeclDbNetlistDeviceClass.cc \
+  gsiDeclDbNetlistNet.cc \
+  gsiDeclDbNetlistObject.cc \
+  gsiDeclDbNetlistPin.cc \
+  gsiDeclDbNetlistSpiceReader.cc \
+  gsiDeclDbNetlistSpiceWriter.cc \
+  gsiDeclDbNetlistSubcircuit.cc \
   gsiDeclDbPath.cc \
   gsiDeclDbPoint.cc \
   gsiDeclDbPolygon.cc \
@@ -248,6 +258,7 @@ SOURCES = \
 
 HEADERS = \
   dbArray.h \
+  dbBinarySerialize.h \
   dbBoxConvert.h \
   dbBox.h \
   dbBoxScanner.h \

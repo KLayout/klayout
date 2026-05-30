@@ -32,6 +32,7 @@
 #include "dbLibraryProxy.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
+#include "dbColdProxy.h"
 #include "dbLayout.h"
 #include "dbLayoutUtils.h"
 #include "dbLayerMapping.h"
@@ -949,6 +950,11 @@ static std::vector<db::cell_index_type> caller_cells (const db::Cell *c)
   return std::vector<db::cell_index_type> (ids.begin (), ids.end ());
 }
 
+static bool is_cold_proxy (const db::Cell *cell)
+{
+  return dynamic_cast<const db::ColdProxy *> (cell) != 0;
+}
+
 static bool is_library_cell (const db::Cell *cell)
 {
   return dynamic_cast<const db::LibraryProxy *> (cell) != 0;
@@ -971,6 +977,36 @@ static db::Library *library (const db::Cell *cell)
     return db::LibraryManager::instance ().lib (l->lib_id ());
   } else {
     return 0;
+  }
+}
+
+static std::string library_name (const db::Cell *cell)
+{
+  const db::ColdProxy *cp = dynamic_cast<const db::ColdProxy *> (cell);
+  if (cp) {
+    return cp->context_info ().lib_name;
+  } else {
+    const db::Library *l = library (cell);
+    if (l) {
+      return l->get_name ();
+    } else {
+      return std::string ();
+    }
+  }
+}
+
+static std::string library_cell_name (const db::Cell *cell)
+{
+  const db::ColdProxy *cp = dynamic_cast<const db::ColdProxy *> (cell);
+  if (cp) {
+    return cp->context_info ().cell_name;
+  } else {
+    const db::Library *l = library (cell);
+    if (l) {
+      return l->layout ().cell_name (library_cell_index (cell));
+    } else {
+      return std::string ();
+    }
   }
 }
 
@@ -1173,13 +1209,25 @@ static const std::vector<tl::Variant> &pcell_parameters (const db::Cell *cell)
 
 static tl::Variant pcell_parameter (const db::Cell *cell, const std::string &name)
 {
-  return cell->layout ()->get_pcell_parameter (cell->cell_index (), name);
+  const db::ColdProxy *cp = dynamic_cast <const db::ColdProxy *> (cell);
+  if (cp) {
+    const auto &pp = cp->context_info ().pcell_parameters;
+    auto i = pp.find (name);
+    return i != pp.end () ? i->second : tl::Variant ();
+  } else {
+    return cell->layout ()->get_pcell_parameter (cell->cell_index (), name);
+  }
 }
 
 static std::map<std::string, tl::Variant> pcell_parameters_by_name (const db::Cell *cell)
 {
-  tl_assert (cell->layout () != 0);
-  return cell->layout ()->get_named_pcell_parameters (cell->cell_index ());
+  const db::ColdProxy *cp = dynamic_cast <const db::ColdProxy *> (cell);
+  if (cp) {
+    return cp->context_info ().pcell_parameters;
+  } else {
+    tl_assert (cell->layout () != 0);
+    return cell->layout ()->get_named_pcell_parameters (cell->cell_index ());
+  }
 }
 
 static void refresh (db::Cell *cell)
@@ -1200,6 +1248,21 @@ static const db::PCellDeclaration *pcell_declaration (const db::Cell *cell)
     }
   } else {
     return 0;
+  }
+}
+
+static std::string pcell_name (const db::Cell *cell)
+{
+  const db::ColdProxy *cp = dynamic_cast <const db::ColdProxy *> (cell);
+  if (cp) {
+    return cp->context_info ().pcell_name;
+  } else {
+    const db::PCellDeclaration *pd = pcell_declaration (cell);
+    if (pd) {
+      return pd->name ();
+    } else {
+      return std::string ();
+    }
   }
 }
 
@@ -3193,7 +3256,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "This method has been introduced in version 0.20.\n"
   ) +
   gsi::method ("is_proxy?", &db::Cell::is_proxy,
-    "@brief Returns true, if the cell presents some external entity   \n"
+    "@brief Returns true, if the cell presents some external entity\n"
     "A cell may represent some data which is imported from some other source, i.e.\n"
     "a library. Such cells are called \"proxy cells\". For a library reference, the\n"
     "proxy cell is some kind of pointer to the library and the cell within the library.\n"
@@ -3201,11 +3264,31 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "For PCells, this data can even be computed through some script.\n"
     "A PCell proxy represents all instances with a given set of parameters.\n"
     "\n"
-    "Proxy cells cannot be modified, except that pcell parameters can be modified\n"
-    "and PCell instances can be recomputed.\n"
+    "Proxy cells should not be modified directly - i.e. the shapes or instances should not\n"
+    "be touched. However, you can change PCell parameters (\\change_pcell_parameter, \\change_pcell_parameters)\n"
+    "or change the library reference (\\change_ref).\n"
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) + 
+  gsi::method_ext ("is_cold_proxy?", &is_cold_proxy,
+    "@brief Returns true, if the cell is a 'cold proxy'\n"
+    "Cold proxies are cells that refer to a library cell or PCell variant, but can temporarily not be resolved -\n"
+    "for example, because the library is not installed. Such cells are basically placeholders\n"
+    "for library references and also carry PCell parameter information needed to establish\n"
+    "the link to the library PCell, once the library is available again.\n"
+    "\n"
+    "You can use \\library_name to obtain the name of the library the proxy points to, "
+    "\\library_cell_name to obtain the cell name in that library, "
+    "\\pcell_name to obtain the PCell name if it is a PCell proxy, "
+    "and \\pcell_parameter or \\pcell_parameters_by_name to obtain the PCell parameters.\n"
+    "\n"
+    "Cold proxies cannot be created or modified. Cold proxies are basically error indicators "
+    "and should be fixed by installing the respective library. Their layout state\n"
+    "reflects the last version of the layout when the cell was functional and properly\n"
+    "linked to a library. Still, they can be used in read-only applications.\n"
+    "\n"
+    "This method has been introduced in version 0.30.9.\n"
+  ) +
   gsi::method_ext ("is_library_cell?", &is_library_cell,
     "@brief Returns true, if the cell is a proxy cell pointing to a library cell\n"
     "If the cell is imported from some library, this attribute returns true.\n"
@@ -3231,10 +3314,32 @@ Class<db::Cell> decl_Cell ("db", "Cell",
   ) +
   gsi::method_ext ("library", &library,
     "@brief Returns a reference to the library from which the cell is imported\n"
-    "if the cell is not imported from a library, this reference is nil.\n"
+    "If the cell is not imported from a library, this reference is nil.\n"
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +  
+  gsi::method_ext ("library_cell_name", &library_cell_name,
+    "@brief Returns the cell name inside the library from which the cell is imported\n"
+    "If the cell is not imported from a library, the return value is an empty string.\n"
+    "This method is basically a convenience function, equivalent to taking the name\n"
+    "from \\library and \\library_cell_index.\n"
+    "Note that for PCells, 'library_cell_name' is the name of the PCell proxy cell inside "
+    "the library, not the name of the PCell.\n"
+    "\n"
+    "However, this method also works for 'cold proxies' (see \\is_cold_proxy?)\n"
+    "for which it delivers the name of cell inside the (missing) library.\n"
+    "\n"
+    "This method has been introduced in version 0.30.8.\n"
+  ) +
+  gsi::method_ext ("library_name", &library_name,
+    "@brief Returns the name of the library from which the cell is imported\n"
+    "If the cell is not imported from a library, the return value is an empty string.\n"
+    "This method is basically a convenience function, equivalent to taking the name\n"
+    "from \\library. However, this method also works for 'cold proxies' (see \\is_cold_proxy?)\n"
+    "for which it delivers the name of the (missing) library.\n"
+    "\n"
+    "This method has been introduced in version 0.30.8.\n"
+  ) +
   gsi::method_ext ("change_ref", &change_library_ref, gsi::arg ("lib_id"), gsi::arg ("lib_cell_index"),
     "@brief Changes the reference to a different library cell\n"
     "This method requires a cell that is a library reference (i.e. \\is_library_cell? is true). It will "
@@ -3307,6 +3412,9 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "If the cell is not a PCell variant or the name is not a valid PCell parameter name, "
     "the return value is nil.\n"
     "\n"
+    "This method also works for 'cold proxies' (see \\is_cold_proxy?)\n"
+    "for which it delivers the value of the given stored PCell parameter.\n"
+    "\n"
     "This method has been introduced in version 0.25."
   ) +
   gsi::method_ext ("pcell_parameters_by_name", &pcell_parameters_by_name,
@@ -3316,8 +3424,20 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "method returns an empty dictionary. This method also returns the PCell parameters if\n"
     "the cell is a PCell imported from a library.\n"
     "\n"
+    "This method also works for 'cold proxies' (see \\is_cold_proxy?)\n"
+    "for which it delivers the names and values of the stored PCell parameters.\n"
+    "\n"
     "This method has been introduced in version 0.24.\n"
   ) +   
+  gsi::method_ext ("pcell_name", &pcell_name,
+    "@brief Returns the PCell name if the cell is a PCell variant\n"
+    "If this cell is not a PCell variant, this method returns an empty string.\n"
+    "This method is basically a convenience function, equivalent to taking the name\n"
+    "from \\pcell_declaration. However, this method also works for 'cold proxies' (see \\is_cold_proxy?)\n"
+    "for which it delivers the name of the (missing) PCell.\n"
+    "\n"
+    "This method has been introduced in version 0.30.9.\n"
+  ) +
   gsi::method_ext ("pcell_declaration", &pcell_declaration,
     "@brief Returns a reference to the PCell declaration\n"
     "If this cell is not a PCell variant, this method returns nil.\n"

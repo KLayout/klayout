@@ -372,12 +372,19 @@ SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index
 
   if (m_all_cells) {
 
+    //  issue #2350: don't write cells that are to be cleanup, but in a sensitive manner
+    //  - this does a kind of virtual cleanup, but with the same rules as applied
+    //  during the normal cleanup.
+    std::set<db::cell_index_type> cleaned_cells = layout.cells_to_cleanup ();
+
     bool has_skipped_replica = false;
 
     //  check if we have skipped replicas
     if (has_context) {
       for (db::Layout::const_iterator cell = layout.begin (); cell != layout.end () && ! has_skipped_replica; ++cell) {
-        has_skipped_replica = cell->can_skip_replica ();
+        if (cell->can_skip_replica () && cleaned_cells.find (cell->cell_index ()) == cleaned_cells.end ()) {
+          has_skipped_replica = true;
+        }
       }
     }
 
@@ -386,7 +393,7 @@ SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index
     if (has_skipped_replica) {
 
       for (db::Layout::const_iterator cell = layout.begin (); cell != layout.end (); ++cell) {
-        if (cell->is_top ()) {
+        if (cell->is_top () && cleaned_cells.find (cell->cell_index ()) == cleaned_cells.end ()) {
           cells.insert (cell->cell_index ());
           collect_called_cells_unskipped (cell->cell_index (), layout, cells);
         }
@@ -394,8 +401,10 @@ SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index
 
     } else {
 
-      for (db::Layout::const_iterator cell = layout.begin (); cell != layout.end () && ! has_skipped_replica; ++cell) {
-        cells.insert (cell->cell_index ());
+      for (db::Layout::const_iterator cell = layout.begin (); cell != layout.end (); ++cell) {
+        if (cleaned_cells.find (cell->cell_index ()) == cleaned_cells.end ()) {
+          cells.insert (cell->cell_index ());
+        }
       }
 
     }

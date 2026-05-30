@@ -73,6 +73,7 @@ connect_global(ptie, "SUBSTRATE")
 
 equivalent_pins("DOESNOTEXIST", 4, 5)
 
+netlist.make_top_level_pins(false)
 netlist.simplify
 
 compare

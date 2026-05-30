@@ -1723,6 +1723,84 @@ Layout::refresh ()
   }
 }
 
+std::set<db::cell_index_type>
+Layout::cells_to_cleanup (const std::set<db::cell_index_type> &keep_always) const
+{
+  std::set<db::cell_index_type> to_clean;
+
+  //  Adressing issue #1835 (reading proxy-only GDS file renders empty layout) we do not delete
+  //  the first (non-cold) proxy if there are only proxy top cells.
+  //  We never clean up the top cell if there is a single one. This catches the case of having
+  //  defunct proxies for top cells.
+
+  if (end_top_cells () - begin_top_down () > 1) {
+
+    std::set<db::cell_index_type> keep;
+
+    for (auto c = begin_top_down (); c != end_top_cells (); ++c) {
+      const db::Cell *cptr = &cell (*c);
+      if (cptr->is_proxy ()) {
+        if (! dynamic_cast <const db::ColdProxy *> (cptr) && keep.empty ()) {
+          keep.insert (*c);
+        }
+      } else {
+        keep.clear ();
+        break;
+      }
+
+    }
+
+    for (auto c = begin_top_down (); c != end_top_cells (); ++c) {
+      if (cell (*c).is_proxy () && keep.find (*c) == keep.end () && keep_always.find (*c) == keep_always.end ()) {
+        to_clean.insert (*c);
+      }
+    }
+
+  }
+
+  //  determine all cells that can be deleted as well because they are called
+  //  by cells registered for cleanup and nowhere else
+
+  if (! to_clean.empty ()) {
+
+    //  collect the called cells
+    std::set <db::cell_index_type> all_called;
+    for (auto c = to_clean.begin (); c != to_clean.end (); ++c) {
+      cell (*c).collect_called_cells (all_called, -1);
+    }
+
+    //  remove all called cells which are not proxies - we don't want to
+    //  clean up those and their children.
+    std::set <db::cell_index_type> called;
+    for (auto c = all_called.begin (); c != all_called.end (); ++c) {
+      if (cell (*c).is_proxy ()) {
+        called.insert (*c);
+      }
+    }
+
+    //  From these cells erase all cells that have parents outside the subtree of our cell.
+    //  Make sure this is done recursively by doing this top-down.
+    for (auto c = begin_top_down (); c != end_top_down (); ++c) {
+      if (called.find (*c) != called.end ()) {
+        const db::Cell &ccref = cell (*c);
+        for (db::Cell::parent_cell_iterator pc = ccref.begin_parent_cells (); pc != ccref.end_parent_cells (); ++pc) {
+          if (to_clean.find (*pc) == to_clean.end () && called.find (*pc) == called.end ()) {
+            //  we have a parent outside the subset considered currently (either the cell was never in or
+            //  it was removed itself already): remove this cell from the set of valid subcells.
+            called.erase (*c);
+            break;
+          }
+        }
+      }
+    }
+
+    to_clean.insert (called.begin (), called.end ());
+
+  }
+
+  return to_clean;
+}
+
 void
 Layout::cleanup (const std::set<db::cell_index_type> &keep)
 {
@@ -1801,27 +1879,16 @@ Layout::cleanup (const std::set<db::cell_index_type> &keep)
 
   }
 
-  std::set<cell_index_type> cells_to_delete;
 
-  //  deleting cells may create new top cells which need to be deleted as well, hence we iterate
-  //  until there are no more cells to delete
-  while (true) {
+  //  Remove all cells that are targeted for cleanup
 
-    //  delete all cells that are top cells and are proxies. Those cells are proxies no longer required.
-    for (top_down_iterator c = begin_top_down (); c != end_top_cells (); ++c) {
-      if (cell (*c).is_proxy () && keep.find (*c) == keep.end ()) {
-        cells_to_delete.insert (*c);
-      }
+  {
+    std::set<cell_index_type> cells_to_delete = cells_to_cleanup (keep);
+    if (! cells_to_delete.empty ()) {
+      delete_cells (cells_to_delete);
     }
-
-    if (cells_to_delete.empty ()) {
-      break;
-    }
-
-    delete_cells (cells_to_delete);
-    cells_to_delete.clear ();
-
   }
+
 
   //  Try to ensure that cell names reflect the library cell names. The latter is good for LVS for example.
 
@@ -2965,12 +3032,7 @@ Layout::has_context_info (cell_index_type cell_index) const
     }
   }
 
-  const db::Cell &cref = cell (cell_index);
-  if (cref.is_proxy () && ! cref.is_top ()) {
-    return true;
-  } else {
-    return false;
-  }
+  return cell (cell_index).is_proxy ();
 }
 
 bool

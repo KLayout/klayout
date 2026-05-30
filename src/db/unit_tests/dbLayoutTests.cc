@@ -1040,3 +1040,134 @@ TEST(101_CopyTreeDoesNotModifyPolygons)
   EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {TOP}\nboundary 1 0 {0 0} {0 1000} {500 1000} {1500 1000} {1000 1000} {1000 0} {0 0}\nend_cell\nend_lib\n");
 }
 
+namespace
+{
+
+class LIBT_L
+  : public db::Library
+{
+public:
+  LIBT_L (tl::TestBase *_this)
+    : Library ()
+  {
+    set_name("L");
+    set_description("A test library.");
+
+    layout ().dbu (0.001);
+
+    db::LayerProperties p;
+
+    p.layer = 23;
+    p.datatype = 0;
+    unsigned int l_cont = layout ().insert_layer (p);
+
+    p.layer = 16;
+    p.datatype = 0;
+    unsigned int l_gate = layout ().insert_layer (p);
+
+    db::Cell &cell_a = layout ().cell (layout ().add_cell ("A"));
+    cell_a.shapes(l_cont).insert(db::Box (50, 50, 150, 150));
+    cell_a.shapes(l_gate).insert(db::Box (0, 0, 200, 1000));
+
+    db::Cell &top = layout ().cell (layout ().add_cell ("TOP"));
+    top.insert (db::CellInstArray (db::CellInst (cell_a.cell_index ()), db::Trans (db::Vector (0, 0))));
+  }
+
+  ~LIBT_L()
+  {
+    // .. nothing yet ..
+  }
+};
+
+}
+
+static std::string cells2string (const db::Layout &layout, bool top = true)
+{
+  std::string s;
+  auto cto = top ? layout.end_top_cells () : layout.end_top_down ();
+  for (auto c = layout.begin_top_down (); c != cto; ++c) {
+    if (! s.empty ()) {
+      s += ",";
+    }
+    if (layout.cell (*c).is_proxy ()) {
+      s += "*";
+    }
+    s += layout.cell_name (*c);
+  }
+  return s;
+}
+
+//  issue #2350
+TEST(101_CleanupBehavior)
+{
+  std::unique_ptr<LIBT_L> lib (new LIBT_L (_this));
+  db::LibraryManager::instance ().register_lib (lib.get ());
+
+  db::Manager m (true);
+  db::Layout layout (&m);
+  layout.do_cleanup (true);
+  layout.dbu (0.001);
+
+  db::Cell &top = layout.cell (layout.add_cell ("TOPTOP"));
+
+  db::cell_index_type lib_top = lib->layout ().cell_by_name ("TOP").second;
+  db::cell_index_type lp1 = layout.get_lib_proxy (lib.get (), lib_top);
+
+  db::Instance i1 = top.insert (db::CellInstArray (db::CellInst (lp1), db::Trans (db::Vector (0, 0))));
+
+  db::Layout layout2 = layout;
+  layout2.do_cleanup (true);
+
+  EXPECT_EQ (cells2string (layout2, false), "TOPTOP,*TOP,*A");
+  EXPECT_EQ (cells2string (layout2), "TOPTOP");
+
+  layout2.cleanup ();
+
+  //  cleanup does not change anything as the top cell is not a proxy
+  EXPECT_EQ (cells2string (layout2, false), "TOPTOP,*TOP,*A");
+  EXPECT_EQ (cells2string (layout2), "TOPTOP");
+
+  top.erase (i1);
+
+  layout2 = layout;
+  layout2.do_cleanup (true);
+
+  EXPECT_EQ (cells2string (layout2, false), "TOPTOP,*TOP,*A");
+  EXPECT_EQ (cells2string (layout2), "TOPTOP,*TOP");
+
+  layout2.cleanup ();
+
+  //  cleanup removes the proxy and subcell
+  EXPECT_EQ (cells2string (layout2, false), "TOPTOP");
+  EXPECT_EQ (cells2string (layout2), "TOPTOP");
+
+  //  now we borrow *A (LIB.A) and place it in TOPTOP
+  db::cell_index_type ci_a = layout.cell_by_name ("A").second;
+  EXPECT_EQ (layout.cell (ci_a).is_proxy (), true);
+  top.insert (db::CellInstArray (db::CellInst (ci_a), db::Trans (db::Vector (0, 0))));
+
+  layout2 = layout;
+  layout2.do_cleanup (true);
+
+  EXPECT_EQ (cells2string (layout2, false), "TOPTOP,*TOP,*A");
+  EXPECT_EQ (cells2string (layout2), "TOPTOP,*TOP");
+
+  layout2.cleanup ();
+
+  //  cleanup removes the *TOP proxy, but not *A as it is used by TOPTOP
+  EXPECT_EQ (cells2string (layout2, false), "TOPTOP,*A");
+  EXPECT_EQ (cells2string (layout2), "TOPTOP");
+
+  layout2 = layout;
+  layout2.delete_cell (top.cell_index ());  //  layout and layout2 use the same cell indexes
+  layout2.do_cleanup (true);
+
+  EXPECT_EQ (cells2string (layout2, false), "*TOP,*A");
+  EXPECT_EQ (cells2string (layout2), "*TOP");
+
+  layout2.cleanup ();
+
+  //  cleanup does not remove the proxy as it is the only top cell
+  EXPECT_EQ (cells2string (layout2, false), "*TOP,*A");
+  EXPECT_EQ (cells2string (layout2), "*TOP");
+}

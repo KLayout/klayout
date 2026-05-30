@@ -142,8 +142,8 @@ public:
     }
   }
 
-  virtual std::vector<std::string> additional_editor_options_pages () const
-  {
+  virtual std::vector<std::string> additional_editor_options_pages (lay::LayoutViewBase *) const
+  {    
     std::vector<std::string> names;
     names.push_back ("GenericEditorOptions");
     return names;
@@ -415,7 +415,7 @@ public:
     return true;
   }
 
-  virtual std::vector<std::string> additional_editor_options_pages () const
+  virtual std::vector<std::string> additional_editor_options_pages (lay::LayoutViewBase *) const
   {
     std::vector<std::string> names;
     names.push_back ("GenericEditorOptions");

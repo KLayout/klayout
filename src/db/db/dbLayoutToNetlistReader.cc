@@ -544,6 +544,7 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
           std::string param_name;
           read_word_or_quoted (param_name);
           int primary = read_int ();
+
           make_parameter (dc, param_name, primary, tl::Variant ());
 
           br.done ();

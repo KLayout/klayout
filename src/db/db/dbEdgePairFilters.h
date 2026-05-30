@@ -119,7 +119,6 @@ public:
   virtual bool wants_variants () const { return false; }
 
 private:
-  bool m_inverted;
   db::EdgeAngleChecker m_checker;
 };
 

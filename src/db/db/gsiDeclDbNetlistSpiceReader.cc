@@ -418,6 +418,22 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
   gsi::method_ext ("parse_element", &parse_element_fb, "@hide") +
   gsi::method_ext ("control_statement", &control_statement_fb, "@hide") +
   gsi::method_ext ("translate_net_name", &translate_net_name_fb, "@hide") +
+  gsi::method ("read_all_parameters=", &NetlistSpiceReaderDelegateImpl::read_all_parameters,
+    "@brief Sets a flag indicating whether to read all device parameters.\n"
+    "If this flag is set to true, all parameters of the devices are read in the default implementation. "
+    "If set to false (the default), only known parameters (i.e. only parameters declared by the device classes in the netlist) are read.\n"
+    "\n"
+    "Note, that you can customize the reader's device input also by reimplementing \\parse_element or \\element. This reimplementation may "
+    "chose to ignore the \\read_all_parameters attribute.\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
+  ) +
+  gsi::method ("read_all_parameters=", &NetlistSpiceReaderDelegateImpl::set_read_all_parameters, gsi::arg ("f"),
+    "@brief Gets a flag indicating whether to read all device parameters.\n"
+    "See \\read_all_parameters= for a description of this attribute.\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
+  ) +
   gsi::callback ("start", &NetlistSpiceReaderDelegateImpl::start, &NetlistSpiceReaderDelegateImpl::cb_start, gsi::arg ("netlist"),
     "@brief This method is called when the reader starts reading a netlist\n"
   ) +

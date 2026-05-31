@@ -47,7 +47,7 @@ NetlistSpiceReaderOptions::NetlistSpiceReaderOptions ()
 // ------------------------------------------------------------------------------------------------------
 
 NetlistSpiceReaderDelegate::NetlistSpiceReaderDelegate ()
-  : mp_netlist (0), m_options (), m_profile (), m_read_all_parameters (true)
+  : mp_netlist (0), m_options (), m_profile (), m_read_all_parameters (false)
 {
   //  .. nothing yet ..
 }

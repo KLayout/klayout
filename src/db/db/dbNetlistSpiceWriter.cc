@@ -44,7 +44,7 @@ static const char *s_not_connect_prefix = "nc_";
 // --------------------------------------------------------------------------------
 
 NetlistSpiceWriterDelegate::NetlistSpiceWriterDelegate ()
-  : mp_writer (0), mp_netlist (0), m_write_all_parameters (true)
+  : mp_writer (0), mp_netlist (0), m_write_all_parameters (false)
 {
   //  .. nothing yet ..
 }
@@ -288,9 +288,9 @@ std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, si
         double sis = i->si_scaling ();
         //  for compatibility
         if (fabs (sis * 1e6 - 1.0) < db::epsilon) {
-          os << tl::to_string (v) << "U";
+          os << tl::to_string (v.to_double ()) << "U";
         } else if (fabs (sis * 1e12 - 1.0) < db::epsilon) {
-          os << tl::to_string (v) << "P";
+          os << tl::to_string (v.to_double ()) << "P";
         } else {
           os << tl::to_string (v.to_double () * sis);
         }

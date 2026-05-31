@@ -379,7 +379,6 @@ TEST(9_DeviceMultipliers)
 
   {
     db::NetlistSpiceReader reader;
-    reader.delegate ()->set_read_all_parameters (false);
 
     tl::InputStream is (path);
     reader.read (is, nl);
@@ -426,7 +425,6 @@ TEST(9_DeviceMultipliers)
   //  read once again, this time with known classes (must not trigger issue-652)
   {
     db::NetlistSpiceReader reader;
-    reader.delegate ()->set_read_all_parameters (false);
 
     tl::InputStream is (path);
     reader.read (is, nl);
@@ -646,7 +644,6 @@ TEST(17_RecursiveExpansion)
     std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader17.cir");
 
     db::NetlistSpiceReader reader;
-    reader.delegate ()->set_read_all_parameters (false);
 
     tl::InputStream is (path);
     reader.read (is, nl);
@@ -683,7 +680,6 @@ TEST(17_RecursiveExpansion)
     std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader17b.cir");
 
     db::NetlistSpiceReader reader;
-    reader.delegate ()->set_read_all_parameters (false);
 
     tl::InputStream is (path);
     reader.read (is, nl2);
@@ -699,7 +695,6 @@ TEST(18_XSchemOutput)
   std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader18.cir");
 
   db::NetlistSpiceReader reader;
-  reader.delegate ()->set_read_all_parameters (false);
 
   tl::InputStream is (path);
   reader.read (is, nl);
@@ -735,7 +730,6 @@ TEST(19_ngspice_ref)
   std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader19.cir");
 
   db::NetlistSpiceReader reader;
-  reader.delegate ()->set_read_all_parameters (false);
 
   tl::InputStream is (path);
   reader.read (is, nl);
@@ -772,7 +766,6 @@ TEST(19b_ngspice_ref)
   std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader19b.cir");
 
   db::NetlistSpiceReader reader;
-  reader.delegate ()->set_read_all_parameters (false);
 
   tl::InputStream is (path);
   reader.read (is, nl);
@@ -809,7 +802,6 @@ TEST(20_precendence)
   std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader20.cir");
 
   db::NetlistSpiceReader reader;
-  reader.delegate ()->set_read_all_parameters (false);
 
   tl::InputStream is (path);
   reader.read (is, nl);

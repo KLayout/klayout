@@ -215,7 +215,27 @@ void Device::set_parameter_value (const std::string &name, const tl::Variant &v)
 void Device::set_parameter_value_create (const std::string &name, const tl::Variant &v, bool primary, const tl::Variant &def_value)
 {
   if (device_class ()) {
-    set_parameter_value (mp_device_class->parameter_id_for_name_create (name, primary, def_value), v);
+
+    tl::Variant dv = def_value;
+
+    if (dv.is_nil ()) {
+      if (v.is_a_string ()) {
+        dv = tl::Variant (std::string ());
+      } else if (v.is_double ()) {
+        dv = tl::Variant (0.0);
+      } else if (v.is_bool ()) {
+        dv = tl::Variant (false);
+      } else if (v.can_convert_to_long ()) {
+        dv = tl::Variant ((long) 0);
+      } else if (v.is_list ()) {
+        dv = tl::Variant::empty_list ();
+      } else if (v.is_array ()) {
+        dv = tl::Variant::empty_array ();
+      }
+    }
+
+    set_parameter_value (mp_device_class->parameter_id_for_name_create (name, primary, dv), v);
+
   }
 }
 

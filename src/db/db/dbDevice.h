@@ -307,9 +307,9 @@ public:
    *
    *  If the name is not valid, the parameter is created with the given primary
    *  flag and default value. The default value also defines the type of the
-   *  parameter.
+   *  parameter. If not given, the type will be derived from the value v.
    */
-  void set_parameter_value_create (const std::string &name, const tl::Variant &v, bool primary, const tl::Variant &def_value);
+  void set_parameter_value_create (const std::string &name, const tl::Variant &v, bool primary, const tl::Variant &def_value = tl::Variant ());
 
   /**
    *  @brief Used for device combination: join terminals with other device

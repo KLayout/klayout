@@ -379,6 +379,8 @@ TEST(9_DeviceMultipliers)
 
   {
     db::NetlistSpiceReader reader;
+    reader.delegate ()->set_read_all_parameters (false);
+
     tl::InputStream is (path);
     reader.read (is, nl);
 
@@ -424,6 +426,8 @@ TEST(9_DeviceMultipliers)
   //  read once again, this time with known classes (must not trigger issue-652)
   {
     db::NetlistSpiceReader reader;
+    reader.delegate ()->set_read_all_parameters (false);
+
     tl::InputStream is (path);
     reader.read (is, nl);
 
@@ -642,6 +646,8 @@ TEST(17_RecursiveExpansion)
     std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader17.cir");
 
     db::NetlistSpiceReader reader;
+    reader.delegate ()->set_read_all_parameters (false);
+
     tl::InputStream is (path);
     reader.read (is, nl);
   }
@@ -677,6 +683,8 @@ TEST(17_RecursiveExpansion)
     std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader17b.cir");
 
     db::NetlistSpiceReader reader;
+    reader.delegate ()->set_read_all_parameters (false);
+
     tl::InputStream is (path);
     reader.read (is, nl2);
   }
@@ -691,6 +699,8 @@ TEST(18_XSchemOutput)
   std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader18.cir");
 
   db::NetlistSpiceReader reader;
+  reader.delegate ()->set_read_all_parameters (false);
+
   tl::InputStream is (path);
   reader.read (is, nl);
 
@@ -725,6 +735,8 @@ TEST(19_ngspice_ref)
   std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader19.cir");
 
   db::NetlistSpiceReader reader;
+  reader.delegate ()->set_read_all_parameters (false);
+
   tl::InputStream is (path);
   reader.read (is, nl);
 
@@ -760,6 +772,8 @@ TEST(19b_ngspice_ref)
   std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader19b.cir");
 
   db::NetlistSpiceReader reader;
+  reader.delegate ()->set_read_all_parameters (false);
+
   tl::InputStream is (path);
   reader.read (is, nl);
 
@@ -795,6 +809,8 @@ TEST(20_precendence)
   std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader20.cir");
 
   db::NetlistSpiceReader reader;
+  reader.delegate ()->set_read_all_parameters (false);
+
   tl::InputStream is (path);
   reader.read (is, nl);
 
@@ -933,6 +949,35 @@ TEST(26_comments)
   );
 }
 
+//  String parameters, add unknown parameters
+TEST(27_MoreParameters)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader27.cir");
+
+  db::NetlistSpiceReader reader;
+  reader.delegate ()->set_read_all_parameters (true);
+
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  //  "QS" is a string parameter and as we have set "read_all_parameters" to true, the
+  //  devices will receive all the new parameters
+  EXPECT_EQ (nl.to_string (),
+    //  right now, this instance appears because it is the default incarnation - but not used
+    "circuit 'CHILD(QS=X,QX=1.5,QY=2)' (A=A,B=B);\n"
+    "  device NMOS '1' (S=A,G=B,D=A,B=B) (L=100,W=1.7,AS=0,AD=0,PS=0,PD=0,QS=X,QX=3,QY=4);\n"
+    "end;\n"
+    "circuit TOP (N1=N1,N2=N2);\n"
+    "  subcircuit 'CHILD(QS=STR_VALUE,QX=17,QY=2)' '1' (A=N1,B=N2);\n"
+    "end;\n"
+    "circuit 'CHILD(QS=STR_VALUE,QX=17,QY=2)' (A=A,B=B);\n"
+    "  device NMOS '1' (S=A,G=B,D=A,B=B) (L=100,W=1.7,AS=0,AD=0,PS=0,PD=0,QS=STR_VALUE,QX=18.5,QY=4);\n"
+    "end;\n"
+  );
+}
+
 TEST(100_ExpressionParser)
 {
   std::map<std::string, tl::Variant> vars;
@@ -1058,3 +1103,4 @@ TEST(101_ExpressionParserWithDefScale)
   EXPECT_EQ (parser.read ("1.75k").to_string (), "1750");
   EXPECT_EQ (parser.read ("2*A").to_string (), "0.035");
 }
+

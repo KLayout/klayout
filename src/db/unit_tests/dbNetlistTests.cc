@@ -354,8 +354,8 @@ TEST(1_DeviceTerminalDefinition)
   dc.add_parameter_definition (ppd2);
   EXPECT_EQ (ppd2.is_primary (), true);
 
-  EXPECT_EQ (pd2string (dc.parameter_definitions ()[0]), "P1(Parameter 1)=1 #0");
-  EXPECT_EQ (pd2string (dc.parameter_definitions ()[1]), "P2(Parameter 2)=0 #1");
+  EXPECT_EQ (pd2string (dc.parameter_definitions ()[0]), "P1(Parameter 1)=##1 #0");
+  EXPECT_EQ (pd2string (dc.parameter_definitions ()[1]), "P2(Parameter 2)=##0 #1");
 
   dc.clear_parameter_definitions ();
   EXPECT_EQ (dc.parameter_definitions ().empty (), true);
@@ -1854,7 +1854,7 @@ TEST(27_CombineSmallC)
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP (p1=n1,p2=n3);\n"
-    "  device model_name c1 (A=n1,B=n3) (C=3.66666666667e-15,A=0,P=0);\n"
+    "  device model_name c1 (A=n1,B=n3) (C=3.66666666666667e-15,A=0,P=0);\n"
     "end;\n"
   );
 }
@@ -2015,17 +2015,17 @@ TEST(28_EliminateShortedDevices)
 
   db::Device *c1 = new db::Device (device, "c1");
   circuit->add_device (c1);
-  c1->set_parameter_value (db::DeviceClassInductor::param_id_L, 1e-15);
+  c1->set_parameter_value (db::DeviceClassCapacitor::param_id_C, 1e-15);
 
   db::Device *c2 = new db::Device (device, "c2");
   circuit->add_device (c2);
-  c2->set_parameter_value (db::DeviceClassInductor::param_id_L, 2e-15);
+  c2->set_parameter_value (db::DeviceClassCapacitor::param_id_C, 2e-15);
 
-  c1->connect_terminal (db::DeviceClassInductor::terminal_id_A, n1);
-  c1->connect_terminal (db::DeviceClassInductor::terminal_id_B, n1);
+  c1->connect_terminal (db::DeviceClassCapacitor::terminal_id_A, n1);
+  c1->connect_terminal (db::DeviceClassCapacitor::terminal_id_B, n1);
 
   c2->connect_terminal (db::DeviceClassInductor::terminal_id_A, n1);
-  c2->connect_terminal (db::DeviceClassInductor::terminal_id_B, n2);
+  c2->connect_terminal (db::DeviceClassCapacitor::terminal_id_B, n2);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP (p1=n1,p2=n2);\n"
@@ -2039,6 +2039,85 @@ TEST(28_EliminateShortedDevices)
   EXPECT_EQ (nl.to_string (),
     "circuit TOP (p1=n1,p2=n2);\n"
     "  device model_name c2 (A=n1,B=n2) (C=2e-15,A=0,P=0);\n"
+    "end;\n"
+  );
+}
+
+TEST(29_DeviceParametersWithArbitraryNameAndType)
+{
+  db::Netlist nl;
+
+  db::Circuit *circuit = new db::Circuit ();
+  circuit->set_name ("TOP");
+  nl.add_circuit (circuit);
+
+  db::DeviceClass *device = new db::DeviceClassCapacitor ();
+  device->set_name ("model_name");
+  nl.add_device_class (device);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+
+  auto p1 = circuit->add_pin ("p1");
+  auto p2 = circuit->add_pin ("p2");
+
+  circuit->connect_pin (p1.id (), n1);
+  circuit->connect_pin (p2.id (), n2);
+
+  db::Device *c1 = new db::Device (device, "c1");
+  circuit->add_device (c1);
+  c1->set_parameter_value (db::DeviceClassCapacitor::param_id_C, 1e-15);
+
+  c1->connect_terminal (db::DeviceClassCapacitor::terminal_id_A, n1);
+  c1->connect_terminal (db::DeviceClassCapacitor::terminal_id_B, n1);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP (p1=n1,p2=n2);\n"
+    "  device model_name c1 (A=n1,B=n1) (C=1e-15,A=0,P=0);\n"
+    "end;\n"
+  );
+
+  c1->set_parameter_value_create ("T", std::string ("tvalue"), false, std::string ("x"));
+  c1->set_parameter_value_create ("N", 17l, true);
+  c1->set_parameter_value_create ("P1", true, false);  //  bool
+  c1->set_parameter_value_create ("P2", 0.5, false);   //  double
+  tl::Variant l = tl::Variant::empty_list ();
+  l.push (tl::Variant (0.5));
+  c1->set_parameter_value_create ("P3", l, false);     //  list
+  tl::Variant a = tl::Variant::empty_array ();
+  a.insert (tl::Variant ("k"), tl::Variant (17l));
+  c1->set_parameter_value_create ("P4", a, false);     //  array
+
+  const auto *pdt = device->parameter_definition (device->parameter_id_for_name ("T"));
+  EXPECT_EQ (pdt->is_primary (), false);
+  EXPECT_EQ (pdt->default_value ().to_parsable_string (), "'x'");
+
+  const auto *pdn = device->parameter_definition (device->parameter_id_for_name ("N"));
+  EXPECT_EQ (pdn->is_primary (), true);
+  EXPECT_EQ (pdn->default_value ().to_parsable_string (), "#0");
+
+  const auto *pd1 = device->parameter_definition (device->parameter_id_for_name ("P1"));
+  EXPECT_EQ (pd1->is_primary (), false);
+  EXPECT_EQ (pd1->default_value ().to_parsable_string (), "false");
+
+  const auto *pd2 = device->parameter_definition (device->parameter_id_for_name ("P2"));
+  EXPECT_EQ (pd2->is_primary (), false);
+  EXPECT_EQ (pd2->default_value ().to_parsable_string (), "##0");
+
+  const auto *pd3 = device->parameter_definition (device->parameter_id_for_name ("P3"));
+  EXPECT_EQ (pd3->is_primary (), false);
+  EXPECT_EQ (pd3->default_value ().to_parsable_string (), "()");
+
+  const auto *pd4 = device->parameter_definition (device->parameter_id_for_name ("P4"));
+  EXPECT_EQ (pd4->is_primary (), false);
+  EXPECT_EQ (pd4->default_value ().to_parsable_string (), "{}");
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP (p1=n1,p2=n2);\n"
+    "  device model_name c1 (A=n1,B=n1) (C=1e-15,A=0,P=0,T=tvalue,N=17,P1=true,P2=0.5,P3=(0.5),P4={k=>17});\n"
     "end;\n"
   );
 }

@@ -1,0 +1,10 @@
+
+.subckt child a b qs=x qx=1.5 qy=2
+* "qx", "qy" and "qs" are new parameters
+m1 a b a b nmos w=1.7u qs=qs qx=qx+1.5 qy=qy*2
+.ends
+
+.subckt top n1 n2
+  x1 n1 n2 child qs=str_value qx=17 qy=2
+.ends
+

@@ -395,11 +395,13 @@ Class<db::Device> decl_dbDevice (decl_dbNetlistObject, "db", "Device",
     "@brief Sets the parameter value for the given parameter name.\n"
     "If the parameter name is not valid, an exception is thrown."
   ) +
-  gsi::method ("set_parameter_create", (void (db::Device::*) (const std::string &, const tl::Variant &, bool, const tl::Variant &)) &db::Device::set_parameter_value_create, gsi::arg ("param_name"), gsi::arg ("value"), gsi::arg ("primary", true), gsi::arg ("default_value", tl::Variant (0.0), "none"),
+  gsi::method ("set_parameter_create", &db::Device::set_parameter_value_create, gsi::arg ("param_name"), gsi::arg ("value"), gsi::arg ("primary", true), gsi::arg ("default_value", tl::Variant (), "auto"),
     "@brief Sets the parameter value for the given parameter name and creates a new parameter if no parameter is present with this name.\n"
+    "If a parameter exists already with the given name, the value of that parameter is set to the given value and the other arguments are ignored. "
     "If no parameter with the given name exists in the device class's parameter table, a new parameter is created. "
-    "\\primary indicates that this parameter will be a primary one and \\default_value is the default value for this parameter. "
-    "The default value also implicitly defines the type of the parameter. A float value will create a float-type parameter, a string value for default will create a string-type parameter.\n"
+    "In this case, \\primary indicates that this parameter will be a primary one and \\default_value is the default value for this parameter. "
+    "The default value also implicitly defines the type of the parameter. A float value will create a float-type parameter, a string value for default will create a string-type parameter, "
+    "hence it should 'fit' to the parameter value. If no default value is given, an automatic default is picked depending on the parameter type."
     "\n"
     "This method has been introduced in version 0.31.0."
   ),

@@ -323,8 +323,8 @@ size_t DeviceClass::parameter_id_for_name_create (const std::string &name, bool 
   pdef.set_id (m_parameter_definitions.size () - 1);
 
   pdef.set_name (name);
-  pdef.set_default_value (default_value);
   pdef.set_is_primary (primary);
+  pdef.set_default_value (default_value);
 
   return pdef.id ();
 }

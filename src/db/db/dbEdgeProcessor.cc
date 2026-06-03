@@ -29,6 +29,13 @@
 #include "tlProgress.h"
 #include "gsi.h"
 
+#if defined(__cpp_lib_execution)
+#include <execution>
+#define PARALLEL_EXEC_POLICY std::execution::par,
+#else
+#define PARALLEL_EXEC_POLICY
+#endif
+
 #include <vector>
 #include <deque>
 #include <memory>
@@ -2237,7 +2244,7 @@ EdgeProcessor::redo_or_process (const std::vector<std::pair<db::EdgeSink *, db::
   } else {
 
     //  step 2: find intersections
-    std::sort (mp_work_edges->begin (), mp_work_edges->end (), edge_ymin_compare<db::Coord> ());
+    std::sort (PARALLEL_EXEC_POLICY mp_work_edges->begin (), mp_work_edges->end (), edge_ymin_compare<db::Coord> ());
 
     y = edge_ymin ((*mp_work_edges) [0]);
     future = mp_work_edges->begin ();
@@ -2422,7 +2429,7 @@ EdgeProcessor::redo_or_process (const std::vector<std::pair<db::EdgeSink *, db::
   gs.reset ();
   gs.reserve (n_props);
 
-  std::sort (mp_work_edges->begin (), mp_work_edges->end (), edge_ymin_compare<db::Coord> ());
+  std::sort (PARALLEL_EXEC_POLICY mp_work_edges->begin (), mp_work_edges->end (), edge_ymin_compare<db::Coord> ());
 
   y = edge_ymin ((*mp_work_edges) [0]);
 

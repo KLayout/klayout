@@ -491,6 +491,23 @@ DeviceClassResistor::DeviceClassResistor ()
   add_parameter_definition (db::DeviceParameterDefinition ("W", "Width (micrometer)", 0.0, false, 1e-6, 1.0));
   add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false, 1e-12, 2.0));
   add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
+
+  //  declare the default way of persisting in SPICE
+
+  db::DeviceClass::SpiceProfile sp;
+  sp.element = "R";
+  sp.terminal_order = { "A", "B" };
+
+  sp.incoming_parameters = {
+    { "M", "" },   //  drop
+    //  apply scaling if available
+    { "R", "(R||$)/(M||1.0)" },
+    { "A", "A*(M||1.0)" },
+    { "W", "W*(M||1.0)" },
+    { "P", "P*(M||1.0)" }
+  };
+
+  set_spice_profile (std::string ("*"), sp);
 }
 
 // ------------------------------------------------------------------------------------
@@ -503,6 +520,11 @@ DeviceClassResistorWithBulk::DeviceClassResistorWithBulk ()
 {
   set_device_combiner (new ResistorWithBulkDeviceCombiner ());
   add_terminal_definition (db::DeviceTerminalDefinition ("W", "Terminal W (well, bulk)"));
+
+  //  modify SPICE profile with W terminal
+  db::DeviceClass::SpiceProfile sp = spice_profile ("*");
+  sp.terminal_order.push_back ("W");
+  set_spice_profile (std::string ("*"), sp);
 }
 
 // ------------------------------------------------------------------------------------
@@ -528,6 +550,22 @@ DeviceClassCapacitor::DeviceClassCapacitor ()
   add_parameter_definition (db::DeviceParameterDefinition ("C", "Capacitance (Farad)", 0.0));
   add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false, 1e-12, 2.0));
   add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
+
+  //  declare the default way of persisting in SPICE
+
+  db::DeviceClass::SpiceProfile sp;
+  sp.element = "C";
+  sp.terminal_order = { "A", "B" };
+
+  sp.incoming_parameters = {
+    { "M", "" },   //  drop
+    //  apply scaling if available
+    { "C", "(C||$)*(M||1.0)" },
+    { "A", "A*(M||1.0)" },
+    { "P", "P*(M||1.0)" }
+  };
+
+  set_spice_profile (std::string ("*"), sp);
 }
 
 // ------------------------------------------------------------------------------------
@@ -540,6 +578,11 @@ DeviceClassCapacitorWithBulk::DeviceClassCapacitorWithBulk ()
 {
   set_device_combiner (new CapacitorWithBulkDeviceCombiner ());
   add_terminal_definition (db::DeviceTerminalDefinition ("W", "Terminal W (well, bulk)"));
+
+  //  modify SPICE profile with W terminal
+  db::DeviceClass::SpiceProfile sp = spice_profile ("*");
+  sp.terminal_order.push_back ("W");
+  set_spice_profile (std::string ("*"), sp);
 }
 
 // ------------------------------------------------------------------------------------
@@ -561,6 +604,20 @@ DeviceClassInductor::DeviceClassInductor ()
   equivalent_terminal_id (terminal_id_A, terminal_id_B);
 
   add_parameter_definition (db::DeviceParameterDefinition ("L", "Inductance (Henry)", 0.0));
+
+  //  declare the default way of persisting in SPICE
+
+  db::DeviceClass::SpiceProfile sp;
+  sp.element = "L";
+  sp.terminal_order = { "A", "B" };
+
+  sp.incoming_parameters = {
+    { "M", "" },   //  drop
+    //  apply scaling if available
+    { "L", "(L||$)/(M||1.0)" }
+  };
+
+  set_spice_profile (std::string ("*"), sp);
 }
 
 // ------------------------------------------------------------------------------------
@@ -582,6 +639,21 @@ DeviceClassDiode::DeviceClassDiode ()
 
   add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false, 1e-12, 2.0));
   add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
+
+  //  declare the default way of persisting in SPICE
+
+  db::DeviceClass::SpiceProfile sp;
+  sp.element = "D";
+  sp.terminal_order = { "A", "C" };
+
+  sp.incoming_parameters = {
+    { "M", "" },   //  drop
+    //  apply scaling if available
+    { "A", "A*(M||1.0)" },
+    { "P", "P*(M||1.0)" }
+  };
+
+  set_spice_profile (std::string ("*"), sp);
 }
 
 // ------------------------------------------------------------------------------------
@@ -614,6 +686,25 @@ DeviceClassMOS3Transistor::DeviceClassMOS3Transistor ()
   add_parameter_definition (db::DeviceParameterDefinition ("AD", "Drain area (square micrometer)", 0.0, false, 1e-12, 2.0));
   add_parameter_definition (db::DeviceParameterDefinition ("PS", "Source perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
   add_parameter_definition (db::DeviceParameterDefinition ("PD", "Drain perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
+
+  //  declare the default way of persisting in SPICE
+
+  db::DeviceClass::SpiceProfile sp;
+  sp.element = "M";
+  sp.terminal_order = { "D", "G", "S" };
+
+  sp.incoming_parameters = {
+    { "M", "" },   //  drop
+    //  apply scaling if available
+    { "L", "_" },
+    { "W", "W*(M||1.0)" },
+    { "AS", "AS*(M||1.0)" },
+    { "PS", "PS*(M||1.0)" },
+    { "AD", "AD*(M||1.0)" },
+    { "PD", "PD*(M||1.0)" }
+  };
+
+  set_spice_profile (std::string ("*"), sp);
 }
 
 bool
@@ -853,6 +944,11 @@ DeviceClassMOS4Transistor::DeviceClassMOS4Transistor ()
 {
   set_device_combiner (new MOS4DeviceCombiner ());
   add_terminal_definition (db::DeviceTerminalDefinition ("B", "Bulk"));
+
+  //  modify SPICE profile with B terminal
+  db::DeviceClass::SpiceProfile sp = spice_profile ("*");
+  sp.terminal_order.push_back ("B");
+  set_spice_profile (std::string ("*"), sp);
 }
 
 bool
@@ -893,6 +989,27 @@ DeviceClassBJT3Transistor::DeviceClassBJT3Transistor ()
   add_parameter_definition (db::DeviceParameterDefinition ("AC", "Collector area (square micrometer)", 0.0, false, 1e-12, 2.0));
   add_parameter_definition (db::DeviceParameterDefinition ("PC", "Collector perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
   add_parameter_definition (db::DeviceParameterDefinition ("NE", "Emitter count", 1.0, true));
+
+
+  //  declare the default way of persisting in SPICE
+
+  db::DeviceClass::SpiceProfile sp;
+  sp.element = "Q";
+  sp.terminal_order = { "C", "B", "E" };
+
+  sp.incoming_parameters = {
+    { "M", "" },   //  drop
+    //  apply scaling if available
+    { "NE", "_" },
+    { "AE", "AE*(M||1.0)" },
+    { "PE", "PE*(M||1.0)" },
+    { "AB", "AB*(M||1.0)" },
+    { "PB", "PB*(M||1.0)" },
+    { "AC", "AC*(M||1.0)" },
+    { "PC", "PC*(M||1.0)" }
+  };
+
+  set_spice_profile (std::string ("*"), sp);
 }
 
 // ------------------------------------------------------------------------------------
@@ -904,6 +1021,11 @@ DeviceClassBJT4Transistor::DeviceClassBJT4Transistor ()
 {
   set_device_combiner (new BJT4DeviceCombiner ());
   add_terminal_definition (db::DeviceTerminalDefinition ("S", "Substrate"));
+
+  //  modify SPICE profile with B terminal
+  db::DeviceClass::SpiceProfile sp = spice_profile ("*");
+  sp.terminal_order.push_back ("S");
+  set_spice_profile (std::string ("*"), sp);
 }
 
 }

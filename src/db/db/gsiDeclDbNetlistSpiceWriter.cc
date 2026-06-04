@@ -134,21 +134,12 @@ Class<NetlistSpiceWriterDelegateImpl> db_NetlistSpiceWriterDelegate ("db", "Netl
   gsi::method ("format_name", &NetlistSpiceWriterDelegateImpl::format_name, gsi::arg ("name"),
     "@brief Formats the given name in a SPICE-compatible way"
   ) +
+  //  provided for test purposes
   gsi::method ("write_all_parameters=", &NetlistSpiceWriterDelegateImpl::set_write_all_parameters,
-    "@brief Sets a flag indicating whether to write all device parameters.\n"
-    "If this flag is set to true, all parameters of the devices are written in the default implementation. "
-    "If set to false (the default), only primary parameters are written.\n"
-    "\n"
-    "Note, that you can customize the writer's device output also by reimplementing \\write_device. This reimplementation may "
-    "chose to ignore the \\write_all_parameters attribute.\n"
-    "\n"
-    "This attribute has been introduced in version 0.31.0."
+    "@hide"
   ) +
   gsi::method ("write_all_parameters=", &NetlistSpiceWriterDelegateImpl::set_write_all_parameters, gsi::arg ("f"),
-    "@brief Gets a flag indicating whether to write all device parameters.\n"
-    "See \\write_all_parameters= for a description of this attribute.\n"
-    "\n"
-    "This attribute has been introduced in version 0.31.0."
+    "@hide"
   ),
   "@brief Provides a delegate for the SPICE writer for doing special formatting for devices\n"
   "Supply a customized class to provide a specialized writing scheme for devices. "

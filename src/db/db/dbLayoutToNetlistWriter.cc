@@ -128,6 +128,13 @@ TokenizedOutput &TokenizedOutput::operator<< (const std::string &s)
   return *this;
 }
 
+TokenizedOutput &TokenizedOutput::operator<< (double d)
+{
+  emit_sep ();
+  stream () << tl::sprintf ("%.12g", d);
+  return *this;
+}
+
 // -------------------------------------------------------------------------------------------
 
 static void write_point (TokenizedOutput &out, const db::Point &pt, db::Point &ref, bool relative)
@@ -326,7 +333,7 @@ void std_writer_impl<Keys>::write_device_class (TokenizedOutput &stream, const d
       }
       const tl::Variant &def = p->default_value ();
       if (def.is_double ()) {
-        TokenizedOutput (out, Keys::param_key) << tl::to_word_or_quoted_string (p->name ()) << tl::to_string (p->is_primary () ? 1 : 0) << def.to_string ();
+        TokenizedOutput (out, Keys::param_key) << tl::to_word_or_quoted_string (p->name ()) << tl::to_string (p->is_primary () ? 1 : 0) << def.to_double ();
       } else if (def.is_long () || def.is_ulong ()) {
         TokenizedOutput (out, Keys::param_int_key) << tl::to_word_or_quoted_string (p->name ()) << tl::to_string (p->is_primary () ? 1 : 0) << def.to_string ();
       } else if (def.is_a_string ()) {
@@ -920,7 +927,7 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Device &de
 
     const tl::Variant &value = device.parameter_value (i->id ());
     if (value.is_double ()) {
-      TokenizedOutput (out, Keys::param_key) << tl::to_word_or_quoted_string (i->name ()) << value.to_string ();
+      TokenizedOutput (out, Keys::param_key) << tl::to_word_or_quoted_string (i->name ()) << value.to_double ();
     } else if (value.is_long () || value.is_ulong ()) {
       TokenizedOutput (out, Keys::param_int_key) << tl::to_word_or_quoted_string (i->name ()) << value.to_string ();
     } else if (value.is_a_string ()) {

@@ -44,7 +44,7 @@ static const char *s_not_connect_prefix = "nc_";
 // --------------------------------------------------------------------------------
 
 NetlistSpiceWriterDelegate::NetlistSpiceWriterDelegate ()
-  : mp_writer (0), mp_netlist (0), m_write_all_parameters (false)
+  : mp_writer (0), mp_netlist (0), m_write_all_parameters (true)
 {
   //  .. nothing yet ..
 }

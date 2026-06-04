@@ -219,7 +219,6 @@ private:
   std::map<std::pair<std::string, std::string>, const db::DeviceClass *> m_spice_profiles;
 
   void def_values_per_element (const std::string &element, std::map<std::string, tl::Variant> &pv);
-  double get_multiplier (const std::map<std::string, tl::Variant> &pv);
 };
 
 }

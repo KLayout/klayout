@@ -415,8 +415,69 @@ public:
    */
   struct SpiceProfile
   {
+    /**
+     *  @brief The SPICE element name to use for this device (i.e. "M", "R" etc.)
+     */
     std::string element;
+
+    /**
+     *  @brief The order the terminals are written to or read from SPICE
+     *
+     *  This is a list of valid terminal names
+     */
     std::vector<std::string> terminal_order;
+
+    /**
+     *  @brief A mapping of parameters when reading
+     *
+     *  The key is the parameter name to be produced in the device
+     *  and the value is a formula that references parameters from the SPICE card.
+     *  For caseless netlists, the parameter names need to be upper case.
+     *
+     *  Special directives apply for the key:
+     *   * "*": all pre-defined parameters plus the ones from the SPICE card
+     *   * "**": all pre-defined parameters
+     *   * "*!": all pre-defined primary parameters
+     *   * "*?": all pre-defined secondary parameters
+     *  Specific names have precendence over wildcard names.
+     *
+     *  The value is a formula in KLayout expression notation that specifies
+     *  how the value of the parameter is computed from SPICE card parameters.
+     *  SPICE parameters are referenced by name. If a parameter is not given,
+     *  the value will be the default from the parameter declaration or "nil".
+     *  So you can implement a default using "P||0.0" for example.
+     *  "_" is the value of the same SPICE parameter. This is useful for generating
+     *  catch-all rules, such as '"*": "_"' (copy all parameters).
+     *
+     *  "$" represents the direct value in expressions. This is used for
+     *  elements like "R", "L" or "C", when the component value is not given
+     *  as a named parameter, but as an explicit value.
+     *
+     *  If the formula returns a nil value, the parameter is not generated in the
+     *  device or the default value is used if the parameter is a known one.
+     */
+    std::map<std::string, std::string> incoming_parameters;
+
+    /**
+     *  @brief A mapping of parameter when writing
+     *
+     *  The key is the parameter name produced in the SPICE file
+     *  and the value is a formula that references parameters from the
+     *  device.
+     *  For caseless netlists, the parameter names need to be upper case.
+     *
+     *  Special directives apply for the key:
+     *   * "*" or "**": all parameters from the device
+     *   * "*!": all primary parameters
+     *   * "*?": all secondary parameters
+     *  Specific names have precendence over wildcard names.
+     *
+     *  The value is a formula in KLayout expression notation that specifies
+     *  how the value of the parameter is computed from device parameters.
+     *  "_" is the value of the same SPICE parameter. This is useful for generating
+     *  catch-all rules, such as '"*": "_"' (copy all parameters).
+     */
+    std::map<std::string, std::string> outgoing_parameters;
   };
 
   typedef size_t terminal_id_type;
@@ -927,6 +988,8 @@ public:
 
   virtual bool is_of (const db::DeviceClass *) const = 0;
   virtual DeviceClass *create () const = 0;
+  virtual size_t spice_num_nets () const = 0;
+  virtual const std::string &spice_element () const = 0;
 
   static DeviceClassTemplateBase *template_by_name (const std::string &name);
   static DeviceClassTemplateBase *is_a (const db::DeviceClass *dc);
@@ -946,7 +1009,10 @@ public:
   device_class_template (const std::string &name)
     : DeviceClassTemplateBase (name)
   {
-    //  .. nothing yet ..
+    T dc;
+    const db::DeviceClass::SpiceProfile &profile = dc.spice_profile ("*");
+    m_num_nets = profile.terminal_order.size ();
+    m_element = profile.element;
   }
 
   virtual bool is_of (const db::DeviceClass *dc) const
@@ -959,7 +1025,20 @@ public:
     return new T ();
   }
 
+  virtual size_t spice_num_nets () const
+  {
+    return m_num_nets;
+  }
+
+  virtual const std::string &spice_element () const
+  {
+    return m_element;
+  }
+
 private:
+  size_t m_num_nets;
+  std::string m_element;
+
   device_class_template (const device_class_template &);
   device_class_template &operator= (const device_class_template &);
 };

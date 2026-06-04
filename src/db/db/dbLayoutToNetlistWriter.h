@@ -62,6 +62,7 @@ public:
   ~TokenizedOutput ();
 
   TokenizedOutput &operator<< (const std::string &s);
+  TokenizedOutput &operator<< (double d);
 
   tl::OutputStream &stream () { return *mp_stream; }
 

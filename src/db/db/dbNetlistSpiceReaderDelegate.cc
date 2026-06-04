@@ -27,6 +27,8 @@
 #include "dbCircuit.h"
 #include "dbNetlistDeviceClasses.h"
 #include "tlLog.h"
+#include "tlExpression.h"
+#include "tlClassRegistry.h"
 
 namespace db
 {
@@ -226,7 +228,7 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, std::strin
   auto dp = m_spice_profiles.end ();
 
   if (! nn.empty ()) {
-    m_spice_profiles.find (std::make_pair (element, nn.back ()));
+    dp = m_spice_profiles.find (std::make_pair (element, nn.back ()));
   }
 
   if (dp != m_spice_profiles.end ()) {
@@ -245,27 +247,6 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, std::strin
       error (tl::sprintf (tl::to_string (tr ("Element '%s' bound to model '%s' in SPICE profile '%s' requires %d terminals, but got %d")),
                           element, model, m_profile, int (to.size ()), int (nn.size ())));
     }
-
-    //  reorder the terminals according to the terminal order
-    std::vector<std::string> nn_ordered;
-
-    const std::vector<db::DeviceTerminalDefinition> &td = dp->second->terminal_definitions ();
-    for (auto t = td.begin (); t != td.end (); ++t) {
-      int ti = -1;
-      for (auto i = to.begin (); i != to.end () && ti < 0; ++i) {
-        if (*i == t->name ()) {
-          ti = int (i - to.begin ());
-        }
-      }
-      if (ti < 0) {
-        std::string tos = tl::join (to, ",");
-        error (tl::sprintf (tl::to_string (tr ("Element '%s' bound to model '%s' in SPICE profile '%s' terminal order (%s) does not provide a binding for terminal '%s'")),
-                            element, model, m_profile, tos, t->name ()));
-      }
-      nn_ordered.push_back (nn[ti]);
-    }
-
-    nn.swap (nn_ordered);
 
   } else if (element == "X") {
 
@@ -403,27 +384,136 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, std::strin
   }
 }
 
-double NetlistSpiceReaderDelegate::get_multiplier (const std::map<std::string, tl::Variant> &params)
+namespace {
+
+class SPICEParameterEval
+  : public tl::Eval
 {
-  double mult = 1.0;
-  auto mp = params.find ("M");
-  if (mp != params.end ()) {
-    mult = mp->second.to_double ();
+public:
+  SPICEParameterEval (const std::string &name, const std::map<std::string, tl::Variant> &params, const std::map<std::string, const db::DeviceParameterDefinition *> &all_params, double value)
+    : m_name (name), m_params (params), m_all_params (all_params), m_value (value)
+  {
+    //  .. nothing yet ..
   }
 
-  if (mult < 1e-10) {
-    error (tl::sprintf (tl::to_string (tr ("Invalid multiplier value (M=%.12g) - must not be zero or negative")), mult));
+protected:
+  virtual void resolve_name (const std::string &name, const tl::EvalFunction *& /*function*/, const tl::Variant *&value, tl::Variant *& /*var*/)
+  {
+    if (name == "$") {
+      value = &m_value;
+      return;
+    }
+
+    auto p = m_params.find (name == "_" ? m_name : name);
+    if (p != m_params.end ()) {
+      value = &p->second;
+      return;
+    }
+
+    auto pp = m_all_params.find (name == "_" ? m_name : name);
+    if (pp != m_all_params.end ()) {
+      if (pp->second) {
+        value = &pp->second->default_value ();
+        return;
+      }
+    }
+
+    static tl::Variant nil;
+    value = &nil;
   }
 
-  return mult;
+private:
+  const std::string m_name;
+  const std::map<std::string, tl::Variant> &m_params;
+  const std::map<std::string, const db::DeviceParameterDefinition *> &m_all_params;
+  tl::Variant m_value;
+};
+
 }
 
-bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, tl::Variant> &pv)
+static tl::Variant
+eval_parameter_expression (const std::string &expr, const std::string &name, const std::map<std::string, tl::Variant> &params, const std::map<std::string, const db::DeviceParameterDefinition *> &all_params, double value)
 {
-  std::map<std::string, tl::Variant> params = pv;
-  std::vector<size_t> terminal_order;
+  //  shortcuts
+  if (expr.empty ()) {
 
+    return tl::Variant ();
+
+  } else if (expr == "_") {
+
+    auto p = params.find (name);
+    return p != params.end () ? p->second : tl::Variant ();
+
+  } else if (expr == "$") {
+
+    return tl::Variant (value);
+
+  } else {
+
+    //  real evaluation
+    SPICEParameterEval eval (name, params, all_params, value);
+    return eval.eval (expr);
+
+  }
+}
+
+static tl::Variant
+default_from_value (const tl::Variant &v)
+{
+  if (v.is_long () || v.is_ulong ()) {
+    return tl::Variant (long (0));
+  } else if (v.is_double ()) {
+    return tl::Variant (0.0);
+  } else if (v.is_a_string ()) {
+    return tl::Variant ("");
+  } else {
+    return tl::Variant ();
+  }
+}
+
+static std::string default_model_name (const std::string &element, size_t nets)
+{
+  for (tl::Registrar<db::DeviceClassTemplateBase>::iterator i = tl::Registrar<db::DeviceClassTemplateBase>::begin (); i != tl::Registrar<db::DeviceClassTemplateBase>::end (); ++i) {
+    if (i->spice_element () == element && i->spice_num_nets () == nets) {
+      return i->name ();
+    }
+  }
+
+  //  TODO: raise an error maybe?
+  return "UNK";
+}
+
+static db::DeviceClass *bootstrap_device_class (db::Netlist *netlist, const std::string &name, const std::string &element, size_t nets)
+{
+  for (tl::Registrar<db::DeviceClassTemplateBase>::iterator i = tl::Registrar<db::DeviceClassTemplateBase>::begin (); i != tl::Registrar<db::DeviceClassTemplateBase>::end (); ++i) {
+
+    if (i->spice_element () == element && i->spice_num_nets () == nets) {
+
+      db::DeviceClass *cls = netlist->device_class_by_name (name);
+      if (! cls) {
+        cls = i->create ();
+        cls->set_name (name);
+        netlist->add_device_class (cls);
+      }
+
+      return cls;
+
+    }
+
+  }
+
+  return 0;
+}
+
+bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, tl::Variant> &params)
+{
   std::string cn = model;
+
+  //  use a default model name if none is given
+  if (cn.empty ()) {
+    cn = default_model_name (element, nets.size ());
+  }
+
   db::DeviceClass *cls = circuit->netlist ()->device_class_by_name (cn);
 
   if (element.empty ()) {
@@ -431,248 +521,122 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     //  obtained through SPICE profile.
     tl_assert (cls != 0);
 
-  } else if (element == "R") {
-
-    if (nets.size () == 2) {
-      if (cls) {
-        if (! dynamic_cast<db::DeviceClassResistor *>(cls)) {
-          error (tl::sprintf (tl::to_string (tr ("Class %s is not a resistor device class as required by 'R' element")), cn));
-        }
-      } else {
-        if (cn.empty ()) {
-          cn = "RES";
-        }
-        cls = make_device_class<db::DeviceClassResistor> (circuit, cn);
-      }
-    } else if (nets.size () == 3) {
-      if (cls) {
-        if (! dynamic_cast<db::DeviceClassResistorWithBulk *>(cls)) {
-          error (tl::sprintf (tl::to_string (tr ("Class %s is not a three-terminal resistor device class as required by 'R' element")), cn));
-        }
-      } else {
-        if (cn.empty ()) {
-          cn = "RES3";
-        }
-        cls = make_device_class<db::DeviceClassResistorWithBulk> (circuit, cn);
-      }
-    } else {
-      error (tl::to_string (tr ("A 'R' element requires two or three nets")));
-    }
-
-    //  Apply multiplier (divider, according to ngspice manual)
-    double mult = get_multiplier (params);
-    value /= mult;
-    params["R"] = tl::Variant (value);
-
-    //  Apply multiplier to other parameters
-    static const char *scale_params[] = { "A", "P", "W" };
-    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
-      auto p = params.find (scale_params [i]);
-      if (p != params.end ()) {
-        p->second = tl::Variant (p->second.to_double () * mult);
-      }
-    }
-
-  } else if (element == "L") {
-
-    if (nets.size () == 2) {
-      if (cls) {
-        if (! dynamic_cast<db::DeviceClassInductor *>(cls)) {
-          error (tl::sprintf (tl::to_string (tr ("Class %s is not a inductor device class as required by 'L' element")), cn));
-        }
-      } else {
-        if (cn.empty ()) {
-          cn = "IND";
-        }
-        cls = make_device_class<db::DeviceClassInductor> (circuit, cn);
-      }
-    } else {
-      error (tl::to_string (tr ("A 'L' element requires two nets")));
-    }
-
-    //  Apply multiplier (divider, according to ngspice manual)
-    double mult = get_multiplier (params);
-    value /= mult;
-    params["L"] = tl::Variant (value);
-
-  } else if (element == "C") {
-
-    if (nets.size () == 2) {
-      if (cls) {
-        if (! dynamic_cast<db::DeviceClassCapacitor *>(cls)) {
-          error (tl::sprintf (tl::to_string (tr ("Class %s is not a capacitor device class as required by 'C' element")), cn));
-        }
-      } else {
-        if (cn.empty ()) {
-          cn = "CAP";
-        }
-        cls = make_device_class<db::DeviceClassCapacitor> (circuit, cn);
-      }
-    } else if (nets.size () == 3) {
-      if (cls) {
-        if (! dynamic_cast<db::DeviceClassCapacitorWithBulk *>(cls)) {
-          error (tl::sprintf (tl::to_string (tr ("Class %s is not a three-terminal capacitor device class as required by 'C' element")), cn));
-        }
-      } else {
-        if (cn.empty ()) {
-          cn = "CAP3";
-        }
-        cls = make_device_class<db::DeviceClassCapacitorWithBulk> (circuit, cn);
-      }
-    } else {
-      error (tl::to_string (tr ("A 'C' element requires two or three nets")));
-    }
-
-    //  Apply multiplier
-    double mult = get_multiplier (params);
-    value *= mult;
-    params["C"] = tl::Variant (value);
-
-    //  Apply multiplier to other parameters
-    static const char *scale_params[] = { "A", "P" };
-    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
-      auto p = params.find (scale_params [i]);
-      if (p != params.end ()) {
-        p->second = tl::Variant (p->second.to_double () * mult);
-      }
-    }
-
-  } else if (element == "D") {
-
-    if (cls) {
-      if (! dynamic_cast<db::DeviceClassDiode *>(cls)) {
-        error (tl::sprintf (tl::to_string (tr ("Class %s is not a diode device class as required by 'D' element")), cn));
-      }
-    } else {
-      if (cn.empty ()) {
-        cn = "DIODE";
-      }
-      cls = make_device_class<db::DeviceClassDiode> (circuit, cn);
-    }
-
-    //  Apply multiplier
-    double mult = get_multiplier (params);
-    static const char *scale_params[] = { "A", "P" };
-    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
-      auto p = params.find (scale_params [i]);
-      if (p != params.end ()) {
-        p->second = tl::Variant (p->second.to_double () * mult);
-      }
-    }
-
-  } else if (element == "Q") {
-
-    if (nets.size () != 3 && nets.size () != 4) {
-      error (tl::to_string (tr ("'Q' element needs to have 3 or 4 terminals")));
-    } else if (cls) {
-      if (nets.size () == 3) {
-        if (! dynamic_cast<db::DeviceClassBJT3Transistor *>(cls)) {
-          error (tl::sprintf (tl::to_string (tr ("Class %s is not a 3-terminal BJT device class as required by 'Q' element")), cn));
-        }
-      } else {
-        if (! dynamic_cast<db::DeviceClassBJT4Transistor *>(cls)) {
-          error (tl::sprintf (tl::to_string (tr ("Class %s is not a 4-terminal BJT device class as required by 'Q' element")), cn));
-        }
-      }
-    } else {
-      if (nets.size () == 3) {
-        if (cn.empty ()) {
-          cn = "BJT3";
-        }
-        cls = make_device_class<db::DeviceClassBJT3Transistor> (circuit, cn);
-      } else {
-        if (cn.empty ()) {
-          cn = "BJT4";
-        }
-        cls = make_device_class<db::DeviceClassBJT4Transistor> (circuit, cn);
-      }
-    }
-
-    //  Apply multiplier
-    double mult = get_multiplier (params);
-    static const char *scale_params[] = { "AE", "PE", "AB", "PB", "AC", "PC" };
-    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
-      auto p = params.find (scale_params [i]);
-      if (p != params.end ()) {
-        p->second = tl::Variant (p->second.to_double () * mult);
-      }
-    }
-
-  } else if (element == "M") {
-
-    if (cls) {
-      if (! dynamic_cast<db::DeviceClassMOS4Transistor *>(cls)) {
-        error (tl::sprintf (tl::to_string (tr ("Class %s is not a 4-terminal MOS device class as required by 'M' element")), cn));
-      }
-    } else {
-      if (nets.size () == 4) {
-        if (cn.empty ()) {
-          cn = "MOS4";
-        }
-        cls = make_device_class<db::DeviceClassMOS4Transistor> (circuit, cn);
-      } else {
-        error (tl::to_string (tr ("'M' element needs to have 4 terminals")));
-      }
-    }
-
-    //  Apply multiplier
-    double mult = get_multiplier (params);
-    static const char *scale_params[] = { "W", "AD", "AS", "PD", "PS" };
-    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
-      auto p = params.find (scale_params [i]);
-      if (p != params.end ()) {
-        p->second = tl::Variant (p->second.to_double () * mult);
-      }
-    }
-
-    //  issue #1304
-    terminal_order.push_back (DeviceClassMOS4Transistor::terminal_id_D);
-    terminal_order.push_back (DeviceClassMOS4Transistor::terminal_id_G);
-    terminal_order.push_back (DeviceClassMOS4Transistor::terminal_id_S);
-    terminal_order.push_back (DeviceClassMOS4Transistor::terminal_id_B);
-
   } else if (! cls) {
 
-    //  if the element class cannot be deduced from the "X" element name, raise an error
-    error (tl::sprintf (tl::to_string (tr ("Not a known element type: '%s'")), element));
+    //  create a device class from the device templates
+    cls = bootstrap_device_class (circuit->netlist (), cn, element, nets.size ());
+
+    if (! cls) {
+
+      std::vector<std::string> candidates;
+      for (tl::Registrar<db::DeviceClassTemplateBase>::iterator i = tl::Registrar<db::DeviceClassTemplateBase>::begin (); i != tl::Registrar<db::DeviceClassTemplateBase>::end (); ++i) {
+        if (i->spice_element () == element) {
+          candidates.push_back (tl::sprintf (tl::to_string (tr ("%s (%d terminals)")), i->name (), int (nets.size ())));
+        }
+      }
+
+      if (! candidates.empty ()) {
+        error (tl::sprintf (tl::to_string (tr ("No matching device found on element '%s' with '%d' terminals. Candidates are: ")), element, int (nets.size ())) + tl::join (candidates, ", "));
+      } else {
+        error (tl::sprintf (tl::to_string (tr ("Element '%s' is not understood by SPICE parser")), element, int (nets.size ())));
+      }
+
+    }
 
   }
 
+  const db::DeviceClass::SpiceProfile &sp = cls->spice_profile (m_profile);
   const std::vector<db::DeviceTerminalDefinition> &td = cls->terminal_definitions ();
+
   if (td.size () != nets.size ()) {
     error (tl::sprintf (tl::to_string (tr ("Wrong number of terminals: class '%s' expects %d, but %d are given")), cn, int (td.size ()), int (nets.size ())));
   }
 
+  //  derive the terminal order from the SPICE profile
+
+  std::vector<size_t> terminal_order;
+  terminal_order.reserve (sp.terminal_order.size ());
+
+  for (auto to = sp.terminal_order.begin (); to != sp.terminal_order.end (); ++to) {
+    if (! cls->has_terminal_with_name (*to)) {
+      error (tl::sprintf (tl::to_string (tr ("Device class '%s' and SPICE profile '%s': inconsistent terminal order - '%s' is not a valid terminal name")),
+                          cls->name (), m_profile, *to));
+    }
+    terminal_order.push_back (cls->terminal_id_for_name (*to));
+  }
+
+  if (terminal_order.size () != td.size ()) {
+    error (tl::sprintf (tl::to_string (tr ("Device class '%s' and SPICE profile '%s': inconsistent terminal order - '%d' terminals are defined, '%d' given in terminal order list")),
+                        cls->name (), m_profile, int (td.size ()), int (terminal_order.size ())));
+  }
+
+  //  create the device
+
   db::Device *device = new db::Device (cls, name);
   circuit->add_device (device);
 
-  if (terminal_order.empty ()) {
-    for (auto t = td.begin (); t != td.end (); ++t) {
-      device->connect_terminal (t->id (), nets [t - td.begin ()]);
-    }
-  } else {
-    for (auto t = terminal_order.begin (); t != terminal_order.end (); ++t) {
-      device->connect_terminal (*t, nets [t - terminal_order.begin ()]);
+  //  make the device connections
+
+  for (auto t = terminal_order.begin (); t != terminal_order.end (); ++t) {
+    device->connect_terminal (*t, nets [t - terminal_order.begin ()]);
+  }
+
+  //  transfer parameters into device
+
+  const std::map<std::string, std::string> &dict = sp.incoming_parameters;
+
+  std::map<std::string, const db::DeviceParameterDefinition *> all_params;
+
+  for (auto p = params.begin (); p != params.end (); ++p) {
+    if (cls->has_parameter_with_name (p->first)) {
+      all_params.insert (std::make_pair (p->first, cls->parameter_definition (cls->parameter_id_for_name (p->first))));
+    } else {
+      all_params.insert (std::make_pair (p->first, (const db::DeviceParameterDefinition *) 0));
     }
   }
 
-  for (auto p = params.begin (); p != params.end (); ++p) {
+  for (auto p = all_params.begin (); p != all_params.end (); ++p) {
 
-    if (cls->has_parameter_with_name (p->first)) {
+    std::map<std::string, std::string>::const_iterator id;
+    if ((id = dict.find (p->first)) != dict.end ()) {
 
-      device->set_parameter_value (p->first, p->second);
+      if (p->second) {
+        device->set_parameter_value (p->second->id (), eval_parameter_expression (p->first, id->second, params, all_params, value));
+      } else {
+        tl::Variant pv = eval_parameter_expression (p->first, id->second, params, all_params, value);
+        device->set_parameter_value_create (p->first, pv, false, default_from_value (pv));
+      }
+
+    } else if (p->second && p->second->is_primary () && (id = dict.find ("*!")) != dict.end ()) {
+
+      device->set_parameter_value (p->second->id (), eval_parameter_expression (p->first, id->second, params, all_params, value));
+
+    } else if (p->second && ! p->second->is_primary () && (id = dict.find ("*?")) != dict.end ()) {
+
+      device->set_parameter_value (p->second->id (), eval_parameter_expression (p->first, id->second, params, all_params, value));
+
+    } else if (p->second && (id = dict.find ("**")) != dict.end ()) {
+
+      device->set_parameter_value (p->second->id (), eval_parameter_expression (p->first, id->second, params, all_params, value));
+
+    } else if ((id = dict.find ("*")) != dict.end ()) {
+
+      if (p->second) {
+        device->set_parameter_value (p->second->id (), eval_parameter_expression (p->first, id->second, params, all_params, value));
+      } else {
+        tl::Variant pv = eval_parameter_expression (p->first, id->second, params, all_params, value);
+        device->set_parameter_value_create (p->first, pv, false, default_from_value (pv));
+      }
 
     } else if (m_read_all_parameters) {
 
-      //  if requested, create the parameter
-      if (p->second.is_long () || p->second.is_ulong ()) {
-        device->set_parameter_value_create (p->first, p->second, false, tl::Variant (long (0)));
-      } else if (p->second.is_double ()) {
-        device->set_parameter_value_create (p->first, p->second, false, tl::Variant (0.0));
-      } else if (p->second.is_a_string ()) {
-        device->set_parameter_value_create (p->first, p->second, false, tl::Variant (""));
+      auto pp = params.find (p->first);
+      tl_assert (pp != params.end ());
+
+      if (p->second) {
+        device->set_parameter_value (p->second->id (), pp->second);
       } else {
-        device->set_parameter_value_create (p->first, p->second, false, tl::Variant ());
+        device->set_parameter_value_create (p->first, pp->second, false, default_from_value (pp->second));
       }
 
     }
@@ -680,6 +644,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
   }
 
   apply_parameter_scaling (device);
+
   return true;
 }
 

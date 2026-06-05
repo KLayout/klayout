@@ -12,6 +12,10 @@ on:
   release:
     types: [published]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -47,8 +51,6 @@ jobs:
           haskell: true
           large-packages: true
       - uses: hmarr/debug-action@v3
-      - name: Cancel Workflow Action
-        uses: styfle/cancel-workflow-action@0.13.1
       - uses: actions/checkout@v6
       - name: ccache
         if: matrix.os != 'ubuntu-24.04-arm'

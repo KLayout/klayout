@@ -52,6 +52,13 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: '$(python.architecture)'
 
+  - task: Cache@2
+    inputs:
+      key: 'microbits | "4.0"'
+      path: $(Build.SourcesDirectory)/klayout-microbits
+      cacheHitVar: MICROBITS_CACHED
+    displayName: 'Cache KLayout microbits'
+
   # Add additional tasks to run using each Python version in the matrix above
 
   # PowerShell
@@ -62,9 +69,13 @@ jobs:
       #arguments: # Optional
       script: | # Required when targetType == Inline
         pwd
-        Invoke-WebRequest -Uri "https://www.klayout.org/downloads/klayout-microbits-4.0.zip" -OutFile klayout-microbits-4.0.zip
-        dir
-        Expand-Archive klayout-microbits-4.0.zip -DestinationPath klayout-microbits
+        if ("$(MICROBITS_CACHED)" -ne "true") {
+          Write-Host "Cache miss: downloading and extracting KLayout microbits..."
+          Invoke-WebRequest -Uri "https://www.klayout.org/downloads/klayout-microbits-4.0.zip" -OutFile klayout-microbits-4.0.zip
+          Expand-Archive klayout-microbits-4.0.zip -DestinationPath klayout-microbits
+        } else {
+          Write-Host "Cache hit: restored KLayout microbits from cache."
+        }
         dir klayout-microbits
       #errorActionPreference: 'stop' # Optional. Options: stop, continue, silentlyContinue
       #failOnStderr: false # Optional

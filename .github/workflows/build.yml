@@ -13,7 +13,34 @@ on:
     types: [published]
 
 jobs:
+  changes:
+    name: Check for source changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code == 'true' || github.event_name == 'release' }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v4
+        id: filter
+        if: github.event_name != 'release'
+        with:
+          filters: |
+            code:
+              - '!**/*.md'
+              - '!docs/**'
+              - '!samples/**'
+              - '!Jenkinsfile*'
+              - '!.travis.yml'
+              - '!dropbox-deployment.yml'
+              - '!.gitignore'
+              - '!LICENSE'
+              - '!COPYRIGHT'
+              - '!CONTRIB'
+              - '!Changelog*'
+
   build:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -106,6 +133,8 @@ jobs:
   # The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
   make_sdist:
     name: Make SDist
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6

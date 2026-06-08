@@ -640,7 +640,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
         }
       }
 
-    } else if (m_read_all_parameters) {
+    } else if (m_read_all_parameters || (p->second && dict.empty ())) {
 
       auto pp = params.find (p->first);
       tl_assert (pp != params.end ());

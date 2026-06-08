@@ -427,7 +427,8 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
     "With 'read_all_parameters' set to true, all parameters are read, even if they are not declared as fixed "
     "parameters by the device classes or as incoming parameters in their SPICE profiles.\n"
     "\n"
-    "Note, that reimplementing \"element\" may change that behavior.\n"
+    "Note, that reimplementing \"element\" may change that behavior. Also, SPICE profiles can choose "
+    "to capture all parameters through a wildcard specification, basically emulation this flag.\n"
     "\n"
     "This attribute has been introduced in version 0.31.0."
   ) +

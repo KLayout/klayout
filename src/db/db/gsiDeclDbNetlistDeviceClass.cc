@@ -316,6 +316,26 @@ static void set_terminal_order (db::DeviceClass::SpiceProfile *profile, const st
   profile->terminal_order = terminal_order;
 }
 
+static const std::map<std::string, std::string> &get_incoming_parameters (const db::DeviceClass::SpiceProfile *profile)
+{
+  return profile->incoming_parameters;
+}
+
+static void set_incoming_parameters (db::DeviceClass::SpiceProfile *profile, const std::map<std::string, std::string> &pd)
+{
+  profile->incoming_parameters = pd;
+}
+
+static const std::map<std::string, std::string> &get_outgoing_parameters (const db::DeviceClass::SpiceProfile *profile)
+{
+  return profile->outgoing_parameters;
+}
+
+static void set_outgoing_parameters (db::DeviceClass::SpiceProfile *profile, const std::map<std::string, std::string> &pd)
+{
+  profile->outgoing_parameters = pd;
+}
+
 Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "DeviceClassSpiceProfile",
   gsi::method_ext ("element", &get_element,
     "@brief Gets the SPICE element to use for this device.\n"
@@ -334,6 +354,75 @@ Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "Devi
   gsi::method_ext ("terminal_order=", &set_terminal_order,
     "@brief Sets the terminal order to use for this device.\n"
     "See \\terminal_order for a description of this attribute.\n"
+  ) +
+  gsi::method_ext ("incoming_parameters", &get_incoming_parameters,
+    "@brief Gets the mapping of incoming parameters from SPICE files\n"
+    "\n"
+    "The key is the parameter name to be produced in the device\n"
+    "and the value is a formula that references parameters from the SPICE line.\n"
+    "For caseless netlists, the parameter names need to be upper case.\n"
+    "\n"
+    "Special wildcards can be used for the key:\n"
+    "\n"
+    "@ul\n"
+    "@li \"*\": all pre-defined parameters plus the ones from the SPICE card @/li\n"
+    "@li \"**\": all pre-defined parameters @/li\n"
+    "@li \"*!\": all pre-defined primary parameters @/li\n"
+    "@li \"*?\": all pre-defined secondary parameters @/li\n"
+    "@/ul\n"
+    "\n"
+    "Specific names have precendence over wildcard names.\n"
+    "\n"
+    "The value is a formula in KLayout expression notation that specifies\n"
+    "how the value of the parameter is computed from incoming SPICE line parameters.\n"
+    "SPICE parameters are referenced by name. If a parameter is not given,\n"
+    "the value will be the default from the parameter declaration or \"nil\".\n"
+    "Hence you can implement a default value of 0 for parameter \"P\" using \"P||0.0\".\n"
+    "\"_\" is the value of the same SPICE parameter. This is useful for generating\n"
+    "catch-all rules, such as '\"*\": \"_\"' (copy all parameters).\n"
+    "\n"
+    "\"$\" represents the direct value in expressions. This is used for\n"
+    "elements like \"R\", \"L\" or \"C\", when the component value is not given\n"
+    "as a named parameter, but as an explicit value. This case is used mainly\n"
+    "internally, as the value parameter is typically also available as \"R\",\n"
+    "\"L\" or \"C\" parameter.\n"
+    "\n"
+    "If the formula returns a nil value, the parameter is not generated in the\n"
+    "device or the default value is used if the parameter is a declared one.\n"
+    "An empty expression string is equal to \"nil\", so you can drop a parameter\n"
+    "by mapping the name to an empty string, e.g. '\"M\": \"\"' (drops \"M\").\n"
+  ) +
+  gsi::method_ext ("incoming_parameters=", &set_incoming_parameters,
+    "@brief Sets the mapping of incoming parameters from SPICE files\n"
+    "See \\incoming_parameters for a description of this attribute.\n"
+  ) +
+  gsi::method_ext ("outgoing_parameters", &get_outgoing_parameters,
+    "@brief Gets the mapping tables for outgoing parameters\n"
+    "\n"
+    "This attribute is a dictionary. "
+    "The keys are the parameter name produced in the SPICE file\n"
+    "and the value is a formula that references parameters from the\n"
+    "device.\n"
+    "For caseless netlists, the parameter names need to be upper case.\n"
+    "\n"
+    "Special directives apply for the key:\n"
+    "\n"
+    "@ul\n"
+    "@li \"*\" or \"**\": all parameters from the device @/li\n"
+    "@li \"*!\": all primary parameters @/li\n"
+    "@li \"*?\": all secondary parameters @/li\n"
+    "@/ul\n"
+    "\n"
+    "Specific names have precendence over wildcard names.\n"
+    "\n"
+    "The value is a formula in KLayout expression notation that specifies\n"
+    "how the value of the parameter is computed from device parameters.\n"
+    "\"_\" is the value of the same SPICE parameter. This is useful for generating\n"
+    "catch-all rules, such as '\"*\": \"_\"' (copy all parameters).\n"
+  ) +
+  gsi::method_ext ("outgoing_parameters=", &set_outgoing_parameters,
+    "@brief Sets the mapping tables for outgoing parameters\n"
+    "See \\outgoing_parameters for a description of this attribute.\n"
   ),
   "@brief Declares a SPICE profile of a device\n"
   "Objects of this type are used inside the \\DeviceClass object to specify how the device "

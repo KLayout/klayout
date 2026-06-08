@@ -7,6 +7,44 @@ trigger:
   tags:
     include:
       - 'v*'
+  paths:
+    exclude:
+    - '*.md'
+    - docs/*
+    - samples/*
+    - etc/*
+    - macbuild/*
+    - ci-scripts/*
+    - scripts/*
+    - .travis.yml
+    - Jenkinsfile*
+    - .gitignore
+    - LICENSE
+    - COPYRIGHT
+    - CONTRIB
+    - Changelog*
+
+pr:
+  branches:
+    include:
+    - master
+    - staging
+  paths:
+    exclude:
+    - '*.md'
+    - docs/*
+    - samples/*
+    - etc/*
+    - macbuild/*
+    - ci-scripts/*
+    - scripts/*
+    - .travis.yml
+    - Jenkinsfile*
+    - .gitignore
+    - LICENSE
+    - COPYRIGHT
+    - CONTRIB
+    - Changelog*
 
 jobs:
 - job: Build

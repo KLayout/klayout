@@ -1192,7 +1192,13 @@ SpiceNetlistBuilder::subcircuit_captured (const std::string &nc_name)
 bool
 SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &prefix, const std::string &name)
 {
-  //  generic parse
+  //  low-level SPICE line parsing
+  //  - "element" will be the element characters ("R", "M", ...)
+  //  - "model" will be the model name if given or empty if no model name is there
+  //  - "value" will be the direct value (for "R", "C", "L"), usually also available as parameter "R", "C" or "L"
+  //  - "nn" will be a list of node (net) names
+  //  - "pv" will be a list of key/value pairs of the parameters
+
   std::vector<std::string> nn;
   NetlistSpiceReader::parameters_type pv;
   std::string model;
@@ -1202,6 +1208,25 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
   mp_delegate->parse_element (ex.skip (), element, model, value, nn, pv, m_variables);
 
   model = mp_netlist->normalize_name (model);
+
+  //  checks if the element is associated with a SPICE profile
+
+  const db::DeviceClass *dc = mp_delegate->device_class (element, model);
+  if (dc) {
+
+    //  check the number of terminals
+    const std::vector<std::string> &to = dc->spice_profile (mp_delegate->profile ()).terminal_order;
+    if (nn.size () != to.size ()) {
+      error (tl::sprintf (tl::to_string (tr ("Element '%s' bound to model '%s' in SPICE profile '%s' requires %d terminals, but got %d")),
+                          element, model, mp_delegate->profile (), int (to.size ()), int (nn.size ())));
+    }
+
+    //  indicates that we must not use the element name further
+    element.clear ();
+
+  }
+
+  //  obtains the db::Net objects from the net names
 
   std::vector<db::Net *> nets;
   for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
@@ -1252,7 +1277,10 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
     return true;
 
   } else {
+
+    //  element to device translation
     return mp_delegate->element (mp_netlist_circuit, element, name, model, value, nets, pv);
+
   }
 }
 

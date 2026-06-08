@@ -71,6 +71,18 @@ NetlistSpiceReaderDelegate::set_read_all_parameters (bool f)
   m_read_all_parameters = f;
 }
 
+bool
+NetlistSpiceReaderDelegate::legacy_mode () const
+{
+  return m_legacy_mode;
+}
+
+void
+NetlistSpiceReaderDelegate::set_legacy_mode (bool f)
+{
+  m_legacy_mode = f;
+}
+
 void NetlistSpiceReaderDelegate::set_netlist (db::Netlist *netlist, const std::string &profile)
 {
   m_options = NetlistSpiceReaderOptions ();
@@ -225,30 +237,7 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, std::strin
   def_values_per_element (element, pv);
   parse_element_components (s, nn, pv, variables);
 
-  auto dp = m_spice_profiles.end ();
-
-  if (! nn.empty ()) {
-    dp = m_spice_profiles.find (std::make_pair (element, nn.back ()));
-  }
-
-  if (dp != m_spice_profiles.end ()) {
-
-    //  element bound to a SPICE element through the device class
-
-    model = dp->first.second;
-    nn.pop_back ();
-
-    //  indicates that we must not use the element name further
-    element.clear ();
-
-    const std::vector<std::string> &to = dp->second->spice_profile (m_profile).terminal_order;
-
-    if (nn.size () != to.size ()) {
-      error (tl::sprintf (tl::to_string (tr ("Element '%s' bound to model '%s' in SPICE profile '%s' requires %d terminals, but got %d")),
-                          element, model, m_profile, int (to.size ()), int (nn.size ())));
-    }
-
-  } else if (element == "X") {
+  if (! m_legacy_mode && element == "X") {
 
     //  subcircuit call:
     //  Xname n1 n2 ... nn circuit [params]
@@ -432,7 +421,7 @@ private:
 }
 
 static tl::Variant
-eval_parameter_expression (const std::string &expr, const std::string &name, const std::map<std::string, tl::Variant> &params, const std::map<std::string, const db::DeviceParameterDefinition *> &all_params, double value)
+eval_parameter_expression (const std::string &name, const std::string &expr, const std::map<std::string, tl::Variant> &params, const std::map<std::string, const db::DeviceParameterDefinition *> &all_params, double value)
 {
   //  shortcuts
   if (expr.empty ()) {
@@ -503,6 +492,16 @@ static db::DeviceClass *bootstrap_device_class (db::Netlist *netlist, const std:
   }
 
   return 0;
+}
+
+const db::DeviceClass *NetlistSpiceReaderDelegate::device_class (const std::string &element, const std::string &model) const
+{
+  auto dp = m_spice_profiles.find (std::make_pair (element, model));
+  if (dp != m_spice_profiles.end ()) {
+    return dp->second;
+  } else {
+    return 0;
+  }
 }
 
 bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, tl::Variant> &params)
@@ -600,32 +599,45 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     std::map<std::string, std::string>::const_iterator id;
     if ((id = dict.find (p->first)) != dict.end ()) {
 
-      if (p->second) {
-        device->set_parameter_value (p->second->id (), eval_parameter_expression (p->first, id->second, params, all_params, value));
-      } else {
-        tl::Variant pv = eval_parameter_expression (p->first, id->second, params, all_params, value);
-        device->set_parameter_value_create (p->first, pv, false, default_from_value (pv));
+      tl::Variant pv = eval_parameter_expression (p->first, id->second, params, all_params, value);
+      if (! pv.is_nil ()) {
+        if (p->second) {
+          device->set_parameter_value (p->second->id (), pv);
+        } else {
+          device->set_parameter_value_create (p->first, pv, false, default_from_value (pv));
+        }
       }
 
     } else if (p->second && p->second->is_primary () && (id = dict.find ("*!")) != dict.end ()) {
 
-      device->set_parameter_value (p->second->id (), eval_parameter_expression (p->first, id->second, params, all_params, value));
+      tl::Variant pv = eval_parameter_expression (p->first, id->second, params, all_params, value);
+      if (! pv.is_nil ()) {
+        device->set_parameter_value (p->second->id (), pv);
+      }
 
     } else if (p->second && ! p->second->is_primary () && (id = dict.find ("*?")) != dict.end ()) {
 
-      device->set_parameter_value (p->second->id (), eval_parameter_expression (p->first, id->second, params, all_params, value));
+      tl::Variant pv = eval_parameter_expression (p->first, id->second, params, all_params, value);
+      if (! pv.is_nil ()) {
+        device->set_parameter_value (p->second->id (), pv);
+      }
 
     } else if (p->second && (id = dict.find ("**")) != dict.end ()) {
 
-      device->set_parameter_value (p->second->id (), eval_parameter_expression (p->first, id->second, params, all_params, value));
+      tl::Variant pv = eval_parameter_expression (p->first, id->second, params, all_params, value);
+      if (! pv.is_nil ()) {
+        device->set_parameter_value (p->second->id (), pv);
+      }
 
     } else if ((id = dict.find ("*")) != dict.end ()) {
 
-      if (p->second) {
-        device->set_parameter_value (p->second->id (), eval_parameter_expression (p->first, id->second, params, all_params, value));
-      } else {
-        tl::Variant pv = eval_parameter_expression (p->first, id->second, params, all_params, value);
-        device->set_parameter_value_create (p->first, pv, false, default_from_value (pv));
+      tl::Variant pv = eval_parameter_expression (p->first, id->second, params, all_params, value);
+      if (! pv.is_nil ()) {
+        if (p->second) {
+          device->set_parameter_value (p->second->id (), pv);
+        } else {
+          device->set_parameter_value_create (p->first, pv, false, default_from_value (pv));
+        }
       }
 
     } else if (m_read_all_parameters) {

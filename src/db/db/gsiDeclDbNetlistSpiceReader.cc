@@ -418,12 +418,60 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
   gsi::method_ext ("parse_element", &parse_element_fb, "@hide") +
   gsi::method_ext ("control_statement", &control_statement_fb, "@hide") +
   gsi::method_ext ("translate_net_name", &translate_net_name_fb, "@hide") +
-  //  provided for test purposes
-  gsi::method ("read_all_parameters=", &NetlistSpiceReaderDelegateImpl::read_all_parameters,
-    "@hide\n"
+  gsi::method ("read_all_parameters", &NetlistSpiceReaderDelegateImpl::read_all_parameters,
+    "@brief Gets a flag indicating whether to read all SPICE parameters\n"
+    "\n"
+    "With this flag set to false, unknown device parameters are ignored. Parameters are declared by the "
+    "device classes present in the netlist, before the reader is used. SPICE profiles can be used to "
+    "configure the parameters accepted by the SPICE reader, in addition to fixed and pre-defined parameters. "
+    "With 'read_all_parameters' set to true, all parameters are read, even if they are not declared as fixed "
+    "parameters by the device classes or as incoming parameters in their SPICE profiles.\n"
+    "\n"
+    "Note, that reimplementing \"element\" may change that behavior.\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
   ) +
   gsi::method ("read_all_parameters=", &NetlistSpiceReaderDelegateImpl::set_read_all_parameters, gsi::arg ("f"),
-    "@hide\n"
+    "@brief Sets a flag indicating whether to read all SPICE parameters\n"
+    "See \\read_all_parameters for details about this attribute.\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
+  ) +
+  gsi::method ("legacy_mode=", &NetlistSpiceReaderDelegateImpl::legacy_mode,
+    "@brief Gets a flag indicating legacy mode\n"
+    "\n"
+    "This flag controls the parsing of SPICE lines in the default\n"
+    "implementation of \"parse_element\". With this flag set to true (default),\n"
+    "the elements are restricted to their original SPICE meaning, i.e. \"R\"\n"
+    "can have two or three nets and a direct value. With this flag set to\n"
+    "false, all elements can have any number of terminals, the last entry\n"
+    "is the model and a direct value is not allowed. In non-legacy mode, all\n"
+    "elements share the same notation and can be bound to devices through\n"
+    "SPICE profiles without restrictions.\n"
+    "\n"
+    "@code\n"
+    "* Allowed always:\n"
+    "R A B MODEL R=1k\n"
+    "\n"
+    "* Allowed with legacy_mode=true (default):\n"
+    "R A B 1k\n"
+    "\n"
+    "* Allowed with legacy_mode=false with a device class named 'MODEL' and\n"
+    "* accepting 4 terminals for the 'R' element in its SPICE profile:\n"
+    "R A B C D MODEL A=17.5 P=105\n"
+    "@/code\n"
+    "\n"
+    "This flag allows configuring the SPICE reading without\n"
+    "need for reimplementing a delegate. Note, that reimplementing\n"
+    "\"parse_element\" may change that behavior.\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
+  ) +
+  gsi::method ("legacy_mode=", &NetlistSpiceReaderDelegateImpl::set_legacy_mode, gsi::arg ("f"),
+    "@brief Sets a flag indicating legacy mode\n"
+    "See \\legacy_mode for details about this attribute.\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
   ) +
   gsi::callback ("start", &NetlistSpiceReaderDelegateImpl::start, &NetlistSpiceReaderDelegateImpl::cb_start, gsi::arg ("netlist"),
     "@brief This method is called when the reader starts reading a netlist\n"
@@ -536,6 +584,11 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
   "translate device parameters.\n"
   "\n"
   "See \\NetlistSpiceReader for more details.\n"
+  "\n"
+  "'SPICE profiles' significantly reduce the need for reimplementing a SPICE reader delegate. "
+  "These profiles are descriptors attached to device classes. By pre-registering device classes "
+  "in the netlist before reading SPICE files, these classes will describe themselves and how they "
+  "like to be read from and written to SPICE files.\n"
   "\n"
   "This class has been introduced in version 0.26. Profiles have been added to the device classes in version 0.31.0."
 );

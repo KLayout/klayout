@@ -107,6 +107,26 @@ public:
   void set_read_all_parameters (bool f);
 
   /**
+   *  @brief Gets a flag indicating legacy mode
+   *
+   *  This flag controls the parsing of SPICE lines in the default
+   *  implementation of "parse_element". With this flag set to true (default),
+   *  the elements are restricted to their original meaning, i.e. "R"
+   *  can have two or three nets and a direct value. With this flag set to
+   *  false, all elements can have any number of terminals, the last entry
+   *  is the model and a direct value is not allowed.
+   *
+   *  This flag allows configuring the SPICE reading without
+   *  need to reimplementing a delegate.
+   */
+  bool legacy_mode () const;
+
+  /**
+   *  @brief Sets a flag indicating legacy mode
+   */
+  void set_legacy_mode (bool f);
+
+  /**
    *  @brief Called when the netlist reading starts
    */
   virtual void start (db::Netlist *netlist);
@@ -211,11 +231,27 @@ public:
    */
   void apply_parameter_scaling (db::Device *device) const;
 
+  /**
+   *  @brief Gets the device class registered for an element/model combination
+   *
+   *  Returns a null pointer if no such combination is registered.
+   */
+  const db::DeviceClass *device_class (const std::string &element, const std::string &model) const;
+
+  /**
+   *  @brief Gets the SPICE profile
+   */
+  const std::string &profile () const
+  {
+    return m_profile;
+  }
+
 private:
   db::Netlist *mp_netlist;
   NetlistSpiceReaderOptions m_options;
   std::string m_profile;
   bool m_read_all_parameters;
+  bool m_legacy_mode;
   std::map<std::pair<std::string, std::string>, const db::DeviceClass *> m_spice_profiles;
 
   void def_values_per_element (const std::string &element, std::map<std::string, tl::Variant> &pv);

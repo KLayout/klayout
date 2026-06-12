@@ -50,7 +50,7 @@ public:
   /**
    *  @brief Default constructor
    */
-  LEFImporter (int warn_level);
+  LEFImporter (int warn_level, bool skip_duplicate_macros);
 
   /**
    *  @brief Destructor
@@ -169,6 +169,8 @@ private:
   void read_layer (Layout &layout);
   void read_macro (Layout &layout);
   void skip_entry ();
+
+  bool m_skip_duplicate_macros;
 };
 
 }

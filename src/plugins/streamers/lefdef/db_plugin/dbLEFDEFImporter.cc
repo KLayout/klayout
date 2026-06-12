@@ -1069,7 +1069,7 @@ void
 LEFDEFReaderState::ensure_lef_importer (int warn_level)
 {
   if (! mp_lef_importer.get ()) {
-    mp_lef_importer.reset (new db::LEFImporter (warn_level));
+    mp_lef_importer.reset (new db::LEFImporter (warn_level, true));
   }
 }
 

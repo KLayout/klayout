@@ -33,8 +33,9 @@ namespace db
 // -----------------------------------------------------------------------------------
 //  LEFImporter implementation
 
-LEFImporter::LEFImporter (int warn_level)
-  : LEFDEFImporter (warn_level)
+LEFImporter::LEFImporter (int warn_level, bool skip_duplicate_macros)
+  : LEFDEFImporter (warn_level),
+    m_skip_duplicate_macros (skip_duplicate_macros)
 {
   //  .. nothing yet ..
 }
@@ -886,7 +887,58 @@ LEFImporter::read_macro (Layout &layout)
   std::string mn = get ();
 
   if (m_macros.find (mn) != m_macros.end ()) {
-    error (tl::to_string (tr ("Duplicate MACRO name: ")) + mn);
+    if (m_skip_duplicate_macros) {
+      // 1. Change error to warning
+      warn (tl::to_string (tr ("Duplicate MACRO name: ")) + mn + tl::to_string (tr (" (Skipping duplicate)")));
+
+      // Safe LEF block skipping
+      while (! at_end ()) {
+        
+        if (test ("END")) {
+          expect (mn);
+          break;
+        } else if (test ("PIN")) {
+            std::string pn = get (); // PIN always has a pin-name -> skip it
+            //tl::info << tl::to_string (tr ("Found PIN : ")) + pn;
+            while (! at_end ()) {
+              if (test ("PORT")) {
+                //tl::info << tl::to_string (tr ("Found PORT within ")) + pn;
+                while (! at_end ()) {
+                  if (test ("END")) {
+                    //tl::info << tl::to_string (tr ("Found PORT END within ")) + pn;
+                    break;
+                  } else {
+                    skip_entry ();
+                  }
+                }
+              } else if (test ("END")) {
+                std::string pn = get (); // PIN always has a pin-name -> skip it
+                //tl::info << tl::to_string (tr ("Found PIN END : ")) + pn;
+                break;
+              } else {
+                skip_entry ();
+              }
+            }
+        } else if (test ("OBS")) {
+          //tl::info << tl::to_string (tr ("Found OBS"));
+          while (! at_end ()) {
+            if (test ("END")) {
+              //tl::info << tl::to_string (tr ("Found END OBS"));
+              break;
+            } else {
+              skip_entry ();
+            }
+          }
+        } else {
+          skip_entry ();
+        }
+      }
+      tl::info << tl::to_string (tr ("Successfully skipped duplicate MACRO: ")) + mn;
+
+      return; // Exit early so we don't register or process this duplicate
+    } else {
+      error (tl::to_string (tr ("Duplicate MACRO name: ")) + mn);
+    }
   }
 
   set_cellname (mn);

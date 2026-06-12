@@ -896,6 +896,16 @@ public:
     m_map_files = f;
   }
 
+  bool skip_duplicate_macros () const
+  {
+      return m_skip_duplicate_macros;
+  }
+
+  void set_skip_duplicate_macros (bool v)
+  {
+      m_skip_duplicate_macros = v;
+  }
+
   std::string single_map_file () const
   {
     return m_map_files.empty () ? std::string () : m_map_files.front ();
@@ -1055,6 +1065,7 @@ private:
   bool m_separate_groups;
   bool m_joined_paths;
   std::vector<std::string> m_map_files;
+  bool m_skip_duplicate_macros;
   unsigned int m_macro_resolution_mode;
   bool m_read_lef_with_def;
   std::vector<std::string> m_lef_files;

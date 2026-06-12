@@ -967,6 +967,19 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n"
     "This property has been added in version 0.27. The ability to supply multiple files has been added in version 0.30.6.\n"
   ) +
+  gsi::method ("skip_duplicate_macros", &db::LEFDEFReaderOptions::skip_duplicate_macros,
+    "@brief Get the setting for wether to skip douplicate LEF Macro definitions.\n"
+    "This property describes what to do when while reading LEF files douplicate MACRO definitions are "
+    "discovered. Normally an error is issued and the import fails. When setting this flag to true a"
+    "warning is issued and the macro definition is skipped. So always the first definition of MACRO is used.\n"
+    "\n"
+    "This property has been added in version 0.30.x.\n"
+  ) +
+  gsi::method ("skip_duplicate_macros=", &db::LEFDEFReaderOptions::set_skip_duplicate_macros, gsi::arg ("skip_duplicate_macros"),
+    "@brief Sets mode how to handle douplicate MARCO definitions.\n"
+    "\n"
+    "This property has been added in version 0.30.x.\n"
+  ) + 
   gsi::method ("macro_resolution_mode", &db::LEFDEFReaderOptions::macro_resolution_mode,
     "@brief Gets the macro resolution mode (LEF macros into DEF).\n"
     "This property describes the way LEF macros are turned into layout cells when reading DEF. There "

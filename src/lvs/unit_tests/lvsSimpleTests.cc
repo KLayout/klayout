@@ -247,6 +247,7 @@ TEST(25_blackbox)
 TEST(26_enableWandL)
 {
   run_test (_this, "enable_wl1", "resistor.gds");
+  run_test (_this, "enable_wl1b", "resistor.gds");
   run_test (_this, "enable_wl2", "resistor.gds");
   run_test (_this, "enable_wl3", "resistor.gds");
 }

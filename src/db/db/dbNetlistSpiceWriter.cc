@@ -249,6 +249,7 @@ void NetlistSpiceWriterDelegate::write_device_profile (const db::Device &dev, co
   }
 
   if (! direct_value.is_nil ()) {
+    os << " ";
     write_parameter_value (os, direct_value, 1.0);
   }
 

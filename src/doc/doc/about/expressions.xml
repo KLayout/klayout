@@ -75,6 +75,39 @@ Box.new(-10, 0, 90, 60).width
   as "false" but as "true"!
   </p>
 
+  <p>
+  The "nil" value shortcuts numerical expressions the following way:
+  </p>
+
+  <pre>
+nil + x    -> nil
+x + nil    -> x
+nil + nil  -> nil
+</pre>
+
+  <p>
+  The same applies to the other binary operators "*", "/", "-", "&amp;" "|", "&lt;&lt; and "&gt;&gt;".
+  </p>
+
+  <p>
+  The unary operators "-" and "~" deliver "nil" when used with a "nil" argument.
+  </p>
+
+  <p>
+  The logical binary operators "||" and "&amp;&amp;" behave this way:
+  </p>
+
+  <pre>
+x || y      -> x if x is not "nil" or "false", y otherwise
+x || nil    -> x
+nil || x    -> x
+nil || nil  -> nil
+x &amp;&amp; y      -> y if x is not "nil" or "false", x otherwise
+x &amp;&amp; nil    -> nil
+nil &amp;&amp; x    -> nil
+nil &amp;&amp; nil  -> nil
+</pre>
+
   <h2>Constants</h2>
 
   <p>

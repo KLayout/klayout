@@ -99,7 +99,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
   const db::DeviceClass *dc = dev.device_class ();
 
   const db::DeviceClass::SpiceProfile &profile = dc->spice_profile (mp_writer->profile ());
-  if (! profile.element.empty ()) {
+  if (! profile.outgoing_parameters.empty ()) {
     write_device_profile (dev, profile);
   } else {
     write_device_default (dev);
@@ -113,7 +113,6 @@ void NetlistSpiceWriterDelegate::write_device_profile (const db::Device &dev, co
   os << profile.element;
   os << format_name (dev.expanded_name ());
   os << format_terminals_with_order (dev, profile.terminal_order);
-  os << " ";
   if (! dev.device_class ()->name ().empty ()) {
     os << " ";
     os << format_name (dev.device_class ()->name ());
@@ -152,7 +151,7 @@ void NetlistSpiceWriterDelegate::write_device_default (const db::Device &dev) co
       os << format_name (dev.device_class ()->name ());
     }
 
-    os << format_params (dev, db::DeviceClassCapacitor::param_id_C);
+    os << format_params (dev, db::DeviceClassCapacitor::param_id_C, true);
 
   } else if (ind) {
 
@@ -165,7 +164,7 @@ void NetlistSpiceWriterDelegate::write_device_default (const db::Device &dev) co
       os << " ";
       os << format_name (dev.device_class ()->name ());
     }
-    os << format_params (dev, db::DeviceClassInductor::param_id_L);
+    os << format_params (dev, db::DeviceClassInductor::param_id_L, true);
 
   } else if (res || res3) {
 
@@ -178,7 +177,7 @@ void NetlistSpiceWriterDelegate::write_device_default (const db::Device &dev) co
       os << " ";
       os << format_name (dev.device_class ()->name ());
     }
-    os << format_params (dev, db::DeviceClassResistor::param_id_R);
+    os << format_params (dev, db::DeviceClassResistor::param_id_R, true);
 
   } else if (diode) {
 
@@ -270,9 +269,12 @@ std::string NetlistSpiceWriterDelegate::format_terminals_with_order (const db::D
   return os.str ();
 }
 
-std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, size_t without_id) const
+std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, size_t without_id, bool only_primary) const
 {
-  bool only_primary = ! m_write_all_parameters;
+  if (m_write_all_parameters) {
+    only_primary = false;
+  }
+
   std::ostringstream os;
 
   const std::vector<db::DeviceParameterDefinition> &pd = dev.device_class ()->parameter_definitions ();

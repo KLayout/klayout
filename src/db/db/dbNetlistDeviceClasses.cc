@@ -502,8 +502,9 @@ DeviceClassResistor::DeviceClassResistor ()
     { "M", "" },   //  drop
     //  apply scaling if available
     { "R", "(R||$)/M" },
+    { "L", "L*M" },
+    { "W", "W" },
     { "A", "A*M" },
-    { "W", "W*M" },
     { "P", "P*M" }
   };
 

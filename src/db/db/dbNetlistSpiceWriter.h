@@ -67,7 +67,7 @@ public:
   std::string format_name (const std::string &s) const;
   std::string format_terminals (const db::Device &dev, size_t max_terminals = std::numeric_limits<size_t>::max ()) const;
   std::string format_terminals_with_order (const db::Device &dev, const std::vector<std::string> &terminal_order) const;
-  std::string format_params (const db::Device &dev, size_t without_id = std::numeric_limits<size_t>::max ()) const;
+  std::string format_params (const db::Device &dev, size_t without_id = std::numeric_limits<size_t>::max (), bool only_primary = false) const;
 
 private:
   friend class NetlistSpiceWriter;

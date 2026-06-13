@@ -4673,7 +4673,7 @@ TEST(26_JoinSymmetricNets)
   nl.combine_devices ();
   EXPECT_EQ (nl.to_string (),
     "circuit RESCUBE (A=A,B=B);\n"
-    "  device RES $10 (A=A,B=B) (R=833.333333333,L=0,W=0,A=0,P=0);\n"
+    "  device RES $10 (A=A,B=B) (R=833.333333333333,L=0,W=0,A=0,P=0);\n"
     "end;\n"
   )
 }

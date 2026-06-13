@@ -1075,7 +1075,9 @@ public:
     m_c[0]->execute (v);
     m_c[1]->execute (b);
 
-    if (v->is_user ()) {
+    if (v->is_nil ()) {
+      //  don't change
+    } else if (v->is_user ()) {
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
@@ -1131,7 +1133,9 @@ public:
     m_c[0]->execute (v);
     m_c[1]->execute (b);
 
-    if (v->is_user ()) {
+    if (v->is_nil ()) {
+      //  don't change
+    } else if (v->is_user ()) {
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
@@ -1187,7 +1191,9 @@ public:
     m_c[0]->execute (v);
     m_c[1]->execute (b);
 
-    if (v->is_user ()) {
+    if (v->is_nil () || b->is_nil ()) {
+      //  don't change
+    } else if (v->is_user ()) {
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
@@ -1249,7 +1255,9 @@ public:
     m_c[0]->execute (v);
     m_c[1]->execute (b);
 
-    if (v->is_user ()) {
+    if (v->is_nil () || b->is_nil ()) {
+      //  don't change
+    } else if (v->is_user ()) {
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
@@ -1309,7 +1317,9 @@ public:
     m_c[0]->execute (v);
     m_c[1]->execute (b);
 
-    if (v->is_user ()) {
+    if (v->is_nil () || b->is_nil ()) {
+      //  don't change
+    } else if (v->is_user ()) {
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
@@ -1399,7 +1409,9 @@ public:
     m_c[0]->execute (v);
     m_c[1]->execute (b);
 
-    if (v->is_user ()) {
+    if (v->is_nil () || b->is_nil ()) {
+      //  don't change
+    } else if (v->is_user ()) {
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
@@ -1555,7 +1567,9 @@ public:
     m_c[0]->execute (v);
     m_c[1]->execute (b);
 
-    if (v->is_user ()) {
+    if (v->is_nil () || b->is_nil ()) {
+      //  don't change
+    } else if (v->is_user ()) {
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
@@ -1611,7 +1625,9 @@ public:
     m_c[0]->execute (v);
     m_c[1]->execute (b);
 
-    if (v->is_user ()) {
+    if (v->is_nil () || b->is_nil ()) {
+      //  don't change
+    } else if (v->is_user ()) {
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
@@ -1667,7 +1683,9 @@ public:
     m_c[0]->execute (v);
     m_c[1]->execute (b);
 
-    if (v->is_user ()) {
+    if (v->is_nil () || b->is_nil ()) {
+      //  don't change
+    } else if (v->is_user ()) {
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
@@ -1802,7 +1820,9 @@ public:
   {
     m_c[0]->execute (v);
 
-    if (v->is_user ()) {
+    if (v->is_nil ()) {
+      //  don't change
+    } else if (v->is_user ()) {
 
       throw EvalError (tl::to_string (tr ("Unary minus not implemented for objects")), m_context);
       /*
@@ -1859,7 +1879,9 @@ public:
   {
     m_c[0]->execute (v);
 
-    if (v->is_user ()) {
+    if (v->is_nil ()) {
+      //  don't change
+    } else if (v->is_user ()) {
 
       throw EvalError (tl::to_string (tr ("Unary tilde not implemented for objects")), m_context);
       /*

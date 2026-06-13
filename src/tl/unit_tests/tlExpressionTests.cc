@@ -39,6 +39,14 @@ TEST(1)
   EXPECT_EQ (v.to_string (), std::string ("1"));
   v = e.parse ("1+2").execute ();
   EXPECT_EQ (v.to_string (), std::string ("3"));
+  v = e.parse ("nil+2").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("nil"));
+  v = e.parse ("2+nil").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("2"));
+  v = e.parse ("nil-2").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("nil"));
+  v = e.parse ("2-nil").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("2"));
   v = e.parse ("1.2e3").execute ();
   EXPECT_EQ (v.to_string (), std::string ("1200"));
   v = e.parse ("-0.25e-2").execute ();
@@ -49,6 +57,14 @@ TEST(1)
   EXPECT_EQ (v.to_string (), std::string ("4097"));
   v = e.parse ("0x1").execute ();
   EXPECT_EQ (v.to_string (), std::string ("1"));
+  v = e.parse ("nil*2").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("nil"));
+  v = e.parse ("2*nil").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("2"));
+  v = e.parse ("nil/2").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("nil"));
+  v = e.parse ("2/nil").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("2"));
   v = e.parse ("1-2+3").execute ();
   EXPECT_EQ (v.to_string (), std::string ("2"));
   v = e.parse ("1-4*2+3").execute ();
@@ -972,8 +988,16 @@ TEST(9)
 
   v = e.parse ("1<<2+3").execute ();
   EXPECT_EQ (v.to_string (), std::string ("32"));
+  v = e.parse ("nil<<2").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("nil"));
+  v = e.parse ("1<<nil").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("1"));
   v = e.parse ("8*8>>2+3").execute ();
   EXPECT_EQ (v.to_string (), std::string ("2"));
+  v = e.parse ("nil>>2").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("nil"));
+  v = e.parse ("1>>nil").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("1"));
 }
 
 //  bitwise ops
@@ -986,8 +1010,16 @@ TEST(10)
   EXPECT_EQ (v.to_string (), std::string ("20"));
   v = e.parse ("31&63").execute ();
   EXPECT_EQ (v.to_string (), std::string ("31"));
+  v = e.parse ("nil&63").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("nil"));
+  v = e.parse ("31&nil").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("31"));
   v = e.parse ("31^63").execute ();
   EXPECT_EQ (v.to_string (), std::string ("32"));
+  v = e.parse ("nil^63").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("nil"));
+  v = e.parse ("31^nil").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("31"));
 }
 
 //  unary ops
@@ -1000,8 +1032,12 @@ TEST(11)
   EXPECT_EQ (v.to_string (), std::string ("2"));
   v = e.parse ("~1").execute ();
   EXPECT_EQ (v.to_string (), std::string ("-2"));
+  v = e.parse ("~nil").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("nil"));
   v = e.parse ("-1").execute ();
   EXPECT_EQ (v.to_string (), std::string ("-1"));
+  v = e.parse ("-nil").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("nil"));
   v = e.parse ("--1").execute ();
   EXPECT_EQ (v.to_string (), std::string ("1"));
 }
@@ -1159,7 +1195,7 @@ TEST(16)
   v = e.parse ("'abc' ~ '(*)a(*)'").execute ();
   EXPECT_EQ (v.to_string (), std::string ("true"));
   v = e.parse ("$1+'.'+$2+'.'+$3").execute ();
-  EXPECT_EQ (v.to_string (), std::string (".bc.nil"));
+  EXPECT_EQ (v.to_string (), std::string (".bc."));
   v = e.parse ("'abc' ~ 'b*'").execute ();
   EXPECT_EQ (v.to_string (), std::string ("false"));
   v = e.parse ("'abc' !~ '*a*'").execute ();

@@ -594,6 +594,12 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     }
   }
 
+  for (auto d = dict.begin (); d != dict.end (); ++d) {
+    if (! d->first.empty () && d->first.front () != '*' && all_params.find (d->first) == all_params.end ()) {
+      all_params.insert (std::make_pair (d->first, (const db::DeviceParameterDefinition *) 0));
+    }
+  }
+
   for (auto p = all_params.begin (); p != all_params.end (); ++p) {
 
     std::map<std::string, std::string>::const_iterator id;

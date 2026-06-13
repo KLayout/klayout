@@ -1077,7 +1077,7 @@ TEST(28_SpiceProfiles3)
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
     "  device NMOS '1' (S=N3,G=N2,D=N1,B=N1) (L=0.25,W=3,AS=0,AD=0,PS=0,PD=0,X=200);\n"
-    "  device PMOS '2' (S=N3,G=N2,D=N5,B=N5) (L=0.25,W=4,AS=0,AD=0,PS=0,PD=0,Y=HELLO!);\n"
+    "  device PMOS '2' (S=N3,G=N2,D=N5,B=N5) (L=0.25,W=4,AS=0,AD=0,PS=0,PD=0,X=42,Y=HELLO!);\n"
     "end;\n"
   );
 }

@@ -501,10 +501,10 @@ DeviceClassResistor::DeviceClassResistor ()
   sp.incoming_parameters = {
     { "M", "" },   //  drop
     //  apply scaling if available
-    { "R", "(R||$)/(M||1.0)" },
-    { "A", "A*(M||1.0)" },
-    { "W", "W*(M||1.0)" },
-    { "P", "P*(M||1.0)" }
+    { "R", "(R||$)/M" },
+    { "A", "A*M" },
+    { "W", "W*M" },
+    { "P", "P*M" }
   };
 
   set_spice_profile (std::string ("*"), sp);
@@ -560,9 +560,9 @@ DeviceClassCapacitor::DeviceClassCapacitor ()
   sp.incoming_parameters = {
     { "M", "" },   //  drop
     //  apply scaling if available
-    { "C", "(C||$)*(M||1.0)" },
-    { "A", "A*(M||1.0)" },
-    { "P", "P*(M||1.0)" }
+    { "C", "(C||$)*M" },
+    { "A", "A*M" },
+    { "P", "P*M" }
   };
 
   set_spice_profile (std::string ("*"), sp);
@@ -614,7 +614,7 @@ DeviceClassInductor::DeviceClassInductor ()
   sp.incoming_parameters = {
     { "M", "" },   //  drop
     //  apply scaling if available
-    { "L", "(L||$)/(M||1.0)" }
+    { "L", "(L||$)/M" }
   };
 
   set_spice_profile (std::string ("*"), sp);
@@ -649,8 +649,8 @@ DeviceClassDiode::DeviceClassDiode ()
   sp.incoming_parameters = {
     { "M", "" },   //  drop
     //  apply scaling if available
-    { "A", "A*(M||1.0)" },
-    { "P", "P*(M||1.0)" }
+    { "A", "A*M" },
+    { "P", "P*M" }
   };
 
   set_spice_profile (std::string ("*"), sp);
@@ -697,11 +697,11 @@ DeviceClassMOS3Transistor::DeviceClassMOS3Transistor ()
     { "M", "" },   //  drop
     //  apply scaling if available
     { "L", "_" },
-    { "W", "W*(M||1.0)" },
-    { "AS", "AS*(M||1.0)" },
-    { "PS", "PS*(M||1.0)" },
-    { "AD", "AD*(M||1.0)" },
-    { "PD", "PD*(M||1.0)" }
+    { "W", "W*M" },
+    { "AS", "AS*M" },
+    { "PS", "PS*M" },
+    { "AD", "AD*M" },
+    { "PD", "PD*M" }
   };
 
   set_spice_profile (std::string ("*"), sp);
@@ -1001,12 +1001,12 @@ DeviceClassBJT3Transistor::DeviceClassBJT3Transistor ()
     { "M", "" },   //  drop
     //  apply scaling if available
     { "NE", "_" },
-    { "AE", "AE*(M||1.0)" },
-    { "PE", "PE*(M||1.0)" },
-    { "AB", "AB*(M||1.0)" },
-    { "PB", "PB*(M||1.0)" },
-    { "AC", "AC*(M||1.0)" },
-    { "PC", "PC*(M||1.0)" }
+    { "AE", "AE*M" },
+    { "PE", "PE*M" },
+    { "AB", "AB*M" },
+    { "PB", "PB*M" },
+    { "AC", "AC*M" },
+    { "PC", "PC*M" }
   };
 
   set_spice_profile (std::string ("*"), sp);

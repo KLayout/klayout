@@ -654,6 +654,8 @@ DeviceClassDiode::DeviceClassDiode ()
     { "P", "P*M" }
   };
 
+  sp.outgoing_parameters = { { "**", "_" } };
+
   set_spice_profile (std::string ("*"), sp);
 }
 
@@ -707,7 +709,7 @@ DeviceClassMOS3Transistor::DeviceClassMOS3Transistor ()
     { "PD", "PD*M" }
   };
 
-  sp.outgoing_parameters = { { "**", "_" }};
+  sp.outgoing_parameters = { { "**", "_" } };
 
   set_spice_profile (std::string ("*"), sp);
 }
@@ -1013,6 +1015,8 @@ DeviceClassBJT3Transistor::DeviceClassBJT3Transistor ()
     { "AC", "AC*M" },
     { "PC", "PC*M" }
   };
+
+  sp.outgoing_parameters = { { "**", "_" } };
 
   set_spice_profile (std::string ("*"), sp);
 }

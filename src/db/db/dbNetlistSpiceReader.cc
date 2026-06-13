@@ -1189,6 +1189,17 @@ SpiceNetlistBuilder::subcircuit_captured (const std::string &nc_name)
   }
 }
 
+static size_t min_terminals (const std::vector<std::string> &to)
+{
+  for (size_t i = 0; i < to.size (); ++i) {
+    if (to[i].front () == '?') {
+      return i;
+    }
+  }
+
+  return to.size ();
+}
+
 bool
 SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &prefix, const std::string &name)
 {
@@ -1216,9 +1227,12 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
 
     //  check the number of terminals
     const std::vector<std::string> &to = dc->spice_profile (mp_delegate->profile ()).terminal_order;
-    if (nn.size () != to.size ()) {
-      error (tl::sprintf (tl::to_string (tr ("Element '%s' bound to model '%s' in SPICE profile '%s' requires %d terminals, but got %d")),
+    if (nn.size () > to.size ()) {
+      error (tl::sprintf (tl::to_string (tr ("Element '%s' bound to model '%s' in SPICE profile '%s' requires %d terminals max, but got %d")),
                           element, model, mp_delegate->profile (), int (to.size ()), int (nn.size ())));
+    } else if (nn.size () < min_terminals (to)) {
+      error (tl::sprintf (tl::to_string (tr ("Element '%s' bound to model '%s' in SPICE profile '%s' requires %d terminals min, but got %d")),
+                          element, model, mp_delegate->profile (), int (min_terminals (to)), int (nn.size ())));
     }
 
     //  indicates that we must not use the element name further

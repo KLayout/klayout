@@ -547,16 +547,15 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
   const db::DeviceClass::SpiceProfile &sp = cls->spice_profile (m_profile);
   const std::vector<db::DeviceTerminalDefinition> &td = cls->terminal_definitions ();
 
-  if (td.size () != nets.size ()) {
-    error (tl::sprintf (tl::to_string (tr ("Wrong number of terminals: class '%s' expects %d, but %d are given")), cn, int (td.size ()), int (nets.size ())));
-  }
-
   //  derive the terminal order from the SPICE profile
 
   std::vector<size_t> terminal_order;
   terminal_order.reserve (sp.terminal_order.size ());
 
   for (auto to = sp.terminal_order.begin (); to != sp.terminal_order.end (); ++to) {
+    if (to->front () == '?') {
+      break;
+    }
     if (! cls->has_terminal_with_name (*to)) {
       error (tl::sprintf (tl::to_string (tr ("Device class '%s' and SPICE profile '%s': inconsistent terminal order - '%s' is not a valid terminal name")),
                           cls->name (), m_profile, *to));
@@ -567,6 +566,14 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
   if (terminal_order.size () != td.size ()) {
     error (tl::sprintf (tl::to_string (tr ("Device class '%s' and SPICE profile '%s': inconsistent terminal order - '%d' terminals are defined, '%d' given in terminal order list")),
                         cls->name (), m_profile, int (td.size ()), int (terminal_order.size ())));
+  }
+
+  //  check number of nets available
+
+  if (nets.size () > sp.terminal_order.size ()) {
+    error (tl::sprintf (tl::to_string (tr ("Wrong number of terminals: class '%s' expects %d max, but %d are given")), cn, int (sp.terminal_order.size ()), int (nets.size ())));
+  } else if (nets.size () < terminal_order.size ()) {
+    error (tl::sprintf (tl::to_string (tr ("Wrong number of terminals: class '%s' expects %d min, but %d are given")), cn, int (terminal_order.size ()), int (nets.size ())));
   }
 
   //  create the device

@@ -163,6 +163,14 @@ public:
     return m_with_comments;
   }
 
+  /**
+   *  @brief Gets the delegate
+   */
+  NetlistSpiceWriterDelegate *delegate ()
+  {
+    return mp_delegate.get ();
+  }
+
 private:
   friend class NetlistSpiceWriterDelegate;
 

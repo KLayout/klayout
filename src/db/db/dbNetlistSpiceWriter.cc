@@ -28,6 +28,7 @@
 #include "tlUniqueName.h"
 #include "tlTimer.h"
 #include "tlLog.h"
+#include "tlExpression.h"
 
 #include <sstream>
 #include <set>
@@ -106,18 +107,160 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
   }
 }
 
+
+static void
+write_parameter_value (std::ostringstream &os, const tl::Variant &v, double sis)
+{
+  if (v.is_double ()) {
+
+    //  for compatibility
+    if (fabs (sis * 1e6 - 1.0) < db::epsilon) {
+      os << tl::to_string (v.to_double ()) << "U";
+    } else if (fabs (sis * 1e12 - 1.0) < db::epsilon) {
+      os << tl::to_string (v.to_double ()) << "P";
+    } else {
+      os << tl::to_string (v.to_double () * sis);
+    }
+
+  } else if (v.is_long () || v.is_ulong ()) {
+    os << v.to_string ();
+  } else {
+    os << tl::to_word_or_quoted_string (v.to_string ());
+  }
+}
+
+namespace {
+
+class SPICEParameterEval
+  : public tl::Eval
+{
+public:
+  SPICEParameterEval (const std::string &name, const db::Device &dev)
+    : m_name (name), mp_dev (&dev)
+  {
+    //  .. nothing yet ..
+  }
+
+protected:
+  virtual void resolve_name (const std::string &name, const tl::EvalFunction *& /*function*/, const tl::Variant *&value, tl::Variant *& /*var*/)
+  {
+    std::string n = (name == "_" ? m_name : name);
+    if (mp_dev->device_class ()->has_parameter_with_name (n)) {
+      value = &mp_dev->parameter_value (mp_dev->device_class ()->parameter_id_for_name (n));
+      return;
+    }
+
+    static tl::Variant nil;
+    value = &nil;
+  }
+
+private:
+  const std::string m_name;
+  const db::Device *mp_dev;
+};
+
+}
+
+static tl::Variant
+eval_parameter_expression (const std::string &name, const std::string &expr, const db::Device &dev)
+{
+  //  shortcuts
+  if (expr.empty ()) {
+
+    return tl::Variant ();
+
+  } else if (expr == "_") {
+
+    if (dev.device_class ()->has_parameter_with_name (name)) {
+      auto id = dev.device_class ()->parameter_id_for_name (name);
+      return dev.parameter_value (id);
+    } else {
+      return tl::Variant ();
+    }
+
+  } else {
+
+    SPICEParameterEval eval (name, dev);
+    return eval.eval (expr);
+
+  }
+}
+
 void NetlistSpiceWriterDelegate::write_device_profile (const db::Device &dev, const db::DeviceClass::SpiceProfile &profile) const
 {
   std::ostringstream os;
 
   os << profile.element;
   os << format_name (dev.expanded_name ());
+
   os << format_terminals_with_order (dev, profile.terminal_order);
-  if (! dev.device_class ()->name ().empty ()) {
-    os << " ";
-    os << format_name (dev.device_class ()->name ());
+
+  //  transfer parameters into device
+
+  const std::map<std::string, std::string> &dict = profile.outgoing_parameters;
+
+  std::vector<std::pair<std::string, const db::DeviceParameterDefinition *> > all_params;
+  std::vector<std::pair<std::string, std::pair<tl::Variant, const db::DeviceParameterDefinition *> > > param_values;
+
+  const db::DeviceClass *cls = dev.device_class ();
+  tl_assert (cls != 0);
+
+  const auto &pdef = cls->parameter_definitions ();
+  for (auto p = pdef.begin (); p != pdef.end (); ++p) {
+    all_params.push_back (std::make_pair (p->name (), p.operator-> ()));
   }
-  os << format_params (dev);
+
+  for (auto d = dict.begin (); d != dict.end (); ++d) {
+    if (! d->first.empty () && d->first.front () != '*' && ! cls->has_parameter_with_name (d->first)) {
+      all_params.push_back (std::make_pair (d->first, (const db::DeviceParameterDefinition *) 0));
+    }
+  }
+
+  tl::Variant direct_value;
+
+  for (auto p = all_params.begin (); p != all_params.end (); ++p) {
+
+    auto id = dict.end ();
+
+    if ((id = dict.find (p->first)) != dict.end () ||
+        (p->second && p->second->is_primary () && (id = dict.find ("*!")) != dict.end ()) ||
+        (p->second && ! p->second->is_primary () && (id = dict.find ("*?")) != dict.end ()) ||
+        (p->second && (id = dict.find ("**")) != dict.end ()) ||
+        ((id = dict.find ("*")) != dict.end ()) ||
+        m_write_all_parameters) {
+
+      tl::Variant pv;
+      if (id != dict.end ()) {
+        pv = eval_parameter_expression (p->first, id->second, dev);
+      } else if (p->second) {
+        pv = dev.parameter_value (p->second->id ());
+      }
+
+      if (! pv.is_nil ()) {
+        if (p->first == "$") {
+          direct_value = pv;
+        } else {
+          param_values.push_back (std::make_pair (p->first, std::make_pair (pv, p->second)));
+        }
+      }
+
+    }
+
+  }
+
+  if (! direct_value.is_nil ()) {
+    write_parameter_value (os, direct_value, 1.0);
+  }
+
+  if (! cls->name ().empty ()) {
+    os << " ";
+    os << format_name (cls->name ());
+  }
+
+  for (auto p = param_values.begin (); p != param_values.end (); ++p) {
+    os << " " << p->first << "=";
+    write_parameter_value (os, p->second.first, p->second.second ? p->second.second->si_scaling () : 1.0);
+  }
 
   emit_line (os.str ());
 }
@@ -125,6 +268,7 @@ void NetlistSpiceWriterDelegate::write_device_profile (const db::Device &dev, co
 void NetlistSpiceWriterDelegate::write_device_default (const db::Device &dev) const
 {
   const db::DeviceClass *dc = dev.device_class ();
+  tl_assert (dc != 0);
 
   const db::DeviceClassCapacitor *cap = dynamic_cast<const db::DeviceClassCapacitor *> (dc);
   const db::DeviceClassCapacitor *cap3 = dynamic_cast<const db::DeviceClassCapacitorWithBulk *> (dc);
@@ -260,10 +404,14 @@ std::string NetlistSpiceWriterDelegate::format_terminals_with_order (const db::D
   std::ostringstream os;
 
   for (auto t = terminal_order.begin (); t != terminal_order.end (); ++t) {
-    if (! dev.device_class ()->has_terminal_with_name (*t)) {
+    std::string tn = *t;
+    if (tn.front () == '?') {
+      tn.erase (0, 1);
+    }
+    if (! dev.device_class ()->has_terminal_with_name (tn)) {
       throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid terminal name '%s' for device of class '%s' in SPICE profile '%s")), *t, dev.device_class ()->name (), mp_writer->profile ()));
     }
-    os << " " << net_to_string (dev.net_for_terminal (dev.device_class ()->terminal_id_for_name (*t)));
+    os << " " << net_to_string (dev.net_for_terminal (dev.device_class ()->terminal_id_for_name (tn)));
   }
 
   return os.str ();
@@ -283,25 +431,7 @@ std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, si
     if (i->id () != without_id && (! only_primary || i->is_primary ())) {
 
       os << " " << i->name () << "=";
-
-      const tl::Variant &v = dev.parameter_value (i->id ());
-      if (v.is_double ()) {
-
-        double sis = i->si_scaling ();
-        //  for compatibility
-        if (fabs (sis * 1e6 - 1.0) < db::epsilon) {
-          os << tl::to_string (v.to_double ()) << "U";
-        } else if (fabs (sis * 1e12 - 1.0) < db::epsilon) {
-          os << tl::to_string (v.to_double ()) << "P";
-        } else {
-          os << tl::to_string (v.to_double () * sis);
-        }
-
-      } else if (v.is_long () || v.is_ulong ()) {
-        os << v.to_string ();
-      } else {
-        os << tl::to_word_or_quoted_string (v.to_string ());
-      }
+      write_parameter_value (os, dev.parameter_value (i->id ()), i->si_scaling ());
 
     }
 

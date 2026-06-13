@@ -692,7 +692,9 @@ DeviceClassMOS3Transistor::DeviceClassMOS3Transistor ()
 
   db::DeviceClass::SpiceProfile sp;
   sp.element = "M";
-  sp.terminal_order = { "D", "G", "S" };
+  //  NOTE: we add another dummy terminal which is skipped on reader and
+  //  duplicates the S terminal in the writer.
+  sp.terminal_order = { "D", "G", "S", "?S" };
 
   sp.incoming_parameters = {
     { "M", "" },   //  drop
@@ -704,6 +706,8 @@ DeviceClassMOS3Transistor::DeviceClassMOS3Transistor ()
     { "AD", "AD*M" },
     { "PD", "PD*M" }
   };
+
+  sp.outgoing_parameters = { { "**", "_" }};
 
   set_spice_profile (std::string ("*"), sp);
 }
@@ -948,7 +952,7 @@ DeviceClassMOS4Transistor::DeviceClassMOS4Transistor ()
 
   //  modify SPICE profile with B terminal
   db::DeviceClass::SpiceProfile sp = spice_profile ("*");
-  sp.terminal_order.push_back ("B");
+  sp.terminal_order = { "D", "G", "S", "B" };
   set_spice_profile (std::string ("*"), sp);
 }
 

@@ -133,13 +133,6 @@ Class<NetlistSpiceWriterDelegateImpl> db_NetlistSpiceWriterDelegate ("db", "Netl
   ) +
   gsi::method ("format_name", &NetlistSpiceWriterDelegateImpl::format_name, gsi::arg ("name"),
     "@brief Formats the given name in a SPICE-compatible way"
-  ) +
-  //  provided for test purposes
-  gsi::method ("write_all_parameters=", &NetlistSpiceWriterDelegateImpl::set_write_all_parameters,
-    "@hide"
-  ) +
-  gsi::method ("write_all_parameters=", &NetlistSpiceWriterDelegateImpl::set_write_all_parameters, gsi::arg ("f"),
-    "@hide"
   ),
   "@brief Provides a delegate for the SPICE writer for doing special formatting for devices\n"
   "Supply a customized class to provide a specialized writing scheme for devices. "
@@ -193,6 +186,19 @@ Class<db::NetlistWriter> db_NetlistWriter ("db", "NetlistWriter",
   "This class has been introduced in version 0.26."
 );
 
+
+void set_write_all_parameters (db::NetlistSpiceWriter *writer, bool f)
+{
+  if (writer->delegate ()) {
+    writer->delegate ()->set_write_all_parameters (f);
+  }
+}
+
+bool write_all_parameters (db::NetlistSpiceWriter *writer)
+{
+  return writer->delegate () ? writer->delegate ()->write_all_parameters () : false;
+}
+
 Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "NetlistSpiceWriter",
   gsi::constructor ("new", &new_spice_writer, gsi::arg ("profile", std::string ()),
     "@brief Creates a new writer without delegate.\n"
@@ -207,6 +213,21 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
     "from the device classes in the netlist.\n"
     "\n"
     "The profile argument has been added in version 0.31.0."
+  ) +
+  gsi::method_ext ("write_all_parameters=", &set_write_all_parameters,
+    "@brief Sets a flag indicating whether to write all parameters\n"
+    "\n"
+    "With this flag all device parameters are written to the SPICE file, even ones which are normally not. "
+    "Note that a SPICE writer delegate or a SPICE profile may override the default behavior.\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
+  ) +
+  gsi::method_ext ("write_all_parameters=", &set_write_all_parameters,
+    "@brief Gets a flag indicating whether to write all parameters\n"
+    "\n"
+    "See \\write_all_parameters= for details about this attribute.\n"
+    "\n"
+    "This attribute has been introduced in version 0.31.0."
   ) +
   gsi::method ("not_connect_prefix", &db::NetlistSpiceWriter::not_connect_prefix,
     "@brief Gets the prefix used for terminals or pins which are not connected.\n"

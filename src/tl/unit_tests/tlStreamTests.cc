@@ -212,6 +212,48 @@ TEST(DataInputStreamWithSuffix)
   EXPECT_EQ (is.suffix (), "txt");
 }
 
+TEST(ImmediateTextInputStream)
+{
+  tl::InputStream is ("text:Hello, world!\nWith another line\n");
+  tl::TextInputStream tis (is);
+  EXPECT_EQ (tis.get_line (), "Hello, world!");
+  EXPECT_EQ (tis.line_number (), size_t (1));
+  EXPECT_EQ (tis.get_line (), "With another line");
+  EXPECT_EQ (tis.line_number (), size_t (2));
+  EXPECT_EQ (tis.at_end (), true);
+
+  EXPECT_EQ (is.is_explicit_suffix (), false);
+  EXPECT_EQ (is.suffix (), "");
+}
+
+TEST(ImmediateTextInputStreamWithSuffix)
+{
+  tl::InputStream is ("text:Hello, world!\nWith another line[xyz]");
+  tl::TextInputStream tis (is);
+  EXPECT_EQ (tis.get_line (), "Hello, world!");
+  EXPECT_EQ (tis.line_number (), size_t (1));
+  EXPECT_EQ (tis.get_line (), "With another line");
+  EXPECT_EQ (tis.line_number (), size_t (2));
+  EXPECT_EQ (tis.at_end (), true);
+
+  EXPECT_EQ (is.is_explicit_suffix (), true);
+  EXPECT_EQ (is.suffix (), "xyz");
+}
+
+TEST(ImmediateTextInputStreamWithoutExplicitSuffix)
+{
+  tl::InputStream is ("text:Hello, world!\nWith another line[xyz]", false /*no explicit suffix*/);
+  tl::TextInputStream tis (is);
+  EXPECT_EQ (tis.get_line (), "Hello, world!");
+  EXPECT_EQ (tis.line_number (), size_t (1));
+  EXPECT_EQ (tis.get_line (), "With another line[xyz]");
+  EXPECT_EQ (tis.line_number (), size_t (2));
+  EXPECT_EQ (tis.at_end (), true);
+
+  EXPECT_EQ (is.is_explicit_suffix (), false);
+  EXPECT_EQ (is.suffix (), "");
+}
+
 namespace
 {
 

@@ -397,6 +397,15 @@ InputStream::InputStream (const std::string &abstract_path_in, bool allow_explic
     memcpy (data_ptr, data.begin ().operator-> (), data.size ());
     mp_delegate = new InputMemoryStream (data_ptr, data.size (), true);
 
+  } else if (ex.test ("text:")) {
+
+    const char *text = ex.get ();
+    size_t text_len = abstract_path.size () - (text - abstract_path.c_str ());
+
+    char *data_ptr = new char [text_len];
+    memcpy (data_ptr, text, text_len);
+    mp_delegate = new InputMemoryStream (data_ptr, text_len, true);
+
   } else if (ex.test ("pipe:")) {
 
     mp_delegate = new InflatingInputPipe (ex.get ());

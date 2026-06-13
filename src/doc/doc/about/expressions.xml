@@ -79,11 +79,12 @@ Box.new(-10, 0, 90, 60).width
   The "nil" value shortcuts numerical expressions the following way:
   </p>
 
-  <pre>
-nil + x    -> nil
-x + nil    -> x
-nil + nil  -> nil
-</pre>
+  <table>
+  <tr><th>Expression</th><th>Result</th></tr>
+  <tr><td><tt>nil + x</tt></td><td><tt>nil</tt></td></tr>
+  <tr><td><tt>x + nil</tt></td><td><tt>x</tt></td></tr>
+  <tr><td><tt>nil + nil</tt></td><td><tt>nil</tt></td></tr>
+  </table>
 
   <p>
   The same applies to the other binary operators "*", "/", "-", "&amp;" "|", "&lt;&lt; and "&gt;&gt;".
@@ -97,16 +98,17 @@ nil + nil  -> nil
   The logical binary operators "||" and "&amp;&amp;" behave this way:
   </p>
 
-  <pre>
-x || y      -> x if x is not "nil" or "false", y otherwise
-x || nil    -> x
-nil || x    -> x
-nil || nil  -> nil
-x &amp;&amp; y      -> y if x is not "nil" or "false", x otherwise
-x &amp;&amp; nil    -> nil
-nil &amp;&amp; x    -> nil
-nil &amp;&amp; nil  -> nil
-</pre>
+  <table>
+  <tr><th>Expression</th><th>Result</th></tr>
+  <tr><td><tt>x || y</tt></td><td><tt>x if x is not "nil" or "false", y otherwise</tt></td></tr>
+  <tr><td><tt>x || nil</tt></td><td><tt>x</tt></td></tr>
+  <tr><td><tt>nil || x</tt></td><td><tt>x</tt></td></tr>
+  <tr><td><tt>nil || nil</tt></td><td><tt>nil</tt></td></tr>
+  <tr><td><tt>x &amp;&amp; y</tt></td><td><tt>y if x is not "nil" or "false", x otherwise</tt></td></tr>
+  <tr><td><tt>x &amp;&amp; nil</tt></td><td><tt>nil</tt></td></tr>
+  <tr><td><tt>nil &amp;&amp; x</tt></td><td><tt>nil</tt></td></tr>
+  <tr><td><tt>nil &amp;&amp; nil</tt></td><td><tt>nil</tt></td></tr>
+  </table>
 
   <h2>Constants</h2>
 

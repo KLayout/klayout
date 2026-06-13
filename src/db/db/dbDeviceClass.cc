@@ -230,6 +230,7 @@ DeviceClass &DeviceClass::operator= (const DeviceClass &other)
     m_supports_serial_combination = other.m_supports_serial_combination;
     m_supports_parallel_combination = other.m_supports_parallel_combination;
     m_equivalent_terminal_ids = other.m_equivalent_terminal_ids;
+    m_spice_profiles = other.m_spice_profiles;
 
   }
   return *this;

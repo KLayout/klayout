@@ -970,6 +970,118 @@ TEST(27_MoreParameters)
   );
 }
 
+TEST(28_SpiceProfiles1)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *dc1 = new db::DeviceClassMOS4Transistor ();
+  dc1->set_name ("NMOS");
+  nl.add_device_class (dc1);
+
+  db::DeviceClass *dc2 = new db::DeviceClassMOS4Transistor ();
+  dc2->set_name ("PMOS");
+  nl.add_device_class (dc2);
+
+  db::NetlistSpiceReader reader;
+
+  tl::InputStream is (
+    "text:\n"
+    ".subckt TOP\n"
+    "M1 n1 n2 n3 n1 nmos w=1.5u l=0.25u m=2 x=5*16\n"
+    "M2 n5 n2 n3 n5 pmos w=4.0u l=0.25u y=hello\n"
+    ".ends\n"
+  );
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP ();\n"
+    "  device NMOS '1' (S=N3,G=N2,D=N1,B=N1) (L=0.25,W=3,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS '2' (S=N3,G=N2,D=N5,B=N5) (L=0.25,W=4,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}
+
+TEST(28_SpiceProfiles2)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *dc1 = new db::DeviceClassMOS4Transistor ();
+  dc1->set_name ("NMOS");
+  nl.add_device_class (dc1);
+
+  db::DeviceClass *dc2 = new db::DeviceClassMOS4Transistor ();
+  dc2->set_name ("PMOS");
+  nl.add_device_class (dc2);
+
+  db::NetlistSpiceReader reader;
+  reader.delegate ()->set_read_all_parameters (true);
+
+  tl::InputStream is (
+    "text:\n"
+    ".subckt TOP\n"
+    "M1 n1 n2 n3 n1 nmos w=1.5u l=0.25u m=2 x=5*16\n"
+    "M2 n5 n2 n3 n5 pmos w=4.0u l=0.25u y=hello\n"
+    ".ends\n"
+  );
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    //  with "read_all_parameters" we also see the unknown ones
+    "circuit TOP ();\n"
+    "  device NMOS '1' (S=N3,G=N2,D=N1,B=N1) (L=0.25,W=3,AS=0,AD=0,PS=0,PD=0,X=80);\n"
+    "  device PMOS '2' (S=N3,G=N2,D=N5,B=N5) (L=0.25,W=4,AS=0,AD=0,PS=0,PD=0,Y=HELLO);\n"
+    "end;\n"
+  );
+}
+
+TEST(28_SpiceProfiles3)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *dc1 = new db::DeviceClassMOS4Transistor ();
+  dc1->set_name ("NMOS");
+
+  auto sp = dc1->spice_profile ("");
+  sp.incoming_parameters.insert (std::make_pair ("X", "X?X*2.5:42.0"));
+  sp.incoming_parameters.insert (std::make_pair ("Y", "Y+'!'"));
+  dc1->set_spice_profile ("NON_DEFAULT_PROFILE", sp);
+
+  EXPECT_EQ (dc1->has_spice_profile ("NON_DEFAULT_PROFILE"), true);
+  EXPECT_EQ (dc1->spice_profile ("NON_DEFAULT_PROFILE").incoming_parameters.size (), size_t (9));
+  EXPECT_EQ (dc1->spice_profile ("NON_DEFAULT_PROFILE").terminal_order.size (), size_t (4));
+
+  nl.add_device_class (dc1);
+
+  db::DeviceClass *dc2 = dc1->clone ();
+
+  EXPECT_EQ (dc2->has_spice_profile ("NON_DEFAULT_PROFILE"), true);
+  EXPECT_EQ (dc2->spice_profile ("NON_DEFAULT_PROFILE").incoming_parameters.size (), size_t (9));
+  EXPECT_EQ (dc2->spice_profile ("NON_DEFAULT_PROFILE").terminal_order.size (), size_t (4));
+
+  dc2->set_name ("PMOS");
+  nl.add_device_class (dc2);
+
+  db::NetlistSpiceReader reader;
+  reader.set_profile ("NON_DEFAULT_PROFILE");
+  EXPECT_EQ (reader.profile (), "NON_DEFAULT_PROFILE");
+
+  tl::InputStream is (
+    "text:\n"
+    ".subckt TOP\n"
+    "M1 n1 n2 n3 n1 nmos w=1.5u l=0.25u m=2 x=5*16\n"
+    "M2 n5 n2 n3 n5 pmos w=4.0u l=0.25u y=hello\n"
+    ".ends\n"
+  );
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP ();\n"
+    "  device NMOS '1' (S=N3,G=N2,D=N1,B=N1) (L=0.25,W=3,AS=0,AD=0,PS=0,PD=0,X=200);\n"
+    "  device PMOS '2' (S=N3,G=N2,D=N5,B=N5) (L=0.25,W=4,AS=0,AD=0,PS=0,PD=0,Y=HELLO!);\n"
+    "end;\n"
+  );
+}
+
 TEST(100_ExpressionParser)
 {
   std::map<std::string, tl::Variant> vars;

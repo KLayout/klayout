@@ -355,8 +355,8 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, std::strin
     nn.pop_back ();
 
     if (element == "M") {
-      if (nn.size () != 4) {
-        error (tl::to_string (tr ("'M' element must have four nodes")));
+      if (nn.size () != 3 && nn.size () != 4) {
+        error (tl::to_string (tr ("'M' element must have three or four nodes")));
       }
     } else if (element == "Q") {
       if (nn.size () != 3 && nn.size () != 4) {

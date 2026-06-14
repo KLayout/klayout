@@ -582,7 +582,7 @@ TEST(14_IncludeWithError)
     reader.read (is, nl);
     EXPECT_EQ (true, false);  //  must not happen
   } catch (tl::Exception &ex) {
-    EXPECT_EQ (ex.msg (), "'M' element must have four nodes in " + std::string (tl::absolute_file_path (tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader14x.cir"))) + ", line 3");
+    EXPECT_EQ (ex.msg (), "'M' element must have three or four nodes in " + std::string (tl::absolute_file_path (tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader14x.cir"))) + ", line 3");
   }
 }
 
@@ -1001,7 +1001,7 @@ TEST(28_SpiceProfiles1)
   );
 }
 
-TEST(28_SpiceProfiles2)
+TEST(29_SpiceProfiles2)
 {
   db::Netlist nl;
 
@@ -1034,7 +1034,7 @@ TEST(28_SpiceProfiles2)
   );
 }
 
-TEST(28_SpiceProfiles3)
+TEST(30_SpiceProfiles3)
 {
   db::Netlist nl;
 
@@ -1080,6 +1080,62 @@ TEST(28_SpiceProfiles3)
     "  device PMOS '2' (S=N3,G=N2,D=N5,B=N5) (L=0.25,W=4,AS=0,AD=0,PS=0,PD=0,X=42,Y=HELLO!);\n"
     "end;\n"
   );
+}
+
+TEST(31_SpiceProfiles4)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *dc1 = new db::DeviceClassMOS3Transistor ();
+  dc1->set_name ("NMOS");
+  nl.add_device_class (dc1);
+
+  db::Netlist nl2 = nl;
+
+  //  4th terminal is optional as terminal order is [ "D", "G", "S", "?S" ]
+  {
+    db::NetlistSpiceReader reader;
+
+    tl::InputStream is (
+      "text:\n"
+      ".subckt TOP\n"
+      "M1 n1 n2 n3 nmos w=1.5u l=0.25u m=2 x=5*16\n"
+      //  4th terminal is not checked right now as S/D are mutable
+      "M2 n1 n2 n3 n1 nmos w=1.5u l=0.25u x=5*16\n"
+      ".ends\n"
+    );
+    reader.read (is, nl);
+
+    EXPECT_EQ (nl.to_string (),
+      "circuit TOP ();\n"
+      "  device NMOS '1' (S=N3,G=N2,D=N1) (L=0.25,W=3,AS=0,AD=0,PS=0,PD=0);\n"
+      "  device NMOS '2' (S=N3,G=N2,D=N1) (L=0.25,W=1.5,AS=0,AD=0,PS=0,PD=0);\n"
+      "end;\n"
+    );
+  }
+
+  //  same for non-legacy mode
+  {
+    db::NetlistSpiceReader reader;
+    reader.delegate ()->set_legacy_mode (false);
+
+    tl::InputStream is (
+      "text:\n"
+      ".subckt TOP\n"
+      "M1 n1 n2 n3 nmos w=1.5u l=0.25u m=2 x=5*16\n"
+      //  4th terminal is not checked right now as S/D are mutable
+      "M2 n1 n2 n3 n1 nmos w=1.5u l=0.25u x=5*16\n"
+      ".ends\n"
+    );
+    reader.read (is, nl2);
+
+    EXPECT_EQ (nl2.to_string (),
+      "circuit TOP ();\n"
+      "  device NMOS '1' (S=N3,G=N2,D=N1) (L=0.25,W=3,AS=0,AD=0,PS=0,PD=0);\n"
+      "  device NMOS '2' (S=N3,G=N2,D=N1) (L=0.25,W=1.5,AS=0,AD=0,PS=0,PD=0);\n"
+      "end;\n"
+    );
+  }
 }
 
 TEST(100_ExpressionParser)

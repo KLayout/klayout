@@ -449,9 +449,9 @@ NetlistSpiceWriter::NetlistSpiceWriter (NetlistSpiceWriterDelegate *delegate)
   m_allowed_name_chars = s_allowed_name_chars;
   m_not_connect_prefix = s_not_connect_prefix;
 
-  static NetlistSpiceWriterDelegate std_delegate;
   if (! delegate) {
-    mp_delegate.reset (&std_delegate);
+    mp_default_delegate.reset (new NetlistSpiceWriterDelegate ());
+    mp_delegate.reset (mp_default_delegate.get ());
   }
 }
 

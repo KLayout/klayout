@@ -176,6 +176,7 @@ private:
 
   const db::Netlist *mp_netlist;
   tl::OutputStream *mp_stream;
+  std::unique_ptr<NetlistSpiceWriterDelegate> mp_default_delegate;
   tl::weak_ptr<NetlistSpiceWriterDelegate> mp_delegate;
   std::map<const db::Net *, size_t> m_net_to_spice_id;
   std::map<const db::Net *, std::string> m_net_to_spice_name;

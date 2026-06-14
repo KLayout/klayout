@@ -1441,6 +1441,160 @@ TEST(14_WriterBJT4Devices)
   compare_netlists (_this, path, au_path);
 }
 
+TEST(15_SpiceProfiles)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *cls = new db::DeviceClassMOS3Transistor ();
+  cls->set_name ("NMOS");
+  nl.add_device_class (cls);
+
+  db::DeviceClass::SpiceProfile sp = cls->spice_profile (std::string ());
+  sp.element = "X";
+  sp.outgoing_parameters = { { "W", "" }, { "L", "L*2" }, { "X", "X||42.0" }, { "WW", "W*2"} };
+  cls->set_spice_profile ("PROFILE", sp);
+
+  db::Circuit *top = new db::Circuit ();
+  top->set_name ("TOP");
+  nl.add_circuit (top);
+
+  db::Device *dev = new db::Device (cls, "1");
+  top->add_device (dev);
+
+  dev->set_parameter_value (cls->parameter_id_for_name ("W"), 2.5);
+  dev->set_parameter_value (cls->parameter_id_for_name ("L"), 0.5);
+  dev->set_parameter_value (cls->parameter_id_for_name ("AD"), 1.25);
+
+  db::Net *n1, *n2, *n3;
+  n1 = new db::Net ();
+  n1->set_name ("n1");
+  top->add_net (n1);
+  n2 = new db::Net ();
+  n2->set_name ("n2");
+  top->add_net (n2);
+  n3 = new db::Net ();
+  n3->set_name ("n3");
+  top->add_net (n3);
+
+  size_t pid1 = top->add_pin ("p1").id ();
+  size_t pid2 = top->add_pin ("p2").id ();
+  size_t pid3 = top->add_pin ("p3").id ();
+
+  top->connect_pin (pid1, n1);
+  top->connect_pin (pid2, n2);
+  top->connect_pin (pid3, n3);
+
+  dev->connect_terminal (cls->terminal_id_for_name ("S"), n1);
+  dev->connect_terminal (cls->terminal_id_for_name ("G"), n2);
+  dev->connect_terminal (cls->terminal_id_for_name ("D"), n3);
+
+  {
+    tl::OutputMemoryStream om;
+
+    {
+      tl::OutputStream stream (om);
+      db::NetlistSpiceWriter writer;
+      writer.set_profile ("PROFILE");
+      writer.set_with_comments (false);
+      writer.write (stream, nl, "written by unit test");
+    }
+
+    EXPECT_EQ (std::string (om.data (), om.size ()),
+      "* written by unit test\n\n"
+      ".SUBCKT TOP 1 2 3\n"
+      "X1 3 2 1 1 NMOS L=1U WW=5 X=42\n"
+      ".ENDS TOP\n"
+    );
+  }
+
+  {
+    tl::OutputMemoryStream om;
+
+    {
+      tl::OutputStream stream (om);
+      db::NetlistSpiceWriter writer;
+      writer.delegate ()->set_write_all_parameters (true);
+      writer.set_profile ("PROFILE");
+      writer.set_with_comments (false);
+      writer.write (stream, nl, "written by unit test");
+    }
+
+    EXPECT_EQ (std::string (om.data (), om.size ()),
+      "* written by unit test\n\n"
+      ".SUBCKT TOP 1 2 3\n"
+      // @@@ not "5U"?
+      "X1 3 2 1 1 NMOS L=1U AS=0P AD=1.25P PS=0U PD=0U WW=5 X=42\n"
+      ".ENDS TOP\n"
+    );
+  }
+
+  sp.outgoing_parameters = { { "L", "L*2" }, { "*!", "_" } };
+  cls->set_spice_profile ("PROFILE", sp);
+
+  {
+    tl::OutputMemoryStream om;
+
+    {
+      tl::OutputStream stream (om);
+      db::NetlistSpiceWriter writer;
+      writer.set_profile ("PROFILE");
+      writer.set_with_comments (false);
+      writer.write (stream, nl, "written by unit test");
+    }
+
+    EXPECT_EQ (std::string (om.data (), om.size ()),
+      "* written by unit test\n\n"
+      ".SUBCKT TOP 1 2 3\n"
+      "X1 3 2 1 1 NMOS L=1U W=2.5U\n"
+      ".ENDS TOP\n"
+    );
+  }
+
+  sp.outgoing_parameters = { { "L", "L*2" }, { "*?", "_" } };
+  cls->set_spice_profile ("PROFILE", sp);
+
+  {
+    tl::OutputMemoryStream om;
+
+    {
+      tl::OutputStream stream (om);
+      db::NetlistSpiceWriter writer;
+      writer.set_profile ("PROFILE");
+      writer.set_with_comments (false);
+      writer.write (stream, nl, "written by unit test");
+    }
+
+    EXPECT_EQ (std::string (om.data (), om.size ()),
+      "* written by unit test\n\n"
+      ".SUBCKT TOP 1 2 3\n"
+      "X1 3 2 1 1 NMOS L=1U AS=0P AD=1.25P PS=0U PD=0U\n"
+      ".ENDS TOP\n"
+    );
+  }
+
+  sp.outgoing_parameters = { { "L", "L*2" }, { "**", "_" } };
+  cls->set_spice_profile ("PROFILE", sp);
+
+  {
+    tl::OutputMemoryStream om;
+
+    {
+      tl::OutputStream stream (om);
+      db::NetlistSpiceWriter writer;
+      writer.set_profile ("PROFILE");
+      writer.set_with_comments (false);
+      writer.write (stream, nl, "written by unit test");
+    }
+
+    EXPECT_EQ (std::string (om.data (), om.size ()),
+      "* written by unit test\n\n"
+      ".SUBCKT TOP 1 2 3\n"
+      "X1 3 2 1 1 NMOS L=1U W=2.5U AS=0P AD=1.25P PS=0U PD=0U\n"
+      ".ENDS TOP\n"
+    );
+  }
+
+}
 
 namespace {
 

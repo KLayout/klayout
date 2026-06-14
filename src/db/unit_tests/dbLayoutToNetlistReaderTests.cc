@@ -563,3 +563,24 @@ TEST(7_CustomDevice)
 
   compare_text_files (path, au_path);
 }
+
+TEST(8_VariantDeviceParameters)
+{
+  db::LayoutToNetlist l2n;
+
+  //  build from: testdata/algo/l2n_reader_4.gds
+
+  std::string in_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_8.l2n");
+  tl::InputStream is_in (in_path);
+
+  db::LayoutToNetlistStandardReader reader (is_in);
+  reader.read (&l2n);
+
+  tl_assert (l2n.netlist () != 0);
+  EXPECT_EQ (l2n.netlist ()->to_string (),
+    "circuit TOP ();\n"
+    "  device DEVCLS dev (S=(null),G=(null),D=(null),B=(null)) (D=17.5,L=42,S=XYZ,B=true,N=nil);\n"
+    "  device DEVCLS dev2 (S=(null),G=(null),D=(null),B=(null)) (D=0,L=0,S=,B=false,N=nil);\n"
+    "end;\n"
+  );
+}

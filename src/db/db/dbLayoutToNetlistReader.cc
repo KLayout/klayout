@@ -481,18 +481,6 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
 
           br.done ();
 
-        } else if (test (skeys::param_key) || test (lkeys::param_key)) {
-
-          Brace br (this);
-
-          std::string param_name;
-          read_word_or_quoted (param_name);
-          int primary = read_int ();
-          double default_value = read_double ();
-          make_parameter (dc, param_name, primary, default_value);
-
-          br.done ();
-
         } else if (test (skeys::param_int_key) || test (lkeys::param_int_key)) {
 
           Brace br (this);
@@ -546,6 +534,18 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
           int primary = read_int ();
 
           make_parameter (dc, param_name, primary, tl::Variant ());
+
+          br.done ();
+
+        } else if (test (skeys::param_key) || test (lkeys::param_key)) {
+
+          Brace br (this);
+
+          std::string param_name;
+          read_word_or_quoted (param_name);
+          int primary = read_int ();
+          double default_value = read_double ();
+          make_parameter (dc, param_name, primary, default_value);
 
           br.done ();
 
@@ -1121,17 +1121,6 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
       br2.done ();
 
-    } else if (test (skeys::param_key) || test (lkeys::param_key)) {
-
-      Brace br2 (this);
-      std::string pname;
-      read_word_or_quoted (pname);
-      double value = read_double ();
-      br2.done ();
-
-      size_t pid = dm.second->parameter_id_for_name_create (pname, true, 0.0);
-      device->set_parameter_value (pid, value);
-
     } else if (test (skeys::param_int_key) || test (lkeys::param_int_key)) {
 
       Brace br2 (this);
@@ -1180,6 +1169,17 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
       size_t pid = dm.second->parameter_id_for_name_create (pname, true, tl::Variant ());
       device->set_parameter_value (pid, tl::Variant ());
+
+    } else if (test (skeys::param_key) || test (lkeys::param_key)) {
+
+      Brace br2 (this);
+      std::string pname;
+      read_word_or_quoted (pname);
+      double value = read_double ();
+      br2.done ();
+
+      size_t pid = dm.second->parameter_id_for_name_create (pname, true, 0.0);
+      device->set_parameter_value (pid, value);
 
     } else if (at_end ()) {
       throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside device definition (location, scale, mirror, rotation, param or terminal expected)")));

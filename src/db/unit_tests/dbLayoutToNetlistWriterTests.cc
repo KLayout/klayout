@@ -25,6 +25,7 @@
 #include "dbStream.h"
 #include "dbCommonReader.h"
 #include "dbNetlistDeviceExtractorClasses.h"
+#include "dbNetlistDeviceClasses.h"
 #include "dbTestSupport.h"
 
 #include "tlUnitTest.h"
@@ -481,6 +482,62 @@ TEST(3_Messages)
   }
 
   au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_writer_au_3s.txt");
+
+  compare_text_files (path, au_path);
+}
+
+TEST(4_VariantDeviceParameters)
+{
+  db::Layout ly;
+  db::Cell &tc = ly.cell (ly.add_cell ("TOP"));
+  db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
+
+  db::Netlist *nl = l2n.make_netlist ();
+
+  db::DeviceClass *dc = new db::DeviceClassMOS4Transistor ();
+  dc->set_name ("DEVCLS");
+  dc->clear_parameter_definitions ();
+  size_t idd = dc->add_parameter_definition (db::DeviceParameterDefinition ("D", "double", tl::Variant (0.0))).id ();
+  size_t idl = dc->add_parameter_definition (db::DeviceParameterDefinition ("L", "long", tl::Variant (long (0)))).id ();
+  size_t ids = dc->add_parameter_definition (db::DeviceParameterDefinition ("S", "string", tl::Variant (""))).id ();
+  size_t idb = dc->add_parameter_definition (db::DeviceParameterDefinition ("B", "bool", tl::Variant (false))).id ();
+  size_t idn = dc->add_parameter_definition (db::DeviceParameterDefinition ("N", "nil", tl::Variant ())).id ();
+  nl->add_device_class (dc);
+
+  db::Circuit *top = new db::Circuit ();
+  top->set_name ("TOP");
+  nl->add_circuit (top);
+
+  db::Device *dev = new db::Device (dc, "dev");
+  dev->set_parameter_value (idd, 17.5);
+  dev->set_parameter_value (idl, long (42));
+  dev->set_parameter_value (ids, "XYZ");
+  dev->set_parameter_value (idb, true);
+  dev->set_parameter_value (idn, tl::Variant ());
+  top->add_device (dev);
+
+  dev = new db::Device (dc, "dev2");
+  top->add_device (dev);
+
+  std::string path = tmp_file ("tmp_l2nwriter_4.txt");
+  {
+    tl::OutputStream stream (path);
+    db::LayoutToNetlistStandardWriter writer (stream, false);
+    writer.write (&l2n);
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_writer_au_4.txt");
+
+  compare_text_files (path, au_path);
+
+  path = tmp_file ("tmp_l2nwriter_4s.txt");
+  {
+    tl::OutputStream stream (path);
+    db::LayoutToNetlistStandardWriter writer (stream, true);
+    writer.write (&l2n);
+  }
+
+  au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_writer_au_4s.txt");
 
   compare_text_files (path, au_path);
 }

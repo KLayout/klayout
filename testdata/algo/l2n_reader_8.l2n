@@ -1,0 +1,55 @@
+#%l2n-klayout
+top(TOP)
+unit(0.001)
+
+# Layer section
+# This section lists the mask layers (drawing or derived) and their connections.
+
+# Mask layers
+
+# Mask layer connectivity
+
+# Device class section
+class(DEVCLS MOS4 1
+ param(D 1 0)
+ param-int(L 1 0)
+ param-string(S 1 '')
+ param-var(B 1 'false')
+ param-nil(N 1)
+ terminal(S)
+ terminal(G)
+ terminal(D)
+ terminal(B)
+)
+
+# Circuit section
+# Circuits are the hierarchical building blocks of the netlist.
+circuit(TOP
+
+ # Devices and their connections
+ device(1 DEVCLS
+  name(dev)
+  param(D 17.5)
+  param-int(L 42)
+  param-string(S 'XYZ')
+  param-var(B 'true')
+  param-nil(N)
+  terminal(S)
+  terminal(G)
+  terminal(D)
+  terminal(B)
+ )
+ device(2 DEVCLS
+  name(dev2)
+  param(D 0)
+  param-int(L 0)
+  param-string(S '')
+  param-var(B 'false')
+  param-nil(N)
+  terminal(S)
+  terminal(G)
+  terminal(D)
+  terminal(B)
+ )
+
+)

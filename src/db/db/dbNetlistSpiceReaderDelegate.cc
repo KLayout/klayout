@@ -373,6 +373,15 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, std::strin
   }
 }
 
+static tl::Variant si_unscale (const tl::Variant &value, double sis)
+{
+  if (value.is_double () && sis != 0 && sis != 1.0) {
+    return tl::Variant (value.to_double () / sis);
+  } else {
+    return value;
+  }
+}
+
 namespace {
 
 class SPICEParameterEval
@@ -393,22 +402,27 @@ protected:
       return;
     }
 
-    auto p = m_params.find (name == "_" ? m_name : name);
-    if (p != m_params.end ()) {
-      value = &p->second;
-      return;
-    }
+    std::string n = name == "_" ? m_name : name;
+    auto h = m_heap.find (n);
+    if (h != m_heap.end ()) {
 
-    auto pp = m_all_params.find (name == "_" ? m_name : name);
-    if (pp != m_all_params.end ()) {
-      if (pp->second) {
-        value = &pp->second->default_value ();
-        return;
+      value = &h->second;
+
+    } else {
+
+      auto p = m_params.find (n);
+      auto pp = m_all_params.find (n);
+
+      tl::Variant v;
+      if (pp != m_all_params.end () && pp->second) {
+        v = si_unscale (p == m_params.end () ? pp->second->default_value () : p->second, pp->second->si_scaling ());
+      } else if (p != m_params.end ()) {
+        v = p->second;
       }
-    }
 
-    static tl::Variant nil;
-    value = &nil;
+      value = &m_heap.insert (std::make_pair (n, v)).first->second;
+
+    }
   }
 
 private:
@@ -416,6 +430,7 @@ private:
   const std::map<std::string, tl::Variant> &m_params;
   const std::map<std::string, const db::DeviceParameterDefinition *> &m_all_params;
   tl::Variant m_value;
+  std::map<std::string, tl::Variant> m_heap;
 };
 
 }
@@ -431,7 +446,13 @@ eval_parameter_expression (const std::string &name, const std::string &expr, con
   } else if (expr == "_") {
 
     auto p = params.find (name);
-    return p != params.end () ? p->second : tl::Variant ();
+    auto pp = all_params.find (name);
+
+    if (p != params.end () && pp != all_params.end () && pp->second) {
+      return si_unscale (p->second, pp->second->si_scaling ());
+    } else {
+      return p != params.end () ? p->second : tl::Variant ();
+    }
 
   } else if (expr == "$") {
 
@@ -659,7 +680,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
       tl_assert (pp != params.end ());
 
       if (p->second) {
-        device->set_parameter_value (p->second->id (), pp->second);
+        device->set_parameter_value (p->second->id (), si_unscale (pp->second, p->second->si_scaling ()));
       } else {
         device->set_parameter_value_create (p->first, pp->second, false, default_from_value (pp->second));
       }
@@ -684,7 +705,7 @@ NetlistSpiceReaderDelegate::apply_parameter_scaling (db::Device *device) const
   for (auto i = pd.begin (); i != pd.end (); ++i) {
     const tl::Variant &pv = device->parameter_value (i->id ());
     if (pv.is_double ()) {
-      device->set_parameter_value (i->id (), pv.to_double () / i->si_scaling () * pow (m_options.scale, i->geo_scaling_exponent ()));
+      device->set_parameter_value (i->id (), pv.to_double () * pow (m_options.scale, i->geo_scaling_exponent ()));
     }
   }
 }

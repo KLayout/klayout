@@ -113,19 +113,51 @@ write_parameter_value (std::ostringstream &os, const tl::Variant &v, double sis)
 {
   if (v.is_double ()) {
 
+    double d = v.to_double () * sis;
+    double da = fabs (d);
+
     //  for compatibility
-    if (fabs (sis * 1e6 - 1.0) < db::epsilon) {
-      os << tl::to_string (v.to_double ()) << "U";
-    } else if (fabs (sis * 1e12 - 1.0) < db::epsilon) {
-      os << tl::to_string (v.to_double ()) << "P";
-    } else {
-      os << tl::to_string (v.to_double () * sis);
+    if (da > 1e15) {
+      os << tl::to_string (d);
+    } else if (da > 1e11 * (1.0 - db::epsilon)) {
+      os << tl::to_string (d * 1e-12) << "T";
+    } else if (da > 1e8 * (1.0 - db::epsilon)) {
+      os << tl::to_string (d * 1e-9) << "G";
+    } else if (da > 1e5 * (1.0 - db::epsilon)) {
+      os << tl::to_string (d * 1e-6) << "MEG";
+    } else if (da > 1e2 * (1.0 - db::epsilon)) {
+      os << tl::to_string (d * 1e-3) << "K";
+    } else if (da > 0.1 * (1.0 - db::epsilon)) {
+      os << tl::to_string (d);
+    } else if (da > 1e-4 * (1.0 - db::epsilon)) {
+      os << tl::to_string (d * 1e3) << "M";
+    } else if (da > 1e-7 * (1.0 - db::epsilon)) {
+      os << tl::to_string (d * 1e6) << "U";
+    } else if (da > 1e-10 * (1.0 - db::epsilon)) {
+      os << tl::to_string (d * 1e9) << "N";
+    } else if (da > 1e-13 * (1.0 - db::epsilon)) {
+      os << tl::to_string (d * 1e12) << "P";
+    } else if (da > 1e-16 * (1.0 - db::epsilon)) {
+      os << tl::to_string (d * 1e15) << "F";
+    } else if (da > 1e-19 * (1.0 - db::epsilon)) {
+      os << tl::to_string (d * 1e18) << "A";
+    } else if (da < 1e-21) {
+      os << tl::to_string (d);
     }
 
   } else if (v.is_long () || v.is_ulong ()) {
     os << v.to_string ();
   } else {
     os << tl::to_word_or_quoted_string (v.to_string ());
+  }
+}
+
+static tl::Variant si_scaling (const tl::Variant &value, double sis)
+{
+  if (sis == 1.0 || ! value.is_double ()) {
+    return value;
+  } else {
+    return tl::Variant (sis * value.to_double ());
   }
 }
 
@@ -145,18 +177,32 @@ protected:
   virtual void resolve_name (const std::string &name, const tl::EvalFunction *& /*function*/, const tl::Variant *&value, tl::Variant *& /*var*/)
   {
     std::string n = (name == "_" ? m_name : name);
-    if (mp_dev->device_class ()->has_parameter_with_name (n)) {
-      value = &mp_dev->parameter_value (mp_dev->device_class ()->parameter_id_for_name (n));
-      return;
-    }
 
-    static tl::Variant nil;
-    value = &nil;
+    const auto *cls = mp_dev->device_class ();
+    if (cls->has_parameter_with_name (n)) {
+
+      size_t id = cls->parameter_id_for_name (n);
+
+      auto h = m_heap.find (id);
+      if (h != m_heap.end ()) {
+        value = &h->second;
+      } else {
+        tl::Variant v = si_scaling (mp_dev->parameter_value (id), cls->parameter_definition (id)->si_scaling ());
+        value = &m_heap.insert (std::make_pair (id, v)).first->second;
+      }
+
+    } else {
+
+      static tl::Variant nil;
+      value = &nil;
+
+    }
   }
 
 private:
   const std::string m_name;
   const db::Device *mp_dev;
+  std::map<size_t, tl::Variant> m_heap;
 };
 
 }
@@ -171,9 +217,10 @@ eval_parameter_expression (const std::string &name, const std::string &expr, con
 
   } else if (expr == "_") {
 
-    if (dev.device_class ()->has_parameter_with_name (name)) {
-      auto id = dev.device_class ()->parameter_id_for_name (name);
-      return dev.parameter_value (id);
+    const auto *cls = dev.device_class ();
+    if (cls->has_parameter_with_name (name)) {
+      auto id = cls->parameter_id_for_name (name);
+      return si_scaling (dev.parameter_value (id), cls->parameter_definition (id)->si_scaling ());
     } else {
       return tl::Variant ();
     }
@@ -200,7 +247,7 @@ void NetlistSpiceWriterDelegate::write_device_profile (const db::Device &dev, co
   const std::map<std::string, std::string> &dict = profile.outgoing_parameters;
 
   std::vector<std::pair<std::string, const db::DeviceParameterDefinition *> > all_params;
-  std::vector<std::pair<std::string, std::pair<tl::Variant, const db::DeviceParameterDefinition *> > > param_values;
+  std::vector<std::pair<std::string, tl::Variant> > param_values;
 
   const db::DeviceClass *cls = dev.device_class ();
   tl_assert (cls != 0);
@@ -233,14 +280,14 @@ void NetlistSpiceWriterDelegate::write_device_profile (const db::Device &dev, co
       if (id != dict.end ()) {
         pv = eval_parameter_expression (p->first, id->second, dev);
       } else if (p->second) {
-        pv = dev.parameter_value (p->second->id ());
+        pv = si_scaling (dev.parameter_value (p->second->id ()), p->second->si_scaling ());
       }
 
       if (! pv.is_nil ()) {
         if (p->first == "$") {
           direct_value = pv;
         } else {
-          param_values.push_back (std::make_pair (p->first, std::make_pair (pv, p->second)));
+          param_values.push_back (std::make_pair (p->first, pv));
         }
       }
 
@@ -260,7 +307,7 @@ void NetlistSpiceWriterDelegate::write_device_profile (const db::Device &dev, co
 
   for (auto p = param_values.begin (); p != param_values.end (); ++p) {
     os << " " << p->first << "=";
-    write_parameter_value (os, p->second.first, p->second.second ? p->second.second->si_scaling () : 1.0);
+    write_parameter_value (os, p->second, 1.0);
   }
 
   emit_line (os.str ());

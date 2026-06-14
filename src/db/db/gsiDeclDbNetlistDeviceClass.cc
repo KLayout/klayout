@@ -339,9 +339,9 @@ static void set_outgoing_parameters (db::DeviceClass::SpiceProfile *profile, con
 Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "DeviceClassSpiceProfile",
   gsi::method_ext ("element", &get_element,
     "@brief Gets the SPICE element to use for this device.\n"
-    "The element is the SPICE code for the element - i.e. 'X', 'M', 'R' etc.\n"
+    "The element is the single-character SPICE code for the element - i.e. 'X', 'M', 'R' etc.\n"
   ) +
-  gsi::method_ext ("element=", &set_element,
+  gsi::method_ext ("element=", &set_element, gsi::arg ("e"),
     "@brief Sets the SPICE element to use for this device.\n"
     "See \\element for a description of this attribute.\n"
   ) +
@@ -376,7 +376,7 @@ Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "Devi
     "So, the forth element mimics the bulk pin of a MOS4 device. It is optional on reading (the net is ignored)\n"
     "and upon writing it is connected to 'S'.\n"
   ) +
-  gsi::method_ext ("terminal_order=", &set_terminal_order,
+  gsi::method_ext ("terminal_order=", &set_terminal_order, gsi::arg ("to"),
     "@brief Sets the terminal order to use for this device.\n"
     "See \\terminal_order for a description of this attribute.\n"
   ) +
@@ -430,7 +430,7 @@ Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "Devi
     "cls.set_spice_profile(sp)\n"
     "@/code\n"
   ) +
-  gsi::method_ext ("incoming_parameters=", &set_incoming_parameters,
+  gsi::method_ext ("incoming_parameters=", &set_incoming_parameters, gsi::arg ("par"),
     "@brief Sets the mapping of incoming parameters from SPICE files\n"
     "See \\incoming_parameters for a description of this attribute.\n"
   ) +
@@ -468,7 +468,7 @@ Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "Devi
     "cls.set_spice_profile(sp)\n"
     "@/code\n"
   ) +
-  gsi::method_ext ("outgoing_parameters=", &set_outgoing_parameters,
+  gsi::method_ext ("outgoing_parameters=", &set_outgoing_parameters, gsi::arg ("par"),
     "@brief Sets the mapping tables for outgoing parameters\n"
     "See \\outgoing_parameters for a description of this attribute.\n"
   ),

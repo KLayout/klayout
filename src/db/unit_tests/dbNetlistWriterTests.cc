@@ -1502,7 +1502,7 @@ TEST(15_SpiceProfiles)
     EXPECT_EQ (std::string (om.data (), om.size ()),
       "* written by unit test\n\n"
       ".SUBCKT TOP 1 2 3\n"
-      "X1 3 2 1 1 NMOS L=1U WW=5 X=42\n"
+      "X1 3 2 1 1 NMOS L=1U WW=5U X=42\n"
       ".ENDS TOP\n"
     );
   }
@@ -1522,8 +1522,7 @@ TEST(15_SpiceProfiles)
     EXPECT_EQ (std::string (om.data (), om.size ()),
       "* written by unit test\n\n"
       ".SUBCKT TOP 1 2 3\n"
-      // @@@ not "5U"?
-      "X1 3 2 1 1 NMOS L=1U AS=0P AD=1.25P PS=0U PD=0U WW=5 X=42\n"
+      "X1 3 2 1 1 NMOS L=1U AS=0 AD=1.25P PS=0 PD=0 WW=5U X=42\n"
       ".ENDS TOP\n"
     );
   }
@@ -1567,7 +1566,7 @@ TEST(15_SpiceProfiles)
     EXPECT_EQ (std::string (om.data (), om.size ()),
       "* written by unit test\n\n"
       ".SUBCKT TOP 1 2 3\n"
-      "X1 3 2 1 1 NMOS L=1U AS=0P AD=1.25P PS=0U PD=0U\n"
+      "X1 3 2 1 1 NMOS L=1U AS=0 AD=1.25P PS=0 PD=0\n"
       ".ENDS TOP\n"
     );
   }
@@ -1589,7 +1588,7 @@ TEST(15_SpiceProfiles)
     EXPECT_EQ (std::string (om.data (), om.size ()),
       "* written by unit test\n\n"
       ".SUBCKT TOP 1 2 3\n"
-      "X1 3 2 1 1 NMOS L=1U W=2.5U AS=0P AD=1.25P PS=0U PD=0U\n"
+      "X1 3 2 1 1 NMOS L=1U W=2.5U AS=0 AD=1.25P PS=0 PD=0\n"
       ".ENDS TOP\n"
     );
   }

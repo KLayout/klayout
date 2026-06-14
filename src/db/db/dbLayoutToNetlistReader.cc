@@ -1129,7 +1129,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       double value = read_double ();
       br2.done ();
 
-      size_t pid = dm.second->parameter_id_for_name_create (pname, false, 0.0);
+      size_t pid = dm.second->parameter_id_for_name_create (pname, true, 0.0);
       device->set_parameter_value (pid, value);
 
     } else if (test (skeys::param_int_key) || test (lkeys::param_int_key)) {
@@ -1140,7 +1140,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       long value = read_long ();
       br2.done ();
 
-      size_t pid = dm.second->parameter_id_for_name_create (pname, false, long (0));
+      size_t pid = dm.second->parameter_id_for_name_create (pname, true, long (0));
       device->set_parameter_value (pid, value);
 
     } else if (test (skeys::param_string_key) || test (lkeys::param_string_key)) {
@@ -1152,7 +1152,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       read_word_or_quoted (value);
       br2.done ();
 
-      size_t pid = dm.second->parameter_id_for_name_create (pname, false, std::string ());
+      size_t pid = dm.second->parameter_id_for_name_create (pname, true, std::string ());
       device->set_parameter_value (pid, value);
 
     } else if (test (skeys::param_var_key) || test (lkeys::param_var_key)) {
@@ -1168,7 +1168,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       tl::Extractor ex (value_str.c_str ());
       ex.read (value);
 
-      size_t pid = dm.second->parameter_id_for_name_create (pname, false, tl::Variant ());
+      size_t pid = dm.second->parameter_id_for_name_create (pname, true, tl::Variant ());
       device->set_parameter_value (pid, value);
 
     } else if (test (skeys::param_nil_key) || test (lkeys::param_nil_key)) {
@@ -1178,7 +1178,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       read_word_or_quoted (pname);
       br2.done ();
 
-      size_t pid = dm.second->parameter_id_for_name_create (pname, false, tl::Variant ());
+      size_t pid = dm.second->parameter_id_for_name_create (pname, true, tl::Variant ());
       device->set_parameter_value (pid, tl::Variant ());
 
     } else if (at_end ()) {

@@ -1234,7 +1234,7 @@ END
     nl.combine_devices
     assert_equal(nl.to_s, <<END)
 circuit RESCUBE (A=A,B=B);
-  device RES $10 (A=A,B=B) (R=833.333333333,L=0,W=0,A=0,P=0);
+  device RES $10 (A=A,B=B) (R=833.333333333333,L=0,W=0,A=0,P=0);
 end;
 END
     

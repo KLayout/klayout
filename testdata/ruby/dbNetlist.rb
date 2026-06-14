@@ -1242,6 +1242,52 @@ END
 
   end
 
+  def test_17_spiceProfiles
+
+    c = RBA::DeviceClass::new
+
+    assert_equal(c.has_spice_profile(""), false)
+    assert_equal(c.has_spice_profile("PROFILE"), false)
+
+    sp = RBA::DeviceClassSpiceProfile::new
+
+    assert_equal(sp.element, "")
+    sp.element = "U"
+    assert_equal(sp.element, "U")
+
+    assert_equal(sp.terminal_order.inspect, "[]")
+    sp.terminal_order = [ "A", "C", "B" ]
+    assert_equal(sp.terminal_order.inspect, "[\"A\", \"C\", \"B\"]")
+
+    assert_equal(sp.incoming_parameters.inspect, "{}")
+    sp.incoming_parameters = { "W" => "W*2", "L" => "" }
+    assert_equal(sp.incoming_parameters.inspect, "{\"L\"=>\"\", \"W\"=>\"W*2\"}")
+
+    assert_equal(sp.outgoing_parameters.inspect, "{}")
+    sp.outgoing_parameters = { "W" => "W*0.5", "L" => "" }
+    assert_equal(sp.outgoing_parameters.inspect, "{\"L\"=>\"\", \"W\"=>\"W*0.5\"}")
+
+    c.set_spice_profile(sp)
+
+    assert_equal(c.has_spice_profile(""), true)
+    assert_equal(c.has_spice_profile("PROFILE"), false)
+
+    assert_equal(c.spice_profile().element, "U")
+    assert_equal(c.spice_profile("").element, "U")
+    
+    sp.element = "Q"
+
+    c.set_spice_profile("PROFILE", sp)
+
+    assert_equal(c.has_spice_profile(""), true)
+    assert_equal(c.has_spice_profile("PROFILE"), true)
+
+    assert_equal(c.spice_profile().element, "U")
+    assert_equal(c.spice_profile("").element, "U")
+    assert_equal(c.spice_profile("PROFILE").element, "Q")
+
+  end
+
 end
 
 load("test_epilogue.rb")

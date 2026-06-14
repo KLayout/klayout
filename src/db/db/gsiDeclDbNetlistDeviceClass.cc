@@ -357,12 +357,24 @@ Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "Devi
     "@code\n"
     "# adds a new terminal 'B' to the terminal order of the default SPICE profile of a device class:\n"
     "cls = ... # some device class\n"
-    "sp = cls.spice_profile('')\n"
+    "sp = cls.spice_profile()\n"
     "term = sp.terminal_order\n"
     "term.append('B')\n"
     "sp.terminal_order = term\n"
-    "cls.set_spice_profile('', sp)\n"
+    "cls.set_spice_profile(sp)\n"
     "@/code\n"
+    "\n"
+    "For special cases, the terminal order can have optional elements. These optional terminals "
+    "are prefixed with a '?' character. Optional terminals must repeat another terminal in the non-optional part. "
+    "Optional terminals must be placed at the end of the list. "
+    "For example, the MOS3 device maps to a 4-terminal 'M' element using this terminal order:\n"
+    "\n"
+    "@code\n"
+    "[ \"D\", \"G', \"S\", \"?S\" ]\n"
+    "@/code\n"
+    "\n"
+    "So, the forth element mimics the bulk pin of a MOS4 device. It is optional on reading (the net is ignored)\n"
+    "and upon writing it is connected to 'S'.\n"
   ) +
   gsi::method_ext ("terminal_order=", &set_terminal_order,
     "@brief Sets the terminal order to use for this device.\n"
@@ -411,11 +423,11 @@ Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "Devi
     "@code\n"
     "# adds a new incoming parameter called 'P' to a device classes default SPICE profile:\n"
     "cls = ... # some device class\n"
-    "sp = cls.spice_profile('')\n"
+    "sp = cls.spice_profile()\n"
     "par = sp.incoming_parameters\n"
     "par['P'] = 'P*2.0'\n"
     "sp.incoming_parameters = par\n"
-    "cls.set_spice_profile('', sp)\n"
+    "cls.set_spice_profile(sp)\n"
     "@/code\n"
   ) +
   gsi::method_ext ("incoming_parameters=", &set_incoming_parameters,
@@ -449,11 +461,11 @@ Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "Devi
     "@code\n"
     "# adds a new outgoing parameter called 'P' to a device classes default SPICE profile:\n"
     "cls = ... # some device class\n"
-    "sp = cls.spice_profile('')\n"
+    "sp = cls.spice_profile()\n"
     "par = sp.outgoing_parameters\n"
     "par['P'] = 'P*2.0'\n"
     "sp.outgoing_parameters = par\n"
-    "cls.set_spice_profile('', sp)\n"
+    "cls.set_spice_profile(sp)\n"
     "@/code\n"
   ) +
   gsi::method_ext ("outgoing_parameters=", &set_outgoing_parameters,
@@ -537,6 +549,11 @@ static void dc_add_parameter_definition (db::DeviceClass *cls, db::DeviceParamet
   }
 }
 
+static void set_default_spice_profile (db::DeviceClass *cls, const db::DeviceClass::SpiceProfile &profile)
+{
+  cls->set_spice_profile (std::string (), profile);
+}
+
 Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   gsi::method ("name", &db::DeviceClass::name,
     "@brief Gets the name of the device class."
@@ -577,7 +594,14 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "\n"
     "SPICE profiles have been introduced in version 0.31.0."
   ) +
-  gsi::method ("spice_profile", &db::DeviceClass::spice_profile, gsi::arg ("profile_name"),
+  gsi::method_ext ("set_spice_profile", &set_default_spice_profile, gsi::arg ("spice_profile"),
+    "@brief Sets the default SPICE profile.\n"
+    "This method is like the other \\set_spice_profile method, but uses an empty string for the profile name. "
+    "This corresponds to the default SPICE profile.\n"
+    "\n"
+    "SPICE profiles have been introduced in version 0.31.0."
+  ) +
+  gsi::method ("spice_profile", &db::DeviceClass::spice_profile, gsi::arg ("profile_name", std::string ()),
     "@brief Gets a SPICE profile with the given name.\n"
     "If the name is not corresponding to a valid profile and a fallback profile '*' exists, the latter is returned. "
     "Otherwise, a default profile is returned, which triggers the default serialization.\n"

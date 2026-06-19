@@ -53,13 +53,18 @@ class DBShapesTest(unittest.TestCase):
   # Issue #2012 (reference count)
   def test_2(self):
 
+    # an empty dict provides the normal reference count
+    obj = {}
+    rc = sys.getrefcount(obj)
+
     ly = pya.Layout()
+    self.assertEqual(sys.getrefcount(ly), rc)
     top = ly.create_cell("TOP")
     l1 = ly.layer(1, 0)
     top.shapes(l1).insert(pya.Box(0, 0, 100, 200))
 
     shapes = top.shapes(l1)
-    self.assertEqual(sys.getrefcount(shapes), 2)
+    self.assertEqual(sys.getrefcount(shapes), rc)
 
   # Tests the ability to take PolygonWithProperties instead of base class
   # for setter

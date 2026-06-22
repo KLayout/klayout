@@ -30,6 +30,14 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include <algorithm>
+
+#if defined(__cpp_lib_execution)
+#include <execution>
+#define PARALLEL_EXEC_POLICY std::execution::par,
+#else
+#define PARALLEL_EXEC_POLICY
+#endif
 
 // #define DEBUG_DUMP_ESSENTIAL_EDGES
 
@@ -269,7 +277,7 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
 
   if (! new_points.empty ()) {
 
-    std::sort (new_points.begin (), new_points.end (), less_compare_func<db::DPoint> ());
+    std::sort (PARALLEL_EXEC_POLICY new_points.begin (), new_points.end (), less_compare_func<db::DPoint> ());
     new_points.erase (std::unique (new_points.begin (), new_points.end (), equal_compare_func<db::DPoint> ()), new_points.end ());
 
     //  Insert the new points and make connections
@@ -332,7 +340,7 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
         }
       }
 
-      std::sort (sorted_edges.begin (), sorted_edges.end (), SortAngleAndEdgesByEdgeLength ());
+      std::sort (PARALLEL_EXEC_POLICY sorted_edges.begin (), sorted_edges.end (), SortAngleAndEdgesByEdgeLength ());
 
       for (auto i = sorted_edges.end (); i != sorted_edges.begin (); ) {
         --i;

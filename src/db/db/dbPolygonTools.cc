@@ -1,3 +1,14 @@
+#if __cplusplus >= 201703L
+  #if __has_include(<execution>)
+    #include <execution>
+  #endif
+#endif
+
+#if defined(__cpp_lib_execution)
+#define PARALLEL_EXEC_POLICY std::execution::par,
+#else
+#define PARALLEL_EXEC_POLICY
+#endif
 
 /*
 
@@ -27,6 +38,7 @@
 #include "dbPolygonGenerators.h"
 #include "tlLog.h"
 #include "tlInt128Support.h"
+
 
 #include <algorithm>
 #include <cmath>
@@ -1838,7 +1850,7 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
   }
 
   //  sort edges
-  std::sort (edges.begin (), edges.end (), db::edge_ymin_compare<C> ());
+  std::sort (PARALLEL_EXEC_POLICY edges.begin (), edges.end (), db::edge_ymin_compare<C> ());
 
   typename std::vector <edge_type>::iterator c = edges.begin ();
 
@@ -2761,7 +2773,7 @@ decompose_convex_to_trapezoids (const db::SimplePolygon &sp, bool horizontal, db
     }
   }
 
-  std::sort (edges.begin (), edges.end (), db::edge_ymin_compare<db::Coord> ());
+  std::sort (PARALLEL_EXEC_POLICY edges.begin (), edges.end (), db::edge_ymin_compare<db::Coord> ());
 
   db::Coord y = db::edge_ymin (edges.front ());
 

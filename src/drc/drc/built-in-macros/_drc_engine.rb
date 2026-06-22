@@ -1238,11 +1238,11 @@ module DRC
     
     # %DRC%
     # @name threads
-    # @brief Specifies the number of CPU cores to use in tiling mode
+    # @brief Specifies the number of CPU cores to use in tiling and hierarchical mode
     # @synopsis threads(n)
     # @synopsis threads
-    # If using threads, tiles are distributed on multiple CPU cores for
-    # parallelization. Still, all tiles must be processed before the 
+    # If using threads, tiles or hierarchical cells are distributed on multiple CPU cores for
+    # parallelization. Still, all tiles or cells must be processed before the 
     # operation proceeds with the next statement. 
     #
     # Without an argument, "threads" will return the current number of 

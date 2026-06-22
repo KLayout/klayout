@@ -1110,6 +1110,7 @@ public:
 
   size_t size () const
   {
+    tl::MutexLocker lock (&m_mutex);
     MemStatisticsSimple ms;
     ms << m_map;
     return ms.used ();
@@ -1127,6 +1128,7 @@ public:
 
   const Value *find (db::cell_index_type ci1, db::cell_index_type ci2, const Key &key) const
   {
+    tl::MutexLocker lock (&m_mutex);
     typename std::map <std::pair<db::cell_index_type, db::cell_index_type>, std::list <std::pair<Key, Value> > >::iterator i1 = m_map.find (std::make_pair (ci1, ci2));
     if (i1 == m_map.end ()) {
       ++m_misses;
@@ -1156,6 +1158,7 @@ public:
   {
     const size_t instance_cache_variant_threshold = 20;
 
+    tl::MutexLocker lock (&m_mutex);
     std::list <std::pair<Key, Value> > &m = m_map [std::make_pair (ci1, ci2)];
     if (m.size () >= instance_cache_variant_threshold) {
       m.pop_back ();
@@ -1166,6 +1169,7 @@ public:
   }
 
 private:
+  mutable tl::Mutex m_mutex;
   mutable size_t m_hits, m_misses;
   mutable std::map <std::pair<db::cell_index_type, db::cell_index_type>, std::list <std::pair<Key, Value> > > m_map;
 };

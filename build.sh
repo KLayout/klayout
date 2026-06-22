@@ -42,6 +42,7 @@ HAVE_EXPAT=0
 HAVE_GIT2=1
 HAVE_LSTREAM=1
 HAVE_CPP20=0
+HAVE_OPENMP=0
 
 RUBYINCLUDE=""
 RUBYINCLUDE2=""
@@ -102,6 +103,9 @@ while [ "$*" != "" ]; do
     ;;
   -without-qtbinding)
     HAVE_QTBINDINGS=0
+    ;;
+  -with-openmp)
+    HAVE_OPENMP=1
     ;;
   -without-qt-uitools)
     HAVE_QT_UITOOLS=0
@@ -255,6 +259,7 @@ while [ "$*" != "" ]; do
     echo "  -with-qtbinding       Create Qt bindings for ruby scripts [default]"
     echo "  -without-qtbinding    Don't create Qt bindings for ruby scripts"
     echo "  -without-qt-uitools   Don't include uitools in Qt binding"
+    echo "  -with-openmp          Enable OpenMP parallelization for hierarchical processing"
     echo "  -with-64bit-coord     Use long (64bit) coordinates - EXPERIMENTAL FEATURE"
     echo "                          (only available for gcc>=4.4 for 64bit build)"
     echo "  -without-64bit-coord  Don't use long (64bit) coordinates [default]"
@@ -601,6 +606,7 @@ echo "      HAVE_PNG=$HAVE_PNG"
 echo "      HAVE_EXPAT=$HAVE_EXPAT"
 echo "      HAVE_GIT2=$HAVE_GIT2"
 echo "      HAVE_LSTREAM=$HAVE_LSTREAM"
+echo "      HAVE_OPENMP=$HAVE_OPENMP"
 echo "      RPATH=$RPATH"
 
 mkdir -p $BUILD
@@ -676,6 +682,7 @@ qmake_options=(
   HAVE_GIT2="$HAVE_GIT2"
   HAVE_LSTREAM="$HAVE_LSTREAM"
   HAVE_CPP20="$HAVE_CPP20"
+  HAVE_OPENMP="$HAVE_OPENMP"
   PREFIX="$BIN"
   RPATH="$RPATH"
   KLAYOUT_VERSION="$KLAYOUT_VERSION"

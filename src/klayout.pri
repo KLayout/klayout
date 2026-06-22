@@ -216,6 +216,20 @@ msvc {
     }
   }
 
+  equals(HAVE_OPENMP, "1") {
+    msvc {
+      QMAKE_CXXFLAGS += /openmp
+      QMAKE_LFLAGS += /openmp
+    } else:macx {
+      QMAKE_CXXFLAGS += -Xpreprocessor -fopenmp
+      LIBS += -lomp
+    } else {
+      QMAKE_CXXFLAGS += -fopenmp
+      QMAKE_LFLAGS += -fopenmp
+    }
+    DEFINES += _OPENMP
+  }
+
   win32 {
 
     QMAKE_LFLAGS += -Wl,--exclude-all-symbols

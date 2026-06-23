@@ -49,8 +49,7 @@ BooleanOptionsDialog::~BooleanOptionsDialog ()
   //  .. nothing yet ..
 }
 
-void
-BooleanOptionsDialog::cv_changed (int)
+void BooleanOptionsDialog::cv_changed (int)
 {
   if (! mp_view) {
     return;
@@ -61,8 +60,7 @@ BooleanOptionsDialog::cv_changed (int)
   layerr_cbx->set_view (mp_view, cvr_cbx->currentIndex ());
 }
 
-bool 
-BooleanOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int &cv_a, int &layer_a, int &cv_b, int &layer_b, int &cv_r, int &layer_r, int &mode, int &hier_mode, bool &min_coherence)
+bool BooleanOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int &cv_a, int &layer_a, int &cv_b, int &layer_b, int &cv_r, int &layer_r, int &mode, int &hier_mode, bool &min_coherence)
 {
   mp_view = view;
 
@@ -100,17 +98,15 @@ BooleanOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int &cv_a, int &la
     min_coherence = min_coherence_cb->isChecked ();
 
     res = true;
-
   }
 
   mp_view = 0;
   return res;
 }
 
-void 
-BooleanOptionsDialog::accept ()
+void BooleanOptionsDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
 
   int cv_a = cva_cbx->current_cv_index ();
   if (cv_a < 0) {
@@ -142,14 +138,14 @@ BEGIN_PROTECTED;
     throw tl::Exception (tl::to_string (QObject::tr ("No layer specified for result layer")));
   }
 
-  if (hier_mode_cbx->currentIndex () == 2 && 
+  if (hier_mode_cbx->currentIndex () == 2 &&
       cva_cbx->current_cv_index () != cvb_cbx->current_cv_index () &&
       cva_cbx->current_cv_index () != cvr_cbx->current_cv_index ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("All source layouts and result layout must be same in 'cell by cell' mode")));
   }
 
   QDialog::accept ();
-END_PROTECTED;
+  END_PROTECTED;
 }
 
 // --------------------------------------------------------------------------------
@@ -171,8 +167,7 @@ SizingOptionsDialog::~SizingOptionsDialog ()
   //  .. nothing yet ..
 }
 
-void
-SizingOptionsDialog::cv_changed (int)
+void SizingOptionsDialog::cv_changed (int)
 {
   if (! mp_view) {
     return;
@@ -182,8 +177,7 @@ SizingOptionsDialog::cv_changed (int)
   layerr_cbx->set_view (mp_view, cvr_cbx->currentIndex ());
 }
 
-bool 
-SizingOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int &cv, int &layer, int &cv_r, int &layer_r, double &dx, double &dy, unsigned int &size_mode, int &hier_mode, bool &min_coherence)
+bool SizingOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int &cv, int &layer, int &cv_r, int &layer_r, double &dx, double &dy, unsigned int &size_mode, int &hier_mode, bool &min_coherence)
 {
   mp_view = view;
 
@@ -228,17 +222,15 @@ SizingOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int &cv, int &layer
     }
 
     res = true;
-
   }
 
   mp_view = 0;
   return res;
 }
 
-void 
-SizingOptionsDialog::accept ()
+void SizingOptionsDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
 
   int cv = cv_cbx->current_cv_index ();
   if (cv < 0) {
@@ -261,7 +253,7 @@ BEGIN_PROTECTED;
     throw tl::Exception (tl::to_string (QObject::tr ("No layer specified for result layer")));
   }
 
-  if (hier_mode_cbx->currentIndex () == 2 && 
+  if (hier_mode_cbx->currentIndex () == 2 &&
       cv_cbx->current_cv_index () != cvr_cbx->current_cv_index ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Source layout and result layout must be same in 'cell by cell' mode")));
   }
@@ -272,10 +264,10 @@ BEGIN_PROTECTED;
   ex.read (x);
   if (ex.test (",")) {
     ex.read (y);
-  } 
+  }
 
   QDialog::accept ();
-END_PROTECTED;
+  END_PROTECTED;
 }
 
 // --------------------------------------------------------------------------------
@@ -297,8 +289,7 @@ MergeOptionsDialog::~MergeOptionsDialog ()
   //  .. nothing yet ..
 }
 
-void
-MergeOptionsDialog::cv_changed (int)
+void MergeOptionsDialog::cv_changed (int)
 {
   if (! mp_view) {
     return;
@@ -308,8 +299,7 @@ MergeOptionsDialog::cv_changed (int)
   layerr_cbx->set_view (mp_view, cvr_cbx->currentIndex ());
 }
 
-bool 
-MergeOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int &cv, int &layer, int &cv_r, int &layer_r, unsigned int &min_wc, int &hier_mode, bool &min_coherence)
+bool MergeOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int &cv, int &layer, int &cv_r, int &layer_r, unsigned int &min_wc, int &hier_mode, bool &min_coherence)
 {
   mp_view = view;
 
@@ -343,17 +333,15 @@ MergeOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int &cv, int &layer,
     ex.read (min_wc);
 
     res = true;
-
   }
 
   mp_view = 0;
   return res;
 }
 
-void 
-MergeOptionsDialog::accept ()
+void MergeOptionsDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
 
   int cv = cv_cbx->current_cv_index ();
   if (cv < 0) {
@@ -376,7 +364,7 @@ BEGIN_PROTECTED;
     throw tl::Exception (tl::to_string (QObject::tr ("No layer specified for result")));
   }
 
-  if (hier_mode_cbx->currentIndex () == 2 && 
+  if (hier_mode_cbx->currentIndex () == 2 &&
       cv_cbx->current_cv_index () != cvr_cbx->current_cv_index ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Source layout and result layout must be same in 'cell by cell' mode")));
   }
@@ -387,8 +375,7 @@ BEGIN_PROTECTED;
   ex.read (min_wc);
 
   QDialog::accept ();
-END_PROTECTED;
+  END_PROTECTED;
 }
 
 }
-

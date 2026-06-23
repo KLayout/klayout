@@ -39,11 +39,11 @@
 namespace db
 {
 
-struct DrillHoleDescriptor
-{
+struct DrillHoleDescriptor {
   DrillHoleDescriptor (double _x, double _y, double _r, double _ex, double _ey)
-    : x(_x), y(_y), r(_r), ex(_ex), ey(_ey)
-  { }
+    : x (_x), y (_y), r (_r), ex (_ex), ey (_ey)
+  {
+  }
 
   double x, y, r, ex, ey;
 };
@@ -53,7 +53,7 @@ struct DrillHoleDescriptor
 
 class GerberDrillFileApertureBase;
 
-class GerberDrillFileReader 
+class GerberDrillFileReader
   : public GerberFileReader
 {
 public:
@@ -79,11 +79,11 @@ private:
   double m_xoff, m_yoff;
   double m_current_diameter;
   int m_current_qty;
-  std::list <std::pair <long, double> > m_qty;
+  std::list<std::pair<long, double>> m_qty;
   int m_current_tool;
-  std::map <int, double> m_tools;
-  std::vector <DrillHoleDescriptor> m_holes;
-  std::vector <DrillHoleDescriptor> m_pattern;
+  std::map<int, double> m_tools;
+  std::vector<DrillHoleDescriptor> m_holes;
+  std::vector<DrillHoleDescriptor> m_pattern;
   size_t m_end_block;
   bool m_recording;
   bool m_record_pattern;
@@ -113,4 +113,3 @@ private:
 }
 
 #endif
-

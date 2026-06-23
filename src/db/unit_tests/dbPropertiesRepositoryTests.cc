@@ -26,7 +26,8 @@
 #include "tlString.h"
 #include "tlUnitTest.h"
 
-namespace {
+namespace
+{
 
 /**
  *  @brief Installs a temporary repository instance for testing
@@ -52,7 +53,7 @@ private:
 
 }
 
-TEST(BasicNames)
+TEST (BasicNames)
 {
   db::PropertiesRepository rep;
 
@@ -73,7 +74,7 @@ TEST(BasicNames)
   EXPECT_EQ (db::property_name (id2) == n2, true);
 }
 
-TEST(BasicValues)
+TEST (BasicValues)
 {
   db::PropertiesRepository rep;
 
@@ -94,7 +95,7 @@ TEST(BasicValues)
   EXPECT_EQ (db::property_value (id2) == v2, true);
 }
 
-TEST(BasicPropertySetsInRepository)
+TEST (BasicPropertySetsInRepository)
 {
   db::PropertiesSet set1;
   db::PropertiesSet set2;
@@ -122,7 +123,7 @@ TEST(BasicPropertySetsInRepository)
   EXPECT_EQ (db::properties (id2) == set2, true);
 }
 
-TEST(PropertySets)
+TEST (PropertySets)
 {
   TempPropertiesRepository tmp_repo;
 
@@ -177,7 +178,7 @@ TEST(PropertySets)
   EXPECT_EQ (ps1.empty (), true);
 }
 
-TEST(PropertySetsMerge)
+TEST (PropertySetsMerge)
 {
   TempPropertiesRepository tmp_repo;
 
@@ -190,7 +191,7 @@ TEST(PropertySetsMerge)
   EXPECT_EQ (ps1.to_dict_var ().to_string (), "{17=>value,x=>42}");
 }
 
-TEST(PropertySetsConversions)
+TEST (PropertySetsConversions)
 {
   TempPropertiesRepository tmp_repo;
 
@@ -208,7 +209,7 @@ TEST(PropertySetsConversions)
   EXPECT_EQ (ps1_map.find (tl::Variant (42)) == ps1_map.end (), true);
 }
 
-TEST(PropertiesTranslator)
+TEST (PropertiesTranslator)
 {
   EXPECT_EQ (db::PropertiesTranslator ().is_null (), true);
   EXPECT_EQ (db::PropertiesTranslator ().is_pass (), true);
@@ -282,8 +283,8 @@ TEST(PropertiesTranslator)
   EXPECT_EQ (db::prop2string (t (prop3)), "{1=>100}");
 
   std::map<tl::Variant, tl::Variant> km;
-  km[1] = 4;
-  km[3] = 1;
+  km [1] = 4;
+  km [3] = 1;
 
   t = db::PropertiesTranslator::make_key_mapper (km, rp);
   EXPECT_EQ (db::prop2string (t (prop1a)), "{4=>100}");
@@ -346,7 +347,7 @@ static std::string ps2s (const db::PropertiesRepository::properties_id_set &ps)
   return res;
 }
 
-TEST(PropertyIdsByNameAndValue)
+TEST (PropertyIdsByNameAndValue)
 {
   db::PropertiesRepository rp;
 
@@ -451,7 +452,7 @@ TEST(PropertyIdsByNameAndValue)
   EXPECT_EQ (ps2s (res), ps2s (ref));
 }
 
-TEST(PropertiesSetHash)
+TEST (PropertiesSetHash)
 {
   db::PropertiesRepository rp;
 
@@ -473,7 +474,7 @@ TEST(PropertiesSetHash)
   EXPECT_EQ (db::hash_for_properties_id (rp.properties_id (ps2)), h1);
 }
 
-TEST(SameValueDifferentTypes)
+TEST (SameValueDifferentTypes)
 {
   {
     db::PropertiesRepository rp;
@@ -504,7 +505,7 @@ TEST(SameValueDifferentTypes)
   }
 }
 
-TEST(ComplexTypes)
+TEST (ComplexTypes)
 {
   //  This is also a smoke test: we intentionally register globally as the finalization code
   //  is critical: without the right destruction order we destroy the class object before the

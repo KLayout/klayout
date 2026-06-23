@@ -102,21 +102,21 @@ CellSelectionForm::CellSelectionForm (QWidget *parent, LayoutViewBase *view, con
 
 
   // signals and slots connections
-  connect (mp_ui->cancel_button, SIGNAL(clicked()), this, SLOT(reject()));
-  connect (mp_ui->cb_views, SIGNAL(activated(int)), this, SLOT(view_changed(int)));
-  connect (mp_ui->tb_set_parent, SIGNAL(clicked()), this, SLOT(set_parent()));
-  connect (mp_ui->tb_set_child, SIGNAL(clicked()), this, SLOT(set_child()));
-  connect (mp_ui->pb_hide, SIGNAL(clicked()), this, SLOT(hide_cell()));
-  connect (mp_ui->pb_show, SIGNAL(clicked()), this, SLOT(show_cell()));
-  connect (mp_ui->le_cell_name, SIGNAL(textChanged(const QString&)), this, SLOT(name_changed()));
-  connect (mp_ui->ok_button, SIGNAL(clicked()), this, SLOT(accept()));
-  connect (mp_ui->apply_button, SIGNAL(clicked()), this, SLOT(apply_clicked()));
-  connect (mp_ui->find_next, SIGNAL(clicked()), this, SLOT(find_next_clicked()));
-  connect (mp_ui->le_cell_name, SIGNAL(tab_pressed()), this, SLOT(find_next_clicked()));
-  connect (mp_ui->le_cell_name, SIGNAL(backtab_pressed()), this, SLOT(find_prev_clicked()));
+  connect (mp_ui->cancel_button, SIGNAL (clicked ()), this, SLOT (reject ()));
+  connect (mp_ui->cb_views, SIGNAL (activated (int)), this, SLOT (view_changed (int)));
+  connect (mp_ui->tb_set_parent, SIGNAL (clicked ()), this, SLOT (set_parent ()));
+  connect (mp_ui->tb_set_child, SIGNAL (clicked ()), this, SLOT (set_child ()));
+  connect (mp_ui->pb_hide, SIGNAL (clicked ()), this, SLOT (hide_cell ()));
+  connect (mp_ui->pb_show, SIGNAL (clicked ()), this, SLOT (show_cell ()));
+  connect (mp_ui->le_cell_name, SIGNAL (textChanged (const QString &)), this, SLOT (name_changed ()));
+  connect (mp_ui->ok_button, SIGNAL (clicked ()), this, SLOT (accept ()));
+  connect (mp_ui->apply_button, SIGNAL (clicked ()), this, SLOT (apply_clicked ()));
+  connect (mp_ui->find_next, SIGNAL (clicked ()), this, SLOT (find_next_clicked ()));
+  connect (mp_ui->le_cell_name, SIGNAL (tab_pressed ()), this, SLOT (find_next_clicked ()));
+  connect (mp_ui->le_cell_name, SIGNAL (backtab_pressed ()), this, SLOT (find_prev_clicked ()));
 
-  connect (mp_ui->lv_parents, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(parent_changed(const QModelIndex &)));
-  connect (mp_ui->lv_children, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(child_changed(const QModelIndex &)));
+  connect (mp_ui->lv_parents, SIGNAL (doubleClicked (const QModelIndex &)), this, SLOT (parent_changed (const QModelIndex &)));
+  connect (mp_ui->lv_children, SIGNAL (doubleClicked (const QModelIndex &)), this, SLOT (child_changed (const QModelIndex &)));
 
 
   m_cellviews.reserve (mp_view->cellviews ());
@@ -158,15 +158,12 @@ CellSelectionForm::CellSelectionForm (QWidget *parent, LayoutViewBase *view, con
 
     mp_ui->lv_parents->header ()->hide ();
     mp_ui->lv_parents->setRootIsDecorated (false);
-      
-    update_cell_list ();  
 
+    update_cell_list ();
   }
-
 }
 
-void 
-CellSelectionForm::update_cell_list () 
+void CellSelectionForm::update_cell_list ()
 {
   if (m_current_cv < 0 || m_current_cv >= int (m_cellviews.size ())) {
     return;
@@ -177,10 +174,10 @@ CellSelectionForm::update_cell_list ()
   }
 
   lay::CellTreeModel *model = new lay::CellTreeModel (mp_ui->lv_cells, mp_view, m_current_cv, lay::CellTreeModel::Flat);
-  
+
   mp_ui->lv_cells->setModel (model);
   //  connect can only happen after setModel()
-  connect (mp_ui->lv_cells->selectionModel (), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(cell_changed(const QModelIndex &, const QModelIndex &)));
+  connect (mp_ui->lv_cells->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (cell_changed (const QModelIndex &, const QModelIndex &)));
 
   lay::CellView::unspecific_cell_path_type path (m_cellviews [m_current_cv].combined_unspecific_path ());
   if (! path.empty ()) {
@@ -188,8 +185,7 @@ CellSelectionForm::update_cell_list ()
   }
 }
 
-void 
-CellSelectionForm::update_parents_list ()
+void CellSelectionForm::update_parents_list ()
 {
   m_parents_cb_enabled = false;
 
@@ -202,19 +198,16 @@ CellSelectionForm::update_parents_list ()
         delete mp_ui->lv_parents->model ();
       }
       mp_ui->lv_parents->setModel (new lay::CellTreeModel (mp_ui->lv_parents, mp_view, m_current_cv, lay::CellTreeModel::Flat | lay::CellTreeModel::Parents, model->cell (mp_ui->lv_cells->selectionModel ()->currentIndex ())));
-
     }
-
   }
 
   m_parents_cb_enabled = true;
 }
 
-void 
-CellSelectionForm::update_children_list ()
+void CellSelectionForm::update_children_list ()
 {
   m_children_cb_enabled = false;
-  
+
   if (m_current_cv >= 0 && m_current_cv < int (m_cellviews.size ())) {
 
     lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
@@ -224,16 +217,13 @@ CellSelectionForm::update_children_list ()
         delete mp_ui->lv_children->model ();
       }
       mp_ui->lv_children->setModel (new lay::CellTreeModel (mp_ui->lv_children, mp_view, m_current_cv, lay::CellTreeModel::Flat | lay::CellTreeModel::Children, model->cell (mp_ui->lv_cells->selectionModel ()->currentIndex ())));
-
     }
-
   }
 
   m_children_cb_enabled = true;
 }
 
-int 
-CellSelectionForm::selected_cellview_index () const
+int CellSelectionForm::selected_cellview_index () const
 {
   return m_current_cv;
 }
@@ -245,10 +235,9 @@ CellSelectionForm::selected_cellview () const
   return m_cellviews [m_current_cv];
 }
 
-void 
-CellSelectionForm::commit_cv ()
+void CellSelectionForm::commit_cv ()
 {
-  //  update the cell view 
+  //  update the cell view
   if (m_current_cv >= 0 && m_current_cv < int (m_cellviews.size ())) {
 
     lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
@@ -260,35 +249,30 @@ CellSelectionForm::commit_cv ()
     if (cell) {
       m_cellviews [m_current_cv].set_cell (cell->cell_index ());
     }
-
   }
 }
 
-void 
-CellSelectionForm::view_changed (int cv)
+void CellSelectionForm::view_changed (int cv)
 {
   commit_cv ();
   m_current_cv = cv;
-  update_cell_list ();  
+  update_cell_list ();
 }
 
-void
-CellSelectionForm::accept ()
+void CellSelectionForm::accept ()
 {
   store_config ();
   commit_cv ();
   QDialog::accept ();
 }
 
-void
-CellSelectionForm::reject ()
+void CellSelectionForm::reject ()
 {
   store_config ();
   QDialog::reject ();
 }
 
-void
-CellSelectionForm::store_config ()
+void CellSelectionForm::store_config ()
 {
   if (lay::Dispatcher::instance ()) {
     lay::Dispatcher::instance ()->config_set (cfg_cell_selection_search_case_sensitive, mp_case_sensitive->isChecked ());
@@ -296,8 +280,7 @@ CellSelectionForm::store_config ()
   }
 }
 
-void
-CellSelectionForm::apply_clicked()
+void CellSelectionForm::apply_clicked ()
 {
   //  select the current cell but don't make it the new top.
   if (m_current_cv >= 0 && m_current_cv < int (m_cellviews.size ())) {
@@ -311,13 +294,11 @@ CellSelectionForm::apply_clicked()
 
     lay::CellView cv (m_cellviews [m_current_cv]);
     cv.set_cell (cell->cell_index ());
-    mp_view->set_current_cell_path(m_current_cv, cv.combined_unspecific_path ());
-
+    mp_view->set_current_cell_path (m_current_cv, cv.combined_unspecific_path ());
   }
 }
 
-void 
-CellSelectionForm::cell_changed (const QModelIndex &current, const QModelIndex &)
+void CellSelectionForm::cell_changed (const QModelIndex &current, const QModelIndex &)
 {
   if (m_cells_cb_enabled) {
 
@@ -333,18 +314,15 @@ CellSelectionForm::cell_changed (const QModelIndex &current, const QModelIndex &
 
     update_children_list ();
     update_parents_list ();
-
   }
 }
 
-void
-CellSelectionForm::set_child ()
+void CellSelectionForm::set_child ()
 {
   child_changed (mp_ui->lv_children->selectionModel ()->currentIndex ());
 }
 
-void 
-CellSelectionForm::child_changed(const QModelIndex &current)
+void CellSelectionForm::child_changed (const QModelIndex &current)
 {
   if (m_children_cb_enabled && current.isValid ()) {
     if (m_current_cv >= 0 && m_current_cv < int (m_cellviews.size ())) {
@@ -356,14 +334,12 @@ CellSelectionForm::child_changed(const QModelIndex &current)
   }
 }
 
-void
-CellSelectionForm::set_parent ()
+void CellSelectionForm::set_parent ()
 {
   parent_changed (mp_ui->lv_parents->selectionModel ()->currentIndex ());
 }
 
-void 
-CellSelectionForm::parent_changed(const QModelIndex &current)
+void CellSelectionForm::parent_changed (const QModelIndex &current)
 {
   if (m_parents_cb_enabled && current.isValid ()) {
     if (m_current_cv >= 0 && m_current_cv < int (m_cellviews.size ())) {
@@ -375,8 +351,7 @@ CellSelectionForm::parent_changed(const QModelIndex &current)
   }
 }
 
-void 
-CellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
+void CellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
 {
   m_cells_cb_enabled = false;
 
@@ -394,7 +369,7 @@ CellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
       break;
     }
   }
-        
+
   if (mi.isValid ()) {
 
     m_cells_cb_enabled = false;
@@ -410,21 +385,18 @@ CellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
     //  do child list updates in a user event handler. Otherwise changing the models
     //  immediately interferes with Qt's internal logic. So we do an deferred update.
     m_update_all_dm ();
-
   }
-  
+
   m_cells_cb_enabled = true;
 }
 
-void 
-CellSelectionForm::update_all ()
+void CellSelectionForm::update_all ()
 {
   update_children_list ();
   update_parents_list ();
 }
 
-void 
-CellSelectionForm::find_next_clicked ()
+void CellSelectionForm::find_next_clicked ()
 {
   lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
@@ -440,12 +412,10 @@ CellSelectionForm::find_next_clicked ()
     update_children_list ();
     update_parents_list ();
     m_cells_cb_enabled = true;
-
   }
 }
 
-void
-CellSelectionForm::find_prev_clicked ()
+void CellSelectionForm::find_prev_clicked ()
 {
   lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
@@ -461,12 +431,10 @@ CellSelectionForm::find_prev_clicked ()
     update_children_list ();
     update_parents_list ();
     m_cells_cb_enabled = true;
-
   }
 }
 
-void
-CellSelectionForm::name_changed ()
+void CellSelectionForm::name_changed ()
 {
   if (m_name_cb_enabled) {
 
@@ -478,7 +446,7 @@ CellSelectionForm::name_changed ()
     }
 
     QModelIndex mi;
-    if (!s.isEmpty ()) {
+    if (! s.isEmpty ()) {
       mi = model->locate (tl::to_string (s).c_str (), mp_use_regular_expressions->isChecked (), mp_case_sensitive->isChecked ());
     } else {
       model->clear_locate ();
@@ -492,12 +460,10 @@ CellSelectionForm::name_changed ()
     update_children_list ();
     update_parents_list ();
     m_cells_cb_enabled = true;
-
   }
 }
 
-void
-CellSelectionForm::show_cell ()
+void CellSelectionForm::show_cell ()
 {
   lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
@@ -522,8 +488,7 @@ CellSelectionForm::show_cell ()
   model->signal_data_changed ();
 }
 
-void
-CellSelectionForm::hide_cell ()
+void CellSelectionForm::hide_cell ()
 {
   lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
@@ -572,11 +537,11 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, db::Layout 
   mp_ui->lib_cb->hide ();
 
   //  signals and slots connections
-  connect (mp_ui->cancel_button, SIGNAL(clicked()), this, SLOT(reject()));
-  connect (mp_ui->ok_button, SIGNAL(clicked()), this, SLOT(accept()));
-  connect (mp_ui->le_cell_name, SIGNAL(textChanged(const QString&)), this, SLOT(name_changed(const QString&)));
-  connect (mp_ui->find_next, SIGNAL(clicked()), this, SLOT(find_next_clicked()));
-  connect (mp_ui->cb_show_all_cells, SIGNAL(clicked()), this, SLOT(show_all_changed()));
+  connect (mp_ui->cancel_button, SIGNAL (clicked ()), this, SLOT (reject ()));
+  connect (mp_ui->ok_button, SIGNAL (clicked ()), this, SLOT (accept ()));
+  connect (mp_ui->le_cell_name, SIGNAL (textChanged (const QString &)), this, SLOT (name_changed (const QString &)));
+  connect (mp_ui->find_next, SIGNAL (clicked ()), this, SLOT (find_next_clicked ()));
+  connect (mp_ui->cb_show_all_cells, SIGNAL (clicked ()), this, SLOT (show_all_changed ()));
 
   mp_ui->lv_cells->header ()->hide ();
   mp_ui->lv_cells->setRootIsDecorated (false);
@@ -584,7 +549,7 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, db::Layout 
   mp_ui->ok_button->setText (QObject::tr ("Ok"));
   mp_ui->cancel_button->setText (QObject::tr ("Cancel"));
 
-  update_cell_list ();  
+  update_cell_list ();
 }
 
 LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, const char *name, bool all_cells, bool top_cells_only, bool hide_private)
@@ -611,12 +576,12 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, const char 
   mp_ui->lib_cb->set_current_library (mp_lib);
 
   // signals and slots connections
-  connect (mp_ui->cancel_button, SIGNAL(clicked()), this, SLOT(reject()));
-  connect (mp_ui->ok_button, SIGNAL(clicked()), this, SLOT(accept()));
-  connect (mp_ui->le_cell_name, SIGNAL(textChanged(const QString&)), this, SLOT(name_changed(const QString&)));
-  connect (mp_ui->find_next, SIGNAL(clicked()), this, SLOT(find_next_clicked()));
-  connect (mp_ui->lib_cb, SIGNAL(currentIndexChanged(int)), this, SLOT(lib_changed()));
-  connect (mp_ui->cb_show_all_cells, SIGNAL(clicked()), this, SLOT(show_all_changed()));
+  connect (mp_ui->cancel_button, SIGNAL (clicked ()), this, SLOT (reject ()));
+  connect (mp_ui->ok_button, SIGNAL (clicked ()), this, SLOT (accept ()));
+  connect (mp_ui->le_cell_name, SIGNAL (textChanged (const QString &)), this, SLOT (name_changed (const QString &)));
+  connect (mp_ui->find_next, SIGNAL (clicked ()), this, SLOT (find_next_clicked ()));
+  connect (mp_ui->lib_cb, SIGNAL (currentIndexChanged (int)), this, SLOT (lib_changed ()));
+  connect (mp_ui->cb_show_all_cells, SIGNAL (clicked ()), this, SLOT (show_all_changed ()));
 
   mp_ui->lv_cells->header ()->hide ();
   mp_ui->lv_cells->setRootIsDecorated (false);
@@ -624,34 +589,30 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, const char 
   mp_ui->ok_button->setText (QObject::tr ("Ok"));
   mp_ui->cancel_button->setText (QObject::tr ("Cancel"));
 
-  update_cell_list ();  
+  update_cell_list ();
 }
 
-void
-LibraryCellSelectionForm::show_all_changed ()
+void LibraryCellSelectionForm::show_all_changed ()
 {
   m_all_cells = mp_ui->cb_show_all_cells->isChecked ();
   update_cell_list ();
 }
 
-void
-LibraryCellSelectionForm::lib_changed ()
+void LibraryCellSelectionForm::lib_changed ()
 {
   mp_lib = mp_ui->lib_cb->current_library ();
   mp_layout = mp_lib ? &mp_lib->layout () : 0;
-  update_cell_list ();  
+  update_cell_list ();
 }
 
-void
-LibraryCellSelectionForm::set_current_library (db::Library *lib)
+void LibraryCellSelectionForm::set_current_library (db::Library *lib)
 {
   mp_lib = lib;
   mp_layout = mp_lib ? &mp_lib->layout () : 0;
   update_cell_list ();
 }
 
-void 
-LibraryCellSelectionForm::set_selected_cell_index (db::cell_index_type ci)
+void LibraryCellSelectionForm::set_selected_cell_index (db::cell_index_type ci)
 {
   if (ci != m_cell_index || selected_cell_is_pcell ()) {
     m_cell_index = ci;
@@ -661,8 +622,7 @@ LibraryCellSelectionForm::set_selected_cell_index (db::cell_index_type ci)
   }
 }
 
-void 
-LibraryCellSelectionForm::set_selected_pcell_id (db::pcell_id_type pci)
+void LibraryCellSelectionForm::set_selected_pcell_id (db::pcell_id_type pci)
 {
   if (pci != m_pcell_id || ! selected_cell_is_pcell ()) {
     m_cell_index = 0;
@@ -672,10 +632,9 @@ LibraryCellSelectionForm::set_selected_pcell_id (db::pcell_id_type pci)
   }
 }
 
-void
-LibraryCellSelectionForm::accept () 
+void LibraryCellSelectionForm::accept ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   if (! mp_layout) {
     throw tl::Exception (tl::to_string (QObject::tr ("No library selected")));
   }
@@ -686,11 +645,10 @@ BEGIN_PROTECTED
 
   QDialog::accept ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-LibraryCellSelectionForm::update_cell_list () 
+void LibraryCellSelectionForm::update_cell_list ()
 {
   if (mp_ui->lv_cells->model ()) {
     delete mp_ui->lv_cells->model ();
@@ -713,18 +671,16 @@ LibraryCellSelectionForm::update_cell_list ()
 
     //  TODO: get rid of that const_cast
     lay::CellTreeModel *model = new lay::CellTreeModel (mp_ui->lv_cells, const_cast<db::Layout *> (mp_layout), flags);
-    
+
     mp_ui->lv_cells->setModel (model);
     //  connect can only happen after setModel()
-    connect (mp_ui->lv_cells->selectionModel (), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(cell_changed(const QModelIndex &, const QModelIndex &)));
+    connect (mp_ui->lv_cells->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (cell_changed (const QModelIndex &, const QModelIndex &)));
 
     select_entry (std::numeric_limits<db::cell_index_type>::max ());
-
   }
 }
 
-void 
-LibraryCellSelectionForm::cell_changed (const QModelIndex &current, const QModelIndex &)
+void LibraryCellSelectionForm::cell_changed (const QModelIndex &current, const QModelIndex &)
 {
   if (m_cells_cb_enabled) {
 
@@ -747,12 +703,10 @@ LibraryCellSelectionForm::cell_changed (const QModelIndex &current, const QModel
     }
 
     m_name_cb_enabled = true;
-
   }
 }
 
-void 
-LibraryCellSelectionForm::select_pcell_entry (db::pcell_id_type pci)
+void LibraryCellSelectionForm::select_pcell_entry (db::pcell_id_type pci)
 {
   m_cells_cb_enabled = false;
   m_pcell_id = pci;
@@ -772,7 +726,7 @@ LibraryCellSelectionForm::select_pcell_entry (db::pcell_id_type pci)
       break;
     }
   }
-        
+
   if (mi.isValid ()) {
 
     m_cells_cb_enabled = false;
@@ -784,14 +738,12 @@ LibraryCellSelectionForm::select_pcell_entry (db::pcell_id_type pci)
     mp_ui->le_cell_name->setText (tl::to_qstring (model->cell_name (mi)));
     model->clear_locate ();
     m_name_cb_enabled = true;
-
   }
-  
+
   m_cells_cb_enabled = true;
 }
 
-void 
-LibraryCellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
+void LibraryCellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
 {
   m_cells_cb_enabled = false;
   m_cell_index = ci;
@@ -811,7 +763,7 @@ LibraryCellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
       break;
     }
   }
-        
+
   if (mi.isValid ()) {
 
     m_cells_cb_enabled = false;
@@ -823,14 +775,12 @@ LibraryCellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
     mp_ui->le_cell_name->setText (tl::to_qstring (model->cell_name (mi)));
     model->clear_locate ();
     m_name_cb_enabled = true;
-
   }
-  
+
   m_cells_cb_enabled = true;
 }
 
-void 
-LibraryCellSelectionForm::find_next_clicked ()
+void LibraryCellSelectionForm::find_next_clicked ()
 {
   lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
@@ -860,8 +810,7 @@ LibraryCellSelectionForm::find_next_clicked ()
   }
 }
 
-void 
-LibraryCellSelectionForm::name_changed (const QString &s)
+void LibraryCellSelectionForm::name_changed (const QString &s)
 {
   if (m_name_cb_enabled) {
 
@@ -891,7 +840,6 @@ LibraryCellSelectionForm::name_changed (const QString &s)
       m_pcell_id = -1;
       m_is_pcell = false;
     }
-
   }
 }
 

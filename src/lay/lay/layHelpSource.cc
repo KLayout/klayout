@@ -49,7 +49,7 @@
 #include <QDomElement>
 #include <QXmlStreamWriter>
 #if QT_VERSION >= 0x050000
-#  include <QUrlQuery>
+#include <QUrlQuery>
 #endif
 
 namespace lay
@@ -67,7 +67,7 @@ static QString class_doc_path (const QString &c)
   if (cm_re.indexIn (c) == 0) {
     QString cn = cm_re.cap (1);
     cn.replace (QString::fromUtf8 ("::"), QString::fromUtf8 ("_"));
-    return QString::fromUtf8 ("/code/class_") + cn +  QString::fromUtf8 (".xml#m_") + cm_re.cap (2);
+    return QString::fromUtf8 ("/code/class_") + cn + QString::fromUtf8 (".xml#m_") + cm_re.cap (2);
   } else {
     QString cn = c;
     cn.replace (QString::fromUtf8 ("::"), QString::fromUtf8 ("_"));
@@ -101,7 +101,7 @@ std::string escape_xml (const std::string &s)
 /**
  *  @brief A modified Levenshtein distance for determining in a fuzzy way whether a string is contained in another
  */
-static int 
+static int
 search_pattern_distance (const std::string &a, const std::string &b)
 {
   std::vector<int> row0, row1;
@@ -109,20 +109,19 @@ search_pattern_distance (const std::string &a, const std::string &b)
   row1.resize (a.size () + 1, 0);
 
   for (int i = 0; i <= int (a.size ()); ++i) {
-    row0[i] = 0;
+    row0 [i] = 0;
   }
 
   for (int i = 0; i < int (b.size ()); ++i) {
 
-    row1[0] = i + 1;
+    row1 [0] = i + 1;
 
     for (int j = 0; j < int (a.size ()); ++j) {
-      int cost = (b[i] == a[j] ? 0 : 1);
-      row1[j + 1] = std::min (row0[j] + cost, std::min (row0[j + 1], row1[j]) + 1);
+      int cost = (b [i] == a [j] ? 0 : 1);
+      row1 [j + 1] = std::min (row0 [j] + cost, std::min (row0 [j + 1], row1 [j]) + 1);
     }
 
     row0.swap (row1);
-
   }
 
   int res = row0 [0];
@@ -132,8 +131,7 @@ search_pattern_distance (const std::string &a, const std::string &b)
   return res;
 }
 
-struct EditDistanceSorter 
-{
+struct EditDistanceSorter {
   EditDistanceSorter (const std::string &subject, const std::vector<IndexEntry> &index)
     : m_subject (subject), m_index (index)
   {
@@ -142,10 +140,10 @@ struct EditDistanceSorter
 
   bool operator() (int a, int b) const
   {
-    int d1 = search_pattern_distance (m_index[a].normalized_key, m_subject);
-    int d2 = search_pattern_distance (m_index[b].normalized_key, m_subject);
+    int d1 = search_pattern_distance (m_index [a].normalized_key, m_subject);
+    int d2 = search_pattern_distance (m_index [b].normalized_key, m_subject);
     if (d1 == d2) {
-      return m_index[a].normalized_key.size () < m_index[b].normalized_key.size ();
+      return m_index [a].normalized_key.size () < m_index [b].normalized_key.size ();
     } else {
       return d1 < d2;
     }
@@ -156,8 +154,7 @@ private:
   const std::vector<IndexEntry> &m_index;
 };
 
-struct StringLengthSorter 
-{
+struct StringLengthSorter {
   StringLengthSorter (const std::vector<IndexEntry> &index)
     : m_index (index)
   {
@@ -166,7 +163,7 @@ struct StringLengthSorter
 
   bool operator() (int a, int b) const
   {
-    return (m_index[a].normalized_key.size () < m_index[b].normalized_key.size ());
+    return (m_index [a].normalized_key.size () < m_index [b].normalized_key.size ());
   }
 
 private:
@@ -218,38 +215,34 @@ static QString topic_element = QString::fromUtf8 ("topic");
 static QString topics_element = QString::fromUtf8 ("topics");
 
 /**
- *  @brief A specialization of tl::make_element that is capable of taking a std::map::const_iterator 
+ *  @brief A specialization of tl::make_element that is capable of taking a std::map::const_iterator
  *
  *  The original tl::make_element gives a compiler warning (taking address of temporary)
  *  TODO: consolidate this version and tl::make_element.
  */
 template <class Value, class Iter, class Parent>
-tl::XMLElement<Value, Parent, tl::XMLMemberIterReadAdaptor <Value, Iter, Parent>, tl::XMLMemberAccRefWriteAdaptor <Value, Parent> > 
+tl::XMLElement<Value, Parent, tl::XMLMemberIterReadAdaptor<Value, Iter, Parent>, tl::XMLMemberAccRefWriteAdaptor<Value, Parent>>
 make_element_iter (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), const std::string &name, const tl::XMLElementList &children)
 {
-  return tl::XMLElement<Value, Parent, tl::XMLMemberIterReadAdaptor <Value, Iter, Parent>, tl::XMLMemberAccRefWriteAdaptor <Value, Parent> > ( 
-          tl::XMLMemberIterReadAdaptor <Value, Iter, Parent> (begin, end), 
-          tl::XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, children); 
+  return tl::XMLElement<Value, Parent, tl::XMLMemberIterReadAdaptor<Value, Iter, Parent>, tl::XMLMemberAccRefWriteAdaptor<Value, Parent>> (
+    tl::XMLMemberIterReadAdaptor<Value, Iter, Parent> (begin, end),
+    tl::XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
-static const tl::XMLStruct <HelpSource>
-help_index_structure ("help-index", 
-  tl::make_member<std::string, HelpSource> (&HelpSource::klayout_version, &HelpSource::set_klayout_version, "program-version") +
-  tl::make_element<IndexEntry, std::vector<IndexEntry>::const_iterator, HelpSource> (&HelpSource::begin_index, &HelpSource::end_index, &HelpSource::push_index, "index",
-    tl::make_member<std::string, IndexEntry> (&IndexEntry::key, "literal-key") +
-    tl::make_member<std::string, IndexEntry> (&IndexEntry::normalized_key, "key") +
-    tl::make_member<std::string, IndexEntry> (&IndexEntry::title, "title") +
-    tl::make_member<std::string, IndexEntry> (&IndexEntry::path, "path") 
-  ) +
-  make_element_iter<std::pair<std::string, std::string>, std::map<std::string, std::string>::const_iterator, HelpSource> (&HelpSource::begin_parents, &HelpSource::end_parents, &HelpSource::push_parent, "parent",
-    tl::make_member<std::string, std::pair<std::string, std::string> > (&std::pair<std::string, std::string>::first, "path") +
-    tl::make_member<std::string, std::pair<std::string, std::string> > (&std::pair<std::string, std::string>::second, "parent") 
-  ) +
-  make_element_iter<std::pair<std::string, std::string>, std::vector<std::pair<std::string, std::string> >::const_iterator, HelpSource> (&HelpSource::begin_titles, &HelpSource::end_titles, &HelpSource::push_title, "title",
-    tl::make_member<std::string, std::pair<std::string, std::string> > (&std::pair<std::string, std::string>::first, "path") +
-    tl::make_member<std::string, std::pair<std::string, std::string> > (&std::pair<std::string, std::string>::second, "title") 
-  ) 
-);
+static const tl::XMLStruct<HelpSource>
+  help_index_structure ("help-index",
+                        tl::make_member<std::string, HelpSource> (&HelpSource::klayout_version, &HelpSource::set_klayout_version, "program-version") +
+                          tl::make_element<IndexEntry, std::vector<IndexEntry>::const_iterator, HelpSource> (&HelpSource::begin_index, &HelpSource::end_index, &HelpSource::push_index, "index",
+                                                                                                             tl::make_member<std::string, IndexEntry> (&IndexEntry::key, "literal-key") +
+                                                                                                               tl::make_member<std::string, IndexEntry> (&IndexEntry::normalized_key, "key") +
+                                                                                                               tl::make_member<std::string, IndexEntry> (&IndexEntry::title, "title") +
+                                                                                                               tl::make_member<std::string, IndexEntry> (&IndexEntry::path, "path")) +
+                          make_element_iter<std::pair<std::string, std::string>, std::map<std::string, std::string>::const_iterator, HelpSource> (&HelpSource::begin_parents, &HelpSource::end_parents, &HelpSource::push_parent, "parent",
+                                                                                                                                                  tl::make_member<std::string, std::pair<std::string, std::string>> (&std::pair<std::string, std::string>::first, "path") +
+                                                                                                                                                    tl::make_member<std::string, std::pair<std::string, std::string>> (&std::pair<std::string, std::string>::second, "parent")) +
+                          make_element_iter<std::pair<std::string, std::string>, std::vector<std::pair<std::string, std::string>>::const_iterator, HelpSource> (&HelpSource::begin_titles, &HelpSource::end_titles, &HelpSource::push_title, "title",
+                                                                                                                                                                tl::make_member<std::string, std::pair<std::string, std::string>> (&std::pair<std::string, std::string>::first, "path") +
+                                                                                                                                                                  tl::make_member<std::string, std::pair<std::string, std::string>> (&std::pair<std::string, std::string>::second, "title")));
 
 HelpSource::HelpSource ()
   : m_kindex (0)
@@ -265,8 +258,7 @@ HelpSource::HelpSource (bool make_index)
   }
 }
 
-void
-HelpSource::initialize_index ()
+void HelpSource::initialize_index ()
 {
   try {
 
@@ -312,7 +304,6 @@ HelpSource::initialize_index ()
       } catch (...) {
         tl::warn << "unknown error.";
       }
-
     }
 
     if (! ok && ! per_user_cache_file.empty ()) {
@@ -328,17 +319,15 @@ HelpSource::initialize_index ()
     m_parent_of.clear ();
 
     tl::error << ex.msg ();
-
   }
 }
 
-HelpSource::~HelpSource()
+HelpSource::~HelpSource ()
 {
   //  .. nothing yet ..
 }
 
-void
-HelpSource::produce_index_file (const std::string &path)
+void HelpSource::produce_index_file (const std::string &path)
 {
   scan ();
 
@@ -356,15 +345,13 @@ HelpSource::produce_index_file (const std::string &path)
   }
 }
 
-void
-HelpSource::create_index_file (const std::string &path)
+void HelpSource::create_index_file (const std::string &path)
 {
   HelpSource source (false);
   source.produce_index_file (path);
 }
 
-void
-HelpSource::scan ()
+void HelpSource::scan ()
 {
   m_index.clear ();
   m_titles.clear ();
@@ -381,8 +368,7 @@ HelpSource::klayout_version () const
   return lay::ApplicationBase::version ();
 }
 
-void
-HelpSource::scan (const std::string &path, tl::AbsoluteProgress &progress)
+void HelpSource::scan (const std::string &path, tl::AbsoluteProgress &progress)
 {
   if (tl::verbosity () >= 20) {
     tl::info << "Help provider: scanning contents for " << path;
@@ -407,8 +393,7 @@ HelpSource::scan (const std::string &path, tl::AbsoluteProgress &progress)
   }
 }
 
-void
-HelpSource::scan_child_nodes (const QDomElement &element, const std::string &path, std::vector<std::string> &subtopics, std::string &title, std::string &section)
+void HelpSource::scan_child_nodes (const QDomElement &element, const std::string &path, std::vector<std::string> &subtopics, std::string &title, std::string &section)
 {
   if (element.isNull ()) {
     return;
@@ -420,8 +405,7 @@ HelpSource::scan_child_nodes (const QDomElement &element, const std::string &pat
   }
 }
 
-void
-HelpSource::scan (const QDomElement &element, const std::string &path, std::vector<std::string> &subtopics, std::string &title, std::string &section)
+void HelpSource::scan (const QDomElement &element, const std::string &path, std::vector<std::string> &subtopics, std::string &title, std::string &section)
 {
   if (element.localName () == topic_ref_element) {
 
@@ -439,7 +423,7 @@ HelpSource::scan (const QDomElement &element, const std::string &path, std::vect
 
   } else if (element.localName () == keyword_element) {
 
-    //  remember that location 
+    //  remember that location
     ++m_kindex;
     QString name = element.attribute (name_attribute, QString ());
     QString title_attr = element.attribute (title_attribute, QString ());
@@ -456,7 +440,7 @@ HelpSource::scan (const QDomElement &element, const std::string &path, std::vect
 
   } else if (element.localName () == inline_keyword_element) {
 
-    //  remember that location 
+    //  remember that location
     ++m_kindex;
     std::string t = title;
     if (! section.empty ()) {
@@ -531,18 +515,18 @@ HelpSource::get_image (const std::string &u)
 #else
   if (res.isCompressed ()) {
 #endif
-    data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+    data = qUncompress ((const unsigned char *) res.data (), (int) res.size ());
   } else {
-    data = QByteArray ((const char *)res.data (), (int)res.size ());
+    data = QByteArray ((const char *) res.data (), (int) res.size ());
   }
 
   return QImage::fromData (data);
 }
 
-std::string 
+std::string
 HelpSource::get_css (const std::string &u)
 {
-  std::ifstream t (tl::to_string (QDir (tl::to_qstring (lay::ApplicationBase::instance()->inst_path ())).absoluteFilePath (QString::fromUtf8 ("help_format.css"))).c_str ());
+  std::ifstream t (tl::to_string (QDir (tl::to_qstring (lay::ApplicationBase::instance ()->inst_path ())).absoluteFilePath (QString::fromUtf8 ("help_format.css"))).c_str ());
   if (t.good ()) {
     std::string c;
     while (t.good ()) {
@@ -564,15 +548,15 @@ HelpSource::get_css (const std::string &u)
 #else
   if (res.isCompressed ()) {
 #endif
-    data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+    data = qUncompress ((const unsigned char *) res.data (), (int) res.size ());
   } else {
-    data = QByteArray ((const char *)res.data (), (int)res.size ());
+    data = QByteArray ((const char *) res.data (), (int) res.size ());
   }
 
   return std::string (data.constData (), data.size ());
 }
 
-std::string 
+std::string
 HelpSource::get (const std::string &u)
 {
   BrowserOutline ol;
@@ -587,14 +571,13 @@ HelpSource::get_outline (const std::string &u)
   return ol;
 }
 
-void
-HelpSource::search_completers (const std::string &string, std::list<std::string> &completers)
+void HelpSource::search_completers (const std::string &string, std::list<std::string> &completers)
 {
   size_t n = 0;
   const size_t max_completers = 100;
 
   //  first produce all hits with match
-  for (std::vector <IndexEntry>::const_iterator i = m_index.begin (); i < m_index.end () && n < max_completers; ++i) {
+  for (std::vector<IndexEntry>::const_iterator i = m_index.begin (); i < m_index.end () && n < max_completers; ++i) {
     if (i->normalized_key.find (string) != std::string::npos) {
       completers.push_back (i->key);
       ++n;
@@ -606,7 +589,7 @@ std::string
 HelpSource::next_topic (const std::string &url)
 {
   std::string u = tl::to_string (QUrl::fromEncoded (url.c_str ()).path ());
-  for (size_t t = m_titles.size (); t > 0; ) {
+  for (size_t t = m_titles.size (); t > 0;) {
     --t;
     if (m_titles [t].first == u) {
       if (t + 1 >= m_titles.size ()) {
@@ -619,7 +602,7 @@ HelpSource::next_topic (const std::string &url)
   return std::string ();
 }
 
-std::string  
+std::string
 HelpSource::prev_topic (const std::string &url)
 {
   std::string u = tl::to_string (QUrl::fromEncoded (url.c_str ()).path ());
@@ -639,11 +622,9 @@ HelpSource::produce_main_index ()
   os << "<doc><title>" << tl::to_string (QObject::tr ("Main Index")) << "</title>" << std::endl;
 
   os << "<p>" << tl::to_string (QObject::tr ("Welcome to KLayout's documentation")) << "</p>" << std::endl;
-  os << "<p>" << tl::to_string (QObject::tr (
-    "The documentation is organized in chapters.\n"
-    "For a brief introduction read the User Manual. 'Various Topics' is a collection of brief articles about specific topics.\n"
-    "For Ruby programming see the 'Programming Ruby Scripts' chapter and for a complete Ruby class reference see the 'Class Index'.\n"
-  ));
+  os << "<p>" << tl::to_string (QObject::tr ("The documentation is organized in chapters.\n"
+                                             "For a brief introduction read the User Manual. 'Various Topics' is a collection of brief articles about specific topics.\n"
+                                             "For Ruby programming see the 'Programming Ruby Scripts' chapter and for a complete Ruby class reference see the 'Class Index'.\n"));
   os << "</p>" << std::endl;
 
   os << "<topics>" << std::endl;
@@ -658,11 +639,11 @@ HelpSource::produce_main_index ()
 
   QDomDocument doc;
   QString errorMsg;
-  int errorLine = 0 ;
+  int errorLine = 0;
   if (! doc.setContent (QByteArray (text.c_str (), int (text.size ())), true, &errorMsg, &errorLine)) {
     throw tl::Exception (tl::to_string (errorMsg) + ", in line " + tl::to_string (errorLine) + " of main index");
   }
-  
+
   return doc;
 }
 
@@ -675,11 +656,11 @@ HelpSource::produce_search (const std::string &string)
 
   os << "<h2>" << tl::to_string (QObject::tr ("Search results for")) << " \"" << escape_xml (string) << "\"</h2><p/>" << std::endl;
 
-  std::vector <int> exact_hit_indices;
+  std::vector<int> exact_hit_indices;
 
   int n = 0;
   //  first produce all hits with match
-  for (std::vector <IndexEntry>::const_iterator i = m_index.begin (); i < m_index.end (); ++i, ++n) {
+  for (std::vector<IndexEntry>::const_iterator i = m_index.begin (); i < m_index.end (); ++i, ++n) {
     if (i->normalized_key.find (string) != std::string::npos) {
       exact_hit_indices.push_back (n);
     }
@@ -700,16 +681,15 @@ HelpSource::produce_search (const std::string &string)
     int max_n = 100;
 
     n = 0;
-    for (std::vector <int>::const_iterator i = exact_hit_indices.begin (); i < exact_hit_indices.end () && n < max_n; ++i, ++n) {
+    for (std::vector<int>::const_iterator i = exact_hit_indices.begin (); i < exact_hit_indices.end () && n < max_n; ++i, ++n) {
 
-      const IndexEntry &ie = m_index[*i];
+      const IndexEntry &ie = m_index [*i];
       size_t f = ie.normalized_key.find (string);
 
       os << "<tr>" << std::endl;
       os << "<td>" << escape_xml (std::string (ie.key, 0, f)) << "<b>" << escape_xml (std::string (ie.key, f, string.size ())) << "</b>" << escape_xml (std::string (ie.key, f + string.size ())) << "</td>" << std::endl;
       os << "<td><a href=\"" << ie.path << "\"><nobr>" << escape_xml (ie.title) << "</nobr></a></td>" << std::endl;
       os << "</tr>" << std::endl;
-
     }
 
     if (int (exact_hit_indices.size ()) >= max_n) {
@@ -720,7 +700,7 @@ HelpSource::produce_search (const std::string &string)
 
   } else {
 
-    std::vector <int> indices;
+    std::vector<int> indices;
     indices.reserve (m_index.size ());
     for (int i = 0; i < int (m_index.size ()); ++i) {
       indices.push_back (i);
@@ -736,9 +716,9 @@ HelpSource::produce_search (const std::string &string)
 
     //  Then produce all similar hits if no exact match was found
     n = 0;
-    for (std::vector <int>::const_iterator i = indices.begin (); i < indices.end () && n < max_n; ++i) {
+    for (std::vector<int>::const_iterator i = indices.begin (); i < indices.end () && n < max_n; ++i) {
 
-      const IndexEntry &ie = m_index[*i];
+      const IndexEntry &ie = m_index [*i];
       size_t f = ie.normalized_key.find (string);
 
       if (f == std::string::npos) {
@@ -751,13 +731,11 @@ HelpSource::produce_search (const std::string &string)
         os << "</tr>" << std::endl;
         ++n;
       }
-
     }
 
     if (n > 0) {
       os << "</table>" << std::endl;
     }
-
   }
 
   os << "</doc>" << std::endl;
@@ -766,16 +744,16 @@ HelpSource::produce_search (const std::string &string)
 
   QDomDocument doc;
   QString errorMsg;
-  int errorLine = 0 ;
+  int errorLine = 0;
   if (! doc.setContent (QByteArray (text.c_str (), int (text.size ())), true, &errorMsg, &errorLine)) {
     throw tl::Exception (tl::to_string (errorMsg) + ", in line " + tl::to_string (errorLine) + " of main index");
   }
-  
+
   return doc;
 }
 
-const std::string & 
-HelpSource::parent_of (const std::string &path) 
+const std::string &
+HelpSource::parent_of (const std::string &path)
 {
   std::map<std::string, std::string>::const_iterator t = m_parent_of.find (path);
   if (t != m_parent_of.end ()) {
@@ -786,7 +764,7 @@ HelpSource::parent_of (const std::string &path)
   }
 }
 
-std::string  
+std::string
 HelpSource::process (const QDomDocument &doc, const std::string &path, BrowserOutline &ol)
 {
   QBuffer output;
@@ -804,8 +782,7 @@ HelpSource::process (const QDomDocument &doc, const std::string &path, BrowserOu
   return std::string (output.data ().constData (), output.data ().size ());
 }
 
-void
-HelpSource::process_child_nodes (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer, BrowserOutline &ol)
+void HelpSource::process_child_nodes (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer, BrowserOutline &ol)
 {
   if (element.isNull ()) {
     return;
@@ -824,8 +801,7 @@ HelpSource::process_child_nodes (const QDomElement &element, const std::string &
   }
 }
 
-void
-HelpSource::writeElement (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer, BrowserOutline &ol)
+void HelpSource::writeElement (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer, BrowserOutline &ol)
 {
   //  simply pass all other elements
   writer.writeStartElement (element.nodeName ());
@@ -859,8 +835,7 @@ add_outline_at_level (int i, BrowserOutline &ol, const BrowserOutline &child)
   }
 }
 
-void
-HelpSource::process (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer, BrowserOutline &ol)
+void HelpSource::process (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer, BrowserOutline &ol)
 {
   if (element.localName () == keyword_element) {
 
@@ -940,7 +915,7 @@ HelpSource::process (const QDomElement &element, const std::string &path, QXmlSt
       title = title_elements.item (0).toElement ().text ();
     }
 
-    std::vector<std::pair<std::string, std::string> > pp;
+    std::vector<std::pair<std::string, std::string>> pp;
     pp.push_back (std::make_pair (std::string (), tl::to_string (title)));
 
     std::string pu = parent_of (tl::to_string (QUrl::fromEncoded (path.c_str ()).path ()));
@@ -964,7 +939,7 @@ HelpSource::process (const QDomElement &element, const std::string &path, QXmlSt
     writer.writeStartElement (QString::fromUtf8 ("body"));
     writer.writeStartElement (QString::fromUtf8 ("p"));
     writer.writeAttribute (QString::fromUtf8 ("class"), QString::fromUtf8 ("navigator"));
-    for (std::vector<std::pair<std::string, std::string> >::const_iterator p = pp.begin (); p != pp.end (); ++p) {
+    for (std::vector<std::pair<std::string, std::string>>::const_iterator p = pp.begin (); p != pp.end (); ++p) {
       if (p != pp.begin ()) {
         writer.writeCharacters (QString::fromUtf8 (" ") + QString (QChar (187)) + QString::fromUtf8 (" ")); // &raquo;
       }
@@ -1062,14 +1037,13 @@ HelpSource::process (const QDomElement &element, const std::string &path, QXmlSt
 
     //  simply pass all other elements
     writeElement (element, path, writer, ol);
-
   }
 }
 
 std::string HelpSource::title_for (const std::string &path)
 {
   if (m_title_map.empty ()) {
-    for (std::vector<std::pair<std::string, std::string> >::const_iterator t = m_titles.begin (); t != m_titles.end (); ++t) {
+    for (std::vector<std::pair<std::string, std::string>>::const_iterator t = m_titles.begin (); t != m_titles.end (); ++t) {
       m_title_map.insert (*t);
     }
   }
@@ -1082,7 +1056,7 @@ std::string HelpSource::title_for (const std::string &path)
   }
 }
 
-std::vector<std::string> 
+std::vector<std::string>
 HelpSource::urls ()
 {
   std::vector<std::string> u;
@@ -1093,10 +1067,9 @@ HelpSource::urls ()
   return u;
 }
 
-void
-HelpSource::set_option (const std::string &key, const tl::Variant &value)
+void HelpSource::set_option (const std::string &key, const tl::Variant &value)
 {
-  s_global_options[key] = value;
+  s_global_options [key] = value;
 }
 
 const tl::Variant &
@@ -1112,4 +1085,3 @@ HelpSource::get_option (const std::string &key) const
 }
 
 }
-

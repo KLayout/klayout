@@ -29,8 +29,7 @@ namespace
 
 static size_t obj_count = 0;
 
-struct MyClass1 : public tl::list_node<MyClass1>
-{
+struct MyClass1 : public tl::list_node<MyClass1> {
   MyClass1 (int _n) : n (_n) { ++obj_count; }
   MyClass1 (const MyClass1 &other) : tl::list_node<MyClass1> (), n (other.n) { ++obj_count; }
   ~MyClass1 () { --obj_count; }
@@ -39,11 +38,11 @@ struct MyClass1 : public tl::list_node<MyClass1>
   bool operator< (const MyClass1 &other) const { return n < other.n; }
 };
 
-struct MyClass2 : public tl::list_node<MyClass2>
-{
+struct MyClass2 : public tl::list_node<MyClass2> {
   MyClass2 (int _n) : n (_n) { ++obj_count; }
   ~MyClass2 () { --obj_count; }
   int n;
+
 public:
   MyClass2 (const MyClass2 &other);
   MyClass2 &operator= (const MyClass2 &other);
@@ -58,7 +57,7 @@ static std::string l2s (const tl::list<C> &l)
 {
   std::string x;
   for (typename tl::list<C>::const_iterator i = l.begin (); i != l.end (); ++i) {
-    if (!x.empty ()) {
+    if (! x.empty ()) {
       x += ",";
     }
     x += tl::to_string (i->n);
@@ -71,7 +70,7 @@ static std::string l2sr (const tl::list<C> &l)
 {
   std::string x;
   for (typename tl::list<C>::const_reverse_iterator i = l.rbegin (); i != l.rend (); ++i) {
-    if (!x.empty ()) {
+    if (! x.empty ()) {
       x += ",";
     }
     x += tl::to_string (i->n);
@@ -83,9 +82,9 @@ template <class C>
 static std::string l2sm (const tl::list<C> &l)
 {
   std::string x;
-  for (typename tl::list<C>::const_iterator i = l.end (); i != l.begin (); ) {
+  for (typename tl::list<C>::const_iterator i = l.end (); i != l.begin ();) {
     --i;
-    if (!x.empty ()) {
+    if (! x.empty ()) {
       x += ",";
     }
     x += tl::to_string (i->n);
@@ -97,9 +96,9 @@ template <class C>
 static std::string l2srm (const tl::list<C> &l)
 {
   std::string x;
-  for (typename tl::list<C>::const_reverse_iterator i = l.rend (); i != l.rbegin (); ) {
+  for (typename tl::list<C>::const_reverse_iterator i = l.rend (); i != l.rbegin ();) {
     --i;
-    if (!x.empty ()) {
+    if (! x.empty ()) {
       x += ",";
     }
     x += tl::to_string (i->n);
@@ -112,7 +111,7 @@ static std::string l2s_nc (tl::list<C> &l)
 {
   std::string x;
   for (typename tl::list<C>::iterator i = l.begin (); i != l.end (); ++i) {
-    if (!x.empty ()) {
+    if (! x.empty ()) {
       x += ",";
     }
     x += tl::to_string (i->n);
@@ -125,7 +124,7 @@ static std::string l2sr_nc (tl::list<C> &l)
 {
   std::string x;
   for (typename tl::list<C>::reverse_iterator i = l.rbegin (); i != l.rend (); ++i) {
-    if (!x.empty ()) {
+    if (! x.empty ()) {
       x += ",";
     }
     x += tl::to_string (i->n);
@@ -137,9 +136,9 @@ template <class C>
 static std::string l2sm_nc (tl::list<C> &l)
 {
   std::string x;
-  for (typename tl::list<C>::iterator i = l.end (); i != l.begin (); ) {
+  for (typename tl::list<C>::iterator i = l.end (); i != l.begin ();) {
     --i;
-    if (!x.empty ()) {
+    if (! x.empty ()) {
       x += ",";
     }
     x += tl::to_string (i->n);
@@ -151,9 +150,9 @@ template <class C>
 static std::string l2srm_nc (tl::list<C> &l)
 {
   std::string x;
-  for (typename tl::list<C>::reverse_iterator i = l.rend (); i != l.rbegin (); ) {
+  for (typename tl::list<C>::reverse_iterator i = l.rend (); i != l.rbegin ();) {
     --i;
-    if (!x.empty ()) {
+    if (! x.empty ()) {
       x += ",";
     }
     x += tl::to_string (i->n);
@@ -161,7 +160,7 @@ static std::string l2srm_nc (tl::list<C> &l)
   return x;
 }
 
-TEST(1_Basic)
+TEST (1_Basic)
 {
   obj_count = 0;
 
@@ -275,12 +274,12 @@ TEST(1_Basic)
   EXPECT_EQ (obj_count, size_t (0));
 }
 
-TEST(2_BasicNoCopy)
+TEST (2_BasicNoCopy)
 {
   {
     obj_count = 0;
 
-    MyClass2 mc2 (42);  //  will not be owned
+    MyClass2 mc2 (42); //  will not be owned
     tl::list<MyClass2> l1, l2, l3;
 
     EXPECT_EQ (l1.empty (), true);
@@ -404,7 +403,7 @@ TEST(2_BasicNoCopy)
   EXPECT_EQ (obj_count, size_t (0)); // mc2 gone as well
 }
 
-TEST(3_Insert)
+TEST (3_Insert)
 {
   obj_count = 0;
 
@@ -434,7 +433,7 @@ TEST(3_Insert)
   EXPECT_EQ (i1->n, 12);
   EXPECT_EQ (l1.size (), size_t (4));
 
-  MyClass1 arr[3] = { MyClass1 (1), MyClass1 (2), MyClass1 (3) };
+  MyClass1 arr [3] = {MyClass1 (1), MyClass1 (2), MyClass1 (3)};
 
   i1 = l1.insert (i1, arr + 0, arr + 0);
   EXPECT_EQ (l2s (l1), "42,11,12,17");
@@ -468,5 +467,3 @@ TEST(3_Insert)
   EXPECT_EQ (l2s (l1), "42");
   EXPECT_EQ (l1.size (), size_t (1));
 }
-
-

@@ -318,11 +318,12 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
  *  device equivalence in the context of netlist comparison.
  */
 class DB_PUBLIC DeviceParameterCompareDelegate
-  : public gsi::ObjectBase, public tl::Object
+  : public gsi::ObjectBase,
+    public tl::Object
 {
 public:
-  DeviceParameterCompareDelegate () { }
-  virtual ~DeviceParameterCompareDelegate () { }
+  DeviceParameterCompareDelegate () {}
+  virtual ~DeviceParameterCompareDelegate () {}
 
   virtual bool less (const db::Device &a, const db::Device &b) const = 0;
 };
@@ -356,7 +357,7 @@ public:
   }
 
 private:
-  std::vector<std::pair<size_t, std::pair<double, double> > > m_compare_set;
+  std::vector<std::pair<size_t, std::pair<double, double>>> m_compare_set;
 };
 
 /**
@@ -380,11 +381,12 @@ private:
  *  The device combiner is a delegate that combines devices
  */
 class DB_PUBLIC DeviceCombiner
-  : public gsi::ObjectBase, public tl::Object
+  : public gsi::ObjectBase,
+    public tl::Object
 {
 public:
-  DeviceCombiner () { }
-  virtual ~DeviceCombiner () { }
+  DeviceCombiner () {}
+  virtual ~DeviceCombiner () {}
 
   /**
    *  @brief Combines two devices
@@ -405,7 +407,9 @@ public:
  *  A device class describes a type of device.
  */
 class DB_PUBLIC DeviceClass
-  : public gsi::ObjectBase, public tl::Object, public tl::UniqueId
+  : public gsi::ObjectBase,
+    public tl::Object,
+    public tl::UniqueId
 {
 public:
   typedef size_t terminal_id_type;
@@ -713,7 +717,7 @@ public:
   void set_parameter_compare_delegate (db::DeviceParameterCompareDelegate *delegate)
   {
     if (delegate) {
-      delegate->keep ();  //  assume transfer of ownership for scripts
+      delegate->keep (); //  assume transfer of ownership for scripts
     }
     mp_pc_delegate.reset (delegate);
   }
@@ -742,7 +746,7 @@ public:
   void set_device_combiner (db::DeviceCombiner *combiner)
   {
     if (combiner) {
-      combiner->keep ();  //  assume transfer of ownership for scripts
+      combiner->keep (); //  assume transfer of ownership for scripts
     }
     mp_device_combiner.reset (combiner);
   }
@@ -845,7 +849,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual ~DeviceClassTemplateBase () { }
+  virtual ~DeviceClassTemplateBase () {}
 
   const std::string &name () const
   {

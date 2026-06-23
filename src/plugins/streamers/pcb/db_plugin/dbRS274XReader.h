@@ -44,7 +44,7 @@ namespace db
 
 class RS274XApertureBase;
 
-class RS274XReader 
+class RS274XReader
   : public GerberFileReader
 {
 public:
@@ -78,7 +78,8 @@ private:
   std::vector<db::Polygon> m_clear_polygons;
   std::vector<RS274XApertureBase *> m_apertures;
   std::map<std::string, std::string> m_aperture_macros;
-  enum { ab_xy, ab_yx } m_axis_mapping;
+  enum { ab_xy,
+         ab_yx } m_axis_mapping;
   RS274XApertureBase *m_current_aperture;
   std::string m_net_name;
 
@@ -115,4 +116,3 @@ private:
 }
 
 #endif
-

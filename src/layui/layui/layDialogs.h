@@ -36,30 +36,30 @@ class QModelIndex;
 
 namespace lay
 {
-  class GenericSyntaxHighlighterAttributes;
+class GenericSyntaxHighlighterAttributes;
 }
 
 namespace Ui
 {
-  class LayerSourceDialog;
-  class NewLayoutPropertiesDialog;
-  class NewLayerPropertiesDialog;
-  class NewCellPropertiesDialog;
-  class LayoutViewFunctionDialog;
-  class MoveOptionsDialog;
-  class MoveToOptionsDialog;
-  class DeleteCellModeDialog;
-  class CopyCellModeDialog;
-  class ReplaceCellOptionsDialog;
-  class ClearLayerModeDialog;
-  class OpenLayoutModeDialog;
-  class RenameCellDialog;
-  class DuplicateLayerDialog;
-  class AlignCellOptionsDialog;
-  class FlattenInstOptionsDialog;
-  class UserPropertiesForm;
-  class UserPropertiesEditForm;
-  class UndoRedoListForm;
+class LayerSourceDialog;
+class NewLayoutPropertiesDialog;
+class NewLayerPropertiesDialog;
+class NewCellPropertiesDialog;
+class LayoutViewFunctionDialog;
+class MoveOptionsDialog;
+class MoveToOptionsDialog;
+class DeleteCellModeDialog;
+class CopyCellModeDialog;
+class ReplaceCellOptionsDialog;
+class ClearLayerModeDialog;
+class OpenLayoutModeDialog;
+class RenameCellDialog;
+class DuplicateLayerDialog;
+class AlignCellOptionsDialog;
+class FlattenInstOptionsDialog;
+class UserPropertiesForm;
+class UserPropertiesEditForm;
+class UndoRedoListForm;
 }
 
 namespace lay
@@ -74,7 +74,7 @@ class LayoutViewBase;
 class LAYUI_PUBLIC LayerSourceDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayerSourceDialog (QWidget *parent);
@@ -89,10 +89,10 @@ private:
 /**
  *  @brief The new cell properties dialog
  */
-class LAYUI_PUBLIC NewCellPropertiesDialog 
+class LAYUI_PUBLIC NewCellPropertiesDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   NewCellPropertiesDialog (QWidget *parent);
@@ -110,10 +110,10 @@ private:
 /**
  *  @brief The new layer properties dialog
  */
-class LAYUI_PUBLIC NewLayerPropertiesDialog 
+class LAYUI_PUBLIC NewLayerPropertiesDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   NewLayerPropertiesDialog (QWidget *parent);
@@ -136,9 +136,10 @@ private:
  *  an "apply" callback.
  */
 class LAYUI_PUBLIC LayoutViewFunctionDialog
-  : public QDialog, public tl::Object
+  : public QDialog,
+    public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewFunctionDialog (QWidget *parent, const QString &title, const QString &label);
@@ -162,10 +163,11 @@ private:
 /**
  *  @brief The move options dialog
  */
-class LAYUI_PUBLIC MoveOptionsDialog 
-  : public QDialog, public tl::Object
+class LAYUI_PUBLIC MoveOptionsDialog
+  : public QDialog,
+    public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MoveOptionsDialog (QWidget *parent);
@@ -189,10 +191,10 @@ private:
 /**
  *  @brief The move "to" options dialog
  */
-class LAYUI_PUBLIC MoveToOptionsDialog 
+class LAYUI_PUBLIC MoveToOptionsDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MoveToOptionsDialog (QWidget *parent);
@@ -212,10 +214,10 @@ private:
 /**
  *  @brief The rename cell options dialog
  */
-class LAYUI_PUBLIC RenameCellDialog 
+class LAYUI_PUBLIC RenameCellDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   RenameCellDialog (QWidget *parent);
@@ -236,13 +238,13 @@ private:
 class LAYUI_PUBLIC ReplaceCellOptionsDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   ReplaceCellOptionsDialog (QWidget *parent);
   virtual ~ReplaceCellOptionsDialog ();
 
-  /** 
+  /**
    *  @brief Execute the dialog
    *
    *  The mode is either 0 (for shallow), 1 (for deep) and 2 (for complete)
@@ -259,16 +261,16 @@ private:
 /**
  *  @brief The copy cell options dialog
  */
-class LAYUI_PUBLIC CopyCellModeDialog 
+class LAYUI_PUBLIC CopyCellModeDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   CopyCellModeDialog (QWidget *parent);
   virtual ~CopyCellModeDialog ();
 
-  /** 
+  /**
    *  @brief Execute the dialog
    *
    *  The mode is either 0 (for shallow), 1 (for deep)
@@ -282,16 +284,16 @@ private:
 /**
  *  @brief The delete cell options dialog
  */
-class LAYUI_PUBLIC DeleteCellModeDialog 
+class LAYUI_PUBLIC DeleteCellModeDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   DeleteCellModeDialog (QWidget *parent);
   virtual ~DeleteCellModeDialog ();
 
-  /** 
+  /**
    *  @brief Execute the dialog
    *
    *  The mode is either 0 (for shallow), 1 (for deep) and 2 (for complete)
@@ -305,16 +307,16 @@ private:
 /**
  *  @brief The delete cell options dialog
  */
-class LAYUI_PUBLIC ClearLayerModeDialog 
+class LAYUI_PUBLIC ClearLayerModeDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   ClearLayerModeDialog (QWidget *parent);
   virtual ~ClearLayerModeDialog ();
 
-  /** 
+  /**
    *  @brief Execute the dialog
    *
    *  The mode is either 0 (for locally), 1 (for hierarchically) and 2 (for all)
@@ -328,16 +330,16 @@ private:
 /**
  *  @brief The open layout mode dialog
  */
-class LAYUI_PUBLIC OpenLayoutModeDialog 
+class LAYUI_PUBLIC OpenLayoutModeDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   OpenLayoutModeDialog (QWidget *parent);
   virtual ~OpenLayoutModeDialog ();
 
-  /** 
+  /**
    *  @brief Execute the dialog
    *
    *  The mode is either 0 (to replace current view), 1 (to create new view) and 2 (add to current view)
@@ -351,10 +353,10 @@ private:
 /**
  *  @brief The new layout properties dialog
  */
-class LAYUI_PUBLIC NewLayoutPropertiesDialog 
+class LAYUI_PUBLIC NewLayoutPropertiesDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   NewLayoutPropertiesDialog (QWidget *parent);
@@ -375,10 +377,10 @@ private:
 /**
  *  @brief The duplicate layer operation options
  */
-class LAYUI_PUBLIC DuplicateLayerDialog 
+class LAYUI_PUBLIC DuplicateLayerDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   DuplicateLayerDialog (QWidget *parent);
@@ -399,11 +401,11 @@ private:
 /**
  *  @brief A data structure holding the options for the "align cell" dialog
  */
-struct LAYUI_PUBLIC AlignCellOptions
-{
+struct LAYUI_PUBLIC AlignCellOptions {
   AlignCellOptions ()
     : mode_x (-1), mode_y (-1), xpos (0.0), ypos (0.0), visible_only (false), adjust_parents (true)
-  { }
+  {
+  }
 
   int mode_x, mode_y;
   double xpos, ypos;
@@ -414,10 +416,10 @@ struct LAYUI_PUBLIC AlignCellOptions
 /**
  *  @brief The merge operation options
  */
-class LAYUI_PUBLIC AlignCellOptionsDialog 
+class LAYUI_PUBLIC AlignCellOptionsDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   AlignCellOptionsDialog (QWidget *parent);
@@ -443,7 +445,7 @@ public:
   FlattenInstOptionsDialog (QWidget *parent, bool enable_pruning = true);
   virtual ~FlattenInstOptionsDialog ();
 
-  bool exec_dialog (int &levels, bool &prune); 
+  bool exec_dialog (int &levels, bool &prune);
 
 private:
   Ui::FlattenInstOptionsDialog *mp_ui;
@@ -452,10 +454,10 @@ private:
 /**
  *  @brief The user properties report form
  */
-class LAYUI_PUBLIC UserPropertiesForm 
+class LAYUI_PUBLIC UserPropertiesForm
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   UserPropertiesForm (QWidget *parent);
@@ -486,7 +488,7 @@ private:
 /**
  *  @brief The user properties report form
  */
-class LAYUI_PUBLIC UserPropertiesEditForm 
+class LAYUI_PUBLIC UserPropertiesEditForm
   : public QDialog
 {
 public:
@@ -505,7 +507,7 @@ public:
 class LAYUI_PUBLIC UndoRedoListForm
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   UndoRedoListForm (QWidget *parent, db::Manager *manager, bool for_undo);
@@ -527,4 +529,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

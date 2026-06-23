@@ -29,7 +29,7 @@
 class MyThread : public tl::Thread
 {
 public:
-  MyThread () : m_value (0), m_stop (false) { }
+  MyThread () : m_value (0), m_stop (false) {}
 
   int value ()
   {
@@ -45,7 +45,7 @@ public:
 
   void run ()
   {
-    for (int i = 0; i < 10 && !m_stop; ++i) {
+    for (int i = 0; i < 10 && ! m_stop; ++i) {
       {
         tl::MutexLocker locker (&m_lock);
         ++m_value;
@@ -66,7 +66,7 @@ private:
 };
 
 //  basic: concurrency, ability to stop async, wait
-TEST(1_basic)
+TEST (1_basic)
 {
   MyThread my_thread;
 
@@ -106,10 +106,10 @@ TEST(1_basic)
   EXPECT_EQ (my_thread.value () >= 5 && my_thread.value () < 10, true);
 }
 
-#if !defined(HAVE_QT)
+#if ! defined(HAVE_QT)
 //  basic: thread dtor while running
 //  NOTE: QThread can't handle this - the pthread-based implementation will terminate the thread in this case
-TEST(1_brute_shutdown)
+TEST (1_brute_shutdown)
 {
   MyThread my_thread;
   my_thread.start ();
@@ -118,7 +118,7 @@ TEST(1_brute_shutdown)
 #endif
 
 //  basic: concurrency, ability to stop async, wait
-TEST(1_timed_wait)
+TEST (1_timed_wait)
 {
   MyThread my_thread;
   my_thread.start ();
@@ -140,7 +140,7 @@ void inc (volatile int &value)
 class MyThread2 : public tl::Thread
 {
 public:
-  MyThread2 (bool locked) : m_value (0), m_locked (locked) { }
+  MyThread2 (bool locked) : m_value (0), m_locked (locked) {}
 
   int value ()
   {
@@ -169,7 +169,7 @@ private:
 };
 
 //  Heavily loaded mutex
-TEST(2_locked)
+TEST (2_locked)
 {
   MyThread2 my_thread (true);
   my_thread.start ();
@@ -180,7 +180,7 @@ TEST(2_locked)
 }
 
 //  Cross-check: unlocked
-TEST(2_nonlocked)
+TEST (2_nonlocked)
 {
   MyThread2 my_thread (false);
   my_thread.start ();
@@ -191,14 +191,14 @@ TEST(2_nonlocked)
 }
 
 //  NOTE: ThreadStorage is broken on Qt 4.6.2 (invalid static_cast from type 'void*' to type 'int')
-#if !defined(HAVE_QT) || QT_VERSION >= 0x40700
+#if ! defined(HAVE_QT) || QT_VERSION >= 0x40700
 
 static tl::ThreadStorage<int> s_tls;
 
 class MyThread3 : public tl::Thread
 {
 public:
-  MyThread3 () : m_value (0) { }
+  MyThread3 () : m_value (0) {}
 
   int value ()
   {
@@ -224,7 +224,7 @@ private:
 };
 
 //  Thread-local storage
-TEST(3)
+TEST (3)
 {
   MyThread3 my_thread;
   my_thread.start ();
@@ -244,7 +244,7 @@ static tl::Mutex s_wait_mutex;
 class MyThread4 : public tl::Thread
 {
 public:
-  MyThread4 (int nstop) : m_value (0), m_nstop (nstop), m_stopped (false) { }
+  MyThread4 (int nstop) : m_value (0), m_nstop (nstop), m_stopped (false) {}
 
   int value ()
   {
@@ -277,7 +277,7 @@ private:
 
 
 //  WaitCondition
-TEST(4_wakeAll)
+TEST (4_wakeAll)
 {
   MyThread4 thr1 (3000000), thr2 (7000000);
 
@@ -310,7 +310,7 @@ TEST(4_wakeAll)
 }
 
 //  WaitCondition with two wakeOne
-TEST(4_wakeOne)
+TEST (4_wakeOne)
 {
   MyThread4 thr1 (3000000), thr2 (7000000);
 

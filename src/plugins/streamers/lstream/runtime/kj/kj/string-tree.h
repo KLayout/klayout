@@ -25,9 +25,11 @@
 
 KJ_BEGIN_HEADER
 
-namespace kj {
+namespace kj
+{
 
-class StringTree {
+class StringTree
+{
   // A long string, represented internally as a tree of strings.  This data structure is like a
   // String, but optimized for concatenation and iteration at the expense of seek time.  The
   // structure is intended to be used for building large text blobs from many small pieces, where
@@ -42,26 +44,26 @@ class StringTree {
   // to return StringTree rather than a flat char container.
 
 public:
-  inline StringTree(): size_(0) {}
-  inline StringTree(String&& text): size_(text.size()), text(kj::mv(text)) {}
+  inline StringTree () : size_ (0) {}
+  inline StringTree (String &&text) : size_ (text.size ()), text (kj::mv (text)) {}
 
-  StringTree(Array<StringTree>&& pieces, StringPtr delim);
+  StringTree (Array<StringTree> &&pieces, StringPtr delim);
   // Build a StringTree by concatenating the given pieces, delimited by the given delimiter
   // (e.g. ", ").
 
-  inline size_t size() const { return size_; }
+  inline size_t size () const { return size_; }
 
   template <typename Func>
-  void visit(Func&& func) const;
+  void visit (Func &&func) const;
 
-  String flatten() const;
+  String flatten () const;
   // Return the contents as a string.
 
   // TODO(someday):  flatten() when *this is an rvalue and when branches.size() == 0 could simply
   //   return `kj::mv(text)`.  Requires reference qualifiers (Clang 3.3 / GCC 4.8).
 
-  char* flattenTo(char* __restrict__ target) const;
-  char* flattenTo(char* __restrict__ target, char* limit) const;
+  char *flattenTo (char *__restrict__ target) const;
+  char *flattenTo (char *__restrict__ target, char *limit) const;
   // Copy the contents to the given character array.  Does not add a NUL terminator. Returns a
   // pointer just past the end of what was filled.
 
@@ -70,43 +72,43 @@ private:
   String text;
 
   struct Branch;
-  Array<Branch> branches;  // In order.
+  Array<Branch> branches; // In order.
 
-  inline void fill(char* pos, size_t branchIndex);
+  inline void fill (char *pos, size_t branchIndex);
   template <typename First, typename... Rest>
-  void fill(char* pos, size_t branchIndex, First&& first, Rest&&... rest);
+  void fill (char *pos, size_t branchIndex, First &&first, Rest &&...rest);
   template <typename... Rest>
-  void fill(char* pos, size_t branchIndex, StringTree&& first, Rest&&... rest);
+  void fill (char *pos, size_t branchIndex, StringTree &&first, Rest &&...rest);
   template <typename... Rest>
-  void fill(char* pos, size_t branchIndex, Array<char>&& first, Rest&&... rest);
+  void fill (char *pos, size_t branchIndex, Array<char> &&first, Rest &&...rest);
   template <typename... Rest>
-  void fill(char* pos, size_t branchIndex, String&& first, Rest&&... rest);
+  void fill (char *pos, size_t branchIndex, String &&first, Rest &&...rest);
 
   template <typename... Params>
-  static StringTree concat(Params&&... params);
-  static StringTree&& concat(StringTree&& param) { return kj::mv(param); }
+  static StringTree concat (Params &&...params);
+  static StringTree &&concat (StringTree &&param) { return kj::mv (param); }
 
   template <typename T>
-  static inline size_t flatSize(const T& t) { return t.size(); }
-  static inline size_t flatSize(String&& s) { return 0; }
-  static inline size_t flatSize(StringTree&& s) { return 0; }
+  static inline size_t flatSize (const T &t) { return t.size (); }
+  static inline size_t flatSize (String &&s) { return 0; }
+  static inline size_t flatSize (StringTree &&s) { return 0; }
 
   template <typename T>
-  static inline size_t branchCount(const T& t) { return 0; }
-  static inline size_t branchCount(String&& s) { return 1; }
-  static inline size_t branchCount(StringTree&& s) { return 1; }
+  static inline size_t branchCount (const T &t) { return 0; }
+  static inline size_t branchCount (String &&s) { return 1; }
+  static inline size_t branchCount (StringTree &&s) { return 1; }
 
   template <typename... Params>
-  friend StringTree strTree(Params&&... params);
+  friend StringTree strTree (Params &&...params);
 };
 
-inline StringTree&& KJ_STRINGIFY(StringTree&& tree) { return kj::mv(tree); }
-inline const StringTree& KJ_STRINGIFY(const StringTree& tree) { return tree; }
+inline StringTree &&KJ_STRINGIFY (StringTree &&tree) { return kj::mv (tree); }
+inline const StringTree &KJ_STRINGIFY (const StringTree &tree) { return tree; }
 
-inline StringTree KJ_STRINGIFY(Array<StringTree>&& trees) { return StringTree(kj::mv(trees), ""); }
+inline StringTree KJ_STRINGIFY (Array<StringTree> &&trees) { return StringTree (kj::mv (trees), ""); }
 
 template <typename... Params>
-StringTree strTree(Params&&... params);
+StringTree strTree (Params &&...params);
 // Build a StringTree by stringifying the given parameters and concatenating the results.
 // If any of the parameters stringify to StringTree rvalues, they will be incorporated as
 // branches to avoid a copy.
@@ -114,41 +116,45 @@ StringTree strTree(Params&&... params);
 // =======================================================================================
 // Inline implementation details
 
-namespace _ {  // private
+namespace _
+{ // private
 
 template <typename... Rest>
-char* fill(char* __restrict__ target, const StringTree& first, Rest&&... rest) {
+char *fill (char *__restrict__ target, const StringTree &first, Rest &&...rest)
+{
   // Make str() work with stringifiers that return StringTree by patching fill().
 
-  first.flattenTo(target);
-  return fill(target + first.size(), kj::fwd<Rest>(rest)...);
+  first.flattenTo (target);
+  return fill (target + first.size (), kj::fwd<Rest> (rest)...);
 }
 
 template <typename... Rest>
-char* fillLimited(char* __restrict__ target, char* limit, const StringTree& first, Rest&&... rest) {
+char *fillLimited (char *__restrict__ target, char *limit, const StringTree &first, Rest &&...rest)
+{
   // Make str() work with stringifiers that return StringTree by patching fill().
 
-  target = first.flattenTo(target, limit);
-  return fillLimited(target + first.size(), limit, kj::fwd<Rest>(rest)...);
+  target = first.flattenTo (target, limit);
+  return fillLimited (target + first.size (), limit, kj::fwd<Rest> (rest)...);
 }
 
-template <typename T> constexpr bool isStringTree() { return false; }
-template <> constexpr bool isStringTree<StringTree>() { return true; }
+template <typename T> constexpr bool isStringTree () { return false; }
+template <> constexpr bool isStringTree<StringTree> () { return true; }
 
-inline StringTree&& toStringTreeOrCharSequence(StringTree&& tree) { return kj::mv(tree); }
-inline StringTree toStringTreeOrCharSequence(String&& str) { return StringTree(kj::mv(str)); }
+inline StringTree &&toStringTreeOrCharSequence (StringTree &&tree) { return kj::mv (tree); }
+inline StringTree toStringTreeOrCharSequence (String &&str) { return StringTree (kj::mv (str)); }
 
 template <typename T>
-inline auto toStringTreeOrCharSequence(T&& value)
-    -> decltype(toCharSequence(kj::fwd<T>(value))) {
-  static_assert(!isStringTree<Decay<T>>(),
-      "When passing a StringTree into kj::strTree(), either pass it by rvalue "
-      "(use kj::mv(value)) or explicitly call value.flatten() to make a copy.");
+inline auto toStringTreeOrCharSequence (T &&value)
+  -> decltype (toCharSequence (kj::fwd<T> (value)))
+{
+  static_assert (! isStringTree<Decay<T>> (),
+                 "When passing a StringTree into kj::strTree(), either pass it by rvalue "
+                 "(use kj::mv(value)) or explicitly call value.flatten() to make a copy.");
 
-  return toCharSequence(kj::fwd<T>(value));
+  return toCharSequence (kj::fwd<T> (value));
 }
 
-}  // namespace _ (private)
+} // namespace _ (private)
 
 struct StringTree::Branch {
   size_t index;
@@ -158,62 +164,69 @@ struct StringTree::Branch {
 };
 
 template <typename Func>
-void StringTree::visit(Func&& func) const {
+void StringTree::visit (Func &&func) const
+{
   size_t pos = 0;
-  for (auto& branch: branches) {
+  for (auto &branch : branches) {
     if (branch.index > pos) {
-      func(text.slice(pos, branch.index));
+      func (text.slice (pos, branch.index));
       pos = branch.index;
     }
-    branch.content.visit(func);
+    branch.content.visit (func);
   }
-  if (text.size() > pos) {
-    func(text.slice(pos, text.size()));
+  if (text.size () > pos) {
+    func (text.slice (pos, text.size ()));
   }
 }
 
-inline void StringTree::fill(char* pos, size_t branchIndex) {
-  KJ_IREQUIRE(pos == text.end() && branchIndex == branches.size(),
-              kj::str(text.end() - pos, ' ', branches.size() - branchIndex).cStr());
+inline void StringTree::fill (char *pos, size_t branchIndex)
+{
+  KJ_IREQUIRE (pos == text.end () && branchIndex == branches.size (),
+               kj::str (text.end () - pos, ' ', branches.size () - branchIndex).cStr ());
 }
 
 template <typename First, typename... Rest>
-void StringTree::fill(char* pos, size_t branchIndex, First&& first, Rest&&... rest) {
-  pos = _::fill(pos, kj::fwd<First>(first));
-  fill(pos, branchIndex, kj::fwd<Rest>(rest)...);
+void StringTree::fill (char *pos, size_t branchIndex, First &&first, Rest &&...rest)
+{
+  pos = _::fill (pos, kj::fwd<First> (first));
+  fill (pos, branchIndex, kj::fwd<Rest> (rest)...);
 }
 
 template <typename... Rest>
-void StringTree::fill(char* pos, size_t branchIndex, StringTree&& first, Rest&&... rest) {
-  branches[branchIndex].index = pos - text.begin();
-  branches[branchIndex].content = kj::mv(first);
-  fill(pos, branchIndex + 1, kj::fwd<Rest>(rest)...);
+void StringTree::fill (char *pos, size_t branchIndex, StringTree &&first, Rest &&...rest)
+{
+  branches [branchIndex].index = pos - text.begin ();
+  branches [branchIndex].content = kj::mv (first);
+  fill (pos, branchIndex + 1, kj::fwd<Rest> (rest)...);
 }
 
 template <typename... Rest>
-void StringTree::fill(char* pos, size_t branchIndex, String&& first, Rest&&... rest) {
-  branches[branchIndex].index = pos - text.begin();
-  branches[branchIndex].content = StringTree(kj::mv(first));
-  fill(pos, branchIndex + 1, kj::fwd<Rest>(rest)...);
+void StringTree::fill (char *pos, size_t branchIndex, String &&first, Rest &&...rest)
+{
+  branches [branchIndex].index = pos - text.begin ();
+  branches [branchIndex].content = StringTree (kj::mv (first));
+  fill (pos, branchIndex + 1, kj::fwd<Rest> (rest)...);
 }
 
 template <typename... Params>
-StringTree StringTree::concat(Params&&... params) {
+StringTree StringTree::concat (Params &&...params)
+{
   StringTree result;
-  result.size_ = _::sum({params.size()...});
-  result.text = heapString(
-      _::sum({StringTree::flatSize(kj::fwd<Params>(params))...}));
-  result.branches = heapArray<StringTree::Branch>(
-      _::sum({StringTree::branchCount(kj::fwd<Params>(params))...}));
-  result.fill(result.text.begin(), 0, kj::fwd<Params>(params)...);
+  result.size_ = _::sum ({params.size ()...});
+  result.text = heapString (
+    _::sum ({StringTree::flatSize (kj::fwd<Params> (params))...}));
+  result.branches = heapArray<StringTree::Branch> (
+    _::sum ({StringTree::branchCount (kj::fwd<Params> (params))...}));
+  result.fill (result.text.begin (), 0, kj::fwd<Params> (params)...);
   return result;
 }
 
 template <typename... Params>
-StringTree strTree(Params&&... params) {
-  return StringTree::concat(_::toStringTreeOrCharSequence(kj::fwd<Params>(params))...);
+StringTree strTree (Params &&...params)
+{
+  return StringTree::concat (_::toStringTreeOrCharSequence (kj::fwd<Params> (params))...);
 }
 
-}  // namespace kj
+} // namespace kj
 
 KJ_END_HEADER

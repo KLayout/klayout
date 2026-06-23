@@ -24,11 +24,11 @@
 #define HDR_layAbstractMenu
 
 #if defined(HAVE_QT)
-#  include <QKeySequence>
-#  include <QShortcut>
-#  include <QAction>
-#  include <QMenu>
-#  include <QObject>
+#include <QKeySequence>
+#include <QShortcut>
+#include <QAction>
+#include <QMenu>
+#include <QObject>
 #endif
 
 #include <string>
@@ -60,22 +60,22 @@ class Dispatcher;
 /**
  *  @brief A utility function to convert the packed key binding in the cfg_key_bindings string to a vector
  */
-LAYBASIC_PUBLIC std::vector<std::pair<std::string, std::string> > unpack_key_binding (const std::string &packed);
+LAYBASIC_PUBLIC std::vector<std::pair<std::string, std::string>> unpack_key_binding (const std::string &packed);
 
 /**
  *  @brief A utility function to convert the key binding (as path/shortcut pair vector) to a packed string for cfg_key_bindings
  */
-LAYBASIC_PUBLIC std::string pack_key_binding (const std::vector<std::pair<std::string, std::string> > &unpacked);
+LAYBASIC_PUBLIC std::string pack_key_binding (const std::vector<std::pair<std::string, std::string>> &unpacked);
 
 /**
  *  @brief A utility function to convert the packed hidden flags in the cfg_menu_items_hidden string to a vector
  */
-LAYBASIC_PUBLIC std::vector<std::pair<std::string, bool> > unpack_menu_items_hidden (const std::string &packed);
+LAYBASIC_PUBLIC std::vector<std::pair<std::string, bool>> unpack_menu_items_hidden (const std::string &packed);
 
 /**
  *  @brief A utility function to convert the hidden flags (as path/bool pair vector) to a packed string for cfg_menu_items_hidden
  */
-LAYBASIC_PUBLIC std::string pack_menu_items_hidden (const std::vector<std::pair<std::string, bool> > &unpacked);
+LAYBASIC_PUBLIC std::string pack_menu_items_hidden (const std::vector<std::pair<std::string, bool>> &unpacked);
 
 /**
  *  @brief The basic Action object
@@ -89,13 +89,13 @@ LAYBASIC_PUBLIC std::string pack_menu_items_hidden (const std::vector<std::pair<
  */
 class LAYBASIC_PUBLIC Action :
 #if defined(HAVE_QT)
-    public QObject,
+  public QObject,
 #endif
-    public tl::Object,
-    public gsi::ObjectBase
+  public tl::Object,
+  public gsi::ObjectBase
 {
 #if defined(HAVE_QT)
-Q_OBJECT
+  Q_OBJECT
 #endif
 
 public:
@@ -459,7 +459,9 @@ class LAYBASIC_PUBLIC ConfigureAction
   : public Action
 {
 public:
-  enum type { setter_type = 0, boolean_type = 1, choice_type = 2 };
+  enum type { setter_type = 0,
+              boolean_type = 1,
+              choice_type = 2 };
 
   /**
    *  @brief The default constructor
@@ -472,7 +474,7 @@ public:
    *  @param cname The name of the configuration parameter to set
    *  @param cvalue The value to set "cname" to
    *
-   *  The value can be "?" in which case the configuration action describes 
+   *  The value can be "?" in which case the configuration action describes
    *  a boolean parameter which is mapped to a checkable action.
    */
   ConfigureAction (const std::string &cname, const std::string &value);
@@ -486,7 +488,7 @@ public:
    *  @param cname The name of the configuration parameter to set
    *  @param cvalue The value to set "cname" to
    *
-   *  The value can be "?" in which case the configuration action describes 
+   *  The value can be "?" in which case the configuration action describes
    *  a boolean parameter which is mapped to a checkable action.
    */
   ConfigureAction (const std::string &title, const std::string &cname, const std::string &value);
@@ -534,13 +536,13 @@ public:
    *  This method is called by the main window when the respective configuration changes.
    */
   void configure (const std::string &value);
-  
+
 protected:
   virtual void triggered ();
 
 private:
-  ConfigureAction (const ConfigureAction &action); 
-  ConfigureAction &operator= (const ConfigureAction &action); 
+  ConfigureAction (const ConfigureAction &action);
+  ConfigureAction &operator= (const ConfigureAction &action);
 
   std::string m_cname, m_cvalue;
   type m_type;
@@ -549,8 +551,7 @@ private:
 /**
  *  @brief One item in the abstract menu
  */
-struct LAYBASIC_PUBLIC AbstractMenuItem
-{
+struct LAYBASIC_PUBLIC AbstractMenuItem {
   AbstractMenuItem (lay::Dispatcher *dispatcher);
 
   //  No copy constructor semantics because we don't need it (we use list's) and Action does not provide one.
@@ -566,9 +567,9 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
     return mp_dispatcher;
   }
 
-  const std::string &name () const 
+  const std::string &name () const
   {
-    return m_name;    
+    return m_name;
   }
 
   const std::set<std::string> &groups () const
@@ -626,7 +627,7 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
     m_primary = p;
   }
 
-  std::list <AbstractMenuItem> children;
+  std::list<AbstractMenuItem> children;
 
 private:
   tl::shared_ptr<Action> mp_action;
@@ -650,13 +651,13 @@ private:
  *  The Action is either provided when new entries are inserted or created upon initialisation.
  *
  *  The abstract menu class provides methods to manipulate the menu structure (the state of the
- *  menu items, their title and shortcut key is provided and manipulated through the Action object). 
+ *  menu items, their title and shortcut key is provided and manipulated through the Action object).
  *
  *  Menu items and submenus are referred to by a "path". The path is a string with this interpretation:
  *
- *    ""                 is the root 
- *    "[<path>.]<name>"  is an element of the submenu given by <path>. If <path> is omitted, this refers to 
- *                       an element in the root 
+ *    ""                 is the root
+ *    "[<path>.]<name>"  is an element of the submenu given by <path>. If <path> is omitted, this refers to
+ *                       an element in the root
  *    "[<path>.]end      refers to the item past the last item of the submenu given by <path> or root
  *    "[<path>.]begin    refers to the first item of the submenu given by <path> or root
  *    "[<path>.]#<n>     refers to the nth item of the submenu given by <path> or root (n is an integer number)
@@ -664,7 +665,7 @@ private:
  *  The abstract menu provides methods to obtain QMenu and Action objects associated with a certain
  *  item by specifying a path.
  *
- *  Menu items can be put into groups. The path strings of each group can be obtained with the 
+ *  Menu items can be put into groups. The path strings of each group can be obtained with the
  *  "group" method. An item is put into a group by appending ":<group-name>" to the item's name.
  *  This specification can be used several times.
  *
@@ -672,24 +673,24 @@ private:
  *  with a name of the form "@<name>". Such menu's are created as detached QMenu object's and not
  *  inserted into the main menu. A special detached menu is "@toolbar" which describes all elements
  *  placed into the toolbar passed to build (). Detached menu objects can be retrieved with the
- *  detached_menu () method, passing the desired name (without the "@"). 
+ *  detached_menu () method, passing the desired name (without the "@").
  *  A detached (separate menu bar) can be created as well from detached menu bars. Such menu
- *  bars are specified by submenus starting with "@@". Detached menu bars can be filled using the 
+ *  bars are specified by submenus starting with "@@". Detached menu bars can be filled using the
  *  build_detached () method.
  *
  *  The abstract menu class issues a signal ("changed") if the structure has changed. To recreate the
  *  QMenu objects and fill the QMenuBar, the "build" method needs to be called. This will delete all
- *  QMenu's created so far (except the detached menus), clear the QMenuBar, recreate the QMenu objects (note, that the 
+ *  QMenu's created so far (except the detached menus), clear the QMenuBar, recreate the QMenu objects (note, that the
  *  addresses will change this way!) and refill the QToolBar and QMenuBar.
  */
 class LAYBASIC_PUBLIC AbstractMenu :
 #if defined(HAVE_QT)
-    public QObject,
+  public QObject,
 #endif
-    public gsi::ObjectBase
+  public gsi::ObjectBase
 {
 #if defined(HAVE_QT)
-Q_OBJECT
+  Q_OBJECT
 #endif
 
 public:
@@ -697,8 +698,8 @@ public:
    *  @brief Create the abstract menu object attached to the given main window
    */
   AbstractMenu (Dispatcher *dispatcher);
-  
-  /** 
+
+  /**
    *  @brief Destroy the abstract menu object
    */
   ~AbstractMenu ();
@@ -720,7 +721,7 @@ public:
   void build (QMenuBar *mbar, QToolBar *tbar);
 
   /**
-   *  @brief Rebuild a menu into a 
+   *  @brief Rebuild a menu into a
    *
    *  This will fill the given menu bar with a menu from
    *  a "@.." top level entry. The menu bar is cleared and rebuilt.
@@ -775,7 +776,7 @@ public:
   /**
    *  @brief Get the Action object for a given item (const version)
    */
-  const Action *action(const std::string &path) const;
+  const Action *action (const std::string &path) const;
 
   /**
    *  @brief Get the subitems for a given submenu
@@ -812,11 +813,11 @@ public:
   /**
    *  @brief Insert a new item before the one given by the path
    *
-   *  The action passed to this method is copied as the item's action. The item will refer to 
+   *  The action passed to this method is copied as the item's action. The item will refer to
    *  this action and issue triggered events on this.
    *
    *  @param path The path to the item before which to insert the new item
-   *  @param name The name of the item to insert 
+   *  @param name The name of the item to insert
    *  @param action The action associated with the item
    *
    *  NOTE: the abstract menu will take ownership of the Action object.
@@ -827,9 +828,9 @@ public:
    *  @brief Insert a new separator before the one item by the path
    *
    *  @param path The path to the item before which to insert the separator
-   *  @param name The name of the separator to insert 
+   *  @param name The name of the separator to insert
    */
-  void insert_separator (const std::string &path, const std::string &name); 
+  void insert_separator (const std::string &path, const std::string &name);
 
   /**
    *  @brief Insert a new submenu before the item given by the path
@@ -838,7 +839,7 @@ public:
    *  unless "owned" is true.
    *
    *  @param path The path to the item before which to insert the new submenu
-   *  @param name The name of the submenu to insert 
+   *  @param name The name of the submenu to insert
    *  @param action The action associated with the submenu
    */
   void insert_menu (const std::string &path, const std::string &name, Action *action);
@@ -850,10 +851,10 @@ public:
    *  in the form <text>["("shortcut")"]["<"icon-resource">"].
    *
    *  @param path The path to the item before which to insert the submenu
-   *  @param name The name of the submenu to insert 
+   *  @param name The name of the submenu to insert
    *  @param title The title of the submenu to insert
    */
-  void insert_menu (const std::string &path, const std::string &name, const std::string &title); 
+  void insert_menu (const std::string &path, const std::string &name, const std::string &title);
 
   /**
    *  @brief Deletes the children of the item with the given path
@@ -938,7 +939,7 @@ signals:
 private:
   friend class Action;
 
-  std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> > find_item (tl::Extractor &extr);
+  std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator>> find_item (tl::Extractor &extr);
   const AbstractMenuItem *find_item_for_action (const Action *action, const AbstractMenuItem *from = 0) const;
   AbstractMenuItem *find_item_for_action (const Action *action, AbstractMenuItem *from = 0);
 #if defined(HAVE_QT)
@@ -955,7 +956,7 @@ private:
 #if defined(HAVE_QT)
   std::map<std::string, QActionGroup *> m_action_groups;
 #endif
-  std::map<std::string, std::vector<ConfigureAction *> > m_config_action_by_name;
+  std::map<std::string, std::vector<ConfigureAction *>> m_config_action_by_name;
   bool m_config_actions_valid;
 };
 

@@ -36,46 +36,47 @@ class shape_as_user_object
 public:
   shape_as_user_object (const Sh &sh)
     : m_shape (sh)
-  { }
+  {
+  }
 
-  virtual bool equals (const db::DUserObjectBase *d) const 
+  virtual bool equals (const db::DUserObjectBase *d) const
   {
     return m_shape == (dynamic_cast<const shape_as_user_object<Sh> *> (d))->m_shape;
   }
 
-  virtual bool less (const db::DUserObjectBase *d) const 
+  virtual bool less (const db::DUserObjectBase *d) const
   {
     return m_shape < (dynamic_cast<const shape_as_user_object<Sh> *> (d))->m_shape;
   }
 
-  virtual unsigned int class_id () const 
+  virtual unsigned int class_id () const
   {
     return (unsigned int) (size_t) &tag_func;
   }
 
-  virtual db::DUserObjectBase *clone () const 
+  virtual db::DUserObjectBase *clone () const
   {
     return new shape_as_user_object<Sh> (m_shape);
   }
 
-  virtual db::DBox box () const 
+  virtual db::DBox box () const
   {
     db::box_convert<Sh> bc;
     return db::DBox (bc (m_shape));
   }
 
-  virtual void transform (const db::simple_trans<db::DCoord> &t) 
-  { 
+  virtual void transform (const db::simple_trans<db::DCoord> &t)
+  {
     m_shape.transform (db::simple_trans<typename Sh::coord_type> (t));
   }
 
-  virtual void transform (const db::DFTrans &t) 
-  { 
+  virtual void transform (const db::DFTrans &t)
+  {
     m_shape.transform (t);
   }
 
   virtual void transform (const db::complex_trans<db::DCoord, db::DCoord> &)
-  { 
+  {
     tl_assert (false);
   }
 
@@ -92,7 +93,7 @@ public:
 private:
   Sh m_shape;
 
-  static void tag_func () { }
+  static void tag_func () {}
 };
 
 template <class Sh>
@@ -102,7 +103,7 @@ db::DUserObject us (const Sh &sh)
 }
 
 
-TEST(1) 
+TEST (1)
 {
   db::Manager m (true);
   lay::AnnotationShapes s (&m);
@@ -120,7 +121,7 @@ TEST(1)
   s.insert (us (e));
   s.update_bbox ();
   EXPECT_EQ (s.bbox (), db::DBox (-100, -200, 1000, 1200));
-  
+
   lay::AnnotationShapes s2 (s);
   s2.update_bbox ();
   EXPECT_EQ (s2.bbox (), db::DBox (-100, -200, 1000, 1200));
@@ -170,9 +171,9 @@ void read_testdata (lay::AnnotationShapes &shapes, unsigned int what = 0xff)
     static db::DPath r1;
     static db::DPath r2;
     static db::DPath r3;
-    db::DPoint pts1 [] = { db::DPoint (0, 100), db::DPoint (0, 500), db::DPoint (200, 700) };
-    db::DPoint pts2 [] = { db::DPoint (0, 1100), db::DPoint (0, 1500), db::DPoint (200, 1300) };
-    db::DPoint pts3 [] = { db::DPoint (0, 2100), db::DPoint (0, 2500), db::DPoint (-200, 2700) };
+    db::DPoint pts1 [] = {db::DPoint (0, 100), db::DPoint (0, 500), db::DPoint (200, 700)};
+    db::DPoint pts2 [] = {db::DPoint (0, 1100), db::DPoint (0, 1500), db::DPoint (200, 1300)};
+    db::DPoint pts3 [] = {db::DPoint (0, 2100), db::DPoint (0, 2500), db::DPoint (-200, 2700)};
     r1 = db::DPath (pts1, pts1 + 3, 100);
     r2 = db::DPath (pts2, pts2 + 3, 150);
     r3 = db::DPath (pts3, pts3 + 3, 200);
@@ -203,7 +204,7 @@ void read_testdata (lay::AnnotationShapes &shapes, unsigned int what = 0xff)
   }
 }
 
-TEST(2)
+TEST (2)
 {
   db::Manager m (true);
   lay::AnnotationShapes shapes (&m);
@@ -211,38 +212,34 @@ TEST(2)
 
   lay::AnnotationShapes copy (&m);
 
-  EXPECT_EQ (shapes_to_string (shapes), 
-    "polygon (0,100;0,2000;1000,2000;1000,100)\n"
-    "polygon (100,200;100,2100;1100,2100;1100,200)\n"
-    "polygon (150,150;150,2050;1150,2050;1150,150)\n"
-  );
+  EXPECT_EQ (shapes_to_string (shapes),
+             "polygon (0,100;0,2000;1000,2000;1000,100)\n"
+             "polygon (100,200;100,2100;1100,2100;1100,200)\n"
+             "polygon (150,150;150,2050;1150,2050;1150,150)\n");
 
   copy.clear ();
   for (lay::AnnotationShapes::iterator shape = shapes.begin (); shape != shapes.end (); ++shape) {
     copy.insert (*shape);
   }
-  EXPECT_EQ (shapes_to_string (copy), 
-    "polygon (0,100;0,2000;1000,2000;1000,100)\n"
-    "polygon (100,200;100,2100;1100,2100;1100,200)\n"
-    "polygon (150,150;150,2050;1150,2050;1150,150)\n"
-  );
+  EXPECT_EQ (shapes_to_string (copy),
+             "polygon (0,100;0,2000;1000,2000;1000,100)\n"
+             "polygon (100,200;100,2100;1100,2100;1100,200)\n"
+             "polygon (150,150;150,2050;1150,2050;1150,150)\n");
 
   shapes.erase (shapes.begin ());
-  EXPECT_EQ (shapes_to_string (shapes), 
-    "polygon (100,200;100,2100;1100,2100;1100,200)\n"
-    "polygon (150,150;150,2050;1150,2050;1150,150)\n"
-  );
+  EXPECT_EQ (shapes_to_string (shapes),
+             "polygon (100,200;100,2100;1100,2100;1100,200)\n"
+             "polygon (150,150;150,2050;1150,2050;1150,150)\n");
 
   shapes.erase (shapes.begin ());
-  EXPECT_EQ (shapes_to_string (shapes), 
-    "polygon (150,150;150,2050;1150,2050;1150,150)\n"
-  );
+  EXPECT_EQ (shapes_to_string (shapes),
+             "polygon (150,150;150,2050;1150,2050;1150,150)\n");
 
   shapes.erase (shapes.begin ());
   EXPECT_EQ (shapes_to_string (shapes), "");
 }
 
-TEST(3)
+TEST (3)
 {
   db::Manager m (true);
   lay::AnnotationShapes shapes (&m);
@@ -250,38 +247,34 @@ TEST(3)
 
   lay::AnnotationShapes copy (&m);
 
-  EXPECT_EQ (shapes_to_string (shapes), 
-    "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
-    "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
-    "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n"
-  );
+  EXPECT_EQ (shapes_to_string (shapes),
+             "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
+             "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
+             "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n");
 
   copy.clear ();
   for (lay::AnnotationShapes::iterator shape = shapes.begin (); shape != shapes.end (); ++shape) {
     copy.insert (*shape);
   }
-  EXPECT_EQ (shapes_to_string (copy), 
-    "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
-    "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
-    "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n"
-  );
+  EXPECT_EQ (shapes_to_string (copy),
+             "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
+             "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
+             "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n");
 
   shapes.erase (shapes.begin ());
-  EXPECT_EQ (shapes_to_string (shapes), 
-    "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
-    "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n"
-  );
+  EXPECT_EQ (shapes_to_string (shapes),
+             "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
+             "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n");
 
   shapes.erase (shapes.begin ());
-  EXPECT_EQ (shapes_to_string (shapes), 
-    "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n"
-  );
+  EXPECT_EQ (shapes_to_string (shapes),
+             "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n");
 
   shapes.erase (shapes.begin ());
   EXPECT_EQ (shapes_to_string (shapes), "");
 }
 
-TEST(4)
+TEST (4)
 {
   db::Manager m (true);
   lay::AnnotationShapes shapes (&m);
@@ -289,11 +282,10 @@ TEST(4)
 
   lay::AnnotationShapes copy (&m);
 
-  EXPECT_EQ (shapes_to_string (shapes), 
-    "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
-    "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
-    "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n"
-  );
+  EXPECT_EQ (shapes_to_string (shapes),
+             "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
+             "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
+             "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n");
 
   copy.clear ();
   for (lay::AnnotationShapes::iterator shape = shapes.begin (); shape != shapes.end (); ++shape) {
@@ -301,22 +293,19 @@ TEST(4)
     copy.insert (*shape);
     m.commit ();
   }
-  EXPECT_EQ (shapes_to_string (copy), 
-    "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
-    "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
-    "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n"
-  );
+  EXPECT_EQ (shapes_to_string (copy),
+             "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
+             "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
+             "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n");
 
   m.undo ();
-  EXPECT_EQ (shapes_to_string (copy), 
-    "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
-    "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
-  );
+  EXPECT_EQ (shapes_to_string (copy),
+             "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
+             "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n");
 
   m.undo ();
-  EXPECT_EQ (shapes_to_string (copy), 
-    "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
-  );
+  EXPECT_EQ (shapes_to_string (copy),
+             "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n");
 
   m.undo ();
   EXPECT_EQ (shapes_to_string (copy), "");
@@ -324,14 +313,13 @@ TEST(4)
   m.redo ();
   m.redo ();
   m.redo ();
-  EXPECT_EQ (shapes_to_string (copy), 
-    "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
-    "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
-    "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n"
-  );
+  EXPECT_EQ (shapes_to_string (copy),
+             "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
+             "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
+             "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n");
 }
 
-TEST(5)
+TEST (5)
 {
   db::Manager m (true);
   lay::AnnotationShapes shapes (&m);
@@ -339,45 +327,41 @@ TEST(5)
 
   lay::AnnotationShapes copy (&m);
 
-  EXPECT_EQ (shapes_to_string (shapes), 
-    "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
-    "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
-    "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n"
-  );
+  EXPECT_EQ (shapes_to_string (shapes),
+             "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
+             "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
+             "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n");
 
   copy.clear ();
   m.transaction ("x");
   copy = shapes;
   m.commit ();
 
-  EXPECT_EQ (shapes_to_string (copy), 
-    "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
-    "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
-    "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n"
-  );
+  EXPECT_EQ (shapes_to_string (copy),
+             "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
+             "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
+             "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n");
 
   m.undo ();
   EXPECT_EQ (shapes_to_string (copy), "");
 
   m.redo ();
-  EXPECT_EQ (shapes_to_string (copy), 
-    "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
-    "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
-    "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n"
-  );
+  EXPECT_EQ (shapes_to_string (copy),
+             "path (0,100;0,500;200,700) w=100 bx=0 ex=0 r=false\n"
+             "path (0,1100;0,1500;200,1300) w=150 bx=0 ex=0 r=false\n"
+             "path (0,2100;0,2500;-200,2700) w=200 bx=0 ex=0 r=false\n");
 }
 
-TEST(6)
+TEST (6)
 {
   db::Manager m (true);
   lay::AnnotationShapes shapes (&m);
   read_testdata (shapes, 0x10);
 
-  EXPECT_EQ (shapes_to_string (shapes), 
-    "box (0,100;2000,1000)\n"
-    "box (100,200;2100,1100)\n"
-    "box (150,150;2150,1050)\n"
-  );
+  EXPECT_EQ (shapes_to_string (shapes),
+             "box (0,100;2000,1000)\n"
+             "box (100,200;2100,1100)\n"
+             "box (150,150;2150,1050)\n");
 
   shapes.update ();
 
@@ -388,23 +372,21 @@ TEST(6)
     copy.insert (*shape);
   }
 
-  EXPECT_EQ (shapes_to_string (copy), 
-    "box (0,100;2000,1000)\n"
-    "box (100,200;2100,1100)\n"
-  );
+  EXPECT_EQ (shapes_to_string (copy),
+             "box (0,100;2000,1000)\n"
+             "box (100,200;2100,1100)\n");
 }
 
-TEST(7)
+TEST (7)
 {
   db::Manager m (true);
   lay::AnnotationShapes shapes (&m);
   read_testdata (shapes, 0x10);
 
-  EXPECT_EQ (shapes_to_string (shapes), 
-    "box (0,100;2000,1000)\n"
-    "box (100,200;2100,1100)\n"
-    "box (150,150;2150,1050)\n"
-  );
+  EXPECT_EQ (shapes_to_string (shapes),
+             "box (0,100;2000,1000)\n"
+             "box (100,200;2100,1100)\n"
+             "box (150,150;2150,1050)\n");
 
   lay::AnnotationShapes copy (&m);
 
@@ -415,8 +397,6 @@ TEST(7)
     copy.insert (*shape);
   }
 
-  EXPECT_EQ (shapes_to_string (copy), 
-    "box (0,100;2000,1000)\n"
-  );
+  EXPECT_EQ (shapes_to_string (copy),
+             "box (0,100;2000,1000)\n");
 }
-

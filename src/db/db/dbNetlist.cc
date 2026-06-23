@@ -75,14 +75,14 @@ Netlist &Netlist::operator= (const Netlist &other)
     std::map<const DeviceClass *, DeviceClass *> dct;
     for (const_device_class_iterator dc = other.begin_device_classes (); dc != other.end_device_classes (); ++dc) {
       DeviceClass *dc_new = dc->clone ();
-      dct [dc.operator-> ()] = dc_new;
+      dct [dc.operator->()] = dc_new;
       m_device_classes.push_back (dc_new);
     }
 
     std::map<const DeviceAbstract *, DeviceAbstract *> dmt;
     for (const_abstract_model_iterator dm = other.begin_device_abstracts (); dm != other.end_device_abstracts (); ++dm) {
       DeviceAbstract *dm_new = new DeviceAbstract (*dm);
-      dmt [dm.operator-> ()] = dm_new;
+      dmt [dm.operator->()] = dm_new;
       m_device_abstracts.push_back (dm_new);
     }
 
@@ -91,14 +91,13 @@ Netlist &Netlist::operator= (const Netlist &other)
       Circuit *ct_new = new Circuit (*i);
       ct_new->translate_device_classes (dct);
       ct_new->translate_device_abstracts (dmt);
-      ct [i.operator-> ()] = ct_new;
+      ct [i.operator->()] = ct_new;
       add_circuit (ct_new);
     }
 
     for (circuit_iterator i = begin_circuits (); i != end_circuits (); ++i) {
       i->translate_circuits (ct);
     }
-
   }
   return *this;
 }
@@ -159,18 +158,17 @@ void Netlist::invalidate_topology ()
       m_child_circuits.clear ();
       m_parent_circuits.clear ();
     }
-
   }
 }
 
-namespace {
-  struct sort_by_index
+namespace
+{
+struct sort_by_index {
+  bool operator() (const Circuit *a, const Circuit *b) const
   {
-    bool operator () (const Circuit *a, const Circuit *b) const
-    {
-      return a->index () < b->index ();
-    }
-  };
+    return a->index () < b->index ();
+  }
+};
 }
 
 void Netlist::validate_topology ()
@@ -224,7 +222,6 @@ void Netlist::validate_topology ()
     pc.insert (pc.end (), parents.begin (), parents.end ());
     //  sort by index for better reproducibility
     std::sort (pc.begin (), pc.end (), sort_by_index ());
-
   }
 
   //  do topology sorting
@@ -248,7 +245,7 @@ void Netlist::validate_topology ()
 
     for (circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
       if (m_parent_circuits [c->index ()].size () == num_parents [c->index ()]) {
-        m_top_down_circuits.push_back (c.operator-> ());
+        m_top_down_circuits.push_back (c.operator->());
         num_parents [c->index ()] = std::numeric_limits<cell_index_type>::max ();
       }
     }
@@ -272,7 +269,6 @@ void Netlist::validate_topology ()
     //  doing this reverse will mean we preserve bottom-up order. This is useful for
     //  netlists where subcircuits have to be defined before they are used.
     std::reverse (m_top_down_circuits.begin () + n_top_down_circuits, m_top_down_circuits.end ());
-
   }
 
   //  Determine the number of top cells
@@ -374,7 +370,7 @@ Circuit *Netlist::top_circuit ()
   } else if (ntop > 1) {
     throw tl::Exception (tl::to_string (tr ("Netlist contains more than a single top circuit")));
   } else {
-    return begin_top_down ().operator-> ();
+    return begin_top_down ().operator->();
   }
 }
 
@@ -389,7 +385,7 @@ std::vector<Circuit *> Netlist::top_circuits ()
   std::vector<Circuit *> result;
   result.reserve (ntop);
   for (auto c = begin_top_down (); ntop > 0 && c != end_top_down (); ++c) {
-    result.push_back (c.operator-> ());
+    result.push_back (c.operator->());
     --ntop;
   }
   return result;
@@ -401,7 +397,7 @@ std::vector<const Circuit *> Netlist::top_circuits () const
   std::vector<const Circuit *> result;
   result.reserve (ntop);
   for (auto c = begin_top_down (); ntop > 0 && c != end_top_down (); ++c) {
-    result.push_back (c.operator-> ());
+    result.push_back (c.operator->());
     --ntop;
   }
   return result;
@@ -499,8 +495,8 @@ void Netlist::flatten_circuits (const std::vector<Circuit *> &circuits)
   //  Before flatten, we sort top-down. This optimizes for the case of flattening away
   //  some hierarchy above a certain circuit.
   for (top_down_circuit_iterator c = begin_top_down (); c != end_top_down (); ++c) {
-    if (circuits_set.find (c.operator-> ()) != circuits_set.end ()) {
-      to_flatten.push_back (c.operator-> ());
+    if (circuits_set.find (c.operator->()) != circuits_set.end ()) {
+      to_flatten.push_back (c.operator->());
     }
   }
 
@@ -520,7 +516,7 @@ void Netlist::flatten_circuit (Circuit *circuit)
 
   std::vector<db::SubCircuit *> refs;
   for (db::Circuit::refs_iterator sc = circuit->begin_refs (); sc != circuit->end_refs (); ++sc) {
-    refs.push_back (sc.operator-> ());
+    refs.push_back (sc.operator->());
   }
 
   for (std::vector<db::SubCircuit *>::const_iterator r = refs.begin (); r != refs.end (); ++r) {
@@ -537,13 +533,13 @@ void Netlist::flatten ()
   std::set<db::Circuit *> top_circuits;
   size_t ntop = top_circuit_count ();
   for (db::Netlist::top_down_circuit_iterator tc = begin_top_down (); tc != end_top_down () && ntop > 0; ++tc) {
-    top_circuits.insert (tc.operator-> ());
+    top_circuits.insert (tc.operator->());
     --ntop;
   }
 
-  for (db::Netlist::bottom_up_circuit_iterator c = begin_bottom_up (); c != end_bottom_up(); ++c) {
-    if (top_circuits.find (c.operator-> ()) == top_circuits.end ()) {
-      flatten_circuit (c.operator-> ());
+  for (db::Netlist::bottom_up_circuit_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
+    if (top_circuits.find (c.operator->()) == top_circuits.end ()) {
+      flatten_circuit (c.operator->());
     }
   }
 }
@@ -554,7 +550,7 @@ DeviceClass *Netlist::device_class_by_name (const std::string &name)
 
   for (device_class_iterator d = begin_device_classes (); d != end_device_classes (); ++d) {
     if (d->name () == nn) {
-      return d.operator-> ();
+      return d.operator->();
     }
   }
   return 0;
@@ -626,22 +622,23 @@ void Netlist::purge_devices ()
   }
 }
 
-namespace {
+namespace
+{
 
-  struct CompareNetByName
+struct CompareNetByName {
+  CompareNetByName (const db::Netlist *netlist)
+    : mp_netlist (netlist)
   {
-    CompareNetByName (const db::Netlist *netlist)
-      : mp_netlist (netlist)
-    { }
+  }
 
-    bool operator() (const db::Net *a, const db::Net *b)
-    {
-      return mp_netlist->normalize_name (a->name ()) < mp_netlist->normalize_name (b->name ());
-    }
+  bool operator() (const db::Net *a, const db::Net *b)
+  {
+    return mp_netlist->normalize_name (a->name ()) < mp_netlist->normalize_name (b->name ());
+  }
 
-  private:
-    const db::Netlist *mp_netlist;
-  };
+private:
+  const db::Netlist *mp_netlist;
+};
 
 }
 
@@ -650,7 +647,7 @@ void Netlist::make_top_level_pins (bool sort_by_name)
   size_t ntop = top_circuit_count ();
   for (top_down_circuit_iterator c = begin_top_down (); c != end_top_down () && ntop > 0; ++c, --ntop) {
 
-    Circuit *circuit = c.operator-> ();
+    Circuit *circuit = c.operator->();
 
     if (circuit->pin_count () == 0) {
 
@@ -659,7 +656,7 @@ void Netlist::make_top_level_pins (bool sort_by_name)
       //  create pins for the named nets and connect them
       for (Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
         if (! n->name ().empty () && n->terminal_count () + n->subcircuit_pin_count () > 0) {
-          nets_for_pins.push_back (n.operator-> ());
+          nets_for_pins.push_back (n.operator->());
         }
       }
 
@@ -672,9 +669,7 @@ void Netlist::make_top_level_pins (bool sort_by_name)
         Pin pin = circuit->add_pin ((*n)->name ());
         circuit->connect_pin (pin.id (), *n);
       }
-
     }
-
   }
 }
 
@@ -686,7 +681,7 @@ void Netlist::purge ()
 
   for (bottom_up_circuit_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
 
-    Circuit *circuit = c.operator-> ();
+    Circuit *circuit = c.operator->();
 
     //  purge floating, disconnected nets
     circuit->purge_nets ();
@@ -701,12 +696,10 @@ void Netlist::purge ()
 
       //  No nets left: delete the subcircuits that refer to us and finally delete the circuit
       while (circuit->begin_refs () != circuit->end_refs ()) {
-        delete circuit->begin_refs ().operator-> ();
+        delete circuit->begin_refs ().operator->();
       }
       delete circuit;
-
     }
-
   }
 }
 
@@ -813,7 +806,6 @@ std::string Netlist::to_string () const
     }
 
     res += std::string ("end;\n");
-
   }
 
   return res;
@@ -848,7 +840,6 @@ static db::Net *read_net (tl::Extractor &ex, db::Circuit *circuit, std::map<std:
     ex.read_word_or_quoted (nn);
 
     has_name = true;
-
   }
 
   std::map<std::string, db::Net *>::const_iterator i = n2n.find (nn);
@@ -868,7 +859,6 @@ static db::Net *read_net (tl::Extractor &ex, db::Circuit *circuit, std::map<std:
   } else {
 
     return i->second;
-
   }
 }
 
@@ -908,7 +898,6 @@ static void read_pins (tl::Extractor &ex, db::Circuit *circuit, std::map<std::st
     }
 
     ex.test (",");
-
   }
 
   if (circuit->pin_count () < org_pins.size ()) {
@@ -949,7 +938,6 @@ static void read_device_terminals (tl::Extractor &ex, db::Device *device, std::m
     }
 
     ex.test (",");
-
   }
 }
 
@@ -986,7 +974,6 @@ static void read_device_parameters (tl::Extractor &ex, db::Device *device)
     device->set_parameter_value (pid, value);
 
     ex.test (",");
-
   }
 }
 
@@ -999,7 +986,7 @@ static void read_device (tl::Extractor &ex, db::Circuit *circuit, std::map<std::
   db::DeviceClass *dc = 0;
   for (db::Netlist::device_class_iterator i = netlist->begin_device_classes (); i != netlist->end_device_classes (); ++i) {
     if (i->name () == dcn) {
-      dc = i.operator-> ();
+      dc = i.operator->();
     }
   }
   if (! dc) {
@@ -1058,7 +1045,6 @@ static void read_subcircuit_pins (tl::Extractor &ex, db::Circuit *circuit, db::S
     ex.test (",");
 
     ++pi;
-
   }
 
   if (pi != circuit_ref->end_pins ()) {
@@ -1147,11 +1133,9 @@ void Netlist::from_string (const std::string &s)
       } else {
         ex.error (tl::to_string (tr ("device or subcircuit expected")));
       }
-
     }
 
     ex.expect (";");
-
   }
 
   ex.expect_end ();

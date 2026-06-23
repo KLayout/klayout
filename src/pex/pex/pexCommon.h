@@ -21,31 +21,31 @@
 */
 
 
-#if !defined(HDR_pexCommon_h)
-# define HDR_pexCommon_h
+#if ! defined(HDR_pexCommon_h)
+#define HDR_pexCommon_h
 
-# if defined _WIN32 || defined __CYGWIN__
+#if defined _WIN32 || defined __CYGWIN__
 
-#   ifdef MAKE_PEX_LIBRARY
-#     define PEX_PUBLIC __declspec(dllexport)
-#   else
-#     define PEX_PUBLIC __declspec(dllimport)
-#   endif
-#   define PEX_LOCAL
-#   define PEX_PUBLIC_TEMPLATE
+#ifdef MAKE_PEX_LIBRARY
+#define PEX_PUBLIC __declspec (dllexport)
+#else
+#define PEX_PUBLIC __declspec (dllimport)
+#endif
+#define PEX_LOCAL
+#define PEX_PUBLIC_TEMPLATE
 
-# else
+#else
 
-#   if __GNUC__ >= 4 || defined(__clang__)
-#     define PEX_PUBLIC __attribute__ ((visibility ("default")))
-#     define PEX_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
-#     define PEX_LOCAL  __attribute__ ((visibility ("hidden")))
-#   else
-#     define PEX_PUBLIC
-#     define PEX_PUBLIC_TEMPLATE
-#     define PEX_LOCAL
-#   endif
+#if __GNUC__ >= 4 || defined(__clang__)
+#define PEX_PUBLIC __attribute__ ((visibility ("default")))
+#define PEX_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
+#define PEX_LOCAL __attribute__ ((visibility ("hidden")))
+#else
+#define PEX_PUBLIC
+#define PEX_PUBLIC_TEMPLATE
+#define PEX_LOCAL
+#endif
 
-# endif
+#endif
 
 #endif

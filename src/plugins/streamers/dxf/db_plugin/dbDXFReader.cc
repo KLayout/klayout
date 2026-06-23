@@ -39,12 +39,12 @@
 #include <set>
 
 #if defined(HAVE_QT)
-# include <QString>
-# include <QStringList>
-# include <QFont>
-# include <QFontMetrics>
-# include <QPolygon>
-# include <QPainterPath>
+#include <QString>
+#include <QStringList>
+#include <QFont>
+#include <QFontMetrics>
+#include <QPolygon>
+#include <QPainterPath>
 #endif
 
 namespace db
@@ -96,25 +96,22 @@ DXFReader::~DXFReader ()
   //  .. nothing yet ..
 }
 
-void 
-DXFReader::check_coord (double x)
+void DXFReader::check_coord (double x)
 {
   //  Note: we stay on the safe side by dropping one bit (*0.5)
-  if (x < std::numeric_limits <db::Coord>::min () * 0.5 ||
-      x > std::numeric_limits <db::Coord>::max () * 0.5) {
+  if (x < std::numeric_limits<db::Coord>::min () * 0.5 ||
+      x > std::numeric_limits<db::Coord>::max () * 0.5) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
 }
 
-void 
-DXFReader::check_point (const db::DPoint &p)
+void DXFReader::check_point (const db::DPoint &p)
 {
   check_coord (p.x ());
   check_coord (p.y ());
 }
 
-void
-DXFReader::check_vector (const db::DVector &p)
+void DXFReader::check_vector (const db::DVector &p)
 {
   check_coord (p.x ());
   check_coord (p.y ());
@@ -134,7 +131,7 @@ DXFReader::safe_from_double (const db::DPolygon &p)
   return db::Polygon (p);
 }
 
-db::SimplePolygon 
+db::SimplePolygon
 DXFReader::safe_from_double (const db::DSimplePolygon &p)
 {
   for (db::DPolygon::polygon_contour_iterator q = p.begin_hull (); q != p.end_hull (); ++q) {
@@ -143,7 +140,7 @@ DXFReader::safe_from_double (const db::DSimplePolygon &p)
   return db::SimplePolygon (p);
 }
 
-db::Text 
+db::Text
 DXFReader::safe_from_double (const db::DText &p)
 {
   check_vector (p.trans ().disp ());
@@ -151,7 +148,7 @@ DXFReader::safe_from_double (const db::DText &p)
   return db::Text (p);
 }
 
-db::Path 
+db::Path
 DXFReader::safe_from_double (const db::DPath &p)
 {
   for (db::DPath::iterator q = p.begin (); q != p.end (); ++q) {
@@ -163,7 +160,7 @@ DXFReader::safe_from_double (const db::DPath &p)
   return db::Path (p);
 }
 
-db::Point 
+db::Point
 DXFReader::safe_from_double (const db::DPoint &p)
 {
   check_point (p);
@@ -185,7 +182,7 @@ DXFReader::safe_from_double (const db::DEdge &p)
   return db::Edge (p);
 }
 
-db::Box 
+db::Box
 DXFReader::safe_from_double (const db::DBox &p)
 {
   check_point (p.p1 ());
@@ -193,8 +190,7 @@ DXFReader::safe_from_double (const db::DBox &p)
   return db::Box (p);
 }
 
-void
-DXFReader::parse_entity (const std::string &entity_code, size_t &nsolids, size_t &closed_polylines)
+void DXFReader::parse_entity (const std::string &entity_code, size_t &nsolids, size_t &closed_polylines)
 {
   int g;
 
@@ -221,8 +217,7 @@ DXFReader::parse_entity (const std::string &entity_code, size_t &nsolids, size_t
   }
 }
 
-int 
-DXFReader::determine_polyline_mode ()
+int DXFReader::determine_polyline_mode ()
 {
   m_initial = true;
   m_line_number = 0;
@@ -235,7 +230,7 @@ DXFReader::determine_polyline_mode ()
 
   while (true) {
 
-    while ((g = read_group_code()) != 0) {
+    while ((g = read_group_code ()) != 0) {
       skip_value (g);
     }
 
@@ -246,7 +241,7 @@ DXFReader::determine_polyline_mode ()
 
     } else if (name == "SECTION") {
 
-      while ((g = read_group_code()) != 2) {
+      while ((g = read_group_code ()) != 2) {
         skip_value (g);
       }
 
@@ -255,7 +250,7 @@ DXFReader::determine_polyline_mode ()
 
         while (true) {
 
-          while ((g = read_group_code()) != 0) {
+          while ((g = read_group_code ()) != 0) {
             skip_value (g);
           }
 
@@ -272,13 +267,12 @@ DXFReader::determine_polyline_mode ()
                 break;
               } else {
                 parse_entity (entity_code, nsolids, closed_polylines);
-              } 
+              }
             }
 
           } else if (entity == "ENDSEC") {
             break;
           }
-
         }
 
       } else if (section_name == "ENTITIES") {
@@ -293,14 +287,10 @@ DXFReader::determine_polyline_mode ()
             break;
           } else {
             parse_entity (entity_code, nsolids, closed_polylines);
-          } 
+          }
         }
-
-
       }
-
     }
-
   }
 
   //  if at least one "solid style" entity is found, create lines from polylines. Otherwise create polygons from closed polylines.
@@ -348,7 +338,7 @@ DXFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   set_create_layers (specific_options.create_other_layers);
   set_keep_layer_names (specific_options.keep_layer_names);
 
-  db::cell_index_type top = layout.add_cell("TOP"); // TODO: make variable ..
+  db::cell_index_type top = layout.add_cell ("TOP"); // TODO: make variable ..
 
   check_dbu (m_dbu);
   layout.dbu (m_dbu);
@@ -364,8 +354,7 @@ DXFReader::read (db::Layout &layout)
   return read (layout, db::LoadLayoutOptions ());
 }
 
-void 
-DXFReader::error (const std::string &msg)
+void DXFReader::error (const std::string &msg)
 {
   if (m_ascii) {
     throw DXFReaderException (msg, m_line_number, m_cellname, m_stream.source ());
@@ -374,8 +363,7 @@ DXFReader::error (const std::string &msg)
   }
 }
 
-void 
-DXFReader::warn (const std::string &msg, int wl)
+void DXFReader::warn (const std::string &msg, int wl)
 {
   if (warn_level () < wl) {
     return;
@@ -403,8 +391,7 @@ DXFReader::warn (const std::string &msg, int wl)
   }
 }
 
-void
-DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
+void DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
 {
   prepare_layers (layout);
 
@@ -423,7 +410,6 @@ DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
     db::LayerProperties lp_zero (0, 0, zero_layer_name);
     m_zero_layer = layout.insert_layer (lp_zero);
     map_layer (zero_layer_name, m_zero_layer);
-
   }
 
   //  Read sections
@@ -432,7 +418,7 @@ DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
 
   while (true) {
 
-    while ((g = read_group_code()) != 0) {
+    while ((g = read_group_code ()) != 0) {
       skip_value (g);
     }
 
@@ -443,7 +429,7 @@ DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
 
     } else if (name == "SECTION") {
 
-      while ((g = read_group_code()) != 2) {
+      while ((g = read_group_code ()) != 2) {
         skip_value (g);
       }
 
@@ -452,7 +438,7 @@ DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
 
         while (true) {
 
-          while ((g = read_group_code()) != 0) {
+          while ((g = read_group_code ()) != 0) {
             skip_value (g);
           }
 
@@ -462,7 +448,6 @@ DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
           } else if (entity == "ENDSEC") {
             break;
           }
-
         }
 
       } else if (section_name == "TABLES") {
@@ -502,17 +487,13 @@ DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
                   if (read_string (true) == "ENDTAB") {
                     break;
                   }
-
                 }
-
               }
-
             }
 
           } else if (entity == "ENDSEC") {
             break;
           }
-
         }
 
       } else if (section_name == "ENTITIES") {
@@ -532,23 +513,18 @@ DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
             skip_value (g);
           }
         } while (read_string (true) != "ENDSEC");
-
       }
-
     }
-
   }
 
   finish_layers (layout);
 }
 
-void
-DXFReader::cleanup (db::Layout &layout, db::cell_index_type top_cell)
+void DXFReader::cleanup (db::Layout &layout, db::cell_index_type top_cell)
 {
-  std::vector <db::cell_index_type> cells_to_delete;
+  std::vector<db::cell_index_type> cells_to_delete;
 
-  do
-  {
+  do {
     cells_to_delete.clear ();
 
     //  remove all cells which are not used except for the top cell
@@ -559,16 +535,16 @@ DXFReader::cleanup (db::Layout &layout, db::cell_index_type top_cell)
     }
 
     //  it's more efficient to remove the cells afterwards because is_top requires an updated hierarchy
-    for (std::vector <db::cell_index_type>::const_iterator c = cells_to_delete.begin (); c != cells_to_delete.end (); ++c) {
+    for (std::vector<db::cell_index_type>::const_iterator c = cells_to_delete.begin (); c != cells_to_delete.end (); ++c) {
       layout.delete_cell (*c);
     }
 
     //  deleting cells can make other cells "top", thus we iterate
 
-  } while (!cells_to_delete.empty ());
+  } while (! cells_to_delete.empty ());
 
   //  rename the remaining cells
-  for (std::map <std::string, db::cell_index_type>::const_iterator b = m_block_per_name.begin (); b != m_block_per_name.end (); ++b) {
+  for (std::map<std::string, db::cell_index_type>::const_iterator b = m_block_per_name.begin (); b != m_block_per_name.end (); ++b) {
     if (layout.is_valid_cell_index (b->second)) {
       layout.rename_cell (b->second, layout.uniquify_cell_name (b->first.c_str ()).c_str ());
     }
@@ -579,8 +555,7 @@ DXFReader::cleanup (db::Layout &layout, db::cell_index_type top_cell)
   m_block_per_name.clear ();
 }
 
-void
-DXFReader::read_cell (db::Layout &layout)
+void DXFReader::read_cell (db::Layout &layout)
 {
   std::string cell_name;
   double xoff = 0.0, yoff = 0.0;
@@ -598,9 +573,9 @@ DXFReader::read_cell (db::Layout &layout)
     }
   }
 
-  std::map <std::string, db::cell_index_type>::const_iterator b = m_block_per_name.find (cell_name);
+  std::map<std::string, db::cell_index_type>::const_iterator b = m_block_per_name.find (cell_name);
   if (b == m_block_per_name.end ()) {
-          
+
     //  create a first representative. Later, layer variants are built
     db::cell_index_type cell = layout.add_cell ();
     m_block_per_name.insert (std::make_pair (cell_name, cell));
@@ -612,17 +587,15 @@ DXFReader::read_cell (db::Layout &layout)
     //  read the entities and create all layer variants required so far.
     read_entities (layout, layout.cell (b->second), db::DVector (-xoff, -yoff));
 
-    for (std::map <VariantKey, db::cell_index_type>::const_iterator b2l = m_block_to_variant.begin (); b2l != m_block_to_variant.end (); ++b2l) {
+    for (std::map<VariantKey, db::cell_index_type>::const_iterator b2l = m_block_to_variant.begin (); b2l != m_block_to_variant.end (); ++b2l) {
       if (b2l->first.cell_index == b->second) {
         fill_layer_variant_cell (layout, cell_name, b->second, b2l->second, b2l->first.layer, b2l->first.sx, b2l->first.sy);
       }
     }
-
   }
 }
 
-void 
-DXFReader::fill_layer_variant_cell (db::Layout &layout, const std::string & /*cellname*/, db::cell_index_type template_cell, db::cell_index_type var_cell, unsigned int layer, double sx, double sy)
+void DXFReader::fill_layer_variant_cell (db::Layout &layout, const std::string & /*cellname*/, db::cell_index_type template_cell, db::cell_index_type var_cell, unsigned int layer, double sx, double sy)
 {
   m_used_template_cells.insert (template_cell);
 
@@ -634,7 +607,7 @@ DXFReader::fill_layer_variant_cell (db::Layout &layout, const std::string & /*ce
 
     db::CellInstArray cell_inst = i->cell_inst ();
 
-    // replace instances to template cells (those are not layer variants yet). This 
+    // replace instances to template cells (those are not layer variants yet). This
     // achieves a recursive variant building.
     std::map<db::cell_index_type, std::string>::const_iterator tc = m_template_cells.find (cell_inst.object ().cell_index ());
     if (tc != m_template_cells.end () || fabs (sx - 1.0) > 1e-6 || fabs (sy - 1.0) > 1e-6) {
@@ -654,16 +627,14 @@ DXFReader::fill_layer_variant_cell (db::Layout &layout, const std::string & /*ce
       } else {
         cell_inst = db::CellInstArray (obj, t);
       }
-
     }
 
     target.insert (cell_inst);
-
   }
 
   if (fabs (sx - 1.0) < 1e-6 && fabs (sy - 1.0) < 1e-6) {
 
-    //  copy the shapes except for the zero layer ... 
+    //  copy the shapes except for the zero layer ...
     for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
       if ((*l).first != m_zero_layer || layer == m_zero_layer) {
         target.shapes ((*l).first) = src.shapes ((*l).first);
@@ -682,7 +653,7 @@ DXFReader::fill_layer_variant_cell (db::Layout &layout, const std::string & /*ce
 
     db::Matrix3d m (sx, 0.0, 0.0, sy);
 
-    //  copy the shapes except for the zero layer ... 
+    //  copy the shapes except for the zero layer ...
     for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
       if ((*l).first != m_zero_layer || layer == m_zero_layer) {
         for (db::Shapes::shape_iterator s = src.shapes ((*l).first).begin (db::Shapes::shape_iterator::All); ! s.at_end (); ++s) {
@@ -698,12 +669,10 @@ DXFReader::fill_layer_variant_cell (db::Layout &layout, const std::string & /*ce
         insert_scaled (ts, *s, m);
       }
     }
-
   }
 }
 
-void 
-DXFReader::insert_scaled (db::Shapes &target, const db::Shape &src, const db::Matrix3d &m)
+void DXFReader::insert_scaled (db::Shapes &target, const db::Shape &src, const db::Matrix3d &m)
 {
   if (src.is_edge ()) {
     db::Edge e;
@@ -727,7 +696,7 @@ DXFReader::insert_scaled (db::Shapes &target, const db::Shape &src, const db::Ma
   }
 }
 
-db::cell_index_type 
+db::cell_index_type
 DXFReader::make_layer_variant (db::Layout &layout, const std::string &cellname, db::cell_index_type template_cell, unsigned int layer, double sx, double sy)
 {
   db::cell_index_type ci;
@@ -737,7 +706,7 @@ DXFReader::make_layer_variant (db::Layout &layout, const std::string &cellname, 
     return template_cell;
   }
 
-  std::map <VariantKey, db::cell_index_type>::const_iterator b2l = m_block_to_variant.find (VariantKey (template_cell, layer, sx, sy));
+  std::map<VariantKey, db::cell_index_type>::const_iterator b2l = m_block_to_variant.find (VariantKey (template_cell, layer, sx, sy));
   if (b2l == m_block_to_variant.end ()) {
 
     //  create a new base layer variant
@@ -753,7 +722,7 @@ DXFReader::make_layer_variant (db::Layout &layout, const std::string &cellname, 
   return ci;
 }
 
-db::DCplxTrans 
+db::DCplxTrans
 DXFReader::global_trans (const db::DVector &offset, double ex, double ey, double ez)
 {
   if (fabs (ex) > 1e-6 || fabs (ey) > 1e-6 || fabs (fabs (ez) - 1.0) > 1e-6) {
@@ -768,8 +737,7 @@ DXFReader::global_trans (const db::DVector &offset, double ex, double ey, double
   }
 }
 
-int
-DXFReader::ncircle_for_radius (double rad) const
+int DXFReader::ncircle_for_radius (double rad) const
 {
   double accu = std::max (m_circle_accuracy, m_dbu / m_unit);
 
@@ -784,10 +752,9 @@ DXFReader::ncircle_for_radius (double rad) const
   return int (0.5 + std::max (4.0, 1.0 / std::max (1.0 / double (std::max (4, m_circle_points)), delta)));
 }
 
-void 
-DXFReader::add_bulge_segment (std::vector<db::DPoint> &points, const db::DPoint &p, double b)
+void DXFReader::add_bulge_segment (std::vector<db::DPoint> &points, const db::DPoint &p, double b)
 {
-  if (!points.empty () && fabs (b) > 1e-10) {
+  if (! points.empty () && fabs (b) > 1e-10) {
 
     double a = 2.0 * atan (b);
 
@@ -806,7 +773,6 @@ DXFReader::add_bulge_segment (std::vector<db::DPoint> &points, const db::DPoint 
     for (int i = 0; i < n; ++i) {
       points.push_back (m + r * (dr * cos (da * (0.5 + i))) + s * (dr * sin (da * (0.5 + i))));
     }
-
   }
 
   points.push_back (p);
@@ -823,7 +789,7 @@ De Boor algorithm for NURBS
 */
 
 static db::DPoint
-b_spline_point (double x, const std::vector<std::pair<db::DPoint, double> > &control_points, int p, const std::vector<double> &t, int &k)
+b_spline_point (double x, const std::vector<std::pair<db::DPoint, double>> &control_points, int p, const std::vector<double> &t, int &k)
 {
   double eps = 1e-12 * (fabs (t.back ()) + fabs (t.front ()));
 
@@ -837,22 +803,22 @@ b_spline_point (double x, const std::vector<std::pair<db::DPoint, double> > &con
 
   std::vector<db::DPoint> d;
   std::vector<double> dw;
-  d.reserve(p + 1);
+  d.reserve (p + 1);
   for (int j = 0; j <= p; ++j) {
-    double w = control_points[j + k - p].second;
-    d.push_back (control_points[j + k - p].first * w);
+    double w = control_points [j + k - p].second;
+    d.push_back (control_points [j + k - p].first * w);
     dw.push_back (w);
   }
 
   for (int r = 1; r <= p; ++r) {
     for (int j = p; j >= r; --j) {
-      double alpha = (x - t[j + k - p]) / (t[j + 1 + k - r] - t[j + k - p]);
-      d[j] = d[j] * alpha + (d[j - 1] - d[j - 1] * alpha);
-      dw[j] = dw[j] * alpha + dw[j - 1] * (1.0 - alpha);
+      double alpha = (x - t [j + k - p]) / (t [j + 1 + k - r] - t [j + k - p]);
+      d [j] = d [j] * alpha + (d [j - 1] - d [j - 1] * alpha);
+      dw [j] = dw [j] * alpha + dw [j - 1] * (1.0 - alpha);
     }
   }
 
-  return d[p] * (1.0 / dw[p]);
+  return d [p] * (1.0 / dw [p]);
 }
 
 /**
@@ -878,7 +844,7 @@ spline_interpolate (std::list<db::DPoint> &curve_points,
                     std::list<db::DPoint>::iterator current_curve_point,
                     double t_start,
                     double dt,
-                    const std::vector<std::pair<db::DPoint, double> > &control_points,
+                    const std::vector<std::pair<db::DPoint, double>> &control_points,
                     int degree,
                     const std::vector<double> &knots,
                     double sin_da,
@@ -896,7 +862,7 @@ spline_interpolate (std::list<db::DPoint> &curve_points,
 
   db::DVector p1 (s1, *current_curve_point);
   db::DVector p2 (*pm, s1);
-  double pl1 = p1.length(), pl2 = p2.length();
+  double pl1 = p1.length (), pl2 = p2.length ();
 
   if (k1 != k2) {
 
@@ -910,7 +876,7 @@ spline_interpolate (std::list<db::DPoint> &curve_points,
 
     db::DVector q1 (s2, *pm);
     db::DVector q2 (*pe, s2);
-    double ql1 = q1.length(), ql2 = q2.length();
+    double ql1 = q1.length (), ql2 = q2.length ();
 
     db::DVector p (*pm, *current_curve_point);
     db::DVector q (*pe, *pm);
@@ -932,7 +898,6 @@ spline_interpolate (std::list<db::DPoint> &curve_points,
 
         curve_points.insert (pm, s1);
         spline_interpolate (curve_points, current_curve_point, t_start, dt * 0.5, control_points, degree, knots, sin_da, accu);
-
       }
 
       if (fabs (db::vprod (q1, q)) > ql * accu) {
@@ -942,24 +907,21 @@ spline_interpolate (std::list<db::DPoint> &curve_points,
 
         curve_points.insert (pe, s2);
         spline_interpolate (curve_points, pm, t_start + dt, dt * 0.5, control_points, degree, knots, sin_da, accu);
-
       }
-
     }
-
   }
 }
 
 std::list<db::DPoint>
-DXFReader::spline_interpolation (std::vector<std::pair<db::DPoint, double> > &control_points, int degree, const std::vector<double> &knots)
+DXFReader::spline_interpolation (std::vector<std::pair<db::DPoint, double>> &control_points, int degree, const std::vector<double> &knots)
 {
   //  TODO: this is quite inefficient
-  if (int (knots.size()) != int (control_points.size() + degree + 1)) {
+  if (int (knots.size ()) != int (control_points.size () + degree + 1)) {
     warn ("Spline interpolation failed: mismatch between number of knots and points");
     return std::list<db::DPoint> ();
   }
 
-  if (int(knots.size ()) <= degree || control_points.empty () || degree <= 1) {
+  if (int (knots.size ()) <= degree || control_points.empty () || degree <= 1) {
     return std::list<db::DPoint> ();
   }
 
@@ -985,10 +947,9 @@ DXFReader::spline_interpolation (std::vector<std::pair<db::DPoint, double> > &co
   return new_points;
 }
 
-void 
-DXFReader::elliptic_interpolation (std::vector<db::DPoint> &points, const std::vector<double> &rmin, const std::vector<db::DPoint> &vmaj, const std::vector<double> &start, const std::vector<double> &end, const std::vector<int> &ccw)
+void DXFReader::elliptic_interpolation (std::vector<db::DPoint> &points, const std::vector<double> &rmin, const std::vector<db::DPoint> &vmaj, const std::vector<double> &start, const std::vector<double> &end, const std::vector<int> &ccw)
 {
-  if (rmin.size () != points.size () || vmaj.size () != points.size () || start.size () != points.size () || end.size () != points.size () || (!ccw.empty () && ccw.size () != points.size ())) {
+  if (rmin.size () != points.size () || vmaj.size () != points.size () || start.size () != points.size () || end.size () != points.size () || (! ccw.empty () && ccw.size () != points.size ())) {
     warn ("Elliptic arc interpolation failed: mismatch between number of parameters and points");
     return;
   }
@@ -1018,23 +979,21 @@ DXFReader::elliptic_interpolation (std::vector<db::DPoint> &points, const std::v
       vy = -vy;
     }
 
-    new_points.push_back (points[i] + vx * cos (sa) + vy * sin (sa));
+    new_points.push_back (points [i] + vx * cos (sa) + vy * sin (sa));
 
     for (int j = 0; j < n; ++j) {
-      new_points.push_back (points[i] + vx * (dr * cos (sa + (j + 0.5) * da)) + vy * (dr * sin (sa + (j + 0.5) * da)));
+      new_points.push_back (points [i] + vx * (dr * cos (sa + (j + 0.5) * da)) + vy * (dr * sin (sa + (j + 0.5) * da)));
     }
 
-    new_points.push_back (points[i] + vx * cos (ea) + vy * sin (ea));
-
+    new_points.push_back (points [i] + vx * cos (ea) + vy * sin (ea));
   }
 
   points.swap (new_points);
 }
 
-void
-DXFReader::arc_interpolation (std::vector<db::DPoint> &points, const std::vector<double> &rad, const std::vector<double> &start, const std::vector<double> &end, const std::vector<int> &ccw)
+void DXFReader::arc_interpolation (std::vector<db::DPoint> &points, const std::vector<double> &rad, const std::vector<double> &start, const std::vector<double> &end, const std::vector<int> &ccw)
 {
-  if (rad.size () != points.size () || start.size () != points.size () || end.size () != points.size () || (!ccw.empty () && ccw.size () != points.size ())) {
+  if (rad.size () != points.size () || start.size () != points.size () || end.size () != points.size () || (! ccw.empty () && ccw.size () != points.size ())) {
     warn ("Circular arc interpolation failed: mismatch between number of parameters and points");
     return;
   }
@@ -1064,21 +1023,19 @@ DXFReader::arc_interpolation (std::vector<db::DPoint> &points, const std::vector
       vy = -vy;
     }
 
-    new_points.push_back (points[i] + vx * cos (sa) + vy * sin (sa));
+    new_points.push_back (points [i] + vx * cos (sa) + vy * sin (sa));
 
     for (int j = 0; j < n; ++j) {
-      new_points.push_back (points[i] + vx * (dr * cos (sa + (0.5 + j) * da)) + vy * (dr * sin (sa + (0.5 + j) * da)));
+      new_points.push_back (points [i] + vx * (dr * cos (sa + (0.5 + j) * da)) + vy * (dr * sin (sa + (0.5 + j) * da)));
     }
 
-    new_points.push_back (points[i] + vx * cos (ea) + vy * sin (ea));
-
+    new_points.push_back (points [i] + vx * cos (ea) + vy * sin (ea));
   }
 
   points.swap (new_points);
 }
 
-void
-DXFReader::deliver_points_to_edges (std::vector<db::DPoint> &points, const std::vector<db::DPoint> &points2, const db::DCplxTrans &tt, int edge_type, int value94, const std::vector<double> &value40, const std::vector<double> &value50, const std::vector<double> &value51, const std::vector<int> &value73, std::vector<db::Edge> &iedges)
+void DXFReader::deliver_points_to_edges (std::vector<db::DPoint> &points, const std::vector<db::DPoint> &points2, const db::DCplxTrans &tt, int edge_type, int value94, const std::vector<double> &value40, const std::vector<double> &value50, const std::vector<double> &value51, const std::vector<int> &value73, std::vector<db::Edge> &iedges)
 {
   if (points.empty ()) {
     return;
@@ -1086,7 +1043,7 @@ DXFReader::deliver_points_to_edges (std::vector<db::DPoint> &points, const std::
 
   if (edge_type == 4) {
 
-    std::vector<std::pair<db::DPoint, double> > control_points;
+    std::vector<std::pair<db::DPoint, double>> control_points;
     control_points.reserve (points.size ());
     for (std::vector<db::DPoint>::const_iterator p = points.begin (); p != points.end (); ++p) {
       control_points.push_back (std::make_pair (*p, 1.0));
@@ -1121,7 +1078,6 @@ DXFReader::deliver_points_to_edges (std::vector<db::DPoint> &points, const std::
   } else if (edge_type == 3) {
 
     elliptic_interpolation (points, value40, points2, value50, value51, value73);
-
   }
 
   //  produce the edges. If cont is true, continue with the previous edge
@@ -1141,7 +1097,7 @@ DXFReader::deliver_points_to_edges (std::vector<db::DPoint> &points, const std::
  *  @brief Adds closing edges to the loop
  *  For this we look for edges not having a connecting edge and insert edges to the nearest points.
  */
-static void 
+static void
 finish_loop (size_t from, size_t to, std::vector<db::Edge> &edges)
 {
   std::multiset<db::Point> p1;
@@ -1181,9 +1137,7 @@ finish_loop (size_t from, size_t to, std::vector<db::Edge> &edges)
       }
 
       edges.push_back (db::Edge (pi2, p1min));
-
     }
-
   }
 }
 
@@ -1213,24 +1167,24 @@ normalize_string (const std::string &in, bool for_mtext)
   */
   std::string s;
 
-  for (const char *c = in.c_str (); *c; ) {
+  for (const char *c = in.c_str (); *c;) {
 
-    if (*c == '%' && c[1] == '%' && c[2] && tolower (c[2]) == 'p') {
+    if (*c == '%' && c [1] == '%' && c [2] && tolower (c [2]) == 'p') {
       //  replace %%p by +/-
       s += "+/-";
       c += 3;
-    } else if (*c == '%' && c[1] == '%' && tolower (c[2]) == 'd') {
+    } else if (*c == '%' && c [1] == '%' && tolower (c [2]) == 'd') {
       //  replace %%d by %
       s += "%";
       c += 3;
-    } else if (for_mtext && *c == '^' && c[1] == 'J') {
-      //  replace 
+    } else if (for_mtext && *c == '^' && c [1] == 'J') {
+      //  replace
       s += "\n";
       c += 2;
     } else if (for_mtext && (*c == '{' || *c == '}')) {
       //  ignore { .. } brackets
       ++c;
-    } else if (*c == '\\' && c[1] && tolower (c[1]) == 'u') {
+    } else if (*c == '\\' && c [1] && tolower (c [1]) == 'u') {
 
       c += 2;
       if (*c == '+') {
@@ -1239,13 +1193,13 @@ normalize_string (const std::string &in, bool for_mtext)
 
       int code = 0;
       for (int i = 0; i < 4; ++i) {
-        if (!*c) {
+        if (! *c) {
           break;
-        } else if (isdigit(*c)) {
-          code = (code * 16) + int(*c - '0');
+        } else if (isdigit (*c)) {
+          code = (code * 16) + int (*c - '0');
           ++c;
-        } else if (tolower(*c) <= 'f' && tolower(*c) >= 'a') {
-          code = (code * 16) + int(tolower(*c) - 'a' + 10);
+        } else if (tolower (*c) <= 'f' && tolower (*c) >= 'a') {
+          code = (code * 16) + int (tolower (*c) - 'a' + 10);
           ++c;
         } else {
           break;
@@ -1256,16 +1210,16 @@ normalize_string (const std::string &in, bool for_mtext)
       ws += wchar_t (code);
       s += tl::to_string (ws);
 
-    } else if (for_mtext && *c == '\\' && c[1] && tolower(c[1]) == 'p') {
+    } else if (for_mtext && *c == '\\' && c [1] && tolower (c [1]) == 'p') {
       s += "\n";
       c += 2;
-    } else if (for_mtext && *c == '\\' && c[1] && (tolower(c[1]) == 'o' || tolower(c[1]) == 'l')) {
-      //  ignore underline, overline, 
+    } else if (for_mtext && *c == '\\' && c [1] && (tolower (c [1]) == 'o' || tolower (c [1]) == 'l')) {
+      //  ignore underline, overline,
       c += 2;
-    } else if (for_mtext && *c == '\\' && c[1] && tolower(c[1]) == '~') {
+    } else if (for_mtext && *c == '\\' && c [1] && tolower (c [1]) == '~') {
       //  ignore non-breaking space
       c += 2;
-    } else if (for_mtext && *c == '\\' && c[1] && isalpha (c[1])) {
+    } else if (for_mtext && *c == '\\' && c [1] && isalpha (c [1])) {
       //  ignore other formatting commands
       c += 2;
       while (*c && *c != ';') {
@@ -1274,9 +1228,9 @@ normalize_string (const std::string &in, bool for_mtext)
       if (*c) {
         ++c;
       }
-    } else if (*c == '\\' && c[1]) {
+    } else if (*c == '\\' && c [1]) {
       //  backslash escape
-      s += c[1];
+      s += c [1];
       c += 2;
     } else {
       s += *c;
@@ -1287,13 +1241,12 @@ normalize_string (const std::string &in, bool for_mtext)
   return s;
 }
 
-void 
-DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCplxTrans &text_trans, double h, double ls, int halign, int valign, double w)
+void DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCplxTrans &text_trans, double h, double ls, int halign, int valign, double w)
 {
   db::HAlign ha = db::NoHAlign;
   if (halign == 0) {
     ha = HAlignLeft;
-  //  TODO: what is the interpretation of halign (TEXT code 72) value 3 and 5?
+    //  TODO: what is the interpretation of halign (TEXT code 72) value 3 and 5?
   } else if (halign == 1 || halign == 3 || halign == 4 || halign == 5) {
     ha = HAlignCenter;
   } else if (halign == 2) {
@@ -1314,7 +1267,7 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
 
     db::EdgeProcessor ep;
 
-    //  we use a pixel size of 200 for reference, so we are less dependent on the accuracy of the 
+    //  we use a pixel size of 200 for reference, so we are less dependent on the accuracy of the
     //  font rendering engine
     QFont f (QString::fromUtf8 ("Courier"));
     f.setPixelSize (200);
@@ -1326,7 +1279,7 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
 
     //  split text into lines
     QStringList lines = QString::fromUtf8 (s.c_str ()).split (QString::fromUtf8 ("\n"));
-    double y0 = 0.0; 
+    double y0 = 0.0;
     if (va == VAlignBottom || va == NoVAlign) {
       y0 += h * (lines.size () - 1);
     } else if (va == VAlignCenter) {
@@ -1335,8 +1288,8 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
       y0 = -h;
     }
 
-    std::vector <db::Point> points;
-    std::vector <db::Edge> iedges;
+    std::vector<db::Point> points;
+    std::vector<db::Edge> iedges;
 
     if (w > 0.0) {
 
@@ -1350,17 +1303,17 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
           //  wrapping required
           QString line;
           double wl = 0.0;
-          for (int i = 0; i < int (l->size ()); ) {
+          for (int i = 0; i < int (l->size ());) {
 
             QString ls;
             bool any_word = false;
-            while (i < int (l->size ()) && ((*l)[i].isLetter () || (*l)[i].isDigit ())) {
-              ls += (*l)[i];
+            while (i < int (l->size ()) && ((*l) [i].isLetter () || (*l) [i].isDigit ())) {
+              ls += (*l) [i];
               ++i;
               any_word = true;
             }
             if (! any_word) {
-              ls += (*l)[i];
+              ls += (*l) [i];
               ++i;
             }
 
@@ -1373,7 +1326,6 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
 
             line += ls;
             wl += wc;
-
           }
 
           if (! line.isEmpty ()) {
@@ -1384,9 +1336,7 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
           //  no wrapping required
           lines.push_back (*l);
         }
-
       }
-
     }
 
     for (QStringList::const_iterator l = lines.begin (); l != lines.end (); ++l) {
@@ -1416,18 +1366,16 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
             iedges.push_back (db::Edge (points [i - 1], points [i]));
           }
         }
-
       }
 
-      std::vector <db::Polygon> pout;
+      std::vector<db::Polygon> pout;
       ep.simple_merge (iedges, pout, true /*resolve holes*/, true /*min coherence*/, 0);
 
-      for (std::vector <db::Polygon>::const_iterator po = pout.begin (); po != pout.end (); ++po) {
+      for (std::vector<db::Polygon>::const_iterator po = pout.begin (); po != pout.end (); ++po) {
         shapes.insert (*po);
       }
 
       y0 -= ls;
-
     }
 
 #else
@@ -1440,10 +1388,9 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
   }
 }
 
-void
-DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector &offset)
+void DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector &offset)
 {
-  std::map <unsigned int, std::vector <db::Edge> > collected_edges;
+  std::map<unsigned int, std::vector<db::Edge>> collected_edges;
   db::EdgeProcessor ep (true /* with progress*/);
 
   int g;
@@ -1459,7 +1406,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
     } else if (entity_code == "LWPOLYLINE" || entity_code == "POLYLINE") {
 
       std::vector<db::DPoint> points;
-      std::vector<std::pair<size_t, double> > widths;
+      std::vector<std::pair<size_t, double>> widths;
 
       std::string layer;
       int flags = 0;
@@ -1506,7 +1453,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
               }
 
               got_width = 0;
-
             }
 
           } else if (g == 210) {
@@ -1535,7 +1481,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
           } else {
             skip_value (g);
           }
-
         }
 
       } else {
@@ -1565,7 +1510,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
           } else {
             skip_value (g);
           }
-
         }
 
         while (true) {
@@ -1574,7 +1518,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
           if (e == "VERTEX") {
 
             unsigned int got_width = 0;
-            
+
             double x = 0.0, y = 0.0;
             double bnew = 0.0;
 
@@ -1620,9 +1564,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
               skip_value (g);
             }
           }
-
         }
-
       }
 
       //  Adds the common width if given
@@ -1640,7 +1582,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         }
       }
 
-      //  Create a closing arc if a bulge was specified on the last point and the polygon is 
+      //  Create a closing arc if a bulge was specified on the last point and the polygon is
       //  marked as a closed one
       if (fabs (b) > 1e-10 && (flags & 1) != 0) {
         //  Hint: needs a copy, since points may be altered by add_bulge_segment
@@ -1654,7 +1596,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
       //  check whether there is a common width and create a path if there is one
       bool width_set = false;
       double width = 0.0;
-      for (std::vector<std::pair<size_t, double> >::const_iterator w = widths.begin (); w != widths.end (); ++w) {
+      for (std::vector<std::pair<size_t, double>>::const_iterator w = widths.begin (); w != widths.end (); ++w) {
         if (! width_set) {
           width = w->second;
           width_set = true;
@@ -1663,7 +1605,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         }
       }
 
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       if (ll.first) {
 
         db::DCplxTrans tt = global_trans (offset, ex, ey, ez);
@@ -1674,22 +1616,22 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         if (width < -1e-6) {
 
           db::DVariableWidthPath vp (points.begin (), points.end (), widths.begin (), widths.end (), tt);
-          cell.shapes(ll.second).insert (safe_from_double (vp.to_poly ()));
+          cell.shapes (ll.second).insert (safe_from_double (vp.to_poly ()));
 
         } else if (width < 1e-6 && (flags & 1) != 0 && m_polyline_mode == 2) {
 
           db::DPolygon p;
           p.assign_hull (points.begin (), points.end (), tt);
-          cell.shapes(ll.second).insert (safe_from_double (p));
+          cell.shapes (ll.second).insert (safe_from_double (p));
 
         } else if (! points.empty ()) {
 
           //  in the merge line modes create a set of edges from an open polyline and merge later
           if (width < 1e-6 && /*(flags & 1) == 0 &&*/ m_polyline_mode >= 3) {
 
-            std::vector <db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector <db::Edge> ())).first->second;
+            std::vector<db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector<db::Edge> ())).first->second;
             for (std::vector<db::DPoint>::const_iterator p = points.begin () + 1; p != points.end (); ++p) {
-              edges.push_back (safe_from_double (db::DEdge (tt.trans (p[-1]), tt.trans (*p))));
+              edges.push_back (safe_from_double (db::DEdge (tt.trans (p [-1]), tt.trans (*p))));
             }
 
             if ((flags & 1) != 0) {
@@ -1702,13 +1644,13 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
               //  closed polylines are created by forming the rim of a polygon
               //  with the specified width
-             
+
               db::DPolygon p;
               p.assign_hull (points.begin (), points.end (), tt, false /*no compression*/);
-              std::vector <db::Polygon> pin;
+              std::vector<db::Polygon> pin;
               pin.push_back (safe_from_double (p));
 
-              std::vector <db::Polygon> pouter, pinner;
+              std::vector<db::Polygon> pouter, pinner;
               db::Coord w = db::coord_traits<db::Coord>::rounded (tt.ctrans (std::max (0.0, width)));
               ep.size (pin, w * 0.5, w * 0.5, pouter, 2, false);
               ep.size (pouter, -w, -w, pinner, 2, false);
@@ -1716,8 +1658,8 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
               pin.clear ();
               ep.boolean (pouter, pinner, pin, db::BooleanOp::ANotB, true /*resolve holes*/);
 
-              for (std::vector <db::Polygon>::const_iterator po = pin.begin (); po != pin.end (); ++po) {
-                cell.shapes(ll.second).insert (*po);
+              for (std::vector<db::Polygon>::const_iterator po = pin.begin (); po != pin.end (); ++po) {
+                cell.shapes (ll.second).insert (*po);
               }
 
             } else {
@@ -1732,19 +1674,15 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
               p.end_ext (0.0);
               p.width (tt.ctrans (std::max (0.0, width)));
               cell.shapes (ll.second).insert (safe_from_double (p));
-
             }
-
           }
-
         }
-
       }
 
     } else if (entity_code == "SPLINE") {
 
       std::vector<double> knots;
-      std::vector<std::pair<db::DPoint, double> > control_points;
+      std::vector<std::pair<db::DPoint, double>> control_points;
       std::vector<double> weights;
       double ex = 0.0, ey = 0.0, ez = 1.0;
 
@@ -1803,7 +1741,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
       db::DCplxTrans tt = global_trans (offset, ex, ey, ez);
 
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       if (ll.first && ! control_points.empty ()) {
 
         std::list<db::DPoint> new_points = spline_interpolation (control_points, degree, knots);
@@ -1811,7 +1749,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         if (m_polyline_mode == 3 || m_polyline_mode == 4) {
 
           //  in "join" mode, add an edge for each segment
-          std::vector <db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector <db::Edge> ())).first->second;
+          std::vector<db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector<db::Edge> ())).first->second;
           std::list<db::DPoint>::const_iterator i = new_points.begin ();
           if (i != new_points.end ()) {
             std::list<db::DPoint>::const_iterator ii = i;
@@ -1842,9 +1780,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
           p.end_ext (0.0);
           p.width (0);
           cell.shapes (ll.second).insert (safe_from_double (p));
-
         }
-
       }
 
     } else if (entity_code == "LINE") {
@@ -1881,27 +1817,25 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
       db::DCplxTrans tt = global_trans (offset, ex, ey, ez);
 
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       if (ll.first) {
 
         if (w < 1e-6 && (m_polyline_mode == 3 || m_polyline_mode == 4)) {
 
-          std::vector <db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector <db::Edge> ())).first->second;
+          std::vector<db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector<db::Edge> ())).first->second;
           edges.push_back (safe_from_double (db::DEdge (tt.trans (p1), tt.trans (p2))));
 
         } else {
 
           //  create the path
-          db::DPoint points [2] = { p1, p2 };
+          db::DPoint points [2] = {p1, p2};
           db::DPath p;
-          p.assign (&points[0], points + 2, tt);
+          p.assign (&points [0], points + 2, tt);
           p.bgn_ext (0.0);
           p.end_ext (0.0);
           p.width (tt.ctrans (std::max (0.0, w)));
           cell.shapes (ll.second).insert (safe_from_double (p));
-
         }
-
       }
 
     } else if (entity_code == "TRACE") {
@@ -1948,17 +1882,16 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
       db::DCplxTrans tt = global_trans (offset, ex, ey, ez);
 
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       if (ll.first) {
 
         //  TODO: what to do with the width?
 
         //  create the path
-        db::DPoint points [4] = { p1, p2, p4, p3 };
+        db::DPoint points [4] = {p1, p2, p4, p3};
         db::DPolygon p;
-        p.assign_hull (&points[0], points + 4, tt);
-        cell.shapes(ll.second).insert (safe_from_double (p));
-
+        p.assign_hull (&points [0], points + 4, tt);
+        cell.shapes (ll.second).insert (safe_from_double (p));
       }
 
     } else if (entity_code == "ARC") {
@@ -2003,7 +1936,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
       db::DCplxTrans tt = global_trans (offset, ex, ey, ez);
 
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       if (ll.first) {
 
         ae *= M_PI / 180.0;
@@ -2026,7 +1959,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
         if (w < 1e-6 && (m_polyline_mode == 3 || m_polyline_mode == 4)) {
 
-          std::vector <db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector <db::Edge> ())).first->second;
+          std::vector<db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector<db::Edge> ())).first->second;
           for (size_t i = 1; i < points.size (); ++i) {
             edges.push_back (safe_from_double (db::DEdge (tt.trans (points [i - 1]), tt.trans (points [i]))));
           }
@@ -2035,14 +1968,12 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
           //  create the path
           db::DPath p;
-          p.assign (&points[0], &points[0] + points.size (), tt);
+          p.assign (&points [0], &points [0] + points.size (), tt);
           p.bgn_ext (0.0);
           p.end_ext (0.0);
           p.width (tt.ctrans (std::max (0.0, w)));
-          cell.shapes(ll.second).insert (safe_from_double (p));
-
+          cell.shapes (ll.second).insert (safe_from_double (p));
         }
-
       }
 
     } else if (entity_code == "MTEXT") {
@@ -2084,7 +2015,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
           double v = read_double ();
           if (! in_columns) {
             xv = db::DVector (cos (v / 180.0 * M_PI), sin (v / 180.0 * M_PI));
-          } 
+          }
         } else if (g == 71) {
           m = read_int32 ();
         } else if (g == 75) {
@@ -2106,13 +2037,13 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
       db::DCplxTrans tt = global_trans (offset, ex, ey, ez);
 
       //  create the text
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       if (ll.first) {
 
         double a = 0.0;
         if (xv.x () != 0.0 || xv.y () != 0.0) {
           a = atan2 (xv.y (), xv.x ()) / M_PI * 180.0;
-        } 
+        }
 
         db::DCplxTrans text_trans (1.0, a, false, db::DVector ());
 
@@ -2130,8 +2061,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
           halign = (m - 1) % 3; // 0: left, 1: middle, 2: right
         }
 
-        deliver_text (cell.shapes(ll.second), normalize_string (s, true), tt * db::DCplxTrans (p) * text_trans, h, h * ls, halign, valign, w);
-
+        deliver_text (cell.shapes (ll.second), normalize_string (s, true), tt * db::DCplxTrans (p) * text_trans, h, h * ls, halign, valign, w);
       }
 
     } else if (entity_code == "TEXT" || entity_code == "ATTRIB" || entity_code == "ATTDEF") {
@@ -2168,7 +2098,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
           m = read_int32 ();
         } else if (g == 72) {
           halign = read_int32 ();
-        } else if ((is_text && g == 73 /*for TEXT*/) || (!is_text && g == 74 /*for ATTRIB and ATTDEF*/)) {
+        } else if ((is_text && g == 73 /*for TEXT*/) || (! is_text && g == 74 /*for ATTRIB and ATTDEF*/)) {
           valign = read_int32 ();
         } else if (g == 1) {
           s = read_string (false);
@@ -2186,7 +2116,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
       db::DCplxTrans tt = global_trans (offset, ex, ey, ez);
 
       //  create the text
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       if (ll.first) {
 
         //  TODO: check implementation, in particular alignment and mirror flags
@@ -2216,7 +2146,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         }
 
         deliver_text (cell.shapes (ll.second), s, tt * db::DCplxTrans (p - db::DPoint ()) * text_trans, h, h, halign, valign);
-
       }
 
     } else if (entity_code == "HATCH") {
@@ -2240,11 +2169,10 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         } else {
           skip_value (g);
         }
-
       }
 
       db::DCplxTrans tt = global_trans (offset, ex, ey, ez);
-      std::vector <db::Edge> iedges;
+      std::vector<db::Edge> iedges;
 
       db::DPoint pc, pc2;
       std::vector<db::DPoint> points;
@@ -2281,7 +2209,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
               add_bulge_segment (points, p0, b);
             }
             deliver_points_to_edges (points, points2, tt, edge_type, value94, value40, value50, value51, value73, iedges);
-          } 
+          }
 
           //  close previous loop if necessary
           if (g != 72) {
@@ -2332,7 +2260,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
         } else if (g == 42) {
 
-          double v = read_double (); 
+          double v = read_double ();
           if (is_polyline) {
             b = v; // bulge for polyline
           }
@@ -2371,7 +2299,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         } else {
           skip_value (g);
         }
-
       }
 
       while (g != 0 && (g = read_group_code ()) != 0) {
@@ -2386,27 +2313,26 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
           add_bulge_segment (points, p0, b);
         }
         deliver_points_to_edges (points, points2, tt, edge_type, value94, value40, value50, value51, value73, iedges);
-      } 
+      }
 
       //  close previous loop if necessary
       finish_loop (loop_start, iedges.size (), iedges);
 
       //  create the polygons
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       if (ll.first) {
 
-        std::vector <db::Polygon> pout;
+        std::vector<db::Polygon> pout;
         ep.simple_merge (iedges, pout, true /*resolve holes*/, true /*min coherence*/, 0);
 
-        for (std::vector <db::Polygon>::const_iterator po = pout.begin (); po != pout.end (); ++po) {
-          cell.shapes(ll.second).insert (*po);
+        for (std::vector<db::Polygon>::const_iterator po = pout.begin (); po != pout.end (); ++po) {
+          cell.shapes (ll.second).insert (*po);
         }
-
       }
 
     } else if (entity_code == "SOLID") {
 
-      std::vector <db::DPoint> p;
+      std::vector<db::DPoint> p;
       p.push_back (db::DPoint ());
       std::string layer;
       double ex = 0.0, ey = 0.0, ez = 1.0;
@@ -2429,7 +2355,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             p.push_back (db::DPoint ());
           }
 
-          p[g - 10].set_x (read_double ());
+          p [g - 10].set_x (read_double ());
 
         } else if (g >= 20 && g <= 23) {
 
@@ -2437,7 +2363,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             p.push_back (db::DPoint ());
           }
 
-          p[g - 20].set_y (read_double ());
+          p [g - 20].set_y (read_double ());
 
         } else {
           skip_value (g);
@@ -2447,14 +2373,14 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
       db::DCplxTrans tt = global_trans (offset, ex, ey, ez);
 
       //  create the polygon
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       if (ll.first) {
         db::DSimplePolygon poly;
         if (p.size () == 4) {
           std::swap (p [2], p [3]);
         }
         poly.assign_hull (p.begin (), p.end (), tt);
-        cell.shapes(ll.second).insert (safe_from_double (poly));
+        cell.shapes (ll.second).insert (safe_from_double (poly));
       }
 
     } else if (entity_code == "ELLIPSE") {
@@ -2496,12 +2422,12 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
       db::DCplxTrans tt = global_trans (offset, ex, ey, ez);
 
       //  create the polygon
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       if (ll.first) {
 
         if (m_polyline_mode == 3 || m_polyline_mode == 4) {
 
-          std::vector <db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector <db::Edge> ())).first->second;
+          std::vector<db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector<db::Edge> ())).first->second;
 
           db::DVector vmaj = db::DVector (pm); // documentation says that pm is the "endpoint",
           db::DVector vmin (-vmaj.y () * r, vmaj.x () * r);
@@ -2521,7 +2447,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             edges.push_back (db::Edge (safe_from_double (pl), safe_from_double (pp)));
 
             pl = pp;
-
           }
 
           pp = tt * (pc + vmaj * (dr * cos (ea)) + vmin * (dr * sin (ea)));
@@ -2545,33 +2470,30 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             pp = tt * (pc + vmaj * (dr * cos (a)) + vmin * (dr * sin (a)));
 
             //  create the line segment
-            db::DPoint points [2] = { pl, pp };
+            db::DPoint points [2] = {pl, pp};
             db::DPath p;
-            p.assign (&points[0], points + 2);
+            p.assign (&points [0], points + 2);
             p.bgn_ext (0.0);
             p.end_ext (0.0);
             p.width (0.0);
-            cell.shapes(ll.second).insert (safe_from_double (p));
+            cell.shapes (ll.second).insert (safe_from_double (p));
 
             pl = pp;
-
           }
 
           pp = tt * (pc + vmaj * cos (ea) + vmin * sin (ea));
 
           {
             //  create the line segment
-            db::DPoint points [2] = { pl, pp };
+            db::DPoint points [2] = {pl, pp};
             db::DPath p;
-            p.assign (&points[0], points + 2);
+            p.assign (&points [0], points + 2);
             p.bgn_ext (0.0);
             p.end_ext (0.0);
             p.width (0.0);
-            cell.shapes(ll.second).insert (safe_from_double (p));
+            cell.shapes (ll.second).insert (safe_from_double (p));
           }
-
         }
-
       }
 
     } else if (entity_code == "CIRCLE") {
@@ -2604,12 +2526,12 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
       db::DCplxTrans tt = global_trans (offset, ex, ey, ez);
 
       //  create the polygon
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       if (ll.first) {
 
         if (m_polyline_mode == 3 || m_polyline_mode == 4) {
 
-          std::vector <db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector <db::Edge> ())).first->second;
+          std::vector<db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector<db::Edge> ())).first->second;
 
           int n = ncircle_for_radius (r);
           double da = (M_PI * 2.0) / n;
@@ -2626,7 +2548,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             edges.push_back (db::Edge (safe_from_double (pl), safe_from_double (pp)));
 
             pl = pp;
-
           }
 
           pp = tt * (p + db::DVector (0, r));
@@ -2634,12 +2555,10 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
         } else {
 
-          db::DPoint pv[1] = { tt * p };
+          db::DPoint pv [1] = {tt * p};
           db::DPath path (pv, pv + 1, tt.ctrans (r * 2), tt.ctrans (r), tt.ctrans (r), true);
-          cell.shapes(ll.second).insert (safe_from_double (path));
-
+          cell.shapes (ll.second).insert (safe_from_double (path));
         }
-
       }
 
     } else if (entity_code == "DIMENSION") {
@@ -2674,8 +2593,8 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
       //  TODO: beside the placement of the representative BLOCK (group 2 record), this
       //  implementation does nothing.
- 
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       //  fallback: if the target layer does not exist (i.e. is not mapped, use the zero layer
       if (! ll.first) {
         ll = open_layer (layout, zero_layer_name);
@@ -2685,30 +2604,27 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         //  Place the BLOCK for that DIMENSION object - no text is generated yet
         if (! cellname.empty ()) {
 
-          std::map <std::string, db::cell_index_type>::const_iterator b = m_block_per_name.find (cellname);
+          std::map<std::string, db::cell_index_type>::const_iterator b = m_block_per_name.find (cellname);
           if (b == m_block_per_name.end ()) {
-            
+
             //  create a first representative. Build variants and fill later when the cell is defined in a BLOCK statement.
             db::cell_index_type cell = layout.add_cell ();
             b = m_block_per_name.insert (std::make_pair (cellname, cell)).first;
             m_template_cells.insert (std::make_pair (cell, cellname));
-
-          } 
+          }
 
           db::cell_index_type ci = make_layer_variant (layout, cellname, b->second, ll.second, 1.0, 1.0);
 
           db::DCplxTrans gt = global_trans (offset, 0.0, 0.0, 1.0);
           double f = gt.mag ();
-          db::DCplxTrans t = gt * db::DCplxTrans(1.0 / f);
+          db::DCplxTrans t = gt * db::DCplxTrans (1.0 / f);
 
           if (t.is_ortho () && ! t.is_mag ()) {
             cell.insert (db::CellInstArray (db::CellInst (ci), db::Trans (db::ICplxTrans (t))));
           } else {
             cell.insert (db::CellInstArray (db::CellInst (ci), db::ICplxTrans (t)));
           }
-
         }
-
       }
 
     } else if (entity_code == "INSERT") {
@@ -2756,22 +2672,21 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         }
       }
 
-      std::pair <bool, unsigned int> ll = open_layer (layout, layer);
+      std::pair<bool, unsigned int> ll = open_layer (layout, layer);
       //  fallback: if the target layer does not exist (i.e. is not mapped, use the zero layer
       if (! ll.first) {
         ll = open_layer (layout, zero_layer_name);
       }
       if (ll.first) {
 
-        std::map <std::string, db::cell_index_type>::const_iterator b = m_block_per_name.find (cellname);
+        std::map<std::string, db::cell_index_type>::const_iterator b = m_block_per_name.find (cellname);
         if (b == m_block_per_name.end ()) {
-          
+
           //  create a first representative. Build variants and fill later when the cell is defined in a BLOCK statement.
           db::cell_index_type cell = layout.add_cell ();
           b = m_block_per_name.insert (std::make_pair (cellname, cell)).first;
           m_template_cells.insert (std::make_pair (cell, cellname));
-
-        } 
+        }
 
         if (fabs (sx) < 1e-6 || fabs (sy) < 1e-6) {
           warn ("Invalid scaling value " + tl::to_string (sx) + "," + tl::to_string (sy) + " ignored");
@@ -2802,10 +2717,10 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         db::DCplxTrans gt = db::DCplxTrans (global_trans (offset, ex, ey, ez));
         double f = gt.mag ();
 
-        t = gt * t * db::DCplxTrans(1.0 / f);
+        t = gt * t * db::DCplxTrans (1.0 / f);
 
         if (nx == 1 && ny == 1) {
-          if (t.is_ortho () && !t.is_mag ()) {
+          if (t.is_ortho () && ! t.is_mag ()) {
             cell.insert (db::CellInstArray (db::CellInst (ci), db::Trans (db::ICplxTrans (t))));
           } else {
             cell.insert (db::CellInstArray (db::CellInst (ci), db::ICplxTrans (t)));
@@ -2819,20 +2734,18 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             cell.insert (db::CellInstArray (db::CellInst (ci), db::ICplxTrans (t), vx, vy, nx, ny));
           }
         }
-
       }
 
     } else {
       warn ("Entity " + entity_code + " not supported - ignored.", 2);
-      while ((g = read_group_code()) != 0) {
+      while ((g = read_group_code ()) != 0) {
         skip_value (g);
       }
     }
-
   }
 
-  //  merge the edges 
-  
+  //  merge the edges
+
   if (! collected_edges.empty ()) {
 
     tl::RelativeProgress progress (tl::to_string (tr ("Merging edges")), 1000000, 10000);
@@ -2841,9 +2754,9 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
     db::Coord accuracy = db::coord_traits<db::Coord>::rounded (m_contour_accuracy * m_unit / m_dbu);
 
-    for (std::map <unsigned int, std::vector <db::Edge> >::iterator ce = collected_edges.begin (); ce != collected_edges.end (); ++ce) {
+    for (std::map<unsigned int, std::vector<db::Edge>>::iterator ce = collected_edges.begin (); ce != collected_edges.end (); ++ce) {
 
-      std::vector <db::Edge> &edges = ce->second;
+      std::vector<db::Edge> &edges = ce->second;
       if (! edges.empty ()) {
 
         std::vector<db::Edge> cc_edges;
@@ -2856,50 +2769,43 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
             //  closed contour: store for later merging
             for (std::vector<db::Point>::const_iterator cc = e2c.contour (c).begin (); cc + 1 != e2c.contour (c).end (); ++cc) {
-              cc_edges.push_back (db::Edge (cc[0], cc[1]));
+              cc_edges.push_back (db::Edge (cc [0], cc [1]));
             }
 
             cc_edges.push_back (db::Edge (e2c.contour (c).back (), e2c.contour (c).front ()));
 
           } else {
 
-            //  open contour: create a path with width = 0 
+            //  open contour: create a path with width = 0
             db::Path p;
             p.assign (e2c.contour (c).begin (), e2c.contour (c).end ());
             p.width (0);
             cell.shapes (ce->first).insert (p);
-
           }
-
         }
 
         //  merge the closed contours to resolve holes
         if (! cc_edges.empty ()) {
 
-          std::vector <db::Polygon> pout;
+          std::vector<db::Polygon> pout;
           ep.simple_merge (cc_edges, pout, true /*resolve holes*/, true /*min coherence*/, 0);
 
-          for (std::vector <db::Polygon>::const_iterator po = pout.begin (); po != pout.end (); ++po) {
+          for (std::vector<db::Polygon>::const_iterator po = pout.begin (); po != pout.end (); ++po) {
             cell.shapes (ce->first).insert (*po);
           }
-
         }
-
       }
-
     }
-
   }
 }
 
-bool
-DXFReader::prepare_read (bool ignore_empty_lines)
+bool DXFReader::prepare_read (bool ignore_empty_lines)
 {
   if (m_initial) {
 
     //  Detect binary format
     const char *h = m_stream.get (22);
-    if (h && h[21] == 0 && std::string (h) == "AutoCAD Binary DXF\015\012\032") {
+    if (h && h [21] == 0 && std::string (h) == "AutoCAD Binary DXF\015\012\032") {
       m_ascii = false;
     } else {
       m_stream.unget (22);
@@ -2907,7 +2813,6 @@ DXFReader::prepare_read (bool ignore_empty_lines)
     }
 
     m_initial = false;
-
   }
 
   if (m_ascii) {
@@ -2922,7 +2827,7 @@ DXFReader::prepare_read (bool ignore_empty_lines)
       //  does not release the buffer ..
       m_line.clear ();
 
-      //  read one line 
+      //  read one line
       while ((c = m_stream.get (1)) != 0) {
         if (*c == '\015' /*CR*/ || *c == '\012') {
           break;
@@ -2954,8 +2859,7 @@ DXFReader::prepare_read (bool ignore_empty_lines)
   }
 }
 
-void
-DXFReader::skip_value (int g) 
+void DXFReader::skip_value (int g)
 {
   //  TODO: this table is very likely to be incomplete ..
   if (g < 10) {
@@ -2965,38 +2869,38 @@ DXFReader::skip_value (int g)
   } else if (g < 90) {
     read_int16 ();
   } else if (g < 100) {
-    read_int32 (); 
+    read_int32 ();
   } else if (g < 110) {
-    read_string (false); 
+    read_string (false);
   } else if (g < 160) {
-    read_double (); 
+    read_double ();
   } else if (g < 210) {
-    read_int16 (); 
+    read_int16 ();
   } else if (g < 270) {
-    read_double (); 
+    read_double ();
   } else if (g < 290) {
-    read_int16 (); 
+    read_int16 ();
   } else if (g < 300) {
     // Documentation says "bool": read_bool (), but how?
     read_int16 ();
   } else if (g < 370) {
-    read_string (false); 
+    read_string (false);
   } else if (g < 390) {
-    read_int16 (); 
+    read_int16 ();
   } else if (g < 400) {
-    read_string (false); 
+    read_string (false);
   } else if (g < 410) {
-    read_int16 (); 
+    read_int16 ();
   } else if (g < 420) {
-    read_string (false); 
+    read_string (false);
   } else if (g < 430) {
-    read_int32 (); 
+    read_int32 ();
   } else if (g < 440) {
-    read_string (false); 
+    read_string (false);
   } else if (g < 460) {
-    read_int32 (); 
+    read_int32 ();
   } else if (g < 470) {
-    read_double (); 
+    read_double ();
   } else if (g < 1010) {
     read_string (false);
   } else if (g < 1060) {
@@ -3014,17 +2918,16 @@ DXFReader::skip_value (int g)
   }
 }
 
-int
-DXFReader::read_group_code ()
+int DXFReader::read_group_code ()
 {
   prepare_read (true);
 
   if (m_ascii) {
 
     do {
-    
+
       //  ignore uninterpretable lines to work around buggy DXF files with empty lines ..
-      tl::Extractor ex (m_line.c_str ()); 
+      tl::Extractor ex (m_line.c_str ());
       int x = 0;
       if (! ex.try_read (x) || ! ex.at_end ()) {
         warn ("Expected an ASCII integer value - line ignored", 2);
@@ -3051,16 +2954,14 @@ DXFReader::read_group_code ()
         error ("Unexpected end of file");
         return 0;
       }
-      return int(x[0]) + (int (x[1]) << 8);
+      return int (x [0]) + (int (x [1]) << 8);
     } else {
-      return x[0];
+      return x [0];
     }
-
   }
 }
 
-int 
-DXFReader::read_int16 ()
+int DXFReader::read_int16 ()
 {
   if (m_ascii) {
     return read_int32 ();
@@ -3074,23 +2975,22 @@ DXFReader::read_int16 ()
       return 0;
     }
 
-    return int(x[0]) + (int (x[1]) << 8);
-
+    return int (x [0]) + (int (x [1]) << 8);
   }
 }
 
-long long 
+long long
 DXFReader::read_int64 ()
 {
   prepare_read (true);
 
   if (m_ascii) {
-    tl::Extractor ex (m_line.c_str ()); 
+    tl::Extractor ex (m_line.c_str ());
     double x = 0;
     if (! ex.try_read (x) || ! ex.at_end ()) {
       error ("Expected an ASCII numerical value");
     }
-    if (x < double (std::numeric_limits<long long>::min()) || x > double (std::numeric_limits<long long>::max())) {
+    if (x < double (std::numeric_limits<long long>::min ()) || x > double (std::numeric_limits<long long>::max ())) {
       error ("Value is out of limits for a 64 bit signed integer");
     }
     return (long long) x;
@@ -3103,23 +3003,22 @@ DXFReader::read_int64 ()
     }
 
     //  TODO: can be done faster probably ..
-    long long ll = (long long)x[0] + ((long long)x[1] << 8) +
-                   (((long long)x[2] + ((long long)x[3] << 8)) << 16) + 
-                   (((long long)x[4] + ((long long)x[5] << 8) + 
-                   (((long long)x[6] + ((long long)x[7] << 8)) << 16)) << 32);
+    long long ll = (long long) x [0] + ((long long) x [1] << 8) +
+                   (((long long) x [2] + ((long long) x [3] << 8)) << 16) +
+                   (((long long) x [4] + ((long long) x [5] << 8) +
+                     (((long long) x [6] + ((long long) x [7] << 8)) << 16))
+                    << 32);
     return ll;
-
   }
-
 }
 
-double 
+double
 DXFReader::read_double ()
 {
   prepare_read (true);
 
   if (m_ascii) {
-    tl::Extractor ex (m_line.c_str ()); 
+    tl::Extractor ex (m_line.c_str ());
     double x = 0;
     if (! ex.try_read (x) || ! ex.at_end ()) {
       error ("Expected an ASCII floating-point value");
@@ -3134,10 +3033,11 @@ DXFReader::read_double ()
     }
 
     //  TODO: can be done faster probably ..
-    long long ll = (long long)x[0] + ((long long)x[1] << 8) +
-                   (((long long)x[2] + ((long long)x[3] << 8)) << 16) + 
-                   (((long long)x[4] + ((long long)x[5] << 8) + 
-                   (((long long)x[6] + ((long long)x[7] << 8)) << 16)) << 32);
+    long long ll = (long long) x [0] + ((long long) x [1] << 8) +
+                   (((long long) x [2] + ((long long) x [3] << 8)) << 16) +
+                   (((long long) x [4] + ((long long) x [5] << 8) +
+                     (((long long) x [6] + ((long long) x [7] << 8)) << 16))
+                    << 32);
 
     union {
       long long ll;
@@ -3146,23 +3046,20 @@ DXFReader::read_double ()
 
     converter.ll = ll;
     return converter.d;
-
   }
-
 }
 
-int 
-DXFReader::read_int32 ()
+int DXFReader::read_int32 ()
 {
   prepare_read (true);
 
   if (m_ascii) {
-    tl::Extractor ex (m_line.c_str ()); 
+    tl::Extractor ex (m_line.c_str ());
     double x = 0;
     if (! ex.try_read (x) || ! ex.at_end ()) {
       error ("Expected an ASCII numerical value");
     }
-    if (x < std::numeric_limits<int>::min() || x > std::numeric_limits<int>::max()) {
+    if (x < std::numeric_limits<int>::min () || x > std::numeric_limits<int>::max ()) {
       error ("Value is out of limits for a 32 bit signed integer");
     }
     return int (x);
@@ -3174,10 +3071,8 @@ DXFReader::read_int32 ()
       return 0;
     }
 
-    return (int)x[0] + ((int)x[1] << 8) + (((int)x[2] + ((int)x[3] << 8)) << 16);
-
+    return (int) x [0] + ((int) x [1] << 8) + (((int) x [2] + ((int) x [3] << 8)) << 16);
   }
-
 }
 
 const std::string &
@@ -3190,7 +3085,7 @@ DXFReader::read_string (bool ignore_empty_lines)
     //  reuse "m_line" for collecting strings ..
     m_line.clear ();
 
-    //  read one string 
+    //  read one string
     const char *c;
     while ((c = m_stream.get (1)) != 0 && *c) {
       m_line += *c;
@@ -3199,11 +3094,9 @@ DXFReader::read_string (bool ignore_empty_lines)
     if (! c) {
       error ("Unexpected end of file");
     }
-
   }
 
   return m_line;
 }
 
 }
-

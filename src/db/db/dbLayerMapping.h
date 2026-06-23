@@ -47,7 +47,7 @@ class Layout;
 class DB_PUBLIC LayerMapping
 {
 public:
-  typedef std::map <unsigned int, unsigned int>::const_iterator iterator;
+  typedef std::map<unsigned int, unsigned int>::const_iterator iterator;
 
   /**
    *  @brief Constructor - creates an empty mapping
@@ -70,7 +70,7 @@ public:
    *  @brief Create a full mapping for layout_b to layout_a employing the layer properties
    *
    *  A full mapping means that all layers of layout_b are mapped. Layers missing in layout A
-   *  are created. 
+   *  are created.
    *
    *  Layers with null properties (temporary layers) are not mapped and not created.
    *
@@ -132,17 +132,15 @@ public:
   /**
    *  @brief Access to the mapping table
    */
-  const std::map <unsigned int, unsigned int> &table () const 
+  const std::map<unsigned int, unsigned int> &table () const
   {
     return m_b2a_mapping;
   }
 
 private:
-  std::map <unsigned int, unsigned int> m_b2a_mapping;
+  std::map<unsigned int, unsigned int> m_b2a_mapping;
 };
 
 }
 
 #endif
-
-

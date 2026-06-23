@@ -24,7 +24,7 @@
 
 #include "tlUnitTest.h"
 
-TEST(1_Basic)
+TEST (1_Basic)
 {
   db::LogEntryData data;
   EXPECT_EQ (data.severity (), db::NoSeverity);
@@ -38,7 +38,7 @@ TEST(1_Basic)
   EXPECT_EQ (data != db::LogEntryData (), false);
 }
 
-TEST(2_Attributes)
+TEST (2_Attributes)
 {
   db::LogEntryData data;
   data.set_severity (db::Error);
@@ -63,7 +63,7 @@ TEST(2_Attributes)
   EXPECT_EQ (data.geometry ().to_string (), "(1,2;1,4;3,4;3,2)");
 }
 
-TEST(3_toString)
+TEST (3_toString)
 {
   db::LogEntryData data;
   data.set_severity (db::Error);

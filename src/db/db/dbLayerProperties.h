@@ -37,30 +37,29 @@ namespace db
 /**
  *  @brief A layer property
  *
- *  The layer properties are basically to be used for storing of layer name and 
+ *  The layer properties are basically to be used for storing of layer name and
  *  layer/datatype information.
  *
  *  A special use case is for the target of a layer mapping specification.
  *  In this case, the layer properties can make use of the relative
  *  layer/datatype specifications.
  */
-struct DB_PUBLIC LayerProperties
-{
+struct DB_PUBLIC LayerProperties {
   /**
    *  @brief Default constructor
    */
   LayerProperties ();
-  
+
   /**
    *  @brief Constructor with layer and datatype
    */
   LayerProperties (int l, int d);
-  
+
   /**
    *  @brief Constructor with name
    */
   LayerProperties (const std::string &n);
-  
+
   /**
    *  @brief Constructor with layer and datatype and name
    */
@@ -73,7 +72,7 @@ struct DB_PUBLIC LayerProperties
    *  a layer, datatype or name assigned.
    */
   bool is_null () const;
-  
+
   /**
    *  @brief Return true, if the layer is specified by name only
    */
@@ -132,44 +131,42 @@ struct DB_PUBLIC LayerProperties
 /**
  *  @brief "Logical less" functor for LayerProperties
  */
-struct LPLogicalLessFunc 
-{
-  bool operator () (const LayerProperties &a, const LayerProperties &b) const
+struct LPLogicalLessFunc {
+  bool operator() (const LayerProperties &a, const LayerProperties &b) const
   {
     return a.log_less (b);
   }
 };
 
 /**
- *  @brief A layer offset 
+ *  @brief A layer offset
  *
  *  This struct defines a layer offset which can be "added" to a LayerProperties object
  *  If the layer offset is defined with a name, any occurrence of '*' in the string
- *  is replaced with the original name. This way, applying "*_A" with "+" yields a 
+ *  is replaced with the original name. This way, applying "*_A" with "+" yields a
  *  postfix "_A" to the original layer name (if it is named).
  */
-struct DB_PUBLIC LayerOffset
-{
+struct DB_PUBLIC LayerOffset {
   /**
    *  @brief Default constructor
    */
   LayerOffset ();
-  
+
   /**
    *  @brief Constructor with layer and datatype
    */
   LayerOffset (int l, int d);
-  
+
   /**
    *  @brief Constructor with name
    */
   LayerOffset (const std::string &n);
-  
+
   /**
    *  @brief Constructor with layer and datatype and name
    */
   LayerOffset (int l, int d, const std::string &n);
-  
+
   /**
    *  @brief Return true, if the layer is specified by name only
    */
@@ -234,12 +231,11 @@ inline LayerProperties &operator+= (LayerProperties &props, const LayerOffset &o
  */
 namespace tl
 {
-  template<> DB_PUBLIC void extractor_impl<db::LayerProperties> (tl::Extractor &ex, db::LayerProperties &p);
-  template<> DB_PUBLIC void extractor_impl<db::LayerOffset> (tl::Extractor &ex, db::LayerOffset &p);
+template <> DB_PUBLIC void extractor_impl<db::LayerProperties> (tl::Extractor &ex, db::LayerProperties &p);
+template <> DB_PUBLIC void extractor_impl<db::LayerOffset> (tl::Extractor &ex, db::LayerOffset &p);
 
-  template<> DB_PUBLIC bool test_extractor_impl<db::LayerProperties> (tl::Extractor &ex, db::LayerProperties &p);
-  template<> DB_PUBLIC bool test_extractor_impl<db::LayerOffset> (tl::Extractor &ex, db::LayerOffset &p);
+template <> DB_PUBLIC bool test_extractor_impl<db::LayerProperties> (tl::Extractor &ex, db::LayerProperties &p);
+template <> DB_PUBLIC bool test_extractor_impl<db::LayerOffset> (tl::Extractor &ex, db::LayerOffset &p);
 } // namespace tl
 
 #endif
-

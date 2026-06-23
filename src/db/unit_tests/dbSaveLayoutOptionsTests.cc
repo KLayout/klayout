@@ -70,16 +70,15 @@ static void set_mywriter_lm (db::SaveLayoutOptions *options, const db::LayerMap 
 }
 
 
-static
-gsi::ClassExt<db::SaveLayoutOptions> mywriteroptions_cls (
+static gsi::ClassExt<db::SaveLayoutOptions> mywriteroptions_cls (
   gsi::method_ext ("mywriter_value", &get_mywriter_value) +
-  gsi::method_ext ("mywriter_value=", &set_mywriter_value) +
-  gsi::method_ext ("mywriter_lm", &get_mywriter_lm) +
-  gsi::method_ext ("mywriter_lm=", &set_mywriter_lm),
+    gsi::method_ext ("mywriter_value=", &set_mywriter_value) +
+    gsi::method_ext ("mywriter_lm", &get_mywriter_lm) +
+    gsi::method_ext ("mywriter_lm=", &set_mywriter_lm),
   "@hide");
 
 
-TEST(1)
+TEST (1)
 {
   db::SaveLayoutOptions opt;
   MyWriterOptions myopt;
@@ -102,7 +101,7 @@ TEST(1)
   EXPECT_EQ (opt.get_option_by_name ("mywriter_value").to_string (), "17");
 }
 
-TEST(2)
+TEST (2)
 {
   db::SaveLayoutOptions opt;
   auto ff = opt.set_format_from_filename ("/home/xyz/test.def");

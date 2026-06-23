@@ -87,7 +87,7 @@ public:
   void set_trans (const db::DCplxTrans &trans);
 
   /**
-   *  @brief Specify the global transformation 
+   *  @brief Specify the global transformation
    */
   void set_global_trans (const db::DCplxTrans &trans);
 
@@ -131,7 +131,7 @@ public:
   /**
    *  @brief Get the target micron box
    *
-   *  The target box may have a different aspect ratio than the viewport box and is 
+   *  The target box may have a different aspect ratio than the viewport box and is
    *  not directly reflected by the transformation.
    */
   db::DBox target_box () const
@@ -149,6 +149,3 @@ private:
 }
 
 #endif
-
-
-

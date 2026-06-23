@@ -31,28 +31,29 @@
 
 #include <iterator>
 
-namespace db 
+namespace db
 {
 
 template <class Coord> class generic_repository;
 class ArrayRepository;
 
-struct stable_layer_tag { };
-struct unstable_layer_tag { };
+struct stable_layer_tag {
+};
+struct unstable_layer_tag {
+};
 
 template <class Box, class Sh, class BoxConvert, class StableTag>
-struct box_tree_typedef { };
-
-template <class Box, class Sh, class BoxConvert>
-struct box_tree_typedef<Box, Sh, BoxConvert, stable_layer_tag> 
-{ 
-  typedef db::box_tree<Box, Sh, BoxConvert> box_tree_type;  
+struct box_tree_typedef {
 };
 
 template <class Box, class Sh, class BoxConvert>
-struct box_tree_typedef<Box, Sh, BoxConvert, unstable_layer_tag> 
-{ 
-  typedef db::unstable_box_tree<Box, Sh, BoxConvert> box_tree_type;  
+struct box_tree_typedef<Box, Sh, BoxConvert, stable_layer_tag> {
+  typedef db::box_tree<Box, Sh, BoxConvert> box_tree_type;
+};
+
+template <class Box, class Sh, class BoxConvert>
+struct box_tree_typedef<Box, Sh, BoxConvert, unstable_layer_tag> {
+  typedef db::unstable_box_tree<Box, Sh, BoxConvert> box_tree_type;
 };
 
 template <class ConstIter, class NonConstIter>
@@ -72,14 +73,13 @@ void to_non_const_box_tree_iter (const ConstIter &ci, NonConstIter &nci, unstabl
 /**
  *  @brief A layer object
  *
- *  A layer is basically a collection of shape objects 
+ *  A layer is basically a collection of shape objects
  *  with a bounding box and the capability to do region queries
  *  with a test box.
  */
 
 template <class Sh, class StableTag>
-struct layer 
-{
+struct layer {
   typedef db::box_convert<Sh> box_convert;
   typedef typename Sh::coord_type coord_type;
   typedef typename db::box<coord_type> box_type;
@@ -94,7 +94,7 @@ struct layer
    *  @brief Default ctor: creates an empty layer object
    */
   layer ()
-    : m_bbox_dirty (false), m_tree_dirty (false) 
+    : m_bbox_dirty (false), m_tree_dirty (false)
   {
     //  .. nothing else ..
   }
@@ -146,18 +146,18 @@ struct layer
   }
 
   /**
-   *  @brief Get the iterator for an object given by a pointer 
+   *  @brief Get the iterator for an object given by a pointer
    */
   iterator iterator_from_pointer (const Sh *p) const
   {
     return m_box_tree.iterator_from_pointer (p);
   }
-  
+
   /**
    *  @brief The translation operator
    *
    *  This operator is used to copy one layer to another repository space.
-   *  The current layer will be overwritten. 
+   *  The current layer will be overwritten.
    *
    *  @param src The source layer
    *  @param rep The repository that is associated with *this and into which the
@@ -183,7 +183,7 @@ struct layer
    *  @brief The translation operator
    *
    *  This operator is used to copy one layer to another repository space with a transformation.
-   *  The current layer will be overwritten. 
+   *  The current layer will be overwritten.
    *
    *  @param src The source layer
    *  @param trans The transformation to apply
@@ -215,7 +215,7 @@ struct layer
    *  and a "sort" call to restore these states.
    *
    *  @param sh The object (copy) to insert
-   *  
+   *
    *  @return A reference to the object created. This reference
    *          is only guaranteed to be valid until the next insert
    *          or sort call.
@@ -246,10 +246,10 @@ struct layer
    *
    *  Replace the element at the position "pos" with the new
    *  element "sh".
-   *  
+   *
    *  @param pos The position at which to replace the element
    *  @param sh The element to replace *pos
-   * 
+   *
    *  @return A reference to the new element
    */
   Sh &replace (iterator pos, const Sh &sh)
@@ -293,7 +293,7 @@ struct layer
   /**
    *  @brief Erasing of elements
    *
-   *  Erase the elements at the given positions [from,to). 
+   *  Erase the elements at the given positions [from,to).
    *  Invalidates sorting and the bbox.
    */
   void erase (iterator from, iterator to)
@@ -337,7 +337,7 @@ struct layer
     m_box_tree.insert (from, to);
   }
 
-  /** 
+  /**
    *  @brief update the bounding box if required
    */
   void update_bbox ()
@@ -349,15 +349,15 @@ struct layer
       box_convert bc = box_convert ();
       m_bbox = box_type ();
       for (typename box_tree_type::const_iterator o = m_box_tree.begin (); o != m_box_tree.end (); ++o) {
-        m_bbox += bc(*o);
+        m_bbox += bc (*o);
       }
 
       m_bbox_dirty = false;
     }
   }
 
-  /** 
-   *  @brief Retrieve the bounding box 
+  /**
+   *  @brief Retrieve the bounding box
    */
   const box_type &bbox () const
   {
@@ -369,7 +369,7 @@ struct layer
   /**
    *  @brief Restore the sorted state
    */
-  void sort () 
+  void sort ()
   {
     //  only sort if not done already
     if (m_tree_dirty) {
@@ -394,10 +394,10 @@ struct layer
   /**
    *  @brief A "flat" query (see box_tree::flat_iterator for a description)
    */
-  flat_iterator begin_flat () const 
+  flat_iterator begin_flat () const
   {
     //  we do not assert !is_dirty here for two reasons: first, in unstable mode, this is not necessary
-    //  and second, in stable mode, it might be by intention, if the shape iterator moves on to a 
+    //  and second, in stable mode, it might be by intention, if the shape iterator moves on to a
     //  shape group that has been updated in between and should *not* iterate over the new set ...
     return m_box_tree.begin_flat ();
   }
@@ -405,7 +405,7 @@ struct layer
   /**
    *  @brief A "touching" region query
    */
-  touching_iterator begin_touching (const box_type &b) const 
+  touching_iterator begin_touching (const box_type &b) const
   {
     //  sort the tree if required
     tl_assert (! m_tree_dirty);
@@ -416,7 +416,7 @@ struct layer
   /**
    *  @brief A "overlapping" region query
    */
-  overlapping_iterator begin_overlapping (const box_type &b) const 
+  overlapping_iterator begin_overlapping (const box_type &b) const
   {
     //  sort the tree if required
     tl_assert (! m_tree_dirty);
@@ -432,10 +432,10 @@ struct layer
    */
   iterator find (const Sh &sh) const
   {
-    //  TODO: this could be done more efficiently with an exact region search 
+    //  TODO: this could be done more efficiently with an exact region search
     //  if we had a converter of a touching iterator to a normal iterator
     for (iterator s = begin (); s != end (); ++s) {
-      if (*s == sh) { 
+      if (*s == sh) {
         return s;
       }
     }
@@ -506,8 +506,12 @@ struct layer
     m_box_tree.swap (other.m_box_tree);
     std::swap (m_bbox, other.m_bbox);
     bool x;
-    x = other.m_bbox_dirty; other.m_bbox_dirty = m_bbox_dirty; m_bbox_dirty = x;
-    x = other.m_tree_dirty; other.m_tree_dirty = m_tree_dirty; m_tree_dirty = x;
+    x = other.m_bbox_dirty;
+    other.m_bbox_dirty = m_bbox_dirty;
+    m_bbox_dirty = x;
+    x = other.m_tree_dirty;
+    other.m_tree_dirty = m_tree_dirty;
+    m_tree_dirty = x;
   }
 
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
@@ -538,4 +542,3 @@ mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const 
 }
 
 #endif
-

@@ -47,50 +47,42 @@ HTMLItemDelegate::HTMLItemDelegate (QObject *parent)
   m_anchors_clickable = false;
 }
 
-void
-HTMLItemDelegate::set_anchors_clickable (bool a)
+void HTMLItemDelegate::set_anchors_clickable (bool a)
 {
   m_anchors_clickable = a;
 }
 
-void
-HTMLItemDelegate::set_plain_text (bool pt)
+void HTMLItemDelegate::set_plain_text (bool pt)
 {
   m_plain_text = pt;
 }
 
-void
-HTMLItemDelegate::set_icon_margin (int m)
+void HTMLItemDelegate::set_icon_margin (int m)
 {
   m_icon_margin = m;
 }
 
-void
-HTMLItemDelegate::set_icon_spacing (int s)
+void HTMLItemDelegate::set_icon_spacing (int s)
 {
   m_icon_spacing = s;
 }
 
-void
-HTMLItemDelegate::set_text_margin (int m)
+void HTMLItemDelegate::set_text_margin (int m)
 {
   m_text_margin = m;
 }
 
-void
-HTMLItemDelegate::set_text_height (int h)
+void HTMLItemDelegate::set_text_height (int h)
 {
   m_text_height = h;
 }
 
-void
-HTMLItemDelegate::set_text_width (int w)
+void HTMLItemDelegate::set_text_width (int w)
 {
   m_text_width = w;
 }
 
-void
-HTMLItemDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void HTMLItemDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 #if QT_VERSION >= 0x60000
   QStyleOptionViewItem option_v4 = option;
@@ -144,8 +136,7 @@ HTMLItemDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, 
   painter->restore ();
 }
 
-QSize
-HTMLItemDelegate::sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const
+QSize HTMLItemDelegate::sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 #if QT_VERSION >= 0x60000
   QStyleOptionViewItem option_v4 = option;
@@ -173,8 +164,7 @@ HTMLItemDelegate::sizeHint (const QStyleOptionViewItem &option, const QModelInde
   return QSize (m_text_width + (has_icon ? icon_size.width () + m_icon_spacing : 0), std::max (has_icon ? icon_size.height () + 2 * m_icon_margin : 0, th));
 }
 
-bool
-HTMLItemDelegate::editorEvent (QEvent *event, QAbstractItemModel * /*model*/, const QStyleOptionViewItem &option, const QModelIndex &index)
+bool HTMLItemDelegate::editorEvent (QEvent *event, QAbstractItemModel * /*model*/, const QStyleOptionViewItem &option, const QModelIndex &index)
 {
   if ((event->type () == QEvent::MouseButtonRelease || event->type () == QEvent::MouseButtonPress) && ! m_plain_text && m_anchors_clickable) {
 
@@ -201,7 +191,6 @@ HTMLItemDelegate::editorEvent (QEvent *event, QAbstractItemModel * /*model*/, co
         emit anchor_clicked (a);
       }
     }
-
   }
 
   return false;

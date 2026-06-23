@@ -30,7 +30,7 @@
 
 namespace tl
 {
-  class OutputStream;
+class OutputStream;
 }
 
 namespace db
@@ -44,8 +44,8 @@ class Netlist;
 class DB_PUBLIC NetlistWriter
 {
 public:
-  NetlistWriter () { }
-  virtual ~NetlistWriter () { }
+  NetlistWriter () {}
+  virtual ~NetlistWriter () {}
 
   virtual void write (tl::OutputStream &stream, const db::Netlist &netlist, const std::string &description = std::string ()) = 0;
 };

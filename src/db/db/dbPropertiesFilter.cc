@@ -43,8 +43,7 @@ PropertiesFilter::PropertiesFilter (const tl::Variant &name, const tl::GlobPatte
   //  .. nothing yet ..
 }
 
-bool
-PropertiesFilter::prop_selected (db::properties_id_type prop_id) const
+bool PropertiesFilter::prop_selected (db::properties_id_type prop_id) const
 {
   tl::MutexLocker locker (&m_lock);
 
@@ -58,8 +57,7 @@ PropertiesFilter::prop_selected (db::properties_id_type prop_id) const
   return res;
 }
 
-bool
-PropertiesFilter::prop_selected_impl (db::properties_id_type prop_id) const
+bool PropertiesFilter::prop_selected_impl (db::properties_id_type prop_id) const
 {
   const db::PropertiesSet &ps = db::properties (prop_id);
   if (ps.has_value (m_name_id)) {

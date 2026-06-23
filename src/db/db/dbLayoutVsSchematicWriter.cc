@@ -74,7 +74,7 @@ private:
   std::string status_to_s (const db::NetlistCrossReference::Status status);
   void write (TokenizedOutput &stream, const db::NetlistCrossReference *xref);
 
-  std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > m_net2id_per_circuit_a, m_net2id_per_circuit_b;
+  std::map<const db::Circuit *, std::map<const db::Net *, unsigned int>> m_net2id_per_circuit_a, m_net2id_per_circuit_b;
 };
 
 template <class Keys>
@@ -98,7 +98,8 @@ void std_writer_impl<Keys>::write (const db::LayoutVsSchematic *lvs)
 
   if (lvs->netlist ()) {
     if (! Keys::is_short ()) {
-      out << endl << "# Layout" << endl;
+      out << endl
+          << "# Layout" << endl;
     }
     TokenizedOutput o (out, Keys::layout_key);
     o << endl;
@@ -107,7 +108,8 @@ void std_writer_impl<Keys>::write (const db::LayoutVsSchematic *lvs)
 
   if (lvs->reference_netlist ()) {
     if (! Keys::is_short ()) {
-      out << endl << "# Reference netlist" << endl;
+      out << endl
+          << "# Reference netlist" << endl;
     }
     TokenizedOutput o (out, Keys::reference_key);
     o << endl;
@@ -116,7 +118,8 @@ void std_writer_impl<Keys>::write (const db::LayoutVsSchematic *lvs)
 
   if (lvs->cross_ref ()) {
     if (! Keys::is_short ()) {
-      out << endl << "# Cross reference" << endl;
+      out << endl
+          << "# Cross reference" << endl;
     }
     TokenizedOutput o (out, Keys::xref_key);
     o << endl;
@@ -160,7 +163,7 @@ static void build_pin_index_map (const db::Circuit *c, std::map<const db::Pin *,
   if (c) {
     unsigned int pi = 0;
     for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p, ++pi) {
-      pin2index.insert (std::make_pair (p.operator-> (), pi));
+      pin2index.insert (std::make_pair (p.operator->(), pi));
     }
   }
 }
@@ -209,7 +212,6 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::NetlistCro
       }
       o << endl;
     }
-
   }
 
   for (auto c = xref->begin_circuits (); c != xref->end_circuits (); ++c) {
@@ -233,7 +235,6 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::NetlistCro
         }
         o << endl;
       }
-
     }
 
     {
@@ -260,7 +261,6 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::NetlistCro
         TokenizedOutput (o, Keys::circuit_key) << ion_to_s (n->pair.first) << ion_to_s (n->pair.second) << status_to_s (n->status) << this->message_to_s (n->msg);
       }
     }
-
   }
 }
 
@@ -287,10 +287,10 @@ void LayoutVsSchematicStandardWriter::do_write_lvs (const db::LayoutVsSchematic 
   double dbu = lvs->internal_layout ()->dbu ();
 
   if (m_short_version) {
-    lvs_std_format::std_writer_impl<lvs_std_format::keys<true> > writer (*mp_stream, dbu);
+    lvs_std_format::std_writer_impl<lvs_std_format::keys<true>> writer (*mp_stream, dbu);
     writer.write (lvs);
   } else {
-    lvs_std_format::std_writer_impl<lvs_std_format::keys<false> > writer (*mp_stream, dbu);
+    lvs_std_format::std_writer_impl<lvs_std_format::keys<false>> writer (*mp_stream, dbu);
     writer.write (lvs);
   }
 }

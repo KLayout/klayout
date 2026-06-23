@@ -21,7 +21,7 @@
 */
 
 #include <Python.h>
-#include <frameobject.h>   //  Python - for traceback
+#include <frameobject.h> //  Python - for traceback
 
 #include "pya.h"
 #include "pyaConvert.h"
@@ -43,7 +43,7 @@
 
 //  For the installation path
 #ifdef _WIN32
-#  include <windows.h>
+#include <windows.h>
 #endif
 
 namespace pya
@@ -52,17 +52,20 @@ namespace pya
 // --------------------------------------------------------------------------
 //  PythonError implementation
 
-PythonError::PythonError (const char *msg, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
+PythonError::PythonError (const char *msg, const char *cls, const std::vector<tl::BacktraceElement> &backtrace)
   : tl::ScriptError (msg, cls, backtrace)
-{ }
+{
+}
 
-PythonError::PythonError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
+PythonError::PythonError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector<tl::BacktraceElement> &backtrace)
   : tl::ScriptError (msg, sourcefile, line, cls, backtrace)
-{ }
+{
+}
 
 PythonError::PythonError (const PythonError &d)
   : tl::ScriptError (d)
-{ }
+{
+}
 
 // --------------------------------------------------------------------------
 
@@ -78,8 +81,7 @@ PythonInterpreter *sp_interpreter = 0;
  *  This function normalizes the file path so it only contains one
  *  kind of slashes on Windows.
  */
-static
-std::string normalize_path (const std::string &p)
+static std::string normalize_path (const std::string &p)
 {
 #if defined(__WIN32)
   std::string np;
@@ -107,14 +109,14 @@ public:
     while (frame != NULL) {
 
 #if PY_VERSION_HEX >= 0x030A0000
-      int line = PyFrame_GetLineNumber(frame);
+      int line = PyFrame_GetLineNumber (frame);
 #else
       int line = frame->f_lineno;
 #endif
       std::string fn;
 #if PY_VERSION_HEX >= 0x030A0000
-      if (test_type<std::string> (PyFrame_GetCode(frame)->co_filename, true)) {
-        fn = normalize_path (python2c<std::string> (PyFrame_GetCode(frame)->co_filename));
+      if (test_type<std::string> (PyFrame_GetCode (frame)->co_filename, true)) {
+        fn = normalize_path (python2c<std::string> (PyFrame_GetCode (frame)->co_filename));
 #else
       if (test_type<std::string> (frame->f_code->co_filename, true)) {
         fn = normalize_path (python2c<std::string> (frame->f_code->co_filename));
@@ -123,13 +125,12 @@ public:
       m_stack_trace.push_back (tl::BacktraceElement (fn, line));
 
 #if PY_VERSION_HEX >= 0x030A0000
-      frame = PyFrame_GetBack(frame);
+      frame = PyFrame_GetBack (frame);
       //  PyFrame_GetBack returns a strong reference, hence we need to make sure it is released
       frame_object_ref = (PyObject *) frame;
 #else
       frame = frame->f_back;
 #endif
-
     }
   }
 
@@ -198,7 +199,6 @@ PythonInterpreter::PythonInterpreter (bool embedded)
     Py_AtExit (&reset_interpreter);
 
     return;
-
   }
 
   tl::SelfTimer timer (tl::verbosity () >= 21, "Initializing Python");
@@ -245,7 +245,7 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 
   std::string inst_dir;
 
-  wchar_t buffer[MAX_PATH];
+  wchar_t buffer [MAX_PATH];
   int len;
 
   if ((len = GetModuleFileNameW (NULL, buffer, MAX_PATH)) > 0) {
@@ -257,7 +257,6 @@ PythonInterpreter::PythonInterpreter (bool embedded)
     //  Use our own installation path for PYTHONHOME unless given
     //  (Our Windows installation comes with its own copy of the libraries)
     tl::set_env (pythonhome_name, inst_dir);
-
   }
 
   if (! has_klayout_pythonpath) {
@@ -294,7 +293,6 @@ PythonInterpreter::PythonInterpreter (bool embedded)
         }
 
         tl::set_env (pythonpath_name, path);
-
       }
 
     } catch (tl::Exception &ex) {
@@ -302,7 +300,6 @@ PythonInterpreter::PythonInterpreter (bool embedded)
     } catch (...) {
       tl::error << tl::to_string (tr ("Evaluation of Python path expression failed"));
     }
-
   }
 
 #endif
@@ -315,7 +312,7 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 
   //  Set dummy argv[]
   //  TODO: more?
-  char *argv[1] = { make_string (app_path) };
+  char *argv [1] = {make_string (app_path)};
 #if PY_MINOR_VERSION >= 7
   PySys_SetArgvEx (1, argv, 0);
 #else
@@ -333,7 +330,7 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 
   //  Set dummy argv[]
   //  TODO: more?
-  wchar_t *argv[1] = { const_cast<wchar_t *> (mp_py3_app_name.c_str()) };
+  wchar_t *argv [1] = {const_cast<wchar_t *> (mp_py3_app_name.c_str ())};
   PySys_SetArgvEx (1, argv, 0);
 
 #endif
@@ -383,8 +380,7 @@ PythonInterpreter::~PythonInterpreter ()
   m_modules.clear ();
 }
 
-void
-PythonInterpreter::register_module (pya::PythonModule *module)
+void PythonInterpreter::register_module (pya::PythonModule *module)
 {
   for (auto m = m_modules.begin (); m != m_modules.end (); ++m) {
     if (*m == module) {
@@ -402,8 +398,7 @@ PythonInterpreter::make_string (const std::string &s)
   return const_cast<char *> (m_string_heap.back ().c_str ());
 }
 
-void
-PythonInterpreter::add_path (const std::string &p, bool prepend)
+void PythonInterpreter::add_path (const std::string &p, bool prepend)
 {
   PyObject *path = PySys_GetObject ((char *) "path");
   if (path != NULL && PyList_Check (path)) {
@@ -415,8 +410,7 @@ PythonInterpreter::add_path (const std::string &p, bool prepend)
   }
 }
 
-void
-PythonInterpreter::add_package_location (const std::string &package_path)
+void PythonInterpreter::add_package_location (const std::string &package_path)
 {
   std::string path = tl::combine_path (tl::absolute_file_path (package_path), "python");
   if (tl::file_exists (path) && m_package_paths.find (path) == m_package_paths.end ()) {
@@ -425,41 +419,35 @@ PythonInterpreter::add_package_location (const std::string &package_path)
   }
 }
 
-void
-PythonInterpreter::remove_package_location (const std::string & /*package_path*/)
+void PythonInterpreter::remove_package_location (const std::string & /*package_path*/)
 {
   //  Currently, we do not really remove the location. Python might get screwed up this way.
 }
 
-void
-PythonInterpreter::require (const std::string & /*filename*/)
+void PythonInterpreter::require (const std::string & /*filename*/)
 {
   //  TODO: is there a way to implement that?
   throw tl::Exception (tl::to_string (tr ("'require' not implemented for Python interpreter")));
 }
 
-void
-PythonInterpreter::set_debugger_scope (const std::string &filename)
+void PythonInterpreter::set_debugger_scope (const std::string &filename)
 {
   m_debugger_scope = filename;
 }
 
-void
-PythonInterpreter::remove_debugger_scope ()
+void PythonInterpreter::remove_debugger_scope ()
 {
   m_debugger_scope.clear ();
 }
 
-void
-PythonInterpreter::ignore_next_exception ()
+void PythonInterpreter::ignore_next_exception ()
 {
   if (mp_current_exec_handler) {
     m_ignore_next_exception = true;
   }
 }
 
-void
-PythonInterpreter::load_file (const std::string &filename)
+void PythonInterpreter::load_file (const std::string &filename)
 {
   tl::InputStream stream (filename);
   eval_string (stream.read_all ().c_str (), filename.c_str (), 1);
@@ -468,8 +456,7 @@ PythonInterpreter::load_file (const std::string &filename)
 /**
  *  @brief Gets the global and local variable lists for a given context index
  */
-void
-PythonInterpreter::get_context (int context, PythonRef &globals, PythonRef &locals, const char *file)
+void PythonInterpreter::get_context (int context, PythonRef &globals, PythonRef &locals, const char *file)
 {
   globals = PythonRef ();
   locals = PythonRef ();
@@ -477,7 +464,7 @@ PythonInterpreter::get_context (int context, PythonRef &globals, PythonRef &loca
   PyFrameObject *f = mp_current_frame;
   while (f && context > 0) {
 #if PY_VERSION_HEX >= 0x030B0000
-    f = PyFrame_GetBack(f);
+    f = PyFrame_GetBack (f);
 #else
     f = f->f_back;
 #endif
@@ -491,8 +478,8 @@ PythonInterpreter::get_context (int context, PythonRef &globals, PythonRef &loca
     PyFrame_FastToLocals (f);
 
 #if PY_VERSION_HEX >= 0x030B0000
-    globals = PythonRef (PyObject_GetAttrString((PyObject*)f, "f_globals"));
-    locals = PythonRef (PyObject_GetAttrString((PyObject*)f, "f_locals"), false);
+    globals = PythonRef (PyObject_GetAttrString ((PyObject *) f, "f_globals"));
+    locals = PythonRef (PyObject_GetAttrString ((PyObject *) f, "f_locals"), false);
 #else
     globals = PythonRef (f->f_globals, false);
     locals = PythonRef (f->f_locals, false);
@@ -513,35 +500,32 @@ PythonInterpreter::get_context (int context, PythonRef &globals, PythonRef &loca
 
       PythonRef fn (c2python (file));
       PyDict_SetItemString (locals.get (), "__file__", fn.get ());
-
     }
-
   }
 }
 
-void
-PythonInterpreter::eval_string (const char *expr, const char *file, int /*line*/, int context)
+void PythonInterpreter::eval_string (const char *expr, const char *file, int /*line*/, int context)
 {
   PYTHON_BEGIN_EXEC
 
-    //  TODO: what to do with "line"?
-    PythonRef code (Py_CompileString(expr, file ? file : "(eval)", Py_file_input));
-    if (! code) {
-      check_error ();
-      return;
-    }
+  //  TODO: what to do with "line"?
+  PythonRef code (Py_CompileString (expr, file ? file : "(eval)", Py_file_input));
+  if (! code) {
+    check_error ();
+    return;
+  }
 
-    PythonRef globals, locals;
-    get_context (context, globals, locals, file);
+  PythonRef globals, locals;
+  get_context (context, globals, locals, file);
 
 #if PY_MAJOR_VERSION < 3
-    PythonRef result (PyEval_EvalCode ((PyCodeObject *)code.get (), globals.get (), locals.get ()));
+  PythonRef result (PyEval_EvalCode ((PyCodeObject *) code.get (), globals.get (), locals.get ()));
 #else
-    PythonRef result (PyEval_EvalCode (code.get (), globals.get (), locals.get ()));
+  PythonRef result (PyEval_EvalCode (code.get (), globals.get (), locals.get ()));
 #endif
-    if (! result) {
-      check_error ();
-    }
+  if (! result) {
+    check_error ();
+  }
 
   PYTHON_END_EXEC
 }
@@ -559,42 +543,41 @@ PythonInterpreter::eval_int (const char *expr, const char *file, int /*line*/, b
 
   PYTHON_BEGIN_EXEC
 
-    //  TODO: what to do with "line"?
-    PythonRef code (Py_CompileString (expr, file ? file : "(eval)", eval_expr ? Py_eval_input : Py_single_input));
-    if (! code) {
-      check_error ();
-      return ret;
-    }
+  //  TODO: what to do with "line"?
+  PythonRef code (Py_CompileString (expr, file ? file : "(eval)", eval_expr ? Py_eval_input : Py_single_input));
+  if (! code) {
+    check_error ();
+    return ret;
+  }
 
-    PythonRef globals, locals;
-    get_context (context, globals, locals, file);
+  PythonRef globals, locals;
+  get_context (context, globals, locals, file);
 
 #if PY_MAJOR_VERSION < 3
-    PythonRef result (PyEval_EvalCode ((PyCodeObject*) code.get (), globals.get (), locals.get ()));
+  PythonRef result (PyEval_EvalCode ((PyCodeObject *) code.get (), globals.get (), locals.get ()));
 #else
-    PythonRef result (PyEval_EvalCode (code.get (), globals.get (), locals.get ()));
+  PythonRef result (PyEval_EvalCode (code.get (), globals.get (), locals.get ()));
 #endif
-    if (! result) {
-      check_error ();
-      return ret;
-    }
+  if (! result) {
+    check_error ();
+    return ret;
+  }
 
-    if (eval_expr) {
-      ret = python2c<tl::Variant> (result.get ());
-    } else {
-      //  eval_expr == false will print the output -> terminate stream if required
-      if (mp_current_console) {
-        mp_current_console->flush ();
-      }
+  if (eval_expr) {
+    ret = python2c<tl::Variant> (result.get ());
+  } else {
+    //  eval_expr == false will print the output -> terminate stream if required
+    if (mp_current_console) {
+      mp_current_console->flush ();
     }
+  }
 
   PYTHON_END_EXEC
 
   return ret;
 }
 
-void
-PythonInterpreter::eval_string_and_print (const char *expr, const char *file, int line, int context)
+void PythonInterpreter::eval_string_and_print (const char *expr, const char *file, int line, int context)
 {
   eval_int (expr, file, line, false, context);
 }
@@ -613,8 +596,7 @@ PythonInterpreter::inspector (int context)
   return create_inspector (locals.get (), true /*symbolic*/);
 }
 
-void
-PythonInterpreter::define_variable (const std::string &name, const tl::Variant &value)
+void PythonInterpreter::define_variable (const std::string &name, const tl::Variant &value)
 {
   PythonPtr main_module (PyImport_AddModule ("__main__"));
   PythonPtr dict (PyModule_GetDict (main_module.get ()));
@@ -624,14 +606,12 @@ PythonInterpreter::define_variable (const std::string &name, const tl::Variant &
   }
 }
 
-bool
-PythonInterpreter::available () const
+bool PythonInterpreter::available () const
 {
   return true;
 }
 
-void
-PythonInterpreter::initialize ()
+void PythonInterpreter::initialize ()
 {
   //  Import the pya module
   PyObject *pya_module = PyImport_ImportModule (pya_module_name);
@@ -652,8 +632,7 @@ PythonInterpreter::prepare_trace (PyObject *fn_object)
 }
 
 //  TODO: make the Python object the interpreter and don't use singleton instances (multi-threading support)
-static
-int pya_trace_func (PyObject * /*obj*/, PyFrameObject *frame, int event, PyObject *arg)
+static int pya_trace_func (PyObject * /*obj*/, PyFrameObject *frame, int event, PyObject *arg)
 {
   if (PythonInterpreter::instance ()) {
     return PythonInterpreter::instance ()->trace_func (frame, event, arg);
@@ -662,8 +641,7 @@ int pya_trace_func (PyObject * /*obj*/, PyFrameObject *frame, int event, PyObjec
   }
 }
 
-int
-PythonInterpreter::trace_func (PyFrameObject *frame, int event, PyObject *arg)
+int PythonInterpreter::trace_func (PyFrameObject *frame, int event, PyObject *arg)
 {
   if (! mp_current_exec_handler || m_in_trace) {
     return 0;
@@ -671,106 +649,102 @@ PythonInterpreter::trace_func (PyFrameObject *frame, int event, PyObject *arg)
 
   PYA_TRY
 
-    mp_current_frame = frame;
-    m_in_trace = true;
+  mp_current_frame = frame;
+  m_in_trace = true;
 
-    if (event == PyTrace_LINE) {
+  if (event == PyTrace_LINE) {
 
-      //  see below for a description of m_block_exceptions
-      m_block_exceptions = false;
-
-#if PY_VERSION_HEX >= 0x030B0000
-      int line = PyFrame_GetLineNumber(frame);
-      size_t file_id = prepare_trace (PyFrame_GetCode(frame)->co_filename);
-#else
-      int line = frame->f_lineno;
-      size_t file_id = prepare_trace (frame->f_code->co_filename);
-#endif
-
-      PythonStackTraceProvider st_provider (frame, m_debugger_scope);
-      mp_current_exec_handler->trace (this, file_id, line, &st_provider);
-
-    } else if (event == PyTrace_CALL) {
-
-      mp_current_exec_handler->push_call_stack (this);
-
-    } else if (event == PyTrace_RETURN) {
-
-      mp_current_exec_handler->pop_call_stack (this);
-
-    } else if (event == PyTrace_EXCEPTION && ! m_block_exceptions) {
-
-      PythonPtr exc_type, exc_value;
-
-      if (PyTuple_Check (arg) && PyTuple_Size (arg) == 3) {
-        exc_type = PythonPtr (PyTuple_GetItem (arg, 0));
-        exc_value = PythonPtr (PyTuple_GetItem (arg, 1));
-      }
-
-#if PY_VERSION_HEX >= 0x03050000
-      if (exc_type && exc_type.get () != PyExc_StopIteration && exc_type.get () != PyExc_GeneratorExit && exc_type.get () != PyExc_StopAsyncIteration) {
-#else
-      if (exc_type && exc_type.get () != PyExc_StopIteration && exc_type.get () != PyExc_GeneratorExit) {
-#endif
-
-        //  If the next exception shall be ignored, do so
-        if (m_ignore_next_exception) {
-
-          m_ignore_next_exception = false;
-
-        } else {
+    //  see below for a description of m_block_exceptions
+    m_block_exceptions = false;
 
 #if PY_VERSION_HEX >= 0x030B0000
-          int line = PyFrame_GetLineNumber(frame);
-          size_t file_id = prepare_trace (PyFrame_GetCode(frame)->co_filename);
+    int line = PyFrame_GetLineNumber (frame);
+    size_t file_id = prepare_trace (PyFrame_GetCode (frame)->co_filename);
 #else
-          int line = frame->f_lineno;
-          size_t file_id = prepare_trace (frame->f_code->co_filename);
+    int line = frame->f_lineno;
+    size_t file_id = prepare_trace (frame->f_code->co_filename);
 #endif
 
-          std::string emsg = "<unknown>";
-          if (exc_value) {
-            PythonRef msg_str (PyObject_Str (exc_value.get ()));
-            if (msg_str && test_type<std::string> (msg_str.get (), true)) {
-              emsg = python2c<std::string> (msg_str.get ());
-            }
-          }
+    PythonStackTraceProvider st_provider (frame, m_debugger_scope);
+    mp_current_exec_handler->trace (this, file_id, line, &st_provider);
 
-          std::string eclass = "<unknown>";
-          if (exc_type) {
-            const char *c = ((PyTypeObject *) exc_type.get ())->tp_name;
-            if (c) {
-              eclass = c;
-            }
-          }
+  } else if (event == PyTrace_CALL) {
 
-          PythonStackTraceProvider st_provider (frame, m_debugger_scope);
-          mp_current_exec_handler->exception_thrown (this, file_id, line, eclass, emsg, &st_provider);
+    mp_current_exec_handler->push_call_stack (this);
 
-        }
+  } else if (event == PyTrace_RETURN) {
 
-        //  TODO: really needed?
-        //  Ruby tends to call this callback twice - once from rb_f_raise and then
-        //  from rb_exc_raise. We use the m_block_exceptions flag to suppress the
-        //  second one
-        m_block_exceptions = true;
+    mp_current_exec_handler->pop_call_stack (this);
 
-      }
+  } else if (event == PyTrace_EXCEPTION && ! m_block_exceptions) {
 
+    PythonPtr exc_type, exc_value;
+
+    if (PyTuple_Check (arg) && PyTuple_Size (arg) == 3) {
+      exc_type = PythonPtr (PyTuple_GetItem (arg, 0));
+      exc_value = PythonPtr (PyTuple_GetItem (arg, 1));
     }
 
-    mp_current_frame = 0;
-    m_in_trace = false;
-    return 0;
+#if PY_VERSION_HEX >= 0x03050000
+    if (exc_type && exc_type.get () != PyExc_StopIteration && exc_type.get () != PyExc_GeneratorExit && exc_type.get () != PyExc_StopAsyncIteration) {
+#else
+    if (exc_type && exc_type.get () != PyExc_StopIteration && exc_type.get () != PyExc_GeneratorExit) {
+#endif
 
-  PYA_CATCH("trace function")
+      //  If the next exception shall be ignored, do so
+      if (m_ignore_next_exception) {
+
+        m_ignore_next_exception = false;
+
+      } else {
+
+#if PY_VERSION_HEX >= 0x030B0000
+        int line = PyFrame_GetLineNumber (frame);
+        size_t file_id = prepare_trace (PyFrame_GetCode (frame)->co_filename);
+#else
+        int line = frame->f_lineno;
+        size_t file_id = prepare_trace (frame->f_code->co_filename);
+#endif
+
+        std::string emsg = "<unknown>";
+        if (exc_value) {
+          PythonRef msg_str (PyObject_Str (exc_value.get ()));
+          if (msg_str && test_type<std::string> (msg_str.get (), true)) {
+            emsg = python2c<std::string> (msg_str.get ());
+          }
+        }
+
+        std::string eclass = "<unknown>";
+        if (exc_type) {
+          const char *c = ((PyTypeObject *) exc_type.get ())->tp_name;
+          if (c) {
+            eclass = c;
+          }
+        }
+
+        PythonStackTraceProvider st_provider (frame, m_debugger_scope);
+        mp_current_exec_handler->exception_thrown (this, file_id, line, eclass, emsg, &st_provider);
+      }
+
+      //  TODO: really needed?
+      //  Ruby tends to call this callback twice - once from rb_f_raise and then
+      //  from rb_exc_raise. We use the m_block_exceptions flag to suppress the
+      //  second one
+      m_block_exceptions = true;
+    }
+  }
+
+  mp_current_frame = 0;
+  m_in_trace = false;
+  return 0;
+
+  PYA_CATCH ("trace function")
 
   m_in_trace = false;
   return -1;
 }
 
-void
-PythonInterpreter::push_exec_handler (gsi::ExecutionHandler *exec_handler)
+void PythonInterpreter::push_exec_handler (gsi::ExecutionHandler *exec_handler)
 {
   if (mp_current_exec_handler) {
     m_exec_handlers.push_back (mp_current_exec_handler);
@@ -788,8 +762,7 @@ PythonInterpreter::push_exec_handler (gsi::ExecutionHandler *exec_handler)
   }
 }
 
-void
-PythonInterpreter::remove_exec_handler (gsi::ExecutionHandler *exec_handler)
+void PythonInterpreter::remove_exec_handler (gsi::ExecutionHandler *exec_handler)
 {
   if (mp_current_exec_handler == exec_handler) {
 
@@ -815,12 +788,10 @@ PythonInterpreter::remove_exec_handler (gsi::ExecutionHandler *exec_handler)
         break;
       }
     }
-
   }
 }
 
-void
-PythonInterpreter::push_console (gsi::Console *console)
+void PythonInterpreter::push_console (gsi::Console *console)
 {
   if (! mp_current_console) {
 
@@ -843,8 +814,7 @@ PythonInterpreter::push_console (gsi::Console *console)
   mp_current_console = console;
 }
 
-void
-PythonInterpreter::remove_console (gsi::Console *console)
+void PythonInterpreter::remove_console (gsi::Console *console)
 {
   if (mp_current_console == console) {
 
@@ -877,7 +847,6 @@ PythonInterpreter::remove_console (gsi::Console *console)
         break;
       }
     }
-
   }
 }
 

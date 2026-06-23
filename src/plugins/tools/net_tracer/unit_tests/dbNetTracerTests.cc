@@ -164,7 +164,7 @@ void run_test2 (tl::TestBase *_this, const std::string &file, const db::NetTrace
   db::compare_layouts (_this, layout_net, fn, db::WriteOAS);
 }
 
-TEST(1) 
+TEST (1)
 {
   std::string file = "t1.oas.gz";
   std::string file_au = "t1_net.oas.gz";
@@ -175,7 +175,7 @@ TEST(1)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (7000, 1500), file_au, "THE_NAME");
 }
 
-TEST(1b) 
+TEST (1b)
 {
   std::string file = "t1.oas.gz";
   std::string file_au = "t1b_net.oas.gz";
@@ -187,7 +187,7 @@ TEST(1b)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (7000, 15000), file_au);
 }
 
-TEST(1c) 
+TEST (1c)
 {
   std::string file = "t1.oas.gz";
   std::string file_au = "t1_net.oas.gz";
@@ -201,7 +201,7 @@ TEST(1c)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (7000, 1500), file_au, "THE_NAME");
 }
 
-TEST(1d) 
+TEST (1d)
 {
   std::string file = "t1.oas.gz";
   std::string file_au = "t1d_net.oas.gz";
@@ -213,7 +213,7 @@ TEST(1d)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (7000, 1500), file_au);
 }
 
-TEST(2) 
+TEST (2)
 {
   std::string file = "t2.oas.gz";
   std::string file_au = "t2_net.oas.gz";
@@ -224,7 +224,7 @@ TEST(2)
   run_test2 (_this, file, tc, db::LayerProperties (1, 0), db::Point (7000, 1500), db::LayerProperties (3, 0), db::Point (4000, -20000), file_au, "THE_NAME");
 }
 
-TEST(3) 
+TEST (3)
 {
   std::string file = "t3.oas.gz";
   std::string file_au = "t3_net.oas.gz";
@@ -241,7 +241,7 @@ TEST(3)
   EXPECT_EQ (msg, "Nets are not connected");
 }
 
-TEST(4) 
+TEST (4)
 {
   std::string file = "t4.oas.gz";
   std::string file_au = "t4_net.oas.gz";
@@ -252,7 +252,7 @@ TEST(4)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (7000, 1500), file_au, "");
 }
 
-TEST(4b) 
+TEST (4b)
 {
   std::string file = "t4.oas.gz";
   std::string file_au = "t4b_net.oas.gz";
@@ -263,7 +263,7 @@ TEST(4b)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (7000, 1500), file_au, "THE_NAME");
 }
 
-TEST(5) 
+TEST (5)
 {
   std::string file = "t5.oas.gz";
   std::string file_au = "t5_net.oas.gz";
@@ -274,7 +274,7 @@ TEST(5)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (7000, 1500), file_au, "THE_NAME");
 }
 
-TEST(5b) 
+TEST (5b)
 {
   std::string file = "t5.oas.gz";
   std::string file_au = "t5b_net.oas.gz";
@@ -285,7 +285,7 @@ TEST(5b)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (7000, 1500), file_au, "THE_NAME");
 }
 
-TEST(5c) 
+TEST (5c)
 {
   std::string file = "t5.oas.gz";
   std::string file_au = "t5c_net.oas.gz";
@@ -296,7 +296,7 @@ TEST(5c)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (7000, 1500), file_au, "");
 }
 
-TEST(5d) 
+TEST (5d)
 {
   std::string file = "t5.oas.gz";
   std::string file_au = "t5d_net.oas.gz";
@@ -307,7 +307,7 @@ TEST(5d)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (7000, 1500), file_au, "THE_NAME");
 }
 
-TEST(5e) 
+TEST (5e)
 {
   std::string file = "t5.oas.gz";
   std::string file_au = "t5e_net.oas.gz";
@@ -318,7 +318,7 @@ TEST(5e)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (7000, 1500), file_au, "THE_NAME");
 }
 
-TEST(5f) 
+TEST (5f)
 {
   std::string file = "t5.oas.gz";
   std::string file_au = "t5f_net.oas.gz";
@@ -331,7 +331,7 @@ TEST(5f)
   run_test (_this, file, tc, db::LayerProperties (10, 0), db::Point (7000, 1500), file_au, "THE_NAME");
 }
 
-TEST(6) 
+TEST (6)
 {
   std::string file = "t6.oas.gz";
   std::string file_au = "t6_net.oas.gz";
@@ -343,7 +343,7 @@ TEST(6)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (-2250, -900), file_au, "A");
 }
 
-TEST(6b)
+TEST (6b)
 {
   std::string file = "t6.oas.gz";
   std::string file_au = "t6b_net.oas.gz";
@@ -355,7 +355,7 @@ TEST(6b)
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (-2250, -900), file_au, "IN_B", 10);
 }
 
-TEST(7)
+TEST (7)
 {
   std::string file = "t7.oas.gz";
   std::string file_au = "t7_net.oas.gz";
@@ -368,7 +368,7 @@ TEST(7)
 }
 
 // bug #456: OASIS box arrays and net tracer
-TEST(8) 
+TEST (8)
 {
   std::string file = "t8.oas.gz";
   std::string file_au = "t8_net.oas.gz";
@@ -379,7 +379,7 @@ TEST(8)
   run_test (_this, file, tc, db::LayerProperties (15, 0), db::Point (4000, 10000), file_au, "");
 }
 
-TEST(9) 
+TEST (9)
 {
   std::string file = "t9.oas.gz";
   std::string file_au = "t9_net.oas.gz";
@@ -395,7 +395,7 @@ TEST(9)
 }
 
 //  issue #1967
-TEST(10)
+TEST (10)
 {
   std::string file = "t10.oas.gz";
   std::string file_au = "t10_net.oas.gz";
@@ -405,4 +405,3 @@ TEST(10)
 
   run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (300000, 7000), file_au, "");
 }
-

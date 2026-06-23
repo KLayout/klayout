@@ -27,7 +27,7 @@
 #include "tlString.h"
 #include "tlUnitTest.h"
 
-TEST(1) 
+TEST (1)
 {
   db::Manager m (true);
   db::Layout g (&m);
@@ -38,9 +38,9 @@ TEST(1)
   db::Cell &c4 (g.cell (g.add_cell ()));
 
   db::Trans tt;
-  c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), tt, db::Vector(), db::Vector(), 5, 2));
+  c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), tt, db::Vector (), db::Vector (), 5, 2));
   c0.insert (db::CellInstArray (db::CellInst (c2.cell_index ()), tt));
-  c4.insert (db::CellInstArray (db::CellInst (c2.cell_index ()), tt, db::Vector(), db::Vector(), 3, 4));
+  c4.insert (db::CellInstArray (db::CellInst (c2.cell_index ()), tt, db::Vector (), db::Vector (), 3, 4));
   c0.insert (db::CellInstArray (db::CellInst (c3.cell_index ()), tt));
   c2.insert (db::CellInstArray (db::CellInst (c3.cell_index ()), tt));
   c2.insert (db::CellInstArray (db::CellInst (c3.cell_index ()), tt));
@@ -131,7 +131,7 @@ public:
 
   InstanceReferenceSum transformed (const db::CellInstArray &inst) const
   {
-    db::Matrix2d m_res; 
+    db::Matrix2d m_res;
     db::DVector p_res;
 
     m_res += db::Matrix2d (inst.complex_trans ()) * double (inst.size ());
@@ -164,7 +164,7 @@ private:
   db::DVector m_p;
 };
 
-TEST(2) 
+TEST (2)
 {
   for (int pass = 0; pass < 3; ++pass) {
 
@@ -178,11 +178,11 @@ TEST(2)
     a4.shapes (0).insert (db::Box (0, 0, 0, 0));
 
     if (pass == 0) {
-      a0.insert (db::CellInstArray (db::CellInst (a4.cell_index ()), db::Trans (1/*r90*/), db::Vector(0, 10), db::Vector(10, 0), 5, 2));
+      a0.insert (db::CellInstArray (db::CellInst (a4.cell_index ()), db::Trans (1 /*r90*/), db::Vector (0, 10), db::Vector (10, 0), 5, 2));
     } else if (pass == 1) {
-      a0.insert (db::CellInstArray (db::CellInst (a4.cell_index ()), db::ICplxTrans (1.0, 90.0, false, db::Vector(0, 0)), db::Vector(0, 10), db::Vector(10, 0), 5, 2));
+      a0.insert (db::CellInstArray (db::CellInst (a4.cell_index ()), db::ICplxTrans (1.0, 90.0, false, db::Vector (0, 0)), db::Vector (0, 10), db::Vector (10, 0), 5, 2));
     } else if (pass == 2) {
-      a0.insert (db::CellInstArray (db::CellInst (a4.cell_index ()), db::ICplxTrans (0.1, 90.0, false, db::Vector(0, 0)), db::Vector(0, 10), db::Vector(10, 0), 5, 2));
+      a0.insert (db::CellInstArray (db::CellInst (a4.cell_index ()), db::ICplxTrans (0.1, 90.0, false, db::Vector (0, 0)), db::Vector (0, 10), db::Vector (10, 0), 5, 2));
     }
 
     db::Layout h;
@@ -195,23 +195,23 @@ TEST(2)
     b4.shapes (0).insert (db::Box (0, 0, 0, 0));
 
     if (pass < 2) {
-      b0.insert (db::CellInstArray (db::CellInst (b4.cell_index ()), db::Trans (1/*r90*/), db::Vector(0, 10), db::Vector(10, 0), 5, 1));
+      b0.insert (db::CellInstArray (db::CellInst (b4.cell_index ()), db::Trans (1 /*r90*/), db::Vector (0, 10), db::Vector (10, 0), 5, 1));
       b0.insert (db::CellInstArray (db::CellInst (b1.cell_index ()), db::Trans (db::Vector (10, 0))));
       b1.insert (db::CellInstArray (db::CellInst (b2.cell_index ()), db::Trans ()));
       b1.insert (db::CellInstArray (db::CellInst (b2.cell_index ()), db::Trans (db::Vector (0, 20))));
       b1.insert (db::CellInstArray (db::CellInst (b3.cell_index ()), db::Trans (db::Vector (0, 40))));
       b2.insert (db::CellInstArray (db::CellInst (b3.cell_index ()), db::Trans (db::Vector (0, 0))));
       b2.insert (db::CellInstArray (db::CellInst (b3.cell_index ()), db::Trans (db::Vector (0, 10))));
-      b3.insert (db::CellInstArray (db::CellInst (b4.cell_index ()), db::Trans (1/*r90*/)));
+      b3.insert (db::CellInstArray (db::CellInst (b4.cell_index ()), db::Trans (1 /*r90*/)));
     } else {
-      b0.insert (db::CellInstArray (db::CellInst (b4.cell_index ()), db::ICplxTrans (0.1, 90.0, false, db::Vector(0, 0)), db::Vector(0, 10), db::Vector(10, 0), 5, 1));
-      b0.insert (db::CellInstArray (db::CellInst (b1.cell_index ()), db::ICplxTrans (0.1, 0.0, false, db::Vector(10, 0))));
+      b0.insert (db::CellInstArray (db::CellInst (b4.cell_index ()), db::ICplxTrans (0.1, 90.0, false, db::Vector (0, 0)), db::Vector (0, 10), db::Vector (10, 0), 5, 1));
+      b0.insert (db::CellInstArray (db::CellInst (b1.cell_index ()), db::ICplxTrans (0.1, 0.0, false, db::Vector (10, 0))));
       b1.insert (db::CellInstArray (db::CellInst (b2.cell_index ()), db::Trans ()));
       b1.insert (db::CellInstArray (db::CellInst (b2.cell_index ()), db::Trans (db::Vector (0, 200))));
       b1.insert (db::CellInstArray (db::CellInst (b3.cell_index ()), db::Trans (db::Vector (0, 400))));
       b2.insert (db::CellInstArray (db::CellInst (b3.cell_index ()), db::Trans (db::Vector (0, 0))));
       b2.insert (db::CellInstArray (db::CellInst (b3.cell_index ()), db::Trans (db::Vector (0, 100))));
-      b3.insert (db::CellInstArray (db::CellInst (b4.cell_index ()), db::Trans (1/*r90*/)));
+      b3.insert (db::CellInstArray (db::CellInst (b4.cell_index ()), db::Trans (1 /*r90*/)));
     }
 
     {
@@ -221,7 +221,7 @@ TEST(2)
 
       db::DPoint p;
       db::Matrix2d m;
-      size_t n = 0; 
+      size_t n = 0;
       for (db::RecursiveShapeIterator s (g, a0, 0); ! s.at_end (); ++s) {
         db::Point q = s.trans () * s.shape ().bbox ().center ();
         p += db::DVector (db::DPoint (q));
@@ -232,7 +232,6 @@ TEST(2)
       EXPECT_EQ (v.n (), n);
       EXPECT_EQ (v.p ().to_string (), p.to_string ());
       EXPECT_EQ (v.m ().to_string (), m.to_string ());
-
     }
 
     {
@@ -242,7 +241,7 @@ TEST(2)
 
       db::DPoint p;
       db::Matrix2d m;
-      size_t n = 0; 
+      size_t n = 0;
       for (db::RecursiveShapeIterator s (h, b0, 0); ! s.at_end (); ++s) {
         db::Point q = s.trans () * s.shape ().bbox ().center ();
         p += db::DVector (db::DPoint (q));
@@ -253,11 +252,6 @@ TEST(2)
       EXPECT_EQ (v.n (), n);
       EXPECT_EQ (v.p ().to_string (), p.to_string ());
       EXPECT_EQ (v.m ().to_string (), m.to_string ());
-
     }
-
   }
-
-
 }
-

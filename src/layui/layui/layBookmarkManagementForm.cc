@@ -34,7 +34,7 @@ namespace lay
 
 // ------------------------------------------------------------
 
-class BookmarkListLVI 
+class BookmarkListLVI
   : public QListWidgetItem
 {
 public:
@@ -81,8 +81,7 @@ BookmarkManagementForm::BookmarkManagementForm (QWidget *parent, const char *nam
   connect (mp_ui->delete_button, SIGNAL (clicked ()), this, SLOT (delete_pressed ()));
 }
 
-void
-BookmarkManagementForm::delete_pressed ()
+void BookmarkManagementForm::delete_pressed ()
 {
   QList<QListWidgetItem *> sel = mp_ui->bookmark_list->selectedItems ();
   for (QList<QListWidgetItem *>::const_iterator i = sel.begin (); i != sel.end (); ++i) {
@@ -90,8 +89,7 @@ BookmarkManagementForm::delete_pressed ()
   }
 }
 
-void
-BookmarkManagementForm::accept ()
+void BookmarkManagementForm::accept ()
 {
   m_bookmarks.clear ();
   m_bookmarks.reserve (mp_ui->bookmark_list->count ());
@@ -113,4 +111,3 @@ BookmarkManagementForm::accept ()
 }
 
 #endif
-

@@ -28,8 +28,8 @@
 #include "laybasicCommon.h"
 
 #if defined(HAVE_QT)
-#  include <QObject>
-#  include <QBitmap>
+#include <QObject>
+#include <QBitmap>
 #endif
 
 #include "dbObject.h"
@@ -50,16 +50,16 @@ namespace lay
 class LAYBASIC_PUBLIC LineStyleInfo
 {
 public:
-  /** 
+  /**
    *  @brief The default constructor
    */
   LineStyleInfo ();
-  
-  /** 
+
+  /**
    *  @brief The copy constructor
    */
   LineStyleInfo (const LineStyleInfo &d);
-  
+
   /**
    *  @brief Assignment operator
    */
@@ -94,7 +94,7 @@ public:
    */
   bool operator!= (const LineStyleInfo &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
@@ -108,7 +108,7 @@ public:
   /**
    *  @brief Write access to the name
    */
-  void set_name (const std::string &name) 
+  void set_name (const std::string &name)
   {
     m_name = name;
   }
@@ -124,7 +124,7 @@ public:
   /**
    *  @brief Write access to the name
    */
-  void set_order_index (unsigned int oi) 
+  void set_order_index (unsigned int oi)
   {
     m_order_index = oi;
   }
@@ -216,7 +216,7 @@ private:
   unsigned int m_pattern_stride;
   unsigned int m_order_index;
   std::string m_name;
-  mutable std::unique_ptr<std::map<unsigned int, LineStyleInfo> > m_scaled_pattern;
+  mutable std::unique_ptr<std::map<unsigned int, LineStyleInfo>> m_scaled_pattern;
 
   void assign_no_lock (const LineStyleInfo &other);
 };
@@ -225,12 +225,11 @@ private:
  *  @brief This class represents the set of line styles available
  *
  *  The main method for accessing the style is through the "style"
- *  method which delivers a LineStyleInfo object. The style can be 
+ *  method which delivers a LineStyleInfo object. The style can be
  *  replaced with a new pattern, except for the first styles which
- *  cannot be changed. 
+ *  cannot be changed.
  */
-class LAYBASIC_PUBLIC LineStyles :
-    public db::Object
+class LAYBASIC_PUBLIC LineStyles : public db::Object
 {
 public:
   typedef std::vector<LineStyleInfo> pattern_vector;
@@ -285,8 +284,8 @@ public:
    *  @brief Replace the style with the given index
    *
    *  The first style cannot be replaced. In this case, the change
-   *  request is simply ignored. 
-   *  By replacing the style with one with an order_index of 0, 
+   *  request is simply ignored.
+   *  By replacing the style with one with an order_index of 0,
    *  the pattern is virtually deleted (such pattern are not shown in the editor)
    */
   void replace_style (unsigned int i, const LineStyleInfo &p);
@@ -294,7 +293,7 @@ public:
   /**
    *  @brief Add a new style, searching for a empty slot and returning that index
    *
-   *  This method will look for the first style with a order index of 0 
+   *  This method will look for the first style with a order index of 0
    *  or create a new entry if no such style exists. This entry will be used
    *  to place the style into. The order_index will be set to the highest value
    *  plus one thus placing the new style at the end of the list in the editor.
@@ -313,7 +312,7 @@ public:
    *  @brief Merge two style lists
    *
    *  *this is filled with all the styles of "other" which are not
-   *  member of this list yet. A mapping table is filled, mapping 
+   *  member of this list yet. A mapping table is filled, mapping
    *  an index of "other" to an index inside *this;
    */
   void merge (const LineStyles &other, std::map<unsigned int, unsigned int> &index_map);
@@ -328,7 +327,7 @@ public:
 
   /**
    *  @brief The begin iterator delivering the custom style objects
-   * 
+   *
    *  The corresponding end iterator is delivered with end()
    */
   iterator begin_custom () const;
@@ -336,7 +335,7 @@ public:
   /**
    *  @brief The begin iterator delivering all style objects
    */
-  iterator begin () const 
+  iterator begin () const
   {
     return m_styles.begin ();
   }
@@ -344,7 +343,7 @@ public:
   /**
    *  @brief The begin iterator delivering the past-the-end style object
    */
-  iterator end () const 
+  iterator end () const
   {
     return m_styles.end ();
   }
@@ -371,4 +370,3 @@ private:
 }
 
 #endif
-

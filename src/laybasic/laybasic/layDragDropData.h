@@ -53,12 +53,12 @@ public:
   /**
    *  @brief Default constructor
    */
-  DragDropDataBase () { }
+  DragDropDataBase () {}
 
   /**
    *  @brief Dtor
    */
-  virtual ~DragDropDataBase () { }
+  virtual ~DragDropDataBase () {}
 
   /**
    *  @brief Serializes itself to an QByteArray
@@ -171,4 +171,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

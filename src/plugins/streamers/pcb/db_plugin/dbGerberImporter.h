@@ -36,12 +36,12 @@
 
 namespace db
 {
-  class Manager;
+class Manager;
 }
 
 namespace lay
 {
-  class LayoutView;
+class LayoutView;
 }
 
 namespace db
@@ -50,13 +50,11 @@ namespace db
 /**
  *  @brief A structure holding the meta data for a Gerber (X2) file
  */
-struct GerberMetaData
-{
+struct GerberMetaData {
   /**
    *  @brief Identifies the function of the layer
    */
-  enum Function
-  {
+  enum Function {
     NoFunction = 0,
     Copper,
     Hole,
@@ -71,8 +69,7 @@ struct GerberMetaData
   /**
    *  @brief Identifies the position of the layer
    */
-  enum Position
-  {
+  enum Position {
     NoPosition = 0,
     Bottom,
     Inner,
@@ -88,7 +85,8 @@ struct GerberMetaData
       from_cu (0),
       to_cu (0),
       position (NoPosition)
-  { }
+  {
+  }
 
   /**
    *  @brief The project name or an empty string if none is given
@@ -148,8 +146,7 @@ struct GerberMetaData
 /**
  *  @brief A class holding the graphics state of the reader
  */
-struct GraphicsState
-{
+struct GraphicsState {
   GraphicsState ()
     : inverse (false),
       m_rot (0.0), m_s (1.0), m_ox (false), m_oy (false), m_mx (false), m_my (false),
@@ -189,7 +186,7 @@ public:
   /**
    *  @brief Destructor
    */
-  virtual ~GerberFileReader () { }
+  virtual ~GerberFileReader () {}
 
   /**
    *  @brief Detect the file format
@@ -201,10 +198,10 @@ public:
   /**
    *  @brief Read the file from the given stream into the set of target containers
    *
-   *  The reader reads the file and produces the same polygons in all layers of topcell 
+   *  The reader reads the file and produces the same polygons in all layers of topcell
    *  provided by the "targets" parameter.
    */
-  void read (tl::TextInputStream &stream, db::Layout &layout, db::Cell &cell, const std::vector <unsigned int> &targets);
+  void read (tl::TextInputStream &stream, db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &targets);
 
   /**
    *  @brief Scans the stream and extracts the metadata
@@ -216,7 +213,7 @@ public:
    *
    *  The value must be larger or equal than 4.
    */
-  void set_circle_points (int c) 
+  void set_circle_points (int c)
   {
     m_circle_points = (c >= 4 ? c : 64);
   }
@@ -234,7 +231,7 @@ public:
    *
    *  If the merge flag is set, all shapes will be merged after reading.
    */
-  void set_merge (bool m) 
+  void set_merge (bool m)
   {
     m_merge = m;
   }
@@ -250,13 +247,13 @@ public:
   /**
    *  @brief Set the database unit
    */
-  void set_dbu (double dbu) 
+  void set_dbu (double dbu)
   {
     m_dbu = dbu;
   }
 
-  /** 
-   *  @brief Gets the current database unit 
+  /**
+   *  @brief Gets the current database unit
    */
   double dbu () const
   {
@@ -282,7 +279,7 @@ public:
   }
 
   /**
-   *  @brief Set the unit 
+   *  @brief Set the unit
    *
    *  The unit is given in micron, i.e. mm=1000, inch=25400
    */
@@ -318,7 +315,7 @@ public:
   }
 
   /**
-   *  @brief Set the format 
+   *  @brief Set the format
    *
    *  @param before Number of digits before the decimal point or -1 for unspecified
    *  @param after Number of digits after the decimal point or -1 for unspecified
@@ -357,7 +354,7 @@ public:
    *  @brief Produce the given line on the output
    *
    *  This method will produce a line, represented by a zero-width path.
-   *  Lines are special objects created for zero-diameter apertures. 
+   *  Lines are special objects created for zero-diameter apertures.
    *  Clear lines are ignored currently and lines don't participate in the
    *  boolean operations.
    *
@@ -472,7 +469,7 @@ protected:
   /**
    *  @brief Access to the edge processor
    */
-  db::EdgeProcessor &ep () 
+  db::EdgeProcessor &ep ()
   {
     return m_ep;
   }
@@ -480,10 +477,10 @@ protected:
   /**
    *  @brief Enter a repeated sequence
    *
-   *  The shapes produced after this method has been called are put into 
+   *  The shapes produced after this method has been called are put into
    *  a subcell which is placed with the given displacements
    */
-  void step_and_repeat (const std::vector <db::DVector> &displacements);
+  void step_and_repeat (const std::vector<db::DVector> &displacements);
 
   /**
    *  @brief Leaves step-and-repeat mode
@@ -497,7 +494,7 @@ protected:
   {
     m_inverse = inverse;
   }
-  
+
   /**
    *  @brief This method updates the progress counter
    *
@@ -508,7 +505,7 @@ protected:
   /**
    *  @brief Gets the stream object
    */
-  tl::TextInputStream &stream () 
+  tl::TextInputStream &stream ()
   {
     return *mp_stream;
   }
@@ -518,7 +515,8 @@ protected:
    */
   void update_local_mirror (bool mx, bool my)
   {
-    m_mx = mx; m_my = my;
+    m_mx = mx;
+    m_my = my;
   }
 
   /**
@@ -542,7 +540,8 @@ protected:
    */
   void update_local_offset (double x, double y)
   {
-    m_ox = x; m_oy = y;
+    m_ox = x;
+    m_oy = y;
   }
 
   /**
@@ -550,7 +549,8 @@ protected:
    */
   void update_object_mirror (bool mx, bool my)
   {
-    m_omx = mx; m_omy = my;
+    m_omx = mx;
+    m_omy = my;
   }
 
   /**
@@ -665,9 +665,9 @@ public:
   }
 
   /**
-   *  @brief Set the format string 
+   *  @brief Set the format string
    *
-   *  The format string is "n:m[TL]". n, m and T or L are optional. n are the 
+   *  The format string is "n:m[TL]". n, m and T or L are optional. n are the
    *  digits before the decimal point, m are the digits after. L specifies leading zeroes (omit trailing zeroes),
    *  T specifies trailing zeroes (omit leading zeroes). "T" is the default.
    *  If "T" is specified, m must be given, otherwise n must be specified. If n or m are not specified "*" can be used instead.
@@ -681,7 +681,7 @@ public:
   std::string format_string () const;
 
   /**
-   *  @brief Set the format 
+   *  @brief Set the format
    *
    *  @param before Number of digits before the decimal point or -1 for unspecified
    *  @param after Number of digits after the decimal point or -1 for unspecified
@@ -749,7 +749,7 @@ public:
   /**
    *  @brief Add a new layer specification
    */
-  const std::vector <db::LayerProperties> &layer_specs () 
+  const std::vector<db::LayerProperties> &layer_specs ()
   {
     return m_layer_specs;
   }
@@ -760,14 +760,14 @@ private:
   int m_digits_before;
   int m_digits_after;
   bool m_omit_leading_zeroes;
-  std::vector <db::LayerProperties> m_layer_specs;
+  std::vector<db::LayerProperties> m_layer_specs;
   std::string m_filename;
 };
 
 /**
  *  @brief The Gerber format importer object
  *
- *  This class provides a importer for Gerber layer stacks. It can be 
+ *  This class provides a importer for Gerber layer stacks. It can be
  *  loaded from project files and saved to such.
  */
 class DB_PLUGIN_PUBLIC GerberImporter
@@ -799,7 +799,7 @@ public:
   /**
    *  @brief Load the project file from the given stream
    *
-   *  This method will use the base directory specified in the 
+   *  This method will use the base directory specified in the
    *  "dir" member for the files.
    */
   void load_project (tl::TextInputStream &stream);
@@ -821,7 +821,7 @@ public:
    *  @brief Read into a fresh layout
    *
    *  This method reads the layer stack into the layout provided.
-   *  The layout should be empty and is initialized with the given 
+   *  The layout should be empty and is initialized with the given
    *  database unit and a cell with the given name is created.
    */
   db::cell_index_type read (db::Layout &layout);
@@ -833,7 +833,7 @@ public:
    *
    *  This value will be used unless a merge mode is explicitly specified per file.
    */
-  void set_merge (bool m) 
+  void set_merge (bool m)
   {
     m_merge = m;
   }
@@ -851,7 +851,7 @@ public:
    *
    *  If the merge flag is set, layers with negative contrast will be inverted.
    */
-  void set_invert_negative_layers (bool i) 
+  void set_invert_negative_layers (bool i)
   {
     m_invert_negative_layers = i;
   }
@@ -903,7 +903,7 @@ public:
   /**
    *  @brief Specifies the layer styles to use
    *
-   *  This allows one to specify a layer style file (path) which will be loaded 
+   *  This allows one to specify a layer style file (path) which will be loaded
    *  after the Gerber files have been imported.
    *
    *  Specify an empty string to disable that feature.
@@ -942,7 +942,7 @@ public:
   /**
    *  @brief Set the reference points
    */
-  void set_reference_points (const std::vector<std::pair <db::DPoint, db::DPoint> > &pts)
+  void set_reference_points (const std::vector<std::pair<db::DPoint, db::DPoint>> &pts)
   {
     m_reference_points = pts;
   }
@@ -970,7 +970,7 @@ public:
   /**
    *  @brief Set the cell name to which the geometries are written
    *
-   *  This is the name of the cell created when the read method is called without a 
+   *  This is the name of the cell created when the read method is called without a
    *  cell argument.
    */
   void set_cell_name (const std::string &cell_name)
@@ -1049,8 +1049,8 @@ private:
   std::string m_layer_styles;
   std::string m_dir;
   db::DCplxTrans m_global_trans;
-  std::vector <std::pair <db::DPoint, db::DPoint> > m_reference_points;
-  std::vector <db::GerberFile> m_files;
+  std::vector<std::pair<db::DPoint, db::DPoint>> m_reference_points;
+  std::vector<db::GerberFile> m_files;
 
   void do_read (db::Layout &layout, db::cell_index_type cell_index);
   void do_load_project (tl::TextInputStream &stream);
@@ -1059,4 +1059,3 @@ private:
 }
 
 #endif
-

@@ -89,4 +89,3 @@ normalize_scene_trans (const QMatrix4x4 &cam_trans, QVector3D &displacement, dou
 }
 
 #endif
-

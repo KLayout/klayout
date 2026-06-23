@@ -34,7 +34,7 @@
 #include <math.h>
 
 // ref layout
-TEST(1)
+TEST (1)
 {
   db::Layout l;
   l.dbu (0.05);
@@ -89,47 +89,53 @@ TEST(1)
   try {
     v = e.parse ("60nm").execute (); // not a multiple of DBU
     error = false;
-  } catch (...) { }
+  } catch (...) {
+  }
   EXPECT_EQ (error, true);
 
   error = true;
   try {
     v = ee.parse ("1 um").execute ();
     error = false;
-  } catch (...) { }
+  } catch (...) {
+  }
   EXPECT_EQ (error, true);
 
   error = true;
   try {
     v = e.parse ("<1/1>").execute ();
     error = false;
-  } catch (...) { }
+  } catch (...) {
+  }
   EXPECT_EQ (error, true);
 
   error = true;
   try {
     v = ee.parse ("<1/15>").execute ();
     error = false;
-  } catch (...) { }
+  } catch (...) {
+  }
   EXPECT_EQ (error, true);
 
   error = true;
   try {
     v = ee.parse ("<<c1>>").execute ();
     error = false;
-  } catch (...) { }
+  } catch (...) {
+  }
   EXPECT_EQ (error, true);
 
   error = true;
   try {
     v = e.parse ("<<c3>>").execute ();
     error = false;
-  } catch (...) { }
+  } catch (...) {
+  }
   EXPECT_EQ (error, true);
 }
 
 //  db objects as Variant payload
-TEST(10)
+TEST (10)
 {
   tl::Variant v;
   v = tl::Variant::make_variant (db::Box (db::Point (0, 10), db::Point (20, 30)));
@@ -144,12 +150,12 @@ TEST(10)
   ex.read (v);
   EXPECT_EQ (vv.is_user<db::Box> (), true)
   EXPECT_EQ (vv.to_parsable_string (), "[box:(0,10;20,30)]");
-  EXPECT_EQ ((int)v.type_code (), (int)tl::Variant::t_double);
-  EXPECT_EQ (std::string(v.to_string()), "15");
+  EXPECT_EQ ((int) v.type_code (), (int) tl::Variant::t_double);
+  EXPECT_EQ (std::string (v.to_string ()), "15");
 }
 
 //  db objects as Variant payload - backward compatibility check
-TEST(11)
+TEST (11)
 {
   std::string s = "[box:(0,10;20,30)],##15";
   tl::Variant vv;
@@ -160,12 +166,12 @@ TEST(11)
   ex.read (v);
   EXPECT_EQ (vv.is_user<db::Box> (), true)
   EXPECT_EQ (vv.to_parsable_string (), "[box:(0,10;20,30)]");
-  EXPECT_EQ ((int)v.type_code (), (int)tl::Variant::t_double);
-  EXPECT_EQ (std::string(v.to_string()), "15");
+  EXPECT_EQ ((int) v.type_code (), (int) tl::Variant::t_double);
+  EXPECT_EQ (std::string (v.to_string ()), "15");
 }
 
 //  db objects as Variant payload - backward compatibility check
-TEST(12)
+TEST (12)
 {
   std::string s = "[Box:(0,10;20,30)],##15";
   tl::Variant vv;
@@ -176,12 +182,12 @@ TEST(12)
   ex.read (v);
   EXPECT_EQ (vv.is_user<db::Box> (), true)
   EXPECT_EQ (vv.to_parsable_string (), "[box:(0,10;20,30)]");
-  EXPECT_EQ ((int)v.type_code (), (int)tl::Variant::t_double);
-  EXPECT_EQ (std::string(v.to_string()), "15");
+  EXPECT_EQ ((int) v.type_code (), (int) tl::Variant::t_double);
+  EXPECT_EQ (std::string (v.to_string ()), "15");
 }
 
 //  db objects as Variant payload - backward compatibility check
-TEST(13)
+TEST (13)
 {
   std::string s = "[layer:1/0],##15";
   tl::Variant vv;
@@ -192,12 +198,12 @@ TEST(13)
   ex.read (v);
   EXPECT_EQ (vv.is_user<db::LayerProperties> (), true)
   EXPECT_EQ (vv.to_parsable_string (), "[layer:1/0]");
-  EXPECT_EQ ((int)v.type_code (), (int)tl::Variant::t_double);
-  EXPECT_EQ (std::string(v.to_string()), "15");
+  EXPECT_EQ ((int) v.type_code (), (int) tl::Variant::t_double);
+  EXPECT_EQ (std::string (v.to_string ()), "15");
 }
 
 //  db objects as Variant payload - backward compatibility check
-TEST(14)
+TEST (14)
 {
   std::string s = "[LayerInfo:1/0],##15";
   tl::Variant vv;
@@ -208,7 +214,6 @@ TEST(14)
   ex.read (v);
   EXPECT_EQ (vv.is_user<db::LayerProperties> (), true)
   EXPECT_EQ (vv.to_parsable_string (), "[layer:1/0]");
-  EXPECT_EQ ((int)v.type_code (), (int)tl::Variant::t_double);
-  EXPECT_EQ (std::string(v.to_string()), "15");
+  EXPECT_EQ ((int) v.type_code (), (int) tl::Variant::t_double);
+  EXPECT_EQ (std::string (v.to_string ()), "15");
 }
-

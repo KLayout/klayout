@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "QtDesignerMain.h"
-DEFINE_PYMOD(QtDesigner, "QtDesigner", "KLayout/Qt module 'QtDesigner'")
+DEFINE_PYMOD (QtDesigner, "QtDesigner", "KLayout/Qt module 'QtDesigner'")

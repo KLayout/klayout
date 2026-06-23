@@ -61,7 +61,7 @@ TechnologyController *
 TechnologyController::instance ()
 {
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    TechnologyController *tc = dynamic_cast <TechnologyController *> (cls.operator-> ());
+    TechnologyController *tc = dynamic_cast<TechnologyController *> (cls.operator->());
     if (tc) {
       return tc;
     }
@@ -69,8 +69,7 @@ TechnologyController::instance ()
   return 0;
 }
 
-void
-TechnologyController::initialize (lay::Dispatcher *dispatcher)
+void TechnologyController::initialize (lay::Dispatcher *dispatcher)
 {
   mp_dispatcher = dispatcher;
   mp_mw = lay::MainWindow::instance ();
@@ -80,8 +79,7 @@ TechnologyController::initialize (lay::Dispatcher *dispatcher)
   }
 }
 
-void
-TechnologyController::initialized (lay::Dispatcher *dispatcher)
+void TechnologyController::initialized (lay::Dispatcher *dispatcher)
 {
   tl_assert (dispatcher == mp_dispatcher);
 
@@ -93,8 +91,7 @@ TechnologyController::initialized (lay::Dispatcher *dispatcher)
   }
 }
 
-void
-TechnologyController::uninitialize (lay::Dispatcher *dispatcher)
+void TechnologyController::uninitialize (lay::Dispatcher *dispatcher)
 {
   tl_assert (dispatcher == mp_dispatcher);
 
@@ -106,22 +103,19 @@ TechnologyController::uninitialize (lay::Dispatcher *dispatcher)
   }
 }
 
-void
-TechnologyController::get_options (std::vector < std::pair<std::string, std::string> > &options) const
+void TechnologyController::get_options (std::vector<std::pair<std::string, std::string>> &options) const
 {
   options.push_back (std::pair<std::string, std::string> (cfg_initial_technology, ""));
   options.push_back (std::pair<std::string, std::string> (cfg_tech_editor_window_state, ""));
 }
 
-void
-TechnologyController::get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
+void TechnologyController::get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
 {
   lay::PluginDeclaration::get_menu_entries (menu_entries);
   menu_entries.push_back (lay::menu_item ("technology_selector:apply_technology", "technology_selector:tech_selector_group", "@toolbar.end", tl::to_string (QObject::tr ("Technology<:techs_24px.png>{Select technology (click to apply)}"))));
 }
 
-void
-TechnologyController::view_changed ()
+void TechnologyController::view_changed ()
 {
   update_active_technology ();
 
@@ -153,9 +147,7 @@ TechnologyController::view_changed ()
       if (mp_mw->current_view ()->active_cellview_index () >= 0 && mp_mw->current_view ()->active_cellview_index () <= int (mp_mw->current_view ()->cellviews ())) {
         mp_mw->current_view ()->active_cellview ()->technology_changed_event.add (this, &TechnologyController::update_active_technology);
       }
-
     }
-
   }
 }
 
@@ -165,8 +157,7 @@ TechnologyController::active_technology () const
   return mp_active_technology;
 }
 
-void
-TechnologyController::update_active_technology ()
+void TechnologyController::update_active_technology ()
 {
   db::Technology *active_tech = 0;
   if (mp_mw && mp_mw->current_view () && mp_mw->current_view ()->active_cellview_index () >= 0 && mp_mw->current_view ()->active_cellview_index () <= int (mp_mw->current_view ()->cellviews ())) {
@@ -175,7 +166,6 @@ TechnologyController::update_active_technology ()
     if (db::Technologies::instance ()->has_technology (tn)) {
       active_tech = db::Technologies::instance ()->technology_by_name (tn);
     }
-
   }
 
 
@@ -194,8 +184,7 @@ TechnologyController::update_active_technology ()
 #endif
 }
 
-void
-TechnologyController::technologies_changed ()
+void TechnologyController::technologies_changed ()
 {
   //  update the configuration to reflect the persisted technologies
   lay::Dispatcher *dispatcher = mp_dispatcher;
@@ -214,14 +203,12 @@ TechnologyController::technologies_changed ()
   emit technologies_edited ();
 }
 
-void
-TechnologyController::technology_changed (db::Technology *)
+void TechnologyController::technology_changed (db::Technology *)
 {
   technologies_changed ();
 }
 
-bool
-TechnologyController::configure (const std::string &name, const std::string &value)
+bool TechnologyController::configure (const std::string &name, const std::string &value)
 {
   if (! m_configure_enabled) {
 
@@ -249,15 +236,12 @@ TechnologyController::configure (const std::string &name, const std::string &val
         m_technologies_configured = true;
       } catch (...) {
       }
-
     }
-
   }
   return false;
 }
 
-void
-TechnologyController::config_finalize ()
+void TechnologyController::config_finalize ()
 {
   if (m_technologies_configured) {
     update_menu (mp_dispatcher);
@@ -271,8 +255,7 @@ TechnologyController::config_finalize ()
   }
 }
 
-bool
-TechnologyController::menu_activated (const std::string &symbol) const
+bool TechnologyController::menu_activated (const std::string &symbol) const
 {
   if (symbol == "technology_selector:apply_technology") {
 
@@ -293,7 +276,6 @@ TechnologyController::menu_activated (const std::string &symbol) const
       } else {
         lay::LayoutView::current ()->active_cellview ()->apply_technology (m_current_technology);
       }
-
     }
 
     return true;
@@ -303,8 +285,7 @@ TechnologyController::menu_activated (const std::string &symbol) const
   }
 }
 
-void
-TechnologyController::update_current_technology (lay::Dispatcher *dispatcher)
+void TechnologyController::update_current_technology (lay::Dispatcher *dispatcher)
 {
   if (! dispatcher || ! dispatcher->has_ui ()) {
     return;
@@ -320,17 +301,16 @@ TechnologyController::update_current_technology (lay::Dispatcher *dispatcher)
 
   std::map<std::string, const db::Technology *> tech_by_name;
   for (db::Technologies::const_iterator t = db::Technologies::instance ()->begin (); t != db::Technologies::instance ()->end (); ++t) {
-    tech_by_name.insert (std::make_pair (t->name (), t.operator-> ()));
+    tech_by_name.insert (std::make_pair (t->name (), t.operator->()));
   }
 
   size_t it = 0;
   for (std::map<std::string, const db::Technology *>::const_iterator t = tech_by_name.begin (); t != tech_by_name.end () && it < m_tech_actions.size (); ++t, ++it) {
-    m_tech_actions[it]->set_checked (t->second->name () == m_current_technology);
+    m_tech_actions [it]->set_checked (t->second->name () == m_current_technology);
   }
 }
 
-void
-TechnologyController::update_menu (lay::Dispatcher *dispatcher)
+void TechnologyController::update_menu (lay::Dispatcher *dispatcher)
 {
   if (! dispatcher || ! dispatcher->has_ui ()) {
     return;
@@ -340,7 +320,7 @@ TechnologyController::update_menu (lay::Dispatcher *dispatcher)
     m_current_technology = lay::LayoutView::current ()->active_cellview ()->tech_name ();
   }
 
-  if (! db::Technologies::instance()->has_technology (m_current_technology)) {
+  if (! db::Technologies::instance ()->has_technology (m_current_technology)) {
     m_current_technology = std::string ();
   }
 
@@ -365,15 +345,15 @@ TechnologyController::update_menu (lay::Dispatcher *dispatcher)
 
   m_tech_actions.clear ();
 
-  std::map<std::string, std::map<std::string, const db::Technology *> > tech_by_name_and_group;
+  std::map<std::string, std::map<std::string, const db::Technology *>> tech_by_name_and_group;
   for (db::Technologies::const_iterator t = db::Technologies::instance ()->begin (); t != db::Technologies::instance ()->end (); ++t) {
-    tech_by_name_and_group [tl::trim (t->group ())].insert (std::make_pair (t->name (), t.operator-> ()));
+    tech_by_name_and_group [tl::trim (t->group ())].insert (std::make_pair (t->name (), t.operator->()));
   }
 
   for (std::vector<std::string>::const_iterator tg = tech_group.begin (); tg != tech_group.end (); ++tg) {
 
     int ig = 0;
-    for (std::map<std::string, std::map<std::string, const db::Technology *> >::const_iterator g = tech_by_name_and_group.begin (); g != tech_by_name_and_group.end (); ++g) {
+    for (std::map<std::string, std::map<std::string, const db::Technology *>>::const_iterator g = tech_by_name_and_group.begin (); g != tech_by_name_and_group.end (); ++g) {
 
       std::string tp = *tg;
       if (! g->first.empty ()) {
@@ -393,18 +373,14 @@ TechnologyController::update_menu (lay::Dispatcher *dispatcher)
         m_tech_actions.back ()->set_checkable (true);
         m_tech_actions.back ()->set_checked (t->first == m_current_technology);
         dispatcher->menu ()->insert_item (tp, "technology_" + tl::to_string (it), m_tech_actions.back ());
-
       }
-
     }
-
   }
 
   update_active_technology ();
 }
 
-void
-TechnologyController::replace_technologies (const db::Technologies &technologies)
+void TechnologyController::replace_technologies (const db::Technologies &technologies)
 {
   bool has_active_tech = (mp_active_technology != 0);
   std::string active_tech_name;
@@ -421,8 +397,7 @@ TechnologyController::replace_technologies (const db::Technologies &technologies
   }
 }
 
-void
-TechnologyController::show_editor ()
+void TechnologyController::show_editor ()
 {
   db::Technologies new_tech = *db::Technologies ().instance ();
 
@@ -458,7 +433,7 @@ TechnologyController::show_editor ()
 
           QDir dir = QFileInfo (tl::to_qstring (t->tech_file_path ())).absoluteDir ();
           QStringList to_create;
-          while (! dir.isRoot() && ! dir.exists ()) {
+          while (! dir.isRoot () && ! dir.exists ()) {
             to_create << dir.dirName ();
             dir = QFileInfo (dir.path ()).absoluteDir ();
           }
@@ -481,19 +456,16 @@ TechnologyController::show_editor ()
           }
           err_msg += t->tech_file_path ();
         }
-
       }
-
     }
 
     if (! err_msg.empty ()) {
       QMessageBox::critical (mp_mw, QObject::tr ("Error Saving Technology Files"),
-                                    QObject::tr ("The following files could not be saved:\n\n") + tl::to_qstring (err_msg),
-                                    QMessageBox::Ok);
+                             QObject::tr ("The following files could not be saved:\n\n") + tl::to_qstring (err_msg),
+                             QMessageBox::Ok);
     }
 
     technologies_changed ();
-
   }
 
   mp_dispatcher->config_set (cfg_tech_editor_window_state, lay::save_dialog_state (mp_editor));
@@ -502,24 +474,21 @@ TechnologyController::show_editor ()
 const std::string &
 TechnologyController::default_root ()
 {
-  tl_assert (!m_paths.empty ());
+  tl_assert (! m_paths.empty ());
   return m_paths.front ();
 }
 
-void
-TechnologyController::load ()
+void TechnologyController::load ()
 {
   rescan (*db::Technologies::instance ());
 }
 
-void
-TechnologyController::sync_with_external_sources ()
+void TechnologyController::sync_with_external_sources ()
 {
   rescan (*db::Technologies::instance ());
 }
 
-void
-TechnologyController::rescan (db::Technologies &technologies)
+void TechnologyController::rescan (db::Technologies &technologies)
 {
   db::Technologies current = technologies;
 
@@ -584,7 +553,7 @@ TechnologyController::rescan (db::Technologies &technologies)
 
         db::Technology t;
         t.load (tl::to_string (*lf));
-        t.set_persisted (false);   // don't save that one in the configuration
+        t.set_persisted (false); // don't save that one in the configuration
         t.set_readonly (readonly || ! QFileInfo (dir.filePath (*lf)).isWritable ());
         t.set_grain_name (grain_name);
         technologies.add (t);
@@ -592,9 +561,7 @@ TechnologyController::rescan (db::Technologies &technologies)
       } catch (tl::Exception &ex) {
         tl::warn << tl::to_string (QObject::tr ("Unable to auto-import technology file ")) << tl::to_string (*lf) << ": " << ex.msg ();
       }
-
     }
-
   }
 
   for (std::vector<db::Technology>::const_iterator t = m_temp_tech.begin (); t != m_temp_tech.end (); ++t) {
@@ -604,21 +571,18 @@ TechnologyController::rescan (db::Technologies &technologies)
     }
 
     db::Technology *tech = technologies.add (*t);
-    tech->set_persisted (false);                //  don't save that one in the configuration
-    tech->set_tech_file_path (std::string ());  //  don't save to a file either
-    tech->set_readonly (true);                  //  don't edit
-
+    tech->set_persisted (false);               //  don't save that one in the configuration
+    tech->set_tech_file_path (std::string ()); //  don't save to a file either
+    tech->set_readonly (true);                 //  don't edit
   }
 }
 
-void
-TechnologyController::add_temp_tech (const db::Technology &t)
+void TechnologyController::add_temp_tech (const db::Technology &t)
 {
   m_temp_tech.push_back (t);
 }
 
-void
-TechnologyController::add_path (const std::string &p)
+void TechnologyController::add_path (const std::string &p)
 {
   std::string tp = tl::to_string (QDir (tl::to_qstring (p)).filePath (QString::fromUtf8 ("tech")));
   m_paths.push_back (tp);

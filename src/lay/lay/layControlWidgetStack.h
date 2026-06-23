@@ -71,7 +71,7 @@ protected:
   bool event (QEvent *e);
 
 
-  std::vector <QWidget *> m_widgets;
+  std::vector<QWidget *> m_widgets;
   QWidget *mp_current_widget;
   QLabel *mp_bglabel;
   bool m_size_follows_content;

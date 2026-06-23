@@ -30,12 +30,12 @@
 namespace lay
 {
 
-static const char *def_palette = 
+static const char *def_palette =
   "0 1 2 3";
 
 static LineStylePalette def_palette_object = LineStylePalette::default_palette ();
 
-LineStylePalette 
+LineStylePalette
 LineStylePalette::default_palette ()
 {
   LineStylePalette p;
@@ -60,7 +60,7 @@ LineStylePalette::LineStylePalette (const LineStylePalette &d)
   // .. nothing yet ..
 }
 
-LineStylePalette 
+LineStylePalette
 LineStylePalette::operator= (const LineStylePalette &d)
 {
   if (&d != this) {
@@ -69,8 +69,7 @@ LineStylePalette::operator= (const LineStylePalette &d)
   return *this;
 }
 
-bool 
-LineStylePalette::operator== (const LineStylePalette &d) const
+bool LineStylePalette::operator== (const LineStylePalette &d) const
 {
   return m_styles == d.m_styles;
 }
@@ -86,14 +85,13 @@ LineStylePalette::style_by_index (unsigned int n) const
   }
 }
 
-unsigned int 
+unsigned int
 LineStylePalette::styles () const
 {
   return (unsigned int) m_styles.size ();
 }
 
-void 
-LineStylePalette::set_style (unsigned int n, unsigned int s)
+void LineStylePalette::set_style (unsigned int n, unsigned int s)
 {
   while (m_styles.size () <= n) {
     m_styles.push_back (0);
@@ -101,13 +99,12 @@ LineStylePalette::set_style (unsigned int n, unsigned int s)
   m_styles [n] = s;
 }
 
-void
-LineStylePalette::clear_styles () 
+void LineStylePalette::clear_styles ()
 {
   m_styles.clear ();
 }
 
-std::string 
+std::string
 LineStylePalette::to_string () const
 {
   std::string res;
@@ -123,8 +120,7 @@ LineStylePalette::to_string () const
   return res;
 }
 
-void 
-LineStylePalette::from_string (const std::string &s)
+void LineStylePalette::from_string (const std::string &s)
 {
   try {
 
@@ -145,7 +141,6 @@ LineStylePalette::from_string (const std::string &s)
       m_styles.push_back (s);
 
       ++i;
-
     }
 
     if (! x.at_end ()) {
@@ -163,4 +158,3 @@ LineStylePalette::from_string (const std::string &s)
 }
 
 }
-

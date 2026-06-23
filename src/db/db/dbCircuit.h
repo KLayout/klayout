@@ -49,16 +49,15 @@ class Layout;
  */
 template <class Iter, class Value>
 struct DB_PUBLIC_TEMPLATE dereferencing_iterator
-  : public Iter
-{
+  : public Iter {
 public:
   typedef Value *pointer;
   typedef Value &reference;
   typedef typename Iter::difference_type difference_type;
 
-  dereferencing_iterator () { }
-  dereferencing_iterator (const dereferencing_iterator &d) : Iter (d) { }
-  dereferencing_iterator (const Iter &d) : Iter (d) { }
+  dereferencing_iterator () {}
+  dereferencing_iterator (const dereferencing_iterator &d) : Iter (d) {}
+  dereferencing_iterator (const Iter &d) : Iter (d) {}
   dereferencing_iterator &operator= (const dereferencing_iterator &d)
   {
     Iter::operator= (d);
@@ -76,7 +75,7 @@ public:
     return *this;
   }
 
-  pointer operator-> () const { return Iter::operator* (); }
+  pointer operator->() const { return Iter::operator* (); }
   reference operator* () const { return *Iter::operator* (); }
 };
 
@@ -87,7 +86,8 @@ public:
  *  devices.
  */
 class DB_PUBLIC Circuit
-  : public db::NetlistObject, public gsi::ObjectBase
+  : public db::NetlistObject,
+    public gsi::ObjectBase
 {
 public:
   typedef std::list<Pin> pin_list;
@@ -815,12 +815,12 @@ private:
   subcircuit_list m_subcircuits;
   Netlist *mp_netlist;
   std::vector<Net::pin_iterator> m_pin_refs;
-  object_by_attr<Circuit, Circuit::device_iterator, id_attribute<Device> > m_device_by_id;
-  object_by_attr<Circuit, Circuit::subcircuit_iterator, id_attribute<SubCircuit> > m_subcircuit_by_id;
-  object_by_attr<Circuit, Circuit::net_iterator, cluster_id_attribute<Net> > m_net_by_cluster_id;
-  object_by_attr<Circuit, Circuit::device_iterator, name_attribute<Device> > m_device_by_name;
-  object_by_attr<Circuit, Circuit::subcircuit_iterator, name_attribute<SubCircuit> > m_subcircuit_by_name;
-  object_by_attr<Circuit, Circuit::net_iterator, name_attribute<Net> > m_net_by_name;
+  object_by_attr<Circuit, Circuit::device_iterator, id_attribute<Device>> m_device_by_id;
+  object_by_attr<Circuit, Circuit::subcircuit_iterator, id_attribute<SubCircuit>> m_subcircuit_by_id;
+  object_by_attr<Circuit, Circuit::net_iterator, cluster_id_attribute<Net>> m_net_by_cluster_id;
+  object_by_attr<Circuit, Circuit::device_iterator, name_attribute<Device>> m_device_by_name;
+  object_by_attr<Circuit, Circuit::subcircuit_iterator, name_attribute<SubCircuit>> m_subcircuit_by_name;
+  object_by_attr<Circuit, Circuit::net_iterator, name_attribute<Net>> m_net_by_name;
   tl::weak_collection<SubCircuit> m_refs;
   size_t m_index;
 

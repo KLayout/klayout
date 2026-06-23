@@ -37,8 +37,7 @@ NetlistCompareGlobalOptions::NetlistCompareGlobalOptions ()
   m_is_initialized = false;
 }
 
-void
-NetlistCompareGlobalOptions::ensure_initialized ()
+void NetlistCompareGlobalOptions::ensure_initialized ()
 {
   if (! m_is_initialized) {
     //  $KLAYOUT_NETLIST_COMPARE_DEBUG_NETCOMPARE
@@ -143,7 +142,6 @@ static int net_name_compare (bool case_sensitive, const std::string &n1, const s
     if (c1 != c2) {
       return c1 < c2 ? -1 : 1;
     }
-
   }
 
   //  colon terminates net name, such that NET:I is identical to NET.
@@ -182,8 +180,7 @@ bool net_names_are_equal (const db::Net *a, const db::Net *b)
 // --------------------------------------------------------------------------------------------------------------------
 //  DeviceCompare implementation
 
-bool
-DeviceCompare::operator() (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const
+bool DeviceCompare::operator() (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const
 {
   if (d1.second != d2.second) {
     return d1.second < d2.second;
@@ -191,8 +188,7 @@ DeviceCompare::operator() (const std::pair<const db::Device *, size_t> &d1, cons
   return db::DeviceClass::less (*d1.first, *d2.first);
 }
 
-bool
-DeviceCompare::equals (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const
+bool DeviceCompare::equals (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const
 {
   if (d1.second != d2.second) {
     return false;
@@ -203,14 +199,12 @@ DeviceCompare::equals (const std::pair<const db::Device *, size_t> &d1, const st
 // --------------------------------------------------------------------------------------------------------------------
 //  SubCircuitCompare implementation
 
-bool
-SubCircuitCompare::operator() (const std::pair<const db::SubCircuit *, size_t> &sc1, const std::pair<const db::SubCircuit *, size_t> &sc2) const
+bool SubCircuitCompare::operator() (const std::pair<const db::SubCircuit *, size_t> &sc1, const std::pair<const db::SubCircuit *, size_t> &sc2) const
 {
   return sc1.second < sc2.second;
 }
 
-bool
-SubCircuitCompare::equals (const std::pair<const db::SubCircuit *, size_t> &sc1, const std::pair<const db::SubCircuit *, size_t> &sc2) const
+bool SubCircuitCompare::equals (const std::pair<const db::SubCircuit *, size_t> &sc1, const std::pair<const db::SubCircuit *, size_t> &sc2) const
 {
   return sc1.second == sc2.second;
 }
@@ -223,14 +217,12 @@ CircuitPinCategorizer::CircuitPinCategorizer ()
   //  .. nothing yet ..
 }
 
-void
-CircuitPinCategorizer::map_pins (const db::Circuit *circuit, size_t pin1_id, size_t pin2_id)
+void CircuitPinCategorizer::map_pins (const db::Circuit *circuit, size_t pin1_id, size_t pin2_id)
 {
   m_pin_map [circuit].same (pin1_id, pin2_id);
 }
 
-void
-CircuitPinCategorizer::map_pins (const db::Circuit *circuit, const std::vector<size_t> &pin_ids)
+void CircuitPinCategorizer::map_pins (const db::Circuit *circuit, const std::vector<size_t> &pin_ids)
 {
   if (pin_ids.size () < 2) {
     return;
@@ -245,7 +237,7 @@ CircuitPinCategorizer::map_pins (const db::Circuit *circuit, const std::vector<s
 size_t
 CircuitPinCategorizer::is_mapped (const db::Circuit *circuit, size_t pin_id) const
 {
-  std::map<const db::Circuit *, tl::equivalence_clusters<size_t> >::const_iterator pm = m_pin_map.find (circuit);
+  std::map<const db::Circuit *, tl::equivalence_clusters<size_t>>::const_iterator pm = m_pin_map.find (circuit);
   if (pm != m_pin_map.end ()) {
     return pm->second.has_attribute (pin_id);
   } else {
@@ -256,7 +248,7 @@ CircuitPinCategorizer::is_mapped (const db::Circuit *circuit, size_t pin_id) con
 size_t
 CircuitPinCategorizer::normalize_pin_id (const db::Circuit *circuit, size_t pin_id) const
 {
-  std::map<const db::Circuit *, tl::equivalence_clusters<size_t> >::const_iterator pm = m_pin_map.find (circuit);
+  std::map<const db::Circuit *, tl::equivalence_clusters<size_t>>::const_iterator pm = m_pin_map.find (circuit);
   if (pm != m_pin_map.end ()) {
     size_t cluster_id = pm->second.cluster_id (pin_id);
     if (cluster_id > 0) {
@@ -275,21 +267,18 @@ CircuitMapper::CircuitMapper ()
   //  .. nothing yet ..
 }
 
-void
-CircuitMapper::map_pin (size_t this_pin, size_t other_pin)
+void CircuitMapper::map_pin (size_t this_pin, size_t other_pin)
 {
   m_pin_map.insert (std::make_pair (this_pin, other_pin));
   m_rev_pin_map.insert (std::make_pair (other_pin, this_pin));
 }
 
-bool
-CircuitMapper::has_other_pin_for_this_pin (size_t this_pin) const
+bool CircuitMapper::has_other_pin_for_this_pin (size_t this_pin) const
 {
   return m_pin_map.find (this_pin) != m_pin_map.end ();
 }
 
-bool
-CircuitMapper::has_this_pin_for_other_pin (size_t other_pin) const
+bool CircuitMapper::has_this_pin_for_other_pin (size_t other_pin) const
 {
   return m_rev_pin_map.find (other_pin) != m_rev_pin_map.end ();
 }
@@ -319,8 +308,7 @@ DeviceFilter::DeviceFilter (double cap_threshold, double res_threshold)
   //  .. nothing yet ..
 }
 
-bool
-DeviceFilter::filter (const db::Device *device) const
+bool DeviceFilter::filter (const db::Device *device) const
 {
   const db::DeviceClassResistor *res = dynamic_cast<const db::DeviceClassResistor *> (device->device_class ());
   const db::DeviceClassCapacitor *cap = dynamic_cast<const db::DeviceClassCapacitor *> (device->device_class ());
@@ -348,15 +336,13 @@ template <class Obj> generic_categorizer<Obj>::generic_categorizer (bool with_na
 }
 
 template <class Obj>
-void
-generic_categorizer<Obj>::set_case_sensitive (bool f)
+void generic_categorizer<Obj>::set_case_sensitive (bool f)
 {
   m_case_sensitive = f;
 }
 
 template <class Obj>
-void
-generic_categorizer<Obj>::same (const Obj *ca, const Obj *cb)
+void generic_categorizer<Obj>::same (const Obj *ca, const Obj *cb)
 {
   if (! ca && ! cb) {
     return;
@@ -400,13 +386,11 @@ generic_categorizer<Obj>::same (const Obj *ca, const Obj *cb)
     ++m_next_cat;
     m_cat_by_ptr.insert (std::make_pair (ca, m_next_cat));
     m_cat_by_ptr.insert (std::make_pair (cb, m_next_cat));
-
   }
 }
 
 template <class Obj>
-bool
-generic_categorizer<Obj>::has_cat_for (const Obj *cls)
+bool generic_categorizer<Obj>::has_cat_for (const Obj *cls)
 {
   return m_cat_by_ptr.find (cls) != m_cat_by_ptr.end ();
 }
@@ -440,7 +424,6 @@ generic_categorizer<Obj>::cat_for (const Obj *cls)
     ++m_next_cat;
     m_cat_by_ptr.insert (std::make_pair (cls, m_next_cat));
     return m_next_cat;
-
   }
 }
 
@@ -457,8 +440,7 @@ DeviceCategorizer::DeviceCategorizer ()
   //  .. nothing yet ..
 }
 
-void
-DeviceCategorizer::same_class (const db::DeviceClass *ca, const db::DeviceClass *cb)
+void DeviceCategorizer::same_class (const db::DeviceClass *ca, const db::DeviceClass *cb)
 {
   generic_categorizer<db::DeviceClass>::same (ca, cb);
 }
@@ -474,20 +456,17 @@ DeviceCategorizer::cat_for_device (const db::Device *device)
   return cat_for_device_class (cls);
 }
 
-void
-DeviceCategorizer::clear_strict_device_categories ()
+void DeviceCategorizer::clear_strict_device_categories ()
 {
   m_strict_device_categories.clear ();
 }
 
-void
-DeviceCategorizer::set_strict_device_category (size_t cat)
+void DeviceCategorizer::set_strict_device_category (size_t cat)
 {
   m_strict_device_categories.insert (cat);
 }
 
-bool
-DeviceCategorizer::is_strict_device_category (size_t cat) const
+bool DeviceCategorizer::is_strict_device_category (size_t cat) const
 {
   return m_strict_device_categories.find (cat) != m_strict_device_categories.end ();
 }
@@ -501,8 +480,7 @@ CircuitCategorizer::CircuitCategorizer ()
   //  .. nothing yet ..
 }
 
-void
-CircuitCategorizer::same_circuit (const db::Circuit *ca, const db::Circuit *cb)
+void CircuitCategorizer::same_circuit (const db::Circuit *ca, const db::Circuit *cb)
 {
   //  no arbitrary cross-pairing
   //  NOTE: many layout circuits are allowed for one schematic to account for layout alternatives.

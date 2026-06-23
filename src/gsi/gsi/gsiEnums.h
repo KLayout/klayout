@@ -29,16 +29,16 @@
 #include "tlVariant.h"
 
 #if defined(HAVE_QT)
-#  include <QFlags>
+#include <QFlags>
 #endif
 
 namespace gsi
 {
- 
+
 template <class E> class Enum;
 
 /**
- *  @brief The basic enum adaptor class 
+ *  @brief The basic enum adaptor class
  *  We will later bind this class to an enum. Binding is automatically resolved by GSI.
  *  The adaptor provides a client-side object which connects to the enum features.
  *  It employs the declaration class to retrieve the constants defined.
@@ -47,11 +47,11 @@ template <class E>
 class EnumAdaptor
 {
 public:
-  EnumAdaptor () : m_e (E (0)) { }
-  EnumAdaptor (E e) : m_e (e) { }
-  EnumAdaptor (int e) : m_e (E (e)) { }
+  EnumAdaptor () : m_e (E (0)) {}
+  EnumAdaptor (E e) : m_e (e) {}
+  EnumAdaptor (int e) : m_e (E (e)) {}
 
-  EnumAdaptor (const std::string &e) 
+  EnumAdaptor (const std::string &e)
   {
     const Enum<E> *ecls = dynamic_cast<const Enum<E> *> (cls_decl<E> ());
     tl_assert (ecls != 0);
@@ -79,8 +79,7 @@ private:
  *  @brief A single specification for an enum value
  */
 template <class E>
-struct EnumSpec
-{
+struct EnumSpec {
   EnumSpec (const std::string &s, E e, const std::string &d)
     : str (s), evalue (e), doc (d)
   {
@@ -105,12 +104,12 @@ public:
   {
   }
 
-  virtual void initialize () 
+  virtual void initialize ()
   {
     set_return<E> ();
   }
-    
-  virtual void call (void * /*obj*/, SerialArgs & /*args*/, SerialArgs &ret) const 
+
+  virtual void call (void * /*obj*/, SerialArgs & /*args*/, SerialArgs &ret) const
   {
     ret.write<E> (m_evalue);
   }
@@ -126,7 +125,7 @@ private:
 
 /**
  *  @brief A list of constants
- *  This list is passed to the declaration class to represent the list of constants 
+ *  This list is passed to the declaration class to represent the list of constants
  *  in the enum.
  *  Building of the list is facilitated by the "gsi::enum_const" function. The use
  *  case is supposed to be this:
@@ -140,7 +139,7 @@ template <class E>
 class EnumSpecs
 {
 public:
-  typedef typename std::vector<EnumSpec<E> >::const_iterator iterator;
+  typedef typename std::vector<EnumSpec<E>>::const_iterator iterator;
 
   EnumSpecs (const std::string &estr, E evalue, const std::string &doc)
   {
@@ -157,12 +156,12 @@ public:
     return m_specs.end ();
   }
 
-  EnumSpecs &operator+ (const EnumSpecs &other) 
+  EnumSpecs &operator+ (const EnumSpecs &other)
   {
     return operator+= (other);
   }
 
-  EnumSpecs &operator+= (const EnumSpecs &other) 
+  EnumSpecs &operator+= (const EnumSpecs &other)
   {
     m_specs.insert (m_specs.end (), other.m_specs.begin (), other.m_specs.end ());
     return *this;
@@ -170,7 +169,7 @@ public:
 
   E enum_from_string (const std::string &s) const
   {
-    for (typename std::vector<EnumSpec<E> >::const_iterator spec = m_specs.begin (); spec != m_specs.end (); ++spec) {
+    for (typename std::vector<EnumSpec<E>>::const_iterator spec = m_specs.begin (); spec != m_specs.end (); ++spec) {
       if (spec->str == s) {
         return spec->evalue;
       }
@@ -188,7 +187,7 @@ public:
 
   std::string enum_to_string (E e) const
   {
-    for (typename std::vector<EnumSpec<E> >::const_iterator spec = m_specs.begin (); spec != m_specs.end (); ++spec) {
+    for (typename std::vector<EnumSpec<E>>::const_iterator spec = m_specs.begin (); spec != m_specs.end (); ++spec) {
       if (spec->evalue == e) {
         return spec->str;
       }
@@ -198,7 +197,7 @@ public:
 
   std::string enum_to_string_inspect (E e) const
   {
-    for (typename std::vector<EnumSpec<E> >::const_iterator spec = m_specs.begin (); spec != m_specs.end (); ++spec) {
+    for (typename std::vector<EnumSpec<E>>::const_iterator spec = m_specs.begin (); spec != m_specs.end (); ++spec) {
       if (spec->evalue == e) {
         return spec->str + tl::sprintf (" (%d)", int (e));
       }
@@ -222,10 +221,10 @@ public:
 
   static int enum_to_int (const E *e)
   {
-    return int (*e); 
+    return int (*e);
   }
 
-  static bool enum_eq (const E *e, const E &other) 
+  static bool enum_eq (const E *e, const E &other)
   {
     return *e == other;
   }
@@ -269,19 +268,19 @@ public:
 
   gsi::Methods methods () const
   {
-    gsi::Methods m = 
-      gsi::constructor ("new", &new_enum_from_int, gsi::arg("i"), "@brief Creates an enum from an integer value") +
-      gsi::constructor ("new", &new_enum_from_string, gsi::arg("s"), "@brief Creates an enum from a string value") +
+    gsi::Methods m =
+      gsi::constructor ("new", &new_enum_from_int, gsi::arg ("i"), "@brief Creates an enum from an integer value") +
+      gsi::constructor ("new", &new_enum_from_string, gsi::arg ("s"), "@brief Creates an enum from a string value") +
       gsi::method_ext ("to_s", &enum_to_string_ext, "@brief Gets the symbolic string from an enum") +
       gsi::method_ext ("inspect", &enum_to_string_inspect_ext, "@brief Converts an enum to a visual string") +
       gsi::method_ext ("to_i", &enum_to_int, "@brief Gets the integer value from the enum") +
       gsi::method_ext ("hash", &enum_to_int, "@brief Gets the hash value from the enum") +
-      gsi::method_ext ("==", &enum_eq, gsi::arg("other"), "@brief Compares two enums") +
-      gsi::method_ext ("==", &enum_eq_with_int, gsi::arg("other"), "@brief Compares an enum with an integer value") +
-      gsi::method_ext ("!=", &enum_ne, gsi::arg("other"), "@brief Compares two enums for inequality") +
-      gsi::method_ext ("!=", &enum_ne_with_int, gsi::arg("other"), "@brief Compares an enum with an integer for inequality") +
-      gsi::method_ext ("<", &enum_lt, gsi::arg("other"), "@brief Returns true if the first enum is less (in the enum symbol order) than the second") +
-      gsi::method_ext ("<", &enum_lt_with_int, gsi::arg("other"), "@brief Returns true if the enum is less (in the enum symbol order) than the integer value");
+      gsi::method_ext ("==", &enum_eq, gsi::arg ("other"), "@brief Compares two enums") +
+      gsi::method_ext ("==", &enum_eq_with_int, gsi::arg ("other"), "@brief Compares an enum with an integer value") +
+      gsi::method_ext ("!=", &enum_ne, gsi::arg ("other"), "@brief Compares two enums for inequality") +
+      gsi::method_ext ("!=", &enum_ne_with_int, gsi::arg ("other"), "@brief Compares an enum with an integer for inequality") +
+      gsi::method_ext ("<", &enum_lt, gsi::arg ("other"), "@brief Returns true if the first enum is less (in the enum symbol order) than the second") +
+      gsi::method_ext ("<", &enum_lt_with_int, gsi::arg ("other"), "@brief Returns true if the enum is less (in the enum symbol order) than the integer value");
 
     return m + defs ();
   }
@@ -289,14 +288,14 @@ public:
   gsi::Methods defs () const
   {
     gsi::Methods m;
-    for (typename std::vector<EnumSpec<E> >::const_iterator spec = m_specs.begin (); spec != m_specs.end (); ++spec) {
+    for (typename std::vector<EnumSpec<E>>::const_iterator spec = m_specs.begin (); spec != m_specs.end (); ++spec) {
       m += gsi::Methods (new EnumConst<E> (spec->str, spec->evalue, spec->doc));
     }
     return m;
   }
 
 private:
-  std::vector<EnumSpec<E> > m_specs;
+  std::vector<EnumSpec<E>> m_specs;
 };
 
 /**
@@ -356,16 +355,17 @@ private:
  *  The use is this:
  *
  *  @code
- *  gsi::Enum<E> e_enum ("A description", 
- *    gsi::enum_const ("a", E::a, "description of a") + 
- *    gsi::enum_const ("b", E::b) + 
+ *  gsi::Enum<E> e_enum ("A description",
+ *    gsi::enum_const ("a", E::a, "description of a") +
+ *    gsi::enum_const ("b", E::b) +
  *    ...
  *  );
  *  @endcode
  */
 template <class E>
 class Enum
-  : public Class<EnumAdaptor<E>, E>, public EnumImpl<E>
+  : public Class<EnumAdaptor<E>, E>,
+    public EnumImpl<E>
 {
 public:
   Enum (const std::string &module, const std::string &name, const EnumSpecs<E> &specs, const std::string &doc = std::string ())
@@ -418,14 +418,14 @@ template <class E>
 class QFlagsAdaptor
 {
 public:
-  QFlagsAdaptor () : m_qf () { }
-  QFlagsAdaptor (E e) : m_qf (e) { }
-  QFlagsAdaptor (const QFlags<E> &qf) : m_qf (qf) { }
-  QFlagsAdaptor (int i) : m_qf (i) { }
+  QFlagsAdaptor () : m_qf () {}
+  QFlagsAdaptor (E e) : m_qf (e) {}
+  QFlagsAdaptor (const QFlags<E> &qf) : m_qf (qf) {}
+  QFlagsAdaptor (int i) : m_qf (i) {}
 
-  QFlagsAdaptor (const std::string &s) 
+  QFlagsAdaptor (const std::string &s)
   {
-    const QFlagsClass<E> *ecls = dynamic_cast<const QFlagsClass<E> *> (cls_decl<QFlags<E> > ());
+    const QFlagsClass<E> *ecls = dynamic_cast<const QFlagsClass<E> *> (cls_decl<QFlags<E>> ());
     tl_assert (ecls != 0);
     m_qf = ecls->qflags_from_string (s);
   }
@@ -453,13 +453,13 @@ private:
  *  QFlagsClass<E> qflags_decl ("QFlags_E", "documentation");
  *  @endcode
  *
- *  The documentation is optional. In addition to the new class "QFlags_E", this 
+ *  The documentation is optional. In addition to the new class "QFlags_E", this
  *  declaration will also provide an "or" operator between two enums of type E
  *  which will render a QFlags object.
  */
 template <class E>
 class QFlagsClass
-  : public Class<QFlagsAdaptor<E>, QFlags<E> >
+  : public Class<QFlagsAdaptor<E>, QFlags<E>>
 {
 public:
 #if QT_VERSION >= 0x050000
@@ -469,7 +469,7 @@ public:
 #endif
 
   QFlagsClass (const std::string &module, const std::string &name, const std::string &doc = std::string ())
-    : Class<QFlagsAdaptor<E>, QFlags<E> > (module, name, methods (), doc),
+    : Class<QFlagsAdaptor<E>, QFlags<E>> (module, name, methods (), doc),
       m_enum_ext (ext_methods ())
   {
   }
@@ -495,7 +495,7 @@ public:
     while (! ex.at_end ()) {
 
       bool any = false;
-      for (typename EnumSpecs<E>::iterator s = ecls->specs ().begin (); s != ecls->specs ().end () && !any; ++s) {
+      for (typename EnumSpecs<E>::iterator s = ecls->specs ().begin (); s != ecls->specs ().end () && ! any; ++s) {
         if (ex.test (s->str.c_str ())) {
           flags |= E (s->evalue);
           any = true;
@@ -508,7 +508,6 @@ public:
       } else {
         break;
       }
-
     }
 
     return new QFlags<E> (flags);
@@ -544,7 +543,7 @@ public:
 
   static std::string inspect (const QFlags<E> *self)
   {
-    return to_s (self) + tl::sprintf(" (%u)", (unsigned int) (int_repr (*self)));
+    return to_s (self) + tl::sprintf (" (%u)", (unsigned int) (int_repr (*self)));
   }
 
   static QFlags<E> invert (const QFlags<E> *self)
@@ -600,33 +599,32 @@ public:
 
   static bool equal (const QFlags<E> *self, const QFlags<E> &other)
   {
-    //  NOTE: in order to avoid ambiguities with non-explicit constructors of objects taking a QFlag as an argument, 
+    //  NOTE: in order to avoid ambiguities with non-explicit constructors of objects taking a QFlag as an argument,
     //  we compare int's explicitly. An example for such an ambiguity is QSurfaceFormat in Qt 5.5.1 which takes a QFlags<FormatOption>
-    //  object in a non-explicit constructor. 
+    //  object in a non-explicit constructor.
     return int_repr (*self) == int_repr (other);
   }
 
   static gsi::Methods methods ()
   {
-    return 
-      gsi::constructor ("new", &new_from_i, gsi::arg ("i"), "@brief Creates a flag set from an integer value") +
-      gsi::constructor ("new", &new_from_s, gsi::arg ("s"), "@brief Creates a flag set from a string") +
-      gsi::constructor ("new", &new_from_e, gsi::arg ("e"), "@brief Creates a flag set from an enum") +
-      gsi::method_ext ("to_s", &to_s, "@brief Converts the flag set to a string") +
-      gsi::method_ext ("to_i", &to_i, "@brief Converts the flag set to an integer") +
-      gsi::method_ext ("testFlag", &test_flag, gsi::arg ("flag"), "@brief Tests whether the flag set contains the given flag") +
-      gsi::method_ext ("inspect", &inspect, "@brief Converts the flag set to a visual string") +
-      gsi::method_ext ("|", &or_op, gsi::arg ("other"), "@brief Computes the union of two flag sets") +
-      gsi::method_ext ("|", &or_op_with_e, gsi::arg ("flag"), "@brief Adds the given flag to the flag set and returns the new flag set") +
-      gsi::method_ext ("&", &and_op, gsi::arg ("other"), "@brief Computes the intersection between the two flag sets") +
-      gsi::method_ext ("&", &and_op_with_e, gsi::arg ("flag"), "@brief Tests whether the given flag is contained in the flag set and returns a null flag set if not") +
-      gsi::method_ext ("^", &xor_op, gsi::arg ("other"), "@brief Computes the exclusive-or between the flag set and the other flag set") +
-      gsi::method_ext ("^", &xor_op_with_e, gsi::arg ("flag"), "@brief Inverts the given flag in the flag set and returns the new flag set") +
-      gsi::method_ext ("==", &equal_with_i, gsi::arg ("other"), "@brief Returns true if the flag set equals the given integer value") +
-      gsi::method_ext ("==", &equal, gsi::arg ("i"), "@brief Returns true if the flag set equals the given other flag set") +
-      gsi::method_ext ("!=", &not_equal_with_i, gsi::arg ("other"), "@brief Returns true if the flag set is not equal to the given integer value") +
-      gsi::method_ext ("!=", &not_equal, gsi::arg ("i"), "@brief Returns true if the flag set is not equal to the given other flag set") +
-      gsi::method_ext ("~", &invert, "@brief Returns the inverted flag set");     
+    return gsi::constructor ("new", &new_from_i, gsi::arg ("i"), "@brief Creates a flag set from an integer value") +
+           gsi::constructor ("new", &new_from_s, gsi::arg ("s"), "@brief Creates a flag set from a string") +
+           gsi::constructor ("new", &new_from_e, gsi::arg ("e"), "@brief Creates a flag set from an enum") +
+           gsi::method_ext ("to_s", &to_s, "@brief Converts the flag set to a string") +
+           gsi::method_ext ("to_i", &to_i, "@brief Converts the flag set to an integer") +
+           gsi::method_ext ("testFlag", &test_flag, gsi::arg ("flag"), "@brief Tests whether the flag set contains the given flag") +
+           gsi::method_ext ("inspect", &inspect, "@brief Converts the flag set to a visual string") +
+           gsi::method_ext ("|", &or_op, gsi::arg ("other"), "@brief Computes the union of two flag sets") +
+           gsi::method_ext ("|", &or_op_with_e, gsi::arg ("flag"), "@brief Adds the given flag to the flag set and returns the new flag set") +
+           gsi::method_ext ("&", &and_op, gsi::arg ("other"), "@brief Computes the intersection between the two flag sets") +
+           gsi::method_ext ("&", &and_op_with_e, gsi::arg ("flag"), "@brief Tests whether the given flag is contained in the flag set and returns a null flag set if not") +
+           gsi::method_ext ("^", &xor_op, gsi::arg ("other"), "@brief Computes the exclusive-or between the flag set and the other flag set") +
+           gsi::method_ext ("^", &xor_op_with_e, gsi::arg ("flag"), "@brief Inverts the given flag in the flag set and returns the new flag set") +
+           gsi::method_ext ("==", &equal_with_i, gsi::arg ("other"), "@brief Returns true if the flag set equals the given integer value") +
+           gsi::method_ext ("==", &equal, gsi::arg ("i"), "@brief Returns true if the flag set equals the given other flag set") +
+           gsi::method_ext ("!=", &not_equal_with_i, gsi::arg ("other"), "@brief Returns true if the flag set is not equal to the given integer value") +
+           gsi::method_ext ("!=", &not_equal, gsi::arg ("i"), "@brief Returns true if the flag set is not equal to the given other flag set") +
+           gsi::method_ext ("~", &invert, "@brief Returns the inverted flag set");
   }
 
   static QFlags<E> e_or_e (const E *self, const E &other)
@@ -641,9 +639,8 @@ public:
 
   static gsi::Methods ext_methods ()
   {
-    return 
-      gsi::method_ext ("|", &e_or_e, gsi::arg ("other"), "@brief Creates a flag set by combining the two flags") +
-      gsi::method_ext ("|", &e_or_ee, gsi::arg ("other"), "@brief Combines the flag and the flag set");
+    return gsi::method_ext ("|", &e_or_e, gsi::arg ("other"), "@brief Creates a flag set by combining the two flags") +
+           gsi::method_ext ("|", &e_or_ee, gsi::arg ("other"), "@brief Combines the flag and the flag set");
   }
 
 private:
@@ -655,4 +652,3 @@ private:
 }
 
 #endif
-

@@ -29,7 +29,8 @@
 
 #include <memory>
 
-namespace lay {
+namespace lay
+{
 
 LAYBASIC_PUBLIC extern std::string move_editor_options_name;
 LAYBASIC_PUBLIC extern std::string move_function_name;
@@ -37,10 +38,9 @@ LAYBASIC_PUBLIC extern std::string move_distance_setter_name;
 
 class LayoutViewBase;
 
-class LAYBASIC_PUBLIC MoveService :
-    public lay::EditorServiceBase
+class LAYBASIC_PUBLIC MoveService : public lay::EditorServiceBase
 {
-public: 
+public:
   MoveService (lay::LayoutViewBase *view);
   ~MoveService ();
 
@@ -81,4 +81,3 @@ private:
 }
 
 #endif
-

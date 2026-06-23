@@ -40,8 +40,7 @@ SaltModel::SaltModel (QObject *parent, lay::Salt *salt, lay::Salt *salt_filtered
   create_ordered_list ();
 }
 
-void
-SaltModel::set_empty_explanation (const QString &text)
+void SaltModel::set_empty_explanation (const QString &text)
 {
   m_empty_explanation = text;
 }
@@ -71,7 +70,7 @@ SaltModel::data (const QModelIndex &index, int role) const
   if (role == Qt::DisplayRole) {
 
     const lay::SaltGrain *g = grain_from_index (index);
-    if (!g) {
+    if (! g) {
       return QVariant (tr ("<html><body><h4>There are no items to show in this list</h4><p>%1</p></body></html>").arg (m_empty_explanation));
     }
 
@@ -83,22 +82,22 @@ SaltModel::data (const QModelIndex &index, int role) const
     }
     text += "<h4>";
     text += tl::escaped_to_html (g->name ());
-    if (!g->version ().empty ()) {
+    if (! g->version ().empty ()) {
       text += " ";
       text += tl::escaped_to_html (g->version ());
     }
-    if (!g->title ().empty ()) {
+    if (! g->title ().empty ()) {
       text += " - ";
       text += tl::escaped_to_html (g->title ());
     }
     text += "</h4>";
-    if (!g->doc ().empty ()) {
+    if (! g->doc ().empty ()) {
       text += "<p>";
       text += tl::escaped_to_html (g->doc ());
       text += "</p>";
     }
 
-    std::map<std::string, std::pair<Severity, std::string> >::const_iterator m = m_messages.find (g->name ());
+    std::map<std::string, std::pair<Severity, std::string>>::const_iterator m = m_messages.find (g->name ());
     if (m != m_messages.end ()) {
       if (m->second.first == Warning || m->second.first == Error) {
         text += "<p><font color=\"#ff0000\"><b>" + tl::escaped_to_html (m->second.second) + "</b></font></p>";
@@ -123,7 +122,7 @@ SaltModel::data (const QModelIndex &index, int role) const
     int icon_dim = 64;
 
     const lay::SaltGrain *g = grain_from_index (index);
-    if (!g) {
+    if (! g) {
       return QVariant ();
     }
 
@@ -150,7 +149,6 @@ SaltModel::data (const QModelIndex &index, int role) const
 #endif
       QPainter painter (&img);
       painter.drawImage ((icon_dim - scaled.width ()) / 2, (icon_dim - scaled.height ()) / 2, scaled);
-
     }
 
     if (m_marked.find (g->name ()) != m_marked.end ()) {
@@ -159,7 +157,7 @@ SaltModel::data (const QModelIndex &index, int role) const
       painter.drawImage (0, 0, warn);
     }
 
-    std::map<std::string, std::pair<Severity, std::string> >::const_iterator m = m_messages.find (g->name ());
+    std::map<std::string, std::pair<Severity, std::string>>::const_iterator m = m_messages.find (g->name ());
     if (m != m_messages.end ()) {
       if (m->second.first == Warning) {
         QPainter painter (&img);
@@ -183,7 +181,7 @@ SaltModel::data (const QModelIndex &index, int role) const
   }
 }
 
-QModelIndex 
+QModelIndex
 SaltModel::index (int row, int column, const QModelIndex &parent) const
 {
   if (parent.isValid ()) {
@@ -193,20 +191,18 @@ SaltModel::index (int row, int column, const QModelIndex &parent) const
   }
 }
 
-QModelIndex 
+QModelIndex
 SaltModel::parent (const QModelIndex & /*index*/) const
 {
   return QModelIndex ();
 }
 
-int 
-SaltModel::columnCount(const QModelIndex & /*parent*/) const
+int SaltModel::columnCount (const QModelIndex & /*parent*/) const
 {
   return 1;
 }
 
-int 
-SaltModel::rowCount (const QModelIndex &parent) const
+int SaltModel::rowCount (const QModelIndex &parent) const
 {
   if (parent.isValid ()) {
     return 0;
@@ -225,20 +221,17 @@ SaltModel::grain_from_index (const QModelIndex &index) const
   }
 }
 
-bool
-SaltModel::is_marked (const std::string &name) const
+bool SaltModel::is_marked (const std::string &name) const
 {
   return m_marked.find (name) != m_marked.end ();
 }
 
-bool
-SaltModel::is_enabled (const std::string &name) const
+bool SaltModel::is_enabled (const std::string &name) const
 {
   return m_disabled.find (name) == m_disabled.end ();
 }
 
-void
-SaltModel::set_marked (const std::string &name, bool marked)
+void SaltModel::set_marked (const std::string &name, bool marked)
 {
   if (marked != is_marked (name)) {
     if (! marked) {
@@ -250,8 +243,7 @@ SaltModel::set_marked (const std::string &name, bool marked)
   }
 }
 
-void
-SaltModel::clear_marked ()
+void SaltModel::clear_marked ()
 {
   if (! m_marked.empty ()) {
     m_marked.clear ();
@@ -259,8 +251,7 @@ SaltModel::clear_marked ()
   }
 }
 
-void
-SaltModel::mark_all ()
+void SaltModel::mark_all ()
 {
   m_marked.clear ();
   for (std::vector<SaltGrain *>::const_iterator g = m_ordered_grains.begin (); g != m_ordered_grains.end (); ++g) {
@@ -269,8 +260,7 @@ SaltModel::mark_all ()
   emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex ()) - 1, 0, QModelIndex ()));
 }
 
-void
-SaltModel::set_enabled (const std::string &name, bool enabled)
+void SaltModel::set_enabled (const std::string &name, bool enabled)
 {
   if (enabled != is_enabled (name)) {
     if (enabled) {
@@ -282,8 +272,7 @@ SaltModel::set_enabled (const std::string &name, bool enabled)
   }
 }
 
-void
-SaltModel::enable_all ()
+void SaltModel::enable_all ()
 {
   if (! m_disabled.empty ()) {
     m_disabled.clear ();
@@ -291,26 +280,22 @@ SaltModel::enable_all ()
   }
 }
 
-void
-SaltModel::clear_order ()
+void SaltModel::clear_order ()
 {
   m_display_order.clear ();
 }
 
-void
-SaltModel::reset_order (const std::string &name)
+void SaltModel::reset_order (const std::string &name)
 {
   m_display_order.erase (name);
 }
 
-void
-SaltModel::set_order (const std::string &name, int order)
+void SaltModel::set_order (const std::string &name, int order)
 {
-  m_display_order[name] = order;
+  m_display_order [name] = order;
 }
 
-void
-SaltModel::set_message (const std::string &name, Severity severity, const std::string &message)
+void SaltModel::set_message (const std::string &name, Severity severity, const std::string &message)
 {
   bool needs_update = false;
   if (message.empty ()) {
@@ -319,7 +304,7 @@ SaltModel::set_message (const std::string &name, Severity severity, const std::s
       needs_update = true;
     }
   } else {
-    std::map<std::string, std::pair<Severity, std::string> >::iterator m = m_messages.find (name);
+    std::map<std::string, std::pair<Severity, std::string>>::iterator m = m_messages.find (name);
     if (m == m_messages.end () || m->second.second != message || m->second.first != severity) {
       m_messages.insert (std::make_pair (name, std::make_pair (severity, message)));
       needs_update = true;
@@ -331,8 +316,7 @@ SaltModel::set_message (const std::string &name, Severity severity, const std::s
   }
 }
 
-void
-SaltModel::clear_messages ()
+void SaltModel::clear_messages ()
 {
   if (! m_messages.empty ()) {
     m_messages.clear ();
@@ -340,8 +324,7 @@ SaltModel::clear_messages ()
   }
 }
 
-void
-SaltModel::begin_update ()
+void SaltModel::begin_update ()
 {
   if (! m_in_update) {
     m_ordered_grains.clear ();
@@ -350,8 +333,7 @@ SaltModel::begin_update ()
   }
 }
 
-void
-SaltModel::update ()
+void SaltModel::update ()
 {
   begin_update ();
   create_ordered_list ();
@@ -359,8 +341,7 @@ SaltModel::update ()
   m_in_update = false;
 }
 
-void
-SaltModel::create_ordered_list ()
+void SaltModel::create_ordered_list ()
 {
   m_ordered_grains.clear ();
 
@@ -402,7 +383,6 @@ SaltModel::create_ordered_list ()
         }
       }
     }
-
   }
 }
 

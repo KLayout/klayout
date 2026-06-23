@@ -42,7 +42,7 @@
 
 namespace db
 {
-  class NetTracerTechnologyComponent;
+class NetTracerTechnologyComponent;
 }
 
 namespace lay
@@ -52,7 +52,7 @@ class NetTracerTechComponentEditor
   : public lay::TechnologyComponentEditor,
     public Ui::NetTracerTechComponentEditor
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   NetTracerTechComponentEditor (QWidget *parent);
@@ -79,4 +79,3 @@ private:
 }
 
 #endif
-

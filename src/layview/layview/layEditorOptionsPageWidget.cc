@@ -52,8 +52,7 @@ EditorOptionsPageWidget::~EditorOptionsPageWidget ()
   set_owner (0);
 }
 
-void
-EditorOptionsPageWidget::edited ()
+void EditorOptionsPageWidget::edited ()
 {
   apply (dispatcher ());
 }
@@ -66,8 +65,7 @@ static bool is_parent_widget (QWidget *w, QWidget *parent)
   return w == parent;
 }
 
-bool
-EditorOptionsPageWidget::focusNextPrevChild (bool next)
+bool EditorOptionsPageWidget::focusNextPrevChild (bool next)
 {
   bool res = QWidget::focusNextPrevChild (next);
 
@@ -80,10 +78,9 @@ EditorOptionsPageWidget::focusNextPrevChild (bool next)
   return res;
 }
 
-void
-EditorOptionsPageWidget::keyPressEvent (QKeyEvent *event)
+void EditorOptionsPageWidget::keyPressEvent (QKeyEvent *event)
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (! is_modal_page () &&
       event->modifiers () == Qt::NoModifier &&
@@ -106,11 +103,10 @@ BEGIN_PROTECTED
     QWidget::keyPressEvent (event);
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-bool
-EditorOptionsPageWidget::event (QEvent *event)
+bool EditorOptionsPageWidget::event (QEvent *event)
 {
   if (event->type () == QEvent::ShortcutOverride) {
 
@@ -124,14 +120,12 @@ EditorOptionsPageWidget::event (QEvent *event)
       //  it in keyPressEvent
       ke->accept ();
     }
-
   }
 
   return QWidget::event (event);
 }
 
-void
-EditorOptionsPageWidget::resizeEvent (QResizeEvent *e)
+void EditorOptionsPageWidget::resizeEvent (QResizeEvent *e)
 {
   //  makes the widget transparent
   //  see https://stackoverflow.com/questions/27855137/how-to-disable-the-delivery-of-mouse-events-to-the-widget-but-not-its-children-i
@@ -149,8 +143,7 @@ EditorOptionsPageWidget::resizeEvent (QResizeEvent *e)
   }
 }
 
-void
-EditorOptionsPageWidget::set_transparent (bool f)
+void EditorOptionsPageWidget::set_transparent (bool f)
 {
   if (f != m_is_transparent) {
     m_is_transparent = f;
@@ -158,8 +151,7 @@ EditorOptionsPageWidget::set_transparent (bool f)
   }
 }
 
-void
-EditorOptionsPageWidget::set_focus ()
+void EditorOptionsPageWidget::set_focus ()
 {
   if (isVisible ()) {
     setFocus (Qt::TabFocusReason);
@@ -167,14 +159,12 @@ EditorOptionsPageWidget::set_focus ()
   }
 }
 
-void
-EditorOptionsPageWidget::set_visible (bool visible)
+void EditorOptionsPageWidget::set_visible (bool visible)
 {
   setVisible (visible);
 }
 
-bool
-EditorOptionsPageWidget::is_visible () const
+bool EditorOptionsPageWidget::is_visible () const
 {
   return isVisible ();
 }

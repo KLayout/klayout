@@ -137,10 +137,10 @@ public:
    *  A higher depth instructs the iterator to look deeper.
    *  The depth must be specified before the instances are being retrieved.
    */
-  void max_depth (int depth) 
-  { 
+  void max_depth (int depth)
+  {
     if (m_max_depth != depth) {
-      m_max_depth = depth; 
+      m_max_depth = depth;
       reset ();
     }
   }
@@ -311,7 +311,7 @@ public:
   void set_targets (const std::set<db::cell_index_type> &set_targets);
 
   /**
-   *  @brief Select cells 
+   *  @brief Select cells
    *
    *  Cell selection allows confining the hierarchy traversal to subtrees of the
    *  hierarchy tree. This happens by "selecting" and "unselecting" cells in the traversal path.
@@ -321,7 +321,7 @@ public:
    *  on their parent's state. They are traversed if their parents are and are not traversed
    *  if their parents are not.
    *
-   *  If no specific cells have been selected before, this method will confine the selection 
+   *  If no specific cells have been selected before, this method will confine the selection
    *  to the given cells (plus their sub-hierarchy).
    *  If cells have been selected before, this will add the given cells to the selection.
    */
@@ -330,7 +330,7 @@ public:
   /**
    *  @brief Select all cells
    *
-   *  Makes all cells selected. After doing so, all unselect_cells calls 
+   *  Makes all cells selected. After doing so, all unselect_cells calls
    *  will unselect only that specific cell without children.
    *
    *  See \select_cells for more details.
@@ -338,7 +338,7 @@ public:
   void select_all_cells ();
 
   /**
-   *  @brief Unselect cells 
+   *  @brief Unselect cells
    *
    *  This method will remove the given cells (plus their sub-hierarchy) from the selection.
    *
@@ -349,7 +349,7 @@ public:
   /**
    *  @brief Unselect all cells
    *
-   *  Makes all cells unselected. After doing so, select_cells calls 
+   *  Makes all cells unselected. After doing so, select_cells calls
    *  will select only that specific cell without children.
    *
    *  See \select_cells for more details.
@@ -359,7 +359,7 @@ public:
   /**
    *  @brief Resets the selection
    *
-   *  This will reset all selections and unselections. 
+   *  This will reset all selections and unselections.
    *  After calling this methods, all select_cells will again select the cells
    *  including their children.
    *
@@ -418,7 +418,7 @@ public:
    */
   instance_element_type instance () const
   {
-    return *operator-> ();
+    return *operator->();
   }
 
   /**
@@ -428,7 +428,7 @@ public:
    */
   instance_element_type operator* () const
   {
-    return *operator-> ();
+    return *operator->();
   }
 
   /**
@@ -436,7 +436,7 @@ public:
    *
    *  The access operator is identical to the instance method.
    */
-  const instance_element_type *operator-> () const;
+  const instance_element_type *operator->() const;
 
   /**
    *  @brief End of iterator predicate
@@ -466,7 +466,7 @@ public:
   /**
    *  @brief Increments the iterator (operator version)
    */
-  RecursiveInstanceIterator &operator++()
+  RecursiveInstanceIterator &operator++ ()
   {
     next (0);
     return *this;
@@ -483,7 +483,7 @@ public:
   /**
    *  @brief Comparison of iterators - equality
    */
-  bool operator==(const RecursiveInstanceIterator &d) const
+  bool operator== (const RecursiveInstanceIterator &d) const
   {
     if (at_end () != d.at_end ()) {
       return false;
@@ -497,9 +497,9 @@ public:
   /**
    *  @brief Comparison of iterators - inequality
    */
-  bool operator!=(const RecursiveInstanceIterator &d) const
+  bool operator!= (const RecursiveInstanceIterator &d) const
   {
-    return !operator==(d);
+    return ! operator== (d);
   }
 
   /**
@@ -584,7 +584,7 @@ private:
   bool is_outside_complex_region (const box_type &box) const;
   box_type correct_box_overlapping (const box_type &box) const;
 
-  void set_inactive (bool a) const 
+  void set_inactive (bool a) const
   {
     size_t c = reinterpret_cast<size_t> (mp_cell);
     c -= (c & size_t (1));
@@ -622,27 +622,29 @@ public:
   /**
    *  @brief See new_inst for details.
    */
-  enum  new_inst_mode { NI_all = 0, NI_single = 1, NI_skip = 2 };
+  enum new_inst_mode { NI_all = 0,
+                       NI_single = 1,
+                       NI_skip = 2 };
 
   /**
    *  @brief Constructor
    */
-  RecursiveInstanceReceiver () { }
+  RecursiveInstanceReceiver () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~RecursiveInstanceReceiver () { }
+  virtual ~RecursiveInstanceReceiver () {}
 
   /**
    *  @brief Called once when the iterator begins pushing
    */
-  virtual void begin (const RecursiveInstanceIterator * /*iter*/) { }
+  virtual void begin (const RecursiveInstanceIterator * /*iter*/) {}
 
   /**
    *  @brief Called once after the iterator pushed everything
    */
-  virtual void end (const RecursiveInstanceIterator * /*iter*/) { }
+  virtual void end (const RecursiveInstanceIterator * /*iter*/) {}
 
   /**
    *  @brief Enters a cell
@@ -656,14 +658,14 @@ public:
    *  @param region The clip box as seen from "cell" or db::Box::world if there is no clip box
    *  @param complex_region A complex clip region if one is supplied together with "region"
    */
-  virtual void enter_cell (const RecursiveInstanceIterator * /*iter*/, const db::Cell * /*cell*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { }
+  virtual void enter_cell (const RecursiveInstanceIterator * /*iter*/, const db::Cell * /*cell*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) {}
 
   /**
    *  @brief Leaves the current cell
    *
    *  This method is the counterpart for "enter_cell". It is called when traversal of "cell" ended.
    */
-  virtual void leave_cell (const RecursiveInstanceIterator * /*iter*/, const db::Cell * /*cell*/) { }
+  virtual void leave_cell (const RecursiveInstanceIterator * /*iter*/, const db::Cell * /*cell*/) {}
 
   /**
    *  @brief Enters a new instance
@@ -707,6 +709,6 @@ public:
   virtual bool new_inst_member (const RecursiveInstanceIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return true; }
 };
 
-}  // namespace db
+} // namespace db
 
 #endif

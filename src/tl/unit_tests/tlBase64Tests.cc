@@ -24,34 +24,34 @@
 #include "tlBase64.h"
 #include "tlUnitTest.h"
 
-TEST(1)
+TEST (1)
 {
   std::vector<unsigned char> r = tl::from_base64 ("");
   EXPECT_EQ (r.empty (), true);
 
   r = tl::from_base64 ("YQ==");
-  EXPECT_EQ (std::string ((const char *) r.begin ().operator-> (), r.size ()), "a");
+  EXPECT_EQ (std::string ((const char *) r.begin ().operator->(), r.size ()), "a");
 
   r = tl::from_base64 ("YQ==");
-  EXPECT_EQ (std::string ((const char *) r.begin ().operator-> (), r.size ()), "a");
+  EXPECT_EQ (std::string ((const char *) r.begin ().operator->(), r.size ()), "a");
 
   r = tl::from_base64 ("YWI=");
-  EXPECT_EQ (std::string ((const char *) r.begin ().operator-> (), r.size ()), "ab");
+  EXPECT_EQ (std::string ((const char *) r.begin ().operator->(), r.size ()), "ab");
 
   r = tl::from_base64 ("YWJj");
-  EXPECT_EQ (std::string ((const char *) r.begin ().operator-> (), r.size ()), "abc");
+  EXPECT_EQ (std::string ((const char *) r.begin ().operator->(), r.size ()), "abc");
 
   r = tl::from_base64 ("YWJjZA==");
-  EXPECT_EQ (std::string ((const char *) r.begin ().operator-> (), r.size ()), "abcd");
+  EXPECT_EQ (std::string ((const char *) r.begin ().operator->(), r.size ()), "abcd");
 
   r = tl::from_base64 ("YWJjZA=");
-  EXPECT_EQ (std::string ((const char *) r.begin ().operator-> (), r.size ()), "abcd");
+  EXPECT_EQ (std::string ((const char *) r.begin ().operator->(), r.size ()), "abcd");
 
   r = tl::from_base64 ("SGVsbG8sIHdvcmxkIQo=");
-  EXPECT_EQ (std::string ((const char *) r.begin ().operator-> (), r.size ()), "Hello, world!\n");
+  EXPECT_EQ (std::string ((const char *) r.begin ().operator->(), r.size ()), "Hello, world!\n");
 
   r = tl::from_base64 ("SGVsbG\n8sIHd  \tvcmxkIQo=");
-  EXPECT_EQ (std::string ((const char *) r.begin ().operator-> (), r.size ()), "Hello, world!\n");
+  EXPECT_EQ (std::string ((const char *) r.begin ().operator->(), r.size ()), "Hello, world!\n");
 
   try {
     r = tl::from_base64 ("YWJjZ==");
@@ -68,7 +68,7 @@ TEST(1)
   }
 }
 
-TEST(2)
+TEST (2)
 {
   std::string s, r;
 

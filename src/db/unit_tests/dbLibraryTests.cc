@@ -27,7 +27,7 @@
 #include "tlFileUtils.h"
 
 //  map library to different file (aka reload/refresh)
-TEST(1) 
+TEST (1)
 {
   std::string pa = tl::testsrc () + "/testdata/gds/lib_a.gds";
   std::string pb = tl::testsrc () + "/testdata/gds/lib_b.gds";
@@ -55,7 +55,7 @@ TEST(1)
 }
 
 //  merge multiple files into one library
-TEST(2)
+TEST (2)
 {
   std::string pa = tl::testsrc () + "/testdata/gds/lib_a.gds";
   std::string pb = tl::testsrc () + "/testdata/gds/lib_b.gds";

@@ -33,7 +33,8 @@
 #include <vector>
 #include <sstream>
 
-namespace tl {
+namespace tl
+{
 
 /**
  *  @brief Returns true, if the test is run in verbose mode
@@ -115,11 +116,11 @@ TL_PUBLIC std::string testtmp ();
  *  @brief A basic exception for the unit test framework
  */
 struct TestException
-  : public tl::Exception
-{
+  : public tl::Exception {
   TestException (const std::string &msg)
     : tl::Exception (msg)
-  { }
+  {
+  }
 };
 
 /**
@@ -262,7 +263,7 @@ protected:
   virtual void endl ();
   virtual void end ();
   virtual void begin ();
-  virtual void yield () { }
+  virtual void yield () {}
 
 private:
   std::ostringstream m_text;
@@ -283,7 +284,7 @@ public:
   /**
    *  @brief Destructor
    */
-  virtual ~TestBase () { }
+  virtual ~TestBase () {}
 
   /**
    *  @brief Actually runs the test
@@ -549,69 +550,69 @@ class TL_PUBLIC TestRegistrar
 public:
   static void reg (tl::TestBase *t);
   static TestRegistrar *instance ();
-  const std::vector <tl::TestBase *> &tests () const;
+  const std::vector<tl::TestBase *> &tests () const;
 
 private:
   static TestRegistrar *ms_instance;
 
   TestRegistrar ();
 
-  std::vector <tl::TestBase *> m_tests;
+  std::vector<tl::TestBase *> m_tests;
 };
 
 } // namespace tl
 
-#define TEST(NAME) \
-  namespace {\
-struct TestImpl##NAME \
-      : public tl::TestBase \
-    { \
-      TestImpl##NAME () : TestBase (__FILE__, #NAME) { } \
-      virtual void execute (tl::TestBase *_this); \
-    }; \
-    static TestImpl##NAME TestImpl_Inst##NAME; \
-  } \
+#define TEST(NAME)                                    \
+  namespace                                           \
+  {                                                   \
+  struct TestImpl##NAME                               \
+    : public tl::TestBase {                           \
+    TestImpl##NAME () : TestBase (__FILE__, #NAME) {} \
+    virtual void execute (tl::TestBase *_this);       \
+  };                                                  \
+  static TestImpl##NAME TestImpl_Inst##NAME;          \
+  }                                                   \
   void TestImpl##NAME::execute (tl::TestBase *_this)
 
-#define EXPECT_LE(WHAT,EQUALS) \
+#define EXPECT_LE(WHAT, EQUALS)           \
   _this->checkpoint (__FILE__, __LINE__); \
   _this->cmp_helper (true, true, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
 
-#define EXPECT_LT(WHAT,EQUALS) \
+#define EXPECT_LT(WHAT, EQUALS)           \
   _this->checkpoint (__FILE__, __LINE__); \
   _this->cmp_helper (true, false, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
 
-#define EXPECT_GE(WHAT,EQUALS) \
+#define EXPECT_GE(WHAT, EQUALS)           \
   _this->checkpoint (__FILE__, __LINE__); \
   _this->cmp_helper (false, true, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
 
-#define EXPECT_GT(WHAT,EQUALS) \
+#define EXPECT_GT(WHAT, EQUALS)           \
   _this->checkpoint (__FILE__, __LINE__); \
   _this->cmp_helper (false, false, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
 
-#define EXPECT_EQ(WHAT,EQUALS) \
+#define EXPECT_EQ(WHAT, EQUALS)           \
   _this->checkpoint (__FILE__, __LINE__); \
   _this->eq_helper (true, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
 
-#define EXPECT_NE(WHAT,EQUALS) \
+#define EXPECT_NE(WHAT, EQUALS)           \
   _this->checkpoint (__FILE__, __LINE__); \
   _this->eq_helper (false, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
 
-#define EXPECT(WHAT) \
-  _this->checkpoint (__FILE__, __LINE__); \
-  if (!(WHAT)) { \
-    std::ostringstream sstr; \
-    sstr << #WHAT << " is not true"; \
+#define EXPECT(WHAT)                                \
+  _this->checkpoint (__FILE__, __LINE__);           \
+  if (! (WHAT)) {                                   \
+    std::ostringstream sstr;                        \
+    sstr << #WHAT << " is not true";                \
     _this->raise (__FILE__, __LINE__, sstr.str ()); \
   }
 
 #define CHECKPOINT() \
   _this->checkpoint (__FILE__, __LINE__);
 
-#define FAIL_ARG(MSG,WHAT) \
-  { \
-    std::ostringstream sstr; \
-    sstr << MSG << ", value is " << (WHAT); \
+#define FAIL_ARG(MSG, WHAT)                         \
+  {                                                 \
+    std::ostringstream sstr;                        \
+    sstr << MSG << ", value is " << (WHAT);         \
     _this->raise (__FILE__, __LINE__, sstr.str ()); \
   }
 

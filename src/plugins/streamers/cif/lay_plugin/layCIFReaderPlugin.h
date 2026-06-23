@@ -30,16 +30,16 @@
 
 namespace Ui
 {
-  class CIFReaderOptionPage;
+class CIFReaderOptionPage;
 }
 
 namespace lay
 {
 
-class CIFReaderOptionPage 
+class CIFReaderOptionPage
   : public StreamReaderOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   CIFReaderOptionPage (QWidget *parent);
@@ -55,5 +55,3 @@ private:
 }
 
 #endif
-
-

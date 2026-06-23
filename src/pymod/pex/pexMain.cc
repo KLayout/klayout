@@ -28,4 +28,4 @@ static PyObject *pex_module_init (const char *pymod_name, const char *mod_name, 
   return module_init (pymod_name, mod_name, mod_description);
 }
 
-DEFINE_PYMOD_WITH_INIT(pexcore, "pex", "KLayout core module 'pex'", pex_module_init)
+DEFINE_PYMOD_WITH_INIT (pexcore, "pex", "KLayout core module 'pex'", pex_module_init)

@@ -28,7 +28,7 @@
 namespace lay
 {
 
-ControlWidgetStack::ControlWidgetStack(QWidget *parent, const char *name, bool size_follows_content)
+ControlWidgetStack::ControlWidgetStack (QWidget *parent, const char *name, bool size_follows_content)
   : QFrame (parent), mp_current_widget (0), m_size_follows_content (size_follows_content)
 {
   setObjectName (QString::fromUtf8 (name));
@@ -40,7 +40,7 @@ ControlWidgetStack::ControlWidgetStack(QWidget *parent, const char *name, bool s
   mp_bglabel->show ();
 }
 
-void ControlWidgetStack::focusInEvent(QFocusEvent *)
+void ControlWidgetStack::focusInEvent (QFocusEvent *)
 {
   for (size_t i = 0; i < m_widgets.size (); ++i) {
     if (m_widgets [i]->isVisible ()) {
@@ -50,7 +50,7 @@ void ControlWidgetStack::focusInEvent(QFocusEvent *)
   }
 }
 
-void ControlWidgetStack::add_widget(QWidget *w)
+void ControlWidgetStack::add_widget (QWidget *w)
 {
   m_widgets.push_back (w);
   w->setParent (this);
@@ -83,11 +83,10 @@ void ControlWidgetStack::update_geometry ()
       setMinimumHeight (0);
       setMaximumHeight (QWIDGETSIZE_MAX);
     }
-
   }
 }
 
-bool ControlWidgetStack::event(QEvent *e)
+bool ControlWidgetStack::event (QEvent *e)
 {
   if (e->type () == QEvent::LayoutRequest) {
     update_geometry ();
@@ -95,7 +94,7 @@ bool ControlWidgetStack::event(QEvent *e)
   return QWidget::event (e);
 }
 
-QSize ControlWidgetStack::sizeHint() const
+QSize ControlWidgetStack::sizeHint () const
 {
   if (m_size_follows_content) {
     for (size_t i = 0; i < m_widgets.size (); ++i) {
@@ -112,7 +111,7 @@ QSize ControlWidgetStack::sizeHint() const
   return QSize (w, 0);
 }
 
-void ControlWidgetStack::remove_widget(size_t index)
+void ControlWidgetStack::remove_widget (size_t index)
 {
   if (index < m_widgets.size ()) {
     if (mp_current_widget == m_widgets [index]) {
@@ -127,7 +126,7 @@ void ControlWidgetStack::remove_widget(size_t index)
   update_geometry ();
 }
 
-void ControlWidgetStack::raise_widget(size_t index)
+void ControlWidgetStack::raise_widget (size_t index)
 {
   mp_current_widget = 0;
   bool any_visible = false;
@@ -152,7 +151,7 @@ void ControlWidgetStack::raise_widget(size_t index)
   update_geometry ();
 }
 
-QWidget *ControlWidgetStack::widget(size_t index)
+QWidget *ControlWidgetStack::widget (size_t index)
 {
   if (index < m_widgets.size ()) {
     return m_widgets [index];
@@ -161,15 +160,15 @@ QWidget *ControlWidgetStack::widget(size_t index)
   }
 }
 
-QWidget *ControlWidgetStack::background_widget()
+QWidget *ControlWidgetStack::background_widget ()
 {
   return mp_bglabel;
 }
 
-void ControlWidgetStack::resize_children()
+void ControlWidgetStack::resize_children ()
 {
   //  set the geometry of all children
-  for (std::vector <QWidget *>::iterator child = m_widgets.begin (); child != m_widgets.end (); ++child) {
+  for (std::vector<QWidget *>::iterator child = m_widgets.begin (); child != m_widgets.end (); ++child) {
     if (*child) {
       (*child)->setGeometry (0, 0, width (), height ());
     }

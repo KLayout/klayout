@@ -30,7 +30,8 @@
 #include "dbShapes.h"
 #include "dbRecursiveShapeIterator.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief An original layer text collection based on a RecursiveShapeIterator
@@ -74,4 +75,3 @@ private:
 }
 
 #endif
-

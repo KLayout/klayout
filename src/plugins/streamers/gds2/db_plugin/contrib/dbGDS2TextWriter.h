@@ -38,8 +38,8 @@ class DB_PLUGIN_PUBLIC GDS2WriterText
 {
 
 public:
-  GDS2WriterText();
-  ~GDS2WriterText();
+  GDS2WriterText ();
+  ~GDS2WriterText ();
 
 protected:
   /**
@@ -104,7 +104,7 @@ private:
   tl::OutputStream *pStream;
   std::stringstream ssFormattingStream;
   short siCurrentRecord;
-  bool  bIsXCoordinate;
+  bool bIsXCoordinate;
   tl::AbsoluteProgress mProgress;
 };
 
@@ -112,4 +112,3 @@ private:
 } // namespace db
 
 #endif
-

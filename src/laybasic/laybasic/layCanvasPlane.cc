@@ -23,7 +23,8 @@
 
 #include "layCanvasPlane.h"
 
-namespace lay {
+namespace lay
+{
 
 CanvasPlane::~CanvasPlane ()
 {
@@ -31,6 +32,3 @@ CanvasPlane::~CanvasPlane ()
 }
 
 } // namespace lay
-
-
-

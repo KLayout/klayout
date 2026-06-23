@@ -35,7 +35,7 @@
 
 namespace tl
 {
-  class OutputStream;
+class OutputStream;
 }
 
 namespace db
@@ -98,9 +98,9 @@ private:
   std::string m_cellname;
 
   std::string filename_for_cell (db::cell_index_type ci, db::Layout &layout);
-  void write_cell (db::cell_index_type ci, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, db::Layout &layout, tl::OutputStream &os);
+  void write_cell (db::cell_index_type ci, const std::vector<std::pair<unsigned int, db::LayerProperties>> &layers, db::Layout &layout, tl::OutputStream &os);
   void write_dummy_top (const std::set<db::cell_index_type> &cell_set, const db::Layout &layout, tl::OutputStream &os);
-  void do_write_cell (db::cell_index_type ci, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, db::Layout &layout, tl::OutputStream &os);
+  void do_write_cell (db::cell_index_type ci, const std::vector<std::pair<unsigned int, db::LayerProperties>> &layers, db::Layout &layout, tl::OutputStream &os);
   void write_polygon (const db::Polygon &poly, const db::Layout &layout, tl::OutputStream &os);
   void write_label (const std::string &layer, const db::Text &text, const Layout &layout, tl::OutputStream &os);
   void write_instance (const db::CellInstArray &inst, const db::Layout &layout, tl::OutputStream &os);
@@ -111,4 +111,3 @@ private:
 } // namespace db
 
 #endif
-

@@ -26,8 +26,8 @@
 #include "tlEnv.h"
 
 #include <stdio.h>
-#if !defined(_MSC_VER)
-#  include <unistd.h>
+#if ! defined(_MSC_VER)
+#include <unistd.h>
 #endif
 
 namespace tl
@@ -55,14 +55,12 @@ static int &verbosity_level ()
   return level;
 }
 
-void
-verbosity (int level)
+void verbosity (int level)
 {
   verbosity_level () = level;
 }
 
-int
-verbosity ()
+int verbosity ()
 {
   return verbosity_level ();
 }
@@ -93,8 +91,7 @@ Channel::issue_proxy ()
   return ChannelProxy (this);
 }
 
-void
-Channel::release_proxy ()
+void Channel::release_proxy ()
 {
   if (! m_no_endl) {
     endl (); //  this helps remembering that there is something implicit going on here ..
@@ -133,8 +130,7 @@ LogTee::LogTee (Channel *first, bool owned)
   add (first, owned);
 }
 
-void
-LogTee::add (Channel *other, bool owned)
+void LogTee::add (Channel *other, bool owned)
 {
   m_lock.lock ();
   m_channels.push_back (other);
@@ -144,8 +140,7 @@ LogTee::add (Channel *other, bool owned)
   m_lock.unlock ();
 }
 
-void
-LogTee::prepend (Channel *other, bool owned)
+void LogTee::prepend (Channel *other, bool owned)
 {
   m_lock.lock ();
   m_channels.insert (m_channels.begin (), other);
@@ -155,8 +150,7 @@ LogTee::prepend (Channel *other, bool owned)
   m_lock.unlock ();
 }
 
-void
-LogTee::clear ()
+void LogTee::clear ()
 {
   m_lock.lock ();
   m_channels.clear ();
@@ -164,8 +158,7 @@ LogTee::clear ()
   m_lock.unlock ();
 }
 
-void
-LogTee::puts (const char *s)
+void LogTee::puts (const char *s)
 {
   try {
     for (tl::weak_collection<tl::Channel>::iterator c = m_channels.begin (); c != m_channels.end (); ++c) {
@@ -176,8 +169,7 @@ LogTee::puts (const char *s)
   }
 }
 
-void
-LogTee::yield ()
+void LogTee::yield ()
 {
   try {
     for (tl::weak_collection<tl::Channel>::iterator c = m_channels.begin (); c != m_channels.end (); ++c) {
@@ -188,8 +180,7 @@ LogTee::yield ()
   }
 }
 
-void
-LogTee::endl ()
+void LogTee::endl ()
 {
   try {
     for (tl::weak_collection<tl::Channel>::iterator c = m_channels.begin (); c != m_channels.end (); ++c) {
@@ -200,8 +191,7 @@ LogTee::endl ()
   }
 }
 
-void
-LogTee::end ()
+void LogTee::end ()
 {
   try {
     for (tl::weak_collection<tl::Channel>::iterator c = m_channels.begin (); c != m_channels.end (); ++c) {
@@ -212,8 +202,7 @@ LogTee::end ()
   }
 }
 
-void
-LogTee::begin ()
+void LogTee::begin ()
 {
   try {
     for (tl::weak_collection<tl::Channel>::iterator c = m_channels.begin (); c != m_channels.end (); ++c) {
@@ -298,7 +287,7 @@ protected:
   virtual void endl ();
   virtual void end ();
   virtual void begin ();
-  virtual void yield () { }
+  virtual void yield () {}
 
 private:
   int m_verbosity;
@@ -316,24 +305,21 @@ InfoChannel::~InfoChannel ()
   //  .. nothing yet ..
 }
 
-void
-InfoChannel::puts (const char *s)
+void InfoChannel::puts (const char *s)
 {
   if (verbosity () >= m_verbosity) {
     fprintf (stdout, "%s", s);
   }
 }
 
-void
-InfoChannel::endl ()
+void InfoChannel::endl ()
 {
   if (verbosity () >= m_verbosity) {
     fprintf (stdout, "\n");
   }
 }
 
-void
-InfoChannel::end ()
+void InfoChannel::end ()
 {
   if (verbosity () >= m_verbosity) {
     if (m_verbosity == 0 && m_colorized) {
@@ -343,8 +329,7 @@ InfoChannel::end ()
   }
 }
 
-void
-InfoChannel::begin ()
+void InfoChannel::begin ()
 {
   if (verbosity () >= m_verbosity) {
     if (m_verbosity == 0 && m_colorized) {
@@ -371,7 +356,7 @@ protected:
   virtual void endl ();
   virtual void end ();
   virtual void begin ();
-  virtual void yield () { }
+  virtual void yield () {}
 
 private:
   bool m_colorized;
@@ -389,16 +374,14 @@ WarningChannel::~WarningChannel ()
   //  .. nothing yet ..
 }
 
-void
-WarningChannel::puts (const char *s)
+void WarningChannel::puts (const char *s)
 {
   if (verbosity () >= 0) {
     fputs (s, stdout);
   }
 }
 
-void
-WarningChannel::endl ()
+void WarningChannel::endl ()
 {
   if (verbosity () >= 0) {
     fputs ("\n", stdout);
@@ -406,8 +389,7 @@ WarningChannel::endl ()
   }
 }
 
-void
-WarningChannel::end ()
+void WarningChannel::end ()
 {
   if (verbosity () >= 0) {
     if (m_colorized) {
@@ -417,8 +399,7 @@ WarningChannel::end ()
   }
 }
 
-void
-WarningChannel::begin ()
+void WarningChannel::begin ()
 {
   if (verbosity () >= 0) {
     if (m_colorized) {
@@ -450,7 +431,7 @@ protected:
   virtual void endl ();
   virtual void end ();
   virtual void begin ();
-  virtual void yield () { }
+  virtual void yield () {}
 
 private:
   bool m_colorized;
@@ -468,16 +449,14 @@ ErrorChannel::~ErrorChannel ()
   //  .. nothing yet ..
 }
 
-void
-ErrorChannel::puts (const char *s)
+void ErrorChannel::puts (const char *s)
 {
   if (verbosity () >= -10) {
     fputs (s, stderr);
   }
 }
 
-void
-ErrorChannel::endl ()
+void ErrorChannel::endl ()
 {
   if (verbosity () >= -10) {
     fputs ("\n", stderr);
@@ -485,8 +464,7 @@ ErrorChannel::endl ()
   }
 }
 
-void
-ErrorChannel::end ()
+void ErrorChannel::end ()
 {
   if (verbosity () >= -10) {
     if (m_colorized) {
@@ -496,8 +474,7 @@ ErrorChannel::end ()
   }
 }
 
-void
-ErrorChannel::begin ()
+void ErrorChannel::begin ()
 {
   if (verbosity () >= -10) {
     if (m_colorized) {
@@ -519,4 +496,3 @@ TL_PUBLIC LogTee log (new InfoChannel (10), true);
 TL_PUBLIC LogTee error (new ErrorChannel (), true);
 
 } // namespace tl
-

@@ -25,9 +25,9 @@
 
 #undef _JOIN
 #if _COUNT == 0
-#  define _JOIN(A,B) A
+#define _JOIN(A, B) A
 #else
-#  define _JOIN(A,B) A,B
+#define _JOIN(A, B) A, B
 #endif
 
 template <_TMPLARGS>
@@ -35,13 +35,13 @@ class TL_PUBLIC_TEMPLATE event_function_base<_TMPLARGLISTP>
   : public tl::Object
 {
 public:
-  event_function_base () : tl::Object () { }
-  virtual ~event_function_base () { }
-  virtual void call (_JOIN(tl::Object *object, _CALLARGLIST)) = 0;
+  event_function_base () : tl::Object () {}
+  virtual ~event_function_base () {}
+  virtual void call (_JOIN (tl::Object *object, _CALLARGLIST)) = 0;
   virtual bool equals (const event_function_base<_TMPLARGLISTP> &other) = 0;
 };
 
-template <_JOIN(class T, _TMPLARGS)>
+template <_JOIN (class T, _TMPLARGS)>
 class TL_PUBLIC_TEMPLATE event_function<T, _TMPLARGLISTP>
   : public event_function_base<_TMPLARGLIST>
 {
@@ -52,7 +52,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void call (_JOIN(tl::Object *object, _CALLARGLIST))
+  virtual void call (_JOIN (tl::Object *object, _CALLARGLIST))
   {
     T *t = dynamic_cast<T *> (object);
     if (t) {
@@ -62,7 +62,7 @@ public:
 
   virtual bool equals (const event_function_base<_TMPLARGLISTP> &other)
   {
-    const event_function<_JOIN(T, _TMPLARGLIST)> *o = dynamic_cast<const event_function<_JOIN(T, _TMPLARGLIST)> *> (&other);
+    const event_function<_JOIN (T, _TMPLARGLIST)> *o = dynamic_cast<const event_function<_JOIN (T, _TMPLARGLIST)> *> (&other);
     return o && o->m_m == m_m;
   }
 
@@ -70,37 +70,37 @@ private:
   void (T::*m_m) (_TMPLARGLIST);
 };
 
-template <class T, _JOIN(class D, _TMPLARGS)>
+template <class T, _JOIN (class D, _TMPLARGS)>
 class TL_PUBLIC_TEMPLATE event_function_with_data<T, D, _TMPLARGLISTP>
   : public event_function_base<_TMPLARGLIST>
 {
 public:
-  event_function_with_data (void (T::*m) (_JOIN(D, _TMPLARGLIST)), D d)
+  event_function_with_data (void (T::*m) (_JOIN (D, _TMPLARGLIST)), D d)
     : m_m (m), m_d (d)
   {
     //  .. nothing yet ..
   }
 
-  virtual void call (_JOIN(tl::Object *object, _CALLARGLIST))
+  virtual void call (_JOIN (tl::Object *object, _CALLARGLIST))
   {
     T *t = dynamic_cast<T *> (object);
     if (t) {
-      (t->*m_m) (_JOIN(m_d, _CALLARGS));
+      (t->*m_m) (_JOIN (m_d, _CALLARGS));
     }
   }
 
   virtual bool equals (const event_function_base<_TMPLARGLISTP> &other)
   {
-    const event_function_with_data<T, _JOIN(D, _TMPLARGLIST)> *o = dynamic_cast<const event_function_with_data<T, _JOIN(D, _TMPLARGLIST)> *> (&other);
+    const event_function_with_data<T, _JOIN (D, _TMPLARGLIST)> *o = dynamic_cast<const event_function_with_data<T, _JOIN (D, _TMPLARGLIST)> *> (&other);
     return o && o->m_m == m_m && o->m_d == m_d;
   }
 
 private:
-  void (T::*m_m) (_JOIN(D, _TMPLARGLIST));
+  void (T::*m_m) (_JOIN (D, _TMPLARGLIST));
   D m_d;
 };
 
-template <_JOIN(class T, _TMPLARGS)>
+template <_JOIN (class T, _TMPLARGS)>
 class TL_PUBLIC_TEMPLATE generic_event_function<T, _TMPLARGLISTP>
   : public event_function_base<_TMPLARGLIST>
 {
@@ -111,18 +111,18 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void call (_JOIN(tl::Object *object, _CALLARGLIST))
+  virtual void call (_JOIN (tl::Object *object, _CALLARGLIST))
   {
     T *t = dynamic_cast<T *> (object);
     if (t) {
-      void *argv[] = { _CALLARGPTRS };
-      (t->*m_m) (_COUNT, &(argv[0]));
+      void *argv [] = {_CALLARGPTRS};
+      (t->*m_m) (_COUNT, &(argv [0]));
     }
   }
 
   virtual bool equals (const event_function_base<_TMPLARGLISTP> &other)
   {
-    const generic_event_function<_JOIN(T, _TMPLARGLIST)> *o = dynamic_cast<const generic_event_function<_JOIN(T, _TMPLARGLIST)> *> (&other);
+    const generic_event_function<_JOIN (T, _TMPLARGLIST)> *o = dynamic_cast<const generic_event_function<_JOIN (T, _TMPLARGLIST)> *> (&other);
     return o && o->m_m == m_m;
   }
 
@@ -130,7 +130,7 @@ private:
   void (T::*m_m) (int, void **);
 };
 
-template <class T, _JOIN(class D, _TMPLARGS)>
+template <class T, _JOIN (class D, _TMPLARGS)>
 class TL_PUBLIC_TEMPLATE generic_event_function_with_data<T, D, _TMPLARGLISTP>
   : public event_function_base<_TMPLARGLIST>
 {
@@ -141,18 +141,18 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void call (_JOIN(tl::Object *object, _CALLARGLIST))
+  virtual void call (_JOIN (tl::Object *object, _CALLARGLIST))
   {
     T *t = dynamic_cast<T *> (object);
     if (t) {
-      void *argv[] = { _CALLARGPTRS };
-      (t->*m_m) (m_d, _COUNT, &(argv[0]));
+      void *argv [] = {_CALLARGPTRS};
+      (t->*m_m) (m_d, _COUNT, &(argv [0]));
     }
   }
 
   virtual bool equals (const event_function_base<_TMPLARGLISTP> &other)
   {
-    const generic_event_function_with_data<T, _JOIN(D, _TMPLARGLIST)> *o = dynamic_cast<const generic_event_function_with_data<T, _JOIN(D, _TMPLARGLIST)> *> (&other);
+    const generic_event_function_with_data<T, _JOIN (D, _TMPLARGLIST)> *o = dynamic_cast<const generic_event_function_with_data<T, _JOIN (D, _TMPLARGLIST)> *> (&other);
     return o && o->m_m == m_m && o->m_d == m_d;
   }
 
@@ -166,7 +166,7 @@ class TL_PUBLIC_TEMPLATE event<_TMPLARGLISTP>
 {
 public:
   typedef event_function_base<_TMPLARGLISTP> func;
-  typedef std::vector<std::pair<tl::weak_ptr<tl::Object>, tl::shared_ptr<func> > > receivers;
+  typedef std::vector<std::pair<tl::weak_ptr<tl::Object>, tl::shared_ptr<func>>> receivers;
 #if _COUNT == 0
   //  NOTE: for gcc 4.4.7 (and may others), event is not a template in this case and
   //  typename must not be given.
@@ -201,7 +201,7 @@ public:
     for (receivers_iterator r = tmp_receivers.begin (); r != tmp_receivers.end (); ++r) {
       if (r->first.get ()) {
         try {
-          r->second->call (_JOIN(r->first.get (), _CALLARGS));
+          r->second->call (_JOIN (r->first.get (), _CALLARGS));
           if (was_destroyed) {
             //  during the call something deleted us. Stop immediately.
             return;
@@ -279,7 +279,7 @@ public:
   }
 
   template <class T, class D>
-  void add (T *obj, void (T::*m) (_JOIN(D, _TMPLARGLIST)), D d)
+  void add (T *obj, void (T::*m) (_JOIN (D, _TMPLARGLIST)), D d)
   {
     event_function_with_data<T, D, _TMPLARGLISTP> f (m, d);
     for (receivers_iterator r = m_receivers.begin (); r != m_receivers.end (); ++r) {
@@ -294,9 +294,9 @@ public:
   }
 
   template <class T, class D>
-  void remove (T *obj, void (T::*m) (_JOIN(D, _TMPLARGLIST)), D d)
+  void remove (T *obj, void (T::*m) (_JOIN (D, _TMPLARGLIST)), D d)
   {
-    event_function_with_data<T, _JOIN(D, _TMPLARGLIST)> f (m, d);
+    event_function_with_data<T, _JOIN (D, _TMPLARGLIST)> f (m, d);
     for (receivers_iterator r = m_receivers.begin (); r != m_receivers.end (); ++r) {
       if (r->first.get () == obj && r->second->equals (f)) {
         //  this receiver is already registered
@@ -337,7 +337,7 @@ public:
   template <class T, class D>
   void add (T *obj, void (T::*m) (D, int, void **), D d)
   {
-    generic_event_function_with_data<T, _JOIN(D, _TMPLARGLIST)> f (m, d);
+    generic_event_function_with_data<T, _JOIN (D, _TMPLARGLIST)> f (m, d);
     for (receivers_iterator r = m_receivers.begin (); r != m_receivers.end (); ++r) {
       if (r->first.get () == obj && r->second->equals (f)) {
         //  this receiver is already registered
@@ -352,7 +352,7 @@ public:
   template <class T, class D>
   void remove (T *obj, void (T::*m) (D, int, void **), D d)
   {
-    generic_event_function_with_data<T, _JOIN(D, _TMPLARGLIST)> f (m, d);
+    generic_event_function_with_data<T, _JOIN (D, _TMPLARGLIST)> f (m, d);
     for (receivers_iterator r = m_receivers.begin (); r != m_receivers.end (); ++r) {
       if (r->first.get () == obj && r->second->equals (f)) {
         //  this receiver is already registered
@@ -366,4 +366,3 @@ private:
   bool *mp_destroyed_sentinel;
   receivers m_receivers;
 };
-

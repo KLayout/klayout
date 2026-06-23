@@ -36,7 +36,7 @@
 // windows-sanity.h, we can be sure that no conflicts will occur regardless of in what order the
 // application chooses to include these headers vs. windows.h.
 
-#if !_WIN32 && !__CYGWIN__
+#if ! _WIN32 && ! __CYGWIN__
 
 // Not on Windows. Tell the compiler never to try to include this again.
 #pragma once
@@ -48,20 +48,21 @@
 // now, we use `#pragma once` to tell the compiler never to include this file again.
 #pragma once
 
-namespace kj_win32_workarounds {
-  // Namespace containing constant definitions intended to replace constants that are defined as
-  // macros in the Windows headers. Do not refer to this namespace directly, we'll import it into
-  // the global scope below.
+namespace kj_win32_workarounds
+{
+// Namespace containing constant definitions intended to replace constants that are defined as
+// macros in the Windows headers. Do not refer to this namespace directly, we'll import it into
+// the global scope below.
 
-#ifdef ERROR  // This could be absent if e.g. NOGDI was used.
-  const auto ERROR_ = ERROR;
+#ifdef ERROR // This could be absent if e.g. NOGDI was used.
+const auto ERROR_ = ERROR;
 #undef ERROR
-  const auto ERROR = ERROR_;
+const auto ERROR = ERROR_;
 #endif
 
-  typedef VOID VOID_;
+typedef VOID VOID_;
 #undef VOID
-  typedef VOID_ VOID;
+typedef VOID_ VOID;
 }
 
 // Pull our constant definitions into the global namespace -- but only if they don't already exist

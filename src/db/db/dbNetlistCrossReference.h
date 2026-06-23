@@ -42,7 +42,8 @@ namespace db
  *  persisting the results of a netlist compare and display in the netlist browser.
  */
 class DB_PUBLIC NetlistCrossReference
-  : public db::NetlistCompareLogger, public tl::Object
+  : public db::NetlistCompareLogger,
+    public tl::Object
 {
 public:
   NetlistCrossReference ();
@@ -50,64 +51,59 @@ public:
 
   enum Status {
     None = 0,
-    Match,              //  objects are paired and match
-    NoMatch,            //  objects are paired, but don't match
-    Skipped,            //  objects are skipped
-    MatchWithWarning,   //  objects are paired and match, but with warning (i.e. ambiguous nets)
-    Mismatch            //  objects are not paired
+    Match,            //  objects are paired and match
+    NoMatch,          //  objects are paired, but don't match
+    Skipped,          //  objects are skipped
+    MatchWithWarning, //  objects are paired and match, but with warning (i.e. ambiguous nets)
+    Mismatch          //  objects are not paired
   };
 
-  struct NetPairData
-  {
+  struct NetPairData {
     typedef db::Net object_type;
 
-    NetPairData (const db::Net *a, const db::Net *b, Status s, const std::string &m) : pair (a, b), status (s), msg (m) { }
-    NetPairData () : pair ((const db::Net *)0, (const db::Net *)0), status (None) { }
+    NetPairData (const db::Net *a, const db::Net *b, Status s, const std::string &m) : pair (a, b), status (s), msg (m) {}
+    NetPairData () : pair ((const db::Net *) 0, (const db::Net *) 0), status (None) {}
 
     std::pair<const db::Net *, const db::Net *> pair;
     Status status;
     std::string msg;
   };
 
-  struct DevicePairData
-  {
+  struct DevicePairData {
     typedef db::Device object_type;
 
-    DevicePairData (const db::Device *a, const db::Device *b, Status s, const std::string &m) : pair (a, b), status (s), msg (m) { }
-    DevicePairData () : pair ((const db::Device *)0, (const db::Device *)0), status (None) { }
+    DevicePairData (const db::Device *a, const db::Device *b, Status s, const std::string &m) : pair (a, b), status (s), msg (m) {}
+    DevicePairData () : pair ((const db::Device *) 0, (const db::Device *) 0), status (None) {}
 
     std::pair<const db::Device *, const db::Device *> pair;
     Status status;
     std::string msg;
   };
 
-  struct PinPairData
-  {
+  struct PinPairData {
     typedef db::Pin object_type;
 
-    PinPairData (const db::Pin *a, const db::Pin *b, Status s, const std::string &m) : pair (a, b), status (s), msg (m) { }
-    PinPairData () : pair ((const db::Pin *)0, (const db::Pin *)0), status (None) { }
+    PinPairData (const db::Pin *a, const db::Pin *b, Status s, const std::string &m) : pair (a, b), status (s), msg (m) {}
+    PinPairData () : pair ((const db::Pin *) 0, (const db::Pin *) 0), status (None) {}
 
     std::pair<const db::Pin *, const db::Pin *> pair;
     Status status;
     std::string msg;
   };
 
-  struct SubCircuitPairData
-  {
+  struct SubCircuitPairData {
     typedef db::SubCircuit object_type;
 
-    SubCircuitPairData (const db::SubCircuit *a, const db::SubCircuit *b, Status s, const std::string &m) : pair (a, b), status (s), msg (m) { }
-    SubCircuitPairData () : pair ((const db::SubCircuit *)0, (const db::SubCircuit *)0), status (None) { }
+    SubCircuitPairData (const db::SubCircuit *a, const db::SubCircuit *b, Status s, const std::string &m) : pair (a, b), status (s), msg (m) {}
+    SubCircuitPairData () : pair ((const db::SubCircuit *) 0, (const db::SubCircuit *) 0), status (None) {}
 
     std::pair<const db::SubCircuit *, const db::SubCircuit *> pair;
     Status status;
     std::string msg;
   };
 
-  struct PerCircuitData
-  {
-    PerCircuitData () : status (None) { }
+  struct PerCircuitData {
+    PerCircuitData () : status (None) {}
 
     typedef std::vector<NetPairData> net_pairs_type;
     typedef net_pairs_type::const_iterator net_pairs_const_iterator;
@@ -129,18 +125,17 @@ public:
     log_entries_type log_entries;
   };
 
-  struct PerNetData
-  {
-    typedef std::vector<std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *> > terminal_pairs_type;
+  struct PerNetData {
+    typedef std::vector<std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *>> terminal_pairs_type;
     typedef terminal_pairs_type::const_iterator terminal_pairs_const_iterator;
-    typedef std::vector<std::pair<const db::NetPinRef *, const db::NetPinRef *> > pin_pairs_type;
+    typedef std::vector<std::pair<const db::NetPinRef *, const db::NetPinRef *>> pin_pairs_type;
     typedef pin_pairs_type::const_iterator pin_pairs_const_iterator;
-    typedef std::vector<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> > subcircuit_pin_pairs_type;
+    typedef std::vector<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *>> subcircuit_pin_pairs_type;
     typedef subcircuit_pin_pairs_type::const_iterator subcircuit_pin_pairs_const_iterator;
 
-    std::vector<std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *> > terminals;
-    std::vector<std::pair<const db::NetPinRef *, const db::NetPinRef *> > pins;
-    std::vector<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> > subcircuit_pins;
+    std::vector<std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *>> terminals;
+    std::vector<std::pair<const db::NetPinRef *, const db::NetPinRef *>> pins;
+    std::vector<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *>> subcircuit_pins;
   };
 
   //  Generic events - thew NetlistCompareLogger events are mapped to these
@@ -258,7 +253,7 @@ public:
 
   const PerCircuitData *per_circuit_data_for (const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const;
 
-  typedef std::vector<std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator circuits_iterator;
+  typedef std::vector<std::pair<const db::Circuit *, const db::Circuit *>>::const_iterator circuits_iterator;
 
   circuits_iterator begin_circuits () const
   {
@@ -299,7 +294,7 @@ private:
   NetlistCrossReference &operator= (const db::NetlistCrossReference &);
 
   tl::weak_ptr<db::Netlist> mp_netlist_a, mp_netlist_b;
-  std::vector<std::pair<const db::Circuit *, const db::Circuit *> > m_circuits;
+  std::vector<std::pair<const db::Circuit *, const db::Circuit *>> m_circuits;
   std::list<PerCircuitData> m_per_circuit_data;
   std::map<const db::Circuit *, PerCircuitData *> m_data_refs;
   mutable std::map<std::pair<const db::Net *, const db::Net *>, PerNetData> m_per_net_data;

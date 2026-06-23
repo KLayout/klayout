@@ -56,26 +56,22 @@ Library::~Library ()
   }
 }
 
-bool
-Library::is_for_technology (const std::string &name) const
+bool Library::is_for_technology (const std::string &name) const
 {
   return (! m_technologies.empty () && name == "*") || m_technologies.find (name) != m_technologies.end ();
 }
 
-bool
-Library::for_technologies () const
+bool Library::for_technologies () const
 {
   return ! m_technologies.empty ();
 }
 
-void
-Library::set_technologies (const std::set<std::string> &t)
+void Library::set_technologies (const std::set<std::string> &t)
 {
   m_technologies = t;
 }
 
-void
-Library::set_technology (const std::string &t)
+void Library::set_technology (const std::string &t)
 {
   m_technologies.clear ();
   if (! t.empty ()) {
@@ -83,28 +79,24 @@ Library::set_technology (const std::string &t)
   }
 }
 
-void
-Library::clear_technologies ()
+void Library::clear_technologies ()
 {
   m_technologies.clear ();
 }
 
-void
-Library::add_technology (const std::string &tech)
+void Library::add_technology (const std::string &tech)
 {
   m_technologies.insert (tech);
 }
 
-void 
-Library::register_proxy (db::LibraryProxy *lib_proxy, db::Layout *ly)
+void Library::register_proxy (db::LibraryProxy *lib_proxy, db::Layout *ly)
 {
   m_referrers.insert (std::make_pair (ly, 0)).first->second += 1;
   m_refcount.insert (std::make_pair (lib_proxy->library_cell_index (), 0)).first->second += 1;
   retired_state_changed_event ();
 }
 
-void 
-Library::unregister_proxy (db::LibraryProxy *lib_proxy, db::Layout *ly)
+void Library::unregister_proxy (db::LibraryProxy *lib_proxy, db::Layout *ly)
 {
   std::map<db::Layout *, int>::iterator r = m_referrers.find (ly);
   if (r != m_referrers.end ()) {
@@ -130,15 +122,13 @@ Library::unregister_proxy (db::LibraryProxy *lib_proxy, db::Layout *ly)
   }
 }
 
-void
-Library::retire_proxy (db::LibraryProxy *lib_proxy)
+void Library::retire_proxy (db::LibraryProxy *lib_proxy)
 {
   m_retired_count.insert (std::make_pair (lib_proxy->library_cell_index (), 0)).first->second += 1;
   retired_state_changed_event ();
 }
 
-void
-Library::unretire_proxy (db::LibraryProxy *lib_proxy)
+void Library::unretire_proxy (db::LibraryProxy *lib_proxy)
 {
   std::map<db::cell_index_type, int>::iterator c = m_retired_count.find (lib_proxy->library_cell_index ());
   if (c != m_retired_count.end ()) {
@@ -149,22 +139,19 @@ Library::unretire_proxy (db::LibraryProxy *lib_proxy)
   }
 }
 
-bool
-Library::is_retired (const db::cell_index_type library_cell_index) const
+bool Library::is_retired (const db::cell_index_type library_cell_index) const
 {
   std::map<db::cell_index_type, int>::const_iterator i = m_refcount.find (library_cell_index);
   std::map<db::cell_index_type, int>::const_iterator j = m_retired_count.find (library_cell_index);
   return (i != m_refcount.end () && j != m_retired_count.end () && i->second == j->second);
 }
 
-void
-Library::set_replicate (bool f)
+void Library::set_replicate (bool f)
 {
   m_replicate = f;
 }
 
-void
-Library::rename (const std::string &name)
+void Library::rename (const std::string &name)
 {
   if (name != get_name () && db::LibraryManager::initialized ()) {
 
@@ -175,12 +162,10 @@ Library::rename (const std::string &name)
     }
 
     db::LibraryManager::instance ().rename (get_id (), name);
-
   }
 }
 
-void
-Library::refresh ()
+void Library::refresh ()
 {
   refresh_without_restore ();
 
@@ -189,8 +174,7 @@ Library::refresh ()
   layout ().restore_proxies ();
 }
 
-void
-Library::refresh_without_restore ()
+void Library::refresh_without_restore ()
 {
   db::LibraryManager::instance ().unregister_lib (this);
 
@@ -205,7 +189,6 @@ Library::refresh_without_restore ()
     db::LibraryManager::instance ().register_lib (this);
 
     throw;
-
   }
 
   //  re-register, potentially under the new name
@@ -216,8 +199,7 @@ Library::refresh_without_restore ()
   remap_to (this);
 }
 
-void
-Library::remap_to (db::Library *other, db::Layout *original_layout)
+void Library::remap_to (db::Library *other, db::Layout *original_layout)
 {
   if (! original_layout) {
     original_layout = &layout ();
@@ -245,12 +227,12 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
 
     for (std::vector<db::Layout *>::const_iterator r = referrers.begin (); r != referrers.end (); ++r) {
 
-      std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> > pcells_to_map;
+      std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *>> pcells_to_map;
       std::vector<db::LibraryProxy *> lib_cells_to_map;
 
       for (auto c = (*r)->begin (); c != (*r)->end (); ++c) {
 
-        db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (c.operator-> ());
+        db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (c.operator->());
         if (lib_proxy && lib_proxy->lib_id () == get_id ()) {
 
           if (! original_layout->is_valid_cell_index (lib_proxy->library_cell_index ())) {
@@ -259,7 +241,7 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
           }
 
           db::Cell *lib_cell = &original_layout->cell (lib_proxy->library_cell_index ());
-          db::PCellVariant *lib_pcell = dynamic_cast <db::PCellVariant *> (lib_cell);
+          db::PCellVariant *lib_pcell = dynamic_cast<db::PCellVariant *> (lib_cell);
           if (lib_pcell) {
             pcells_to_map.push_back (std::make_pair (lib_proxy, lib_pcell));
           } else {
@@ -267,15 +249,13 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
           }
 
           needs_cleanup.insert (*r);
-
         }
-
       }
 
       //  We do PCell resolution before the library proxy resolution. The reason is that
       //  PCells may generate library proxies in their instantiation. Hence we must instantiate
       //  the PCells before we can resolve them.
-      for (std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> >::const_iterator lp = pcells_to_map.begin (); lp != pcells_to_map.end (); ++lp) {
+      for (std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *>>::const_iterator lp = pcells_to_map.begin (); lp != pcells_to_map.end (); ++lp) {
 
         db::cell_index_type ci = lp->first->Cell::cell_index ();
         db::PCellVariant *lib_pcell = lp->second;
@@ -318,11 +298,8 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
             }
 
             lp->first->remap (other->get_id (), other->layout ().get_pcell_variant (pn.second, new_parameters));
-
           }
-
         }
-
       }
 
       for (std::vector<db::LibraryProxy *>::const_iterator lp = lib_cells_to_map.begin (); lp != lib_cells_to_map.end (); ++lp) {
@@ -349,13 +326,9 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
           }
 
           (*lp)->remap (other->get_id (), cn.second);
-
         }
-
       }
-
     }
-
   }
 
   //  Do a cleanup later since the referrers now might have invalid proxy instances
@@ -368,4 +341,3 @@ Library::remap_to (db::Library *other, db::Layout *original_layout)
 }
 
 }
-

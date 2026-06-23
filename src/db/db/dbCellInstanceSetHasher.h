@@ -84,7 +84,6 @@ private:
   MatrixHash get_hash_uncached (db::cell_index_type for_cell);
 };
 
-}  // namespace db
+} // namespace db
 
 #endif
-

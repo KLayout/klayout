@@ -44,7 +44,7 @@ TL_PUBLIC void current_utc_time (struct timespec *ts);
 /**
  *  @brief A basic timer class
  *
- *  Measure the time between start() and stop() and 
+ *  Measure the time between start() and stop() and
  *  report the time through several methods
  */
 
@@ -54,13 +54,13 @@ public:
   typedef int64_t timer_t;
 
   Timer ();
-  
-  /** 
+
+  /**
    *  @brief Starts the timer
    */
   void start ();
 
-  /** 
+  /**
    *  @brief Stops the timer
    *  Only after stop or take, the time can be read with sec_user etc.
    */
@@ -75,16 +75,16 @@ public:
    *  @brief Reports the time spent between start() and stop() in user space
    */
   double sec_user () const
-  { 
-    return (double (m_user_ms_res) * 0.001); 
+  {
+    return (double (m_user_ms_res) * 0.001);
   }
 
-  /** 
+  /**
    *  @brief Reports the time spent between start() and stop() in system space
    */
   double sec_sys () const
-  { 
-    return (double (m_sys_ms_res) * 0.001); 
+  {
+    return (double (m_sys_ms_res) * 0.001);
   }
 
   /**
@@ -106,18 +106,18 @@ private:
 };
 
 /**
- *  @brief A self-timing class 
+ *  @brief A self-timing class
  *
  *  Starts the timer upon construction of the object and
  *  reports the object's lifetime upon destruction
  */
 
 class TL_PUBLIC SelfTimer
-  : public Timer 
+  : public Timer
 {
 public:
   /**
-   *  @brief Instantiate the timer and start 
+   *  @brief Instantiate the timer and start
    */
   SelfTimer (const std::string &desc) : Timer (), m_desc (desc)
   {
@@ -129,7 +129,7 @@ public:
   /**
    *  @brief Instantiate the timer and start if the first parameter is true
    *
-   *  This constructor is useful in conjunction with the verbosity level: 
+   *  This constructor is useful in conjunction with the verbosity level:
    *  SelfTimer (tl::verbosity () >= 30, ...).
    */
   SelfTimer (bool enabled, const std::string &desc) : Timer (), m_desc (desc)
@@ -142,7 +142,7 @@ public:
   }
 
   ~SelfTimer ()
-  {  
+  {
     if (m_enabled) {
       stop ();
       report ();
@@ -159,8 +159,8 @@ private:
 
 /**
  *  @brief An abstraction for a time measurement feature
- *  
- *  This class can be used to take the current time and 
+ *
+ *  This class can be used to take the current time and
  *  compute time differences. The clock represents real
  *  time and can be used to time user interface actions.
  *
@@ -172,7 +172,7 @@ private:
  *  }
  *  @/code
  */
-class TL_PUBLIC Clock 
+class TL_PUBLIC Clock
 {
 public:
   typedef int64_t timer_t;
@@ -202,7 +202,7 @@ public:
   }
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   Clock &operator= (Clock d)
   {
@@ -211,7 +211,7 @@ public:
   }
 
   /**
-   *  @brief Equality 
+   *  @brief Equality
    */
   bool operator== (Clock d) const
   {
@@ -219,7 +219,7 @@ public:
   }
 
   /**
-   *  @brief Inequality 
+   *  @brief Inequality
    */
   bool operator!= (Clock d) const
   {
@@ -227,7 +227,7 @@ public:
   }
 
   /**
-   *  @brief Comparison 
+   *  @brief Comparison
    */
   bool operator< (Clock d) const
   {
@@ -270,4 +270,3 @@ private:
 } // namespace tl
 
 #endif
-

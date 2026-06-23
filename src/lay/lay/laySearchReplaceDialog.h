@@ -42,8 +42,8 @@
 
 namespace db
 {
-  class LayoutQuery;
-  class LayoutQueryIterator;
+class LayoutQuery;
+class LayoutQueryIterator;
 }
 
 namespace lay
@@ -55,41 +55,41 @@ class MarkerBase;
 class SearchReplaceResults
   : public QAbstractItemModel
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
-  struct QueryShapeResult
-  {
+  struct QueryShapeResult {
     QueryShapeResult (const db::Shape &s, unsigned int l, const db::ICplxTrans &t, db::cell_index_type ci, db::cell_index_type ici)
       : shape (s), layer_index (l), trans (t), cell_index (ci), initial_cell_index (ici)
-    { }
+    {
+    }
 
     db::Shape shape;
     unsigned int layer_index;
     db::ICplxTrans trans;
     db::cell_index_type cell_index;
     db::cell_index_type initial_cell_index;
-    tl::optional<std::vector<db::InstElement> > inst_elements;
+    tl::optional<std::vector<db::InstElement>> inst_elements;
   };
 
-  struct QueryInstResult
-  {
+  struct QueryInstResult {
     QueryInstResult (const db::Instance &i, const db::ICplxTrans &t, db::cell_index_type ci, db::cell_index_type ici)
       : inst (i), trans (t), cell_index (ci), initial_cell_index (ici)
-    { }
+    {
+    }
 
     db::Instance inst;
     db::ICplxTrans trans;
     db::cell_index_type cell_index;
     db::cell_index_type initial_cell_index;
-    tl::optional<std::vector<db::InstElement> > inst_elements;
+    tl::optional<std::vector<db::InstElement>> inst_elements;
   };
 
-  struct QueryCellResult
-  {
+  struct QueryCellResult {
     QueryCellResult (db::cell_index_type ci, db::cell_index_type pci)
       : cell_index (ci), parent_cell_index (pci)
-    { }
+    {
+    }
 
     db::cell_index_type cell_index;
     db::cell_index_type parent_cell_index;
@@ -183,13 +183,16 @@ class SearchReplaceDialog
   : public lay::Browser,
     private Ui::SearchReplaceDialog
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
-  enum window_type { DontChange = 0, FitCell, FitMarker, Center, CenterSize };
+  enum window_type { DontChange = 0,
+                     FitCell,
+                     FitMarker,
+                     Center,
+                     CenterSize };
 
-  struct SavedQuery
-  {
+  struct SavedQuery {
     std::string description;
     std::string text;
   };
@@ -276,4 +279,3 @@ private:
 }
 
 #endif
-

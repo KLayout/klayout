@@ -23,8 +23,8 @@
 #ifndef HDR_tlFileSystemWatcher
 #define HDR_tlFileSystemWatcher
 
-#if !defined(HAVE_QT)
-# error tl::FileSystemWatcher not available
+#if ! defined(HAVE_QT)
+#error tl::FileSystemWatcher not available
 #endif
 
 #include "tlEvents.h"
@@ -49,7 +49,7 @@ namespace tl
 class TL_PUBLIC FileSystemWatcher
   : public QObject
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -124,10 +124,9 @@ private slots:
   void timeout ();
 
 private:
-
   struct FileEntry {
-    FileEntry () : refcount (0), size (0) { }
-    FileEntry (int r, size_t s, const QDateTime &t) : refcount (r), size (s), time (t) { }
+    FileEntry () : refcount (0), size (0) {}
+    FileEntry (int r, size_t s, const QDateTime &t) : refcount (r), size (s), time (t) {}
     int refcount;
     size_t size;
     QDateTime time;
@@ -157,8 +156,6 @@ public:
     tl::FileSystemWatcher::global_enable (true);
   }
 };
-
 }
 
 #endif
-

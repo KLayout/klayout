@@ -41,7 +41,7 @@ static const std::string layer_mode_visible ("layer-mode-visible");
 static const std::string layer_mode_selected ("layer-mode-selected");
 
 //  items in layer_cb
-static const std::vector<std::string> layer_modes = { layer_mode_specific, layer_mode_visible, layer_mode_selected };
+static const std::vector<std::string> layer_modes = {layer_mode_specific, layer_mode_visible, layer_mode_selected};
 
 static const std::string region_mode_global_bbox ("region-mode-global-bbox");
 static const std::string region_mode_layer_bbox ("region-mode-layer-bbox");
@@ -55,8 +55,7 @@ static const std::vector<std::string> region_modes = {
   region_mode_layer_bbox,
   region_mode_single_box,
   region_mode_visible_region,
-  region_mode_by_rulers
-};
+  region_mode_by_rulers};
 
 static const std::string boundary_mode_periodic ("boundary-mode-periodic");
 static const std::string boundary_mode_zero ("boundary-mode-zero");
@@ -64,13 +63,13 @@ static const std::string boundary_mode_one ("boundary-mode-one");
 static const std::string boundary_mode_average ("boundary-mode-average");
 
 //  items in boundary_mode_cb
-static const std::vector<std::string> boundary_modes = { boundary_mode_periodic, boundary_mode_zero, boundary_mode_one, boundary_mode_average };
+static const std::vector<std::string> boundary_modes = {boundary_mode_periodic, boundary_mode_zero, boundary_mode_one, boundary_mode_average};
 
 static const std::string averaging_mode_square ("averaging-mode-square");
 static const std::string averaging_mode_gaussian ("averaging-mode-gaussian");
 
 //  items in average_mode_cb
-static const std::vector<std::string> averaging_modes = { averaging_mode_square, averaging_mode_gaussian };
+static const std::vector<std::string> averaging_modes = {averaging_mode_square, averaging_mode_gaussian};
 
 static const std::string cfg_density_map_region_mode ("density-map-region-mode");
 static const std::string cfg_density_map_layer_mode ("density-map-layer-mode");
@@ -90,7 +89,7 @@ class DensityMapDialogPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::make_pair (cfg_density_map_layer_mode, layer_mode_specific));
     options.push_back (std::make_pair (cfg_density_map_region_mode, region_mode_global_bbox));
@@ -111,7 +110,7 @@ public:
     lay::PluginDeclaration::get_menu_entries (menu_entries);
     menu_entries.push_back (lay::menu_item ("density_map::show", "density_map_tool:edit", "tools_menu.post_verification_group", tl::to_string (QObject::tr ("Density Map"))));
   }
- 
+
   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
     if (lay::has_gui ()) {
@@ -128,7 +127,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new DensityMapDi
 // ------------------------------------------------------------
 
 DensityMapDialog::DensityMapDialog (lay::Dispatcher *root, LayoutViewBase *vw)
-  : lay::Browser (root, vw), 
+  : lay::Browser (root, vw),
     Ui::DensityMapDialog ()
 {
   Ui::DensityMapDialog::setupUi (this);
@@ -142,8 +141,7 @@ DensityMapDialog::DensityMapDialog (lay::Dispatcher *root, LayoutViewBase *vw)
   layer_mode_changed (layer_cb->currentIndex ());
 }
 
-void
-DensityMapDialog::region_mode_changed (int mode)
+void DensityMapDialog::region_mode_changed (int mode)
 {
   if (mode < 0 || mode >= int (region_modes.size ())) {
     return;
@@ -159,8 +157,7 @@ DensityMapDialog::region_mode_changed (int mode)
   }
 }
 
-void
-DensityMapDialog::layer_mode_changed (int mode)
+void DensityMapDialog::layer_mode_changed (int mode)
 {
   if (mode < 0 || mode >= int (layer_modes.size ())) {
     return;
@@ -174,8 +171,7 @@ DensityMapDialog::layer_mode_changed (int mode)
   }
 }
 
-void 
-DensityMapDialog::menu_activated (const std::string &symbol)
+void DensityMapDialog::menu_activated (const std::string &symbol)
 {
   if (symbol == "density_map::show") {
 
@@ -202,62 +198,59 @@ DensityMapDialog::~DensityMapDialog ()
 namespace
 {
 
-  class DensityMapTileReceiver
-    : public db::TileOutputReceiver
+class DensityMapTileReceiver
+  : public db::TileOutputReceiver
+{
+public:
+  DensityMapTileReceiver (img::Object *img)
+    : mp_img (img)
   {
-  public:
-    DensityMapTileReceiver (img::Object *img)
-      : mp_img (img)
-    {
-      //  .. nothing yet ..
+    //  .. nothing yet ..
+  }
+
+  virtual void put (size_t ix, size_t iy, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double /*dbu*/, const db::ICplxTrans & /*trans*/, bool /*clip*/)
+  {
+    if (tl::verbosity () >= 30) {
+      tl::info << "Density map value: " << ix << "," << iy << " " << tile.to_string () << " -> " << obj.to_string ();
     }
 
-    virtual void put (size_t ix, size_t iy, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double /*dbu*/, const db::ICplxTrans & /*trans*/, bool /*clip*/)
-    {
-      if (tl::verbosity () >= 30) {
-        tl::info << "Density map value: " << ix << "," << iy << " " << tile.to_string () << " -> " << obj.to_string ();
-      }
+    mp_img->set_pixel (ix, iy, obj.to_double ());
+  }
 
-      mp_img->set_pixel (ix, iy, obj.to_double ());
-    }
-
-  private:
-    img::Object *mp_img;
-  };
+private:
+  img::Object *mp_img;
+};
 
 }
 
-void
-DensityMapDialog::apply ()
+void DensityMapDialog::apply ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   make_density_map ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-DensityMapDialog::accept ()
+void DensityMapDialog::accept ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   make_density_map ();
 
   //  close this dialog
   QDialog::accept ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-bool
-DensityMapDialog::configure (const std::string &name, const std::string &value)
+bool DensityMapDialog::configure (const std::string &name, const std::string &value)
 {
   if (name == cfg_density_map_layer_mode) {
 
     int mode = 0;
     for (size_t i = 0; i < layer_modes.size (); ++i) {
-      if (layer_modes[i] == value) {
+      if (layer_modes [i] == value) {
         mode = int (i);
       }
     }
@@ -270,7 +263,7 @@ DensityMapDialog::configure (const std::string &name, const std::string &value)
 
     int mode = 0;
     for (size_t i = 0; i < region_modes.size (); ++i) {
-      if (region_modes[i] == value) {
+      if (region_modes [i] == value) {
         mode = int (i);
       }
     }
@@ -307,7 +300,7 @@ DensityMapDialog::configure (const std::string &name, const std::string &value)
 
     int mode = 0;
     for (size_t i = 0; i < boundary_modes.size (); ++i) {
-      if (boundary_modes[i] == value) {
+      if (boundary_modes [i] == value) {
         mode = int (i);
       }
     }
@@ -319,7 +312,7 @@ DensityMapDialog::configure (const std::string &name, const std::string &value)
 
     int mode = 0;
     for (size_t i = 0; i < averaging_modes.size (); ++i) {
-      if (averaging_modes[i] == value) {
+      if (averaging_modes [i] == value) {
         mode = int (i);
       }
     }
@@ -382,8 +375,7 @@ DensityMapDialog::configure (const std::string &name, const std::string &value)
   }
 }
 
-void
-DensityMapDialog::make_density_map ()
+void DensityMapDialog::make_density_map ()
 {
   DensityMapParameters par;
 
@@ -449,7 +441,7 @@ DensityMapDialog::make_density_map ()
 
   } else if (rm == region_mode_by_rulers) {
 
-    ant::Service *ant_service = view ()->get_plugin <ant::Service> ();
+    ant::Service *ant_service = view ()->get_plugin<ant::Service> ();
     if (ant_service) {
       ant::AnnotationIterator ant = ant_service->begin_annotations ();
       while (! ant.at_end ()) {
@@ -479,7 +471,6 @@ DensityMapDialog::make_density_map ()
 
     lay::CellView cv = view ()->cellview (view ()->active_cellview_index ());
     par.region = db::CplxTrans (cv->layout ().dbu ()) * cv->layout ().cell (cv.cell_index ()).bbox ();
-
   }
 
   if (lm == layer_mode_specific) {
@@ -498,7 +489,7 @@ DensityMapDialog::make_density_map ()
 
   } else if (lm == layer_mode_visible) {
 
-    for (auto l = view ()->begin_layers (); !l.at_end (); ++l) {
+    for (auto l = view ()->begin_layers (); ! l.at_end (); ++l) {
 
       if (! l->has_children () && l->visible (true)) {
 
@@ -509,9 +500,7 @@ DensityMapDialog::make_density_map ()
         if (ccv.is_valid () || li >= 0 || ! ccv->layout ().is_valid_layer (li)) {
           par.input_layers.push_back (std::make_pair (cvi, li));
         }
-
       }
-
     }
 
   } else if (lm == layer_mode_selected) {
@@ -529,11 +518,8 @@ DensityMapDialog::make_density_map ()
         if (ccv.is_valid () || li >= 0 || ! ccv->layout ().is_valid_layer (li)) {
           par.input_layers.push_back (std::make_pair (cvi, li));
         }
-
       }
-
     }
-
   }
 
   //  Commit the parameters
@@ -560,8 +546,7 @@ DensityMapDialog::make_density_map ()
   compute_density_map (par);
 }
 
-void
-DensityMapDialog::compute_density_map (const DensityMapParameters &par)
+void DensityMapDialog::compute_density_map (const DensityMapParameters &par)
 {
   if (par.region.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Density map region is empty")));
@@ -620,7 +605,6 @@ DensityMapDialog::compute_density_map (const DensityMapParameters &par)
       in_expr += "+";
     }
     in_expr += in_name;
-
   }
 
   tp.queue (std::string ("var inp = ") + in_expr + "; _tile && _output(dens, to_f(inp.area(_tile.bbox)) / to_f(_tile.bbox.area))");
@@ -629,7 +613,7 @@ DensityMapDialog::compute_density_map (const DensityMapParameters &par)
 
   img::Object *img_object = 0;
 
-  img::Service *img_service = view ()->get_plugin <img::Service> ();
+  img::Service *img_service = view ()->get_plugin<img::Service> ();
   if (img_service) {
 
     const std::string img_tag = "density-map-image";
@@ -656,7 +640,6 @@ DensityMapDialog::compute_density_map (const DensityMapParameters &par)
     img.set_tag (img_tag);
 
     img_object = img_service->insert_image (img);
-
   }
 
   tl_assert (img_object);
@@ -701,9 +684,7 @@ DensityMapDialog::compute_density_map (const DensityMapParameters &par)
       }
 
       average_window (*img_object, par.boundary_mode, wh, weights);
-
     }
-
   }
 }
 
@@ -716,8 +697,7 @@ inline int safe_mod (int a, int b)
   }
 }
 
-void
-DensityMapDialog::average_window (img::Object &img_object, const std::string boundary_mode, int wh, const std::vector<double> &weights)
+void DensityMapDialog::average_window (img::Object &img_object, const std::string boundary_mode, int wh, const std::vector<double> &weights)
 {
   tl_assert (weights.size () == size_t (wh * 2 + 1));
 
@@ -744,7 +724,6 @@ DensityMapDialog::average_window (img::Object &img_object, const std::string bou
       outside += *d++;
     }
     outside /= double (nx) * double (ny);
-
   }
 
   std::vector<double> vavg_data;
@@ -770,14 +749,12 @@ DensityMapDialog::average_window (img::Object &img_object, const std::string bou
           *d++ += f * outside;
         }
       }
-
     }
-
   }
 
   //  horizontal sum
 
-  outside *= ws;   //  because we do normalization later
+  outside *= ws; //  because we do normalization later
 
   //  TODO: transposing the image would make things more efficient
 
@@ -806,9 +783,7 @@ DensityMapDialog::average_window (img::Object &img_object, const std::string bou
           d += nx;
         }
       }
-
     }
-
   }
 
   //  take the average
@@ -821,4 +796,3 @@ DensityMapDialog::average_window (img::Object &img_object, const std::string bou
 }
 
 }
-

@@ -104,8 +104,7 @@ EditorOptionsGeneric::title () const
   return tl::to_string (QObject::tr ("Basic Editing"));
 }
 
-void
-EditorOptionsGeneric::apply (lay::Dispatcher *root)
+void EditorOptionsGeneric::apply (lay::Dispatcher *root)
 {
   //  Edit grid
 
@@ -141,20 +140,17 @@ EditorOptionsGeneric::apply (lay::Dispatcher *root)
   root->config_set (cfg_edit_show_shapes_of_instances, tl::to_string (mp_ui->show_shapes_cbx->isChecked ()));
 }
 
-void
-EditorOptionsGeneric::grid_changed (int grid_mode)
+void EditorOptionsGeneric::grid_changed (int grid_mode)
 {
   mp_ui->edit_grid_le->setEnabled (grid_mode == 2);
 }
 
-void
-EditorOptionsGeneric::show_shapes_changed ()
+void EditorOptionsGeneric::show_shapes_changed ()
 {
   mp_ui->max_shapes_le->setEnabled (mp_ui->show_shapes_cbx->isChecked ());
 }
 
-void
-EditorOptionsGeneric::setup (lay::Dispatcher *root)
+void EditorOptionsGeneric::setup (lay::Dispatcher *root)
 {
   //  Edit grid
 
@@ -233,14 +229,13 @@ EditorOptionsText::~EditorOptionsText ()
   mp_ui = 0;
 }
 
-std::string 
+std::string
 EditorOptionsText::title () const
 {
   return tl::to_string (QObject::tr ("Text"));
 }
 
-void  
-EditorOptionsText::apply (lay::Dispatcher *root)
+void EditorOptionsText::apply (lay::Dispatcher *root)
 {
   //  Text string
   root->config_set (cfg_edit_text_string, tl::unescape_string (tl::to_string (mp_ui->text_le->text ())));
@@ -263,8 +258,7 @@ EditorOptionsText::apply (lay::Dispatcher *root)
   }
 }
 
-void  
-EditorOptionsText::setup (lay::Dispatcher *root)
+void EditorOptionsText::setup (lay::Dispatcher *root)
 {
   //  Text string
   std::string s;
@@ -313,27 +307,25 @@ EditorOptionsPath::~EditorOptionsPath ()
   mp_ui = 0;
 }
 
-std::string 
+std::string
 EditorOptionsPath::title () const
 {
   return tl::to_string (QObject::tr ("Path"));
 }
 
-void
-EditorOptionsPath::type_changed (int type)
+void EditorOptionsPath::type_changed (int type)
 {
   mp_ui->start_ext_le->setEnabled (type == 2);
   mp_ui->end_ext_le->setEnabled (type == 2);
 }
 
-void  
-EditorOptionsPath::apply (lay::Dispatcher *root)
+void EditorOptionsPath::apply (lay::Dispatcher *root)
 {
   //  width
 
   configure_from_line_edit<double> (root, mp_ui->width_le, cfg_edit_path_width);
 
-  //  path type and extensions 
+  //  path type and extensions
 
   if (mp_ui->type_cb->currentIndex () == 0) {
 
@@ -353,12 +345,10 @@ EditorOptionsPath::apply (lay::Dispatcher *root)
   } else if (mp_ui->type_cb->currentIndex () == 3) {
 
     root->config_set (cfg_edit_path_ext_type, "round");
-
   }
 }
 
-void  
-EditorOptionsPath::setup (lay::Dispatcher *root)
+void EditorOptionsPath::setup (lay::Dispatcher *root)
 {
   //  width
 
@@ -367,7 +357,7 @@ EditorOptionsPath::setup (lay::Dispatcher *root)
   mp_ui->width_le->setText (tl::to_qstring (tl::to_string (w)));
   lay::indicate_error (mp_ui->width_le, (tl::Exception *) 0);
 
-  //  path type and extensions 
+  //  path type and extensions
 
   std::string type;
   root->config_get (cfg_edit_path_ext_type, type);
@@ -425,14 +415,13 @@ EditorOptionsInst::~EditorOptionsInst ()
   mp_ui = 0;
 }
 
-std::string 
+std::string
 EditorOptionsInst::title () const
 {
   return tl::to_string (QObject::tr ("Instance"));
 }
 
-void
-EditorOptionsInst::library_changed ()
+void EditorOptionsInst::library_changed ()
 {
   update_cell_edits ();
   edited ();
@@ -441,8 +430,7 @@ EditorOptionsInst::library_changed ()
 //  Maximum number of cells for which to offer a cell name completer
 const static size_t max_cells = 10000;
 
-void
-EditorOptionsInst::update_cell_edits ()
+void EditorOptionsInst::update_cell_edits ()
 {
   if (mp_ui->cell_le->completer ()) {
     mp_ui->cell_le->completer ()->deleteLater ();
@@ -488,14 +476,13 @@ EditorOptionsInst::update_cell_edits ()
   lay::indicate_error (mp_ui->cell_le, (! pc.first && ! cc.first) ? &ex : 0);
 }
 
-void
-EditorOptionsInst::browse_cell ()
+void EditorOptionsInst::browse_cell ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (m_cv_index >= 0 && view ()->cellview (m_cv_index).is_valid ()) {
 
-    //  find the layout the cell has to be looked up: that is either the layout of the current instance or 
+    //  find the layout the cell has to be looked up: that is either the layout of the current instance or
     //  the library selected
     db::Layout *layout = 0;
     db::Library *lib = 0;
@@ -531,14 +518,12 @@ BEGIN_PROTECTED
       }
       edited ();
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-EditorOptionsInst::array_changed ()
+void EditorOptionsInst::array_changed ()
 {
   bool array = (mp_ui->array_grp->isChecked ());
   mp_ui->rows_le->setEnabled (array);
@@ -550,8 +535,7 @@ EditorOptionsInst::array_changed ()
   edited ();
 }
 
-void  
-EditorOptionsInst::apply (lay::Dispatcher *root)
+void EditorOptionsInst::apply (lay::Dispatcher *root)
 {
   //  cell name
   root->config_set (cfg_edit_inst_cell_name, tl::to_string (mp_ui->cell_le->text ()));
@@ -587,22 +571,19 @@ EditorOptionsInst::apply (lay::Dispatcher *root)
   root->config_set (cfg_edit_inst_place_origin, tl::to_string (place_origin));
 }
 
-void
-EditorOptionsInst::technology_changed (const std::string &)
+void EditorOptionsInst::technology_changed (const std::string &)
 {
   //  The layout's technology has changed
   setup (dispatcher ());
 }
 
-void
-EditorOptionsInst::active_cellview_changed ()
+void EditorOptionsInst::active_cellview_changed ()
 {
   //  The active cellview has changed
   setup (dispatcher ());
 }
 
-void
-EditorOptionsInst::setup (lay::Dispatcher *root)
+void EditorOptionsInst::setup (lay::Dispatcher *root)
 {
   m_cv_index = view ()->active_cellview_index ();
 
@@ -706,8 +687,7 @@ EditorOptionsInstPCellParam::title () const
   return tl::to_string (QObject::tr ("PCell"));
 }
 
-void
-EditorOptionsInstPCellParam::apply (lay::Dispatcher *root)
+void EditorOptionsInstPCellParam::apply (lay::Dispatcher *root)
 {
   //  pcell parameters
   std::string param;
@@ -737,14 +717,12 @@ EditorOptionsInstPCellParam::apply (lay::Dispatcher *root)
   }
 }
 
-void
-EditorOptionsInstPCellParam::technology_changed (const std::string &)
+void EditorOptionsInstPCellParam::technology_changed (const std::string &)
 {
   setup (dispatcher ());
 }
 
-void
-EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
+void EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
 {
   m_cv_index = view ()->active_cellview_index ();
 
@@ -793,7 +771,7 @@ EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
         std::map<std::string, tl::Variant> parameters;
         try {
           tl::Extractor ex (param.c_str ());
-          ex.test ("!");  //  used to flag PCells
+          ex.test ("!"); //  used to flag PCells
           while (! ex.at_end ()) {
             std::string n;
             ex.read_word_or_quoted (n);
@@ -801,7 +779,8 @@ EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
             ex.read (parameters.insert (std::make_pair (n, tl::Variant ())).first->second);
             ex.test (";");
           }
-        } catch (...) { }
+        } catch (...) {
+        }
 
         const std::vector<db::PCellParameterDeclaration> &pcp = pc_decl->parameter_declarations ();
         for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
@@ -812,11 +791,8 @@ EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
             pv.push_back (pd->get_default ());
           }
         }
-
       }
-
     }
-
   }
 
   if (! needs_update) {
@@ -830,17 +806,16 @@ EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
     if (needs_update) {
       update_pcell_parameters (pv);
     }
-  } catch (...) { }
+  } catch (...) {
+  }
 }
 
-void
-EditorOptionsInstPCellParam::update_pcell_parameters ()
+void EditorOptionsInstPCellParam::update_pcell_parameters ()
 {
-  update_pcell_parameters (std::vector <tl::Variant> ());
+  update_pcell_parameters (std::vector<tl::Variant> ());
 }
 
-void
-EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Variant> &parameters)
+void EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector<tl::Variant> &parameters)
 {
   db::Layout *layout = 0;
 
@@ -895,7 +870,6 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
     mp_placeholder_label->setText (tr ("Not a PCell"));
     mp_placeholder_label->setAlignment (Qt::AlignHCenter | Qt::AlignVCenter);
     this->layout ()->addWidget (mp_placeholder_label);
-
   }
 }
 
@@ -934,14 +908,12 @@ BoxToolboxWidget::title () const
   return "Box Options";
 }
 
-void
-BoxToolboxWidget::deactivated ()
+void BoxToolboxWidget::deactivated ()
 {
   hide ();
 }
 
-void
-BoxToolboxWidget::commit (lay::Dispatcher *dispatcher)
+void BoxToolboxWidget::commit (lay::Dispatcher *dispatcher)
 {
   try {
 
@@ -956,8 +928,7 @@ BoxToolboxWidget::commit (lay::Dispatcher *dispatcher)
   }
 }
 
-void
-BoxToolboxWidget::configure (const std::string &name, const std::string &value)
+void BoxToolboxWidget::configure (const std::string &name, const std::string &value)
 {
   if (name == BoxService::configure_name () && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
 
@@ -971,7 +942,6 @@ BoxToolboxWidget::configure (const std::string &name, const std::string &value)
 
     } catch (...) {
     }
-
   }
 }
 
@@ -1010,14 +980,12 @@ ConnectionToolboxWidget::title () const
   return "Connection Options";
 }
 
-void
-ConnectionToolboxWidget::deactivated ()
+void ConnectionToolboxWidget::deactivated ()
 {
   hide ();
 }
 
-void
-ConnectionToolboxWidget::commit (lay::Dispatcher *dispatcher)
+void ConnectionToolboxWidget::commit (lay::Dispatcher *dispatcher)
 {
   m_in_commit = true;
 
@@ -1036,8 +1004,7 @@ ConnectionToolboxWidget::commit (lay::Dispatcher *dispatcher)
   m_in_commit = false;
 }
 
-void
-ConnectionToolboxWidget::configure (const std::string &name, const std::string &value)
+void ConnectionToolboxWidget::configure (const std::string &name, const std::string &value)
 {
   if (name == ShapeEditService::connection_configure_name () &&
       ((! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) || m_in_commit)) {
@@ -1052,7 +1019,6 @@ ConnectionToolboxWidget::configure (const std::string &name, const std::string &
 
     } catch (...) {
     }
-
   }
 }
 
@@ -1095,14 +1061,12 @@ PathConnectionToolboxWidget::title () const
   return "Path Connection Options";
 }
 
-void
-PathConnectionToolboxWidget::deactivated ()
+void PathConnectionToolboxWidget::deactivated ()
 {
   hide ();
 }
 
-void
-PathConnectionToolboxWidget::commit (lay::Dispatcher *dispatcher)
+void PathConnectionToolboxWidget::commit (lay::Dispatcher *dispatcher)
 {
   m_in_commit = true;
 
@@ -1124,7 +1088,6 @@ PathConnectionToolboxWidget::commit (lay::Dispatcher *dispatcher)
 
       //  NOTE: going the way through "configure" makes the width part of the recent path configuration
       dispatcher->config_set (cfg_edit_path_width, tl::to_string (w));
-
     }
 
   } catch (...) {
@@ -1133,8 +1096,7 @@ PathConnectionToolboxWidget::commit (lay::Dispatcher *dispatcher)
   m_in_commit = false;
 }
 
-void
-PathConnectionToolboxWidget::configure (const std::string &name, const std::string &value)
+void PathConnectionToolboxWidget::configure (const std::string &name, const std::string &value)
 {
   if (name == ShapeEditService::connection_configure_name () &&
       ((! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) || m_in_commit)) {
@@ -1151,7 +1113,7 @@ PathConnectionToolboxWidget::configure (const std::string &name, const std::stri
     }
 
   } else if (name == cfg_edit_path_width &&
-      (! mp_width->hasFocus () || m_in_commit)) {
+             (! mp_width->hasFocus () || m_in_commit)) {
 
     try {
 
@@ -1162,7 +1124,6 @@ PathConnectionToolboxWidget::configure (const std::string &name, const std::stri
 
     } catch (...) {
     }
-
   }
 }
 
@@ -1197,14 +1158,12 @@ TextToolboxWidget::title () const
   return "Text Options";
 }
 
-void
-TextToolboxWidget::deactivated ()
+void TextToolboxWidget::deactivated ()
 {
   hide ();
 }
 
-void
-TextToolboxWidget::commit (lay::Dispatcher *dispatcher)
+void TextToolboxWidget::commit (lay::Dispatcher *dispatcher)
 {
   m_in_commit = true;
 
@@ -1216,8 +1175,7 @@ TextToolboxWidget::commit (lay::Dispatcher *dispatcher)
   m_in_commit = false;
 }
 
-void
-TextToolboxWidget::configure (const std::string &name, const std::string &value)
+void TextToolboxWidget::configure (const std::string &name, const std::string &value)
 {
   if (name == cfg_edit_text_string && (! mp_text->hasFocus () || m_in_commit)) {
     mp_text->setText (tl::to_qstring (value));

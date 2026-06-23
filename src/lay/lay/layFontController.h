@@ -52,9 +52,10 @@ class MainWindow;
  *  initialization and configuration calls.
  */
 class FontController
-  : public lay::PluginDeclaration, public tl::Object
+  : public lay::PluginDeclaration,
+    public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -80,7 +81,7 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
+  void get_options (std::vector<std::pair<std::string, std::string>> &options) const;
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
@@ -95,7 +96,7 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  void config_finalize();
+  void config_finalize ();
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
@@ -128,4 +129,3 @@ private:
 }
 
 #endif
-

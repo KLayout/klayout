@@ -34,9 +34,10 @@ namespace lay
 {
 
 class EditLineStyleWidget
-  : public QFrame, public db::Object
+  : public QFrame,
+    public db::Object
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   EditLineStyleWidget (QWidget *parent);
@@ -102,4 +103,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

@@ -50,14 +50,12 @@ static struct {
   lay::nt_window_type mode;
   const char *string;
 } window_modes [] = {
-  { lay::NTDontChange,    "dont-change" },
-  { lay::NTFitNet,        "fit-net"     },
-  { lay::NTCenter,        "center"      },
-  { lay::NTCenterSize,    "center-size" }
-};
+  {lay::NTDontChange, "dont-change"},
+  {lay::NTFitNet, "fit-net"},
+  {lay::NTCenter, "center"},
+  {lay::NTCenterSize, "center-size"}};
 
-void
-NetTracerWindowModeConverter::from_string (const std::string &value, lay::nt_window_type &mode)
+void NetTracerWindowModeConverter::from_string (const std::string &value, lay::nt_window_type &mode)
 {
   for (unsigned int i = 0; i < sizeof (window_modes) / sizeof (window_modes [0]); ++i) {
     if (value == window_modes [i].string) {
@@ -68,7 +66,7 @@ NetTracerWindowModeConverter::from_string (const std::string &value, lay::nt_win
   throw tl::Exception (tl::to_string (QObject::tr ("Invalid net tracer window mode: ")) + value);
 }
 
-std::string 
+std::string
 NetTracerWindowModeConverter::to_string (lay::nt_window_type mode)
 {
   for (unsigned int i = 0; i < sizeof (window_modes) / sizeof (window_modes [0]); ++i) {
@@ -81,17 +79,16 @@ NetTracerWindowModeConverter::to_string (lay::nt_window_type mode)
 
 // ------------------------------------------------------------
 //
-static QToolButton * (Ui::NetTracerConfigPage::*cc_buttons []) = {
-  &Ui::NetTracerConfigPage::cc0,  
-  &Ui::NetTracerConfigPage::cc1,  
-  &Ui::NetTracerConfigPage::cc2,  
-  &Ui::NetTracerConfigPage::cc3,  
-  &Ui::NetTracerConfigPage::cc4,  
-  &Ui::NetTracerConfigPage::cc5,  
-  &Ui::NetTracerConfigPage::cc6,  
-  &Ui::NetTracerConfigPage::cc7
-};
- 
+static QToolButton *(Ui::NetTracerConfigPage::*cc_buttons []) = {
+  &Ui::NetTracerConfigPage::cc0,
+  &Ui::NetTracerConfigPage::cc1,
+  &Ui::NetTracerConfigPage::cc2,
+  &Ui::NetTracerConfigPage::cc3,
+  &Ui::NetTracerConfigPage::cc4,
+  &Ui::NetTracerConfigPage::cc5,
+  &Ui::NetTracerConfigPage::cc6,
+  &Ui::NetTracerConfigPage::cc7};
+
 NetTracerConfigPage::NetTracerConfigPage (QWidget *parent)
   : lay::ConfigPage (parent)
 {
@@ -104,8 +101,7 @@ NetTracerConfigPage::NetTracerConfigPage (QWidget *parent)
   }
 }
 
-void 
-NetTracerConfigPage::color_button_clicked ()
+void NetTracerConfigPage::color_button_clicked ()
 {
   for (unsigned int i = 0; i < sizeof (cc_buttons) / sizeof (cc_buttons [0]); ++i) {
 
@@ -123,14 +119,11 @@ NetTracerConfigPage::color_button_clicked ()
       }
 
       break;
-
     }
-
   }
 }
 
-void 
-NetTracerConfigPage::setup (lay::Dispatcher *root)
+void NetTracerConfigPage::setup (lay::Dispatcher *root)
 {
   //  window mode
   lay::nt_window_type wmode = lay::NTFitNet;
@@ -141,7 +134,7 @@ NetTracerConfigPage::setup (lay::Dispatcher *root)
   double wdim = 1.0;
   root->config_get (cfg_nt_window_dim, wdim);
   le_window->setText (tl::to_qstring (tl::to_string (wdim)));
-    
+
   //  max. shapes highlighted
   unsigned int max_marker_count = 10000;
   root->config_get (cfg_nt_max_shapes_highlighted, max_marker_count);
@@ -164,7 +157,7 @@ NetTracerConfigPage::setup (lay::Dispatcher *root)
   while (m_palette.colors () < sizeof (cc_buttons) / sizeof (cc_buttons [0])) {
     m_palette.set_color (int (m_palette.colors ()), 0);
   }
- 
+
   update_colors ();
 
   //  marker color
@@ -206,8 +199,7 @@ NetTracerConfigPage::setup (lay::Dispatcher *root)
   halo_cb->setCheckState (halo < 0 ? Qt::PartiallyChecked : (halo ? Qt::Checked : Qt::Unchecked));
 }
 
-void 
-NetTracerConfigPage::update_colors ()
+void NetTracerConfigPage::update_colors ()
 {
   for (unsigned int i = 0; i < sizeof (cc_buttons) / sizeof (cc_buttons [0]); ++i) {
 
@@ -228,18 +220,15 @@ NetTracerConfigPage::update_colors ()
 
     (this->*(cc_buttons [i]))->setIconSize (pxmp.size ());
     (this->*(cc_buttons [i]))->setIcon (QIcon (pxmp));
-
   }
 }
 
-void
-NetTracerConfigPage::window_changed (int m)
+void NetTracerConfigPage::window_changed (int m)
 {
   le_window->setEnabled (m == int (lay::NTFitNet) || m == int (lay::NTCenterSize));
 }
 
-void 
-NetTracerConfigPage::commit (lay::Dispatcher *root)
+void NetTracerConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
   tl::from_string_ext (tl::to_string (le_window->text ()), dim);
@@ -264,7 +253,8 @@ NetTracerConfigPage::commit (lay::Dispatcher *root)
       int s;
       tl::from_string_ext (tl::to_string (lw_le->text ()), s);
       root->config_set (cfg_nt_marker_line_width, s);
-    } catch (...) { }
+    } catch (...) {
+    }
   }
 
   if (vs_le->text ().isEmpty ()) {
@@ -274,7 +264,8 @@ NetTracerConfigPage::commit (lay::Dispatcher *root)
       int s;
       tl::from_string_ext (tl::to_string (vs_le->text ()), s);
       root->config_set (cfg_nt_marker_vertex_size, s);
-    } catch (...) { }
+    } catch (...) {
+    }
   }
 
   root->config_set (cfg_nt_marker_dither_pattern, stipple_pb->dither_pattern ());
@@ -291,4 +282,3 @@ NetTracerConfigPage::commit (lay::Dispatcher *root)
 }
 
 }
-

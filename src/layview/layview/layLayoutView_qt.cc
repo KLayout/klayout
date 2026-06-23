@@ -125,7 +125,6 @@ LayoutViewNotificationWidget::LayoutViewNotificationWidget (LayoutViewWidget *pa
     pb->setText (tl::to_qstring (a->second));
     m_action_buttons.insert (std::make_pair (pb, a->first));
     connect (pb, SIGNAL (clicked ()), this, SLOT (action_triggered ()));
-
   }
 
   QToolButton *close_button = new QToolButton ();
@@ -136,8 +135,7 @@ LayoutViewNotificationWidget::LayoutViewNotificationWidget (LayoutViewWidget *pa
   connect (close_button, SIGNAL (clicked ()), this, SLOT (close_triggered ()));
 }
 
-void
-LayoutViewNotificationWidget::action_triggered ()
+void LayoutViewNotificationWidget::action_triggered ()
 {
   BEGIN_PROTECTED
 
@@ -149,8 +147,7 @@ LayoutViewNotificationWidget::action_triggered ()
   END_PROTECTED_W (this)
 }
 
-void
-LayoutViewNotificationWidget::close_triggered ()
+void LayoutViewNotificationWidget::close_triggered ()
 {
   mp_parent->remove_notification (*mp_notification);
 }
@@ -195,8 +192,7 @@ LayoutViewWidget::~LayoutViewWidget ()
   delete view;
 }
 
-void
-LayoutViewWidget::add_toolbox_widget (lay::EditorOptionsPageWidget *toolbox_widget)
+void LayoutViewWidget::add_toolbox_widget (lay::EditorOptionsPageWidget *toolbox_widget)
 {
   if (toolbox_widget->parent () != this) {
 
@@ -212,12 +208,10 @@ LayoutViewWidget::add_toolbox_widget (lay::EditorOptionsPageWidget *toolbox_widg
     }
 
     mp_layout->insertWidget (index, toolbox_widget);
-
   }
 }
 
-void
-LayoutViewWidget::add_notification (const LayoutViewNotification &notificaton)
+void LayoutViewWidget::add_notification (const LayoutViewNotification &notificaton)
 {
   if (m_notification_widgets.find (&notificaton) == m_notification_widgets.end ()) {
     m_notifications.push_back (notificaton);
@@ -227,8 +221,7 @@ LayoutViewWidget::add_notification (const LayoutViewNotification &notificaton)
   }
 }
 
-void
-LayoutViewWidget::remove_notification (const LayoutViewNotification &notification)
+void LayoutViewWidget::remove_notification (const LayoutViewNotification &notification)
 {
   auto nw = m_notification_widgets.find (&notification);
   if (nw != m_notification_widgets.end ()) {
@@ -242,12 +235,10 @@ LayoutViewWidget::remove_notification (const LayoutViewNotification &notificatio
         break;
       }
     }
-
   }
 }
 
-void
-LayoutViewWidget::notification_action (const LayoutViewNotification &notification, const std::string &action)
+void LayoutViewWidget::notification_action (const LayoutViewNotification &notification, const std::string &action)
 {
   if (action == "reload") {
 
@@ -261,12 +252,10 @@ LayoutViewWidget::notification_action (const LayoutViewNotification &notificatio
     }
 
     remove_notification (notification);
-
   }
 }
 
-void
-LayoutViewWidget::view_deleted (lay::LayoutView *view)
+void LayoutViewWidget::view_deleted (lay::LayoutView *view)
 {
   if (view != mp_view) {
     return;
@@ -276,22 +265,19 @@ LayoutViewWidget::view_deleted (lay::LayoutView *view)
   mp_view = new LayoutView (view->manager (), view->is_editable (), view->plugin_parent (), this, view->options ());
 }
 
-void
-LayoutViewWidget::resizeEvent (QResizeEvent *)
+void LayoutViewWidget::resizeEvent (QResizeEvent *)
 {
   if (mp_view && mp_view->canvas ()) {
     mp_view->canvas ()->resize (width (), height ());
   }
 }
 
-QSize
-LayoutViewWidget::sizeHint () const
+QSize LayoutViewWidget::sizeHint () const
 {
   return mp_view ? mp_view->size_hint () : QFrame::sizeHint ();
 }
 
-bool
-LayoutViewWidget::eventFilter(QObject *obj, QEvent *event)
+bool LayoutViewWidget::eventFilter (QObject *obj, QEvent *event)
 {
   if (! mp_view) {
     return QFrame::eventFilter (obj, event);
@@ -322,32 +308,32 @@ void LayoutViewWidget::hideEvent (QHideEvent *)
 
 QWidget *LayoutViewWidget::layer_control_frame ()
 {
-  return !mp_view ? 0 : mp_view->layer_control_frame ();
+  return ! mp_view ? 0 : mp_view->layer_control_frame ();
 }
 
 QWidget *LayoutViewWidget::layer_toolbox_frame ()
 {
-  return !mp_view ? 0 : mp_view->layer_toolbox_frame ();
+  return ! mp_view ? 0 : mp_view->layer_toolbox_frame ();
 }
 
 QWidget *LayoutViewWidget::hierarchy_control_frame ()
 {
-  return !mp_view ? 0 : mp_view->hierarchy_control_frame ();
+  return ! mp_view ? 0 : mp_view->hierarchy_control_frame ();
 }
 
 QWidget *LayoutViewWidget::libraries_frame ()
 {
-  return !mp_view ? 0 : mp_view->libraries_frame ();
+  return ! mp_view ? 0 : mp_view->libraries_frame ();
 }
 
 QWidget *LayoutViewWidget::bookmarks_frame ()
 {
-  return !mp_view ? 0 : mp_view->bookmarks_frame ();
+  return ! mp_view ? 0 : mp_view->bookmarks_frame ();
 }
 
 QWidget *LayoutViewWidget::editor_options_frame ()
 {
-  return !mp_view ? 0 : mp_view->editor_options_frame ();
+  return ! mp_view ? 0 : mp_view->editor_options_frame ();
 }
 
 // -------------------------------------------------------------
@@ -489,40 +475,36 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   LayoutView::set_active_cellview_index (source->active_cellview_index ());
 }
 
-void
-LayoutView::add_notification (const LayoutViewNotification &notification)
+void LayoutView::add_notification (const LayoutViewNotification &notification)
 {
   if (mp_widget) {
     mp_widget->add_notification (notification);
   }
 }
 
-void
-LayoutView::remove_notification (const LayoutViewNotification &notification)
+void LayoutView::remove_notification (const LayoutViewNotification &notification)
 {
   if (mp_widget) {
     mp_widget->remove_notification (notification);
   }
 }
 
-void
-LayoutView::add_toolbox_widget (lay::EditorOptionsPage *toolbox_widget)
+void LayoutView::add_toolbox_widget (lay::EditorOptionsPage *toolbox_widget)
 {
   if (mp_widget && toolbox_widget->widget ()) {
     mp_widget->add_toolbox_widget (toolbox_widget->widget ());
   }
 }
 
-bool
-LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
+bool LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
 {
   if (obj == mp_min_hier_spbx || obj == mp_max_hier_spbx) {
 
     taken = true;
 
     //  Makes the min/max spin boxes accept only numeric and some control keys ..
-    QKeyEvent *keyEvent = dynamic_cast<QKeyEvent*>(event);
-    if (keyEvent && 
+    QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *> (event);
+    if (keyEvent &&
         keyEvent->key () != Qt::Key_Home &&
         keyEvent->key () != Qt::Key_End &&
         keyEvent->key () != Qt::Key_Delete &&
@@ -530,14 +512,12 @@ LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
         (keyEvent->key () < Qt::Key_0 || keyEvent->key () > Qt::Key_9)) {
       return true;
     }
-
   }
 
   return false;
 }
 
-void
-LayoutView::init_ui (db::Manager *mgr)
+void LayoutView::init_ui (db::Manager *mgr)
 {
   m_activated = true;
   m_always_show_source = false;
@@ -616,7 +596,6 @@ LayoutView::init_ui (db::Manager *mgr)
 
       QObject::connect (mp_min_hier_spbx, SIGNAL (valueChanged (int)), mp_connector, SLOT (min_hier_changed (int)));
       QObject::connect (mp_max_hier_spbx, SIGNAL (valueChanged (int)), mp_connector, SLOT (max_hier_changed (int)));
-
     }
 
     if ((options () & LV_NoBookmarksView) == 0 && (options () & LV_Naked) == 0) {
@@ -632,7 +611,6 @@ LayoutView::init_ui (db::Manager *mgr)
       left_frame_ly->addWidget (mp_bookmarks_view, 1 /*stretch*/);
 
       QObject::connect (mp_bookmarks_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
-
     }
 
     if ((options () & LV_NoLibrariesView) == 0 && (options () & LV_Naked) == 0) {
@@ -648,7 +626,6 @@ LayoutView::init_ui (db::Manager *mgr)
 
       QObject::connect (mp_libraries_view, SIGNAL (active_library_changed (int)), mp_connector, SLOT (active_library_changed (int)));
       QObject::connect (mp_libraries_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
-
     }
 
     if ((options () & LV_NoEditorOptionsPanel) == 0 && (options () & LV_Naked) == 0) {
@@ -657,7 +634,6 @@ LayoutView::init_ui (db::Manager *mgr)
       mp_editor_options_frame->populate (this);
 
       QObject::connect (mp_editor_options_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
-
     }
 
     if ((options () & LV_NoLayers) == 0 && (options () & LV_Naked) == 0) {
@@ -683,13 +659,11 @@ LayoutView::init_ui (db::Manager *mgr)
       lt_frame_ly->addWidget (mp_toolbox, 0 /*stretch*/);
 
       QObject::connect (mp_toolbox_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
-
     }
 
     mp_timer = new QTimer (mp_widget);
     QObject::connect (mp_timer, SIGNAL (timeout ()), mp_connector, SLOT (timer ()));
     mp_timer->start (timer_interval);
-
   }
 
   config_setup ();
@@ -762,8 +736,7 @@ void LayoutView::close ()
   mp_bookmarks_view = 0;
 }
 
-void
-LayoutView::finish ()
+void LayoutView::finish ()
 {
   if (dispatcher () == this) {
     set_menu_parent_widget (mp_widget);
@@ -774,8 +747,7 @@ LayoutView::finish ()
   }
 }
 
-void
-LayoutView::show_properties ()
+void LayoutView::show_properties ()
 {
   if ((options () & lay::LayoutViewBase::LV_NoPropertiesPopup) != 0) {
     return;
@@ -806,8 +778,7 @@ LayoutView::show_properties ()
   }
 }
 
-void
-LayoutView::do_change_active_cellview ()
+void LayoutView::do_change_active_cellview ()
 {
   dm_setup_editor_option_pages ();
 }
@@ -891,7 +862,8 @@ void LayoutView::create_plugins (const lay::PluginDeclaration *except_this)
   dm_setup_editor_option_pages ();
 }
 
-namespace {
+namespace
+{
 
 class GotoBookmarkAction
   : public lay::Action
@@ -917,8 +889,7 @@ private:
 
 }
 
-void
-LayoutView::update_menu (lay::LayoutView *view, lay::AbstractMenu &menu)
+void LayoutView::update_menu (lay::LayoutView *view, lay::AbstractMenu &menu)
 {
   std::string bm_menu = "bookmark_menu.goto_bookmark_menu";
 
@@ -941,12 +912,10 @@ LayoutView::update_menu (lay::LayoutView *view, lay::AbstractMenu &menu)
     } else {
       goto_bookmark_action->set_enabled (false);
     }
-
   }
 }
 
-bool 
-LayoutView::configure (const std::string &name, const std::string &value)
+bool LayoutView::configure (const std::string &name, const std::string &value)
 {
   if (LayoutViewBase::configure (name, value)) {
     return true;
@@ -1208,16 +1177,14 @@ LayoutView::configure (const std::string &name, const std::string &value)
   }
 }
 
-void
-LayoutView::config_finalize ()
+void LayoutView::config_finalize ()
 {
   //  It's important that the editor option pages are updated last - because the
   //  configuration change may trigger other configuration changes
   dm_setup_editor_option_pages ();
 }
 
-void
-LayoutView::set_current_layer (const lay::LayerPropertiesConstIterator &l) 
+void LayoutView::set_current_layer (const lay::LayerPropertiesConstIterator &l)
 {
   if (mp_control_panel) {
     mp_control_panel->set_current_layer (l);
@@ -1236,7 +1203,7 @@ LayoutView::current_layer () const
   }
 }
 
-std::vector<lay::LayerPropertiesConstIterator> 
+std::vector<lay::LayerPropertiesConstIterator>
 LayoutView::selected_layers () const
 {
   if (mp_control_panel) {
@@ -1246,8 +1213,7 @@ LayoutView::selected_layers () const
   }
 }
 
-void 
-LayoutView::set_selected_layers (const std::vector<lay::LayerPropertiesConstIterator> &sel) 
+void LayoutView::set_selected_layers (const std::vector<lay::LayerPropertiesConstIterator> &sel)
 {
   if (mp_control_panel) {
     mp_control_panel->set_selection (sel);
@@ -1256,8 +1222,7 @@ LayoutView::set_selected_layers (const std::vector<lay::LayerPropertiesConstIter
   }
 }
 
-void
-LayoutView::begin_layer_updates ()
+void LayoutView::begin_layer_updates ()
 {
   if (mp_control_panel) {
     mp_control_panel->begin_updates ();
@@ -1266,8 +1231,7 @@ LayoutView::begin_layer_updates ()
   }
 }
 
-void
-LayoutView::end_layer_updates ()
+void LayoutView::end_layer_updates ()
 {
   if (mp_control_panel) {
     mp_control_panel->end_updates ();
@@ -1276,8 +1240,7 @@ LayoutView::end_layer_updates ()
   }
 }
 
-bool
-LayoutView::layer_model_updated ()
+bool LayoutView::layer_model_updated ()
 {
   //  because check_updated is called in the initialization phase, we check if the pointers
   //  to the widgets are non-null:
@@ -1288,8 +1251,7 @@ LayoutView::layer_model_updated ()
   }
 }
 
-void
-LayoutView::bookmark_current_view ()
+void LayoutView::bookmark_current_view ()
 {
   if (! mp_widget) {
     return;
@@ -1312,8 +1274,7 @@ LayoutView::bookmark_current_view ()
   }
 }
 
-void
-LayoutView::manage_bookmarks ()
+void LayoutView::manage_bookmarks ()
 {
   if (! mp_widget) {
     return;
@@ -1330,8 +1291,7 @@ LayoutView::manage_bookmarks ()
   }
 }
 
-void
-LayoutView::bookmarks_changed ()
+void LayoutView::bookmarks_changed ()
 {
   mp_bookmarks_view->refresh ();
   if (mp_widget) {
@@ -1339,34 +1299,29 @@ LayoutView::bookmarks_changed ()
   }
 }
 
-void
-LayoutView::layer_tab_changed ()
+void LayoutView::layer_tab_changed ()
 {
   update_content ();
 }
 
-void 
-LayoutView::layer_order_changed ()
+void LayoutView::layer_order_changed ()
 {
   update_content ();
 }
 
-void 
-LayoutView::min_hier_changed (int i)
+void LayoutView::min_hier_changed (int i)
 {
   mp_max_hier_spbx->setMinimum (i);
   set_hier_levels (std::make_pair (i, get_hier_levels ().second));
 }
 
-void 
-LayoutView::max_hier_changed (int i)
+void LayoutView::max_hier_changed (int i)
 {
   mp_min_hier_spbx->setMaximum (i);
   set_hier_levels (std::make_pair (get_hier_levels ().first, i));
 }
 
-void
-LayoutView::layer_search_options_edited ()
+void LayoutView::layer_search_options_edited ()
 {
   if (mp_control_panel) {
     dispatcher ()->config_set (cfg_layer_search_as_expressions, mp_control_panel->search_as_expression ());
@@ -1375,8 +1330,7 @@ LayoutView::layer_search_options_edited ()
   }
 }
 
-void
-LayoutView::cell_search_options_edited ()
+void LayoutView::cell_search_options_edited ()
 {
   if (mp_hierarchy_panel) {
     dispatcher ()->config_set (cfg_cell_search_as_expressions, mp_hierarchy_panel->search_as_expression ());
@@ -1395,8 +1349,7 @@ LayoutView::default_background_color ()
   }
 }
 
-void 
-LayoutView::do_set_background_color (tl::Color c, tl::Color contrast)
+void LayoutView::do_set_background_color (tl::Color c, tl::Color contrast)
 {
   if (mp_control_panel) {
     mp_control_panel->set_background_color (c);
@@ -1419,24 +1372,21 @@ LayoutView::do_set_background_color (tl::Color c, tl::Color contrast)
   }
 }
 
-void
-LayoutView::do_set_no_stipples (bool no_stipples)
+void LayoutView::do_set_no_stipples (bool no_stipples)
 {
   if (mp_control_panel) {
     mp_control_panel->set_no_stipples (no_stipples);
   }
 }
 
-void
-LayoutView::do_set_phase (int phase)
+void LayoutView::do_set_phase (int phase)
 {
   if (mp_control_panel) {
     mp_control_panel->set_phase (phase);
   }
 }
 
-void
-LayoutView::active_library_changed (int /*index*/)
+void LayoutView::active_library_changed (int /*index*/)
 {
   std::string lib_name;
   if (mp_libraries_view->active_lib ()) {
@@ -1448,8 +1398,7 @@ LayoutView::active_library_changed (int /*index*/)
   dispatcher ()->config_set (cfg_current_lib_view, lib_name);
 }
 
-bool
-LayoutView::set_hier_levels_basic (std::pair<int, int> l)
+bool LayoutView::set_hier_levels_basic (std::pair<int, int> l)
 {
   if (l != get_hier_levels ()) {
 
@@ -1474,8 +1423,7 @@ LayoutView::set_hier_levels_basic (std::pair<int, int> l)
   }
 }
 
-bool
-LayoutView::has_selection ()
+bool LayoutView::has_selection ()
 {
   if (mp_control_panel && mp_control_panel->has_focus ()) {
     return mp_control_panel->has_selection ();
@@ -1486,8 +1434,7 @@ LayoutView::has_selection ()
   }
 }
 
-void
-LayoutView::do_paste ()
+void LayoutView::do_paste ()
 {
   //  let the receivers sort out who is pasting what ..
   if (mp_hierarchy_panel) {
@@ -1498,8 +1445,7 @@ LayoutView::do_paste ()
   }
 }
 
-void
-LayoutView::copy ()
+void LayoutView::copy ()
 {
   if (mp_hierarchy_panel && mp_hierarchy_panel->has_focus ()) {
     mp_hierarchy_panel->copy ();
@@ -1510,8 +1456,7 @@ LayoutView::copy ()
   }
 }
 
-void
-LayoutView::cut ()
+void LayoutView::cut ()
 {
   if (mp_hierarchy_panel && mp_hierarchy_panel->has_focus ()) {
     //  TODO: currently the hierarchy panel's cut function does its own transaction handling.
@@ -1525,8 +1470,7 @@ LayoutView::cut ()
   }
 }
 
-int
-LayoutView::active_cellview_index () const
+int LayoutView::active_cellview_index () const
 {
   if (mp_hierarchy_panel) {
     return mp_hierarchy_panel->active ();
@@ -1535,8 +1479,7 @@ LayoutView::active_cellview_index () const
   }
 }
 
-void
-LayoutView::set_active_cellview_index (int index) 
+void LayoutView::set_active_cellview_index (int index)
 {
   if (index >= 0 && index < int (cellviews ())) {
     if (mp_hierarchy_panel) {
@@ -1547,8 +1490,7 @@ LayoutView::set_active_cellview_index (int index)
   }
 }
 
-void 
-LayoutView::selected_cells_paths (int cv_index, std::vector<cell_path_type> &paths) const
+void LayoutView::selected_cells_paths (int cv_index, std::vector<cell_path_type> &paths) const
 {
   if (mp_hierarchy_panel) {
     mp_hierarchy_panel->selected_cells (cv_index, paths);
@@ -1557,8 +1499,7 @@ LayoutView::selected_cells_paths (int cv_index, std::vector<cell_path_type> &pat
   }
 }
 
-void
-LayoutView::current_cell_path (int cv_index, cell_path_type &path) const
+void LayoutView::current_cell_path (int cv_index, cell_path_type &path) const
 {
   if (mp_hierarchy_panel) {
     mp_hierarchy_panel->current_cell (cv_index, path);
@@ -1567,8 +1508,7 @@ LayoutView::current_cell_path (int cv_index, cell_path_type &path) const
   }
 }
 
-void
-LayoutView::set_current_cell_path (int cv_index, const cell_path_type &path) 
+void LayoutView::set_current_cell_path (int cv_index, const cell_path_type &path)
 {
   if (mp_hierarchy_panel) {
     mp_hierarchy_panel->set_current_cell (cv_index, path);
@@ -1577,8 +1517,7 @@ LayoutView::set_current_cell_path (int cv_index, const cell_path_type &path)
   }
 }
 
-void
-LayoutView::cancel_edits ()
+void LayoutView::cancel_edits ()
 {
   //  close the property dialog
   if (mp_properties_dialog) {
@@ -1588,8 +1527,7 @@ LayoutView::cancel_edits ()
   LayoutViewBase::cancel_edits ();
 }
 
-void
-LayoutView::finish_edits ()
+void LayoutView::finish_edits ()
 {
   //  closes the property dialog
   if (mp_properties_dialog) {
@@ -1599,8 +1537,7 @@ LayoutView::finish_edits ()
   LayoutViewBase::finish_edits ();
 }
 
-void
-LayoutView::activate ()
+void LayoutView::activate ()
 {
   if (! m_activated) {
     for (std::vector<lay::Plugin *>::const_iterator p = plugins ().begin (); p != plugins ().end (); ++p) {
@@ -1613,8 +1550,7 @@ LayoutView::activate ()
   }
 }
 
-void
-LayoutView::deactivate ()
+void LayoutView::deactivate ()
 {
   for (std::vector<lay::Plugin *>::const_iterator p = plugins ().begin (); p != plugins ().end (); ++p) {
     if ((*p)->browser_interface ()) {
@@ -1630,14 +1566,12 @@ LayoutView::deactivate ()
   m_activated = false;
 }
 
-bool
-LayoutView::is_activated () const
+bool LayoutView::is_activated () const
 {
   return m_activated;
 }
 
-void
-LayoutView::deactivate_all_browsers ()
+void LayoutView::deactivate_all_browsers ()
 {
   for (std::vector<lay::Plugin *>::const_iterator p = plugins ().begin (); p != plugins ().end (); ++p) {
     if ((*p)->browser_interface ()) {
@@ -1646,16 +1580,14 @@ LayoutView::deactivate_all_browsers ()
   }
 }
 
-void
-LayoutView::update_content_for_cv (int cellview_index)
+void LayoutView::update_content_for_cv (int cellview_index)
 {
   if (mp_hierarchy_panel) {
     mp_hierarchy_panel->do_update_content (cellview_index);
   }
 }
 
-void
-LayoutView::current_pos (double x, double y)
+void LayoutView::current_pos (double x, double y)
 {
   if (! mp_widget) {
     return;
@@ -1676,40 +1608,35 @@ LayoutView::current_pos (double x, double y)
   }
 }
 
-void
-LayoutView::emit_edits_enabled_changed ()
+void LayoutView::emit_edits_enabled_changed ()
 {
   if (mp_widget) {
     mp_widget->emit_edits_enabled_changed ();
   }
 }
 
-void
-LayoutView::emit_title_changed ()
+void LayoutView::emit_title_changed ()
 {
   if (mp_widget) {
     mp_widget->emit_title_changed (this);
   }
 }
 
-void
-LayoutView::emit_dirty_changed ()
+void LayoutView::emit_dirty_changed ()
 {
   if (mp_widget) {
     mp_widget->emit_dirty_changed (this);
   }
 }
 
-void
-LayoutView::emit_layer_order_changed ()
+void LayoutView::emit_layer_order_changed ()
 {
   if (mp_widget) {
     mp_widget->emit_layer_order_changed ();
   }
 }
 
-void
-LayoutView::signal_selection_changed ()
+void LayoutView::signal_selection_changed ()
 {
   if (selection_size () > 1) {
     message (tl::sprintf (tl::to_string (tr ("selected: %ld objects")), selection_size ()));
@@ -1718,24 +1645,21 @@ LayoutView::signal_selection_changed ()
   lay::Editables::signal_selection_changed ();
 }
 
-void
-LayoutView::message (const std::string &s, int timeout, int priority)
+void LayoutView::message (const std::string &s, int timeout, int priority)
 {
   if (mp_widget) {
     mp_widget->emit_show_message (s, timeout * 1000, priority);
   }
 }
 
-void
-LayoutView::set_focus ()
+void LayoutView::set_focus ()
 {
   if (canvas () && canvas ()->widget ()) {
     canvas ()->widget ()->setFocus (Qt::TabFocusReason);
   }
 }
 
-void
-LayoutView::mode (int m)
+void LayoutView::mode (int m)
 {
   if (mode () != m) {
     LayoutViewBase::mode (m);
@@ -1744,8 +1668,7 @@ LayoutView::mode (int m)
   }
 }
 
-void
-LayoutView::activate_editor_option_pages ()
+void LayoutView::activate_editor_option_pages ()
 {
   lay::EditorOptionsPageCollection *eo_pages = editor_options_pages ();
   if (eo_pages) {
@@ -1753,8 +1676,7 @@ LayoutView::activate_editor_option_pages ()
   }
 }
 
-void
-LayoutView::switch_mode (int m)
+void LayoutView::switch_mode (int m)
 {
   if (mode () != m) {
     LayoutViewBase::mode (m);
@@ -1766,26 +1688,23 @@ LayoutView::switch_mode (int m)
   }
 }
 
-void 
-LayoutView::open_l2ndb_browser (int l2ndb_index, int cv_index)
+void LayoutView::open_l2ndb_browser (int l2ndb_index, int cv_index)
 {
-  lay::NetlistBrowserDialog *l2ndb_browser = get_plugin <lay::NetlistBrowserDialog> ();
+  lay::NetlistBrowserDialog *l2ndb_browser = get_plugin<lay::NetlistBrowserDialog> ();
   if (l2ndb_browser) {
     l2ndb_browser->load (l2ndb_index, cv_index);
   }
 }
 
-void
-LayoutView::open_rdb_browser (int rdb_index, int cv_index)
+void LayoutView::open_rdb_browser (int rdb_index, int cv_index)
 {
-  rdb::MarkerBrowserDialog *rdb_browser = get_plugin <rdb::MarkerBrowserDialog> ();
+  rdb::MarkerBrowserDialog *rdb_browser = get_plugin<rdb::MarkerBrowserDialog> ();
   if (rdb_browser) {
     rdb_browser->load (rdb_index, cv_index);
   }
 }
 
-QSize
-LayoutView::size_hint () const
+QSize LayoutView::size_hint () const
 {
   if ((options () & LV_Naked) != 0) {
     return QSize (200, 200);
@@ -1799,4 +1718,3 @@ LayoutView::size_hint () const
 } // namespace lay
 
 #endif
-

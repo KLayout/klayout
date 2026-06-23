@@ -45,7 +45,7 @@ iterator_from_shape (const db::layer<Sh, db::unstable_layer_tag> &layer, const d
 {
   //  compute the iterator by some pointer arithmetics assuming that layer uses an contiguous container
   //  in unstable mode ...
-  return layer.begin () + (shape.basic_ptr (typename Sh::tag ()) - layer.begin ().operator-> ());
+  return layer.begin () + (shape.basic_ptr (typename Sh::tag ()) - layer.begin ().operator->());
 }
 
 template <class Sh>
@@ -60,7 +60,7 @@ template <class Sh>
 inline bool
 iterator_from_shape_is_valid (const db::layer<Sh, db::unstable_layer_tag> &layer, const db::Shape &shape)
 {
-  return layer.size () > size_t (shape.basic_ptr (typename Sh::tag ()) - layer.begin ().operator-> ());
+  return layer.size () > size_t (shape.basic_ptr (typename Sh::tag ()) - layer.begin ().operator->());
 }
 
 // -------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ Shapes::get_layer () const
   typedef layer_class<Sh, StableTag> lay_cls;
 
   for (typename tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    const lay_cls *lc = dynamic_cast <const lay_cls *> (*l);
+    const lay_cls *lc = dynamic_cast<const lay_cls *> (*l);
     if (lc) {
       return lc->layer ();
     }
@@ -95,7 +95,7 @@ Shapes::get_layer ()
   lay_cls *lc;
 
   for (typename tl::vector<LayerBase *>::iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    lc = dynamic_cast <lay_cls *> (*l);
+    lc = dynamic_cast<lay_cls *> (*l);
     if (lc) {
       //  this is what optimizes access times for another access
       //  with this type
@@ -278,8 +278,7 @@ template DB_PUBLIC const layer<db::object_with_properties<db::Shape::user_object
 
 
 template <class Tag>
-bool
-Shapes::is_valid_shape_by_tag (Tag /*tag*/, const shape_type &shape) const
+bool Shapes::is_valid_shape_by_tag (Tag /*tag*/, const shape_type &shape) const
 {
   if (! is_editable ()) {
     if (! shape.has_prop_id ()) {
@@ -300,8 +299,7 @@ Shapes::is_valid_shape_by_tag (Tag /*tag*/, const shape_type &shape) const
   }
 }
 
-bool
-Shapes::is_valid (const Shapes::shape_type &shape) const
+bool Shapes::is_valid (const Shapes::shape_type &shape) const
 {
   switch (shape.m_type) {
   case shape_type::Null:
@@ -357,8 +355,7 @@ Shapes::is_valid (const Shapes::shape_type &shape) const
 }
 
 template <class Tag>
-void
-Shapes::erase_shape_by_tag (Tag tag, const shape_type &shape)
+void Shapes::erase_shape_by_tag (Tag tag, const shape_type &shape)
 {
   if (is_editable ()) {
     erase_shape_by_tag_ws (tag, db::stable_layer_tag (), shape);
@@ -368,8 +365,7 @@ Shapes::erase_shape_by_tag (Tag tag, const shape_type &shape)
 }
 
 template <class Tag, class StableTag>
-void
-Shapes::erase_shape_by_tag_ws (Tag /*tag*/, StableTag /*stable_tag*/, const shape_type &shape)
+void Shapes::erase_shape_by_tag_ws (Tag /*tag*/, StableTag /*stable_tag*/, const shape_type &shape)
 {
   if (! is_editable ()) {
     throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
@@ -382,7 +378,7 @@ Shapes::erase_shape_by_tag_ws (Tag /*tag*/, StableTag /*stable_tag*/, const shap
       check_is_editable_for_undo_redo ();
       db::layer_op<typename Tag::object_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, *i);
     }
-    invalidate_state ();  //  HINT: must come before the change is done!
+    invalidate_state (); //  HINT: must come before the change is done!
     l.erase (i);
 
   } else {
@@ -395,15 +391,13 @@ Shapes::erase_shape_by_tag_ws (Tag /*tag*/, StableTag /*stable_tag*/, const shap
       check_is_editable_for_undo_redo ();
       db::layer_op<swp_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, *i);
     }
-    invalidate_state ();  //  HINT: must come before the change is done!
+    invalidate_state (); //  HINT: must come before the change is done!
     l.erase (i);
-
   }
 }
 
 template <class Tag, class StableTag>
-void
-Shapes::erase_shapes_by_tag_ws (Tag /*tag*/, StableTag /*stable_tag*/, std::vector<Shapes::shape_type>::const_iterator s1, std::vector<Shapes::shape_type>::const_iterator s2)
+void Shapes::erase_shapes_by_tag_ws (Tag /*tag*/, StableTag /*stable_tag*/, std::vector<Shapes::shape_type>::const_iterator s1, std::vector<Shapes::shape_type>::const_iterator s2)
 {
   if (! s1->has_prop_id ()) {
 
@@ -435,13 +429,11 @@ Shapes::erase_shapes_by_tag_ws (Tag /*tag*/, StableTag /*stable_tag*/, std::vect
     }
 
     erase_positions (typename swp_type::tag (), StableTag (), iters.begin (), iters.end ());
-
   }
 }
 
 template <class Tag>
-void
-Shapes::erase_shapes_by_tag (Tag tag, std::vector<Shapes::shape_type>::const_iterator s1, std::vector<Shapes::shape_type>::const_iterator s2)
+void Shapes::erase_shapes_by_tag (Tag tag, std::vector<Shapes::shape_type>::const_iterator s1, std::vector<Shapes::shape_type>::const_iterator s2)
 {
   if (is_editable ()) {
     erase_shapes_by_tag_ws (tag, db::stable_layer_tag (), s1, s2);
@@ -450,8 +442,7 @@ Shapes::erase_shapes_by_tag (Tag tag, std::vector<Shapes::shape_type>::const_ite
   }
 }
 
-void
-Shapes::erase_shape (const Shapes::shape_type &shape)
+void Shapes::erase_shape (const Shapes::shape_type &shape)
 {
   if (! is_editable ()) {
     throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
@@ -541,14 +532,13 @@ Shapes::erase_shape (const Shapes::shape_type &shape)
   };
 }
 
-void
-Shapes::erase_shapes (const std::vector<Shapes::shape_type> &shapes)
+void Shapes::erase_shapes (const std::vector<Shapes::shape_type> &shapes)
 {
   if (! is_editable ()) {
     throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
   }
 
-  for (std::vector<shape_type>::const_iterator s = shapes.begin (); s != shapes.end (); ) {
+  for (std::vector<shape_type>::const_iterator s = shapes.begin (); s != shapes.end ();) {
 
     std::vector<shape_type>::const_iterator snext = s;
     while (snext != shapes.end () && snext->type () == s->type () && snext->has_prop_id () == s->has_prop_id ()) {
@@ -639,7 +629,6 @@ Shapes::erase_shapes (const std::vector<Shapes::shape_type> &shapes)
     };
 
     s = snext;
-
   }
 }
 

@@ -55,14 +55,13 @@ RuntimeErrorForm::RuntimeErrorForm (QWidget *parent, const char *name, const tl:
   resize (size ().width (), 50);
 }
 
-void 
-RuntimeErrorForm::show_details ()
+void RuntimeErrorForm::show_details ()
 {
   QString t (details_pb->text ());
   if (details_frame->isVisible ()) {
     details_frame->hide ();
     t.replace (QString::fromUtf8 ("<<"), QString::fromUtf8 (">>"));
-    //  It looks like the minimum size is set to a too large value internally. 
+    //  It looks like the minimum size is set to a too large value internally.
     //  Resetting it helps to keep a small-as-possible dialog size.
     setMinimumSize (QSize (0, 0));
     resize (size ().width (), 0);
@@ -75,4 +74,3 @@ RuntimeErrorForm::show_details ()
 }
 
 }
-

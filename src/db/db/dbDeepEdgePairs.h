@@ -30,13 +30,15 @@
 #include "dbDeepShapeStore.h"
 #include "dbEdgePairs.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief Provides hierarchical edges implementation
  */
 class DB_PUBLIC DeepEdgePairs
-  : public db::MutableEdgePairs, public db::DeepShapeCollectionDelegateBase
+  : public db::MutableEdgePairs,
+    public db::DeepShapeCollectionDelegateBase
 {
 public:
   DeepEdgePairs ();
@@ -123,4 +125,3 @@ private:
 }
 
 #endif
-

@@ -46,8 +46,7 @@ ProgressAdaptor::~ProgressAdaptor ()
   tl::Progress::register_adaptor (0);
 }
 
-void
-ProgressAdaptor::register_object (Progress *progress)
+void ProgressAdaptor::register_object (Progress *progress)
 {
   bool cancelled = ! mp_objects.empty () && mp_objects.first ()->break_scheduled ();
   mp_objects.push_back (progress); // this keeps the outmost one visible. push_front would make the latest one visible.
@@ -56,14 +55,12 @@ ProgressAdaptor::register_object (Progress *progress)
   }
 }
 
-void
-ProgressAdaptor::unregister_object (Progress *progress)
+void ProgressAdaptor::unregister_object (Progress *progress)
 {
   progress->unlink ();
 }
 
-void
-ProgressAdaptor::prev (ProgressAdaptor *pa)
+void ProgressAdaptor::prev (ProgressAdaptor *pa)
 {
   mp_prev = pa;
 }
@@ -74,8 +71,7 @@ ProgressAdaptor::prev ()
   return mp_prev;
 }
 
-void
-ProgressAdaptor::signal_break ()
+void ProgressAdaptor::signal_break ()
 {
   for (tl::list<tl::Progress>::iterator k = mp_objects.begin (); k != mp_objects.end (); ++k) {
     k->signal_break ();
@@ -87,7 +83,7 @@ ProgressAdaptor::first ()
 {
   for (tl::list<tl::Progress>::iterator k = mp_objects.begin (); k != mp_objects.end (); ++k) {
     if (! k->is_abstract ()) {
-      return k.operator-> ();
+      return k.operator->();
     }
   }
   return 0;
@@ -101,7 +97,7 @@ ProgressGarbageCollector::ProgressGarbageCollector ()
   tl::ProgressAdaptor *a = tl::Progress::adaptor ();
   if (a) {
     for (tl::ProgressAdaptor::iterator p = a->begin (); p != a->end (); ++p) {
-      mp_valid_objects.insert (p.operator-> ());
+      mp_valid_objects.insert (p.operator->());
     }
   }
 }
@@ -111,19 +107,17 @@ ProgressGarbageCollector::~ProgressGarbageCollector ()
   tl::ProgressAdaptor *a = tl::Progress::adaptor ();
   if (a) {
 
-    for (tl::ProgressAdaptor::iterator p = a->begin (); p != a->end (); ) {
+    for (tl::ProgressAdaptor::iterator p = a->begin (); p != a->end ();) {
 
       tl::ProgressAdaptor::iterator pn = p;
       ++pn;
 
-      if (mp_valid_objects.find (p.operator-> ()) == mp_valid_objects.end ()) {
-        a->unregister_object (p.operator-> ());
+      if (mp_valid_objects.find (p.operator->()) == mp_valid_objects.end ()) {
+        a->unregister_object (p.operator->());
       }
 
       p = pn;
-
     }
-
   }
 }
 
@@ -139,7 +133,7 @@ const size_t default_yield_interval = 1000;
 
 Progress::Progress (const std::string &desc, size_t yield_interval, bool can_cancel)
   : m_desc (desc), m_title (desc), m_final (false),
-    m_interval_count (0), 
+    m_interval_count (0),
     m_yield_interval (yield_interval == 0 ? default_yield_interval : yield_interval),
     m_last_value (-1.0),
     m_can_cancel (can_cancel),
@@ -154,8 +148,7 @@ Progress::~Progress ()
   //  .. nothing yet ..
 }
 
-void
-Progress::initialize ()
+void Progress::initialize ()
 {
   //  The abstract progress does not get test() calls so we need to register it now.
   ProgressAdaptor *a = adaptor ();
@@ -169,12 +162,10 @@ Progress::initialize ()
       m_cancelled = false;
       throw tl::BreakException ();
     }
-
   }
 }
 
-void
-Progress::shutdown ()
+void Progress::shutdown ()
 {
   ProgressAdaptor *a = adaptor ();
   if (a && m_registered) {
@@ -182,8 +173,7 @@ Progress::shutdown ()
   }
 }
 
-void 
-Progress::register_adaptor (ProgressAdaptor *pa)
+void Progress::register_adaptor (ProgressAdaptor *pa)
 {
   ProgressAdaptor *current_pa = adaptor ();
   if (current_pa) {
@@ -198,7 +188,7 @@ Progress::register_adaptor (ProgressAdaptor *pa)
 }
 
 ProgressAdaptor *
-Progress::adaptor () 
+Progress::adaptor ()
 {
   if (! s_thread_data.hasLocalData ()) {
     return 0;
@@ -207,16 +197,14 @@ Progress::adaptor ()
   }
 }
 
-void 
-Progress::signal_break ()
+void Progress::signal_break ()
 {
   if (m_can_cancel) {
     m_cancelled = true;
   }
 }
 
-void
-Progress::set_desc (const std::string &d)
+void Progress::set_desc (const std::string &d)
 {
   if (d != m_desc) {
     m_desc = d;
@@ -261,9 +249,7 @@ bool Progress::test (bool force_yield)
         }
 
         a->yield (this);
-
       }
-
     }
 
     return true;
@@ -316,7 +302,7 @@ RelativeProgress::value () const
   }
 }
 
-std::string 
+std::string
 RelativeProgress::formatted_value () const
 {
   return tl::sprintf (m_format, value ());
@@ -361,7 +347,7 @@ AbsoluteProgress::value () const
   }
 }
 
-std::string 
+std::string
 AbsoluteProgress::formatted_value () const
 {
   double v = 0.0;
@@ -384,5 +370,3 @@ AbsoluteProgress::set (size_t count, bool force_yield)
 }
 
 } // namespace tl
-
-

@@ -79,52 +79,42 @@ static void set_path (lay::NetlistObjectPath *p, const std::vector<db::SubCircui
 }
 
 Class<lay::NetlistObjectPath> decl_NetlistObjectPath ("lay", "NetlistObjectPath",
-  gsi::method_ext ("root=", &set_root, gsi::arg ("root"),
-    "@brief Sets the root circuit of the path.\n"
-    "The root circuit is the circuit from which the path starts.\n"
-  ) +
-  gsi::method_ext ("root", &root,
-    "@brief Gets the root circuit of the path.\n"
-  ) +
-  gsi::method_ext ("path=", &set_path, gsi::arg ("path"),
-    "@brief Sets the path.\n"
-    "The path is a list of subcircuits leading from the root to the final object. "
-    "The final (net, device) object is located in the circuit called by the last subcircuit "
-    "of the subcircuit chain. If the subcircuit list is empty, the final object is located inside "
-    "the root object."
-  ) +
-  gsi::method_ext ("path", &path,
-    "@brief Gets the path.\n"
-  ) +
-  gsi::method_ext ("net=", &set_net, gsi::arg ("net"),
-    "@brief Sets the net the path points to.\n"
-    "If the path describes the location of a net, this member will indicate it.\n"
-    "The other way to describe a final object is \\device=. If neither a device nor "
-    "net is given, the path describes a circuit and how it is referenced from the root."
-  ) +
-  gsi::method_ext ("net", &net,
-    "@brief Gets the net the path points to.\n"
-  ) +
-  gsi::method_ext ("device=", &set_device, gsi::arg ("device"),
-    "@brief Sets the device the path points to.\n"
-    "If the path describes the location of a device, this member will indicate it.\n"
-    "The other way to describe a final object is \\net=. If neither a device nor "
-    "net is given, the path describes a circuit and how it is referenced from the root."
-  ) +
-  gsi::method_ext ("device", &device,
-    "@brief Gets the device the path points to.\n"
-  ) +
-  gsi::method ("is_null?", &lay::NetlistObjectPath::is_null,
-    "@brief Returns a value indicating whether the path is an empty one.\n"
-  ),
-  "@brief An object describing the instantiation of a netlist object.\n"
-  "This class describes the instantiation of a net or a device or a circuit in terms of "
-  "a root circuit and a subcircuit chain leading to the indicated object.\n"
-  "\n"
-  "See \\net= or \\device= for the indicated object, \\path= for the subcircuit chain.\n"
-  "\n"
-  "This class has been introduced in version 0.27.\n"
-);
+                                                      gsi::method_ext ("root=", &set_root, gsi::arg ("root"),
+                                                                       "@brief Sets the root circuit of the path.\n"
+                                                                       "The root circuit is the circuit from which the path starts.\n") +
+                                                        gsi::method_ext ("root", &root,
+                                                                         "@brief Gets the root circuit of the path.\n") +
+                                                        gsi::method_ext ("path=", &set_path, gsi::arg ("path"),
+                                                                         "@brief Sets the path.\n"
+                                                                         "The path is a list of subcircuits leading from the root to the final object. "
+                                                                         "The final (net, device) object is located in the circuit called by the last subcircuit "
+                                                                         "of the subcircuit chain. If the subcircuit list is empty, the final object is located inside "
+                                                                         "the root object.") +
+                                                        gsi::method_ext ("path", &path,
+                                                                         "@brief Gets the path.\n") +
+                                                        gsi::method_ext ("net=", &set_net, gsi::arg ("net"),
+                                                                         "@brief Sets the net the path points to.\n"
+                                                                         "If the path describes the location of a net, this member will indicate it.\n"
+                                                                         "The other way to describe a final object is \\device=. If neither a device nor "
+                                                                         "net is given, the path describes a circuit and how it is referenced from the root.") +
+                                                        gsi::method_ext ("net", &net,
+                                                                         "@brief Gets the net the path points to.\n") +
+                                                        gsi::method_ext ("device=", &set_device, gsi::arg ("device"),
+                                                                         "@brief Sets the device the path points to.\n"
+                                                                         "If the path describes the location of a device, this member will indicate it.\n"
+                                                                         "The other way to describe a final object is \\net=. If neither a device nor "
+                                                                         "net is given, the path describes a circuit and how it is referenced from the root.") +
+                                                        gsi::method_ext ("device", &device,
+                                                                         "@brief Gets the device the path points to.\n") +
+                                                        gsi::method ("is_null?", &lay::NetlistObjectPath::is_null,
+                                                                     "@brief Returns a value indicating whether the path is an empty one.\n"),
+                                                      "@brief An object describing the instantiation of a netlist object.\n"
+                                                      "This class describes the instantiation of a net or a device or a circuit in terms of "
+                                                      "a root circuit and a subcircuit chain leading to the indicated object.\n"
+                                                      "\n"
+                                                      "See \\net= or \\device= for the indicated object, \\path= for the subcircuit chain.\n"
+                                                      "\n"
+                                                      "This class has been introduced in version 0.27.\n");
 
 static lay::NetlistObjectPath first (const lay::NetlistObjectsPath *pp)
 {
@@ -136,18 +126,17 @@ static lay::NetlistObjectPath second (const lay::NetlistObjectsPath *pp)
   return pp->second ();
 }
 
-namespace {
-
-struct First
+namespace
 {
+
+struct First {
   lay::NetlistObjectsPath operator() (const lay::NetlistObjectPath &p)
   {
     return lay::NetlistObjectsPath::from_first (p);
   }
 };
 
-struct Second
-{
+struct Second {
   lay::NetlistObjectsPath operator() (const lay::NetlistObjectPath &p)
   {
     return lay::NetlistObjectsPath::from_second (p);
@@ -214,97 +203,84 @@ static lay::NetlistObjectsPath from_subcircuit (const db::SubCircuit *subcircuit
 }
 
 Class<lay::NetlistObjectsPath> decl_NetlistObjectsPath ("lay", "NetlistObjectsPath",
-  gsi::method_ext ("first", &first,
-    "@brief Gets the first object's path.\n"
-    "In cases of paired netlists (LVS database), the first path points to the layout netlist object.\n"
-    "For the single netlist, the first path is the only path supplied."
-  ) +
-  gsi::method_ext ("second", &second,
-    "@brief Gets the second object's path.\n"
-    "In cases of paired netlists (LVS database), the first path points to the schematic netlist object.\n"
-    "For the single netlist, the second path is always a null path."
-  ) +
-  gsi::method ("from_first", &from<First>, gsi::arg ("p"),
-    "@brief Creates a path from given first coordinates.\n"
-    "Use this constructor to create a paired path from a first set of coordinates (net, circuit, device).\n"
-    "For single-sided databases (i.e. extracted netlist or schematic only), use the first coordinates. "
-    "For two-sided database (i.e. LVS cross references), use the first coordinates when you refer to "
-    "layout netlist objects.\n"
-    "\n"
-    "In this version, the minimum requirement for the path is to have a root.\n"
-    "\n"
-    "This constructor has been added in version 0.30.8."
-  ) +
-  gsi::method ("from_first", &from_net<First>, gsi::arg ("net"),
-    "@brief Creates a path from a given net in the first netlist space.\n"
-    "\n"
-    "This constructor has been added in version 0.30.8."
-  ) +
-  gsi::method ("from_first", &from_device<First>, gsi::arg ("device"),
-    "@brief Creates a path from a given device in the first netlist space.\n"
-    "\n"
-    "This constructor has been added in version 0.30.8."
-  ) +
-  gsi::method ("from_first", &from_circuit<First>, gsi::arg ("circuit"),
-    "@brief Creates a path from a given circuit in the first netlist space.\n"
-    "\n"
-    "This constructor has been added in version 0.30.8."
-  ) +
-  gsi::method ("from_first", &from_subcircuit<First>, gsi::arg ("subcircuit"),
-    "@brief Creates a path from a given subcircuit in the first netlist space.\n"
-    "\n"
-    "This constructor has been added in version 0.30.8."
-  ) +
-  gsi::method ("from_second", &from<Second>, gsi::arg ("p"),
-    "@brief Creates a path from given second coordinates.\n"
-    "Use this constructor to create a paired path from a second set of coordinates (net, circuit, device).\n"
-    "For two-sided database (i.e. LVS cross references), use the second coordinates when you refer to "
-    "schematic netlist objects.\n"
-    "\n"
-    "In this version, the minimum requirement for the path is to have a root.\n"
-    "\n"
-    "This constructor has been added in version 0.30.8."
-  ) +
-  gsi::method ("from_second", &from_net<Second>, gsi::arg ("net"),
-    "@brief Creates a path from a given net in the second netlist space.\n"
-    "\n"
-    "This constructor has been added in version 0.30.8."
-  ) +
-  gsi::method ("from_second", &from_device<Second>, gsi::arg ("device"),
-    "@brief Creates a path from a given device in the second netlist space.\n"
-    "\n"
-    "This constructor has been added in version 0.30.8."
-  ) +
-  gsi::method ("from_second", &from_circuit<Second>, gsi::arg ("circuit"),
-    "@brief Creates a path from a given circuit in the second netlist space.\n"
-    "\n"
-    "This constructor has been added in version 0.30.8."
-  ) +
-  gsi::method ("from_second", &from_subcircuit<Second>, gsi::arg ("subcircuit"),
-    "@brief Creates a path from a given subcircuit in the second netlist space.\n"
-    "\n"
-    "This constructor has been added in version 0.30.8."
-  ),
-  "@brief An object describing the instantiation of a single netlist object or a pair of those.\n"
-  "This class is basically a pair of netlist object paths (see \\NetlistObjectPath). When derived from a single netlist view, "
-  "only the first path is valid and will point to the selected object (a net, a device or a circuit). The second path is null.\n"
-  "\n"
-  "If the path is derived from a paired netlist view (a LVS report view), the first path corresponds to the object in the layout netlist, "
-  "the second one to the object in the schematic netlist.\n"
-  "If the selected object isn't a matched one, either the first or second path may be a null or a partial path without a final net or device object "
-  "or a partial path.\n"
-  "\n"
-  "To create a paired path from an existing object (net, device, circuit, subcircuit), use \\from_first and \\from_second.\n"
-  "Use \\from_first, if the object belongs to the first netlist of the database ('netlist', layout netlist in the LVS context).\n"
-  "Use \\from_second, if the object belongs to the second netlist of the database ('reference', schematic netlist in the LVS context).\n"
-  "\n"
-  "It is also possible to create a paired path from a full path object (including root, a subcircuit path and a target object), either "
-  "for the first or second side. Use \\from_first and \\from_second with a \\NetlistObjectPath argument in that case.\n"
-  "A minimum requirement in that case is to set the root (the origin of the path). If no subcircuit path is "
-  "given (see \\NetlistObjectPath#path), a suitable path leading from the target object (net or device) to the root will be constructed.\n"
-  "\n"
-  "This class has been introduced in version 0.27 and has been extended in version 0.30.8.\n"
-);
+                                                        gsi::method_ext ("first", &first,
+                                                                         "@brief Gets the first object's path.\n"
+                                                                         "In cases of paired netlists (LVS database), the first path points to the layout netlist object.\n"
+                                                                         "For the single netlist, the first path is the only path supplied.") +
+                                                          gsi::method_ext ("second", &second,
+                                                                           "@brief Gets the second object's path.\n"
+                                                                           "In cases of paired netlists (LVS database), the first path points to the schematic netlist object.\n"
+                                                                           "For the single netlist, the second path is always a null path.") +
+                                                          gsi::method ("from_first", &from<First>, gsi::arg ("p"),
+                                                                       "@brief Creates a path from given first coordinates.\n"
+                                                                       "Use this constructor to create a paired path from a first set of coordinates (net, circuit, device).\n"
+                                                                       "For single-sided databases (i.e. extracted netlist or schematic only), use the first coordinates. "
+                                                                       "For two-sided database (i.e. LVS cross references), use the first coordinates when you refer to "
+                                                                       "layout netlist objects.\n"
+                                                                       "\n"
+                                                                       "In this version, the minimum requirement for the path is to have a root.\n"
+                                                                       "\n"
+                                                                       "This constructor has been added in version 0.30.8.") +
+                                                          gsi::method ("from_first", &from_net<First>, gsi::arg ("net"),
+                                                                       "@brief Creates a path from a given net in the first netlist space.\n"
+                                                                       "\n"
+                                                                       "This constructor has been added in version 0.30.8.") +
+                                                          gsi::method ("from_first", &from_device<First>, gsi::arg ("device"),
+                                                                       "@brief Creates a path from a given device in the first netlist space.\n"
+                                                                       "\n"
+                                                                       "This constructor has been added in version 0.30.8.") +
+                                                          gsi::method ("from_first", &from_circuit<First>, gsi::arg ("circuit"),
+                                                                       "@brief Creates a path from a given circuit in the first netlist space.\n"
+                                                                       "\n"
+                                                                       "This constructor has been added in version 0.30.8.") +
+                                                          gsi::method ("from_first", &from_subcircuit<First>, gsi::arg ("subcircuit"),
+                                                                       "@brief Creates a path from a given subcircuit in the first netlist space.\n"
+                                                                       "\n"
+                                                                       "This constructor has been added in version 0.30.8.") +
+                                                          gsi::method ("from_second", &from<Second>, gsi::arg ("p"),
+                                                                       "@brief Creates a path from given second coordinates.\n"
+                                                                       "Use this constructor to create a paired path from a second set of coordinates (net, circuit, device).\n"
+                                                                       "For two-sided database (i.e. LVS cross references), use the second coordinates when you refer to "
+                                                                       "schematic netlist objects.\n"
+                                                                       "\n"
+                                                                       "In this version, the minimum requirement for the path is to have a root.\n"
+                                                                       "\n"
+                                                                       "This constructor has been added in version 0.30.8.") +
+                                                          gsi::method ("from_second", &from_net<Second>, gsi::arg ("net"),
+                                                                       "@brief Creates a path from a given net in the second netlist space.\n"
+                                                                       "\n"
+                                                                       "This constructor has been added in version 0.30.8.") +
+                                                          gsi::method ("from_second", &from_device<Second>, gsi::arg ("device"),
+                                                                       "@brief Creates a path from a given device in the second netlist space.\n"
+                                                                       "\n"
+                                                                       "This constructor has been added in version 0.30.8.") +
+                                                          gsi::method ("from_second", &from_circuit<Second>, gsi::arg ("circuit"),
+                                                                       "@brief Creates a path from a given circuit in the second netlist space.\n"
+                                                                       "\n"
+                                                                       "This constructor has been added in version 0.30.8.") +
+                                                          gsi::method ("from_second", &from_subcircuit<Second>, gsi::arg ("subcircuit"),
+                                                                       "@brief Creates a path from a given subcircuit in the second netlist space.\n"
+                                                                       "\n"
+                                                                       "This constructor has been added in version 0.30.8."),
+                                                        "@brief An object describing the instantiation of a single netlist object or a pair of those.\n"
+                                                        "This class is basically a pair of netlist object paths (see \\NetlistObjectPath). When derived from a single netlist view, "
+                                                        "only the first path is valid and will point to the selected object (a net, a device or a circuit). The second path is null.\n"
+                                                        "\n"
+                                                        "If the path is derived from a paired netlist view (a LVS report view), the first path corresponds to the object in the layout netlist, "
+                                                        "the second one to the object in the schematic netlist.\n"
+                                                        "If the selected object isn't a matched one, either the first or second path may be a null or a partial path without a final net or device object "
+                                                        "or a partial path.\n"
+                                                        "\n"
+                                                        "To create a paired path from an existing object (net, device, circuit, subcircuit), use \\from_first and \\from_second.\n"
+                                                        "Use \\from_first, if the object belongs to the first netlist of the database ('netlist', layout netlist in the LVS context).\n"
+                                                        "Use \\from_second, if the object belongs to the second netlist of the database ('reference', schematic netlist in the LVS context).\n"
+                                                        "\n"
+                                                        "It is also possible to create a paired path from a full path object (including root, a subcircuit path and a target object), either "
+                                                        "for the first or second side. Use \\from_first and \\from_second with a \\NetlistObjectPath argument in that case.\n"
+                                                        "A minimum requirement in that case is to set the root (the origin of the path). If no subcircuit path is "
+                                                        "given (see \\NetlistObjectPath#path), a suitable path leading from the target object (net or device) to the root will be constructed.\n"
+                                                        "\n"
+                                                        "This class has been introduced in version 0.27 and has been extended in version 0.30.8.\n");
 
 static lay::NetlistObjectPath current_path_first (lay::NetlistBrowserDialog *dialog)
 {
@@ -331,62 +307,50 @@ static lay::LayoutViewBase *get_view (lay::NetlistBrowserDialog *dialog)
 }
 
 Class<lay::NetlistBrowserDialog> decl_NetlistBrowserDialog ("lay", "NetlistBrowserDialog",
-  gsi::event ("on_current_db_changed", &lay::NetlistBrowserDialog::current_db_changed_event,
-    "@brief This event is triggered when the current database is changed.\n"
-    "The current database can be obtained with \\db."
-  ) +
-  gsi::event ("on_selection_changed", &lay::NetlistBrowserDialog::selection_changed_event,
-    "@brief This event is triggered when the selection changed.\n"
-    "The selection can be obtained with \\current_path_first, \\current_path_second, \\selected_nets, \\selected_devices, \\selected_subcircuits and \\selected_circuits."
-  ) +
-  gsi::event ("on_probe", &lay::NetlistBrowserDialog::probe_event, gsi::arg ("first_path"), gsi::arg ("second_path"),
-    "@brief This event is triggered when a net is probed.\n"
-    "The first path will indicate the location of the probed net in terms of two paths: one describing the instantiation of the "
-    "net in layout space and one in schematic space. Both objects are \\NetlistObjectPath objects which hold the root circuit, the "
-    "chain of subcircuits leading to the circuit containing the net and the net itself."
-  ) +
-  gsi::method ("db", &lay::NetlistBrowserDialog::db,
-    "@brief Gets the database the browser is connected to.\n"
-  ) +
-  gsi::method ("db_index", &lay::NetlistBrowserDialog::l2n_index,
-    "@brief Gets the database index inside the view the browser is connected to.\n"
-    "\n"
-    "This attribute has been introduced in version 0.30.8.\n"
-  ) +
-  gsi::method_ext ("view", &get_view,
-    "@brief Gets the view the browser is connected to.\n"
-    "\n"
-    "This attribute has been introduced in version 0.30.8.\n"
-  ) +
-  gsi::method_ext ("current_path_first", &current_path_first,
-    "@brief Gets the path of the current object on the first (layout in case of LVS database) side.\n"
-  ) +
-  gsi::method_ext ("current_path_second", &current_path_second,
-    "@brief Gets the path of the current object on the second (schematic in case of LVS database) side.\n"
-  ) +
-  gsi::method ("current_path", &lay::NetlistBrowserDialog::current_path,
-    "@brief Gets the path of the current object as a path pair (combines layout and schematic object paths in case of a LVS database view).\n"
-  ) +
-  gsi::method_ext ("current_path=", &set_current_path,
-    "@brief Sets the current path.\n"
-    "This is the setter corresponding to the 'current_path' getter. Passing nil clears the selection.\n"
-    "Changing the selection will update the highlights and navigate to the location depending on the "
-    "settings. An \\on_selection_changed signal is not emitted.\n"
-    "\n"
-    "To get a suitable path, see the \\NetlistObjectsPath#from_first and \\NetlistObjectsPath#from_second generators.\n"
-    "\n"
-    "This setter has been introduced in version 0.30.8.\n"
-  ) +
-  gsi::method ("selected_paths", &lay::NetlistBrowserDialog::selected_paths,
-    "@brief Gets the nets currently selected objects (paths) in the netlist database browser.\n"
-    "The result is an array of path pairs. See \\NetlistObjectsPath for details about these pairs."
-  ),
-  "@brief Represents the netlist browser dialog.\n"
-  "This dialog is a part of the \\LayoutView class and can be obtained through \\LayoutView#netlist_browser.\n"
-  "This interface allows to interact with the browser - mainly to get information about state changes.\n"
-  "\n"
-  "This class has been introduced in version 0.27.\n"
-);
+                                                            gsi::event ("on_current_db_changed", &lay::NetlistBrowserDialog::current_db_changed_event,
+                                                                        "@brief This event is triggered when the current database is changed.\n"
+                                                                        "The current database can be obtained with \\db.") +
+                                                              gsi::event ("on_selection_changed", &lay::NetlistBrowserDialog::selection_changed_event,
+                                                                          "@brief This event is triggered when the selection changed.\n"
+                                                                          "The selection can be obtained with \\current_path_first, \\current_path_second, \\selected_nets, \\selected_devices, \\selected_subcircuits and \\selected_circuits.") +
+                                                              gsi::event ("on_probe", &lay::NetlistBrowserDialog::probe_event, gsi::arg ("first_path"), gsi::arg ("second_path"),
+                                                                          "@brief This event is triggered when a net is probed.\n"
+                                                                          "The first path will indicate the location of the probed net in terms of two paths: one describing the instantiation of the "
+                                                                          "net in layout space and one in schematic space. Both objects are \\NetlistObjectPath objects which hold the root circuit, the "
+                                                                          "chain of subcircuits leading to the circuit containing the net and the net itself.") +
+                                                              gsi::method ("db", &lay::NetlistBrowserDialog::db,
+                                                                           "@brief Gets the database the browser is connected to.\n") +
+                                                              gsi::method ("db_index", &lay::NetlistBrowserDialog::l2n_index,
+                                                                           "@brief Gets the database index inside the view the browser is connected to.\n"
+                                                                           "\n"
+                                                                           "This attribute has been introduced in version 0.30.8.\n") +
+                                                              gsi::method_ext ("view", &get_view,
+                                                                               "@brief Gets the view the browser is connected to.\n"
+                                                                               "\n"
+                                                                               "This attribute has been introduced in version 0.30.8.\n") +
+                                                              gsi::method_ext ("current_path_first", &current_path_first,
+                                                                               "@brief Gets the path of the current object on the first (layout in case of LVS database) side.\n") +
+                                                              gsi::method_ext ("current_path_second", &current_path_second,
+                                                                               "@brief Gets the path of the current object on the second (schematic in case of LVS database) side.\n") +
+                                                              gsi::method ("current_path", &lay::NetlistBrowserDialog::current_path,
+                                                                           "@brief Gets the path of the current object as a path pair (combines layout and schematic object paths in case of a LVS database view).\n") +
+                                                              gsi::method_ext ("current_path=", &set_current_path,
+                                                                               "@brief Sets the current path.\n"
+                                                                               "This is the setter corresponding to the 'current_path' getter. Passing nil clears the selection.\n"
+                                                                               "Changing the selection will update the highlights and navigate to the location depending on the "
+                                                                               "settings. An \\on_selection_changed signal is not emitted.\n"
+                                                                               "\n"
+                                                                               "To get a suitable path, see the \\NetlistObjectsPath#from_first and \\NetlistObjectsPath#from_second generators.\n"
+                                                                               "\n"
+                                                                               "This setter has been introduced in version 0.30.8.\n") +
+                                                              gsi::method ("selected_paths", &lay::NetlistBrowserDialog::selected_paths,
+                                                                           "@brief Gets the nets currently selected objects (paths) in the netlist database browser.\n"
+                                                                           "The result is an array of path pairs. See \\NetlistObjectsPath for details about these pairs."),
+                                                            "@brief Represents the netlist browser dialog.\n"
+                                                            "This dialog is a part of the \\LayoutView class and can be obtained through \\LayoutView#netlist_browser.\n"
+                                                            "This interface allows to interact with the browser - mainly to get information about state changes.\n"
+                                                            "\n"
+                                                            "This class has been introduced in version 0.27.\n");
 
 static lay::NetlistBrowserDialog *netlist_browser (lay::LayoutViewBase *lv)
 {
@@ -394,16 +358,12 @@ static lay::NetlistBrowserDialog *netlist_browser (lay::LayoutViewBase *lv)
 }
 
 //  extend lay::LayoutViewBase with the getter for the netlist browser
-static
-gsi::ClassExt<lay::LayoutViewBase> decl_ext_layout_view (
+static gsi::ClassExt<lay::LayoutViewBase> decl_ext_layout_view (
   gsi::method_ext ("netlist_browser", &netlist_browser,
-    "@brief Gets the netlist browser object for the given layout view\n"
-    "\n"
-    "\nThis method has been added in version 0.27.\n"
-  )
-);
+                   "@brief Gets the netlist browser object for the given layout view\n"
+                   "\n"
+                   "\nThis method has been added in version 0.27.\n"));
 
 }
 
 #endif
-

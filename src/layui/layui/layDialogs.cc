@@ -71,7 +71,7 @@ LayerSourceDialog::LayerSourceDialog (QWidget *parent)
   : QDialog (parent)
 {
   setObjectName (QString::fromUtf8 ("layer_source_dialog"));
-  
+
   mp_ui = new Ui::LayerSourceDialog ();
   mp_ui->setupUi (this);
 
@@ -84,8 +84,7 @@ LayerSourceDialog::~LayerSourceDialog ()
   mp_ui = 0;
 }
 
-bool 
-LayerSourceDialog::exec_dialog (std::string &s)
+bool LayerSourceDialog::exec_dialog (std::string &s)
 {
   mp_ui->sourceString->setText (tl::to_qstring (s));
   if (QDialog::exec ()) {
@@ -116,8 +115,7 @@ NewLayoutPropertiesDialog::~NewLayoutPropertiesDialog ()
   mp_ui = 0;
 }
 
-void
-NewLayoutPropertiesDialog::tech_changed ()
+void NewLayoutPropertiesDialog::tech_changed ()
 {
   double dbu = 0.0;
   int technology_index = mp_ui->tech_cbx->currentIndex ();
@@ -136,8 +134,7 @@ NewLayoutPropertiesDialog::tech_changed ()
 #endif
 }
 
-bool 
-NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &cell_name, double &dbu, double &size, std::vector<db::LayerProperties> &layers, bool &current_panel)
+bool NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &cell_name, double &dbu, double &size, std::vector<db::LayerProperties> &layers, bool &current_panel)
 {
   mp_ui->tech_cbx->clear ();
   unsigned int technology_index = 0;
@@ -147,7 +144,6 @@ NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &ce
     if (t->name () == technology) {
       mp_ui->tech_cbx->setCurrentIndex (technology_index);
     }
-
   }
 
   tech_changed ();
@@ -211,24 +207,23 @@ NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &ce
   }
 }
 
-void 
-NewLayoutPropertiesDialog::accept ()
+void NewLayoutPropertiesDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
 
   double x = 0.0;
   tl::from_string_ext (tl::to_string (mp_ui->window_le->text ()), x);
-  if (!mp_ui->dbu_le->text ().isEmpty ()) {
+  if (! mp_ui->dbu_le->text ().isEmpty ()) {
     tl::from_string_ext (tl::to_string (mp_ui->dbu_le->text ()), x);
   }
 
   if (mp_ui->topcell_le->text ().isEmpty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("The topcell must be specified")));
   }
-  
+
   QDialog::accept ();
 
-END_PROTECTED;
+  END_PROTECTED;
 }
 
 // --------------------------------------------------------------------------------
@@ -250,8 +245,7 @@ NewCellPropertiesDialog::~NewCellPropertiesDialog ()
   mp_ui = 0;
 }
 
-bool 
-NewCellPropertiesDialog::exec_dialog (const db::Layout *layout, std::string &cell_name, double &size)
+bool NewCellPropertiesDialog::exec_dialog (const db::Layout *layout, std::string &cell_name, double &size)
 {
   mp_layout = layout;
 
@@ -269,10 +263,9 @@ NewCellPropertiesDialog::exec_dialog (const db::Layout *layout, std::string &cel
   }
 }
 
-void 
-NewCellPropertiesDialog::accept ()
+void NewCellPropertiesDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
 
   double x = 0.0;
   tl::from_string_ext (tl::to_string (mp_ui->window_le->text ()), x);
@@ -280,10 +273,10 @@ BEGIN_PROTECTED;
   if (mp_layout->cell_by_name (tl::to_string (mp_ui->name_le->text ()).c_str ()).first) {
     throw tl::Exception (tl::to_string (QObject::tr ("A cell with that name already exists: %s")), tl::to_string (mp_ui->name_le->text ()));
   }
-  
+
   QDialog::accept ();
 
-END_PROTECTED;
+  END_PROTECTED;
 }
 
 // --------------------------------------------------------------------------------
@@ -304,14 +297,12 @@ NewLayerPropertiesDialog::~NewLayerPropertiesDialog ()
   mp_ui = 0;
 }
 
-bool 
-NewLayerPropertiesDialog::exec_dialog (db::LayerProperties &src)
+bool NewLayerPropertiesDialog::exec_dialog (db::LayerProperties &src)
 {
   return exec_dialog (lay::CellView (), src);
 }
 
-bool 
-NewLayerPropertiesDialog::exec_dialog (const lay::CellView &cv, db::LayerProperties &src)
+bool NewLayerPropertiesDialog::exec_dialog (const lay::CellView &cv, db::LayerProperties &src)
 {
   if (cv.is_valid ()) {
     mp_ui->layout_lbl->setText (tl::to_qstring ((tl::to_string (QObject::tr ("Layer for layout: ")) + cv->name ())));
@@ -340,8 +331,7 @@ NewLayerPropertiesDialog::exec_dialog (const lay::CellView &cv, db::LayerPropert
   }
 }
 
-void
-NewLayerPropertiesDialog::get (db::LayerProperties &src)
+void NewLayerPropertiesDialog::get (db::LayerProperties &src)
 {
   if (! mp_ui->layer_le->text ().isEmpty ()) {
     int l = -1;
@@ -360,22 +350,21 @@ NewLayerPropertiesDialog::get (db::LayerProperties &src)
   src.name = tl::to_string (mp_ui->name_le->text ());
 }
 
-void 
-NewLayerPropertiesDialog::accept ()
+void NewLayerPropertiesDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
   db::LayerProperties lp;
   get (lp);
 
   if (lp.layer < 0 && lp.datatype < 0) {
     if (lp.name.empty ()) {
       throw tl::Exception (tl::to_string (QObject::tr ("Either a layer/datatype combination or a name must be specified for a layer")));
-    } 
+    }
   } else if (lp.layer < 0 || lp.datatype < 0) {
     throw tl::Exception (tl::to_string (QObject::tr ("Both layer and datatype must be specified for a layer")));
   }
   QDialog::accept ();
-END_PROTECTED;
+  END_PROTECTED;
 }
 
 // --------------------------------------------------------------------------------
@@ -401,8 +390,7 @@ LayoutViewFunctionDialog::~LayoutViewFunctionDialog ()
   mp_ui = 0;
 }
 
-bool
-LayoutViewFunctionDialog::exec_dialog (QString &text)
+bool LayoutViewFunctionDialog::exec_dialog (QString &text)
 {
   mp_ui->edit->setText (text);
   if (QDialog::exec ()) {
@@ -413,21 +401,19 @@ LayoutViewFunctionDialog::exec_dialog (QString &text)
   }
 }
 
-void
-LayoutViewFunctionDialog::apply_clicked ()
+void LayoutViewFunctionDialog::apply_clicked ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
   apply_event (tl::to_string (mp_ui->edit->text ()));
-END_PROTECTED;
+  END_PROTECTED;
 }
 
-void
-LayoutViewFunctionDialog::accept ()
+void LayoutViewFunctionDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
   accept_event (tl::to_string (mp_ui->edit->text ()));
   QDialog::accept ();
-END_PROTECTED;
+  END_PROTECTED;
 }
 
 // --------------------------------------------------------------------------------
@@ -450,8 +436,7 @@ MoveOptionsDialog::~MoveOptionsDialog ()
   mp_ui = 0;
 }
 
-bool 
-MoveOptionsDialog::exec_dialog (db::DVector &disp)
+bool MoveOptionsDialog::exec_dialog (db::DVector &disp)
 {
   mp_ui->disp_x_le->setText (tl::to_qstring (tl::to_string (disp.x ())));
   mp_ui->disp_y_le->setText (tl::to_qstring (tl::to_string (disp.y ())));
@@ -473,21 +458,19 @@ MoveOptionsDialog::vector ()
   return db::DVector (x, y);
 }
 
-void
-MoveOptionsDialog::apply_clicked ()
+void MoveOptionsDialog::apply_clicked ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
   apply_event (vector ());
-END_PROTECTED;
+  END_PROTECTED;
 }
 
-void
-MoveOptionsDialog::accept ()
+void MoveOptionsDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
   accept_event (vector ());
   QDialog::accept ();
-END_PROTECTED;
+  END_PROTECTED;
 }
 
 // --------------------------------------------------------------------------------
@@ -501,11 +484,11 @@ MoveToOptionsDialog::MoveToOptionsDialog (QWidget *parent)
   mp_ui = new Ui::MoveToOptionsDialog ();
   mp_ui->setupUi (this);
 
-  QToolButton *buttons[3][3] = { { mp_ui->lb, mp_ui->cb, mp_ui->rb }, { mp_ui->lc, mp_ui->cc, mp_ui->rc }, { mp_ui->lt, mp_ui->ct, mp_ui->rt } };
+  QToolButton *buttons [3][3] = {{mp_ui->lb, mp_ui->cb, mp_ui->rb}, {mp_ui->lc, mp_ui->cc, mp_ui->rc}, {mp_ui->lt, mp_ui->ct, mp_ui->rt}};
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      connect (buttons[i][j], SIGNAL (clicked ()), this, SLOT (button_clicked ()));
+      connect (buttons [i][j], SIGNAL (clicked ()), this, SLOT (button_clicked ()));
     }
   }
 }
@@ -516,17 +499,16 @@ MoveToOptionsDialog::~MoveToOptionsDialog ()
   mp_ui = 0;
 }
 
-bool 
-MoveToOptionsDialog::exec_dialog (int &mode_x, int &mode_y, db::DPoint &target)
+bool MoveToOptionsDialog::exec_dialog (int &mode_x, int &mode_y, db::DPoint &target)
 {
   mp_ui->x_le->setText (tl::to_qstring (tl::to_string (target.x ())));
   mp_ui->y_le->setText (tl::to_qstring (tl::to_string (target.y ())));
 
-  QToolButton *buttons[3][3] = { { mp_ui->lb, mp_ui->cb, mp_ui->rb }, { mp_ui->lc, mp_ui->cc, mp_ui->rc }, { mp_ui->lt, mp_ui->ct, mp_ui->rt } };
+  QToolButton *buttons [3][3] = {{mp_ui->lb, mp_ui->cb, mp_ui->rb}, {mp_ui->lc, mp_ui->cc, mp_ui->rc}, {mp_ui->lt, mp_ui->ct, mp_ui->rt}};
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      buttons[i][j]->setChecked (j - 1 == mode_x && i - 1 == mode_y);
+      buttons [i][j]->setChecked (j - 1 == mode_x && i - 1 == mode_y);
     }
   }
 
@@ -534,7 +516,7 @@ MoveToOptionsDialog::exec_dialog (int &mode_x, int &mode_y, db::DPoint &target)
 
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
-        if (buttons[i][j]->isChecked ()) {
+        if (buttons [i][j]->isChecked ()) {
           mode_x = j - 1;
           mode_y = i - 1;
         }
@@ -554,21 +536,19 @@ MoveToOptionsDialog::exec_dialog (int &mode_x, int &mode_y, db::DPoint &target)
   }
 }
 
-void 
-MoveToOptionsDialog::accept ()
+void MoveToOptionsDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
   double x = 0.0;
   tl::from_string_ext (tl::to_string (mp_ui->x_le->text ()), x);
   tl::from_string_ext (tl::to_string (mp_ui->y_le->text ()), x);
   QDialog::accept ();
-END_PROTECTED;
+  END_PROTECTED;
 }
 
-void 
-MoveToOptionsDialog::button_clicked ()
+void MoveToOptionsDialog::button_clicked ()
 {
-  QToolButton *buttons[3][3] = { { mp_ui->lb, mp_ui->cb, mp_ui->rb }, { mp_ui->lc, mp_ui->cc, mp_ui->rc }, { mp_ui->lt, mp_ui->ct, mp_ui->rt } };
+  QToolButton *buttons [3][3] = {{mp_ui->lb, mp_ui->cb, mp_ui->rb}, {mp_ui->lc, mp_ui->cc, mp_ui->rc}, {mp_ui->lt, mp_ui->ct, mp_ui->rt}};
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
@@ -597,10 +577,9 @@ RenameCellDialog::~RenameCellDialog ()
   mp_ui = 0;
 }
 
-void 
-RenameCellDialog::accept ()
+void RenameCellDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
   if (mp_ui->name_le->text ().isEmpty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("A name must be given")));
   }
@@ -608,11 +587,10 @@ BEGIN_PROTECTED;
     throw tl::Exception (tl::to_string (QObject::tr ("A cell with that name already exists")));
   }
   QDialog::accept ();
-END_PROTECTED;
+  END_PROTECTED;
 }
 
-bool 
-RenameCellDialog::exec_dialog (const db::Layout &layout, std::string &name)
+bool RenameCellDialog::exec_dialog (const db::Layout &layout, std::string &name)
 {
   mp_layout = &layout;
   mp_ui->name_le->setText (tl::to_qstring (name));
@@ -642,10 +620,9 @@ CopyCellModeDialog::~CopyCellModeDialog ()
   mp_ui = 0;
 }
 
-bool 
-CopyCellModeDialog::exec_dialog (int &copy_mode, bool &dont_ask)
+bool CopyCellModeDialog::exec_dialog (int &copy_mode, bool &dont_ask)
 {
-  QRadioButton *buttons [] = { mp_ui->shallow_rb, mp_ui->deep_rb };
+  QRadioButton *buttons [] = {mp_ui->shallow_rb, mp_ui->deep_rb};
 
   for (int i = 0; i < int (sizeof (buttons) / sizeof (buttons [0])); ++i) {
     buttons [i]->setChecked (copy_mode == i);
@@ -682,10 +659,9 @@ DeleteCellModeDialog::~DeleteCellModeDialog ()
   mp_ui = 0;
 }
 
-bool 
-DeleteCellModeDialog::exec_dialog (int &delete_mode)
+bool DeleteCellModeDialog::exec_dialog (int &delete_mode)
 {
-  QRadioButton *buttons [] = { mp_ui->shallow_rb, mp_ui->deep_rb, mp_ui->full_rb };
+  QRadioButton *buttons [] = {mp_ui->shallow_rb, mp_ui->deep_rb, mp_ui->full_rb};
 
   for (int i = 0; i < int (sizeof (buttons) / sizeof (buttons [0])); ++i) {
     buttons [i]->setChecked (delete_mode == i);
@@ -733,10 +709,9 @@ find_cell_by_display_name (const db::Layout &layout, const std::string &cn)
   return std::make_pair (false, 0);
 }
 
-bool 
-ReplaceCellOptionsDialog::exec_dialog (const lay::CellView &cv, int &replace_mode, db::cell_index_type &cell_index)
+bool ReplaceCellOptionsDialog::exec_dialog (const lay::CellView &cv, int &replace_mode, db::cell_index_type &cell_index)
 {
-  QRadioButton *buttons [] = { mp_ui->shallow_rb, mp_ui->deep_rb, mp_ui->full_rb };
+  QRadioButton *buttons [] = {mp_ui->shallow_rb, mp_ui->deep_rb, mp_ui->full_rb};
 
   for (int i = 0; i < int (sizeof (buttons) / sizeof (buttons [0])); ++i) {
     buttons [i]->setChecked (replace_mode == i);
@@ -765,10 +740,9 @@ ReplaceCellOptionsDialog::exec_dialog (const lay::CellView &cv, int &replace_mod
   }
 }
 
-void 
-ReplaceCellOptionsDialog::accept ()
+void ReplaceCellOptionsDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
 
   lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->cell_selection_cbx->model ());
   if (model) {
@@ -781,7 +755,7 @@ BEGIN_PROTECTED;
 
   QDialog::accept ();
 
-END_PROTECTED;
+  END_PROTECTED;
 }
 
 // --------------------------------------------------------------------------------
@@ -802,10 +776,9 @@ ClearLayerModeDialog::~ClearLayerModeDialog ()
   mp_ui = 0;
 }
 
-bool 
-ClearLayerModeDialog::exec_dialog (int &clear_mode)
+bool ClearLayerModeDialog::exec_dialog (int &clear_mode)
 {
-  QRadioButton *buttons [3] = { mp_ui->local_rb, mp_ui->hierarchically_rb, mp_ui->layout_rb };
+  QRadioButton *buttons [3] = {mp_ui->local_rb, mp_ui->hierarchically_rb, mp_ui->layout_rb};
 
   for (int i = 0; i < int (sizeof (buttons) / sizeof (buttons [0])); ++i) {
     buttons [i]->setChecked (clear_mode == i);
@@ -841,10 +814,9 @@ OpenLayoutModeDialog::~OpenLayoutModeDialog ()
   mp_ui = 0;
 }
 
-bool 
-OpenLayoutModeDialog::exec_dialog (int &open_mode)
+bool OpenLayoutModeDialog::exec_dialog (int &open_mode)
 {
-  QRadioButton *buttons [3] = { mp_ui->replace_rb, mp_ui->new_rb, mp_ui->add_rb };
+  QRadioButton *buttons [3] = {mp_ui->replace_rb, mp_ui->new_rb, mp_ui->add_rb};
 
   for (int i = 0; i < int (sizeof (buttons) / sizeof (buttons [0])); ++i) {
     buttons [i]->setChecked (open_mode == i);
@@ -884,8 +856,7 @@ DuplicateLayerDialog::~DuplicateLayerDialog ()
   mp_ui = 0;
 }
 
-void
-DuplicateLayerDialog::cv_changed (int)
+void DuplicateLayerDialog::cv_changed (int)
 {
   if (! mp_view) {
     return;
@@ -895,8 +866,7 @@ DuplicateLayerDialog::cv_changed (int)
   mp_ui->layerr_cbx->set_view (mp_view, mp_ui->cvr_cbx->currentIndex ());
 }
 
-bool 
-DuplicateLayerDialog::exec_dialog (lay::LayoutViewBase *view, int &cv, int &layer, int &cv_r, int &layer_r, int &hier_mode, bool &clear_before)
+bool DuplicateLayerDialog::exec_dialog (lay::LayoutViewBase *view, int &cv, int &layer, int &cv_r, int &layer_r, int &hier_mode, bool &clear_before)
 {
   mp_view = view;
 
@@ -925,17 +895,15 @@ DuplicateLayerDialog::exec_dialog (lay::LayoutViewBase *view, int &cv, int &laye
     clear_before = mp_ui->clear_cb->isChecked ();
 
     res = true;
-
   }
 
   mp_view = 0;
   return res;
 }
 
-void 
-DuplicateLayerDialog::accept ()
+void DuplicateLayerDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
 
   int cv = mp_ui->cv_cbx->current_cv_index ();
   if (cv < 0) {
@@ -968,7 +936,7 @@ BEGIN_PROTECTED;
   }
 
   QDialog::accept ();
-END_PROTECTED;
+  END_PROTECTED;
 }
 
 // --------------------------------------------------------------------------------
@@ -982,11 +950,11 @@ AlignCellOptionsDialog::AlignCellOptionsDialog (QWidget *parent)
   mp_ui = new Ui::AlignCellOptionsDialog ();
   mp_ui->setupUi (this);
 
-  QToolButton *buttons[3][3] = { { mp_ui->lb, mp_ui->cb, mp_ui->rb }, { mp_ui->lc, mp_ui->cc, mp_ui->rc }, { mp_ui->lt, mp_ui->ct, mp_ui->rt } };
+  QToolButton *buttons [3][3] = {{mp_ui->lb, mp_ui->cb, mp_ui->rb}, {mp_ui->lc, mp_ui->cc, mp_ui->rc}, {mp_ui->lt, mp_ui->ct, mp_ui->rt}};
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      connect (buttons[i][j], SIGNAL (clicked ()), this, SLOT (button_clicked ()));
+      connect (buttons [i][j], SIGNAL (clicked ()), this, SLOT (button_clicked ()));
     }
   }
 }
@@ -997,17 +965,16 @@ AlignCellOptionsDialog::~AlignCellOptionsDialog ()
   mp_ui = 0;
 }
 
-bool 
-AlignCellOptionsDialog::exec_dialog (AlignCellOptions &data)
+bool AlignCellOptionsDialog::exec_dialog (AlignCellOptions &data)
 {
   mp_ui->vis_only_cbx->setChecked (data.visible_only);
   mp_ui->adjust_calls_cbx->setChecked (data.adjust_parents);
 
-  QToolButton *buttons[3][3] = { { mp_ui->lb, mp_ui->cb, mp_ui->rb }, { mp_ui->lc, mp_ui->cc, mp_ui->rc }, { mp_ui->lt, mp_ui->ct, mp_ui->rt } };
+  QToolButton *buttons [3][3] = {{mp_ui->lb, mp_ui->cb, mp_ui->rb}, {mp_ui->lc, mp_ui->cc, mp_ui->rc}, {mp_ui->lt, mp_ui->ct, mp_ui->rt}};
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      buttons[i][j]->setChecked (j - 1 == data.mode_x && i - 1 == data.mode_y);
+      buttons [i][j]->setChecked (j - 1 == data.mode_x && i - 1 == data.mode_y);
     }
   }
 
@@ -1021,7 +988,7 @@ AlignCellOptionsDialog::exec_dialog (AlignCellOptions &data)
 
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
-        if (buttons[i][j]->isChecked ()) {
+        if (buttons [i][j]->isChecked ()) {
           data.mode_x = j - 1;
           data.mode_y = i - 1;
         }
@@ -1038,10 +1005,9 @@ AlignCellOptionsDialog::exec_dialog (AlignCellOptions &data)
   }
 }
 
-void
-AlignCellOptionsDialog::accept ()
+void AlignCellOptionsDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
 
   double x = 0.0;
   tl::from_string_ext (tl::to_string (mp_ui->x_le->text ()), x);
@@ -1049,13 +1015,12 @@ BEGIN_PROTECTED;
 
   QDialog::accept ();
 
-END_PROTECTED;
+  END_PROTECTED;
 }
 
-void
-AlignCellOptionsDialog::button_clicked ()
+void AlignCellOptionsDialog::button_clicked ()
 {
-  QToolButton *buttons[3][3] = { { mp_ui->lb, mp_ui->cb, mp_ui->rb }, { mp_ui->lc, mp_ui->cc, mp_ui->rc }, { mp_ui->lt, mp_ui->ct, mp_ui->rt } };
+  QToolButton *buttons [3][3] = {{mp_ui->lb, mp_ui->cb, mp_ui->rb}, {mp_ui->lc, mp_ui->cc, mp_ui->rc}, {mp_ui->lt, mp_ui->ct, mp_ui->rt}};
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
@@ -1071,7 +1036,7 @@ AlignCellOptionsDialog::button_clicked ()
 
 FlattenInstOptionsDialog::FlattenInstOptionsDialog (QWidget *parent, bool enable_pruning)
   : QDialog (parent)
-{ 
+{
   mp_ui = new Ui::FlattenInstOptionsDialog ();
   mp_ui->setupUi (this);
 
@@ -1087,8 +1052,7 @@ FlattenInstOptionsDialog::~FlattenInstOptionsDialog ()
   mp_ui = 0;
 }
 
-bool
-FlattenInstOptionsDialog::exec_dialog (int &levels, bool &prune) 
+bool FlattenInstOptionsDialog::exec_dialog (int &levels, bool &prune)
 {
   mp_ui->first_level_rb->setChecked (false);
   mp_ui->all_levels_rb->setChecked (false);
@@ -1119,8 +1083,7 @@ FlattenInstOptionsDialog::exec_dialog (int &levels, bool &prune)
       levels = std::numeric_limits<int>::max ();
       return true;
     }
-
-  } 
+  }
   return false;
 }
 
@@ -1197,7 +1160,6 @@ UserPropertiesForm::get_properties (int tab)
       props.insert (k, v);
 
       ++it;
-
     }
 
   } else {
@@ -1219,18 +1181,14 @@ UserPropertiesForm::get_properties (int tab)
         ex.expect_end ();
 
         props.insert (k, v);
-
       }
-
     }
-
   }
 
   return props;
 }
 
-void
-UserPropertiesForm::set_properties (const db::PropertiesSet &props)
+void UserPropertiesForm::set_properties (const db::PropertiesSet &props)
 {
   mp_ui->prop_list->clear ();
 
@@ -1253,8 +1211,7 @@ UserPropertiesForm::set_properties (const db::PropertiesSet &props)
   mp_ui->text_edit->setPlainText (tl::to_qstring (text));
 }
 
-void
-UserPropertiesForm::set_meta_info (db::Layout::meta_info_iterator begin_meta, db::Layout::meta_info_iterator end_meta, const db::Layout &layout)
+void UserPropertiesForm::set_meta_info (db::Layout::meta_info_iterator begin_meta, db::Layout::meta_info_iterator end_meta, const db::Layout &layout)
 {
   m_begin_meta = begin_meta;
   m_end_meta = end_meta;
@@ -1273,19 +1230,17 @@ UserPropertiesForm::set_meta_info (db::Layout::meta_info_iterator begin_meta, db
   }
 }
 
-bool
-UserPropertiesForm::show (LayoutViewBase *view, unsigned int cv_index, db::properties_id_type &prop_id)
+bool UserPropertiesForm::show (LayoutViewBase *view, unsigned int cv_index, db::properties_id_type &prop_id)
 {
   db::Layout::meta_info_map no_meta;
   return show (view, cv_index, prop_id, no_meta.begin (), no_meta.end ());
 }
 
-bool
-UserPropertiesForm::show (LayoutViewBase *view, unsigned int cv_index, db::properties_id_type &prop_id, db::Layout::meta_info_iterator begin_meta, db::Layout::meta_info_iterator end_meta)
+bool UserPropertiesForm::show (LayoutViewBase *view, unsigned int cv_index, db::properties_id_type &prop_id, db::Layout::meta_info_iterator begin_meta, db::Layout::meta_info_iterator end_meta)
 {
   bool ret = false;
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   const lay::CellView &cv = view->cellview (cv_index);
 
@@ -1317,17 +1272,16 @@ BEGIN_PROTECTED
     ret = false;
   }
 
-END_PROTECTED
+  END_PROTECTED
 
   return ret;
 }
 
-void 
-UserPropertiesForm::add ()
+void UserPropertiesForm::add ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
-  if (!m_editable) {
+  if (! m_editable) {
     return;
   }
 
@@ -1341,18 +1295,16 @@ BEGIN_PROTECTED
     entry->setText (1, value);
 
     mp_ui->prop_list->setCurrentItem (entry);
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-UserPropertiesForm::remove ()
+void UserPropertiesForm::remove ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
-  if (!m_editable) {
+  if (! m_editable) {
     return;
   }
 
@@ -1362,23 +1314,21 @@ BEGIN_PROTECTED
 
   delete mp_ui->prop_list->currentItem ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-UserPropertiesForm::dbl_clicked (QTreeWidgetItem *, int)
+void UserPropertiesForm::dbl_clicked (QTreeWidgetItem *, int)
 {
   edit ();
 }
 
-void
-UserPropertiesForm::tab_changed (int tab_index)
+void UserPropertiesForm::tab_changed (int tab_index)
 {
   if (! m_editable) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   int prev_tab = tab_index == 0 ? 1 : 0;
 
@@ -1394,16 +1344,14 @@ BEGIN_PROTECTED
     mp_ui->mode_tab->blockSignals (false);
 
     throw;
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-UserPropertiesForm::accept ()
+void UserPropertiesForm::accept ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   //  Test for errors
   if (m_editable) {
@@ -1412,15 +1360,14 @@ BEGIN_PROTECTED
 
   QDialog::accept ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-UserPropertiesForm::edit ()
+void UserPropertiesForm::edit ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
-  if (!m_editable) {
+  if (! m_editable) {
     return;
   }
 
@@ -1437,7 +1384,7 @@ BEGIN_PROTECTED
     mp_ui->prop_list->currentItem ()->setText (1, value);
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
 // ----------------------------------------------------------------------
@@ -1479,10 +1426,9 @@ normalize (const QString &s)
   return tl::to_qstring (v.to_parsable_string ());
 }
 
-bool 
-UserPropertiesEditForm::show (QString &key, QString &value)
+bool UserPropertiesEditForm::show (QString &key, QString &value)
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   mp_ui->key_le->setText (key);
   mp_ui->value_le->setText (value);
@@ -1493,27 +1439,27 @@ BEGIN_PROTECTED
     return true;
   }
 
-END_PROTECTED
+  END_PROTECTED
   return false;
 }
 
-void 
-UserPropertiesEditForm::accept ()
+void UserPropertiesEditForm::accept ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   normalize (mp_ui->key_le->text ());
   normalize (mp_ui->value_le->text ());
 
   QDialog::accept ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
 // ----------------------------------------------------------------------
 //  UndoRedoListForm implementation
 
-namespace {
+namespace
+{
 
 class UndoRedoListViewModel
   : public QAbstractListModel
@@ -1559,7 +1505,7 @@ public:
     }
   }
 
-  QModelIndex parent(const QModelIndex &) const
+  QModelIndex parent (const QModelIndex &) const
   {
     return QModelIndex ();
   }
@@ -1601,7 +1547,7 @@ UndoRedoListForm::UndoRedoListForm (QWidget *parent, db::Manager *manager, bool 
 
   mp_ui->items->setModel (new UndoRedoListViewModel (mp_ui->items, manager, for_undo));
 
-  connect (mp_ui->items->selectionModel (), SIGNAL (currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT (selection_changed(const QModelIndex &)));
+  connect (mp_ui->items->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (selection_changed (const QModelIndex &)));
   selection_changed (QModelIndex ());
 }
 
@@ -1611,8 +1557,7 @@ UndoRedoListForm::~UndoRedoListForm ()
   mp_ui = 0;
 }
 
-void
-UndoRedoListForm::selection_changed (const QModelIndex &current)
+void UndoRedoListForm::selection_changed (const QModelIndex &current)
 {
   if (! current.isValid () || current.row () < 0) {
     mp_ui->title_lbl->setText (m_for_undo ? tr ("Undo to step (select one)") : tr ("Redo to step (select one)"));
@@ -1630,12 +1575,10 @@ UndoRedoListForm::selection_changed (const QModelIndex &current)
     if (model) {
       model->set_current_step (m_steps - 1);
     }
-
   }
 }
 
-bool
-UndoRedoListForm::exec (int &steps)
+bool UndoRedoListForm::exec (int &steps)
 {
   if (QDialog::exec ()) {
     steps = m_steps;

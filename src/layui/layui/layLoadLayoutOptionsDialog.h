@@ -39,14 +39,14 @@ class QAbstractButton;
 
 namespace db
 {
-  class LoadLayoutOptions;
-  class Technologies;
+class LoadLayoutOptions;
+class Technologies;
 }
 
 namespace Ui
 {
-  class LoadLayoutOptionsDialog;
-  class SpecificLoadLayoutOptionsDialog;
+class LoadLayoutOptionsDialog;
+class SpecificLoadLayoutOptionsDialog;
 }
 
 namespace lay
@@ -58,7 +58,7 @@ class FileDialog;
 class LAYUI_PUBLIC LoadLayoutOptionsDialog
   : public QDialog
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   LoadLayoutOptionsDialog (QWidget *parent, const std::string &title);
@@ -85,7 +85,7 @@ public slots:
 
 private:
   Ui::LoadLayoutOptionsDialog *mp_ui;
-  std::vector< std::pair<StreamReaderOptionsPage *, std::string> > m_pages;
+  std::vector<std::pair<StreamReaderOptionsPage *, std::string>> m_pages;
   bool m_show_always;
   int m_technology_index;
   std::vector<db::LoadLayoutOptions> m_opt_array;
@@ -118,4 +118,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

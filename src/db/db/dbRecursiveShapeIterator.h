@@ -48,7 +48,7 @@ class RecursiveShapeReceiver;
  *  It simplifies retrieval of shapes from a geometrical region while considering
  *  subcells as well.
  *  Some options can be specified, i.e. the level to which to look into or
- *  shape classes and shape properties. 
+ *  shape classes and shape properties.
  */
 class DB_PUBLIC RecursiveShapeIterator
   : public gsi::ObjectBase
@@ -97,7 +97,7 @@ public:
    *  @param region The region from which to select the shapes
    *  @param overlapping Specify overlapping mode
    *
-   *  This iterator will iterate the shapes from the given shapes container using 
+   *  This iterator will iterate the shapes from the given shapes container using
    *  the given search region in overlapping or touching mode.
    */
   RecursiveShapeIterator (const shapes_type &shapes, const box_type &region, bool overlapping = false);
@@ -261,10 +261,10 @@ public:
    *  A depth of 0 instructs the iterator to deliver only shapes from the initial cell.
    *  The depth must be specified before the shapes are being retrieved.
    */
-  void max_depth (int depth) 
-  { 
+  void max_depth (int depth)
+  {
     if (m_max_depth != depth) {
-      m_max_depth = depth; 
+      m_max_depth = depth;
       reset ();
     }
   }
@@ -303,7 +303,7 @@ public:
   /**
    *  @brief Gets the iterated shapes
    *
-   *  Alternatively to layout/cell, the shape iterator can iterate shapes which will 
+   *  Alternatively to layout/cell, the shape iterator can iterate shapes which will
    *  deliver the shapes of the shape container rather than the cell.
    *  Layers and hierarchy levels don't have a meaning in that case.
    */
@@ -486,9 +486,9 @@ public:
   void reset ();
 
   /**
-   *  @brief Select cells 
+   *  @brief Select cells
    *
-   *  If no specific cells have been selected before, this method will confine the selection 
+   *  If no specific cells have been selected before, this method will confine the selection
    *  to the given cells (plus their sub-hierarchy).
    *  If cells have been selected before, this will add the given cells to the selection.
    */
@@ -497,13 +497,13 @@ public:
   /**
    *  @brief Select all cells
    *
-   *  Makes all cells selected. After doing so, all unselect_cells calls 
+   *  Makes all cells selected. After doing so, all unselect_cells calls
    *  will unselect only that specific cell without children.
    */
   void select_all_cells ();
 
   /**
-   *  @brief Unselect cells 
+   *  @brief Unselect cells
    *
    *  This method will remove the given cells (plus their sub-hierarchy) from the selection.
    */
@@ -512,7 +512,7 @@ public:
   /**
    *  @brief Unselect all cells
    *
-   *  Makes all cells unselected. After doing so, select_cells calls 
+   *  Makes all cells unselected. After doing so, select_cells calls
    *  will select only that specific cell without children.
    */
   void unselect_all_cells ();
@@ -520,7 +520,7 @@ public:
   /**
    *  @brief Resets the selection
    *
-   *  This will reset all selections and unselections. 
+   *  This will reset all selections and unselections.
    *  After calling this methods, all select_cells will again select the cells
    *  including their children.
    */
@@ -552,10 +552,10 @@ public:
    *  The flags are the same then being defined in db::ShapeIterator.
    *  The flags must be specified before the shapes are being retrieved.
    */
-  void shape_flags (unsigned int flags) 
-  { 
+  void shape_flags (unsigned int flags)
+  {
     if (m_shape_flags != flags) {
-      m_shape_flags = flags; 
+      m_shape_flags = flags;
       reset ();
     }
   }
@@ -589,10 +589,10 @@ public:
    *  It is not copied and the object must stay valid as long as the iterator is used.
    *  The selector must be specified before the shapes are being retrieved.
    */
-  void shape_property_selector (const shape_iterator::property_selector *prop_sel) 
-  { 
+  void shape_property_selector (const shape_iterator::property_selector *prop_sel)
+  {
     if (mp_shape_prop_sel != prop_sel) {
-      mp_shape_prop_sel = prop_sel; 
+      mp_shape_prop_sel = prop_sel;
       reset ();
     }
   }
@@ -604,9 +604,9 @@ public:
    *  The flags must be specified before the shapes are being retrieved.
    */
   void inverse_shape_property_selection (bool inv)
-  { 
+  {
     if (m_shape_inv_prop_sel != inv) {
-      m_shape_inv_prop_sel = inv; 
+      m_shape_inv_prop_sel = inv;
       reset ();
     }
   }
@@ -636,7 +636,7 @@ public:
   /**
    *  @brief Gets a value indicating whether a multiple layers are used
    *
-   *  If this value is true, multiple layers are searched for shapes. 
+   *  If this value is true, multiple layers are searched for shapes.
    *  Use the \layers method to retrieve them
    *  Otherwise a single layer is used. Use the \layer method to retrieve it.
    */
@@ -648,7 +648,7 @@ public:
   /**
    *  @brief Get the current transformation by which the shapes must be transformed into the initial cell
    *
-   *  The shapes delivered are not transformed. Instead, this transformation must be applied to 
+   *  The shapes delivered are not transformed. Instead, this transformation must be applied to
    *  get the shape in the coordinate system of the top cell.
    */
   const cplx_trans_type &trans () const
@@ -671,7 +671,7 @@ public:
   /**
    *  @brief Gets the current shape
    *
-   *  Returns the shape currently referred to by the recursive iterator. 
+   *  Returns the shape currently referred to by the recursive iterator.
    *  This shape is not transformed yet and is located in the current cell.
    */
   shape_type shape () const
@@ -696,10 +696,10 @@ public:
    *
    *  The access operator is identical to the shape method.
    */
-  const shape_type *operator-> () const
+  const shape_type *operator->() const
   {
     validate (0);
-    return m_shape.operator-> ();
+    return m_shape.operator->();
   }
 
   /**
@@ -765,7 +765,7 @@ public:
   /**
    *  @brief Increments the iterator (operator version)
    */
-  RecursiveShapeIterator &operator++() 
+  RecursiveShapeIterator &operator++ ()
   {
     next (0);
     return *this;
@@ -782,7 +782,7 @@ public:
   /**
    *  @brief Comparison of iterators - equality
    */
-  bool operator==(const RecursiveShapeIterator &d) const
+  bool operator== (const RecursiveShapeIterator &d) const
   {
     if (at_end () != d.at_end ()) {
       return false;
@@ -796,9 +796,9 @@ public:
   /**
    *  @brief Comparison of iterators - inequality
    */
-  bool operator!=(const RecursiveShapeIterator &d) const
+  bool operator!= (const RecursiveShapeIterator &d) const
   {
-    return !operator==(d);
+    return ! operator== (d);
   }
 
   /**
@@ -904,7 +904,7 @@ private:
   bool skip_shapes () const;
   bool is_outside_complex_region (const db::Box &box) const;
 
-  void set_inactive (bool a) const 
+  void set_inactive (bool a) const
   {
     size_t c = reinterpret_cast<size_t> (mp_cell);
     c -= (c & size_t (1));
@@ -943,17 +943,19 @@ public:
   /**
    *  @brief See new_inst for details.
    */
-  enum  new_inst_mode { NI_all = 0, NI_single = 1, NI_skip = 2 };
+  enum new_inst_mode { NI_all = 0,
+                       NI_single = 1,
+                       NI_skip = 2 };
 
   /**
    *  @brief Constructor
    */
-  RecursiveShapeReceiver () { }
+  RecursiveShapeReceiver () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~RecursiveShapeReceiver () { }
+  virtual ~RecursiveShapeReceiver () {}
 
   /**
    *  @brief Returns true, if the receivers wants the full hierarchy and not just non-empty cells
@@ -963,12 +965,12 @@ public:
   /**
    *  @brief Called once when the iterator begins pushing
    */
-  virtual void begin (const RecursiveShapeIterator * /*iter*/) { }
+  virtual void begin (const RecursiveShapeIterator * /*iter*/) {}
 
   /**
    *  @brief Called once after the iterator pushed everything
    */
-  virtual void end (const RecursiveShapeIterator * /*iter*/) { }
+  virtual void end (const RecursiveShapeIterator * /*iter*/) {}
 
   /**
    *  @brief Enters a cell
@@ -982,14 +984,14 @@ public:
    *  @param region The clip box as seen from "cell" or db::Box::world if there is no clip box
    *  @param complex_region A complex clip region if one is supplied together with "region"
    */
-  virtual void enter_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { }
+  virtual void enter_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) {}
 
   /**
    *  @brief Leaves the current cell
    *
    *  This method is the counterpart for "enter_cell". It is called when traversal of "cell" ended.
    */
-  virtual void leave_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/) { }
+  virtual void leave_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/) {}
 
   /**
    *  @brief Enters a new instance
@@ -1043,9 +1045,9 @@ public:
    *
    *  @param trans The transformation which maps the shape to the top cell.
    */
-  virtual void shape (const RecursiveShapeIterator * /*iter*/, const db::Shape & /*shape*/, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { }
+  virtual void shape (const RecursiveShapeIterator * /*iter*/, const db::Shape & /*shape*/, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) {}
 };
 
-}  // namespace db
+} // namespace db
 
 #endif

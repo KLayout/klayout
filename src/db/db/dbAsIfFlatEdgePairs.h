@@ -29,7 +29,8 @@
 #include "dbEdgePairsDelegate.h"
 #include "dbEdgePairsUtils.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief Provides default flat implementations
@@ -124,4 +125,3 @@ private:
 }
 
 #endif
-

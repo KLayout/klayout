@@ -50,8 +50,7 @@ class NetlistCompareLogger;
 // --------------------------------------------------------------------------------------------------------------------
 //  Global netlist compare options
 
-struct DB_PUBLIC NetlistCompareGlobalOptions
-{
+struct DB_PUBLIC NetlistCompareGlobalOptions {
   NetlistCompareGlobalOptions ();
   void ensure_initialized ();
 
@@ -128,8 +127,7 @@ DB_PUBLIC bool net_names_are_equal (const db::Net *a, const db::Net *b);
  *  in a second step, by equivalence of the devices. The device class will implement
  *  the device equivalence function.
  */
-struct DB_PUBLIC DeviceCompare
-{
+struct DB_PUBLIC DeviceCompare {
   bool operator() (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const;
   bool equals (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const;
 };
@@ -143,8 +141,7 @@ struct DB_PUBLIC DeviceCompare
  *  As Subcircuits are not parametrized, the comparison of subcircuits is only based on
  *  the circuit equivalence (via category).
  */
-struct DB_PUBLIC SubCircuitCompare
-{
+struct DB_PUBLIC SubCircuitCompare {
   bool operator() (const std::pair<const db::SubCircuit *, size_t> &sc1, const std::pair<const db::SubCircuit *, size_t> &sc2) const;
   bool equals (const std::pair<const db::SubCircuit *, size_t> &sc1, const std::pair<const db::SubCircuit *, size_t> &sc2) const;
 };
@@ -172,7 +169,7 @@ public:
   size_t normalize_pin_id (const db::Circuit *circuit, size_t pin_id) const;
 
 private:
-  std::map<const db::Circuit *, tl::equivalence_clusters<size_t> > m_pin_map;
+  std::map<const db::Circuit *, tl::equivalence_clusters<size_t>> m_pin_map;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -279,7 +276,7 @@ class SubCircuitEquivalenceTracker
   : public generic_equivalence_tracker<db::SubCircuit>
 {
 public:
-  SubCircuitEquivalenceTracker () : generic_equivalence_tracker<db::SubCircuit> () { }
+  SubCircuitEquivalenceTracker () : generic_equivalence_tracker<db::SubCircuit> () {}
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -289,7 +286,7 @@ class DeviceEquivalenceTracker
   : public generic_equivalence_tracker<db::Device>
 {
 public:
-  DeviceEquivalenceTracker () : generic_equivalence_tracker<db::Device> () { }
+  DeviceEquivalenceTracker () : generic_equivalence_tracker<db::Device> () {}
 };
 
 // --------------------------------------------------------------------------------------------------------------------

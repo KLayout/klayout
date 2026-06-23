@@ -41,8 +41,10 @@
 
 KJ_BEGIN_HEADER
 
-namespace kj {
-namespace _ {  // private
+namespace kj
+{
+namespace _
+{ // private
 
 template <size_t index, typename... T>
 struct TypeByIndex_;
@@ -52,22 +54,25 @@ struct TypeByIndex_<0, First, Rest...> {
 };
 template <size_t index, typename First, typename... Rest>
 struct TypeByIndex_<index, First, Rest...>
-    : public TypeByIndex_<index - 1, Rest...> {};
+  : public TypeByIndex_<index - 1, Rest...> {
+};
 template <size_t index>
 struct TypeByIndex_<index> {
-  static_assert(index != index, "Index out-of-range.");
+  static_assert (index != index, "Index out-of-range.");
 };
 template <size_t index, typename... T>
 using TypeByIndex = typename TypeByIndex_<index, T...>::Type;
 // Chose a particular type out of a list of types, by index.
 
 template <size_t... s>
-struct Indexes {};
+struct Indexes {
+};
 // Dummy helper type that just encapsulates a sequential list of indexes, so that we can match
 // templates against them and unpack them with '...'.
 
 template <size_t end, size_t... prefix>
-struct MakeIndexes_: public MakeIndexes_<end - 1, end - 1, prefix...> {};
+struct MakeIndexes_ : public MakeIndexes_<end - 1, end - 1, prefix...> {
+};
 template <size_t... prefix>
 struct MakeIndexes_<0, prefix...> {
   typedef Indexes<prefix...> Type;
@@ -79,11 +84,11 @@ using MakeIndexes = typename MakeIndexes_<end>::Type;
 template <typename... T>
 class Tuple;
 template <size_t index, typename... U>
-inline TypeByIndex<index, U...>& getImpl(Tuple<U...>& tuple);
+inline TypeByIndex<index, U...> &getImpl (Tuple<U...> &tuple);
 template <size_t index, typename... U>
-inline TypeByIndex<index, U...>&& getImpl(Tuple<U...>&& tuple);
+inline TypeByIndex<index, U...> &&getImpl (Tuple<U...> &&tuple);
 template <size_t index, typename... U>
-inline const TypeByIndex<index, U...>& getImpl(const Tuple<U...>& tuple);
+inline const TypeByIndex<index, U...> &getImpl (const Tuple<U...> &tuple);
 
 template <uint index, typename T>
 struct TupleElement {
@@ -91,23 +96,23 @@ struct TupleElement {
   // from a TupleElement for each element, which is more efficient than a recursive definition.
 
   T value;
-  TupleElement() = default;
-  constexpr inline TupleElement(const T& value): value(value) {}
-  constexpr inline TupleElement(T&& value): value(kj::mv(value)) {}
+  TupleElement () = default;
+  constexpr inline TupleElement (const T &value) : value (value) {}
+  constexpr inline TupleElement (T &&value) : value (kj::mv (value)) {}
 };
 
 template <uint index, typename T>
-struct TupleElement<index, T&> {
+struct TupleElement<index, T &> {
   // A tuple containing references can be constructed using refTuple().
 
-  T& value;
-  constexpr inline TupleElement(T& value): value(value) {}
+  T &value;
+  constexpr inline TupleElement (T &value) : value (value) {}
 };
 
 template <uint index, typename... T>
 struct TupleElement<index, Tuple<T...>> {
-  static_assert(sizeof(Tuple<T...>*) == 0,
-                "Tuples cannot contain other tuples -- they should be flattened.");
+  static_assert (sizeof (Tuple<T...> *) == 0,
+                 "Tuples cannot contain other tuples -- they should be flattened.");
 };
 
 template <typename Indexes, typename... Types>
@@ -115,69 +120,72 @@ struct TupleImpl;
 
 template <size_t... indexes, typename... Types>
 struct TupleImpl<Indexes<indexes...>, Types...>
-    : public TupleElement<indexes, Types>... {
+  : public TupleElement<indexes, Types>... {
   // Implementation of Tuple.  The only reason we need this rather than rolling this into class
   // Tuple (below) is so that we can get "indexes" as an unpackable list.
 
-  static_assert(sizeof...(indexes) == sizeof...(Types), "Incorrect use of TupleImpl.");
+  static_assert (sizeof...(indexes) == sizeof...(Types), "Incorrect use of TupleImpl.");
 
-  TupleImpl() = default;
+  TupleImpl () = default;
 
   template <typename... Params>
-  inline TupleImpl(Params&&... params)
-      : TupleElement<indexes, Types>(kj::fwd<Params>(params))... {
+  inline TupleImpl (Params &&...params)
+    : TupleElement<indexes, Types> (kj::fwd<Params> (params))...
+  {
     // Work around Clang 3.2 bug 16303 where this is not detected.  (Unfortunately, Clang sometimes
     // segfaults instead.)
-    static_assert(sizeof...(params) == sizeof...(indexes),
-                  "Wrong number of parameters to Tuple constructor.");
+    static_assert (sizeof...(params) == sizeof...(indexes),
+                   "Wrong number of parameters to Tuple constructor.");
   }
 
   template <typename... U>
-  constexpr inline TupleImpl(Tuple<U...>&& other)
-      : TupleElement<indexes, Types>(kj::fwd<U>(getImpl<indexes>(other)))... {}
+  constexpr inline TupleImpl (Tuple<U...> &&other)
+    : TupleElement<indexes, Types> (kj::fwd<U> (getImpl<indexes> (other)))... {}
   template <typename... U>
-  constexpr inline TupleImpl(Tuple<U...>& other)
-      : TupleElement<indexes, Types>(getImpl<indexes>(other))... {}
+  constexpr inline TupleImpl (Tuple<U...> &other)
+    : TupleElement<indexes, Types> (getImpl<indexes> (other))... {}
   template <typename... U>
-  constexpr inline TupleImpl(const Tuple<U...>& other)
-      : TupleElement<indexes, Types>(getImpl<indexes>(other))... {}
+  constexpr inline TupleImpl (const Tuple<U...> &other)
+    : TupleElement<indexes, Types> (getImpl<indexes> (other))... {}
 };
 
 struct MakeTupleFunc;
 struct MakeRefTupleFunc;
 
 template <typename... T>
-class Tuple {
+class Tuple
+{
   // The actual Tuple class (used for tuples of size other than 1).
 
 public:
-  Tuple() = default;
+  Tuple () = default;
 
   template <typename... U>
-  constexpr inline Tuple(Tuple<U...>&& other): impl(kj::mv(other)) {}
+  constexpr inline Tuple (Tuple<U...> &&other) : impl (kj::mv (other)) {}
   template <typename... U>
-  constexpr inline Tuple(Tuple<U...>& other): impl(other) {}
+  constexpr inline Tuple (Tuple<U...> &other) : impl (other) {}
   template <typename... U>
-  constexpr inline Tuple(const Tuple<U...>& other): impl(other) {}
+  constexpr inline Tuple (const Tuple<U...> &other) : impl (other) {}
 
 private:
   template <typename... Params>
-  constexpr Tuple(Params&&... params): impl(kj::fwd<Params>(params)...) {}
+  constexpr Tuple (Params &&...params) : impl (kj::fwd<Params> (params)...) {}
 
   TupleImpl<MakeIndexes<sizeof...(T)>, T...> impl;
 
   template <size_t index, typename... U>
-  friend inline TypeByIndex<index, U...>& getImpl(Tuple<U...>& tuple);
+  friend inline TypeByIndex<index, U...> &getImpl (Tuple<U...> &tuple);
   template <size_t index, typename... U>
-  friend inline TypeByIndex<index, U...>&& getImpl(Tuple<U...>&& tuple);
+  friend inline TypeByIndex<index, U...> &&getImpl (Tuple<U...> &&tuple);
   template <size_t index, typename... U>
-  friend inline const TypeByIndex<index, U...>& getImpl(const Tuple<U...>& tuple);
+  friend inline const TypeByIndex<index, U...> &getImpl (const Tuple<U...> &tuple);
   friend struct MakeTupleFunc;
   friend struct MakeRefTupleFunc;
 };
 
 template <>
-class Tuple<> {
+class Tuple<>
+{
   // Simplified zero-member version of Tuple.  In particular this is important to make sure that
   // Tuple<>() is constexpr.
 };
@@ -187,30 +195,34 @@ class Tuple<T>;
 // Single-element tuple should never be used.  The public API should ensure this.
 
 template <size_t index, typename... T>
-inline TypeByIndex<index, T...>& getImpl(Tuple<T...>& tuple) {
+inline TypeByIndex<index, T...> &getImpl (Tuple<T...> &tuple)
+{
   // Get member of a Tuple by index, e.g. `get<2>(myTuple)`.
-  static_assert(index < sizeof...(T), "Tuple element index out-of-bounds.");
-  return implicitCast<TupleElement<index, TypeByIndex<index, T...>>&>(tuple.impl).value;
+  static_assert (index < sizeof...(T), "Tuple element index out-of-bounds.");
+  return implicitCast<TupleElement<index, TypeByIndex<index, T...>> &> (tuple.impl).value;
 }
 template <size_t index, typename... T>
-inline TypeByIndex<index, T...>&& getImpl(Tuple<T...>&& tuple) {
+inline TypeByIndex<index, T...> &&getImpl (Tuple<T...> &&tuple)
+{
   // Get member of a Tuple by index, e.g. `get<2>(myTuple)`.
-  static_assert(index < sizeof...(T), "Tuple element index out-of-bounds.");
-  return kj::mv(implicitCast<TupleElement<index, TypeByIndex<index, T...>>&>(tuple.impl).value);
+  static_assert (index < sizeof...(T), "Tuple element index out-of-bounds.");
+  return kj::mv (implicitCast<TupleElement<index, TypeByIndex<index, T...>> &> (tuple.impl).value);
 }
 template <size_t index, typename... T>
-inline const TypeByIndex<index, T...>& getImpl(const Tuple<T...>& tuple) {
+inline const TypeByIndex<index, T...> &getImpl (const Tuple<T...> &tuple)
+{
   // Get member of a Tuple by index, e.g. `get<2>(myTuple)`.
-  static_assert(index < sizeof...(T), "Tuple element index out-of-bounds.");
-  return implicitCast<const TupleElement<index, TypeByIndex<index, T...>>&>(tuple.impl).value;
+  static_assert (index < sizeof...(T), "Tuple element index out-of-bounds.");
+  return implicitCast<const TupleElement<index, TypeByIndex<index, T...>> &> (tuple.impl).value;
 }
 template <size_t index, typename T>
-inline T&& getImpl(T&& value) {
+inline T &&getImpl (T &&value)
+{
   // Get member of a Tuple by index, e.g. `getImpl<2>(myTuple)`.
 
   // Non-tuples are equivalent to one-element tuples.
-  static_assert(index == 0, "Tuple element index out-of-bounds.");
-  return kj::fwd<T>(value);
+  static_assert (index == 0, "Tuple element index out-of-bounds.");
+  return kj::fwd<T> (value);
 }
 
 
@@ -222,114 +234,134 @@ struct ExpandAndApplyResult_;
 
 template <typename Func, typename First, typename... Rest, typename... T>
 struct ExpandAndApplyResult_<Func, Tuple<T...>, First, Rest...>
-    : public ExpandAndApplyResult_<Func, Tuple<T..., First>, Rest...> {};
+  : public ExpandAndApplyResult_<Func, Tuple<T..., First>, Rest...> {
+};
 template <typename Func, typename... FirstTypes, typename... Rest, typename... T>
 struct ExpandAndApplyResult_<Func, Tuple<T...>, Tuple<FirstTypes...>, Rest...>
-    : public ExpandAndApplyResult_<Func, Tuple<T...>, FirstTypes&&..., Rest...> {};
+  : public ExpandAndApplyResult_<Func, Tuple<T...>, FirstTypes &&..., Rest...> {
+};
 template <typename Func, typename... FirstTypes, typename... Rest, typename... T>
-struct ExpandAndApplyResult_<Func, Tuple<T...>, Tuple<FirstTypes...>&, Rest...>
-    : public ExpandAndApplyResult_<Func, Tuple<T...>, FirstTypes&..., Rest...> {};
+struct ExpandAndApplyResult_<Func, Tuple<T...>, Tuple<FirstTypes...> &, Rest...>
+  : public ExpandAndApplyResult_<Func, Tuple<T...>, FirstTypes &..., Rest...> {
+};
 template <typename Func, typename... FirstTypes, typename... Rest, typename... T>
-struct ExpandAndApplyResult_<Func, Tuple<T...>, const Tuple<FirstTypes...>&, Rest...>
-    : public ExpandAndApplyResult_<Func, Tuple<T...>, const FirstTypes&..., Rest...> {};
+struct ExpandAndApplyResult_<Func, Tuple<T...>, const Tuple<FirstTypes...> &, Rest...>
+  : public ExpandAndApplyResult_<Func, Tuple<T...>, const FirstTypes &..., Rest...> {
+};
 template <typename Func, typename... T>
 struct ExpandAndApplyResult_<Func, Tuple<T...>> {
-  typedef decltype(instance<Func>()(instance<T&&>()...)) Type;
+  typedef decltype (instance<Func> () (instance<T &&> ()...)) Type;
 };
 template <typename Func, typename... T>
 using ExpandAndApplyResult = typename ExpandAndApplyResult_<Func, Tuple<>, T...>::Type;
 // Computes the expected return type of `expandAndApply()`.
 
 template <typename Func>
-inline auto expandAndApply(Func&& func) -> ExpandAndApplyResult<Func> {
-  return func();
+inline auto expandAndApply (Func &&func) -> ExpandAndApplyResult<Func>
+{
+  return func ();
 }
 
 template <typename Func, typename First, typename... Rest>
 struct ExpandAndApplyFunc {
-  Func&& func;
-  First&& first;
-  ExpandAndApplyFunc(Func&& func, First&& first)
-      : func(kj::fwd<Func>(func)), first(kj::fwd<First>(first)) {}
+  Func &&func;
+  First &&first;
+  ExpandAndApplyFunc (Func &&func, First &&first)
+    : func (kj::fwd<Func> (func)), first (kj::fwd<First> (first)) {}
   template <typename... T>
-  auto operator()(T&&... params)
-      -> decltype(this->func(kj::fwd<First>(first), kj::fwd<T>(params)...)) {
-    return this->func(kj::fwd<First>(first), kj::fwd<T>(params)...);
+  auto operator() (T &&...params)
+    -> decltype (this->func (kj::fwd<First> (first), kj::fwd<T> (params)...))
+  {
+    return this->func (kj::fwd<First> (first), kj::fwd<T> (params)...);
   }
 };
 
 template <typename Func, typename First, typename... Rest>
-inline auto expandAndApply(Func&& func, First&& first, Rest&&... rest)
-    -> ExpandAndApplyResult<Func, First, Rest...> {
+inline auto expandAndApply (Func &&func, First &&first, Rest &&...rest)
+  -> ExpandAndApplyResult<Func, First, Rest...>
+{
 
-  return expandAndApply(
-      ExpandAndApplyFunc<Func, First, Rest...>(kj::fwd<Func>(func), kj::fwd<First>(first)),
-      kj::fwd<Rest>(rest)...);
+  return expandAndApply (
+    ExpandAndApplyFunc<Func, First, Rest...> (kj::fwd<Func> (func), kj::fwd<First> (first)),
+    kj::fwd<Rest> (rest)...);
 }
 
 template <typename Func, typename... FirstTypes, typename... Rest>
-inline auto expandAndApply(Func&& func, Tuple<FirstTypes...>&& first, Rest&&... rest)
-    -> ExpandAndApplyResult<Func, FirstTypes&&..., Rest...> {
-  return expandAndApplyWithIndexes(MakeIndexes<sizeof...(FirstTypes)>(),
-      kj::fwd<Func>(func), kj::mv(first), kj::fwd<Rest>(rest)...);
+inline auto expandAndApply (Func &&func, Tuple<FirstTypes...> &&first, Rest &&...rest)
+  -> ExpandAndApplyResult<Func, FirstTypes &&..., Rest...>
+{
+  return expandAndApplyWithIndexes (MakeIndexes<sizeof...(FirstTypes)> (),
+                                    kj::fwd<Func> (func), kj::mv (first), kj::fwd<Rest> (rest)...);
 }
 
 template <typename Func, typename... FirstTypes, typename... Rest>
-inline auto expandAndApply(Func&& func, Tuple<FirstTypes...>& first, Rest&&... rest)
-    -> ExpandAndApplyResult<Func, FirstTypes..., Rest...> {
-  return expandAndApplyWithIndexes(MakeIndexes<sizeof...(FirstTypes)>(),
-      kj::fwd<Func>(func), first, kj::fwd<Rest>(rest)...);
+inline auto expandAndApply (Func &&func, Tuple<FirstTypes...> &first, Rest &&...rest)
+  -> ExpandAndApplyResult<Func, FirstTypes..., Rest...>
+{
+  return expandAndApplyWithIndexes (MakeIndexes<sizeof...(FirstTypes)> (),
+                                    kj::fwd<Func> (func), first, kj::fwd<Rest> (rest)...);
 }
 
 template <typename Func, typename... FirstTypes, typename... Rest>
-inline auto expandAndApply(Func&& func, const Tuple<FirstTypes...>& first, Rest&&... rest)
-    -> ExpandAndApplyResult<Func, FirstTypes..., Rest...> {
-  return expandAndApplyWithIndexes(MakeIndexes<sizeof...(FirstTypes)>(),
-      kj::fwd<Func>(func), first, kj::fwd<Rest>(rest)...);
+inline auto expandAndApply (Func &&func, const Tuple<FirstTypes...> &first, Rest &&...rest)
+  -> ExpandAndApplyResult<Func, FirstTypes..., Rest...>
+{
+  return expandAndApplyWithIndexes (MakeIndexes<sizeof...(FirstTypes)> (),
+                                    kj::fwd<Func> (func), first, kj::fwd<Rest> (rest)...);
 }
 
 template <typename Func, typename... FirstTypes, typename... Rest, size_t... indexes>
-inline auto expandAndApplyWithIndexes(
-    Indexes<indexes...>, Func&& func, Tuple<FirstTypes...>&& first, Rest&&... rest)
-    -> ExpandAndApplyResult<Func, FirstTypes&&..., Rest...> {
-  return expandAndApply(kj::fwd<Func>(func), kj::mv(getImpl<indexes>(first))...,
-                        kj::fwd<Rest>(rest)...);
+inline auto expandAndApplyWithIndexes (
+  Indexes<indexes...>, Func &&func, Tuple<FirstTypes...> &&first, Rest &&...rest)
+  -> ExpandAndApplyResult<Func, FirstTypes &&..., Rest...>
+{
+  return expandAndApply (kj::fwd<Func> (func), kj::mv (getImpl<indexes> (first))...,
+                         kj::fwd<Rest> (rest)...);
 }
 
 template <typename Func, typename... FirstTypes, typename... Rest, size_t... indexes>
-inline auto expandAndApplyWithIndexes(
-    Indexes<indexes...>, Func&& func, const Tuple<FirstTypes...>& first, Rest&&... rest)
-    -> ExpandAndApplyResult<Func, FirstTypes..., Rest...> {
-  return expandAndApply(kj::fwd<Func>(func), getImpl<indexes>(first)...,
-                       kj::fwd<Rest>(rest)...);
+inline auto expandAndApplyWithIndexes (
+  Indexes<indexes...>, Func &&func, const Tuple<FirstTypes...> &first, Rest &&...rest)
+  -> ExpandAndApplyResult<Func, FirstTypes..., Rest...>
+{
+  return expandAndApply (kj::fwd<Func> (func), getImpl<indexes> (first)...,
+                         kj::fwd<Rest> (rest)...);
 }
 
 struct MakeTupleFunc {
   template <typename... Params>
-  Tuple<Decay<Params>...> operator()(Params&&... params) {
-    return Tuple<Decay<Params>...>(kj::fwd<Params>(params)...);
+  Tuple<Decay<Params>...> operator() (Params &&...params)
+  {
+    return Tuple<Decay<Params>...> (kj::fwd<Params> (params)...);
   }
   template <typename Param>
-  Decay<Param> operator()(Param&& param) {
-    return kj::fwd<Param>(param);
+  Decay<Param> operator() (Param &&param)
+  {
+    return kj::fwd<Param> (param);
   }
 };
 
 struct MakeRefTupleFunc {
   template <typename... Params>
-  Tuple<Params...> operator()(Params&&... params) {
-    return Tuple<Params...>(kj::fwd<Params>(params)...);
+  Tuple<Params...> operator() (Params &&...params)
+  {
+    return Tuple<Params...> (kj::fwd<Params> (params)...);
   }
   template <typename Param>
-  Param operator()(Param&& param) {
-    return kj::fwd<Param>(param);
+  Param operator() (Param &&param)
+  {
+    return kj::fwd<Param> (param);
   }
 };
 
-}  // namespace _ (private)
+} // namespace _ (private)
 
-template <typename... T> struct Tuple_ { typedef _::Tuple<T...> Type; };
-template <typename T> struct Tuple_<T> { typedef T Type; };
+template <typename... T> struct Tuple_ {
+  typedef _::Tuple<T...> Type;
+};
+template <typename T> struct Tuple_<T> {
+  typedef T Type;
+};
 
 template <typename... T> using Tuple = typename Tuple_<T...>::Type;
 // Tuple type.  `Tuple<T>` (i.e. a single-element tuple) is a synonym for `T`.  Tuples of size
@@ -341,42 +373,48 @@ template <typename... T> using Tuple = typename Tuple_<T...>::Type;
 // construct a tuple from other tuples, the elements are flattened and concatenated.
 
 template <typename... Params>
-inline auto tuple(Params&&... params)
-    -> decltype(_::expandAndApply(_::MakeTupleFunc(), kj::fwd<Params>(params)...)) {
+inline auto tuple (Params &&...params)
+  -> decltype (_::expandAndApply (_::MakeTupleFunc (), kj::fwd<Params> (params)...))
+{
   // Construct a new tuple from the given values.  Any tuples in the argument list will be
   // flattened into the result.
-  return _::expandAndApply(_::MakeTupleFunc(), kj::fwd<Params>(params)...);
+  return _::expandAndApply (_::MakeTupleFunc (), kj::fwd<Params> (params)...);
 }
 
 template <typename... Params>
-inline auto refTuple(Params&&... params)
-    -> decltype(_::expandAndApply(_::MakeRefTupleFunc(), kj::fwd<Params>(params)...)) {
+inline auto refTuple (Params &&...params)
+  -> decltype (_::expandAndApply (_::MakeRefTupleFunc (), kj::fwd<Params> (params)...))
+{
   // Like tuple(), but if the params include lvalue references, they will be captured as
   // references. rvalue references will still be captured as whole values (moved).
-  return _::expandAndApply(_::MakeRefTupleFunc(), kj::fwd<Params>(params)...);
+  return _::expandAndApply (_::MakeRefTupleFunc (), kj::fwd<Params> (params)...);
 }
 
 template <size_t index, typename Tuple>
-inline auto get(Tuple&& tuple) -> decltype(_::getImpl<index>(kj::fwd<Tuple>(tuple))) {
+inline auto get (Tuple &&tuple) -> decltype (_::getImpl<index> (kj::fwd<Tuple> (tuple)))
+{
   // Unpack and return the tuple element at the given index.  The index is specified as a template
   // parameter, e.g. `kj::get<3>(myTuple)`.
-  return _::getImpl<index>(kj::fwd<Tuple>(tuple));
+  return _::getImpl<index> (kj::fwd<Tuple> (tuple));
 }
 
 template <typename Func, typename... Params>
-inline auto apply(Func&& func, Params&&... params)
-    -> decltype(_::expandAndApply(kj::fwd<Func>(func), kj::fwd<Params>(params)...)) {
+inline auto apply (Func &&func, Params &&...params)
+  -> decltype (_::expandAndApply (kj::fwd<Func> (func), kj::fwd<Params> (params)...))
+{
   // Apply a function to some arguments, expanding tuples into separate arguments.
-  return _::expandAndApply(kj::fwd<Func>(func), kj::fwd<Params>(params)...);
+  return _::expandAndApply (kj::fwd<Func> (func), kj::fwd<Params> (params)...);
 }
 
-template <typename T> struct TupleSize_ { static constexpr size_t size = 1; };
+template <typename T> struct TupleSize_ {
+  static constexpr size_t size = 1;
+};
 template <typename... T> struct TupleSize_<_::Tuple<T...>> {
   static constexpr size_t size = sizeof...(T);
 };
 
 template <typename T>
-constexpr size_t tupleSize() { return TupleSize_<T>::size; }
+constexpr size_t tupleSize () { return TupleSize_<T>::size; }
 // Returns size of the tuple T.
 
 template <typename T, typename Tuple>
@@ -398,8 +436,8 @@ struct HasType_<T, T> {
 template <typename T, typename... U>
 struct IndexOfType_<T, _::Tuple<T, U...>> {
   static constexpr size_t value = 0;
-  static_assert(!HasType_<T, _::Tuple<U...>>::value,
-      "requested type appears multiple times in tuple");
+  static_assert (! HasType_<T, _::Tuple<U...>>::value,
+                 "requested type appears multiple times in tuple");
 };
 template <typename T, typename... U>
 struct HasType_<T, _::Tuple<T, U...>> {
@@ -416,8 +454,9 @@ struct HasType_<T, _::Tuple<U, V...>> {
 };
 
 template <typename T, typename U>
-inline constexpr size_t indexOfType() {
-  static_assert(HasType_<T, U>::value, "type not present");
+inline constexpr size_t indexOfType ()
+{
+  static_assert (HasType_<T, U>::value, "type not present");
   return IndexOfType_<T, U>::value;
 }
 
@@ -429,7 +468,8 @@ struct TypeOfIndex_<0, T> {
 };
 template <size_t i, typename T, typename... U>
 struct TypeOfIndex_<i, _::Tuple<T, U...>>
-    : public TypeOfIndex_<i - 1, _::Tuple<U...>> {};
+  : public TypeOfIndex_<i - 1, _::Tuple<U...>> {
+};
 template <typename T, typename... U>
 struct TypeOfIndex_<0, _::Tuple<T, U...>> {
   typedef T Type;
@@ -438,6 +478,6 @@ struct TypeOfIndex_<0, _::Tuple<T, U...>> {
 template <size_t i, typename Tuple>
 using TypeOfIndex = typename TypeOfIndex_<i, Tuple>::Type;
 
-}  // namespace kj
+} // namespace kj
 
 KJ_END_HEADER

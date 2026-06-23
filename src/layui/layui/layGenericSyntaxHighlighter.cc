@@ -39,7 +39,7 @@
 /**
  *  @brief Provide a compare operator for QList<QString> because Qt doesn't
  */
-static bool operator<(const QList<QString> &a, const QList<QString> &b)
+static bool operator< (const QList<QString> &a, const QList<QString> &b)
 {
   if (a.size () != b.size ()) {
     return a.size () < b.size ();
@@ -53,7 +53,7 @@ static bool operator<(const QList<QString> &a, const QList<QString> &b)
   }
 }
 
-inline bool 
+inline bool
 is_word_char (QChar c)
 {
   return c.isLetterOrNumber () || c == QChar::fromLatin1 ('_');
@@ -72,7 +72,7 @@ static QString replace_tokens (const QString &input, const QList<QString> &input
   int i = 1;
   for (QList<QString>::const_iterator a = input_args.begin (); a != input_args.end (); ++a, ++i) {
     QString tok (2, QChar::fromLatin1 ('%'));
-    tok[1] = QChar ('0' + i);
+    tok [1] = QChar ('0' + i);
     output.replace (tok, *a);
   }
 
@@ -252,7 +252,7 @@ public:
       return false;
     }
 
-    index = input.indexOf (*ps, index); 
+    index = input.indexOf (*ps, index);
     if (index < 0) {
       return false;
     }
@@ -517,15 +517,18 @@ class GenericSyntaxHighlighterRuleRegExp
   : public GenericSyntaxHighlighterRuleBase
 {
 public:
-  enum anchor_t { AnchorNone = 0, AnchorWB, AnchorNWB, AnchorStart };
+  enum anchor_t { AnchorNone = 0,
+                  AnchorWB,
+                  AnchorNWB,
+                  AnchorStart };
 
   GenericSyntaxHighlighterRuleRegExp (const QString &re, bool dynamic = false)
     : m_re (re), m_dynamic (dynamic), m_c (QChar::Null), m_anchor (AnchorNone), m_last_generation_id (0), m_last_index (-1)
   {
     //  look for the shortcut character
     if (! m_dynamic && re.length () > 0 &&
-      QString::fromUtf8 ("\\.[({^$|").indexOf (re [0]) < 0 && 
-      (re.length () <= 1 || QString::fromUtf8 ("*?{").indexOf (re [1]) < 0)) {
+        QString::fromUtf8 ("\\.[({^$|").indexOf (re [0]) < 0 &&
+        (re.length () <= 1 || QString::fromUtf8 ("*?{").indexOf (re [1]) < 0)) {
       m_c = re [0];
     } else if (re.startsWith (QString::fromUtf8 ("\\b"))) {
       m_anchor = AnchorWB;
@@ -560,8 +563,8 @@ public:
         return false;
       }
       if (m_anchor == AnchorWB || m_anchor == AnchorNWB) {
-        bool at_wb = index <= 0 || !is_word_char (input [index - 1]);
-        if ((m_anchor == AnchorWB) == !at_wb) {
+        bool at_wb = index <= 0 || ! is_word_char (input [index - 1]);
+        if ((m_anchor == AnchorWB) == ! at_wb) {
           return false;
         }
       }
@@ -610,9 +613,7 @@ public:
       } else {
         return false;
       }
-
     }
-
   }
 
   virtual void dump () const
@@ -668,7 +669,7 @@ GenericSyntaxHighlighterRule::~GenericSyntaxHighlighterRule ()
 }
 
 GenericSyntaxHighlighterRule &
-GenericSyntaxHighlighterRule::operator= (const GenericSyntaxHighlighterRule &d) 
+GenericSyntaxHighlighterRule::operator= (const GenericSyntaxHighlighterRule &d)
 {
   if (this != &d) {
     if (m_owner && mp_rule) {
@@ -689,8 +690,7 @@ GenericSyntaxHighlighterRule::operator= (const GenericSyntaxHighlighterRule &d)
   return *this;
 }
 
-bool 
-GenericSyntaxHighlighterRule::match (const QString &input, unsigned int generation_id, int index, int &end_index, const QList<QString> &input_args, QList<QString> &output_args) const
+bool GenericSyntaxHighlighterRule::match (const QString &input, unsigned int generation_id, int index, int &end_index, const QList<QString> &input_args, QList<QString> &output_args) const
 {
   if (m_column >= 0 && std::max (0, index) != m_column) {
     return false;
@@ -698,7 +698,7 @@ GenericSyntaxHighlighterRule::match (const QString &input, unsigned int generati
 
   if (m_first_non_space) {
     for (int i = std::max (0, index) - 1; i >= 0; --i) {
-      if (! input[i].isSpace ()) {
+      if (! input [i].isSpace ()) {
         return false;
       }
     }
@@ -710,7 +710,7 @@ GenericSyntaxHighlighterRule::match (const QString &input, unsigned int generati
       end_index = index;
     }
 
-    //  match child rules if there are some 
+    //  match child rules if there are some
     int new_ei = 0;
     QList<QString> new_oa;
 
@@ -728,8 +728,7 @@ GenericSyntaxHighlighterRule::match (const QString &input, unsigned int generati
   }
 }
 
-void 
-GenericSyntaxHighlighterRule::dump () const
+void GenericSyntaxHighlighterRule::dump () const
 {
   std::cout << "    [attribute=" << m_attribute_id << ", context_id=" << m_target_context_id << ", column=" << m_column << ", first-non-space=" << m_first_non_space << ", lookahead=" << m_lookahead << "]" << std::endl;
   mp_rule->dump ();
@@ -751,16 +750,14 @@ GenericSyntaxHighlighterContext::GenericSyntaxHighlighterContext ()
   // .. nothing yet ..
 }
 
-void 
-GenericSyntaxHighlighterContext::add_rule (const GenericSyntaxHighlighterRule &rule)
+void GenericSyntaxHighlighterContext::add_rule (const GenericSyntaxHighlighterRule &rule)
 {
   if (! rule.is_null ()) {
     m_rules.push_back (rule);
   }
 }
 
-bool
-GenericSyntaxHighlighterContext::match (const QString &string, unsigned int generation_id, int index, int &end_index, const QList<QString> &input_args, QList<QString> &output_args, int &new_context, int &attribute_id) const
+bool GenericSyntaxHighlighterContext::match (const QString &string, unsigned int generation_id, int index, int &end_index, const QList<QString> &input_args, QList<QString> &output_args, int &new_context, int &attribute_id) const
 {
   end_index = index;
   output_args.clear ();
@@ -813,8 +810,7 @@ GenericSyntaxHighlighterContext::match (const QString &string, unsigned int gene
   }
 }
 
-void 
-GenericSyntaxHighlighterContext::include (const GenericSyntaxHighlighterContext &other)
+void GenericSyntaxHighlighterContext::include (const GenericSyntaxHighlighterContext &other)
 {
   //  TODO: don't create copies here but rather reference?
   for (std::list<GenericSyntaxHighlighterRule>::const_iterator r = other.m_rules.begin (); r != other.m_rules.end (); ++r) {
@@ -822,8 +818,7 @@ GenericSyntaxHighlighterContext::include (const GenericSyntaxHighlighterContext 
   }
 }
 
-void 
-GenericSyntaxHighlighterContext::dump () const
+void GenericSyntaxHighlighterContext::dump () const
 {
   std::cout << "  [context id=" << m_id << ", fallthrough=" << m_fallthrough_context << ", linebegin=" << m_linebegin_context << ", lineend=" << m_lineend_context << ", attribute=" << m_attribute_id << "]" << std::endl;
   for (std::list<GenericSyntaxHighlighterRule>::const_iterator r = m_rules.begin (); r != m_rules.end (); ++r) {
@@ -841,8 +836,7 @@ GenericSyntaxHighlighterContexts::GenericSyntaxHighlighterContexts ()
   //  .. nothing yet ..
 }
 
-void 
-GenericSyntaxHighlighterContexts::insert (const QString &name, const GenericSyntaxHighlighterContext &c)
+void GenericSyntaxHighlighterContexts::insert (const QString &name, const GenericSyntaxHighlighterContext &c)
 {
   GenericSyntaxHighlighterContext &new_context = context (name);
   //  since the assignment destroys the ID, we have to restore it
@@ -892,10 +886,9 @@ GenericSyntaxHighlighterContexts::context (int id) const
   return *m_contexts_by_id [id - 1];
 }
 
-void 
-GenericSyntaxHighlighterContexts::dump () const
+void GenericSyntaxHighlighterContexts::dump () const
 {
-    std::cout << "[contexts]" << std::endl;
+  std::cout << "[contexts]" << std::endl;
   for (std::map<QString, GenericSyntaxHighlighterContext>::const_iterator c = m_contexts_by_name.begin (); c != m_contexts_by_name.end (); ++c) {
     std::cout << tl::to_string (c->first) << ":" << std::endl;
     c->second.dump ();
@@ -909,36 +902,35 @@ GenericSyntaxHighlighterAttributes::GenericSyntaxHighlighterAttributes (const Ge
   : mp_basic_attributes (basic_attributes)
 {
   if (! basic_attributes) {
-    add (QString::fromUtf8 ("Normal"),            dsNormal,         false, false, false, false, 0,         0,         0,         0);
-    add (QString::fromUtf8 ("Alert"),             dsAlert,          true,  false, false, false, "#BF0303", "#9C0D0D", "#F7E7E7", 0);
-    add (QString::fromUtf8 ("Base-N Integer"),    dsBaseN,          false, false, false, false, "#B07E00", "#FFDD00", 0,         0);
-    add (QString::fromUtf8 ("Character"),         dsChar,           false, false, false, false, "#FF80E0", "#FF80E0", 0,         0);
-    add (QString::fromUtf8 ("Comment"),           dsComment,        false, true,  false, false, "#888786", "#A6C2E4", 0,         0);
-    add (QString::fromUtf8 ("Data Type"),         dsDataType,       false, false, false, false, "#0057AE", "#00316E", 0,         0);
-    add (QString::fromUtf8 ("Decimal/Value"),     dsDecVal,         false, false, false, false, "#B07E00", "#FFDD00", 0,         0);
-    add (QString::fromUtf8 ("Error"),             dsError,          false, false, true,  false, "#BF0303", "#9C0D0D", 0,         0);
-    add (QString::fromUtf8 ("Floating Point"),    dsFloat,          false, false, false, false, "#B07E00", "#FFDD00", 0,         0);
-    add (QString::fromUtf8 ("Function"),          dsFunction,       false, false, false, false, "#442886", "#442886", 0,         0);
-    add (QString::fromUtf8 ("Keyword"),           dsKeyword,        true,  false, false, false, 0,         0,         0,         0);
-    add (QString::fromUtf8 ("Others"),            dsOthers,         false, false, false, false, "#006E26", "#80FF80", 0,         0);
-    add (QString::fromUtf8 ("Region Marker"),     dsRegionMarker,   false, false, false, false, "#0057AE", "#00316E", "#E1EAF8", 0);
-    add (QString::fromUtf8 ("String"),            dsString,         false, false, false, false, "#BF0303", "#9C0D0D", 0,         0);
-    add (QString::fromUtf8 ("Operator"),          dsOperator,       false, false, false, false, "#1F1C1B", 0,         0,         0);
-    add (QString::fromUtf8 ("Control Flow"),      dsControlFlow,    true,  false, false, false, "#1F1C1B", 0,         0,         0);
-    add (QString::fromUtf8 ("Built-in"),          dsBuiltIn,        true,  false, false, false, "#644A9B", "#452886", 0,         0);
-    add (QString::fromUtf8 ("Variable"),          dsVariable,       false, false, false, false, "#0057AE", "#00316e", 0,         0);
-    add (QString::fromUtf8 ("Extension"),         dsExtension,      false, false, false, false, "#0095FF", 0,         0,         0);
-    add (QString::fromUtf8 ("Preprocessor"),      dsPreprocessor,   false, false, false, false, "#006E28", "#006e28", 0,         0);
-    add (QString::fromUtf8 ("Import"),            dsImport,         false, false, false, false, "#FF5500", "#FF5500", 0,         0);
-    add (QString::fromUtf8 ("Verbatim String"),   dsVerbatimString, false, false, false, false, "#BF0303", "#9C0E0E", 0,         0);
-    add (QString::fromUtf8 ("Special String"),    dsSpecialString,  false, false, false, false, "#FF5500", "#FF5500", 0,         0);
-    add (QString::fromUtf8 ("Special Character"), dsSpecialChar,    false, false, false, false, "#3DAEE9", "#FCFCFC", 0,         0);
-    add (QString::fromUtf8 ("Attribute"),         dsAttribute,      false, false, false, false, "#0057AE", "#00316E", 0,         0);
+    add (QString::fromUtf8 ("Normal"), dsNormal, false, false, false, false, 0, 0, 0, 0);
+    add (QString::fromUtf8 ("Alert"), dsAlert, true, false, false, false, "#BF0303", "#9C0D0D", "#F7E7E7", 0);
+    add (QString::fromUtf8 ("Base-N Integer"), dsBaseN, false, false, false, false, "#B07E00", "#FFDD00", 0, 0);
+    add (QString::fromUtf8 ("Character"), dsChar, false, false, false, false, "#FF80E0", "#FF80E0", 0, 0);
+    add (QString::fromUtf8 ("Comment"), dsComment, false, true, false, false, "#888786", "#A6C2E4", 0, 0);
+    add (QString::fromUtf8 ("Data Type"), dsDataType, false, false, false, false, "#0057AE", "#00316E", 0, 0);
+    add (QString::fromUtf8 ("Decimal/Value"), dsDecVal, false, false, false, false, "#B07E00", "#FFDD00", 0, 0);
+    add (QString::fromUtf8 ("Error"), dsError, false, false, true, false, "#BF0303", "#9C0D0D", 0, 0);
+    add (QString::fromUtf8 ("Floating Point"), dsFloat, false, false, false, false, "#B07E00", "#FFDD00", 0, 0);
+    add (QString::fromUtf8 ("Function"), dsFunction, false, false, false, false, "#442886", "#442886", 0, 0);
+    add (QString::fromUtf8 ("Keyword"), dsKeyword, true, false, false, false, 0, 0, 0, 0);
+    add (QString::fromUtf8 ("Others"), dsOthers, false, false, false, false, "#006E26", "#80FF80", 0, 0);
+    add (QString::fromUtf8 ("Region Marker"), dsRegionMarker, false, false, false, false, "#0057AE", "#00316E", "#E1EAF8", 0);
+    add (QString::fromUtf8 ("String"), dsString, false, false, false, false, "#BF0303", "#9C0D0D", 0, 0);
+    add (QString::fromUtf8 ("Operator"), dsOperator, false, false, false, false, "#1F1C1B", 0, 0, 0);
+    add (QString::fromUtf8 ("Control Flow"), dsControlFlow, true, false, false, false, "#1F1C1B", 0, 0, 0);
+    add (QString::fromUtf8 ("Built-in"), dsBuiltIn, true, false, false, false, "#644A9B", "#452886", 0, 0);
+    add (QString::fromUtf8 ("Variable"), dsVariable, false, false, false, false, "#0057AE", "#00316e", 0, 0);
+    add (QString::fromUtf8 ("Extension"), dsExtension, false, false, false, false, "#0095FF", 0, 0, 0);
+    add (QString::fromUtf8 ("Preprocessor"), dsPreprocessor, false, false, false, false, "#006E28", "#006e28", 0, 0);
+    add (QString::fromUtf8 ("Import"), dsImport, false, false, false, false, "#FF5500", "#FF5500", 0, 0);
+    add (QString::fromUtf8 ("Verbatim String"), dsVerbatimString, false, false, false, false, "#BF0303", "#9C0E0E", 0, 0);
+    add (QString::fromUtf8 ("Special String"), dsSpecialString, false, false, false, false, "#FF5500", "#FF5500", 0, 0);
+    add (QString::fromUtf8 ("Special Character"), dsSpecialChar, false, false, false, false, "#3DAEE9", "#FCFCFC", 0, 0);
+    add (QString::fromUtf8 ("Attribute"), dsAttribute, false, false, false, false, "#0057AE", "#00316E", 0, 0);
   }
 }
 
-void 
-GenericSyntaxHighlighterAttributes::add (const QString &name, int id, bool bold, bool italic, bool underline, bool strikeout, const char *foreground, const char * /*fg_selected*/, const char *background, const char * /*bg_selected*/)
+void GenericSyntaxHighlighterAttributes::add (const QString &name, int id, bool bold, bool italic, bool underline, bool strikeout, const char *foreground, const char * /*fg_selected*/, const char *background, const char * /*bg_selected*/)
 {
   QTextCharFormat fmt;
   if (bold) {
@@ -968,21 +960,18 @@ GenericSyntaxHighlighterAttributes::add (const QString &name, int id, bool bold,
   m_ids.insert (std::make_pair (name, id));
 }
 
-void
-GenericSyntaxHighlighterAttributes::assign (const GenericSyntaxHighlighterAttributes &other)
+void GenericSyntaxHighlighterAttributes::assign (const GenericSyntaxHighlighterAttributes &other)
 {
   m_attributes = other.m_attributes;
   m_ids = other.m_ids;
 }
 
-bool
-GenericSyntaxHighlighterAttributes::has_attribute (const QString &name) const
+bool GenericSyntaxHighlighterAttributes::has_attribute (const QString &name) const
 {
   return m_ids.find (name) != m_ids.end ();
 }
 
-int 
-GenericSyntaxHighlighterAttributes::id (const QString &name)
+int GenericSyntaxHighlighterAttributes::id (const QString &name)
 {
   std::map<QString, int>::const_iterator i = m_ids.find (name);
   if (i == m_ids.end ()) {
@@ -995,15 +984,14 @@ GenericSyntaxHighlighterAttributes::id (const QString &name)
   }
 }
 
-int 
-GenericSyntaxHighlighterAttributes::id (const QString &name) const
+int GenericSyntaxHighlighterAttributes::id (const QString &name) const
 {
   std::map<QString, int>::const_iterator i = m_ids.find (name);
   tl_assert (i != m_ids.end ());
   return i->second;
 }
 
-QTextCharFormat  
+QTextCharFormat
 GenericSyntaxHighlighterAttributes::specific_style (int id) const
 {
   if (id >= 0 && id < int (m_attributes.size ())) {
@@ -1013,8 +1001,7 @@ GenericSyntaxHighlighterAttributes::specific_style (int id) const
   }
 }
 
-int  
-GenericSyntaxHighlighterAttributes::basic_id (int id) const
+int GenericSyntaxHighlighterAttributes::basic_id (int id) const
 {
   if (id >= 0 && id < int (m_attributes.size ())) {
     return m_attributes [id].first;
@@ -1023,44 +1010,42 @@ GenericSyntaxHighlighterAttributes::basic_id (int id) const
   }
 }
 
-void 
-GenericSyntaxHighlighterAttributes::set_style (int id, const QTextCharFormat &format)
+void GenericSyntaxHighlighterAttributes::set_style (int id, const QTextCharFormat &format)
 {
   if (id < 0 || id >= int (m_attributes.size ())) {
     return;
-  } 
+  }
 
   m_attributes [id].second = format;
 }
 
-void 
-GenericSyntaxHighlighterAttributes::set_styles (int id, int basic_style_id,  const QTextCharFormat &format)
+void GenericSyntaxHighlighterAttributes::set_styles (int id, int basic_style_id, const QTextCharFormat &format)
 {
   if (id < 0 || id >= int (m_attributes.size ())) {
     return;
-  } 
+  }
 
   m_attributes [id].first = basic_style_id;
   m_attributes [id].second = format;
 }
 
-QTextCharFormat 
+QTextCharFormat
 GenericSyntaxHighlighterAttributes::format_for (int id) const
 {
   if (id < 0 || id >= int (m_attributes.size ())) {
     return QTextCharFormat ();
   } else {
-    int bs = m_attributes[id].first;
+    int bs = m_attributes [id].first;
     QTextCharFormat fmt;
     if (mp_basic_attributes) {
       fmt = mp_basic_attributes->format_for (bs);
     }
-    fmt.merge (m_attributes[id].second);
+    fmt.merge (m_attributes [id].second);
     return fmt;
   }
 }
 
-std::string 
+std::string
 GenericSyntaxHighlighterAttributes::to_string () const
 {
   std::string s;
@@ -1113,7 +1098,6 @@ GenericSyntaxHighlighterAttributes::to_string () const
     }
 
     s += "(" + a + ")";
-
   }
 
   s += ";";
@@ -1121,8 +1105,7 @@ GenericSyntaxHighlighterAttributes::to_string () const
   return s;
 }
 
-void 
-GenericSyntaxHighlighterAttributes::read (tl::Extractor &ex)
+void GenericSyntaxHighlighterAttributes::read (tl::Extractor &ex)
 {
   while (! ex.at_end () && ! ex.test (";")) {
 
@@ -1183,7 +1166,6 @@ GenericSyntaxHighlighterAttributes::read (tl::Extractor &ex)
       }
 
       ex.test (",");
-
     }
 
     for (std::map<QString, int>::const_iterator id = m_ids.begin (); id != m_ids.end (); ++id) {
@@ -1194,9 +1176,7 @@ GenericSyntaxHighlighterAttributes::read (tl::Extractor &ex)
     }
 
     ex.test (",");
-
   }
-
 }
 
 // ---------------------------------------------------------------------------------
@@ -1209,20 +1189,17 @@ GenericSyntaxHighlighterState::GenericSyntaxHighlighterState (const GenericSynta
   m_stack.push_back (std::make_pair (mp_contexts->initial_context_id (), QList<QString> ()));
 }
 
-bool  
-GenericSyntaxHighlighterState::operator< (const GenericSyntaxHighlighterState &d) const
+bool GenericSyntaxHighlighterState::operator< (const GenericSyntaxHighlighterState &d) const
 {
   return m_stack < d.m_stack;
 }
 
-bool  
-GenericSyntaxHighlighterState::operator== (const GenericSyntaxHighlighterState &d) const
+bool GenericSyntaxHighlighterState::operator== (const GenericSyntaxHighlighterState &d) const
 {
   return m_stack == d.m_stack;
 }
 
-bool 
-GenericSyntaxHighlighterState::match (const QString &string, unsigned int generation_id, int index, int &end_index, int &def_attribute_id, int &attribute_id)
+bool GenericSyntaxHighlighterState::match (const QString &string, unsigned int generation_id, int index, int &end_index, int &def_attribute_id, int &attribute_id)
 {
   const GenericSyntaxHighlighterContext &ctx = mp_contexts->context (m_stack.back ().first);
   def_attribute_id = ctx.attribute_id ();
@@ -1248,11 +1225,9 @@ GenericSyntaxHighlighterState::match (const QString &string, unsigned int genera
   } else {
     return false;
   }
-
 }
 
-int 
-GenericSyntaxHighlighterState::current_context_id () const
+int GenericSyntaxHighlighterState::current_context_id () const
 {
   if (m_stack.empty ()) {
     return 0;
@@ -1264,13 +1239,13 @@ GenericSyntaxHighlighterState::current_context_id () const
 // ---------------------------------------------------------------------------------
 //  Implementation of GenericSyntaxHighlighter
 
-static GenericSyntaxHighlighterRuleStringList 
-parse_list (QDomElement e) 
+static GenericSyntaxHighlighterRuleStringList
+parse_list (QDomElement e)
 {
   QList<QString> items;
 
-  for (QDomNode n = e.firstChild(); !n.isNull(); n = n.nextSibling()) {
-    if (n.isElement()) {
+  for (QDomNode n = e.firstChild (); ! n.isNull (); n = n.nextSibling ()) {
+    if (n.isElement ()) {
       QDomElement e = n.toElement ();
       if (e.tagName () == QString::fromUtf8 ("item")) {
         items.push_back (e.text ().trimmed ());
@@ -1281,7 +1256,7 @@ parse_list (QDomElement e)
   return GenericSyntaxHighlighterRuleStringList (items);
 }
 
-static int 
+static int
 context_name_to_id (const QString &nr, GenericSyntaxHighlighterContexts &contexts)
 {
   QString n = nr.trimmed ();
@@ -1294,7 +1269,7 @@ context_name_to_id (const QString &nr, GenericSyntaxHighlighterContexts &context
   }
 }
 
-static bool 
+static bool
 string_to_bool (const QString &n)
 {
   QString nt = n.trimmed ().toLower ();
@@ -1311,7 +1286,7 @@ string_to_bool (const QString &n)
   }
 }
 
-static GenericSyntaxHighlighterRule 
+static GenericSyntaxHighlighterRule
 parse_rule (QDomElement e, GenericSyntaxHighlighterContexts &contexts, std::map<QString, GenericSyntaxHighlighterRuleStringList> &lists, GenericSyntaxHighlighterAttributes &attributes)
 {
   GenericSyntaxHighlighterRule rule;
@@ -1400,7 +1375,6 @@ parse_rule (QDomElement e, GenericSyntaxHighlighterContexts &contexts, std::map<
     if (lists.find (s) != lists.end ()) {
       rule = GenericSyntaxHighlighterRule (&lists.find (s)->second, -1, 0, false);
     }
-
   }
 
   if (e.hasAttribute (QString::fromUtf8 ("context"))) {
@@ -1424,9 +1398,9 @@ parse_rule (QDomElement e, GenericSyntaxHighlighterContexts &contexts, std::map<
     rule.set_column (e.attributeNode (QString::fromUtf8 ("column")).value ().toInt ());
   }
 
-  for (QDomNode n = e.firstChild(); !n.isNull(); n = n.nextSibling()) {
-    if (n.isElement()) {
-      QDomElement ee = n.toElement();
+  for (QDomNode n = e.firstChild (); ! n.isNull (); n = n.nextSibling ()) {
+    if (n.isElement ()) {
+      QDomElement ee = n.toElement ();
       rule.add_child_rule (parse_rule (ee, contexts, lists, attributes));
     }
   }
@@ -1434,14 +1408,14 @@ parse_rule (QDomElement e, GenericSyntaxHighlighterContexts &contexts, std::map<
   return rule;
 }
 
-static GenericSyntaxHighlighterContext 
+static GenericSyntaxHighlighterContext
 parse_context (QDomElement e, const std::map<QString, QDomElement> &contexts_by_name, GenericSyntaxHighlighterContexts &contexts, std::map<QString, GenericSyntaxHighlighterRuleStringList> &lists, GenericSyntaxHighlighterAttributes &attributes)
 {
   GenericSyntaxHighlighterContext context;
 
-  for (QDomNode n = e.firstChild(); !n.isNull(); n = n.nextSibling()) {
-    if (n.isElement()) {
-      QDomElement ee = n.toElement();
+  for (QDomNode n = e.firstChild (); ! n.isNull (); n = n.nextSibling ()) {
+    if (n.isElement ()) {
+      QDomElement ee = n.toElement ();
       if (ee.tagName () == QString::fromUtf8 ("IncludeRules")) {
         QString included_name = ee.attributeNode (QString::fromUtf8 ("context")).value ();
         std::map<QString, QDomElement>::const_iterator c2n = contexts_by_name.find (included_name);
@@ -1472,7 +1446,7 @@ parse_context (QDomElement e, const std::map<QString, QDomElement> &contexts_by_
   return context;
 }
 
-static void 
+static void
 parse_item_data (QDomElement e, GenericSyntaxHighlighterAttributes &attributes, bool initialize)
 {
   QString name = e.attributeNode (QString::fromUtf8 ("name")).value ();
@@ -1492,7 +1466,7 @@ parse_item_data (QDomElement e, GenericSyntaxHighlighterAttributes &attributes, 
   }
 
   if (e.hasAttribute (QString::fromUtf8 ("selColor"))) {
-    // TODO: not implemented yet 
+    // TODO: not implemented yet
   }
 
   if (e.hasAttribute (QString::fromUtf8 ("bold"))) {
@@ -1513,32 +1487,59 @@ parse_item_data (QDomElement e, GenericSyntaxHighlighterAttributes &attributes, 
 
   if (e.hasAttribute (QString::fromUtf8 ("defStyleNum"))) {
     QString s = e.attributeNode (QString::fromUtf8 ("defStyleNum")).value ();
-    if (s == QString::fromUtf8 ("dsNormal")) { ds = dsNormal; }
-    else if (s == QString::fromUtf8 ("dsAlert")) { ds = dsAlert; }
-    else if (s == QString::fromUtf8 ("dsBaseN")) { ds = dsBaseN; }
-    else if (s == QString::fromUtf8 ("dsChar")) { ds = dsChar; }
-    else if (s == QString::fromUtf8 ("dsComment")) { ds = dsComment; }
-    else if (s == QString::fromUtf8 ("dsDataType")) { ds = dsDataType; }
-    else if (s == QString::fromUtf8 ("dsDecVal")) { ds = dsDecVal; }
-    else if (s == QString::fromUtf8 ("dsError")) { ds = dsError; }
-    else if (s == QString::fromUtf8 ("dsFloat")) { ds = dsFloat; }
-    else if (s == QString::fromUtf8 ("dsFunction")) { ds = dsFunction; }
-    else if (s == QString::fromUtf8 ("dsKeyword")) { ds = dsKeyword; }
-    else if (s == QString::fromUtf8 ("dsOthers")) { ds = dsOthers; }
-    else if (s == QString::fromUtf8 ("dsRegionMarker")) { ds = dsRegionMarker; }
-    else if (s == QString::fromUtf8 ("dsString")) { ds = dsString; }
-    else if (s == QString::fromUtf8 ("dsOperator")) { ds = dsOperator; }
-    else if (s == QString::fromUtf8 ("dsControlFlow")) { ds = dsControlFlow; }
-    else if (s == QString::fromUtf8 ("dsBuiltIn")) { ds = dsBuiltIn; }
-    else if (s == QString::fromUtf8 ("dsVariable")) { ds = dsVariable; }
-    else if (s == QString::fromUtf8 ("dsExtension")) { ds = dsExtension; }
-    else if (s == QString::fromUtf8 ("dsPreprocessor")) { ds = dsPreprocessor; }
-    else if (s == QString::fromUtf8 ("dsImport")) { ds = dsImport; }
-    else if (s == QString::fromUtf8 ("dsVerbatimString")) { ds = dsVerbatimString; }
-    else if (s == QString::fromUtf8 ("dsSpecialString")) { ds = dsSpecialString; }
-    else if (s == QString::fromUtf8 ("dsSpecialString")) { ds = dsSpecialString; }
-    else if (s == QString::fromUtf8 ("dsSpecialChar")) { ds = dsSpecialChar; }
-    else if (s == QString::fromUtf8 ("dsAttribute")) { ds = dsAttribute; }
+    if (s == QString::fromUtf8 ("dsNormal")) {
+      ds = dsNormal;
+    } else if (s == QString::fromUtf8 ("dsAlert")) {
+      ds = dsAlert;
+    } else if (s == QString::fromUtf8 ("dsBaseN")) {
+      ds = dsBaseN;
+    } else if (s == QString::fromUtf8 ("dsChar")) {
+      ds = dsChar;
+    } else if (s == QString::fromUtf8 ("dsComment")) {
+      ds = dsComment;
+    } else if (s == QString::fromUtf8 ("dsDataType")) {
+      ds = dsDataType;
+    } else if (s == QString::fromUtf8 ("dsDecVal")) {
+      ds = dsDecVal;
+    } else if (s == QString::fromUtf8 ("dsError")) {
+      ds = dsError;
+    } else if (s == QString::fromUtf8 ("dsFloat")) {
+      ds = dsFloat;
+    } else if (s == QString::fromUtf8 ("dsFunction")) {
+      ds = dsFunction;
+    } else if (s == QString::fromUtf8 ("dsKeyword")) {
+      ds = dsKeyword;
+    } else if (s == QString::fromUtf8 ("dsOthers")) {
+      ds = dsOthers;
+    } else if (s == QString::fromUtf8 ("dsRegionMarker")) {
+      ds = dsRegionMarker;
+    } else if (s == QString::fromUtf8 ("dsString")) {
+      ds = dsString;
+    } else if (s == QString::fromUtf8 ("dsOperator")) {
+      ds = dsOperator;
+    } else if (s == QString::fromUtf8 ("dsControlFlow")) {
+      ds = dsControlFlow;
+    } else if (s == QString::fromUtf8 ("dsBuiltIn")) {
+      ds = dsBuiltIn;
+    } else if (s == QString::fromUtf8 ("dsVariable")) {
+      ds = dsVariable;
+    } else if (s == QString::fromUtf8 ("dsExtension")) {
+      ds = dsExtension;
+    } else if (s == QString::fromUtf8 ("dsPreprocessor")) {
+      ds = dsPreprocessor;
+    } else if (s == QString::fromUtf8 ("dsImport")) {
+      ds = dsImport;
+    } else if (s == QString::fromUtf8 ("dsVerbatimString")) {
+      ds = dsVerbatimString;
+    } else if (s == QString::fromUtf8 ("dsSpecialString")) {
+      ds = dsSpecialString;
+    } else if (s == QString::fromUtf8 ("dsSpecialString")) {
+      ds = dsSpecialString;
+    } else if (s == QString::fromUtf8 ("dsSpecialChar")) {
+      ds = dsSpecialChar;
+    } else if (s == QString::fromUtf8 ("dsAttribute")) {
+      ds = dsAttribute;
+    }
   }
 
   attributes.set_styles (attribute_id, ds, format);
@@ -1551,9 +1552,9 @@ GenericSyntaxHighlighter::GenericSyntaxHighlighter (QObject *parent, QIODevice &
   d.setContent (&input, true);
 
   QDomElement highlighting;
-  for (QDomNode n = d.documentElement ().firstChild(); !n.isNull(); n = n.nextSibling()) {
-    if (n.isElement()) {
-      QDomElement e = n.toElement();
+  for (QDomNode n = d.documentElement ().firstChild (); ! n.isNull (); n = n.nextSibling ()) {
+    if (n.isElement ()) {
+      QDomElement e = n.toElement ();
       if (e.tagName () == QString::fromUtf8 ("highlighting")) {
         highlighting = e;
         break;
@@ -1565,10 +1566,10 @@ GenericSyntaxHighlighter::GenericSyntaxHighlighter (QObject *parent, QIODevice &
     return;
   }
 
-  for (QDomNode n = highlighting.firstChild(); !n.isNull(); n = n.nextSibling()) {
-    if (n.isElement()) {
+  for (QDomNode n = highlighting.firstChild (); ! n.isNull (); n = n.nextSibling ()) {
+    if (n.isElement ()) {
 
-      QDomElement e = n.toElement();
+      QDomElement e = n.toElement ();
       if (e.tagName () == QString::fromUtf8 ("list")) {
 
         m_lists.insert (std::make_pair (e.attributeNode (QString::fromUtf8 ("name")).value (), parse_list (e)));
@@ -1579,18 +1580,18 @@ GenericSyntaxHighlighter::GenericSyntaxHighlighter (QObject *parent, QIODevice &
 
         std::map<QString, QDomElement> contexts_by_name;
 
-        for (QDomNode nn = e.firstChild(); !nn.isNull(); nn = nn.nextSibling()) {
-          if (nn.isElement()) {
+        for (QDomNode nn = e.firstChild (); ! nn.isNull (); nn = nn.nextSibling ()) {
+          if (nn.isElement ()) {
             QDomElement ee = nn.toElement ();
             if (ee.tagName () == QString::fromUtf8 ("context")) {
               QString context_name = ee.attributeNode (QString::fromUtf8 ("name")).value ();
-              contexts_by_name[context_name] = ee;
+              contexts_by_name [context_name] = ee;
             }
           }
         }
 
-        for (QDomNode nn = e.firstChild(); !nn.isNull(); nn = nn.nextSibling()) {
-          if (nn.isElement()) {
+        for (QDomNode nn = e.firstChild (); ! nn.isNull (); nn = nn.nextSibling ()) {
+          if (nn.isElement ()) {
             QDomElement ee = nn.toElement ();
             if (ee.tagName () == QString::fromUtf8 ("context")) {
               QString context_name = ee.attributeNode (QString::fromUtf8 ("name")).value ();
@@ -1601,17 +1602,15 @@ GenericSyntaxHighlighter::GenericSyntaxHighlighter (QObject *parent, QIODevice &
 
       } else if (e.tagName () == QString::fromUtf8 ("itemDatas")) {
 
-        for (QDomNode nn = e.firstChild(); !nn.isNull(); nn = nn.nextSibling()) {
-          if (nn.isElement()) {
+        for (QDomNode nn = e.firstChild (); ! nn.isNull (); nn = nn.nextSibling ()) {
+          if (nn.isElement ()) {
             QDomElement ee = nn.toElement ();
             if (ee.tagName () == QString::fromUtf8 ("itemData")) {
               parse_item_data (ee, *mp_attributes, initialize_attributes);
             }
           }
         }
-
       }
-
     }
   }
 
@@ -1620,13 +1619,12 @@ GenericSyntaxHighlighter::GenericSyntaxHighlighter (QObject *parent, QIODevice &
 #endif
 }
 
-void 
-GenericSyntaxHighlighter::highlightBlock(const QString &text)
+void GenericSyntaxHighlighter::highlightBlock (const QString &text)
 {
   ++m_generation_id;
 
 #if defined(DEBUG_HIGHLIGHTER)
-  std::cout << "Highlighting '" << text.toAscii().constData() << "'" << std::endl;
+  std::cout << "Highlighting '" << text.toAscii ().constData () << "'" << std::endl;
 #endif
   if (m_contexts.is_empty ()) {
     return;
@@ -1644,7 +1642,7 @@ GenericSyntaxHighlighter::highlightBlock(const QString &text)
 #if defined(DEBUG_HIGHLIGHTER)
   std::cout << index << ":" << m_contexts.context (state.current_context_id ()).name ().toAscii ().constData () << std::endl;
 #endif
-  int end_index = 0, last_index= -1;
+  int end_index = 0, last_index = -1;
   int attribute_id = 0, def_attribute_id = 0;
 
   std::unique_ptr<SyntaxHighlighterUserData> user_data (new SyntaxHighlighterUserData ());
@@ -1657,9 +1655,9 @@ GenericSyntaxHighlighter::highlightBlock(const QString &text)
         index = 0;
       }
 
-      //  apply def_attribute_id to last_index .. index 
+      //  apply def_attribute_id to last_index .. index
       if (last_index >= 0 && def_attribute_id >= 0) {
-        setFormat(last_index, index - last_index, mp_attributes->format_for (def_attribute_id));
+        setFormat (last_index, index - last_index, mp_attributes->format_for (def_attribute_id));
       }
 
       //  save this element's information
@@ -1675,7 +1673,7 @@ GenericSyntaxHighlighter::highlightBlock(const QString &text)
 
       //  apply attribute_id to index .. end_index
       if (end_index > index && attribute_id >= 0) {
-        setFormat(index, end_index - index, mp_attributes->format_for (attribute_id));
+        setFormat (index, end_index - index, mp_attributes->format_for (attribute_id));
       }
 
       //  save this element's information
@@ -1698,24 +1696,22 @@ GenericSyntaxHighlighter::highlightBlock(const QString &text)
         index = 0;
       }
 
-      if (last_index < 0 && !text [index].isSpace ()) {
+      if (last_index < 0 && ! text [index].isSpace ()) {
         last_index = index;
       }
 
       ++index;
-
     }
-
   }
 
-  //  apply def_attribute_id to last_index .. index 
+  //  apply def_attribute_id to last_index .. index
   if (last_index >= 0 && def_attribute_id >= 0) {
-    setFormat(last_index, index - last_index, mp_attributes->format_for (def_attribute_id));
+    setFormat (last_index, index - last_index, mp_attributes->format_for (def_attribute_id));
   }
 
-  //  apply def_attribute_id to index .. end of string 
+  //  apply def_attribute_id to index .. end of string
   if (index < text.length () && def_attribute_id >= 0) {
-    setFormat(index, text.length () - index, mp_attributes->format_for (def_attribute_id));
+    setFormat (index, text.length () - index, mp_attributes->format_for (def_attribute_id));
   }
 
   //  match potential line-end context
@@ -1733,7 +1729,7 @@ GenericSyntaxHighlighter::highlightBlock(const QString &text)
   setCurrentBlockUserData (user_data.release ());
 
 #if defined(DEBUG_HIGHLIGHTER)
-  std::cout << "# states=" << m_state_cache.size() << std::endl;
+  std::cout << "# states=" << m_state_cache.size () << std::endl;
 #endif
 }
 

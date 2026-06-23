@@ -37,15 +37,16 @@
 
 namespace lay
 {
-  class LayoutViewBase;
+class LayoutViewBase;
 }
 
-namespace lay {
+namespace lay
+{
 
 /**
  *  @brief A class encapsulating an instantiation path and the element addressed by it
  *
- *  This class either addresses an instance (in which case the path is that to the instance 
+ *  This class either addresses an instance (in which case the path is that to the instance
  *  addressed) or a shape (in which case the path leads to the cell that has this shape and
  *  the layer and shape is specified additionally).
  */
@@ -71,7 +72,7 @@ public:
   }
 
   /**
-   *  @brief Set the topcell 
+   *  @brief Set the topcell
    */
   void set_topcell (db::cell_index_type topcell)
   {
@@ -141,7 +142,7 @@ public:
   /**
    *  @brief Set the layer
    *
-   *  Setting a layer explicitly makes this path point to a shape (which has to be 
+   *  Setting a layer explicitly makes this path point to a shape (which has to be
    *  specified additionally).
    */
   void set_layer (unsigned int layer)
@@ -150,9 +151,9 @@ public:
   }
 
   /**
-   *  @brief Get the layer that the selected shape is on 
+   *  @brief Get the layer that the selected shape is on
    */
-  unsigned int layer () const 
+  unsigned int layer () const
   {
     tl_assert (! is_cell_inst ());
     return (unsigned int) m_layer;
@@ -178,7 +179,7 @@ public:
   /**
    *  @brief Gets the selected shape (non-const version)
    */
-  db::Shape &shape () 
+  db::Shape &shape ()
   {
     tl_assert (! is_cell_inst ());
     return m_shape;
@@ -249,7 +250,7 @@ public:
   /**
    *  @brief The "back" element of the path
    */
-  db::InstElement &back () 
+  db::InstElement &back ()
   {
     return m_path.back ();
   }
@@ -262,12 +263,12 @@ public:
     return m_path.back ();
   }
 
-  /** 
+  /**
    *  @brief Comparison operator
    */
   bool operator< (const ObjectInstPath &d) const;
 
-  /** 
+  /**
    *  @brief Comparison operator
    */
   bool operator== (const ObjectInstPath &d) const;
@@ -277,7 +278,7 @@ public:
    */
   bool operator!= (const ObjectInstPath &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
@@ -320,4 +321,3 @@ private:
 } // namespace lay
 
 #endif
-

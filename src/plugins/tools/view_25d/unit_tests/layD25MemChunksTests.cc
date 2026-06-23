@@ -24,7 +24,7 @@
 #include "layD25MemChunks.h"
 #include "tlUnitTest.h"
 
-TEST(1_Basic)
+TEST (1_Basic)
 {
   lay::mem_chunks<int, 2> ch;
   EXPECT_EQ (ch.begin () == ch.end (), true);
@@ -62,7 +62,7 @@ TEST(1_Basic)
   EXPECT_EQ (ch.begin () == ch.end (), true);
 }
 
-TEST(2_Copy)
+TEST (2_Copy)
 {
   lay::mem_chunks<int, 2> ch1;
   ch1.add (1);

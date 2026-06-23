@@ -33,7 +33,8 @@
 
 #include <set>
 
-namespace db {
+namespace db
+{
 
 template <class C> class polygon;
 template <class C> class simple_polygon;
@@ -58,7 +59,7 @@ public:
   typedef std::set<Sh> set_type;
   typedef typename set_type::const_iterator iterator;
 
-  /** 
+  /**
    *  @brief The standard constructor
    */
   repository ()
@@ -126,7 +127,7 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
  *  @brief A repository for many shape types
  *
  *  This generic repository is providing a repository for several
- *  shape types, even if these repositories are never used. 
+ *  shape types, even if these repositories are never used.
  */
 
 template <class C>
@@ -136,33 +137,33 @@ public:
   typedef C coord_type;
 
   /**
-   *  @brief Return the repository by tag 
+   *  @brief Return the repository by tag
    */
-  db::repository< db::polygon<C> > &repository (db::object_tag< db::polygon<C> > /*tag*/)
+  db::repository<db::polygon<C>> &repository (db::object_tag<db::polygon<C>> /*tag*/)
   {
     return m_polygon_repository;
   }
 
   /**
-   *  @brief Return the repository by tag 
+   *  @brief Return the repository by tag
    */
-  db::repository< db::simple_polygon<C> > &repository (db::object_tag< db::simple_polygon<C> > /*tag*/)
+  db::repository<db::simple_polygon<C>> &repository (db::object_tag<db::simple_polygon<C>> /*tag*/)
   {
     return m_simple_polygon_repository;
   }
 
   /**
-   *  @brief Return the repository by tag 
+   *  @brief Return the repository by tag
    */
-  db::repository< db::path<C> > &repository (db::object_tag< db::path<C> > /*tag*/)
+  db::repository<db::path<C>> &repository (db::object_tag<db::path<C>> /*tag*/)
   {
     return m_path_repository;
   }
 
   /**
-   *  @brief Return the repository by tag 
+   *  @brief Return the repository by tag
    */
-  db::repository< db::text<C> > &repository (db::object_tag< db::text<C> > /*tag*/)
+  db::repository<db::text<C>> &repository (db::object_tag<db::text<C>> /*tag*/)
   {
     return m_text_repository;
   }
@@ -185,10 +186,10 @@ public:
   }
 
 private:
-  db::repository< db::polygon<C> > m_polygon_repository;
-  db::repository< db::simple_polygon<C> > m_simple_polygon_repository;
-  db::repository< db::path<C> > m_path_repository;
-  db::repository< db::text<C> > m_text_repository;
+  db::repository<db::polygon<C>> m_polygon_repository;
+  db::repository<db::simple_polygon<C>> m_simple_polygon_repository;
+  db::repository<db::path<C>> m_path_repository;
+  db::repository<db::text<C>> m_text_repository;
 };
 
 /**
@@ -205,7 +206,7 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
  */
 typedef db::generic_repository<db::Coord> GenericRepository;
 
-/** 
+/**
  *  @brief A generic shape reference
  *
  *  A shape reference is basically a proxy to an actual shape  and
@@ -213,18 +214,17 @@ typedef db::generic_repository<db::Coord> GenericRepository;
  */
 
 template <class Sh, class Trans>
-struct shape_ref
-{
+struct shape_ref {
   typedef Sh shape_type;
   typedef typename Sh::coord_type coord_type;
   typedef typename Sh::vector_type vector_type;
   typedef Trans trans_type;
   typedef db::generic_repository<coord_type> repository_type;
-  typedef db::object_tag<shape_ref<Sh, Trans> > tag;
+  typedef db::object_tag<shape_ref<Sh, Trans>> tag;
 
   /**
    *  @brief The default constructor.
-   *  
+   *
    *  The default constructor creates a invalid polygon reference
    */
   shape_ref ()
@@ -235,7 +235,7 @@ struct shape_ref
 
   /**
    *  @brief The constructor taking a shape pointer and a transformation.
-   *  
+   *
    *  It is assumed that the shape is stored in a proper repository already
    */
   shape_ref (const Sh *ptr, const Trans &trans)
@@ -257,7 +257,7 @@ struct shape_ref
 
   /**
    *  @brief The translation constructor.
-   *  
+   *
    *  This constructor allows one to copy a shape reference from one
    *  repository to another
    */
@@ -272,7 +272,7 @@ struct shape_ref
 
   /**
    *  @brief The translation operator.
-   *  
+   *
    *  This assignment allows assigning a reference in one repository
    *  to a reference in another repository
    */
@@ -288,7 +288,7 @@ struct shape_ref
 
   /**
    *  @brief The translation operator with transformation.
-   *  
+   *
    *  This assignment allows assigning a reference in one repository
    *  to a reference in another repository
    */
@@ -309,7 +309,7 @@ struct shape_ref
 
   /**
    *  @brief The translation operator.
-   *  
+   *
    *  This operator allows changing a reference to another repository.
    */
   void translate (repository_type &rep)
@@ -321,7 +321,7 @@ struct shape_ref
     }
   }
 
-  /** 
+  /**
    *  @brief Equality test
    *
    *  This test assumes that the source and target are from the same
@@ -332,12 +332,12 @@ struct shape_ref
     return m_trans == b.m_trans && m_ptr == b.m_ptr;
   }
 
-  /** 
+  /**
    *  @brief Inequality test
    */
   bool operator!= (const shape_ref<Sh, Trans> &b) const
   {
-    return !operator== (b);
+    return ! operator== (b);
   }
 
   /**
@@ -345,7 +345,7 @@ struct shape_ref
    *
    *  Transforms the shape with the given transformation.
    *  Modifies the shape with the transformed shape.
-   *  
+   *
    *  @param t The transformation to apply.
    *
    *  @return The transformed shape reference.
@@ -401,7 +401,7 @@ struct shape_ref
   }
 
   /**
-   *  @brief Instantiate the shape 
+   *  @brief Instantiate the shape
    */
   Sh instantiate () const
   {
@@ -444,7 +444,7 @@ struct shape_ref
    */
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    if (!no_self) {
+    if (! no_self) {
       stat->add (typeid (shape_ref<Sh, Trans>), (void *) this, sizeof (shape_ref<Sh, Trans>), sizeof (shape_ref<Sh, Trans>), parent, purpose, cat);
     }
     if (m_ptr) {
@@ -479,4 +479,3 @@ operator<< (std::ostream &os, const shape_ref<Sh, Tr> &p)
 } // namespace db
 
 #endif
-

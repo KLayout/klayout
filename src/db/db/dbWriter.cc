@@ -53,8 +53,7 @@ Writer::~Writer ()
   mp_writer = 0;
 }
 
-void 
-Writer::write (db::Layout &layout, tl::OutputStream &stream)
+void Writer::write (db::Layout &layout, tl::OutputStream &stream)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Writing file: ")) + stream.path ());
 
@@ -68,4 +67,3 @@ Writer::write (db::Layout &layout, tl::OutputStream &stream)
 }
 
 }
-

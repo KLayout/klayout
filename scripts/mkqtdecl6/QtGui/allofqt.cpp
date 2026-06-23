@@ -194,8 +194,8 @@
 #include <QtGui/QTextTableCell>
 #include <QtGui/QTextTableCellFormat>
 #include <QtGui/QTextTableFormat>
-//#include <QtGui/QtGui>
-//#include <QtGui/QtGuiDepends>
+// #include <QtGui/QtGui>
+// #include <QtGui/QtGuiDepends>
 #include <QtGui/QtGuiVersion>
 #include <QtGui/QToolBarChangeEvent>
 #include <QtGui/QTouchEvent>

@@ -74,32 +74,32 @@ class TL_PUBLIC BreakException
   : public tl::Exception
 {
 public:
-  BreakException () : tl::Exception ("Operation cancelled") { }
+  BreakException () : tl::Exception ("Operation cancelled") {}
 };
 
 /**
- *  @brief A "progress" reporter class 
+ *  @brief A "progress" reporter class
  *
  *  A progress can be reported in two ways: as
  *  a relative value with a target "max" values and as
- *  an absolute value. 
+ *  an absolute value.
  *  This implementation delegates the actual implementation
  *  to an "adaptor" class that handles the actual display
  *  of the progress.
  *
  *  This class also allows for some kind of background processing:
- *  once the test() method is called, the 
- *  adaptor's yield() method is called once that "yield_interval" 
+ *  once the test() method is called, the
+ *  adaptor's yield() method is called once that "yield_interval"
  *  calls have passed. The yield_interval value should be chosen
  *  sufficiently large so that no performance penalty is to be paid
  *  for this. In addition, each test() call tests whether
- *  the operation may have been cancelled and may throw an 
+ *  the operation may have been cancelled and may throw an
  *  BreakException in this case.
  *
  *  This class is basically a base class for the actual implementation.
- *  A functionality every progress object must provide is the 
- *  ability to deliver a relative value and a textual description of 
- *  the progress. By default the progress is displayed as a bar 
+ *  A functionality every progress object must provide is the
+ *  ability to deliver a relative value and a textual description of
+ *  the progress. By default the progress is displayed as a bar
  *  showing the relative progress.
  */
 
@@ -112,7 +112,7 @@ public:
    *
    *  This initializes the progress reporter object.
    *  The string passed is the initial description and title string.
-   * 
+   *
    *  @param desc The description and title string
    *  @param yield_interval See above.
    *  @param can_cancel If set to true, the progress may be cancelled which results in a BreakException begin raised
@@ -132,7 +132,7 @@ public:
   /**
    *  @brief Delivers the relative progress (a value between 0 and 100 for 0 to 100%).
    *
-   *  The value can be bigger and the default progress bar will wrap around for 
+   *  The value can be bigger and the default progress bar will wrap around for
    *  values >= 100.
    */
   virtual double value () const = 0;
@@ -157,7 +157,7 @@ public:
   /**
    *  @brief Renders the progress on the widget that was created by progress_widget
    */
-  virtual void render_progress (QWidget * /*widget*/) const { }
+  virtual void render_progress (QWidget * /*widget*/) const {}
 
   /**
    *  @brief Gets a value indicating whether the operation can be cancelled
@@ -284,7 +284,7 @@ public:
 
   bool is_busy () const
   {
-    return !mp_objects.empty ();
+    return ! mp_objects.empty ();
   }
 
   tl::Progress *first ();
@@ -343,7 +343,7 @@ public:
   /**
    *  @brief Indicates this progress reporter is abstract
    */
-  bool is_abstract() const { return true; }
+  bool is_abstract () const { return true; }
 };
 
 /**
@@ -361,7 +361,7 @@ public:
    *
    *  This initializes the progress reporter object.
    *  The string passed is the initial description and title string.
-   * 
+   *
    *  @param desc The description and title string
    *  @param max_count The limit "max" value. 0 for absolute display of values.
    *  @param yield_interval See above.
@@ -379,7 +379,7 @@ public:
   /**
    *  @brief Delivers the relative progress (a value between 0 and 1 for 0 to 100%).
    *
-   *  The value can be bigger and the default progress bar will wrap around for 
+   *  The value can be bigger and the default progress bar will wrap around for
    *  values >= 1.
    */
   double value () const;
@@ -387,9 +387,9 @@ public:
   /**
    *  @brief Indicates this progress reporter isn't abstract
    */
-  bool is_abstract() const { return false; }
+  bool is_abstract () const { return false; }
 
-  /** 
+  /**
    *  @brief Set the format of the output.
    *
    *  This is a sprintf format string with the value being
@@ -399,7 +399,7 @@ public:
   {
     m_format = fmt;
   }
-  
+
   /**
    *  @brief Increment the count
    */
@@ -439,7 +439,7 @@ public:
    *
    *  This initializes the progress reporter object.
    *  The string passed is the initial description and title string.
-   * 
+   *
    *  @param desc The description and title string
    *  @param yield_interval See above.
    */
@@ -458,7 +458,7 @@ public:
   /**
    *  @brief Delivers the relative progress (a value between 0 and 1 for 0 to 100%).
    *
-   *  The value can be bigger and the default progress bar will wrap around for 
+   *  The value can be bigger and the default progress bar will wrap around for
    *  values >= 1.
    */
   double value () const;
@@ -466,7 +466,7 @@ public:
   /**
    *  @brief Indicates this progress reporter isn't abstract
    */
-  bool is_abstract() const { return false; }
+  bool is_abstract () const { return false; }
 
   /**
    *  @brief Set the format of the output.
@@ -478,11 +478,11 @@ public:
   {
     m_format = fmt;
   }
-  
+
   /**
    *  @brief Set the unit
    *
-   *  This is the unit of the output. The unit is the 
+   *  This is the unit of the output. The unit is the
    *  value by which the current count is divided to render
    *  the value passed to the format string.
    */
@@ -527,4 +527,3 @@ private:
 }
 
 #endif
-

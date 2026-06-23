@@ -42,8 +42,7 @@ class SignalHandler;
  *  @brief The channel object that replaces stdout/stderr when the console is set
  */
 struct PYAChannelObject
-  : public PyObject
-{
+  : public PyObject {
   static void make_class ();
   static PYAChannelObject *create (gsi::Console::output_stream chn);
 
@@ -58,8 +57,7 @@ struct PYAChannelObject
  *  @brief The static attribute descriptor object
  */
 struct PYAStaticAttributeDescriptorObject
-  : public PyObject
-{
+  : public PyObject {
   typedef PyObject *((*func_t) (PyObject *self, PyObject *args));
 
   static void make_class (PyObject *module);
@@ -78,8 +76,7 @@ struct PYAStaticAttributeDescriptorObject
  *  @brief The non-static/static dispatcher object
  */
 struct PYAAmbiguousMethodDispatcher
-  : public PyObject
-{
+  : public PyObject {
   static void make_class (PyObject *module);
   static PYAAmbiguousMethodDispatcher *create (PyObject *ai, PyObject *ac);
 
@@ -95,8 +92,7 @@ struct PYAAmbiguousMethodDispatcher
  *  This object will turn a gsi::IterAdaptorAbstractBase class into a Python iterator
  */
 struct PYAIteratorObject
-  : public PyObject
-{
+  : public PyObject {
   static void make_class (PyObject *module);
   static PYAIteratorObject *create (PyObject *origin, gsi::IterAdaptorAbstractBase *iter, const gsi::ArgType *value_type);
 
@@ -115,8 +111,7 @@ struct PYAIteratorObject
  *  @brief The signal object will be delivered by signal getters and allow manipulation of the signal
  */
 struct PYASignal
-  : public PyObject
-{
+  : public PyObject {
   static void make_class (PyObject *module);
   static PYASignal *create (PyObject *origin, pya::SignalHandler *handler);
 
@@ -132,4 +127,3 @@ struct PYASignal
 }
 
 #endif
-

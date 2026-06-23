@@ -89,4 +89,3 @@ TL_PUBLIC std::vector<std::string> find_resources (const std::string &pattern);
 }
 
 #endif
-

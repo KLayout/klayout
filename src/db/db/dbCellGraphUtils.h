@@ -44,19 +44,19 @@ namespace db
  *  this object once and use it as often as possible.
  */
 
-class DB_PUBLIC CellCounter 
+class DB_PUBLIC CellCounter
 {
 public:
-  typedef std::map <db::cell_index_type, size_t> cache_t;
-  typedef std::set <db::cell_index_type> selection_t;
+  typedef std::map<db::cell_index_type, size_t> cache_t;
+  typedef std::set<db::cell_index_type> selection_t;
   typedef selection_t::const_iterator selection_iterator;
 
-  /** 
+  /**
    *  @brief Instantiate a counter object with a reference to the given cell graph
    */
   CellCounter (const db::Layout *cell_graph);
 
-  /** 
+  /**
    *  @brief Instantiate a counter object with a reference to the given cell graph
    *
    *  This version allows one to specify a initial (starting) cell where only the cell tree below the
@@ -78,15 +78,15 @@ public:
    *
    *  The iterator pair delivers all selected cells (only applicable if an initial cell is specified).
    */
-  selection_iterator begin () const 
+  selection_iterator begin () const
   {
     return m_selection.begin ();
   }
-  
+
   /**
    *  @brief End iterator for the cells in the selection
    */
-  selection_iterator end () const 
+  selection_iterator end () const
   {
     return m_selection.end ();
   }
@@ -108,7 +108,7 @@ private:
 /**
  *  @brief A generic cell instance statistics generator
  *
- *  This class provides a way to efficiently run a cell instance statistics over a 
+ *  This class provides a way to efficiently run a cell instance statistics over a
  *  cell graph or a sub tree of the graph.
  *
  *  The Value specifies the statistics object that is collected over the hierarchy.
@@ -120,17 +120,17 @@ private:
  *  The ctor is supposed to create a value for the cell representing "no instance".
  *  The transformed method is supposed to transform a value from a parent to a child cell.
  *  The instance specifies the parent instance which transforms into the child cell.
- *  The add method is supposed to add value for a cell (but a different instance) to *this. 
+ *  The add method is supposed to add value for a cell (but a different instance) to *this.
  *
  *  The cell counter can be implemented with this value class:
  *
  *    class CellCountValue {
- *      CellCountValue (const db::Layout &, const db::Cell &) 
+ *      CellCountValue (const db::Layout &, const db::Cell &)
  *        : m_count (0) { }
- *      CellCountValue (size_t count) 
+ *      CellCountValue (size_t count)
  *        : m_count (count) { }
- *      CellCountValue transformed (const db::CellInstArray &trans) { 
- *        return CellCountValue (std::max (m_count, 1) * trans.size ()); 
+ *      CellCountValue transformed (const db::CellInstArray &trans) {
+ *        return CellCountValue (std::max (m_count, 1) * trans.size ());
  *      }
  *      void add (const CellCountValue &other) {
  *        m_count += other.m_count;
@@ -140,14 +140,14 @@ private:
  *  This will deliver count 0 for the top cell.
  */
 template <class Value>
-class InstanceStatistics 
+class InstanceStatistics
 {
 public:
-  typedef std::map <db::cell_index_type, Value> cache_t;
-  typedef std::set <db::cell_index_type> selection_t;
+  typedef std::map<db::cell_index_type, Value> cache_t;
+  typedef std::set<db::cell_index_type> selection_t;
   typedef selection_t::const_iterator selection_iterator;
 
-  /** 
+  /**
    *  @brief Instantiate a counter object with a reference to the given cell graph
    */
   InstanceStatistics (const db::Layout *layout)
@@ -156,7 +156,7 @@ public:
     //  .. nothing yet ..
   }
 
-  /** 
+  /**
    *  @brief Instantiate a counter object with a reference to the given cell graph
    *
    *  This version allows one to specify a initial (starting) cell where only the cell tree below the
@@ -186,7 +186,7 @@ public:
       return Value (*mp_layout, mp_layout->cell (ci));
     } else {
 
-      const db::Cell *cell = & mp_layout->cell (ci);
+      const db::Cell *cell = &mp_layout->cell (ci);
 
       Value res (*mp_layout, *cell);
 
@@ -198,7 +198,6 @@ public:
 
       m_cache.insert (std::make_pair (ci, res));
       return res;
-
     }
   }
 
@@ -207,15 +206,15 @@ public:
    *
    *  The iterator pair delivers all selected cells (only applicable if an initial cell is specified).
    */
-  selection_iterator begin () const 
+  selection_iterator begin () const
   {
     return m_selection.begin ();
   }
-  
+
   /**
    *  @brief End iterator for the cells in the selection
    */
-  selection_iterator end () const 
+  selection_iterator end () const
   {
     return m_selection.end ();
   }
@@ -235,7 +234,6 @@ private:
 };
 
 
-}  // namespace db
+} // namespace db
 
 #endif
-

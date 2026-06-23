@@ -38,11 +38,11 @@
 namespace lay
 {
 
-struct LAY_PUBLIC FillParameters
-{
+struct LAY_PUBLIC FillParameters {
   FillParameters ()
     : exclude_all_layers (true), fill_region_mode (WholeCell), enhanced_fill (false)
-  { }
+  {
+  }
 
   enum FillRegionMode {
     WholeCell,
@@ -74,7 +74,7 @@ class LAY_PUBLIC FillDialog
     public lay::Plugin,
     private Ui::FillDialog
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   FillDialog (QWidget *parent, lay::LayoutViewBase *view);
@@ -103,4 +103,3 @@ private:
 }
 
 #endif
-

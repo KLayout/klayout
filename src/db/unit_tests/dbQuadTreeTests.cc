@@ -29,8 +29,7 @@
 
 #include <stdlib.h>
 
-struct MyQuadTreeCMP
-{
+struct MyQuadTreeCMP {
   bool operator() (const db::DBox &a, const db::DBox &b) const
   {
     return a.equal (b);
@@ -109,7 +108,7 @@ std::string find_overlapping_from_all (const MyQuadTree &qt, const db::DBox &box
   return tl::join (v, "/");
 }
 
-TEST(basic)
+TEST (basic)
 {
   MyQuadTree tree;
   EXPECT_EQ (tree.empty (), true);
@@ -246,7 +245,7 @@ TEST(basic)
   EXPECT_EQ (find_overlapping (tree, bx), find_overlapping_from_all (tree, bx));
 }
 
-TEST(remove)
+TEST (remove)
 {
   MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
@@ -273,7 +272,7 @@ TEST(remove)
   EXPECT_EQ (tree.levels (), size_t (1));
 }
 
-TEST(grow)
+TEST (grow)
 {
   MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
@@ -299,7 +298,7 @@ TEST(grow)
   EXPECT_EQ (tree.levels (), size_t (1));
 }
 
-TEST(grow2)
+TEST (grow2)
 {
   MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
@@ -325,7 +324,7 @@ TEST(grow2)
   EXPECT_EQ (tree.levels (), size_t (1));
 }
 
-TEST(clear)
+TEST (clear)
 {
   MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
@@ -345,7 +344,7 @@ TEST(clear)
   EXPECT_EQ (find_all (tree), "");
 }
 
-TEST(copy)
+TEST (copy)
 {
   MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
@@ -365,7 +364,7 @@ TEST(copy)
   EXPECT_EQ (tree2.levels (), size_t (3));
 }
 
-TEST(assign)
+TEST (assign)
 {
   MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
@@ -386,7 +385,7 @@ TEST(assign)
   EXPECT_EQ (tree2.levels (), size_t (3));
 }
 
-TEST(swap)
+TEST (swap)
 {
   MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
@@ -411,7 +410,7 @@ TEST(swap)
   EXPECT_EQ (tree2.levels (), size_t (3));
 }
 
-TEST(move)
+TEST (move)
 {
   MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
@@ -436,7 +435,7 @@ TEST(move)
   EXPECT_EQ (tree2.levels (), size_t (3));
 }
 
-TEST(move_ctor)
+TEST (move_ctor)
 {
   MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
@@ -481,7 +480,7 @@ static db::DBox rbox (double dim)
   return box = db::DBox (c, c).enlarged (db::DVector (dim * 0.5, dim * 0.5));
 }
 
-TEST(many)
+TEST (many)
 {
   MyQuadTree tree;
 
@@ -520,7 +519,7 @@ TEST(many)
   EXPECT_EQ (tree.size (), size_t (0));
 }
 
-TEST(timing_insert)
+TEST (timing_insert)
 {
   MyQuadTree tree;
 
@@ -545,7 +544,7 @@ TEST(timing_insert)
   }
 }
 
-TEST(timing_lookup)
+TEST (timing_lookup)
 {
   test_is_long_runner ();
 
@@ -558,7 +557,7 @@ TEST(timing_lookup)
 
   unsigned int ntests = 1000;
 
-  std::vector<std::pair<db::DBox, std::pair<size_t, size_t> > > tests;
+  std::vector<std::pair<db::DBox, std::pair<size_t, size_t>>> tests;
   for (unsigned int i = 0; i < ntests; ++i) {
     db::DBox bx = rbox (5.0);
     tests.push_back (std::make_pair (bx, std::make_pair (size_t (0), size_t (0))));
@@ -592,4 +591,3 @@ TEST(timing_lookup)
     EXPECT_EQ (t->second.first, t->second.second);
   }
 }
-

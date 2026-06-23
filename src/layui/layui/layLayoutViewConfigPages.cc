@@ -77,8 +77,7 @@ LayoutViewConfigPage::~LayoutViewConfigPage ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage::setup (lay::Dispatcher *root)
 {
   lay::ColorConverter cc;
   QColor color;
@@ -87,8 +86,7 @@ LayoutViewConfigPage::setup (lay::Dispatcher *root)
   mp_ui->bkgnd_color_pb->set_color (color);
 }
 
-void 
-LayoutViewConfigPage::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage::commit (lay::Dispatcher *root)
 {
   lay::ColorConverter cc;
   root->config_set (cfg_background_color, mp_ui->bkgnd_color_pb->get_color (), cc);
@@ -110,8 +108,7 @@ LayoutViewConfigPage1::~LayoutViewConfigPage1 ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage1::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage1::setup (lay::Dispatcher *root)
 {
   lay::ColorConverter cc;
 
@@ -155,8 +152,7 @@ LayoutViewConfigPage1::setup (lay::Dispatcher *root)
   mp_ui->abstract_mode_grp->setChecked (am);
 }
 
-void 
-LayoutViewConfigPage1::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage1::commit (lay::Dispatcher *root)
 {
   lay::ColorConverter cc;
 
@@ -195,8 +191,7 @@ LayoutViewConfigPage2a::~LayoutViewConfigPage2a ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage2a::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage2a::setup (lay::Dispatcher *root)
 {
   QColor color;
   root->config_get (cfg_cell_box_color, color, ColorConverter ());
@@ -248,8 +243,7 @@ LayoutViewConfigPage2a::setup (lay::Dispatcher *root)
   mp_ui->pcell_gs_vs->setValue (gs_vs);
 }
 
-void 
-LayoutViewConfigPage2a::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage2a::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_cell_box_text_transform, mp_ui->cell_xform_text_cbx->isChecked ());
   root->config_set (cfg_cell_box_text_font, mp_ui->cell_font_cb->currentIndex ());
@@ -266,13 +260,15 @@ LayoutViewConfigPage2a::commit (lay::Dispatcher *root)
     int n;
     tl::from_string_ext (tl::to_string (mp_ui->cell_min_size_for_label_edit->text ()), n);
     root->config_set (cfg_min_inst_label_size, n);
-  } catch (...) { }
+  } catch (...) {
+  }
 
   try {
     double ecd;
     tl::from_string_ext (tl::to_string (mp_ui->empty_cell_dimension->text ()), ecd);
     root->config_set (cfg_empty_cell_dimension, ecd);
-  } catch (...) { }
+  } catch (...) {
+  }
 }
 
 // ------------------------------------------------------------
@@ -291,8 +287,7 @@ LayoutViewConfigPage2b::~LayoutViewConfigPage2b ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage2b::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage2b::setup (lay::Dispatcher *root)
 {
   QColor color;
   root->config_get (cfg_text_color, color, ColorConverter ());
@@ -332,11 +327,10 @@ LayoutViewConfigPage2b::setup (lay::Dispatcher *root)
   mp_ui->text_def_size_edit->setText (tl::to_qstring (tl::to_string (s)));
 }
 
-void 
-LayoutViewConfigPage2b::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage2b::commit (lay::Dispatcher *root)
 {
   unsigned int mode = (mp_ui->text_apply_trans_scale_cbx->isChecked () ? 1 : 0) | (mp_ui->text_apply_trans_rotate_cbx->isChecked () ? 2 : 0);
-  root->config_set (cfg_apply_text_trans, mode != 0);    //  for backward compatibility before version 0.30.8
+  root->config_set (cfg_apply_text_trans, mode != 0); //  for backward compatibility before version 0.30.8
   root->config_set (cfg_apply_text_trans_mode, mode);
 
   root->config_set (cfg_text_color, mp_ui->text_color_pb->get_color (), ColorConverter ());
@@ -348,7 +342,8 @@ LayoutViewConfigPage2b::commit (lay::Dispatcher *root)
     double s;
     tl::from_string_ext (tl::to_string (mp_ui->text_def_size_edit->text ()), s);
     root->config_set (cfg_default_text_size, s);
-  } catch (...) { }
+  } catch (...) {
+  }
 }
 
 // ------------------------------------------------------------
@@ -367,8 +362,7 @@ LayoutViewConfigPage2c::~LayoutViewConfigPage2c ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage2c::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage2c::setup (lay::Dispatcher *root)
 {
   QColor color;
   root->config_get (cfg_sel_color, color, lay::ColorConverter ());
@@ -439,8 +433,7 @@ LayoutViewConfigPage2c::setup (lay::Dispatcher *root)
   mp_ui->search_range_box_spinbx->setValue (srbox);
 }
 
-void 
-LayoutViewConfigPage2c::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage2c::commit (lay::Dispatcher *root)
 {
   lay::ColorConverter cc;
   root->config_set (cfg_sel_color, mp_ui->color_pb->get_color (), cc);
@@ -478,8 +471,7 @@ LayoutViewConfigPage2d::~LayoutViewConfigPage2d ()
   mp_ui = 0;
 }
 
-void
-LayoutViewConfigPage2d::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage2d::setup (lay::Dispatcher *root)
 {
   QColor color;
   root->config_get (cfg_tracking_cursor_color, color, lay::ColorConverter ());
@@ -502,8 +494,7 @@ LayoutViewConfigPage2d::setup (lay::Dispatcher *root)
   mp_ui->crosshair_cursor_cb->setChecked (enabled);
 }
 
-void
-LayoutViewConfigPage2d::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage2d::commit (lay::Dispatcher *root)
 {
   lay::ColorConverter cc;
   root->config_set (cfg_tracking_cursor_color, mp_ui->color_pb->get_color (), cc);
@@ -529,8 +520,7 @@ LayoutViewConfigPage3a::~LayoutViewConfigPage3a ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage3a::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage3a::setup (lay::Dispatcher *root)
 {
   bool flag = true;
 
@@ -542,8 +532,7 @@ LayoutViewConfigPage3a::setup (lay::Dispatcher *root)
   mp_ui->clear_ruler_new_cell_cbx->setChecked (flag);
 }
 
-void 
-LayoutViewConfigPage3a::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage3a::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_fit_new_cell, mp_ui->fit_new_cell_cbx->isChecked ());
   root->config_set (cfg_full_hier_new_cell, mp_ui->full_hier_new_cell_cbx->isChecked ());
@@ -566,8 +555,7 @@ LayoutViewConfigPage3b::~LayoutViewConfigPage3b ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage3b::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage3b::setup (lay::Dispatcher *root)
 {
   bool flag = true;
   double pd = 0.0;
@@ -586,15 +574,15 @@ LayoutViewConfigPage3b::setup (lay::Dispatcher *root)
   mp_ui->alt_mouse_wheel_mode_cbx->setChecked (flag);
 }
 
-void 
-LayoutViewConfigPage3b::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage3b::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_mouse_wheel_mode, mp_ui->alt_mouse_wheel_mode_cbx->isChecked () ? 1 : 0);
 
   double pd = 0.0;
   try {
     tl::from_string_ext (tl::to_string (mp_ui->pan_distance_le->text ()), pd);
-  } catch (...) { }
+  } catch (...) {
+  }
   if (pd <= 0.0) {
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid pan distance: must be larger than 0.0")));
   }
@@ -625,8 +613,7 @@ LayoutViewConfigPage3c::~LayoutViewConfigPage3c ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage3c::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage3c::setup (lay::Dispatcher *root)
 {
   bool flag = true;
 
@@ -636,8 +623,7 @@ LayoutViewConfigPage3c::setup (lay::Dispatcher *root)
   mp_ui->abs_units_cbx->setChecked (flag);
 }
 
-void 
-LayoutViewConfigPage3c::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage3c::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_dbu_units, mp_ui->dbu_units_cbx->isChecked ());
   root->config_set (cfg_abs_units, mp_ui->abs_units_cbx->isChecked ());
@@ -659,8 +645,7 @@ LayoutViewConfigPage3f::~LayoutViewConfigPage3f ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage3f::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage3f::setup (lay::Dispatcher *root)
 {
   int workers = 1;
   bool flag = true;
@@ -691,8 +676,7 @@ LayoutViewConfigPage3f::setup (lay::Dispatcher *root)
   mp_ui->image_cache_size_spbx->setValue (int (n));
 }
 
-void 
-LayoutViewConfigPage3f::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage3f::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_drawing_workers, mp_ui->drawing_workers_spbx->value ());
 
@@ -703,7 +687,8 @@ LayoutViewConfigPage3f::commit (lay::Dispatcher *root)
     unsigned int s;
     tl::from_string_ext (tl::to_string (mp_ui->drop_small_cells_value_le->text ()), s);
     root->config_set (cfg_drop_small_cells_value, s);
-  } catch (...) { }
+  } catch (...) {
+  }
 
   root->config_set (cfg_array_border_instances, mp_ui->array_border_insts_cbx->isChecked ());
 
@@ -717,29 +702,29 @@ LayoutViewConfigPage3f::commit (lay::Dispatcher *root)
 // ------------------------------------------------------------
 //  LayoutConfigPage4 implementation
 
-class PaletteOp 
+class PaletteOp
   : public db::Op
 {
 public:
   PaletteOp (const lay::ColorPalette &p, bool e, bool b)
     : palette (p), edit_order (e), before (b)
-  { }
+  {
+  }
 
   lay::ColorPalette palette;
   bool edit_order, before;
 };
 
-static QToolButton * (Ui::LayoutViewConfigPage4::*cfg4_buttons []) = {
-  &Ui::LayoutViewConfigPage4::cb_1,  &Ui::LayoutViewConfigPage4::cb_2,  &Ui::LayoutViewConfigPage4::cb_3,  &Ui::LayoutViewConfigPage4::cb_4,  &Ui::LayoutViewConfigPage4::cb_5,
-  &Ui::LayoutViewConfigPage4::cb_6,  &Ui::LayoutViewConfigPage4::cb_7,  &Ui::LayoutViewConfigPage4::cb_8,  &Ui::LayoutViewConfigPage4::cb_9,  &Ui::LayoutViewConfigPage4::cb_10,
+static QToolButton *(Ui::LayoutViewConfigPage4::*cfg4_buttons []) = {
+  &Ui::LayoutViewConfigPage4::cb_1, &Ui::LayoutViewConfigPage4::cb_2, &Ui::LayoutViewConfigPage4::cb_3, &Ui::LayoutViewConfigPage4::cb_4, &Ui::LayoutViewConfigPage4::cb_5,
+  &Ui::LayoutViewConfigPage4::cb_6, &Ui::LayoutViewConfigPage4::cb_7, &Ui::LayoutViewConfigPage4::cb_8, &Ui::LayoutViewConfigPage4::cb_9, &Ui::LayoutViewConfigPage4::cb_10,
   &Ui::LayoutViewConfigPage4::cb_11, &Ui::LayoutViewConfigPage4::cb_12, &Ui::LayoutViewConfigPage4::cb_13, &Ui::LayoutViewConfigPage4::cb_14, &Ui::LayoutViewConfigPage4::cb_15,
   &Ui::LayoutViewConfigPage4::cb_16, &Ui::LayoutViewConfigPage4::cb_17, &Ui::LayoutViewConfigPage4::cb_18, &Ui::LayoutViewConfigPage4::cb_19, &Ui::LayoutViewConfigPage4::cb_20,
   &Ui::LayoutViewConfigPage4::cb_21, &Ui::LayoutViewConfigPage4::cb_22, &Ui::LayoutViewConfigPage4::cb_23, &Ui::LayoutViewConfigPage4::cb_24, &Ui::LayoutViewConfigPage4::cb_25,
   &Ui::LayoutViewConfigPage4::cb_26, &Ui::LayoutViewConfigPage4::cb_27, &Ui::LayoutViewConfigPage4::cb_28, &Ui::LayoutViewConfigPage4::cb_29, &Ui::LayoutViewConfigPage4::cb_30,
   &Ui::LayoutViewConfigPage4::cb_31, &Ui::LayoutViewConfigPage4::cb_32, &Ui::LayoutViewConfigPage4::cb_33, &Ui::LayoutViewConfigPage4::cb_34, &Ui::LayoutViewConfigPage4::cb_35,
   &Ui::LayoutViewConfigPage4::cb_36, &Ui::LayoutViewConfigPage4::cb_37, &Ui::LayoutViewConfigPage4::cb_38, &Ui::LayoutViewConfigPage4::cb_39, &Ui::LayoutViewConfigPage4::cb_40,
-  &Ui::LayoutViewConfigPage4::cb_41, &Ui::LayoutViewConfigPage4::cb_42
-};
+  &Ui::LayoutViewConfigPage4::cb_41, &Ui::LayoutViewConfigPage4::cb_42};
 
 LayoutViewConfigPage4::LayoutViewConfigPage4 (QWidget *parent)
   : lay::ConfigPage (parent),
@@ -770,16 +755,14 @@ LayoutViewConfigPage4::~LayoutViewConfigPage4 ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage4::set_edit_order (bool edit_order)
+void LayoutViewConfigPage4::set_edit_order (bool edit_order)
 {
   m_edit_order_changed_disabled = true;
   mp_ui->edit_order_cbx->setChecked (edit_order);
   m_edit_order_changed_disabled = false;
 }
 
-void 
-LayoutViewConfigPage4::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage4::setup (lay::Dispatcher *root)
 {
   m_manager.clear ();
 
@@ -792,7 +775,7 @@ LayoutViewConfigPage4::setup (lay::Dispatcher *root)
       palette.from_string (s);
     }
   } catch (...) {
-    //  ignore errors: just reset the palette 
+    //  ignore errors: just reset the palette
     palette = lay::ColorPalette::default_palette ();
   }
 
@@ -802,14 +785,12 @@ LayoutViewConfigPage4::setup (lay::Dispatcher *root)
   update ();
 }
 
-void 
-LayoutViewConfigPage4::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage4::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_color_palette, m_palette.to_string ());
 }
 
-void 
-LayoutViewConfigPage4::undo (db::Op *op)
+void LayoutViewConfigPage4::undo (db::Op *op)
 {
   PaletteOp *pop = dynamic_cast<PaletteOp *> (op);
   if (pop && pop->before) {
@@ -818,8 +799,7 @@ LayoutViewConfigPage4::undo (db::Op *op)
   }
 }
 
-void 
-LayoutViewConfigPage4::redo (db::Op *op)
+void LayoutViewConfigPage4::redo (db::Op *op)
 {
   PaletteOp *pop = dynamic_cast<PaletteOp *> (op);
   if (pop && ! pop->before) {
@@ -828,22 +808,19 @@ LayoutViewConfigPage4::redo (db::Op *op)
   }
 }
 
-void 
-LayoutViewConfigPage4::undo_button_clicked ()
+void LayoutViewConfigPage4::undo_button_clicked ()
 {
   m_manager.undo ();
   update ();
 }
 
-void 
-LayoutViewConfigPage4::redo_button_clicked ()
+void LayoutViewConfigPage4::redo_button_clicked ()
 {
   m_manager.redo ();
   update ();
 }
 
-void 
-LayoutViewConfigPage4::reset_button_clicked ()
+void LayoutViewConfigPage4::reset_button_clicked ()
 {
   m_manager.transaction (tl::to_string (QObject::tr ("Reset palette")));
   m_manager.queue (this, new PaletteOp (m_palette, mp_ui->edit_order_cbx->isChecked (), true /*before*/));
@@ -854,8 +831,7 @@ LayoutViewConfigPage4::reset_button_clicked ()
   update ();
 }
 
-void 
-LayoutViewConfigPage4::edit_order_changed (int s)
+void LayoutViewConfigPage4::edit_order_changed (int s)
 {
   if (m_edit_order_changed_disabled) {
     return;
@@ -876,8 +852,7 @@ LayoutViewConfigPage4::edit_order_changed (int s)
   }
 }
 
-void 
-LayoutViewConfigPage4::color_button_clicked ()
+void LayoutViewConfigPage4::color_button_clicked ()
 {
   if (mp_ui->edit_order_cbx->isChecked ()) {
 
@@ -885,7 +860,7 @@ LayoutViewConfigPage4::color_button_clicked ()
       if (sender () == mp_ui->*(cfg4_buttons [i])) {
 
         bool found = false;
-        for (unsigned int j = 0; j < m_palette.luminous_colors () && !found; ++j) {
+        for (unsigned int j = 0; j < m_palette.luminous_colors () && ! found; ++j) {
           if (m_palette.luminous_color_index_by_index (j) == i) {
             found = true;
           }
@@ -924,15 +899,12 @@ LayoutViewConfigPage4::color_button_clicked ()
         }
 
         break;
-
       }
     }
-
   }
 }
 
-void 
-LayoutViewConfigPage4::update ()
+void LayoutViewConfigPage4::update ()
 {
   for (unsigned int i = 0; i < sizeof (cfg4_buttons) / sizeof (cfg4_buttons [0]); ++i) {
 
@@ -943,7 +915,7 @@ LayoutViewConfigPage4::update ()
 
     QColor text_color = color.green () > 128 ? QColor (0, 0, 0) : QColor (255, 255, 255);
 
-    QString text = QString::fromUtf8 ("  "); 
+    QString text = QString::fromUtf8 ("  ");
     for (unsigned int j = 0; j < m_palette.luminous_colors (); ++j) {
       if (i == m_palette.luminous_color_index_by_index (j)) {
         text = tl::to_qstring (tl::sprintf ("%d", j));
@@ -980,7 +952,6 @@ LayoutViewConfigPage4::update ()
     QPixmap pxmp = QPixmap::fromImage (img);
     (mp_ui->*(cfg4_buttons [i]))->setIconSize (QSize (w, h));
     (mp_ui->*(cfg4_buttons [i]))->setIcon (QIcon (pxmp));
-
   }
 }
 
@@ -1001,8 +972,7 @@ LayoutViewConfigPage5::~LayoutViewConfigPage5 ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage5::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage5::setup (lay::Dispatcher *root)
 {
   std::string lyp_file;
   root->config_get (cfg_default_lyp_file, lyp_file);
@@ -1030,8 +1000,7 @@ LayoutViewConfigPage5::setup (lay::Dispatcher *root)
   mp_ui->auto_create_new_layers_cb->setChecked (auto_create_new_layers);
 }
 
-void 
-LayoutViewConfigPage5::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage5::commit (lay::Dispatcher *root)
 {
   if (mp_ui->lyp_file_gbx->isChecked ()) {
     root->config_set (cfg_default_lyp_file, tl::to_string (mp_ui->lyp_file_le->text ()));
@@ -1045,14 +1014,13 @@ LayoutViewConfigPage5::commit (lay::Dispatcher *root)
   root->config_set (cfg_auto_create_new_layers, mp_ui->auto_create_new_layers_cb->isChecked ());
 }
 
-void 
-LayoutViewConfigPage5::browse_clicked ()
+void LayoutViewConfigPage5::browse_clicked ()
 {
   std::string fn = tl::to_string (mp_ui->lyp_file_le->text ());
   lay::FileDialog file_dialog (this,
-    tl::to_string (QObject::tr ("Select Layer Properties File")),
-    tl::to_string (QObject::tr ("Layer properties files (*.lyp);;All files (*)")), 
-    "lyp");
+                               tl::to_string (QObject::tr ("Select Layer Properties File")),
+                               tl::to_string (QObject::tr ("Layer properties files (*.lyp);;All files (*)")),
+                               "lyp");
 
   if (file_dialog.get_open (fn)) {
     mp_ui->lyp_file_le->setText (tl::to_qstring (fn));
@@ -1062,23 +1030,36 @@ LayoutViewConfigPage5::browse_clicked ()
 // ------------------------------------------------------------
 //  LayoutConfigPage6 implementation
 
-class StipplePaletteOp 
+class StipplePaletteOp
   : public db::Op
 {
 public:
   StipplePaletteOp (const lay::StipplePalette &p, bool e, bool b)
     : palette (p), edit_order (e), before (b)
-  { }
+  {
+  }
 
   lay::StipplePalette palette;
   bool edit_order, before;
 };
 
-static QToolButton * (Ui::LayoutViewConfigPage6::*cfg6_buttons []) = {
-  &Ui::LayoutViewConfigPage6::cb_1,  &Ui::LayoutViewConfigPage6::cb_2,  &Ui::LayoutViewConfigPage6::cb_3,  &Ui::LayoutViewConfigPage6::cb_4,  
-  &Ui::LayoutViewConfigPage6::cb_5,  &Ui::LayoutViewConfigPage6::cb_6,  &Ui::LayoutViewConfigPage6::cb_7,  &Ui::LayoutViewConfigPage6::cb_8,  
-  &Ui::LayoutViewConfigPage6::cb_9,  &Ui::LayoutViewConfigPage6::cb_10, &Ui::LayoutViewConfigPage6::cb_11, &Ui::LayoutViewConfigPage6::cb_12, 
-  &Ui::LayoutViewConfigPage6::cb_13, &Ui::LayoutViewConfigPage6::cb_14, &Ui::LayoutViewConfigPage6::cb_15, &Ui::LayoutViewConfigPage6::cb_16, 
+static QToolButton *(Ui::LayoutViewConfigPage6::*cfg6_buttons []) = {
+  &Ui::LayoutViewConfigPage6::cb_1,
+  &Ui::LayoutViewConfigPage6::cb_2,
+  &Ui::LayoutViewConfigPage6::cb_3,
+  &Ui::LayoutViewConfigPage6::cb_4,
+  &Ui::LayoutViewConfigPage6::cb_5,
+  &Ui::LayoutViewConfigPage6::cb_6,
+  &Ui::LayoutViewConfigPage6::cb_7,
+  &Ui::LayoutViewConfigPage6::cb_8,
+  &Ui::LayoutViewConfigPage6::cb_9,
+  &Ui::LayoutViewConfigPage6::cb_10,
+  &Ui::LayoutViewConfigPage6::cb_11,
+  &Ui::LayoutViewConfigPage6::cb_12,
+  &Ui::LayoutViewConfigPage6::cb_13,
+  &Ui::LayoutViewConfigPage6::cb_14,
+  &Ui::LayoutViewConfigPage6::cb_15,
+  &Ui::LayoutViewConfigPage6::cb_16,
 };
 
 LayoutViewConfigPage6::LayoutViewConfigPage6 (QWidget *parent)
@@ -1110,16 +1091,14 @@ LayoutViewConfigPage6::~LayoutViewConfigPage6 ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage6::set_edit_order (bool edit_order)
+void LayoutViewConfigPage6::set_edit_order (bool edit_order)
 {
   m_edit_order_changed_disabled = true;
   mp_ui->edit_order_cbx->setChecked (edit_order);
   m_edit_order_changed_disabled = false;
 }
 
-void 
-LayoutViewConfigPage6::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage6::setup (lay::Dispatcher *root)
 {
   m_manager.clear ();
 
@@ -1132,7 +1111,7 @@ LayoutViewConfigPage6::setup (lay::Dispatcher *root)
       palette.from_string (s);
     }
   } catch (...) {
-    //  ignore errors: just reset the palette 
+    //  ignore errors: just reset the palette
     palette = lay::StipplePalette::default_palette ();
   }
 
@@ -1146,8 +1125,7 @@ LayoutViewConfigPage6::setup (lay::Dispatcher *root)
   update ();
 }
 
-void 
-LayoutViewConfigPage6::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage6::commit (lay::Dispatcher *root)
 {
   if (m_palette.stipples () == 0) {
     throw tl::Exception (tl::to_string (QObject::tr ("No stipples set")));
@@ -1159,8 +1137,7 @@ LayoutViewConfigPage6::commit (lay::Dispatcher *root)
   root->config_set (cfg_stipple_offset, mp_ui->stipple_offset_cbx->isChecked ());
 }
 
-void 
-LayoutViewConfigPage6::undo (db::Op *op)
+void LayoutViewConfigPage6::undo (db::Op *op)
 {
   StipplePaletteOp *pop = dynamic_cast<StipplePaletteOp *> (op);
   if (pop && pop->before) {
@@ -1169,8 +1146,7 @@ LayoutViewConfigPage6::undo (db::Op *op)
   }
 }
 
-void 
-LayoutViewConfigPage6::redo (db::Op *op)
+void LayoutViewConfigPage6::redo (db::Op *op)
 {
   StipplePaletteOp *pop = dynamic_cast<StipplePaletteOp *> (op);
   if (pop && ! pop->before) {
@@ -1179,22 +1155,19 @@ LayoutViewConfigPage6::redo (db::Op *op)
   }
 }
 
-void 
-LayoutViewConfigPage6::undo_button_clicked ()
+void LayoutViewConfigPage6::undo_button_clicked ()
 {
   m_manager.undo ();
   update ();
 }
 
-void 
-LayoutViewConfigPage6::redo_button_clicked ()
+void LayoutViewConfigPage6::redo_button_clicked ()
 {
   m_manager.redo ();
   update ();
 }
 
-void 
-LayoutViewConfigPage6::reset_button_clicked ()
+void LayoutViewConfigPage6::reset_button_clicked ()
 {
   m_manager.transaction (tl::to_string (QObject::tr ("Reset palette")));
   m_manager.queue (this, new StipplePaletteOp (m_palette, mp_ui->edit_order_cbx->isChecked (), true /*before*/));
@@ -1205,8 +1178,7 @@ LayoutViewConfigPage6::reset_button_clicked ()
   update ();
 }
 
-void 
-LayoutViewConfigPage6::edit_order_changed (int s)
+void LayoutViewConfigPage6::edit_order_changed (int s)
 {
   if (m_edit_order_changed_disabled) {
     return;
@@ -1227,8 +1199,7 @@ LayoutViewConfigPage6::edit_order_changed (int s)
   }
 }
 
-void 
-LayoutViewConfigPage6::stipple_button_clicked ()
+void LayoutViewConfigPage6::stipple_button_clicked ()
 {
   if (mp_ui->edit_order_cbx->isChecked ()) {
 
@@ -1236,7 +1207,7 @@ LayoutViewConfigPage6::stipple_button_clicked ()
       if (sender () == mp_ui->*(cfg6_buttons [i])) {
 
         bool found = false;
-        for (unsigned int j = 0; j < m_palette.standard_stipples () && !found; ++j) {
+        for (unsigned int j = 0; j < m_palette.standard_stipples () && ! found; ++j) {
           if (m_palette.standard_stipple_index_by_index (j) == i) {
             found = true;
           }
@@ -1272,30 +1243,25 @@ LayoutViewConfigPage6::stipple_button_clicked ()
             m_manager.queue (this, new StipplePaletteOp (m_palette, false, false /*after*/));
             m_manager.commit ();
             update ();
-
           }
-
         }
 
         break;
-
       }
     }
-
   }
 }
 
-void 
-LayoutViewConfigPage6::update ()
+void LayoutViewConfigPage6::update ()
 {
   for (unsigned int i = 0; i < sizeof (cfg6_buttons) / sizeof (cfg6_buttons [0]); ++i) {
 
     int s = -1;
     if (i < m_palette.stipples ()) {
-      s = (int)m_palette.stipple_by_index (i);
+      s = (int) m_palette.stipple_by_index (i);
     }
 
-    QString text = QString::fromUtf8 ("  "); 
+    QString text = QString::fromUtf8 ("  ");
     for (unsigned int j = 0; j < m_palette.standard_stipples (); ++j) {
       if (i == m_palette.standard_stipple_index_by_index (j)) {
         text = tl::to_qstring (tl::sprintf ("%d", j));
@@ -1341,7 +1307,6 @@ LayoutViewConfigPage6::update ()
     QPixmap pxmp = QPixmap::fromImage (image);
     (mp_ui->*(cfg6_buttons [i]))->setIconSize (QSize (w, h));
     (mp_ui->*(cfg6_buttons [i]))->setIcon (QIcon (pxmp));
-
   }
 }
 
@@ -1354,14 +1319,18 @@ class LineStylePaletteOp
 public:
   LineStylePaletteOp (const lay::LineStylePalette &p, bool b)
     : palette (p), before (b)
-  { }
+  {
+  }
 
   lay::LineStylePalette palette;
   bool before;
 };
 
-static QToolButton * (Ui::LayoutViewConfigPage6a::*cfg6a_buttons []) = {
-  &Ui::LayoutViewConfigPage6a::cb_1,  &Ui::LayoutViewConfigPage6a::cb_2,  &Ui::LayoutViewConfigPage6a::cb_3,  &Ui::LayoutViewConfigPage6a::cb_4,
+static QToolButton *(Ui::LayoutViewConfigPage6a::*cfg6a_buttons []) = {
+  &Ui::LayoutViewConfigPage6a::cb_1,
+  &Ui::LayoutViewConfigPage6a::cb_2,
+  &Ui::LayoutViewConfigPage6a::cb_3,
+  &Ui::LayoutViewConfigPage6a::cb_4,
 };
 
 LayoutViewConfigPage6a::LayoutViewConfigPage6a (QWidget *parent)
@@ -1391,8 +1360,7 @@ LayoutViewConfigPage6a::~LayoutViewConfigPage6a ()
   mp_ui = 0;
 }
 
-void
-LayoutViewConfigPage6a::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage6a::setup (lay::Dispatcher *root)
 {
   m_manager.clear ();
 
@@ -1414,8 +1382,7 @@ LayoutViewConfigPage6a::setup (lay::Dispatcher *root)
   update ();
 }
 
-void
-LayoutViewConfigPage6a::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage6a::commit (lay::Dispatcher *root)
 {
   if (m_palette.styles () == 0) {
     throw tl::Exception (tl::to_string (QObject::tr ("No styles set")));
@@ -1423,8 +1390,7 @@ LayoutViewConfigPage6a::commit (lay::Dispatcher *root)
   root->config_set (cfg_line_style_palette, m_palette.to_string ());
 }
 
-void
-LayoutViewConfigPage6a::undo (db::Op *op)
+void LayoutViewConfigPage6a::undo (db::Op *op)
 {
   LineStylePaletteOp *pop = dynamic_cast<LineStylePaletteOp *> (op);
   if (pop && pop->before) {
@@ -1432,8 +1398,7 @@ LayoutViewConfigPage6a::undo (db::Op *op)
   }
 }
 
-void
-LayoutViewConfigPage6a::redo (db::Op *op)
+void LayoutViewConfigPage6a::redo (db::Op *op)
 {
   LineStylePaletteOp *pop = dynamic_cast<LineStylePaletteOp *> (op);
   if (pop && ! pop->before) {
@@ -1441,22 +1406,19 @@ LayoutViewConfigPage6a::redo (db::Op *op)
   }
 }
 
-void
-LayoutViewConfigPage6a::undo_button_clicked ()
+void LayoutViewConfigPage6a::undo_button_clicked ()
 {
   m_manager.undo ();
   update ();
 }
 
-void
-LayoutViewConfigPage6a::redo_button_clicked ()
+void LayoutViewConfigPage6a::redo_button_clicked ()
 {
   m_manager.redo ();
   update ();
 }
 
-void
-LayoutViewConfigPage6a::reset_button_clicked ()
+void LayoutViewConfigPage6a::reset_button_clicked ()
 {
   m_manager.transaction (tl::to_string (QObject::tr ("Reset palette")));
   m_manager.queue (this, new LineStylePaletteOp (m_palette, true /*before*/));
@@ -1466,8 +1428,7 @@ LayoutViewConfigPage6a::reset_button_clicked ()
   update ();
 }
 
-void
-LayoutViewConfigPage6a::line_style_button_clicked ()
+void LayoutViewConfigPage6a::line_style_button_clicked ()
 {
   for (unsigned int i = 0; i < sizeof (cfg6a_buttons) / sizeof (cfg6a_buttons [0]); ++i) {
 
@@ -1486,25 +1447,21 @@ LayoutViewConfigPage6a::line_style_button_clicked ()
           m_manager.queue (this, new LineStylePaletteOp (m_palette, false /*after*/));
           m_manager.commit ();
           update ();
-
         }
-
       }
 
       break;
-
     }
   }
 }
 
-void
-LayoutViewConfigPage6a::update ()
+void LayoutViewConfigPage6a::update ()
 {
   for (unsigned int i = 0; i < sizeof (cfg6a_buttons) / sizeof (cfg6a_buttons [0]); ++i) {
 
     int s = -1;
     if (i < m_palette.styles ()) {
-      s = (int)m_palette.style_by_index (i);
+      s = (int) m_palette.style_by_index (i);
     }
 
     QToolButton *b = mp_ui->*(cfg6a_buttons [i]);
@@ -1530,7 +1487,6 @@ LayoutViewConfigPage6a::update ()
     QPixmap pixmap = QPixmap::fromImage (image);
     b->setIconSize (QSize (w, h));
     b->setIcon (QIcon (pixmap));
-
   }
 }
 
@@ -1555,8 +1511,7 @@ LayoutViewConfigPage7::~LayoutViewConfigPage7 ()
   mp_ui = 0;
 }
 
-void 
-LayoutViewConfigPage7::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage7::setup (lay::Dispatcher *root)
 {
   int oversampling = 1;
   root->config_get (cfg_bitmap_oversampling, oversampling);
@@ -1582,15 +1537,15 @@ LayoutViewConfigPage7::setup (lay::Dispatcher *root)
     db::DCplxTrans t;
     ex.read (t);
     mp_ui->global_trans->setCurrentIndex (t.rot ());
-  } catch (...) { }
+  } catch (...) {
+  }
 
   int def_depth = 0;
   root->config_get (cfg_initial_hier_depth, def_depth);
-  mp_ui->def_depth->setValue(def_depth);
+  mp_ui->def_depth->setValue (def_depth);
 }
 
-void 
-LayoutViewConfigPage7::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage7::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_bitmap_oversampling, mp_ui->oversampling->currentIndex () + 1);
   root->config_set (cfg_highres_mode, mp_ui->highres_mode->isChecked ());
@@ -1616,16 +1571,14 @@ LayoutViewConfigPage8::~LayoutViewConfigPage8 ()
   mp_ui = 0;
 }
 
-void
-LayoutViewConfigPage8::setup (lay::Dispatcher *root)
+void LayoutViewConfigPage8::setup (lay::Dispatcher *root)
 {
   int cpm = -1;
   root->config_get (cfg_copy_cell_mode, cpm);
   mp_ui->hier_copy_mode_cbx->setCurrentIndex ((cpm < 0 || cpm > 1) ? 2 : cpm);
 }
 
-void
-LayoutViewConfigPage8::commit (lay::Dispatcher *root)
+void LayoutViewConfigPage8::commit (lay::Dispatcher *root)
 {
   int cpm = mp_ui->hier_copy_mode_cbx->currentIndex ();
   root->config_set (cfg_copy_cell_mode, (cpm < 0 || cpm > 1) ? -1 : cpm);
@@ -1638,27 +1591,27 @@ class LayoutViewConfigDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual std::vector<std::pair <std::string, ConfigPage *> > config_pages (QWidget *parent) const 
+  virtual std::vector<std::pair<std::string, ConfigPage *>> config_pages (QWidget *parent) const
   {
-    std::vector<std::pair <std::string, ConfigPage *> > pages;
+    std::vector<std::pair<std::string, ConfigPage *>> pages;
 
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|General")),         new LayoutViewConfigPage7 (parent)));
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Cells")),           new LayoutViewConfigPage2a (parent)));
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Texts")),           new LayoutViewConfigPage2b (parent)));
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Color Palette")),   new LayoutViewConfigPage4 (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|General")), new LayoutViewConfigPage7 (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Cells")), new LayoutViewConfigPage2a (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Texts")), new LayoutViewConfigPage2b (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Color Palette")), new LayoutViewConfigPage4 (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Stipple Palette")), new LayoutViewConfigPage6 (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Line Style Palette")), new LayoutViewConfigPage6a (parent)));
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Background")),      new LayoutViewConfigPage (parent)));
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Context")),         new LayoutViewConfigPage1 (parent)));
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Optimization")),    new LayoutViewConfigPage3f (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Background")), new LayoutViewConfigPage (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Context")), new LayoutViewConfigPage1 (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Optimization")), new LayoutViewConfigPage3f (parent)));
 
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Selection")),   new LayoutViewConfigPage2c (parent)));
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Tracking")),    new LayoutViewConfigPage2d (parent)));
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Layer Properties")),  new LayoutViewConfigPage5 (parent)));
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Units")),       new LayoutViewConfigPage3c (parent)));
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Cells")),       new LayoutViewConfigPage8 (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Selection")), new LayoutViewConfigPage2c (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Tracking")), new LayoutViewConfigPage2d (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Layer Properties")), new LayoutViewConfigPage5 (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Units")), new LayoutViewConfigPage3c (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Cells")), new LayoutViewConfigPage8 (parent)));
 
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Navigation|New Cell")),     new LayoutViewConfigPage3a (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Navigation|New Cell")), new LayoutViewConfigPage3a (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Navigation|Zoom And Pan")), new LayoutViewConfigPage3b (parent)));
 
     return pages;

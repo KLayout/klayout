@@ -31,7 +31,7 @@
 
 static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001, bool dummy_calls = false, bool blank_sep = false)
 {
-  db::CIFReaderOptions *opt = new db::CIFReaderOptions();
+  db::CIFReaderOptions *opt = new db::CIFReaderOptions ();
   opt->dbu = dbu;
 
   db::LayerMap lm;
@@ -90,7 +90,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   {
     tl::OutputStream stream (tmp_cif_file);
 
-    db::CIFWriterOptions *opt = new db::CIFWriterOptions();
+    db::CIFWriterOptions *opt = new db::CIFWriterOptions ();
     opt->dummy_calls = dummy_calls;
     opt->blank_separator = blank_sep;
 
@@ -103,7 +103,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   {
     tl::InputStream stream (tmp_cif_file);
 
-    db::CIFReaderOptions *opt = new db::CIFReaderOptions();
+    db::CIFReaderOptions *opt = new db::CIFReaderOptions ();
     opt->dbu = dbu;
     db::LoadLayoutOptions reread_options;
     reread_options.set_options (opt);
@@ -134,7 +134,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
 
 static void run_test2 (tl::TestBase *_this, const std::string &base, db::Layout &layout, const char *file_au, const char *file_au_cif, const char *map = 0, double dbu = 0.001, bool dummy_calls = false, bool blank_sep = false)
 {
-  db::CIFReaderOptions *opt = new db::CIFReaderOptions();
+  db::CIFReaderOptions *opt = new db::CIFReaderOptions ();
   opt->dbu = dbu;
 
   db::LayerMap lm;
@@ -185,7 +185,7 @@ static void run_test2 (tl::TestBase *_this, const std::string &base, db::Layout 
   {
     tl::OutputStream stream (tmp_cif_file);
 
-    db::CIFWriterOptions *opt = new db::CIFWriterOptions();
+    db::CIFWriterOptions *opt = new db::CIFWriterOptions ();
     opt->dummy_calls = dummy_calls;
     opt->blank_separator = blank_sep;
 
@@ -198,7 +198,7 @@ static void run_test2 (tl::TestBase *_this, const std::string &base, db::Layout 
   {
     tl::InputStream stream (tmp_cif_file);
 
-    db::CIFReaderOptions *opt = new db::CIFReaderOptions();
+    db::CIFReaderOptions *opt = new db::CIFReaderOptions ();
     opt->dbu = dbu;
     db::LoadLayoutOptions reread_options;
     reread_options.set_options (opt);
@@ -236,82 +236,82 @@ static void run_test2 (tl::TestBase *_this, const std::string &base, db::Layout 
   }
 }
 
-TEST(1a)
+TEST (1a)
 {
   run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1a_au.gds.gz");
 }
 
-TEST(1b)
+TEST (1b)
 {
   run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01);
 }
 
-TEST(1c)
+TEST (1c)
 {
   run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, true);
 }
 
-TEST(1d)
+TEST (1d)
 {
   run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, false, true);
 }
 
-TEST(2)
+TEST (2)
 {
   run_test (_this, tl::testdata_private (), "t2.cif.gz", "t2_au.gds.gz");
 }
 
-TEST(3a)
+TEST (3a)
 {
   run_test (_this, tl::testdata_private (), "t3.cif.gz", "t3a_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26");
 }
 
-TEST(3b)
+TEST (3b)
 {
   run_test (_this, tl::testdata_private (), "t3.cif.gz", "t3b_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26", 0.00012);
 }
 
-TEST(3c)
+TEST (3c)
 {
   run_test (_this, tl::testdata_private (), "t3.cif.gz", "t3c_au.gds.gz", "(CPG:1/0) +(CPG:1000/0) (CCP:1/0) (CMF:2/0) +(CMF:1000/0) (CVA:3/0)", 0.00012);
 }
 
-TEST(4)
+TEST (4)
 {
   run_test (_this, tl::testdata_private (), "t4.cif.gz", "t4_au.gds.gz");
 }
 
-TEST(5)
+TEST (5)
 {
   run_test (_this, tl::testdata_private (), "t5.cif.gz", "t5_au.gds.gz");
 }
 
 //  Issue #28
-TEST(lasi)
+TEST (lasi)
 {
   run_test (_this, tl::testdata (), "lasi.cif.gz", "lasi_au.gds.gz");
 }
 
 //  Issue #305
-TEST(rot_boxes)
+TEST (rot_boxes)
 {
   run_test (_this, tl::testdata (), "issue_305.cif", "issue_305_au.gds");
 }
 
 //  Issue #568
-TEST(rot_instances)
+TEST (rot_instances)
 {
   run_test (_this, tl::testdata (), "issue_568.cif", "issue_568_au.gds");
 }
 
 //  Issue #578
-TEST(rot_instances2)
+TEST (rot_instances2)
 {
   run_test (_this, tl::testdata (), "issue_578.cif", "issue_578_au.gds");
 }
 
 //  issue #972
-TEST(bad_names)
+TEST (bad_names)
 {
   db::Layout ly;
 

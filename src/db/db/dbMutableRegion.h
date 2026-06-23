@@ -30,7 +30,8 @@
 
 #include <set>
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief An interface representing mutable regions
@@ -47,7 +48,7 @@ public:
 
   virtual void do_insert (const db::Polygon &polygon, db::properties_id_type prop_id) = 0;
 
-  void transform (const db::UnitTrans &) { }
+  void transform (const db::UnitTrans &) {}
   void transform (const db::Disp &t) { do_transform (db::Trans (t)); }
   void transform (const db::Trans &t) { do_transform (t); }
   void transform (const db::ICplxTrans &t) { do_transform (t); }
@@ -106,4 +107,3 @@ public:
 }
 
 #endif
-

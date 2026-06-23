@@ -29,7 +29,7 @@
 static std::string test_url ("https://github.com/klayout/klayout_git_test.git");
 static std::string test_url_invalid ("https://github.com/klayout/doesnotexist.git");
 
-TEST(1_plain)
+TEST (1_plain)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
@@ -42,7 +42,7 @@ TEST(1_plain)
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "src/macros/xsection.lym")), true);
 }
 
-TEST(2_subdir)
+TEST (2_subdir)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
@@ -55,7 +55,7 @@ TEST(2_subdir)
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "macros/xsection.lym")), true);
 }
 
-TEST(3_subdir_as_filter)
+TEST (3_subdir_as_filter)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
@@ -68,7 +68,7 @@ TEST(3_subdir_as_filter)
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "src/macros/xsection.lym")), true);
 }
 
-TEST(4_single_file)
+TEST (4_single_file)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
@@ -80,7 +80,7 @@ TEST(4_single_file)
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "src")), false);
 }
 
-TEST(5_single_file_from_subdir)
+TEST (5_single_file_from_subdir)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
@@ -102,7 +102,7 @@ TEST(5_single_file_from_subdir)
   EXPECT_EQ (found, true);
 }
 
-TEST(6_branch)
+TEST (6_branch)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
@@ -124,7 +124,7 @@ TEST(6_branch)
   EXPECT_EQ (found, true);
 }
 
-TEST(7_tag)
+TEST (7_tag)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
@@ -146,7 +146,7 @@ TEST(7_tag)
   EXPECT_EQ (found, true);
 }
 
-TEST(8_refspec)
+TEST (8_refspec)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
@@ -168,7 +168,7 @@ TEST(8_refspec)
   EXPECT_EQ (found, true);
 }
 
-TEST(9_HEAD)
+TEST (9_HEAD)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
@@ -190,7 +190,7 @@ TEST(9_HEAD)
   EXPECT_EQ (found, true);
 }
 
-TEST(10_invalid_branch)
+TEST (10_invalid_branch)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
@@ -202,7 +202,7 @@ TEST(10_invalid_branch)
   }
 }
 
-TEST(11_invalid_url)
+TEST (11_invalid_url)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
@@ -215,4 +215,3 @@ TEST(11_invalid_url)
 }
 
 #endif
-

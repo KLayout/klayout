@@ -45,7 +45,7 @@ SelectLineStyleForm::SelectLineStyleForm (QWidget *parent, const lay::LineStyles
 
   update ();
 
-  connect (mp_ui->style_items, SIGNAL (currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
+  connect (mp_ui->style_items, SIGNAL (currentItemChanged (QListWidgetItem *, QListWidgetItem *)),
            this, SLOT (sel_changed (QListWidgetItem *, QListWidgetItem *)));
 }
 
@@ -55,8 +55,7 @@ SelectLineStyleForm::~SelectLineStyleForm ()
   mp_ui = 0;
 }
 
-void 
-SelectLineStyleForm::set_selected (int selected)
+void SelectLineStyleForm::set_selected (int selected)
 {
   if (selected != m_selected) {
     m_selected = selected;
@@ -64,18 +63,17 @@ SelectLineStyleForm::set_selected (int selected)
   }
 }
 
-namespace {
-  struct display_order
+namespace
+{
+struct display_order {
+  bool operator() (lay::LineStyles::iterator a, lay::LineStyles::iterator b)
   {
-    bool operator () (lay::LineStyles::iterator a, lay::LineStyles::iterator b)
-    {
-      return a->order_index () < b->order_index ();
-    }
-  };
+    return a->order_index () < b->order_index ();
+  }
+};
 }
 
-void 
-SelectLineStyleForm::update ()
+void SelectLineStyleForm::update ()
 {
   mp_ui->style_items->clear ();
 
@@ -83,7 +81,7 @@ SelectLineStyleForm::update ()
     new QListWidgetItem (QObject::tr ("None"), mp_ui->style_items);
   }
 
-  std::vector <lay::LineStyles::iterator> iters;
+  std::vector<lay::LineStyles::iterator> iters;
   for (lay::LineStyles::iterator i = m_styles.begin_custom (); i != m_styles.end (); ++i) {
     iters.push_back (i);
   }
@@ -98,7 +96,7 @@ SelectLineStyleForm::update ()
     new QListWidgetItem (QIcon (i->get_bitmap (36, 26)), tl::to_qstring (name), mp_ui->style_items);
   }
 
-  for (std::vector <lay::LineStyles::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
+  for (std::vector<lay::LineStyles::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
     if ((*i)->order_index () > 0) {
       std::string name ((*i)->name ());
       if (name.empty ()) {
@@ -109,8 +107,7 @@ SelectLineStyleForm::update ()
   }
 }
 
-void 
-SelectLineStyleForm::sel_changed (QListWidgetItem *citem, QListWidgetItem *)
+void SelectLineStyleForm::sel_changed (QListWidgetItem *citem, QListWidgetItem *)
 {
   int row = mp_ui->style_items->row (citem);
   if (m_include_nil) {

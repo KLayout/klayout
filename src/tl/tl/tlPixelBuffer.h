@@ -33,7 +33,7 @@
 #include <cstdint>
 
 #if defined(HAVE_QT)
-#  include <QImage>
+#include <QImage>
 #endif
 
 namespace tl
@@ -120,7 +120,7 @@ public:
    */
   bool operator!= (const PixelBuffer &other) const
   {
-    return !operator== (other);
+    return ! operator== (other);
   }
 
   /**
@@ -284,7 +284,7 @@ public:
    *
    *  Texts are annotations which can be stored to PNG and back.
    */
-  const std::vector<std::pair<std::string, std::string> > &texts () const
+  const std::vector<std::pair<std::string, std::string>> &texts () const
   {
     return m_texts;
   }
@@ -294,7 +294,7 @@ public:
    *
    *  Texts are annotations which can be stored to PNG and back.
    */
-  void set_texts (const std::vector<std::pair<std::string, std::string> > &texts)
+  void set_texts (const std::vector<std::pair<std::string, std::string>> &texts)
   {
     m_texts = texts;
   }
@@ -324,7 +324,7 @@ private:
 
     ~ImageData ()
     {
-      delete[] mp_data;
+      delete [] mp_data;
       mp_data = 0;
     }
 
@@ -342,7 +342,7 @@ private:
   unsigned int m_width, m_height;
   bool m_transparent;
   tl::copy_on_write_ptr<ImageData> m_data;
-  std::vector<std::pair<std::string, std::string> > m_texts;
+  std::vector<std::pair<std::string, std::string>> m_texts;
 };
 
 /**
@@ -399,7 +399,7 @@ public:
    */
   bool operator!= (const BitmapBuffer &other) const
   {
-    return !operator== (other);
+    return ! operator== (other);
   }
 
   /**
@@ -513,7 +513,7 @@ public:
    *
    *  Texts are annotations which can be stored to PNG and back.
    */
-  const std::vector<std::pair<std::string, std::string> > &texts () const
+  const std::vector<std::pair<std::string, std::string>> &texts () const
   {
     return m_texts;
   }
@@ -523,7 +523,7 @@ public:
    *
    *  Texts are annotations which can be stored to PNG and back.
    */
-  void set_texts (const std::vector<std::pair<std::string, std::string> > &texts)
+  void set_texts (const std::vector<std::pair<std::string, std::string>> &texts)
   {
     m_texts = texts;
   }
@@ -553,7 +553,7 @@ private:
 
     ~MonoImageData ()
     {
-      delete[] mp_data;
+      delete [] mp_data;
       mp_data = 0;
     }
 
@@ -571,7 +571,7 @@ private:
   unsigned int m_width, m_height;
   unsigned int m_stride;
   tl::copy_on_write_ptr<MonoImageData> m_data;
-  std::vector<std::pair<std::string, std::string> > m_texts;
+  std::vector<std::pair<std::string, std::string>> m_texts;
 };
 
 }

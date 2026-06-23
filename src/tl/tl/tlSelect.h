@@ -29,16 +29,18 @@
 namespace tl
 {
 
-template<class Q, class X>
-struct try_assign
-{
+template <class Q, class X>
+struct try_assign {
   bool operator() (Q &, const X &) { return false; }
 };
 
-template<class Q>
-struct try_assign<Q, Q>
-{
-  bool operator() (Q &q, const Q &x) { q = x; return true; }
+template <class Q>
+struct try_assign<Q, Q> {
+  bool operator() (Q &q, const Q &x)
+  {
+    q = x;
+    return true;
+  }
 };
 
 /**
@@ -55,4 +57,3 @@ bool select (Q &q, const A &a, const B &b)
 }
 
 #endif
-

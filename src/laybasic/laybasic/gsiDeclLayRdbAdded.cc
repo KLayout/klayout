@@ -30,16 +30,13 @@ namespace gsi
 
 ClassExt<rdb::Item> decl_RdbItem (
   gsi::method ("image", &rdb::Item::image,
-    "@brief Gets the attached image as a QImage object\n"
-    "\n"
-    "This method has been added in version 0.28."
-  ) +
+               "@brief Gets the attached image as a QImage object\n"
+               "\n"
+               "This method has been added in version 0.28.") +
   gsi::method ("image=", static_cast<void (rdb::Item::*) (const QImage &)> (&rdb::Item::set_image),
-    "@brief Sets the attached image from a QImage object\n"
-    "\n"
-    "This method has been added in version 0.28."
-  )
-);
+               "@brief Sets the attached image from a QImage object\n"
+               "\n"
+               "This method has been added in version 0.28."));
 
 #endif
 

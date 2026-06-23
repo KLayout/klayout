@@ -27,18 +27,20 @@
 
 #include "layPluginConfigPage.h"
 
-namespace Ui {
-  class GridNetConfigPage;
+namespace Ui
+{
+class GridNetConfigPage;
 }
 
-namespace lay {
+namespace lay
+{
 
 class ColorButton;
 
 class GridNetConfigPage
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   GridNetConfigPage (QWidget *parent);
@@ -59,4 +61,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

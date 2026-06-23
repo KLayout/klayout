@@ -25,7 +25,7 @@
 
 const char *dne_name = "__DOES_NOT_EXIST__";
 
-TEST(1)
+TEST (1)
 {
   EXPECT_EQ (tl::has_env (dne_name), false);
 

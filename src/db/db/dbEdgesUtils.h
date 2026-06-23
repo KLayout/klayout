@@ -32,12 +32,15 @@
 
 #include <unordered_set>
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief The operation mode for the interaction filters
  */
-enum EdgeInteractionMode { EdgesInteract, EdgesInside, EdgesOutside };
+enum EdgeInteractionMode { EdgesInteract,
+                           EdgesInside,
+                           EdgesOutside };
 
 class PolygonSink;
 
@@ -51,8 +54,7 @@ class PolygonSink;
  */
 
 struct DB_PUBLIC EdgeLengthFilter
-  : public EdgeFilterBase
-{
+  : public EdgeFilterBase {
   typedef db::Edge::distance_type length_type;
 
   /**
@@ -174,8 +176,7 @@ private:
  */
 
 struct DB_PUBLIC EdgeOrientationFilter
-  : public EdgeFilterBase
-{
+  : public EdgeFilterBase {
   /**
    *  @brief Constructor
    *
@@ -255,12 +256,11 @@ private:
  */
 
 struct DB_PUBLIC SpecialEdgeOrientationFilter
-  : public EdgeFilterBase
-{
+  : public EdgeFilterBase {
   enum FilterType {
-    Ortho = 0,          //  0 and 90 degree
-    Diagonal = 1,       //  -45 and 45 degree
-    OrthoDiagonal = 2   //  both Ortho and Diagonal
+    Ortho = 0,        //  0 and 90 degree
+    Diagonal = 1,     //  -45 and 45 degree
+    OrthoDiagonal = 2 //  both Ortho and Diagonal
   };
 
   /**
@@ -323,12 +323,11 @@ private:
  */
 
 struct DB_PUBLIC AllEdgesMustMatchFilter
-  : public EdgeFilterBase
-{
+  : public EdgeFilterBase {
   /**
    *  @brief Constructor
    */
-  AllEdgesMustMatchFilter () { }
+  AllEdgesMustMatchFilter () {}
 
   virtual bool selected_set (const std::unordered_set<db::EdgeWithProperties> &edges) const
   {
@@ -368,8 +367,8 @@ public:
     : mp_output (&output), m_mode (mode), m_min_count (min_count), m_max_count (max_count)
   {
     //  NOTE: "counting" does not really make much sense in Outside mode ...
-    m_counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
-    tl_assert (!m_counting || mode != EdgesOutside);
+    m_counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+    tl_assert (! m_counting || mode != EdgesOutside);
   }
 
   void finish (const db::Edge *o, size_t p)
@@ -396,7 +395,6 @@ public:
       if (m_mode == EdgesOutside && m_seen.find (o) == m_seen.end ()) {
         mp_output->insert (*o);
       }
-
     }
   }
 
@@ -412,7 +410,7 @@ public:
           (m_mode == EdgesInside && db::edge_is_inside (*o, *oo))) {
 
         if (m_counting) {
-          m_counts[o] += 1;
+          m_counts [o] += 1;
         } else {
           if (m_seen.insert (o).second) {
             mp_output->insert (*o);
@@ -423,13 +421,11 @@ public:
 
         //  In this case we need to collect edges which are outside always - we report those on "finished".
         if (m_counting) {
-          m_counts[o] += 1;
+          m_counts [o] += 1;
         } else {
           m_seen.insert (o);
         }
-
       }
-
     }
   }
 
@@ -475,8 +471,8 @@ public:
     : mp_output (output), m_mode (mode), m_min_count (min_count), m_max_count (max_count)
   {
     //  NOTE: "counting" does not really make much sense in Outside mode ...
-    m_counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
-    tl_assert (!m_counting || mode != EdgesOutside);
+    m_counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+    tl_assert (! m_counting || mode != EdgesOutside);
   }
 
   void finish (const OutputType *o)
@@ -499,7 +495,6 @@ public:
       if (m_mode == EdgesOutside && m_seen.find (o) == m_seen.end ()) {
         mp_output->insert (*o);
       }
-
     }
   }
 
@@ -533,8 +528,7 @@ public:
           (m_mode == EdgesOutside && ! db::edge_is_outside (*e, *p))) {
 
         //  we report the result on "finish" here.
-        m_counts[ep] += 1;
-
+        m_counts [ep] += 1;
       }
 
     } else if (m_seen.find (ep) == m_seen.end ()) {
@@ -549,9 +543,7 @@ public:
 
         //  In this case we need to collect edges which are outside always - we report those on "finished".
         m_seen.insert (ep);
-
       }
-
     }
   }
 
@@ -594,7 +586,6 @@ public:
       if (mp_check->check (l1 <= l2 ? *o1 : *o2, l1 <= l2 ? *o2 : *o1, &ep)) {
         mp_output->insert (ep);
       }
-
     }
   }
 
@@ -611,8 +602,7 @@ private:
  *  driven by a box scanner.
  */
 struct JoinEdgesCluster
-  : public db::cluster<db::Edge, size_t>
-{
+  : public db::cluster<db::Edge, size_t> {
   typedef db::Edge::coord_type coord_type;
 
   JoinEdgesCluster (db::PolygonSink *output, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i);
@@ -637,11 +627,13 @@ class DB_PUBLIC ExtendedEdgeProcessor
 public:
   ExtendedEdgeProcessor (db::Coord e)
     : m_ext_b (e), m_ext_e (e), m_ext_o (e), m_ext_i (e)
-  { }
+  {
+  }
 
   ExtendedEdgeProcessor (db::Coord ext_b, db::Coord ext_e, db::Coord ext_o, db::Coord ext_i)
     : m_ext_b (ext_b), m_ext_e (ext_e), m_ext_o (ext_o), m_ext_i (ext_i)
-  { }
+  {
+  }
 
   virtual void process (const EdgeWithProperties &edge, std::vector<db::PolygonWithProperties> &res) const
   {

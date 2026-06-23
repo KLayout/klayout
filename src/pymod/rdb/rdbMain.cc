@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "rdbMain.h"
-DEFINE_PYMOD(rdbcore, "rdb", "KLayout core module 'rdb'")
+DEFINE_PYMOD (rdbcore, "rdb", "KLayout core module 'rdb'")

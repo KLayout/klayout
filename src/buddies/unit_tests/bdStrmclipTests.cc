@@ -25,9 +25,9 @@
 #include "dbTestSupport.h"
 #include "tlUnitTest.h"
 
-BD_PUBLIC int strmclip (int argc, char *argv[]);
+BD_PUBLIC int strmclip (int argc, char *argv []);
 
-TEST(1A)
+TEST (1A)
 {
   std::string input = tl::testdata ();
   input += "/bd/strm2clip_in.gds";
@@ -37,9 +37,9 @@ TEST(1A)
 
   std::string output = this->tmp_file ();
 
-  const char *argv[] = { "x", input.c_str (), output.c_str (), "-r=0,-2,9,5", "-r=13,-2,16,3", "-r=13,5,16,7" };
+  const char *argv [] = {"x", input.c_str (), output.c_str (), "-r=0,-2,9,5", "-r=13,-2,16,3", "-r=13,5,16,7"};
 
-  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
+  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv [0]), (char **) argv), 0);
 
   db::Layout layout;
 
@@ -52,7 +52,7 @@ TEST(1A)
   db::compare_layouts (this, layout, au, db::NoNormalization);
 }
 
-TEST(1B)
+TEST (1B)
 {
   std::string input = tl::testdata ();
   input += "/bd/strm2clip_in.gds";
@@ -62,9 +62,9 @@ TEST(1B)
 
   std::string output = this->tmp_file ();
 
-  const char *argv[] = { "x", input.c_str (), output.c_str (), "-l=100/0" };
+  const char *argv [] = {"x", input.c_str (), output.c_str (), "-l=100/0"};
 
-  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
+  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv [0]), (char **) argv), 0);
 
   db::Layout layout;
 
@@ -77,7 +77,7 @@ TEST(1B)
   db::compare_layouts (this, layout, au, db::NoNormalization);
 }
 
-TEST(2)
+TEST (2)
 {
   std::string input = tl::testdata ();
   input += "/bd/strm2clip_in.gds";
@@ -87,9 +87,9 @@ TEST(2)
 
   std::string output = this->tmp_file ();
 
-  const char *argv[] = { "x", input.c_str (), output.c_str (), "-r=0,-2,9,5", "-t", "INV2", "-x=CLIP_OUT" };
+  const char *argv [] = {"x", input.c_str (), output.c_str (), "-r=0,-2,9,5", "-t", "INV2", "-x=CLIP_OUT"};
 
-  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
+  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv [0]), (char **) argv), 0);
 
   db::Layout layout;
 
@@ -104,7 +104,7 @@ TEST(2)
 }
 
 //  with explicit output format
-TEST(3)
+TEST (3)
 {
   std::string input = tl::testdata ();
   input += "/bd/strm2clip_in.gds";
@@ -114,9 +114,9 @@ TEST(3)
 
   std::string output = this->tmp_file () + "[oas]";
 
-  const char *argv[] = { "x", input.c_str (), output.c_str (), "-r=0,-2,9,5", "-t", "INV2", "-x=CLIP_OUT" };
+  const char *argv [] = {"x", input.c_str (), output.c_str (), "-r=0,-2,9,5", "-t", "INV2", "-x=CLIP_OUT"};
 
-  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
+  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv [0]), (char **) argv), 0);
 
   db::Layout layout;
 
@@ -129,4 +129,3 @@ TEST(3)
 
   db::compare_layouts (this, layout, au, db::NoNormalization);
 }
-

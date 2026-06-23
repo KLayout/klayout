@@ -32,9 +32,8 @@ namespace db
 // ----------------------------------------------------------------------------
 //  HullEdgeCollector definition and implementation
 
-struct ECJoinOp
-{
-  void operator () (db::Coord &a, db::Coord b)
+struct ECJoinOp {
+  void operator() (db::Coord &a, db::Coord b)
   {
     if (b > a) {
       a = b;
@@ -42,9 +41,8 @@ struct ECJoinOp
   }
 };
 
-struct ECAreaCompareOp
-{
-  bool operator () (const db::Box &a, const db::Box &b) const
+struct ECAreaCompareOp {
+  bool operator() (const db::Box &a, const db::Box &b) const
   {
     return a.area () < b.area ();
   }
@@ -89,7 +87,7 @@ public:
     }
   }
 
-  void produce (std::vector <db::Point> &points)
+  void produce (std::vector<db::Point> &points)
   {
     if (m_cmap.begin () == m_cmap.end ()) {
       return;
@@ -100,7 +98,7 @@ public:
 
     points.push_back (m_tn.trans (db::Point (xl, yl)));
 
-    for (tl::interval_map <db::Coord, db::Coord>::const_iterator cm = m_cmap.begin (); cm != m_cmap.end (); ++cm) {
+    for (tl::interval_map<db::Coord, db::Coord>::const_iterator cm = m_cmap.begin (); cm != m_cmap.end (); ++cm) {
 
       db::Coord x1 = cm->first.first;
       db::Coord x2 = cm->first.second;
@@ -121,7 +119,6 @@ public:
 
       yl = y;
       xl = x2;
-
     }
 
     db::Coord xe = m_e.length ();
@@ -136,12 +133,12 @@ public:
     }
   }
 
-  void reduce (size_t n) 
+  void reduce (size_t n)
   {
-    //  remove as many concave pockets in the contour to achieve size n 
+    //  remove as many concave pockets in the contour to achieve size n
     //  (proceed in the order of area)
 
-    std::vector <db::Box> pockets;
+    std::vector<db::Box> pockets;
 
     size_t ntot = 0;
     while ((ntot = m_cmap.size ()) > n) {
@@ -150,10 +147,10 @@ public:
 
       if (ntot > 1) {
 
-        tl::interval_map <db::Coord, db::Coord>::const_iterator cl = m_cmap.begin ();
-        for (tl::interval_map <db::Coord, db::Coord>::const_iterator cm = m_cmap.begin (); cm != m_cmap.end (); ) {
+        tl::interval_map<db::Coord, db::Coord>::const_iterator cl = m_cmap.begin ();
+        for (tl::interval_map<db::Coord, db::Coord>::const_iterator cm = m_cmap.begin (); cm != m_cmap.end ();) {
 
-          tl::interval_map <db::Coord, db::Coord>::const_iterator cc = cm;
+          tl::interval_map<db::Coord, db::Coord>::const_iterator cc = cm;
           ++cm;
 
           if ((cc == m_cmap.begin () || cc->second < cl->second) && (cm == m_cmap.end () || cc->second < cm->second)) {
@@ -167,9 +164,7 @@ public:
           }
 
           cl = cc;
-
         }
-
       }
 
       if (pockets.size () > ntot - n) {
@@ -182,18 +177,17 @@ public:
         break;
       }
 
-      for (std::vector <db::Box>::const_iterator p = pockets.begin (); p != pockets.end (); ++p) {
+      for (std::vector<db::Box>::const_iterator p = pockets.begin (); p != pockets.end (); ++p) {
         ECJoinOp jo;
         m_cmap.add (p->left (), p->right (), p->top (), jo);
       }
-
     }
   }
 
 private:
   db::Edge m_e;
   db::Trans m_tn;
-  tl::interval_map <db::Coord, db::Coord> m_cmap;
+  tl::interval_map<db::Coord, db::Coord> m_cmap;
 };
 
 // ----------------------------------------------------------------------------
@@ -209,10 +203,10 @@ CellHullGenerator::CellHullGenerator (const db::Layout &layout)
   }
 }
 
-CellHullGenerator::CellHullGenerator (const db::Layout &layout, const std::vector <unsigned int> &layers)
+CellHullGenerator::CellHullGenerator (const db::Layout &layout, const std::vector<unsigned int> &layers)
   : m_all_layers (true), m_small_cell_size (100), m_complexity (default_complexity)
 {
-  std::set <unsigned int> ll;
+  std::set<unsigned int> ll;
   ll.insert (layers.begin (), layers.end ());
   for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
     if (ll.find ((*l).first) != ll.end ()) {
@@ -223,25 +217,23 @@ CellHullGenerator::CellHullGenerator (const db::Layout &layout, const std::vecto
   }
 }
 
-void 
-CellHullGenerator::set_small_cell_size (db::Coord sms)
+void CellHullGenerator::set_small_cell_size (db::Coord sms)
 {
   m_small_cell_size = sms;
 }
 
-void 
-CellHullGenerator::set_complexity (size_t complexity)
+void CellHullGenerator::set_complexity (size_t complexity)
 {
   m_complexity = complexity;
 }
 
-void CellHullGenerator::generate_hull (const db::Cell &cell, std::vector <db::Polygon> &hull)
+void CellHullGenerator::generate_hull (const db::Cell &cell, std::vector<db::Polygon> &hull)
 {
   db::Box bbox;
   if (m_all_layers) {
     bbox = cell.bbox ();
   } else {
-    for (std::vector <unsigned int>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+    for (std::vector<unsigned int>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
       bbox += cell.bbox (*l);
     }
   }
@@ -252,7 +244,7 @@ void CellHullGenerator::generate_hull (const db::Cell &cell, std::vector <db::Po
   }
 
   //  for small cells just take the bbox
-  if (bbox.height () <= db::coord_traits <db::Coord>::distance_type (m_small_cell_size) && bbox.width () <= db::coord_traits <db::Coord>::distance_type (m_small_cell_size)) {
+  if (bbox.height () <= db::coord_traits<db::Coord>::distance_type (m_small_cell_size) && bbox.width () <= db::coord_traits<db::Coord>::distance_type (m_small_cell_size)) {
     hull.push_back (db::Polygon (bbox));
     return;
   }
@@ -261,8 +253,7 @@ void CellHullGenerator::generate_hull (const db::Cell &cell, std::vector <db::Po
     db::Box (bbox.lower_left (), bbox.center ()),
     db::Box (bbox.lower_right (), bbox.center ()),
     db::Box (bbox.upper_left (), bbox.center ()),
-    db::Box (bbox.upper_right (), bbox.center ())
-  };
+    db::Box (bbox.upper_right (), bbox.center ())};
 
   db::HullEdgeCollector ec [4][4];
   for (unsigned int i = 0; i < 4; ++i) {
@@ -273,9 +264,9 @@ void CellHullGenerator::generate_hull (const db::Cell &cell, std::vector <db::Po
     }
   }
 
-  std::vector <db::Polygon> clipped_polygons;
+  std::vector<db::Polygon> clipped_polygons;
 
-  for (std::vector <unsigned int>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+  for (std::vector<unsigned int>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
 
     for (db::ShapeIterator s = cell.shapes (*l).begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes | db::ShapeIterator::Paths); ! s.at_end (); ++s) {
 
@@ -295,21 +286,18 @@ void CellHullGenerator::generate_hull (const db::Cell &cell, std::vector <db::Po
         } else {
           clipped_polygons.clear ();
           db::clip_poly (poly, sectors [is], clipped_polygons);
-          for (std::vector <db::Polygon>::const_iterator p = clipped_polygons.begin (); p != clipped_polygons.end (); ++p) {
+          for (std::vector<db::Polygon>::const_iterator p = clipped_polygons.begin (); p != clipped_polygons.end (); ++p) {
             for (unsigned int ie = 0; ie < 4; ++ie) {
               ec [is][ie].add (*p);
             }
           }
         }
-
       }
-
     }
-
   }
 
-  //  reduce the number of intervals on the edges 
-  //  (the complexity is roughly distributed on the 
+  //  reduce the number of intervals on the edges
+  //  (the complexity is roughly distributed on the
   //  various contributions, 1/10th is a rough estimate)
   for (unsigned int is = 0; is < 4; ++is) {
     for (unsigned int ie = 0; ie < 4; ++ie) {
@@ -322,7 +310,7 @@ void CellHullGenerator::generate_hull (const db::Cell &cell, std::vector <db::Po
   //  produce points
   for (unsigned int is = 0; is < 4; ++is) {
 
-    std::vector <db::Point> points;
+    std::vector<db::Point> points;
     size_t s1 [4], s2 [4];
 
     for (unsigned int ie = 0; ie < 4; ++ie) {
@@ -341,9 +329,7 @@ void CellHullGenerator::generate_hull (const db::Cell &cell, std::vector <db::Po
           }
         }
       }
-
     }
-
   }
 
   db::PolygonContainer ps (hull);
@@ -354,5 +340,3 @@ void CellHullGenerator::generate_hull (const db::Cell &cell, std::vector <db::Po
 }
 
 }
-
-

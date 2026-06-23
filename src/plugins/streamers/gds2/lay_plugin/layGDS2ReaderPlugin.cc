@@ -49,12 +49,11 @@ GDS2ReaderOptionPage::~GDS2ReaderOptionPage ()
   mp_ui = 0;
 }
 
-void 
-GDS2ReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
+void GDS2ReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   static const db::GDS2ReaderOptions default_options;
   const db::GDS2ReaderOptions *options = dynamic_cast<const db::GDS2ReaderOptions *> (o);
-  if (!options) {
+  if (! options) {
     options = &default_options;
   }
 
@@ -63,8 +62,7 @@ GDS2ReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db:
   mp_ui->box_mode_cb->setCurrentIndex (options->box_mode);
 }
 
-void 
-GDS2ReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
+void GDS2ReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   db::GDS2ReaderOptions *options = dynamic_cast<db::GDS2ReaderOptions *> (o);
   if (options) {
@@ -72,7 +70,6 @@ GDS2ReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Tech
     options->allow_big_records = ! mp_ui->big_records_cbx->isChecked ();
     options->allow_multi_xy_records = ! mp_ui->big_poly_cbx->isChecked ();
     options->box_mode = mp_ui->box_mode_cb->currentIndex ();
-
   }
 }
 
@@ -83,7 +80,7 @@ class GDS2ReaderPluginDeclaration
   : public StreamReaderPluginDeclaration
 {
 public:
-  GDS2ReaderPluginDeclaration () 
+  GDS2ReaderPluginDeclaration ()
     : StreamReaderPluginDeclaration (db::GDS2ReaderOptions ().format_name ())
   {
     // .. nothing yet ..

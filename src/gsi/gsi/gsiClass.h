@@ -45,102 +45,90 @@ namespace gsi
 /**
  *  @brief A helper function to implement equal as efficiently as possible
  */
-template<class T, bool> struct _var_user_equal_impl;
+template <class T, bool> struct _var_user_equal_impl;
 
-template<class T>
-struct _var_user_equal_impl<T, true>
-{
+template <class T>
+struct _var_user_equal_impl<T, true> {
   static bool call (const T *a, const T *b, const VariantUserClassImpl * /*delegate*/) { return *a == *b; }
 };
 
-template<class T>
-struct _var_user_equal_impl<T, false>
-{
+template <class T>
+struct _var_user_equal_impl<T, false> {
   static bool call (const T *a, const T *b, const VariantUserClassImpl *delegate) { return delegate->equal_impl ((void *) a, (void *) b); }
 };
 
 /**
  *  @brief A helper function to implement equal as efficiently as possible
  */
-template<class T, bool> struct _var_user_less_impl;
+template <class T, bool> struct _var_user_less_impl;
 
-template<class T>
-struct _var_user_less_impl<T, true>
-{
+template <class T>
+struct _var_user_less_impl<T, true> {
   static bool call (const T *a, const T *b, const VariantUserClassImpl * /*delegate*/) { return *a < *b; }
 };
 
-template<class T>
-struct _var_user_less_impl<T, false>
-{
+template <class T>
+struct _var_user_less_impl<T, false> {
   static bool call (const T *a, const T *b, const VariantUserClassImpl *delegate) { return delegate->less_impl ((void *) a, (void *) b); }
 };
 
 /**
  *  @brief A helper function to implement to_string as efficiently as possible
  */
-template<class T, bool> struct _var_user_to_string_impl;
+template <class T, bool> struct _var_user_to_string_impl;
 
-template<class T>
-struct _var_user_to_string_impl<T, true>
-{
+template <class T>
+struct _var_user_to_string_impl<T, true> {
   static std::string call (const T *a, const VariantUserClassImpl * /*delegate*/) { return a ? a->to_string () : std::string (); }
 };
 
-template<class T>
-struct _var_user_to_string_impl<T, false>
-{
+template <class T>
+struct _var_user_to_string_impl<T, false> {
   static std::string call (const T *a, const VariantUserClassImpl *delegate) { return delegate->to_string_impl ((void *) a); }
 };
 
 /**
  *  @brief A helper function to implement to_variant as efficiently as possible
  */
-template<class T, bool> struct _var_user_to_variant_impl;
+template <class T, bool> struct _var_user_to_variant_impl;
 
-template<class T>
-struct _var_user_to_variant_impl<T, true>
-{
+template <class T>
+struct _var_user_to_variant_impl<T, true> {
   static tl::Variant call (const T *a, const VariantUserClassImpl * /*delegate*/) { return a->to_variant (); }
 };
 
-template<class T>
-struct _var_user_to_variant_impl<T, false>
-{
+template <class T>
+struct _var_user_to_variant_impl<T, false> {
   static tl::Variant call (const T *a, const VariantUserClassImpl *delegate) { return delegate->to_variant_impl ((void *) a); }
 };
 
 /**
  *  @brief A helper function to implement to_int as efficiently as possible
  */
-template<class T, bool> struct _var_user_to_int_impl;
+template <class T, bool> struct _var_user_to_int_impl;
 
-template<class T>
-struct _var_user_to_int_impl<T, true>
-{
+template <class T>
+struct _var_user_to_int_impl<T, true> {
   static int call (const T *a, const VariantUserClassImpl * /*delegate*/) { return a->to_int (); }
 };
 
-template<class T>
-struct _var_user_to_int_impl<T, false>
-{
+template <class T>
+struct _var_user_to_int_impl<T, false> {
   static int call (const T *a, const VariantUserClassImpl *delegate) { return delegate->to_int_impl ((void *) a); }
 };
 
 /**
  *  @brief A helper function to implement to_double as efficiently as possible
  */
-template<class T, bool> struct _var_user_to_double_impl;
+template <class T, bool> struct _var_user_to_double_impl;
 
-template<class T>
-struct _var_user_to_double_impl<T, true>
-{
+template <class T>
+struct _var_user_to_double_impl<T, true> {
   static double call (const T *a, const VariantUserClassImpl * /*delegate*/) { return a->to_double (); }
 };
 
-template<class T>
-struct _var_user_to_double_impl<T, false>
-{
+template <class T>
+struct _var_user_to_double_impl<T, false> {
   static double call (const T *a, const VariantUserClassImpl *delegate) { return delegate->to_double_impl ((void *) a); }
 };
 
@@ -149,7 +137,8 @@ struct _var_user_to_double_impl<T, false>
  */
 template <class T>
 class GSI_PUBLIC_TEMPLATE VariantUserClass
-  : public tl::VariantUserClass<T>, private VariantUserClassImpl
+  : public tl::VariantUserClass<T>,
+    private VariantUserClassImpl
 {
 public:
   VariantUserClass ()
@@ -167,7 +156,7 @@ public:
 
   void initialize (const gsi::ClassBase *cls, const tl::VariantUserClassBase *object_cls, bool is_const)
   {
-    mp_cls = cls; 
+    mp_cls = cls;
     mp_object_cls = object_cls;
     m_is_const = is_const;
 
@@ -179,7 +168,7 @@ public:
     }
   }
 
-  const tl::EvalClass *eval_cls () const 
+  const tl::EvalClass *eval_cls () const
   {
     return this;
   }
@@ -241,7 +230,7 @@ public:
     return mp_cls->create ();
   }
 
-  void destroy (void *obj) const 
+  void destroy (void *obj) const
   {
     if (obj) {
       mp_cls->destroy (obj);
@@ -250,7 +239,7 @@ public:
 
   const char *name () const
   {
-    return mp_cls ? mp_cls->name ().c_str() : 0;
+    return mp_cls ? mp_cls->name ().c_str () : 0;
   }
 
   void read (void *a, tl::Extractor &ex) const
@@ -264,14 +253,14 @@ public:
     return mp_cls;
   }
 
-  bool is_class () const 
-  { 
-    return mp_object_cls != 0; 
+  bool is_class () const
+  {
+    return mp_object_cls != 0;
   }
 
   bool is_const () const
-  { 
-    return m_is_const; 
+  {
+    return m_is_const;
   }
 
 private:
@@ -288,37 +277,53 @@ private:
 //  GSI implementation
 
 template <class X, bool> struct _destroy;
-template <class X> struct _destroy<X, false> { static void call (X *) { tl_assert (false); } };
-template <class X> struct _destroy<X, true> { static void call (X *x) { delete x; } };
+template <class X> struct _destroy<X, false> {
+  static void call (X *) { tl_assert (false); }
+};
+template <class X> struct _destroy<X, true> {
+  static void call (X *x) { delete x; }
+};
 
 template <class X, bool> struct _create;
-template <class X> struct _create<X, false> { static void *call () { throw tl::Exception (tl::to_string (tr ("Object cannot be created here"))); } };
-template <class X> struct _create<X, true> { static void *call () { return new X (); } };
+template <class X> struct _create<X, false> {
+  static void *call () { throw tl::Exception (tl::to_string (tr ("Object cannot be created here"))); }
+};
+template <class X> struct _create<X, true> {
+  static void *call () { return new X (); }
+};
 
 template <class X, bool> struct _clone;
-template <class X> struct _clone<X, false> { static void *call (const void *) { throw tl::Exception (tl::to_string (tr ("Object cannot be copied here"))); } };
-template <class X> struct _clone<X, true> { static void *call (const void *other) { return new X (*(const X *)other); } };
+template <class X> struct _clone<X, false> {
+  static void *call (const void *) { throw tl::Exception (tl::to_string (tr ("Object cannot be copied here"))); }
+};
+template <class X> struct _clone<X, true> {
+  static void *call (const void *other) { return new X (*(const X *) other); }
+};
 
 template <class X, bool> struct _assign;
-template <class X> struct _assign<X, false> { static void call (void *, const void *) { throw tl::Exception (tl::to_string (tr ("Object cannot be copied here"))); } };
-template <class X> struct _assign<X, true> { static void call (void *dest, const void *src) { *(X *)dest = *(const X *)src; } };
+template <class X> struct _assign<X, false> {
+  static void call (void *, const void *) { throw tl::Exception (tl::to_string (tr ("Object cannot be copied here"))); }
+};
+template <class X> struct _assign<X, true> {
+  static void call (void *dest, const void *src) { *(X *) dest = *(const X *) src; }
+};
 
 /**
- *  @brief A helper class which tests whether a given object can be upcast 
+ *  @brief A helper class which tests whether a given object can be upcast
  */
 class SubClassTesterBase
 {
 public:
-  SubClassTesterBase () { }
-  virtual ~SubClassTesterBase () { }
+  SubClassTesterBase () {}
+  virtual ~SubClassTesterBase () {}
 
   virtual bool can_upcast (const void *p) const = 0;
 };
 
 /**
  *  @brief A specific implementation of the upcast tester
- *  
- *  The can_upcast method will return true, if the object (which has at least to 
+ *
+ *  The can_upcast method will return true, if the object (which has at least to
  *  be of type B) can be upcast to X.
  */
 template <class X, class B, bool B_IS_POLYMORPHIC>
@@ -329,12 +334,12 @@ class SubClassTester;
  */
 template <class X, class B>
 class SubClassTester<X, B, true>
-  : public SubClassTesterBase 
+  : public SubClassTesterBase
 {
 public:
-  virtual bool can_upcast (const void *p) const 
+  virtual bool can_upcast (const void *p) const
   {
-    return dynamic_cast<const X *>((const B *)p) != 0;
+    return dynamic_cast<const X *> ((const B *) p) != 0;
   }
 };
 
@@ -343,10 +348,10 @@ public:
  */
 template <class X, class B>
 class SubClassTester<X, B, false>
-  : public SubClassTesterBase 
+  : public SubClassTesterBase
 {
 public:
-  virtual bool can_upcast (const void *) const 
+  virtual bool can_upcast (const void *) const
   {
     //  Non-polymorphic classes can't be upcast, hence we always return false here
     return false;
@@ -356,7 +361,7 @@ public:
 /**
  *  @brief An extension declaration
  *
- *  Instantiating an object of this kind will extend the class X with 
+ *  Instantiating an object of this kind will extend the class X with
  *  the given methods.
  */
 template <class X>
@@ -404,7 +409,7 @@ public:
    *  The main declaration object is 0 initially indicating that the classes
    *  have not been merged.
    */
-  virtual const ClassBase *declaration () const 
+  virtual const ClassBase *declaration () const
   {
     return mp_declaration;
   }
@@ -420,7 +425,7 @@ public:
       non_const_decl->add_method ((*m)->clone ());
     }
 
-    //  Treat class imports (extensions with a base class): import the class as 
+    //  Treat class imports (extensions with a base class): import the class as
     //  a child class plus import constants into the class (intended for enum import).
     if (declaration ()) {
       non_const_decl->add_child_class (this);
@@ -437,14 +442,14 @@ private:
 /**
  *  @brief A tag indicating "no adaptor"
  */
-struct NoAdaptorTag { };
+struct NoAdaptorTag {
+};
 
 /**
- *  @brief Delivers the typeid for the given class 
+ *  @brief Delivers the typeid for the given class
  */
 template <class X, class Adapted>
-struct adaptor_type_info
-{
+struct adaptor_type_info {
   typedef Adapted final_type;
 
   static const std::type_info *type_info ()
@@ -476,11 +481,10 @@ struct adaptor_type_info
 };
 
 template <class X>
-struct adaptor_type_info<X, NoAdaptorTag>
-{
+struct adaptor_type_info<X, NoAdaptorTag> {
   typedef X final_type;
 
-  static const std::type_info *type_info () 
+  static const std::type_info *type_info ()
   {
     return 0;
   }
@@ -555,7 +559,7 @@ public:
     set_base (&base);
   }
 
-  virtual const std::type_info *adapted_type_info () const 
+  virtual const std::type_info *adapted_type_info () const
   {
     return adaptor_type_info<X, Adapted>::type_info ();
   }
@@ -590,7 +594,7 @@ public:
 
   virtual void destroy (void *p) const
   {
-    X *x = (X *)p;
+    X *x = (X *) p;
     _destroy<X, std::is_destructible<X>::value>::call (x);
   }
 
@@ -644,7 +648,7 @@ public:
     return std::is_default_constructible<X>::value;
   }
 
-  virtual const ClassBase *subclass_decl (const void *p) const 
+  virtual const ClassBase *subclass_decl (const void *p) const
   {
     if (p) {
       for (tl::weak_collection<ClassBase>::const_iterator s = subclasses ().begin (); s != subclasses ().end (); ++s) {
@@ -657,7 +661,7 @@ public:
     return this;
   }
 
-  virtual bool can_upcast (const void *p) const 
+  virtual bool can_upcast (const void *p) const
   {
     return m_subclass_tester.get () && m_subclass_tester->can_upcast (p);
   }
@@ -697,7 +701,7 @@ private:
  *  @brief The declaration of a class with a base class
  *
  *  This is an alternative to using the Class constructor with a base class reference. It
- *  employs a template parameter rather than a gsi::Class object. This way it's easier to 
+ *  employs a template parameter rather than a gsi::Class object. This way it's easier to
  *  use if the declaration object of the base class is not available.
  */
 template <class X, class B, class Adapted = NoAdaptorTag>
@@ -803,10 +807,10 @@ GSI_PUBLIC const ClassBase *fallback_cls_decl (const std::type_info &ti);
 
 /**
  *  @brief Obtain the class declaration for a given class
- * 
+ *
  *  This method looks up the declaration object for a given type.
  *  It does so dynamically, since declarations may be located in different
- *  libraries. However, for performance reasons, the definitions are cached. 
+ *  libraries. However, for performance reasons, the definitions are cached.
  */
 template <class X>
 const ClassBase *cls_decl ()
@@ -816,7 +820,7 @@ const ClassBase *cls_decl ()
   static const ClassBase *cd = 0;
   if (! cd) {
     cd = class_by_typeinfo_no_assert (typeid (X));
-    if (!cd) {
+    if (! cd) {
       cd = fallback_cls_decl (typeid (X));
     }
   }

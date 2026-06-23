@@ -40,8 +40,7 @@ class Circuit;
 class DeviceClass;
 class Device;
 
-struct DB_PUBLIC NetlistSpiceReaderOptions
-{
+struct DB_PUBLIC NetlistSpiceReaderOptions {
   NetlistSpiceReaderOptions ();
 
   double scale;
@@ -152,12 +151,12 @@ public:
   /**
    *  @brief Reads a value from the extractor (with formula evaluation)
    */
-  static tl::Variant read_value(tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables);
+  static tl::Variant read_value (tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables);
 
   /**
    *  @brief Reads a value from the extractor (with formula evaluation and two levels of variables)
    */
-  static tl::Variant read_value(tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables1, const std::map<std::string, tl::Variant> &variables2);
+  static tl::Variant read_value (tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables1, const std::map<std::string, tl::Variant> &variables2);
 
   /**
    *  @brief Tries to read a value from the extractor (with formula evaluation)

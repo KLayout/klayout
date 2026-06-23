@@ -47,22 +47,19 @@ RS274XReader::~RS274XReader ()
   m_apertures.clear ();
 }
 
-bool 
-RS274XReader::does_accept ()
+bool RS274XReader::does_accept ()
 {
   return true;
 }
 
-bool
-RS274XReader::is_clear_polarity ()
+bool RS274XReader::is_clear_polarity ()
 {
   //  Now that we have used the polarity, we not longer guess it.
   m_guess_polarity = false;
-  return m_neg_polarity ? !m_clear : m_clear;
+  return m_neg_polarity ? ! m_clear : m_clear;
 }
 
-void
-RS274XReader::init ()
+void RS274XReader::init ()
 {
   //  Initialize reader:
   m_clear = false;
@@ -113,7 +110,7 @@ RS274XReader::do_scan ()
   char c;
 
   //  Actually read:
-  while ((c = stream ().skip ()) != 0 && !stream ().at_end ()) {
+  while ((c = stream ().skip ()) != 0 && ! stream ().at_end ()) {
 
     if (c == '%') {
 
@@ -192,11 +189,8 @@ RS274XReader::do_scan ()
             } else {
               data.function = GerberMetaData::NoFunction;
             }
-
           }
-
         }
-
       }
 
       //  eat trailing '%'
@@ -207,28 +201,26 @@ RS274XReader::do_scan ()
     } else {
       get_block ();
     }
-
   }
 
   return data;
 }
 
-void
-RS274XReader::do_read ()
+void RS274XReader::do_read ()
 {
   init ();
 
   char c;
 
   //  Actually read:
-  while ((c = stream ().skip ()) != 0 && !stream ().at_end ()) {
+  while ((c = stream ().skip ()) != 0 && ! stream ().at_end ()) {
 
     if (c == '%') {
 
       stream ().get_char ();
 
       while (! stream ().at_end () && (c = stream ().skip ()) != '%') {
-        
+
         std::string param;
         param += stream ().get_char ();
 
@@ -331,9 +323,8 @@ RS274XReader::do_read ()
           get_block ();
           warn (tl::to_string (tr ("Parameter ignored: ")) + param);
         }
-
       }
-      
+
       //  eat trailing '%'
       stream ().get_char ();
 
@@ -403,12 +394,12 @@ RS274XReader::do_read ()
 
           } else if (gcode == 70) {
 
-            // .. G70 - specify inches 
+            // .. G70 - specify inches
             set_unit (25400);
 
           } else if (gcode == 71) {
 
-            // .. G71 - specify millimeters 
+            // .. G71 - specify millimeters
             set_unit (1000);
 
           } else if (gcode == 74) {
@@ -491,18 +482,18 @@ RS274XReader::do_read ()
           if (dcode >= 10) {
 
             //  set current aperture
-            if (dcode >= int (m_apertures.size ()) || m_apertures[dcode] == 0) {
+            if (dcode >= int (m_apertures.size ()) || m_apertures [dcode] == 0) {
               throw tl::Exception (tl::to_string (tr ("Aperture code D%d is invalid or undefined")), dcode);
             }
 
-            m_current_aperture = m_apertures[dcode];
+            m_current_aperture = m_apertures [dcode];
 
           } else if (dcode <= 3) {
 
             m_current_dcode = dcode;
 
             if (dcode == 3) {
-              //  force a flash here even if there is no explicit coordinate 
+              //  force a flash here even if there is no explicit coordinate
               has_coord = true;
             }
 
@@ -513,7 +504,6 @@ RS274XReader::do_read ()
         } else {
           throw tl::Exception (tl::to_string (tr ("Invalid function code '%c'")), c);
         }
-
       }
 
       if (has_coord) {
@@ -533,7 +523,6 @@ RS274XReader::do_read ()
 
             m_polygon_points.clear ();
             m_polygon_points.push_back (db::DPoint (x, y));
-
           }
 
         } else if (m_current_dcode == 3) {
@@ -583,7 +572,7 @@ RS274XReader::do_read ()
                     aa1 += M_PI * 2.0;
                   }
 
-                  //  this is the single quadrant interpolation, so we can choose the one which is 
+                  //  this is the single quadrant interpolation, so we can choose the one which is
                   //  properly located for one quadrant.
                   if (aa1 - aa0 - 1e-6 < 0.5 * M_PI) {
 
@@ -595,9 +584,7 @@ RS274XReader::do_read ()
                       a1 = aa1;
                       has_center = true;
                     }
-
                   }
-
                 }
 
                 if (! has_center) {
@@ -618,7 +605,6 @@ RS274XReader::do_read ()
                 }
 
                 has_center = true;
-
               }
 
               if (has_center) {
@@ -641,16 +627,12 @@ RS274XReader::do_read ()
                     }
 
                     m_current_aperture->produce_linear (db::DCplxTrans (db::DVector (m_x, m_y)) * object_trans (), pe - db::DPoint (m_x, m_y), *this, ep (), is_clear_polarity ());
-
                   }
 
                   m_x = pe.x ();
                   m_y = pe.y ();
-
                 }
-
               }
-
             }
 
           } else if (m_current_gcode == 0) {
@@ -664,28 +646,23 @@ RS274XReader::do_read ()
             if (m_polygon_mode) {
               m_polygon_points.push_back (db::DPoint (x, y));
             } else {
-              
+
               if (! m_current_aperture) {
                 throw tl::Exception (tl::to_string (tr ("No aperture defined (missing G54 block)")));
               }
 
               m_current_aperture->produce_linear (db::DCplxTrans (db::DVector (m_x, m_y)) * object_trans (), db::DPoint (x, y) - db::DPoint (m_x, m_y), *this, ep (), is_clear_polarity ());
-
             }
 
           } else {
             throw tl::Exception (tl::to_string (tr ("G00 or unspecified 'G' code requires D03")));
           }
-
         }
 
         m_x = x;
         m_y = y;
-
       }
-
     }
-
   }
 
   if (! m_net_name.empty ()) {
@@ -697,8 +674,7 @@ RS274XReader::do_read ()
   }
 }
 
-void
-RS274XReader::process_mcode (int /*mcode*/)
+void RS274XReader::process_mcode (int /*mcode*/)
 {
   //  no processing for M codes currently.
 }
@@ -718,8 +694,7 @@ RS274XReader::get_block ()
   return m_buffer;
 }
 
-void
-RS274XReader::read_as_parameter (const std::string &block)
+void RS274XReader::read_as_parameter (const std::string &block)
 {
   if (block == "AXBY") {
     m_axis_mapping = ab_xy;
@@ -730,8 +705,7 @@ RS274XReader::read_as_parameter (const std::string &block)
   }
 }
 
-void
-RS274XReader::read_fs_parameter (const std::string &block)
+void RS274XReader::read_fs_parameter (const std::string &block)
 {
   bool omit_lz = true;
   int ld = -1;
@@ -764,7 +738,7 @@ RS274XReader::read_fs_parameter (const std::string &block)
   ex.read (i);
   ld = i / 10;
   td = i % 10;
-  
+
   int j = i;
   ex.expect ("Y");
   ex.read (j);
@@ -784,8 +758,7 @@ RS274XReader::read_fs_parameter (const std::string &block)
   set_format (ld, td, omit_lz);
 }
 
-void
-RS274XReader::read_mi_parameter (const std::string &block)
+void RS274XReader::read_mi_parameter (const std::string &block)
 {
   tl::Extractor ex (block.c_str ());
 
@@ -807,8 +780,7 @@ RS274XReader::read_mi_parameter (const std::string &block)
   update_local_mirror (mx, my);
 }
 
-void
-RS274XReader::read_mo_parameter (const std::string &block)
+void RS274XReader::read_mo_parameter (const std::string &block)
 {
   if (block == "IN") {
     set_unit (25400);
@@ -819,8 +791,7 @@ RS274XReader::read_mo_parameter (const std::string &block)
   }
 }
 
-void
-RS274XReader::read_of_parameter (const std::string &block)
+void RS274XReader::read_of_parameter (const std::string &block)
 {
   // TODO: relationship to IO paramter???
   tl::Extractor ex (block.c_str ());
@@ -845,8 +816,7 @@ RS274XReader::read_of_parameter (const std::string &block)
   update_local_offset (ox, oy);
 }
 
-void
-RS274XReader::read_sf_parameter (const std::string &block)
+void RS274XReader::read_sf_parameter (const std::string &block)
 {
   tl::Extractor ex (block.c_str ());
 
@@ -869,8 +839,7 @@ RS274XReader::read_sf_parameter (const std::string &block)
   update_local_scale (sx);
 }
 
-void
-RS274XReader::read_ls_parameter (const std::string &block)
+void RS274XReader::read_ls_parameter (const std::string &block)
 {
   tl::Extractor ex (block.c_str ());
 
@@ -880,8 +849,7 @@ RS274XReader::read_ls_parameter (const std::string &block)
   update_object_scale (s);
 }
 
-void
-RS274XReader::read_lr_parameter (const std::string &block)
+void RS274XReader::read_lr_parameter (const std::string &block)
 {
   tl::Extractor ex (block.c_str ());
 
@@ -891,17 +859,16 @@ RS274XReader::read_lr_parameter (const std::string &block)
   update_object_angle (a);
 }
 
-void
-RS274XReader::read_lm_parameter (const std::string &block)
+void RS274XReader::read_lm_parameter (const std::string &block)
 {
   tl::Extractor ex (block.c_str ());
 
   bool omx = false, omy = false;
   while (! ex.at_end ()) {
     if (ex.test ("X")) {
-      omy = true;  //  "my == mirror at y axis" is "X == mirror along x axis"
+      omy = true; //  "my == mirror at y axis" is "X == mirror along x axis"
     } else if (ex.test ("Y")) {
-      omx = true;  //  "mx == mirror at x axis" is "Y == mirror along y axis"
+      omx = true; //  "mx == mirror at x axis" is "Y == mirror along y axis"
     } else {
       break;
     }
@@ -910,20 +877,17 @@ RS274XReader::read_lm_parameter (const std::string &block)
   update_object_mirror (omx, omy);
 }
 
-void
-RS274XReader::read_ij_parameter (const std::string & /*block*/)
+void RS274XReader::read_ij_parameter (const std::string & /*block*/)
 {
   warn (tl::to_string (tr ("IJ parameters are ignored currently")));
 }
 
-void
-RS274XReader::read_in_parameter (const std::string & /*block*/)
+void RS274XReader::read_in_parameter (const std::string & /*block*/)
 {
   // image name ignored currently
 }
 
-void
-RS274XReader::read_io_parameter (const std::string &block)
+void RS274XReader::read_io_parameter (const std::string &block)
 {
   // TODO: clarify: relationship to OF paramter???
   tl::Extractor ex (block.c_str ());
@@ -948,8 +912,7 @@ RS274XReader::read_io_parameter (const std::string &block)
   update_local_offset (ox, oy);
 }
 
-void
-RS274XReader::read_ip_parameter (const std::string &block)
+void RS274XReader::read_ip_parameter (const std::string &block)
 {
   tl::Extractor ex (block.c_str ());
 
@@ -957,13 +920,12 @@ RS274XReader::read_ip_parameter (const std::string &block)
     set_inverse (false);
   } else if (ex.test ("NEG")) {
     set_inverse (true);
-  } 
+  }
 
   ex.expect_end ();
 }
 
-void
-RS274XReader::read_ir_parameter (const std::string &block)
+void RS274XReader::read_ir_parameter (const std::string &block)
 {
   tl::Extractor ex (block.c_str ());
 
@@ -972,14 +934,12 @@ RS274XReader::read_ir_parameter (const std::string &block)
   update_local_angle (rot);
 }
 
-void
-RS274XReader::read_pf_parameter (const std::string & /*block*/)
+void RS274XReader::read_pf_parameter (const std::string & /*block*/)
 {
   warn (tl::to_string (tr ("PF parameters are ignored")));
 }
 
-bool
-RS274XReader::read_net_name (const std::string &block, std::string &net_name) const
+bool RS274XReader::read_net_name (const std::string &block, std::string &net_name) const
 {
   tl::Extractor ex (block.c_str ());
 
@@ -1000,8 +960,7 @@ RS274XReader::read_net_name (const std::string &block, std::string &net_name) co
   return false;
 }
 
-void
-RS274XReader::read_ad_parameter (const std::string &block)
+void RS274XReader::read_ad_parameter (const std::string &block)
 {
   tl::Extractor ex (block.c_str ());
 
@@ -1029,22 +988,21 @@ RS274XReader::read_ad_parameter (const std::string &block)
   }
 
   if (name == "C") {
-    m_apertures[dcode] = new RS274XCircleAperture (*this, ex);
+    m_apertures [dcode] = new RS274XCircleAperture (*this, ex);
   } else if (name == "R") {
-    m_apertures[dcode] = new RS274XRectAperture (*this, ex);
+    m_apertures [dcode] = new RS274XRectAperture (*this, ex);
   } else if (name == "O") {
-    m_apertures[dcode] = new RS274XOvalAperture (*this, ex);
+    m_apertures [dcode] = new RS274XOvalAperture (*this, ex);
   } else if (name == "P") {
-    m_apertures[dcode] = new RS274XRegularAperture (*this, ex);
+    m_apertures [dcode] = new RS274XRegularAperture (*this, ex);
   } else if (m_aperture_macros.find (name) != m_aperture_macros.end ()) {
-    m_apertures[dcode] = new RS274XMacroAperture (*this, name, m_aperture_macros[name], ex);
+    m_apertures [dcode] = new RS274XMacroAperture (*this, name, m_aperture_macros [name], ex);
   } else {
     throw tl::Exception (tl::to_string (tr ("Invalid aperture name '%s' (not a macro name and not a standard aperture) for AD parameter")), name);
   }
 }
 
-void
-RS274XReader::install_block_aperture (const std::string &d, const db::Region &region)
+void RS274XReader::install_block_aperture (const std::string &d, const db::Region &region)
 {
   int dcode = 0;
 
@@ -1065,11 +1023,10 @@ RS274XReader::install_block_aperture (const std::string &d, const db::Region &re
     m_apertures.push_back (0);
   }
 
-  m_apertures[dcode] = new RS274XRegionAperture (region);
+  m_apertures [dcode] = new RS274XRegionAperture (region);
 }
 
-void
-RS274XReader::read_am_parameter (const std::string &block)
+void RS274XReader::read_am_parameter (const std::string &block)
 {
   tl::Extractor ex (block.c_str ());
 
@@ -1084,20 +1041,17 @@ RS274XReader::read_am_parameter (const std::string &block)
   m_aperture_macros.insert (std::make_pair (name, std::string (ex.skip ())));
 }
 
-void
-RS274XReader::read_ko_parameter (const std::string & /*block*/)
+void RS274XReader::read_ko_parameter (const std::string & /*block*/)
 {
   warn (tl::to_string (tr ("KO parameters are not supported currently")));
 }
 
-void
-RS274XReader::read_ln_parameter (const std::string & /*block*/)
+void RS274XReader::read_ln_parameter (const std::string & /*block*/)
 {
   // TODO: implement layer name
 }
 
-void
-RS274XReader::read_lp_parameter (const std::string &block)
+void RS274XReader::read_lp_parameter (const std::string &block)
 {
   if (block == "C") {
     //  when we encounter the first LP parameter, and it is a clear layer, we
@@ -1118,8 +1072,7 @@ RS274XReader::read_lp_parameter (const std::string &block)
   }
 }
 
-void
-RS274XReader::read_sr_parameter (const std::string &block)
+void RS274XReader::read_sr_parameter (const std::string &block)
 {
   reset_step_and_repeat ();
 
@@ -1153,7 +1106,7 @@ RS274XReader::read_sr_parameter (const std::string &block)
     dx *= unit ();
     dy *= unit ();
 
-    std::vector <db::DVector> steps;
+    std::vector<db::DVector> steps;
     steps.reserve (nx * ny);
     for (int i = 0; i < nx; ++i) {
       for (int j = 0; j < ny; ++j) {
@@ -1162,15 +1115,12 @@ RS274XReader::read_sr_parameter (const std::string &block)
     }
 
     step_and_repeat (steps);
-
   }
 }
 
-void
-RS274XReader::read_if_parameter (const std::string & /*block*/)
+void RS274XReader::read_if_parameter (const std::string & /*block*/)
 {
   warn (tl::to_string (tr ("IF parameters are not supported currently")));
 }
 
 }
-

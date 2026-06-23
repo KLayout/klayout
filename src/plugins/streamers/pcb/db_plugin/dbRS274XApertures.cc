@@ -33,12 +33,11 @@ namespace db
 
 RS274XApertureBase::RS274XApertureBase ()
   : mp_ep (0), mp_reader (0), m_needs_update (true)
-{ 
+{
   // .. nothing yet ..
 }
 
-void
-RS274XApertureBase::produce_flash (const db::DCplxTrans &d, RS274XReader &reader, db::EdgeProcessor &ep, bool clear)
+void RS274XApertureBase::produce_flash (const db::DCplxTrans &d, RS274XReader &reader, db::EdgeProcessor &ep, bool clear)
 {
   if (m_needs_update) {
 
@@ -62,21 +61,19 @@ RS274XApertureBase::produce_flash (const db::DCplxTrans &d, RS274XReader &reader
 
     mp_reader = 0;
     mp_ep = 0;
-
   }
 
   db::CplxTrans trans = d * db::CplxTrans (reader.dbu ());
 
-  for (std::vector <db::Polygon>::const_iterator p = m_polygons.begin (); p != m_polygons.end (); ++p) {
+  for (std::vector<db::Polygon>::const_iterator p = m_polygons.begin (); p != m_polygons.end (); ++p) {
     reader.produce_polygon (p->transformed (trans), clear);
   }
-  for (std::vector <db::Path>::const_iterator p = m_lines.begin (); p != m_lines.end (); ++p) {
+  for (std::vector<db::Path>::const_iterator p = m_lines.begin (); p != m_lines.end (); ++p) {
     reader.produce_line (p->transformed (trans), clear);
   }
 }
 
-void 
-RS274XApertureBase::produce_linear (const db::DCplxTrans &d, const db::DVector &dist, RS274XReader &reader, db::EdgeProcessor &ep, bool clear)
+void RS274XApertureBase::produce_linear (const db::DCplxTrans &d, const db::DVector &dist, RS274XReader &reader, db::EdgeProcessor &ep, bool clear)
 {
   mp_reader = &reader;
   mp_ep = &ep;
@@ -113,7 +110,6 @@ RS274XApertureBase::produce_linear (const db::DCplxTrans &d, const db::DVector &
     for (std::vector<db::Polygon>::const_iterator f = p.begin (); f != p.end (); ++f) {
       m_polygons.push_back (db::minkowski_sum (*f, db::Edge (ifrom, ito), true /*resolve holes*/));
     }
-    
   }
 
   if (! m_clear_polygons.empty ()) {
@@ -125,10 +121,10 @@ RS274XApertureBase::produce_linear (const db::DCplxTrans &d, const db::DVector &
 
   db::CplxTrans trans = d * db::CplxTrans (mp_reader->dbu ());
 
-  for (std::vector <db::Polygon>::const_iterator p = m_polygons.begin (); p != m_polygons.end (); ++p) {
+  for (std::vector<db::Polygon>::const_iterator p = m_polygons.begin (); p != m_polygons.end (); ++p) {
     mp_reader->produce_polygon (p->transformed (trans), clear);
   }
-  for (std::vector <db::Path>::const_iterator p = m_lines.begin (); p != m_lines.end (); ++p) {
+  for (std::vector<db::Path>::const_iterator p = m_lines.begin (); p != m_lines.end (); ++p) {
     mp_reader->produce_line (p->transformed (trans), clear);
   }
 
@@ -140,34 +136,29 @@ RS274XApertureBase::produce_linear (const db::DCplxTrans &d, const db::DVector &
   cp.swap (m_clear_polygons);
 }
 
-void 
-RS274XApertureBase::clear_points ()
+void RS274XApertureBase::clear_points ()
 {
   m_points.clear ();
 }
 
-void 
-RS274XApertureBase::add_point (double x, double y)
+void RS274XApertureBase::add_point (double x, double y)
 {
   double dbu = mp_reader->dbu ();
   m_points.push_back (db::Point (db::coord_traits<db::Coord>::rounded (x / dbu), db::coord_traits<db::Coord>::rounded (y / dbu)));
 }
 
-void 
-RS274XApertureBase::add_point (const db::DPoint &d)
+void RS274XApertureBase::add_point (const db::DPoint &d)
 {
   double dbu = mp_reader->dbu ();
   m_points.push_back (db::Point (db::coord_traits<db::Coord>::rounded (d.x () / dbu), db::coord_traits<db::Coord>::rounded (d.y () / dbu)));
 }
 
-void
-RS274XApertureBase::add_point (const db::Point &p)
+void RS274XApertureBase::add_point (const db::Point &p)
 {
   m_points.push_back (p);
 }
 
-void
-RS274XApertureBase::produce_circle (double cx, double cy, double r, bool clear)
+void RS274XApertureBase::produce_circle (double cx, double cy, double r, bool clear)
 {
   clear_points ();
 
@@ -184,14 +175,12 @@ RS274XApertureBase::produce_circle (double cx, double cy, double r, bool clear)
   produce_polygon (clear);
 }
 
-void 
-RS274XApertureBase::produce_line ()
+void RS274XApertureBase::produce_line ()
 {
   m_lines.push_back (db::Path (m_points.begin (), m_points.end (), 0));
 }
 
-void 
-RS274XApertureBase::produce_polygon (bool clear)
+void RS274XApertureBase::produce_polygon (bool clear)
 {
   if (clear) {
 
@@ -209,7 +198,6 @@ RS274XApertureBase::produce_polygon (bool clear)
 
     m_polygons.push_back (db::Polygon ());
     m_polygons.back ().assign_hull (m_points.begin (), m_points.end ());
-
   }
 }
 
@@ -219,13 +207,13 @@ RS274XApertureBase::produce_polygon (bool clear)
 RS274XCircleAperture::RS274XCircleAperture (RS274XReader &reader, tl::Extractor &ex)
   : m_d (0.0), m_dx (0.0), m_dy (0.0)
 {
-  ex.expect(",");
+  ex.expect (",");
   ex.read (m_d);
-  ex.test(",");
+  ex.test (",");
   if (ex.test ("X")) {
     ex.read (m_dx);
   }
-  ex.test(",");
+  ex.test (",");
   if (ex.test ("X")) {
     ex.read (m_dy);
   }
@@ -236,12 +224,11 @@ RS274XCircleAperture::RS274XCircleAperture (RS274XReader &reader, tl::Extractor 
   m_dy = reader.um (m_dy);
 }
 
-void 
-RS274XCircleAperture::do_produce_flash () 
+void RS274XCircleAperture::do_produce_flash ()
 {
   // produce outer circle
   produce_circle (0.0, 0.0, m_d * 0.5, false);
-  
+
   if (m_dx > 0.0 && m_dy == 0.0) {
 
     // produce circle hole
@@ -256,12 +243,10 @@ RS274XCircleAperture::do_produce_flash ()
     add_point (db::DPoint (m_dx * 0.5, m_dy * 0.5));
     add_point (db::DPoint (-m_dx * 0.5, m_dy * 0.5));
     produce_polygon (true);
-
   }
 }
 
-bool 
-RS274XCircleAperture::do_produce_linear (const db::DPoint &from, const db::DPoint &to) 
+bool RS274XCircleAperture::do_produce_linear (const db::DPoint &from, const db::DPoint &to)
 {
   if (m_dx > 0.0 || m_dy > 0.0) {
     return false;
@@ -269,7 +254,7 @@ RS274XCircleAperture::do_produce_linear (const db::DPoint &from, const db::DPoin
 
   if (m_d < 1e-10) {
 
-    //  zero radius: draw a line rather than a aperture 
+    //  zero radius: draw a line rather than a aperture
     clear_points ();
     add_point (from);
     add_point (to);
@@ -296,22 +281,20 @@ RS274XCircleAperture::do_produce_linear (const db::DPoint &from, const db::DPoin
 
       double a = -2.0 * M_PI / double (n_circle);
 
-      p = db::DVector (p.x() * cos(a * 0.5) - p.y() * sin(a * 0.5), p.x() * sin(a * 0.5) + p.y() * cos(a * 0.5));
+      p = db::DVector (p.x () * cos (a * 0.5) - p.y () * sin (a * 0.5), p.x () * sin (a * 0.5) + p.y () * cos (a * 0.5));
 
       for (int i = 0; i < n_circle / 2; ++i) {
         add_point (from + p);
-        p = db::DVector (p.x() * cos(a) - p.y() * sin(a), p.x() * sin(a) + p.y() * cos(a));
+        p = db::DVector (p.x () * cos (a) - p.y () * sin (a), p.x () * sin (a) + p.y () * cos (a));
       }
 
       for (int i = 0; i < n_circle / 2; ++i) {
         add_point (to + p);
-        p = db::DVector (p.x() * cos(a) - p.y() * sin(a), p.x() * sin(a) + p.y() * cos(a));
+        p = db::DVector (p.x () * cos (a) - p.y () * sin (a), p.x () * sin (a) + p.y () * cos (a));
       }
 
       produce_polygon (false);
-
     }
-
   }
 
   return true;
@@ -323,17 +306,17 @@ RS274XCircleAperture::do_produce_linear (const db::DPoint &from, const db::DPoin
 RS274XRectAperture::RS274XRectAperture (db::RS274XReader &reader, tl::Extractor &ex)
   : m_dx (0.0), m_dy (0.0), m_hx (0.0), m_hy (0.0)
 {
-  ex.expect(",");
+  ex.expect (",");
   ex.read (m_dx);
-  ex.test(",");
+  ex.test (",");
   if (ex.test ("X")) {
     ex.read (m_dy);
   }
-  ex.test(",");
+  ex.test (",");
   if (ex.test ("X")) {
     ex.read (m_hx);
   }
-  ex.test(",");
+  ex.test (",");
   if (ex.test ("X")) {
     ex.read (m_hy);
   }
@@ -345,8 +328,7 @@ RS274XRectAperture::RS274XRectAperture (db::RS274XReader &reader, tl::Extractor 
   m_hy = reader.um (m_hy);
 }
 
-void 
-RS274XRectAperture::do_produce_flash ()
+void RS274XRectAperture::do_produce_flash ()
 {
   // produce outer box
   clear_points ();
@@ -355,7 +337,7 @@ RS274XRectAperture::do_produce_flash ()
   add_point (db::DPoint (m_dx * 0.5, m_dy * 0.5));
   add_point (db::DPoint (-m_dx * 0.5, m_dy * 0.5));
   produce_polygon (false);
-  
+
   if (m_hx > 0.0 && m_hy > 0.0) {
 
     // produce square hole
@@ -365,12 +347,10 @@ RS274XRectAperture::do_produce_flash ()
     add_point (db::DPoint (m_hx * 0.5, m_hy * 0.5));
     add_point (db::DPoint (-m_hx * 0.5, m_hy * 0.5));
     produce_polygon (true);
-
   }
 }
 
-bool  
-RS274XRectAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DPoint & /*to*/) 
+bool RS274XRectAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DPoint & /*to*/)
 {
   return false;
 }
@@ -381,17 +361,17 @@ RS274XRectAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DP
 RS274XOvalAperture::RS274XOvalAperture (db::RS274XReader &reader, tl::Extractor &ex)
   : m_dx (0.0), m_dy (0.0), m_hx (0.0), m_hy (0.0)
 {
-  ex.expect(",");
+  ex.expect (",");
   ex.read (m_dx);
-  ex.test(",");
+  ex.test (",");
   if (ex.test ("X")) {
     ex.read (m_dy);
   }
-  ex.test(",");
+  ex.test (",");
   if (ex.test ("X")) {
     ex.read (m_hx);
   }
-  ex.test(",");
+  ex.test (",");
   if (ex.test ("X")) {
     ex.read (m_hy);
   }
@@ -403,8 +383,7 @@ RS274XOvalAperture::RS274XOvalAperture (db::RS274XReader &reader, tl::Extractor 
   m_hy = reader.um (m_hy);
 }
 
-void 
-RS274XOvalAperture::do_produce_flash ()
+void RS274XOvalAperture::do_produce_flash ()
 {
   int n_circle = reader ().get_circle_points ();
 
@@ -441,17 +420,16 @@ RS274XOvalAperture::do_produce_flash ()
 
   } else {
 
-    //  intentionally create a polygon confined within (!) the circle (in the other cases, 
+    //  intentionally create a polygon confined within (!) the circle (in the other cases,
     //  this must not be the case to maintain the width, here this is not necessary)
     for (int i = 0; i < n_circle; ++i) {
       double a = -M_PI * 2.0 * ((double (i) + 0.5) / double (n_circle));
       add_point (0.5 * m_dx * cos (a), 0.5 * m_dx * sin (a));
     }
-
   }
 
   produce_polygon (false);
-  
+
   if (m_hx > 0.0 && m_hy == 0.0) {
 
     // produce circle hole
@@ -466,12 +444,10 @@ RS274XOvalAperture::do_produce_flash ()
     add_point (db::DPoint (m_hx * 0.5, m_hy * 0.5));
     add_point (db::DPoint (-m_hx * 0.5, m_hy * 0.5));
     produce_polygon (true);
-
   }
 }
 
-bool 
-RS274XOvalAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DPoint & /*to*/) 
+bool RS274XOvalAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DPoint & /*to*/)
 {
   return false;
 }
@@ -482,21 +458,21 @@ RS274XOvalAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DP
 RS274XRegularAperture::RS274XRegularAperture (db::RS274XReader &reader, tl::Extractor &ex)
   : m_d (0.0), m_a (0.0), m_nsides (0), m_hx (0.0), m_hy (0.0)
 {
-  ex.expect(",");
+  ex.expect (",");
   ex.read (m_d);
-  ex.test(",");
+  ex.test (",");
   ex.expect ("X");
   ex.read (m_nsides);
 
-  ex.test(",");
+  ex.test (",");
   if (ex.test ("X")) {
     ex.read (m_a);
   }
-  ex.test(",");
+  ex.test (",");
   if (ex.test ("X")) {
     ex.read (m_hx);
   }
-  ex.test(",");
+  ex.test (",");
   if (ex.test ("X")) {
     ex.read (m_hy);
   }
@@ -508,8 +484,7 @@ RS274XRegularAperture::RS274XRegularAperture (db::RS274XReader &reader, tl::Extr
   m_hy = reader.um (m_hy);
 }
 
-void 
-RS274XRegularAperture::do_produce_flash ()
+void RS274XRegularAperture::do_produce_flash ()
 {
   // produce outer regular polygon
   clear_points ();
@@ -520,7 +495,7 @@ RS274XRegularAperture::do_produce_flash ()
   }
 
   produce_polygon (false);
-  
+
   if (m_hx > 0.0 && m_hy > 0.0) {
 
     // produce square hole
@@ -530,12 +505,10 @@ RS274XRegularAperture::do_produce_flash ()
     add_point (db::DPoint (m_hx * 0.5, m_hy * 0.5));
     add_point (db::DPoint (-m_hx * 0.5, m_hy * 0.5));
     produce_polygon (true);
-
   }
 }
 
-bool 
-RS274XRegularAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DPoint & /*to*/) 
+bool RS274XRegularAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DPoint & /*to*/)
 {
   return false;
 }
@@ -568,12 +541,10 @@ void RS274XRegionAperture::do_produce_flash ()
       }
       produce_polygon (true);
     }
-
   }
 }
 
-bool
-RS274XRegionAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DPoint & /*to*/)
+bool RS274XRegionAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DPoint & /*to*/)
 {
   return false;
 }
@@ -583,7 +554,7 @@ RS274XRegionAperture::do_produce_linear (const db::DPoint & /*from*/, const db::
 
 RS274XMacroAperture::RS274XMacroAperture (db::RS274XReader &reader, const std::string &name, const std::string &def, tl::Extractor &ex)
   : m_name (name), m_def (def), m_unit (1.0)
-{ 
+{
   //  use the unit at definition time, not at execution time
   m_unit = reader.unit ();
 
@@ -597,8 +568,7 @@ RS274XMacroAperture::RS274XMacroAperture (db::RS274XReader &reader, const std::s
   }
 }
 
-void 
-RS274XMacroAperture::do_produce_flash ()
+void RS274XMacroAperture::do_produce_flash ()
 {
   try {
     do_produce_flash_internal ();
@@ -607,8 +577,7 @@ RS274XMacroAperture::do_produce_flash ()
   }
 }
 
-void
-RS274XMacroAperture::read_exposure (tl::Extractor &ex, bool &clear, bool &clear_set)
+void RS274XMacroAperture::read_exposure (tl::Extractor &ex, bool &clear, bool &clear_set)
 {
   int pol = int (floor (read_expr (ex) + 0.5));
 
@@ -617,7 +586,7 @@ RS274XMacroAperture::read_exposure (tl::Extractor &ex, bool &clear, bool &clear_
   } else if (pol == 1) {
     clear = false;
   } else if (pol == 2) {
-    clear = !clear_set || !clear;
+    clear = ! clear_set || ! clear;
   } else {
     throw tl::Exception (tl::to_string (tr ("Invalid exposure code '%d'")), pol);
   }
@@ -625,8 +594,7 @@ RS274XMacroAperture::read_exposure (tl::Extractor &ex, bool &clear, bool &clear_
   clear_set = true;
 }
 
-void 
-RS274XMacroAperture::do_produce_flash_internal ()
+void RS274XMacroAperture::do_produce_flash_internal ()
 {
   tl::Extractor ex (m_def.c_str ());
   bool clear = false;
@@ -648,7 +616,7 @@ RS274XMacroAperture::do_produce_flash_internal ()
         while (int (m_parameters.size ()) <= nvar) {
           m_parameters.push_back (0.0);
         }
-        m_parameters[nvar] = value;
+        m_parameters [nvar] = value;
       }
 
     } else if (! ex.test ("*")) {
@@ -694,7 +662,7 @@ RS274XMacroAperture::do_produce_flash_internal ()
 
         db::DCplxTrans t = db::DCplxTrans (1.0, a, false, db::DVector ());
         db::DPoint from = db::DPoint (x1, y1);
-        db::DPoint to   = db::DPoint (x2, y2);
+        db::DPoint to = db::DPoint (x2, y2);
 
         db::DVector p (to - from);
         if (p.sq_length () < 1e-10) {
@@ -703,15 +671,15 @@ RS274XMacroAperture::do_produce_flash_internal ()
 
         clear_points ();
 
-        p = db::DVector (p.y(), -p.x()) * (0.5 * w / p.length ());
+        p = db::DVector (p.y (), -p.x ()) * (0.5 * w / p.length ());
 
         for (int i = 0; i < 2; ++i) {
           add_point (t * (from + p));
-          p = db::DVector (-p.x(), -p.y ());
+          p = db::DVector (-p.x (), -p.y ());
         }
 
         for (int i = 0; i < 2; ++i) {
-          p = db::DVector (-p.x(), -p.y ());
+          p = db::DVector (-p.x (), -p.y ());
           add_point (t * (to + p));
         }
 
@@ -770,7 +738,6 @@ RS274XMacroAperture::do_produce_flash_internal ()
           double y = read_expr (ex, true);
 
           points.push_back (db::DPoint (x, y));
-
         }
 
         ex.expect (",");
@@ -780,7 +747,7 @@ RS274XMacroAperture::do_produce_flash_internal ()
 
         if (points.size () > 2 && points.front ().sq_distance (points.back ()) < 1e-10) {
 
-          //  closed outline - fill solid 
+          //  closed outline - fill solid
 
           clear_points ();
 
@@ -798,32 +765,29 @@ RS274XMacroAperture::do_produce_flash_internal ()
 
           for (std::vector<db::DPoint>::const_iterator o = points.begin () + 1; o != points.end (); ++o) {
 
-            db::DPoint from = t * o[-1];
-            db::DPoint to   = t * o[0];
+            db::DPoint from = t * o [-1];
+            db::DPoint to = t * o [0];
 
             db::DVector p (to - from);
             if (p.sq_length () > 1e-10) {
 
               clear_points ();
 
-              p = db::DVector (p.y(), -p.x()) * (0.5 * w / p.length ());
+              p = db::DVector (p.y (), -p.x ()) * (0.5 * w / p.length ());
 
               for (int i = 0; i < 2; ++i) {
                 add_point (from + p);
-                p = db::DVector (-p.x(), -p.y ());
+                p = db::DVector (-p.x (), -p.y ());
               }
 
               for (int i = 0; i < 2; ++i) {
-                p = db::DVector (-p.x(), -p.y ());
+                p = db::DVector (-p.x (), -p.y ());
                 add_point (to + p);
               }
 
               produce_polygon (clear);
-
             }
-
           }
-
         }
 
       } else if (code == 5) {
@@ -938,23 +902,19 @@ RS274XMacroAperture::do_produce_flash_internal ()
         while (! ex.at_end () && *ex != '*') {
           ++ex;
         }
-
       }
 
       ex.test ("*");
-
-    } 
-
+    }
   }
 }
 
-bool 
-RS274XMacroAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DPoint & /*to*/) 
+bool RS274XMacroAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DPoint & /*to*/)
 {
   return false;
 }
 
-double 
+double
 RS274XMacroAperture::read_atom (tl::Extractor &ex)
 {
   double fac = 1.0;
@@ -969,7 +929,7 @@ RS274XMacroAperture::read_atom (tl::Extractor &ex)
     ex.read (nvar);
     nvar -= 1;
     if (nvar >= 0 && nvar < int (m_parameters.size ())) {
-      d = m_parameters[nvar];
+      d = m_parameters [nvar];
     }
   } else if (ex.test ("(")) {
     d = read_expr (ex);
@@ -981,7 +941,7 @@ RS274XMacroAperture::read_atom (tl::Extractor &ex)
   return fac * d;
 }
 
-double 
+double
 RS274XMacroAperture::read_dot_expr (tl::Extractor &ex)
 {
   double d = read_atom (ex);
@@ -998,7 +958,7 @@ RS274XMacroAperture::read_dot_expr (tl::Extractor &ex)
   return d;
 }
 
-double 
+double
 RS274XMacroAperture::read_expr (tl::Extractor &ex, bool length)
 {
   double d = read_dot_expr (ex);
@@ -1020,4 +980,3 @@ RS274XMacroAperture::read_expr (tl::Extractor &ex, bool length)
 }
 
 }
-

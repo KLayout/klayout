@@ -29,9 +29,9 @@
 #include "tlFileUtils.h"
 
 #if defined(HAVE_QT)
-#  include <QResource>
-#  include <QByteArray>
-#  include <QFileInfo>
+#include <QResource>
+#include <QByteArray>
+#include <QFileInfo>
 #endif
 
 #include <cctype>
@@ -52,7 +52,7 @@ TextGenerator::TextGenerator ()
 const std::vector<db::Polygon> &
 TextGenerator::glyph (char c) const
 {
-  std::map<char, std::vector<db::Polygon> >::const_iterator dc = m_data.find (m_lowercase_supported ? c : toupper(c));
+  std::map<char, std::vector<db::Polygon>>::const_iterator dc = m_data.find (m_lowercase_supported ? c : toupper (c));
   if (dc != m_data.end ()) {
     return dc->second;
   } else {
@@ -65,7 +65,7 @@ db::Region
 TextGenerator::glyph_as_region (char c) const
 {
   db::Region region;
-  std::map<char, std::vector<db::Polygon> >::const_iterator dc = m_data.find (m_lowercase_supported ? c : toupper(c));
+  std::map<char, std::vector<db::Polygon>>::const_iterator dc = m_data.find (m_lowercase_supported ? c : toupper (c));
   if (dc != m_data.end ()) {
     for (std::vector<db::Polygon>::const_iterator p = dc->second.begin (); p != dc->second.end (); ++p) {
       region.insert (*p);
@@ -74,8 +74,7 @@ TextGenerator::glyph_as_region (char c) const
   return region;
 }
 
-void
-TextGenerator::text (const std::string &t, double target_dbu, double mag, bool inv, double bias, double char_spacing, double line_spacing, std::vector <db::Polygon> &data) const
+void TextGenerator::text (const std::string &t, double target_dbu, double mag, bool inv, double bias, double char_spacing, double line_spacing, std::vector<db::Polygon> &data) const
 {
   data.clear ();
   db::EdgeProcessor ep;
@@ -116,9 +115,7 @@ TextGenerator::text (const std::string &t, double target_dbu, double mag, bool i
       bb += background ().transformed (trans);
 
       x += dx;
-
     }
-
   }
 
   if (b != 0) {
@@ -147,14 +144,12 @@ TextGenerator::text_as_region (const std::string &t, double target_dbu, double m
   return region;
 }
 
-void
-TextGenerator::load_from_resource (const std::string &name)
+void TextGenerator::load_from_resource (const std::string &name)
 {
   load_from_file (name);
 }
 
-void
-TextGenerator::load_from_data (const char *data, size_t ndata, const std::string &name, const std::string &description)
+void TextGenerator::load_from_data (const char *data, size_t ndata, const std::string &name, const std::string &description)
 {
   db::Layout layout;
   tl::InputMemoryStream memory_stream (data, ndata);
@@ -174,8 +169,7 @@ TextGenerator::load_from_data (const char *data, size_t ndata, const std::string
   }
 }
 
-void
-TextGenerator::load_from_file (const std::string &filename)
+void TextGenerator::load_from_file (const std::string &filename)
 {
   db::Layout layout;
   tl::InputStream stream (filename);
@@ -195,8 +189,7 @@ TextGenerator::load_from_file (const std::string &filename)
   m_name = tl::basename (filename);
 }
 
-void
-TextGenerator::read_from_layout (const db::Layout &layout, unsigned int l1, unsigned int l2, unsigned int l3)
+void TextGenerator::read_from_layout (const db::Layout &layout, unsigned int l1, unsigned int l2, unsigned int l3)
 {
   m_dbu = layout.dbu ();
 
@@ -227,13 +220,10 @@ TextGenerator::read_from_layout (const db::Layout &layout, unsigned int l1, unsi
         } else {
           m_description = sh->text_string ();
         }
-
       }
 
       ++sh;
-
     }
-
   }
 
   m_lowercase_supported = layout.cell_by_name ("a").first || layout.cell_by_name ("065").first;
@@ -243,9 +233,9 @@ TextGenerator::read_from_layout (const db::Layout &layout, unsigned int l1, unsi
   //  read the data and determine the bounding box
   for (int ch = 32; ch < 128; ++ch) {
 
-    char n[32];
-    n[0] = char (ch);
-    n[1] = 0;
+    char n [32];
+    n [0] = char (ch);
+    n [1] = 0;
 
     std::pair<bool, db::cell_index_type> cn = layout.cell_by_name (n);
     if (! cn.first) {
@@ -270,9 +260,7 @@ TextGenerator::read_from_layout (const db::Layout &layout, unsigned int l1, unsi
         }
         ++sh;
       }
-
     }
-
   }
 
   if (! bbox.empty ()) {
@@ -289,7 +277,7 @@ TextGenerator::generator_by_name (const std::string &name)
   const std::vector<TextGenerator> &fonts = generators ();
   for (std::vector<TextGenerator>::const_iterator f = fonts.begin (); f != fonts.end (); ++f) {
     if (f->name () == name) {
-      return f.operator-> ();
+      return f.operator->();
     }
   }
   return 0;
@@ -307,8 +295,7 @@ static std::vector<std::string> s_font_paths;
 static std::vector<TextGenerator> s_fonts;
 static bool s_fonts_loaded = false;
 
-void
-TextGenerator::set_font_paths (const std::vector<std::string> &paths)
+void TextGenerator::set_font_paths (const std::vector<std::string> &paths)
 {
   s_font_paths = paths;
   s_fonts.clear ();
@@ -348,15 +335,11 @@ TextGenerator::generators ()
             tl::error << ex.msg ();
             s_fonts.pop_back ();
           }
-
         }
-
       }
-
     }
 
     s_fonts_loaded = true;
-
   }
 
   return s_fonts;

@@ -37,12 +37,14 @@
 #include <set>
 #include <vector>
 
-namespace lay {
-  class Dispatcher;
-  class FlattenInstOptionsDialog;
+namespace lay
+{
+class Dispatcher;
+class FlattenInstOptionsDialog;
 }
 
-namespace edt {
+namespace edt
+{
 
 class Service;
 class EditorOptionsPages;
@@ -56,11 +58,11 @@ class DistributeOptionsDialog;
 
 // -------------------------------------------------------------
 
-struct ArrayOptions
-{
-  enum mode_type { PitchVectors, Spaced };
+struct ArrayOptions {
+  enum mode_type { PitchVectors,
+                   Spaced };
 
-  ArrayOptions () : mode (PitchVectors), a (0.0, 1.0), b (1.0, 0.0), na (1), nb (1) { }
+  ArrayOptions () : mode (PitchVectors), a (0.0, 1.0), b (1.0, 0.0), na (1), nb (1) {}
 
   mode_type mode;
   db::DVector a, b;
@@ -76,7 +78,7 @@ class MainService
     public lay::Editable,
     public db::Object
 {
-public: 
+public:
   /**
    *  @brief The constructor
    */
@@ -95,13 +97,13 @@ public:
     return mp_view;
   }
 
-  /** 
+  /**
    *  @brief Implementation of the menu functions
    */
   virtual void menu_activated (const std::string &symbol);
 
   /**
-   *  @brief Descend to selection 
+   *  @brief Descend to selection
    */
   void cm_descend ();
 
@@ -246,7 +248,7 @@ private:
   lay::Dispatcher *mp_root;
   bool m_needs_update;
 
-  //  options 
+  //  options
   int m_flatten_insts_levels;
   bool m_flatten_prune;
   int m_align_hmode;
@@ -295,4 +297,3 @@ private:
 }
 
 #endif
-

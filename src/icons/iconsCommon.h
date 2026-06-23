@@ -21,31 +21,31 @@
 */
 
 
-#if !defined(HDR_iconsCommon_h)
-# define HDR_iconsCommon_h
+#if ! defined(HDR_iconsCommon_h)
+#define HDR_iconsCommon_h
 
-# if defined _WIN32 || defined __CYGWIN__
+#if defined _WIN32 || defined __CYGWIN__
 
-#   ifdef MAKE_ICONS_LIBRARY
-#     define ICONS_PUBLIC __declspec(dllexport)
-#   else
-#     define ICONS_PUBLIC __declspec(dllimport)
-#   endif
-#   define ICONS_LOCAL
-#   define ICONS_PUBLIC_TEMPLATE
+#ifdef MAKE_ICONS_LIBRARY
+#define ICONS_PUBLIC __declspec (dllexport)
+#else
+#define ICONS_PUBLIC __declspec (dllimport)
+#endif
+#define ICONS_LOCAL
+#define ICONS_PUBLIC_TEMPLATE
 
-# else
+#else
 
-#   if __GNUC__ >= 4 || defined(__clang__)
-#     define ICONS_PUBLIC __attribute__ ((visibility ("default")))
-#     define ICONS_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
-#     define ICONS_LOCAL  __attribute__ ((visibility ("hidden")))
-#   else
-#     define ICONS_PUBLIC
-#     define ICONS_PUBLIC_TEMPLATE
-#     define ICONS_LOCAL
-#   endif
+#if __GNUC__ >= 4 || defined(__clang__)
+#define ICONS_PUBLIC __attribute__ ((visibility ("default")))
+#define ICONS_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
+#define ICONS_LOCAL __attribute__ ((visibility ("hidden")))
+#else
+#define ICONS_PUBLIC
+#define ICONS_PUBLIC_TEMPLATE
+#define ICONS_LOCAL
+#endif
 
-# endif
+#endif
 
 #endif

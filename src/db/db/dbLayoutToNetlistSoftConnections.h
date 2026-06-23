@@ -275,7 +275,7 @@ public:
 private:
   const db::Circuit *mp_circuit;
   net_graph_list m_net_graphs;
-  std::map<size_t, std::pair<SoftConnectionPinDir, const SoftConnectionNetGraph *> > m_pin_info;
+  std::map<size_t, std::pair<SoftConnectionPinDir, const SoftConnectionNetGraph *>> m_pin_info;
 };
 
 /**
@@ -344,7 +344,7 @@ private:
    */
   std::set<size_t> net_connections_through_subcircuits (const db::Net *net, size_t &partial_net_count);
 
-  void report_partial_nets (const db::Circuit *circuit, const SoftConnectionNetGraph &cluster_info, LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index, std::set<std::pair<const db::Net *, db::DCplxTrans> > &seen);
+  void report_partial_nets (const db::Circuit *circuit, const SoftConnectionNetGraph &cluster_info, LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index, std::set<std::pair<const db::Net *, db::DCplxTrans>> &seen);
   db::DPolygon representative_polygon (const db::Net *net, const db::LayoutToNetlist &l2n, const db::CplxTrans &trans);
 };
 

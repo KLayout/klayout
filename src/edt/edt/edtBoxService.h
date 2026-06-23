@@ -40,7 +40,7 @@ public:
   static const char *function_name ();
 
   BoxService (db::Manager *manager, lay::LayoutViewBase *view);
-  
+
 #if defined(HAVE_QT)
   virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
 #endif
@@ -64,4 +64,3 @@ private:
 }
 
 #endif
-

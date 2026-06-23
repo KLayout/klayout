@@ -33,16 +33,17 @@
 
 namespace db
 {
-  class ReaderUnknownFormatException;
+class ReaderUnknownFormatException;
 }
 
 namespace lay
 {
 
 class ReaderErrorForm
-  : public QDialog, private Ui::ReaderErrorForm
+  : public QDialog,
+    private Ui::ReaderErrorForm
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   ReaderErrorForm (QWidget *parent, const char *name, const db::ReaderUnknownFormatException *error);
@@ -54,4 +55,3 @@ public slots:
 }
 
 #endif
-

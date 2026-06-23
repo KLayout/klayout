@@ -38,7 +38,7 @@
 
 namespace tl
 {
-  class OutputStream;
+class OutputStream;
 }
 
 namespace db
@@ -52,7 +52,7 @@ class OASISWriter;
  *  @brief A displacement list compactor
  *
  *  This object will collect objects  of the given kind and create
- *  OASIS repetitions then. For this, it creates a hash map collecting all 
+ *  OASIS repetitions then. For this, it creates a hash map collecting all
  *  equivalent objects on "add" and their displacements. When "emit" is called,
  *  these displacements are converted to OASIS repetitions and
  *  emitted to the writer.
@@ -61,13 +61,13 @@ class OASISWriter;
 const unsigned int max_oasis_compression_level = 10;
 
 template <class Obj>
-class Compressor 
+class Compressor
 {
 public:
-  /** 
+  /**
    *  @brief Constructor
    *
-   *  @param level The compression level 
+   *  @param level The compression level
    *
    *  Allowed levels are:
    *    0   - simple
@@ -89,8 +89,8 @@ public:
 
 private:
   typedef std::vector<db::Vector> disp_vector;
-  
-  std::unordered_map <Obj, disp_vector> m_normalized;
+
+  std::unordered_map<Obj, disp_vector> m_normalized;
 
   unsigned int m_level;
 };
@@ -213,10 +213,10 @@ private:
   uint64_t m_textstring_id;
   bool m_proptables_written;
 
-  std::map <std::string, uint64_t> m_textstrings;
-  std::map <std::string, uint64_t> m_propnames;
-  std::map <std::string, uint64_t> m_propstrings;
-  std::map <db::cell_index_type, std::string> m_cell_nstrings;
+  std::map<std::string, uint64_t> m_textstrings;
+  std::map<std::string, uint64_t> m_propnames;
+  std::map<std::string, uint64_t> m_propstrings;
+  std::map<db::cell_index_type, std::string> m_cell_nstrings;
 
   typedef std::vector<tl::Variant> property_value_list;
 
@@ -235,11 +235,11 @@ private:
   modal_variable<db::Coord> mm_geometry_y;
   modal_variable<db::coord_traits<db::Coord>::distance_type> mm_geometry_w;
   modal_variable<db::coord_traits<db::Coord>::distance_type> mm_geometry_h;
-  modal_variable< std::vector<db::Vector> > mm_polygon_point_list;
+  modal_variable<std::vector<db::Vector>> mm_polygon_point_list;
   modal_variable<db::Coord> mm_path_halfwidth;
   modal_variable<db::Coord> mm_path_start_extension;
   modal_variable<db::Coord> mm_path_end_extension;
-  modal_variable< std::vector<db::Vector> > mm_path_point_list;
+  modal_variable<std::vector<db::Vector>> mm_path_point_list;
   modal_variable<uint32_t> mm_ctrapezoid_type;
   modal_variable<db::Coord> mm_circle_radius;
   modal_variable<std::string> mm_last_property_name;
@@ -249,8 +249,8 @@ private:
   OASISWriterOptions m_options;
   tl::AbsoluteProgress m_progress;
 
-  void create_cell_nstrings (const db::Layout &layout, const std::set <db::cell_index_type> &cell_set);
-  const char *cell_nstring(db::cell_index_type cell_index);
+  void create_cell_nstrings (const db::Layout &layout, const std::set<db::cell_index_type> &cell_set);
+  const char *cell_nstring (db::cell_index_type cell_index);
 
   void write_record_id (char b);
   void write_byte (char b);
@@ -302,7 +302,7 @@ private:
 
   void emit_propname_def (db::properties_id_type prop_id);
   void emit_propstring_def (db::properties_id_type prop_id);
-  void write_insts (const std::set <db::cell_index_type> &cell_set);
+  void write_insts (const std::set<db::cell_index_type> &cell_set);
 
   void write_shapes (const db::LayerProperties &lprops, const db::Shapes &shapes);
 
@@ -313,14 +313,13 @@ private:
 
   void write_inst_with_rep (const db::CellInstArray &inst, db::properties_id_type prop_id, const db::Vector &disp, const db::Repetition &rep);
 
-  void write_propname_table (size_t &propnames_table_pos, const std::vector<db::cell_index_type> &cells, const Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties> > &layers);
-  void write_propstring_table (size_t &propstrings_table_pos, const std::vector<db::cell_index_type> &cells, const Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties> > &layers);
+  void write_propname_table (size_t &propnames_table_pos, const std::vector<db::cell_index_type> &cells, const Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties>> &layers);
+  void write_propstring_table (size_t &propstrings_table_pos, const std::vector<db::cell_index_type> &cells, const Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties>> &layers);
   void write_cellname_table (size_t &cellnames_table_pos, const std::vector<db::cell_index_type> &cells_by_index, const std::map<cell_index_type, size_t> *cell_positions, const Layout &layout);
-  void write_textstring_table (size_t &textstrings_table_pos, const std::vector<db::cell_index_type> &cells, const Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties> > &layers);
-  void write_layername_table (size_t &layernames_table_pos, const std::vector<std::pair<unsigned int, LayerProperties> > &layers);
+  void write_textstring_table (size_t &textstrings_table_pos, const std::vector<db::cell_index_type> &cells, const Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties>> &layers);
+  void write_layername_table (size_t &layernames_table_pos, const std::vector<std::pair<unsigned int, LayerProperties>> &layers);
 };
 
 } // namespace db
 
 #endif
-

@@ -67,23 +67,23 @@ public:
   void bbox_differs (const db::Box &ba, const db::Box &bb);
   void begin_cell (const std::string &cellname, db::cell_index_type cia, db::cell_index_type cib);
   void begin_inst_differences ();
-  void instances_in_a (const std::vector <db::CellInstArrayWithProperties> &insts_a, const std::vector <std::string> &cell_names);
-  void instances_in_b (const std::vector <db::CellInstArrayWithProperties> &insts_b, const std::vector <std::string> &cell_names);
-  void instances_in_a_only (const std::vector <db::CellInstArrayWithProperties> &anotb, const db::Layout &a);
-  void instances_in_b_only (const std::vector <db::CellInstArrayWithProperties> &bnota, const db::Layout &b);
+  void instances_in_a (const std::vector<db::CellInstArrayWithProperties> &insts_a, const std::vector<std::string> &cell_names);
+  void instances_in_b (const std::vector<db::CellInstArrayWithProperties> &insts_b, const std::vector<std::string> &cell_names);
+  void instances_in_a_only (const std::vector<db::CellInstArrayWithProperties> &anotb, const db::Layout &a);
+  void instances_in_b_only (const std::vector<db::CellInstArrayWithProperties> &bnota, const db::Layout &b);
   void begin_layer (const db::LayerProperties &layer, unsigned int layer_index_a, bool is_valid_a, unsigned int layer_index_b, bool is_valid_b);
   void end_layer ();
   void per_layer_bbox_differs (const db::Box &ba, const db::Box &bb);
   void begin_polygon_differences ();
-  void detailed_diff (const std::vector <std::pair <db::Polygon, db::properties_id_type> > &a, const std::vector <std::pair <db::Polygon, db::properties_id_type> > &b);
+  void detailed_diff (const std::vector<std::pair<db::Polygon, db::properties_id_type>> &a, const std::vector<std::pair<db::Polygon, db::properties_id_type>> &b);
   void begin_path_differences ();
-  void detailed_diff (const std::vector <std::pair <db::Path, db::properties_id_type> > &a, const std::vector <std::pair <db::Path, db::properties_id_type> > &b);
+  void detailed_diff (const std::vector<std::pair<db::Path, db::properties_id_type>> &a, const std::vector<std::pair<db::Path, db::properties_id_type>> &b);
   void begin_box_differences ();
-  void detailed_diff (const std::vector <std::pair <db::Box, db::properties_id_type> > &a, const std::vector <std::pair <db::Box, db::properties_id_type> > &b);
+  void detailed_diff (const std::vector<std::pair<db::Box, db::properties_id_type>> &a, const std::vector<std::pair<db::Box, db::properties_id_type>> &b);
   void begin_edge_differences ();
-  void detailed_diff (const std::vector <std::pair <db::Edge, db::properties_id_type> > &a, const std::vector <std::pair <db::Edge, db::properties_id_type> > &b);
+  void detailed_diff (const std::vector<std::pair<db::Edge, db::properties_id_type>> &a, const std::vector<std::pair<db::Edge, db::properties_id_type>> &b);
   void begin_text_differences ();
-  void detailed_diff (const std::vector <std::pair <db::Text, db::properties_id_type> > &a, const std::vector <std::pair <db::Text, db::properties_id_type> > &b);
+  void detailed_diff (const std::vector<std::pair<db::Text, db::properties_id_type>> &a, const std::vector<std::pair<db::Text, db::properties_id_type>> &b);
 
 private:
   const db::Layout *mp_layout_a;
@@ -111,25 +111,25 @@ private:
   size_t m_obj_index;
 
   void produce_cell_inst (const db::CellInstArrayWithProperties &ci, const db::Layout *layout, const rdb::Category *cat);
-  template <class SH> void produce_diffs_for_xor (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b, double dbu_a, db::Shapes &shapes);
-  template <class SH> void produce_diffs (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b, double dbu_a, const rdb::Category *cat);
-  template <class SH> void shape_diffs (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b);
+  template <class SH> void produce_diffs_for_xor (const std::vector<std::pair<SH, db::properties_id_type>> &a, const std::vector<std::pair<SH, db::properties_id_type>> &b, double dbu_a, db::Shapes &shapes);
+  template <class SH> void produce_diffs (const std::vector<std::pair<SH, db::properties_id_type>> &a, const std::vector<std::pair<SH, db::properties_id_type>> &b, double dbu_a, const rdb::Category *cat);
+  template <class SH> void shape_diffs (const std::vector<std::pair<SH, db::properties_id_type>> &a, const std::vector<std::pair<SH, db::properties_id_type>> &b);
   void shape_diffs_found ();
 };
 
 RdbDifferenceReceiver::RdbDifferenceReceiver (const db::Layout &layout_a, const db::Layout &layout_b, rdb::Database *rdb, bool detailed, bool with_properties, bool run_xor)
-  : mp_layout_a (&layout_a), 
-    mp_layout_b (&layout_b), 
-    mp_rdb (rdb), 
-    mp_cell (0), 
-    m_cellname (), 
-    m_layer (), 
-    m_layer_index_a (0), 
-    m_layer_index_b (0), 
-    m_is_valid_layer_index_a (false), 
-    m_is_valid_layer_index_b (false), 
-    m_diffs_reported (false), 
-    m_with_properties (with_properties), 
+  : mp_layout_a (&layout_a),
+    mp_layout_b (&layout_b),
+    mp_rdb (rdb),
+    mp_cell (0),
+    m_cellname (),
+    m_layer (),
+    m_layer_index_a (0),
+    m_layer_index_b (0),
+    m_is_valid_layer_index_a (false),
+    m_is_valid_layer_index_b (false),
+    m_diffs_reported (false),
+    m_with_properties (with_properties),
     m_detailed (detailed),
     m_run_xor (run_xor)
 {
@@ -178,7 +178,6 @@ RdbDifferenceReceiver::RdbDifferenceReceiver (const db::Layout &layout_a, const 
         mp_b_only_per_layer_cat [(unsigned int) l->second.second] = rdb->create_category (layer_cat, "B");
         mp_b_only_per_layer_cat [(unsigned int) l->second.second]->set_description (tl::to_string (QObject::tr ("Shapes in B but not in A, on Layer ")) + l->first.to_string ());
       }
-
     }
 
   } else {
@@ -193,13 +192,11 @@ RdbDifferenceReceiver::RdbDifferenceReceiver (const db::Layout &layout_a, const 
       rdb::Category *cat = rdb->create_category (std::string ("XOR ") + l->first.to_string ());
       cat->set_description (tl::to_string (QObject::tr ("Geometrical differences on layer")) + " " + l->first.to_string ());
       mp_xor_cat [l->second] = cat;
-
     }
-
   }
 }
 
-static void 
+static void
 add_property_text (rdb::Item *item, db::properties_id_type prop_id)
 {
   if (prop_id != 0) {
@@ -212,10 +209,9 @@ add_property_text (rdb::Item *item, db::properties_id_type prop_id)
   }
 }
 
-void 
-RdbDifferenceReceiver::produce_cell_inst (const db::CellInstArrayWithProperties &ci, const db::Layout *layout, const rdb::Category *cat)
+void RdbDifferenceReceiver::produce_cell_inst (const db::CellInstArrayWithProperties &ci, const db::Layout *layout, const rdb::Category *cat)
 {
-  db::box_convert <db::CellInstArrayWithProperties> bc (*layout);
+  db::box_convert<db::CellInstArrayWithProperties> bc (*layout);
 
   rdb::Item *item = mp_rdb->create_item (mp_cell->id (), cat->id ());
 
@@ -241,57 +237,49 @@ RdbDifferenceReceiver::produce_cell_inst (const db::CellInstArrayWithProperties 
   }
 }
 
-void
-RdbDifferenceReceiver::dbu_differs (double dbu_a, double dbu_b) 
+void RdbDifferenceReceiver::dbu_differs (double dbu_a, double dbu_b)
 {
   rdb::Item *item = mp_rdb->create_item (mp_topcell->id (), mp_general_cat->id ());
   item->add_value (tl::sprintf (tl::to_string (QObject::tr ("Database units differ %g vs. %g")), dbu_a, dbu_b));
 }
 
-void 
-RdbDifferenceReceiver::layer_in_a_only (const db::LayerProperties &la)
+void RdbDifferenceReceiver::layer_in_a_only (const db::LayerProperties &la)
 {
   rdb::Item *item = mp_rdb->create_item (mp_topcell->id (), mp_general_cat->id ());
   item->add_value (tl::sprintf (tl::to_string (QObject::tr ("Layer %s is not present in layout B, but in A")), la.to_string ()));
 }
 
-void 
-RdbDifferenceReceiver::layer_in_b_only (const db::LayerProperties &lb)
+void RdbDifferenceReceiver::layer_in_b_only (const db::LayerProperties &lb)
 {
   rdb::Item *item = mp_rdb->create_item (mp_topcell->id (), mp_general_cat->id ());
   item->add_value (tl::sprintf (tl::to_string (QObject::tr ("Layer %s is not present in layout A, but in B")), lb.to_string ()));
 }
 
-void
-RdbDifferenceReceiver::layer_name_differs (const db::LayerProperties &la, const db::LayerProperties &lb)
+void RdbDifferenceReceiver::layer_name_differs (const db::LayerProperties &la, const db::LayerProperties &lb)
 {
   rdb::Item *item = mp_rdb->create_item (mp_topcell->id (), mp_general_cat->id ());
   item->add_value (tl::sprintf (tl::to_string (QObject::tr ("Layer names differ between layout A and B for layer %d/%d: %s vs. %s")), la.layer, la.datatype, la.name, lb.name));
 }
 
-void 
-RdbDifferenceReceiver::cell_in_a_only (const std::string &cellname, db::cell_index_type /*ci*/)
+void RdbDifferenceReceiver::cell_in_a_only (const std::string &cellname, db::cell_index_type /*ci*/)
 {
   rdb::Item *item = mp_rdb->create_item (mp_topcell->id (), mp_general_cat->id ());
   item->add_value (tl::sprintf (tl::to_string (QObject::tr ("Cell %s is not present in layout B, but in A")), cellname));
 }
 
-void 
-RdbDifferenceReceiver::cell_in_b_only (const std::string &cellname, db::cell_index_type /*ci*/)
+void RdbDifferenceReceiver::cell_in_b_only (const std::string &cellname, db::cell_index_type /*ci*/)
 {
   rdb::Item *item = mp_rdb->create_item (mp_topcell->id (), mp_general_cat->id ());
   item->add_value (tl::sprintf (tl::to_string (QObject::tr ("Cell %s is not present in layout A, but in B")), cellname));
 }
 
-void 
-RdbDifferenceReceiver::cell_name_differs (const std::string &cellname_a, db::cell_index_type /*cia*/, const std::string &cellname_b, db::cell_index_type /*cib*/)
+void RdbDifferenceReceiver::cell_name_differs (const std::string &cellname_a, db::cell_index_type /*cia*/, const std::string &cellname_b, db::cell_index_type /*cib*/)
 {
   rdb::Item *item = mp_rdb->create_item (mp_topcell->id (), mp_general_cat->id ());
   item->add_value (tl::sprintf (tl::to_string (QObject::tr ("Cell %s in A is renamed to %s in B")), cellname_a, cellname_b));
 }
 
-void 
-RdbDifferenceReceiver::begin_cell (const std::string &cellname, db::cell_index_type /*cia*/, db::cell_index_type /*cib*/)
+void RdbDifferenceReceiver::begin_cell (const std::string &cellname, db::cell_index_type /*cia*/, db::cell_index_type /*cib*/)
 {
   mp_cell = mp_rdb->create_cell (cellname);
   m_diffs_reported = false;
@@ -300,37 +288,32 @@ RdbDifferenceReceiver::begin_cell (const std::string &cellname, db::cell_index_t
   m_insts_b.clear ();
 }
 
-void 
-RdbDifferenceReceiver::bbox_differs (const db::Box &ba, const db::Box &bb)
+void RdbDifferenceReceiver::bbox_differs (const db::Box &ba, const db::Box &bb)
 {
   rdb::Item *item = mp_rdb->create_item (mp_cell->id (), mp_general_cat->id ());
   item->add_value (tl::sprintf (tl::to_string (QObject::tr ("Bounding boxes differ: %s (A) vs. %s (B)")), ba.to_string (), bb.to_string ()));
 }
 
-void
-RdbDifferenceReceiver::begin_inst_differences ()
+void RdbDifferenceReceiver::begin_inst_differences ()
 {
   rdb::Item *item = mp_rdb->create_item (mp_cell->id (), mp_general_cat->id ());
   item->add_value (tl::to_string (QObject::tr ("Instances differ")));
 }
 
-void
-RdbDifferenceReceiver::instances_in_a (const std::vector <db::CellInstArrayWithProperties> & /*insts_a*/, const std::vector <std::string> & /*cell_names*/)
+void RdbDifferenceReceiver::instances_in_a (const std::vector<db::CellInstArrayWithProperties> & /*insts_a*/, const std::vector<std::string> & /*cell_names*/)
 {
   // .. nothing ..
 }
 
-void
-RdbDifferenceReceiver::instances_in_b (const std::vector <db::CellInstArrayWithProperties> & /*insts_b*/, const std::vector <std::string> & /*cell_names*/)
+void RdbDifferenceReceiver::instances_in_b (const std::vector<db::CellInstArrayWithProperties> & /*insts_b*/, const std::vector<std::string> & /*cell_names*/)
 {
   // .. nothing ..
 }
 
-void
-RdbDifferenceReceiver::instances_in_a_only (const std::vector <db::CellInstArrayWithProperties> &anotb, const db::Layout & /*a*/)
+void RdbDifferenceReceiver::instances_in_a_only (const std::vector<db::CellInstArrayWithProperties> &anotb, const db::Layout & /*a*/)
 {
   if (m_detailed) {
-    for (std::vector <db::CellInstArrayWithProperties>::const_iterator s = anotb.begin (); s != anotb.end (); ++s) {
+    for (std::vector<db::CellInstArrayWithProperties>::const_iterator s = anotb.begin (); s != anotb.end (); ++s) {
       produce_cell_inst (*s, mp_layout_a, mp_a_only_cat);
     }
   }
@@ -340,11 +323,10 @@ RdbDifferenceReceiver::instances_in_a_only (const std::vector <db::CellInstArray
   }
 }
 
-void
-RdbDifferenceReceiver::instances_in_b_only (const std::vector <db::CellInstArrayWithProperties> &bnota, const db::Layout & /*b*/)
+void RdbDifferenceReceiver::instances_in_b_only (const std::vector<db::CellInstArrayWithProperties> &bnota, const db::Layout & /*b*/)
 {
   if (m_detailed) {
-    for (std::vector <db::CellInstArrayWithProperties>::const_iterator s = bnota.begin (); s != bnota.end (); ++s) {
+    for (std::vector<db::CellInstArrayWithProperties>::const_iterator s = bnota.begin (); s != bnota.end (); ++s) {
       produce_cell_inst (*s, mp_layout_b, mp_b_only_cat);
     }
   }
@@ -354,8 +336,7 @@ RdbDifferenceReceiver::instances_in_b_only (const std::vector <db::CellInstArray
   }
 }
 
-void
-RdbDifferenceReceiver::begin_layer (const db::LayerProperties &layer, unsigned int layer_index_a, bool is_valid_a, unsigned int layer_index_b, bool is_valid_b)
+void RdbDifferenceReceiver::begin_layer (const db::LayerProperties &layer, unsigned int layer_index_a, bool is_valid_a, unsigned int layer_index_b, bool is_valid_b)
 {
   m_layer = layer;
   m_diffs_reported = false;
@@ -369,7 +350,7 @@ RdbDifferenceReceiver::begin_layer (const db::LayerProperties &layer, unsigned i
     m_obj_index = 0;
 
     if (is_valid_a) {
-      for (std::vector <db::CellInstArrayWithProperties>::const_iterator i = m_insts_a.begin (); i != m_insts_a.end (); ++i) {
+      for (std::vector<db::CellInstArrayWithProperties>::const_iterator i = m_insts_a.begin (); i != m_insts_a.end (); ++i) {
         for (db::RecursiveShapeIterator shapes (*mp_layout_a, mp_layout_a->cell (i->object ().cell_index ()), m_layer_index_a); ! shapes.at_end (); ++shapes) {
           for (db::CellInstArray::iterator a = i->begin (); ! a.at_end (); ++a) {
             m_ep.insert (shapes.shape (), i->complex_trans (*a) * shapes.trans (), m_obj_index * 2);
@@ -380,7 +361,7 @@ RdbDifferenceReceiver::begin_layer (const db::LayerProperties &layer, unsigned i
     }
 
     if (is_valid_b) {
-      for (std::vector <db::CellInstArrayWithProperties>::const_iterator i = m_insts_b.begin (); i != m_insts_b.end (); ++i) {
+      for (std::vector<db::CellInstArrayWithProperties>::const_iterator i = m_insts_b.begin (); i != m_insts_b.end (); ++i) {
         for (db::RecursiveShapeIterator shapes (*mp_layout_b, mp_layout_b->cell (i->object ().cell_index ()), m_layer_index_b); ! shapes.at_end (); ++shapes) {
           for (db::CellInstArray::iterator a = i->begin (); ! a.at_end (); ++a) {
             m_ep.insert (shapes.shape (), i->complex_trans (*a) * shapes.trans (), m_obj_index * 2 + 1);
@@ -389,16 +370,14 @@ RdbDifferenceReceiver::begin_layer (const db::LayerProperties &layer, unsigned i
         }
       }
     }
-
   }
 }
 
-void
-RdbDifferenceReceiver::end_layer ()
+void RdbDifferenceReceiver::end_layer ()
 {
   if (m_run_xor) {
 
-    std::vector <db::Polygon> out_polygons;
+    std::vector<db::Polygon> out_polygons;
     db::BooleanOp op (db::BooleanOp::Xor);
     db::PolygonContainer pc (out_polygons);
     db::PolygonGenerator out (pc, false /*don't resolve holes*/, true /*min coherence*/);
@@ -408,26 +387,23 @@ RdbDifferenceReceiver::end_layer ()
 
     rdb::Category *cat = mp_xor_cat [std::make_pair (m_is_valid_layer_index_a ? m_layer_index_a : -1, m_is_valid_layer_index_b ? m_layer_index_b : -1)];
     if (cat) {
-      for (std::vector <db::Polygon>::const_iterator x = out_polygons.begin (); x != out_polygons.end (); ++x) {
+      for (std::vector<db::Polygon>::const_iterator x = out_polygons.begin (); x != out_polygons.end (); ++x) {
         rdb::Item *item = mp_rdb->create_item (mp_cell->id (), cat->id ());
         item->add_value (t * *x);
       }
     }
 
     m_ep.clear ();
-
   }
 }
 
-void 
-RdbDifferenceReceiver::per_layer_bbox_differs (const db::Box &ba, const db::Box &bb)
+void RdbDifferenceReceiver::per_layer_bbox_differs (const db::Box &ba, const db::Box &bb)
 {
   rdb::Item *item = mp_rdb->create_item (mp_cell->id (), mp_general_cat->id ());
   item->add_value (tl::sprintf (tl::to_string (QObject::tr ("Per-layer bounding boxes differ (layer %s): %s (A) vs. %s (B)")), m_layer.to_string (), ba.to_string (), bb.to_string ()));
 }
 
-void
-RdbDifferenceReceiver::shape_diffs_found ()
+void RdbDifferenceReceiver::shape_diffs_found ()
 {
   if (! m_diffs_reported) {
     rdb::Item *item = mp_rdb->create_item (mp_cell->id (), mp_general_cat->id ());
@@ -436,57 +412,54 @@ RdbDifferenceReceiver::shape_diffs_found ()
   }
 }
 
-void
-RdbDifferenceReceiver::begin_polygon_differences ()
+void RdbDifferenceReceiver::begin_polygon_differences ()
 {
   shape_diffs_found ();
 }
 
-inline std::string shape_type (const db::Polygon &) 
+inline std::string shape_type (const db::Polygon &)
 {
   return "polygon";
 }
 
-inline std::string shape_type (const db::Path &) 
+inline std::string shape_type (const db::Path &)
 {
   return "path";
 }
 
-inline std::string shape_type (const db::Edge &) 
+inline std::string shape_type (const db::Edge &)
 {
   return "edge";
 }
 
-inline std::string shape_type (const db::Text &) 
+inline std::string shape_type (const db::Text &)
 {
   return "text";
 }
 
-inline std::string shape_type (const db::Box &) 
+inline std::string shape_type (const db::Box &)
 {
   return "box";
 }
 
 template <class SH>
-void
-RdbDifferenceReceiver::produce_diffs_for_xor (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b, double dbu_a, db::Shapes &shapes)
+void RdbDifferenceReceiver::produce_diffs_for_xor (const std::vector<std::pair<SH, db::properties_id_type>> &a, const std::vector<std::pair<SH, db::properties_id_type>> &b, double dbu_a, db::Shapes &shapes)
 {
   db::CplxTrans t (dbu_a);
-  std::vector <std::pair <SH, db::properties_id_type> > anotb;
+  std::vector<std::pair<SH, db::properties_id_type>> anotb;
   std::set_difference (a.begin (), a.end (), b.begin (), b.end (), std::back_inserter (anotb));
-  for (typename std::vector <std::pair <SH, db::properties_id_type> >::const_iterator s = anotb.begin (); s != anotb.end (); ++s) {
+  for (typename std::vector<std::pair<SH, db::properties_id_type>>::const_iterator s = anotb.begin (); s != anotb.end (); ++s) {
     shapes.insert (s->first);
   }
 }
 
 template <class SH>
-void
-RdbDifferenceReceiver::produce_diffs (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b, double dbu_a, const rdb::Category *cat)
+void RdbDifferenceReceiver::produce_diffs (const std::vector<std::pair<SH, db::properties_id_type>> &a, const std::vector<std::pair<SH, db::properties_id_type>> &b, double dbu_a, const rdb::Category *cat)
 {
   db::CplxTrans t (dbu_a);
-  std::vector <std::pair <SH, db::properties_id_type> > anotb;
+  std::vector<std::pair<SH, db::properties_id_type>> anotb;
   std::set_difference (a.begin (), a.end (), b.begin (), b.end (), std::back_inserter (anotb));
-  for (typename std::vector <std::pair <SH, db::properties_id_type> >::const_iterator s = anotb.begin (); s != anotb.end (); ++s) {
+  for (typename std::vector<std::pair<SH, db::properties_id_type>>::const_iterator s = anotb.begin (); s != anotb.end (); ++s) {
 
     rdb::Item *item = mp_rdb->create_item (mp_cell->id (), cat->id ());
 
@@ -501,13 +474,11 @@ RdbDifferenceReceiver::produce_diffs (const std::vector <std::pair <SH, db::prop
     if (s->second && m_with_properties) {
       add_property_text (item, s->second);
     }
-
   }
 }
 
-template <class SH> 
-void 
-RdbDifferenceReceiver::shape_diffs (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b)
+template <class SH>
+void RdbDifferenceReceiver::shape_diffs (const std::vector<std::pair<SH, db::properties_id_type>> &a, const std::vector<std::pair<SH, db::properties_id_type>> &b)
 {
   if (m_detailed && m_is_valid_layer_index_a && mp_a_only_per_layer_cat [m_layer_index_a] != 0) {
     produce_diffs (a, b, mp_layout_a->dbu (), mp_a_only_per_layer_cat [m_layer_index_a]);
@@ -536,56 +507,47 @@ RdbDifferenceReceiver::shape_diffs (const std::vector <std::pair <SH, db::proper
   }
 }
 
-void
-RdbDifferenceReceiver::detailed_diff (const std::vector <std::pair <db::Polygon, db::properties_id_type> > &a, const std::vector <std::pair <db::Polygon, db::properties_id_type> > &b)
+void RdbDifferenceReceiver::detailed_diff (const std::vector<std::pair<db::Polygon, db::properties_id_type>> &a, const std::vector<std::pair<db::Polygon, db::properties_id_type>> &b)
 {
   shape_diffs (a, b);
 }
 
-void
-RdbDifferenceReceiver::begin_path_differences ()
+void RdbDifferenceReceiver::begin_path_differences ()
 {
   shape_diffs_found ();
 }
 
-void
-RdbDifferenceReceiver::detailed_diff (const std::vector <std::pair <db::Path, db::properties_id_type> > &a, const std::vector <std::pair <db::Path, db::properties_id_type> > &b)
+void RdbDifferenceReceiver::detailed_diff (const std::vector<std::pair<db::Path, db::properties_id_type>> &a, const std::vector<std::pair<db::Path, db::properties_id_type>> &b)
 {
   shape_diffs (a, b);
 }
 
-void
-RdbDifferenceReceiver::begin_box_differences ()
+void RdbDifferenceReceiver::begin_box_differences ()
 {
   shape_diffs_found ();
 }
 
-void
-RdbDifferenceReceiver::detailed_diff (const std::vector <std::pair <db::Box, db::properties_id_type> > &a, const std::vector <std::pair <db::Box, db::properties_id_type> > &b)
+void RdbDifferenceReceiver::detailed_diff (const std::vector<std::pair<db::Box, db::properties_id_type>> &a, const std::vector<std::pair<db::Box, db::properties_id_type>> &b)
 {
   shape_diffs (a, b);
 }
 
-void
-RdbDifferenceReceiver::begin_edge_differences ()
+void RdbDifferenceReceiver::begin_edge_differences ()
 {
   shape_diffs_found ();
 }
 
-void
-RdbDifferenceReceiver::detailed_diff (const std::vector <std::pair <db::Edge, db::properties_id_type> > &a, const std::vector <std::pair <db::Edge, db::properties_id_type> > &b)
+void RdbDifferenceReceiver::detailed_diff (const std::vector<std::pair<db::Edge, db::properties_id_type>> &a, const std::vector<std::pair<db::Edge, db::properties_id_type>> &b)
 {
   shape_diffs (a, b);
 }
 
-void
-RdbDifferenceReceiver::begin_text_differences ()
+void RdbDifferenceReceiver::begin_text_differences ()
 {
   shape_diffs_found ();
 }
 
-void
-RdbDifferenceReceiver::detailed_diff (const std::vector <std::pair <db::Text, db::properties_id_type> > &a, const std::vector <std::pair <db::Text, db::properties_id_type> > &b)
+void RdbDifferenceReceiver::detailed_diff (const std::vector<std::pair<db::Text, db::properties_id_type>> &a, const std::vector<std::pair<db::Text, db::properties_id_type>> &b)
 {
   shape_diffs (a, b);
 }
@@ -608,8 +570,7 @@ DiffToolDialog::~DiffToolDialog ()
   mp_ui = 0;
 }
 
-int 
-DiffToolDialog::exec_dialog (lay::LayoutViewBase *view)
+int DiffToolDialog::exec_dialog (lay::LayoutViewBase *view)
 {
   mp_view = view;
 
@@ -667,10 +628,9 @@ DiffToolDialog::exec_dialog (lay::LayoutViewBase *view)
   return ret;
 }
 
-void 
-DiffToolDialog::accept ()
+void DiffToolDialog::accept ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   int cv_index_a = mp_ui->layouta->current_cv_index ();
   int cv_index_b = mp_ui->layoutb->current_cv_index ();
@@ -679,7 +639,7 @@ BEGIN_PROTECTED
   const lay::CellView &cvb = mp_view->cellview (cv_index_b);
 
   if (&cva->layout () == &cvb->layout () && cva.cell_index () == cvb.cell_index ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Trying to perform an Diff between identical layouts")));  
+    throw tl::Exception (tl::to_string (QObject::tr ("Trying to perform an Diff between identical layouts")));
   }
 
   lay::Dispatcher *config_root = lay::Dispatcher::instance ();
@@ -695,11 +655,10 @@ BEGIN_PROTECTED
 
   QDialog::accept ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-DiffToolDialog::update ()
+void DiffToolDialog::update ()
 {
   bool xor_mode = mp_ui->xor_cbx->isChecked ();
   mp_ui->summarize_cbx->setEnabled (! xor_mode);
@@ -708,15 +667,14 @@ DiffToolDialog::update ()
   mp_ui->exact_cbx->setEnabled (! xor_mode);
 }
 
-void 
-DiffToolDialog::run_diff ()
+void DiffToolDialog::run_diff ()
 {
   bool smart = mp_ui->smart_cbx->isChecked ();
   bool run_xor = mp_ui->xor_cbx->isChecked ();
-  bool detailed = !run_xor && mp_ui->detailed_cbx->isChecked ();
-  bool summarize = !run_xor && mp_ui->summarize_cbx->isChecked ();
-  bool expand_cell_arrays = !run_xor && mp_ui->expand_cell_arrays_cbx->isChecked ();
-  bool exact = !run_xor && mp_ui->exact_cbx->isChecked ();
+  bool detailed = ! run_xor && mp_ui->detailed_cbx->isChecked ();
+  bool summarize = ! run_xor && mp_ui->summarize_cbx->isChecked ();
+  bool expand_cell_arrays = ! run_xor && mp_ui->expand_cell_arrays_cbx->isChecked ();
+  bool exact = ! run_xor && mp_ui->exact_cbx->isChecked ();
   bool ignore_duplicates = mp_ui->ignore_duplicates_cbx->isChecked ();
 
   int cv_index_a = mp_ui->layouta->current_cv_index ();
@@ -729,7 +687,7 @@ DiffToolDialog::run_diff ()
   if (detailed || run_xor) {
     flags |= db::layout_diff::f_verbose;
   }
-  if (!exact) {
+  if (! exact) {
     flags |= db::layout_diff::f_no_text_details;
     flags |= db::layout_diff::f_no_layer_names;
     flags |= db::layout_diff::f_no_text_orientation;
@@ -776,4 +734,3 @@ DiffToolDialog::run_diff ()
 }
 
 }
-

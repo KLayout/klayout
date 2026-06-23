@@ -42,7 +42,7 @@
 
 namespace kj
 {
-  class BufferedOutputStream;
+class BufferedOutputStream;
 }
 
 namespace lstr
@@ -62,7 +62,7 @@ public:
 
   /**
    *  @brief Writes the layout object
-   * 
+   *
    *  @param layout The layout object to write
    *  @param stream The stream to write to
    *  @param options The writer options to use
@@ -81,7 +81,7 @@ private:
   int m_layout_view_id;
   int m_meta_data_view_id;
   std::map<db::lib_id_type, uint64_t> m_ls_lib_ids;
-  std::vector<std::pair <unsigned int, db::LayerProperties> > m_layers_to_write;
+  std::vector<std::pair<unsigned int, db::LayerProperties>> m_layers_to_write;
   std::set<db::cell_index_type> m_cells_to_write;
   std::map<db::property_names_id_type, uint64_t> m_ls_prop_name_ids;
   std::map<db::properties_id_type, uint64_t> m_ls_prop_ids;
@@ -139,4 +139,3 @@ private:
 } // namespace db
 
 #endif
-

@@ -135,13 +135,13 @@ public:
   virtual std::string format_title () const { return "MALY (MALY jobdeck format)"; }
   virtual std::string file_format () const { return "MALY jobdeck files (*.maly *.MALY *.mly *.MLY)"; }
 
-  virtual bool detect (tl::InputStream &s) const 
+  virtual bool detect (tl::InputStream &s) const
   {
     db::MALYReader reader (s);
     return reader.test ();
   }
 
-  virtual ReaderBase *create_reader (tl::InputStream &s) const 
+  virtual ReaderBase *create_reader (tl::InputStream &s) const
   {
     return new db::MALYReader (s);
   }
@@ -169,10 +169,9 @@ public:
   virtual tl::XMLElementBase *xml_reader_options_element () const
   {
     return new db::ReaderOptionsXMLElement<db::MALYReaderOptions> ("maly",
-      tl::make_member (&db::MALYReaderOptions::dbu, "dbu") +
-      tl::make_member (&db::MALYReaderOptions::layer_map, "layer-map") +
-      tl::make_member (&db::MALYReaderOptions::create_other_layers, "create-other-layers")
-    );
+                                                                   tl::make_member (&db::MALYReaderOptions::dbu, "dbu") +
+                                                                     tl::make_member (&db::MALYReaderOptions::layer_map, "layer-map") +
+                                                                     tl::make_member (&db::MALYReaderOptions::create_other_layers, "create-other-layers"));
   }
 };
 
@@ -184,5 +183,3 @@ static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new MALYFor
 int force_link_MALY = 0;
 
 }
-
-

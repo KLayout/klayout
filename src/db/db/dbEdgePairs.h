@@ -57,8 +57,8 @@ class DB_PUBLIC EdgePairFilterBase
 public:
   typedef db::EdgePair shape_type;
 
-  EdgePairFilterBase () { }
-  virtual ~EdgePairFilterBase () { }
+  EdgePairFilterBase () {}
+  virtual ~EdgePairFilterBase () {}
 
   virtual bool selected (const db::EdgePair &edge_pair, db::properties_id_type prop_id) const = 0;
   virtual const TransformationReducer *vars () const = 0;
@@ -96,7 +96,7 @@ public:
    *  This constructor creates an empty edge pair set.
    */
   EdgePairs ();
-  
+
   /**
    *  @brief Destructor
    */
@@ -351,7 +351,7 @@ public:
    *  @brief Filters the edge pairs
    *
    *  This method will keep all edge pairs for which the filter returns true.
-   *  Merged semantics applies. 
+   *  Merged semantics applies.
    */
   EdgePairs &filter (const EdgePairFilterBase &filter)
   {
@@ -770,7 +770,7 @@ public:
    *  @brief Converts to polygons
    *
    *  Note: because of the include hierarchy we can't use a direct return value.
-   *  
+   *
    *  The output container is not cleared by this method but polygons are rather
    *  appended.
    *
@@ -784,7 +784,7 @@ public:
    *  @brief Returns individual edges
    *
    *  Note: because of the include hierarchy we can't use a direct return value.
-   *  
+   *
    *  The output container is not cleared by this method but edges are rather
    *  appended.
    */
@@ -797,7 +797,7 @@ public:
    *
    *  The output container is not cleared by this method but edges are rather
    *  appended.
-   */  
+   */
   void first_edges (Edges &output) const;
 
   /**
@@ -807,7 +807,7 @@ public:
    *
    *  The output container is not cleared by this method but edges are rather
    *  appended.
-   */  
+   */
   void second_edges (Edges &output) const;
 
   /**
@@ -879,9 +879,8 @@ private:
 
 namespace tl
 {
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::EdgePairs &b);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::EdgePairs &b);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::EdgePairs &b);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::EdgePairs &b);
 }
 
 #endif
-

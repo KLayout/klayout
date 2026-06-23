@@ -57,16 +57,15 @@ PolygonSplitter::PolygonSplitter (PolygonSink &sink, double max_area_ratio, size
   //  .. nothing yet ..
 }
 
-void
-PolygonSplitter::put (const db::Polygon &poly)
+void PolygonSplitter::put (const db::Polygon &poly)
 {
   if (poly.is_empty ()) {
     //  ignore empty polygons
   } else if (db::suggest_split_polygon (poly, m_max_vertex_count, m_max_area_ratio)) {
 
-    std::vector <db::Polygon> split_polygons;
+    std::vector<db::Polygon> split_polygons;
     db::split_polygon (poly, split_polygons);
-    for (std::vector <db::Polygon>::const_iterator sp = split_polygons.begin (); sp != split_polygons.end (); ++sp) {
+    for (std::vector<db::Polygon>::const_iterator sp = split_polygons.begin (); sp != split_polygons.end (); ++sp) {
       put (*sp);
     }
 

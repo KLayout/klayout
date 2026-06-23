@@ -32,23 +32,22 @@ namespace db
 //  this is the character to replace invalid characters (>end_char)
 const char invalid_char = '?';
 
-struct HersheyCharInfo 
-{
+struct HersheyCharInfo {
   HersheyCharInfo (unsigned int e1, unsigned int e2, int w, int y1, int y2)
     : edge_start (e1), edge_end (e2), width (w), ymin (y1), ymax (y2)
-  { }
+  {
+  }
 
   unsigned int edge_start, edge_end;
   int width;
   int ymin, ymax;
 };
 
-struct HersheyFont
-{
-  HersheyFont (const short (*e) [4], const HersheyCharInfo *c, 
+struct HersheyFont {
+  HersheyFont (const short (*e) [4], const HersheyCharInfo *c,
                unsigned char c1, unsigned char c2, int y2, int y1)
     : edges (e), chars (c), start_char (c1), end_char (c2), ymin (y1), ymax (y2)
-  { 
+  {
     width = ymax;
     height = ymax;
 
@@ -72,13 +71,13 @@ struct HersheyFont
 const int line_spacing = 4;
 
 static HersheyFont *fonts [] = {
-  &futural,     // Default
-  &gothiceng,   // Gothic
-  &futuram,     // Sans thick
-  &futural,     // Stick
-  &timesi,      // Times italic
-  &timesr,      // Times thin
-  &rowmant,     // Times thick
+  &futural,   // Default
+  &gothiceng, // Gothic
+  &futuram,   // Sans thick
+  &futural,   // Stick
+  &timesi,    // Times italic
+  &timesr,    // Times thin
+  &rowmant,   // Times thick
 };
 
 std::vector<std::string>
@@ -101,7 +100,7 @@ hershey_count_edges (const std::string &s, unsigned int f)
   HersheyFont *fp = fonts [f];
   size_t n = 0;
 
-  for (const char *cp = s.c_str (); *cp; ) {
+  for (const char *cp = s.c_str (); *cp;) {
 
     if (tl::skip_newline (cp)) {
 
@@ -116,27 +115,23 @@ hershey_count_edges (const std::string &s, unsigned int f)
       } else if (invalid_char < fp->end_char && invalid_char >= fp->start_char) {
         n += fp->chars [invalid_char - fp->start_char].edge_end - fp->chars [invalid_char - fp->start_char].edge_start;
       }
-
     }
-
   }
 
   return n;
 }
 
-int
-hershey_font_width (unsigned int f)
+int hershey_font_width (unsigned int f)
 {
   return fonts [f]->width;
 }
 
-int
-hershey_font_height (unsigned int f)
+int hershey_font_height (unsigned int f)
 {
   return fonts [f]->height;
 }
 
-db::DBox 
+db::DBox
 hershey_text_box (const std::string &s, unsigned int f)
 {
   HersheyFont *fp = fonts [f];
@@ -147,7 +142,7 @@ hershey_text_box (const std::string &s, unsigned int f)
   int w = 0;
   int h = fp->ymax;
 
-  for (const char *cp = s.c_str (); *cp; ) {
+  for (const char *cp = s.c_str (); *cp;) {
 
     if (tl::skip_newline (cp)) {
 
@@ -167,9 +162,7 @@ hershey_text_box (const std::string &s, unsigned int f)
       } else if (invalid_char < fp->end_char && invalid_char >= fp->start_char) {
         w += fp->chars [invalid_char - fp->start_char].width;
       }
-
     }
-
   }
 
   if (w > wl) {
@@ -180,8 +173,7 @@ hershey_text_box (const std::string &s, unsigned int f)
   return db::DBox (0, fp->ymin, wl, hl);
 }
 
-void
-hershey_justify (const std::string &s, unsigned int f, db::DBox bx, HAlign halign, VAlign valign, std::vector<db::DPoint> &linestarts, double &left, double &bottom)
+void hershey_justify (const std::string &s, unsigned int f, db::DBox bx, HAlign halign, VAlign valign, std::vector<db::DPoint> &linestarts, double &left, double &bottom)
 {
   left = 0.0;
   bottom = 0.0;
@@ -192,7 +184,7 @@ hershey_justify (const std::string &s, unsigned int f, db::DBox bx, HAlign halig
   int w = 0;
   int h = fp->ymax;
 
-  for (const char *cp = s.c_str (); *cp; ) {
+  for (const char *cp = s.c_str (); *cp;) {
 
     if (tl::skip_newline (cp)) {
 
@@ -209,9 +201,7 @@ hershey_justify (const std::string &s, unsigned int f, db::DBox bx, HAlign halig
       } else if (invalid_char < fp->end_char && invalid_char >= fp->start_char) {
         w += fp->chars [invalid_char - fp->start_char].width;
       }
-
     }
-
   }
 
   linestarts.push_back (db::DPoint (w, -hl));
@@ -225,7 +215,7 @@ hershey_justify (const std::string &s, unsigned int f, db::DBox bx, HAlign halig
     delta = db::DVector (0, bx.height () - fp->ymax);
   } else if (valign == VAlignBottom || valign == NoVAlign) {
     delta = db::DVector (0, hl - fp->ymax);
-  }    
+  }
 
   for (std::vector<db::DPoint>::iterator l = linestarts.begin (); l != linestarts.end (); ++l) {
     db::DPoint p (bx.p1 () + delta);
@@ -262,14 +252,13 @@ basic_hershey_edge_iterator::basic_hershey_edge_iterator (const std::string &s, 
   m_pos = m_linestarts [0];
 }
 
-bool
-basic_hershey_edge_iterator::at_end () const
+bool basic_hershey_edge_iterator::at_end () const
 {
   return *mp_cp == 0 && m_edge == m_edge_end;
 }
 
 db::DEdge
-basic_hershey_edge_iterator::get () 
+basic_hershey_edge_iterator::get ()
 {
   while (m_edge == m_edge_end && *mp_cp) {
 
@@ -303,21 +292,18 @@ basic_hershey_edge_iterator::get ()
         m_edge_end = m_fp->chars [c - m_fp->start_char].edge_end;
         m_delta = db::DVector (m_fp->chars [c - m_fp->start_char].width, 0);
       }
-
     }
-
   }
 
-  if (!at_end ()) {
+  if (! at_end ()) {
     const short *ep = m_fp->edges [m_edge];
-    return db::DEdge (m_pos + db::DVector (ep[0], ep[1]), m_pos + db::DVector (ep[2], ep[3]));
+    return db::DEdge (m_pos + db::DVector (ep [0], ep [1]), m_pos + db::DVector (ep [2], ep [3]));
   } else {
     return db::DEdge ();
   }
 }
 
-void
-basic_hershey_edge_iterator::inc ()
+void basic_hershey_edge_iterator::inc ()
 {
   if (! at_end ()) {
     ++m_edge;
@@ -327,4 +313,3 @@ basic_hershey_edge_iterator::inc ()
 
 
 } // namespace db
-

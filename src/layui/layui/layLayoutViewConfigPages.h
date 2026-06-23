@@ -34,23 +34,24 @@
 #include "layLineStyles.h"
 #include "dbObject.h"
 
-namespace Ui {
-  class LayoutViewConfigPage;
-  class LayoutViewConfigPage1;
-  class LayoutViewConfigPage2a;
-  class LayoutViewConfigPage2b;
-  class LayoutViewConfigPage2c;
-  class LayoutViewConfigPage2d;
-  class LayoutViewConfigPage3a;
-  class LayoutViewConfigPage3b;
-  class LayoutViewConfigPage3c;
-  class LayoutViewConfigPage3f;
-  class LayoutViewConfigPage4;
-  class LayoutViewConfigPage5;
-  class LayoutViewConfigPage6;
-  class LayoutViewConfigPage6a;
-  class LayoutViewConfigPage7;
-  class LayoutViewConfigPage8;
+namespace Ui
+{
+class LayoutViewConfigPage;
+class LayoutViewConfigPage1;
+class LayoutViewConfigPage2a;
+class LayoutViewConfigPage2b;
+class LayoutViewConfigPage2c;
+class LayoutViewConfigPage2d;
+class LayoutViewConfigPage3a;
+class LayoutViewConfigPage3b;
+class LayoutViewConfigPage3c;
+class LayoutViewConfigPage3f;
+class LayoutViewConfigPage4;
+class LayoutViewConfigPage5;
+class LayoutViewConfigPage6;
+class LayoutViewConfigPage6a;
+class LayoutViewConfigPage7;
+class LayoutViewConfigPage8;
 }
 
 namespace lay
@@ -62,10 +63,10 @@ class ColorButton;
 //  This file provides the main declarations for the configuration
 //  dialogs for the layout view.
 
-class LayoutViewConfigPage 
+class LayoutViewConfigPage
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage (QWidget *parent);
@@ -78,10 +79,10 @@ private:
   Ui::LayoutViewConfigPage *mp_ui;
 };
 
-class LayoutViewConfigPage1 
+class LayoutViewConfigPage1
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage1 (QWidget *parent);
@@ -97,7 +98,7 @@ private:
 class LayoutViewConfigPage2a
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage2a (QWidget *parent);
@@ -113,7 +114,7 @@ private:
 class LayoutViewConfigPage2b
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage2b (QWidget *parent);
@@ -126,10 +127,10 @@ private:
   Ui::LayoutViewConfigPage2b *mp_ui;
 };
 
-class LayoutViewConfigPage2c 
+class LayoutViewConfigPage2c
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage2c (QWidget *parent);
@@ -145,7 +146,7 @@ private:
 class LayoutViewConfigPage2d
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage2d (QWidget *parent);
@@ -161,7 +162,7 @@ private:
 class LayoutViewConfigPage3a
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage3a (QWidget *parent);
@@ -174,10 +175,10 @@ private:
   Ui::LayoutViewConfigPage3a *mp_ui;
 };
 
-class LayoutViewConfigPage3b 
+class LayoutViewConfigPage3b
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage3b (QWidget *parent);
@@ -190,10 +191,10 @@ private:
   Ui::LayoutViewConfigPage3b *mp_ui;
 };
 
-class LayoutViewConfigPage3c 
+class LayoutViewConfigPage3c
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage3c (QWidget *parent);
@@ -206,10 +207,10 @@ private:
   Ui::LayoutViewConfigPage3c *mp_ui;
 };
 
-class LayoutViewConfigPage3f 
+class LayoutViewConfigPage3f
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage3f (QWidget *parent);
@@ -222,11 +223,11 @@ private:
   Ui::LayoutViewConfigPage3f *mp_ui;
 };
 
-class LayoutViewConfigPage4 
-  : public lay::ConfigPage, 
+class LayoutViewConfigPage4
+  : public lay::ConfigPage,
     public db::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage4 (QWidget *parent);
@@ -244,7 +245,7 @@ public slots:
   void redo_button_clicked ();
   void reset_button_clicked ();
   void edit_order_changed (int s);
-  
+
 private:
   Ui::LayoutViewConfigPage4 *mp_ui;
   lay::ColorPalette m_palette;
@@ -255,10 +256,10 @@ private:
   void set_edit_order (bool edit_order);
 };
 
-class LayoutViewConfigPage5 
+class LayoutViewConfigPage5
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage5 (QWidget *parent);
@@ -274,11 +275,11 @@ private:
   Ui::LayoutViewConfigPage5 *mp_ui;
 };
 
-class LayoutViewConfigPage6 
-  : public lay::ConfigPage, 
+class LayoutViewConfigPage6
+  : public lay::ConfigPage,
     public db::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage6 (QWidget *parent);
@@ -296,7 +297,7 @@ public slots:
   void redo_button_clicked ();
   void reset_button_clicked ();
   void edit_order_changed (int s);
-  
+
 private:
   Ui::LayoutViewConfigPage6 *mp_ui;
   lay::StipplePalette m_palette;
@@ -312,7 +313,7 @@ class LayoutViewConfigPage6a
   : public lay::ConfigPage,
     public db::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage6a (QWidget *parent);
@@ -343,7 +344,7 @@ private:
 class LayoutViewConfigPage7
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage7 (QWidget *parent);
@@ -359,7 +360,7 @@ private:
 class LayoutViewConfigPage8
   : public lay::ConfigPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewConfigPage8 (QWidget *parent);
@@ -376,4 +377,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

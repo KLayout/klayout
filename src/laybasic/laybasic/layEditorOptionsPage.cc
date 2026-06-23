@@ -57,16 +57,14 @@ EditorOptionsPage::~EditorOptionsPage ()
   set_owner (0);
 }
 
-void
-EditorOptionsPage::init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+void EditorOptionsPage::init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
 {
   mp_view = view;
   mp_dispatcher = dispatcher;
   attach_events ();
 }
 
-int
-EditorOptionsPage::show ()
+int EditorOptionsPage::show ()
 {
   if (! m_active) {
     return -1;
@@ -85,8 +83,7 @@ EditorOptionsPage::show ()
   }
 }
 
-void
-EditorOptionsPage::attach_events ()
+void EditorOptionsPage::attach_events ()
 {
   detach_from_all_events ();
   view ()->active_cellview_changed_event.add (this, &EditorOptionsPage::on_active_cellview_changed);
@@ -96,21 +93,18 @@ EditorOptionsPage::attach_events ()
   }
 }
 
-void
-EditorOptionsPage::on_active_cellview_changed ()
+void EditorOptionsPage::on_active_cellview_changed ()
 {
   active_cellview_changed ();
   attach_events ();
 }
 
-void
-EditorOptionsPage::on_technology_changed ()
+void EditorOptionsPage::on_technology_changed ()
 {
   technology_changed (view ()->active_cellview_ref ()->tech_name ());
 }
 
-void
-EditorOptionsPage::set_owner (EditorOptionsPageCollection *owner)
+void EditorOptionsPage::set_owner (EditorOptionsPageCollection *owner)
 {
   if (mp_owner) {
     mp_owner->unregister_page (this);
@@ -118,8 +112,7 @@ EditorOptionsPage::set_owner (EditorOptionsPageCollection *owner)
   mp_owner = owner;
 }
 
-void
-EditorOptionsPage::activate (bool active)
+void EditorOptionsPage::activate (bool active)
 {
   if (m_active != active) {
     m_active = active;
@@ -135,4 +128,3 @@ EditorOptionsPage::activate (bool active)
 }
 
 }
-

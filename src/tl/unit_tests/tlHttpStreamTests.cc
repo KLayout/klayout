@@ -31,7 +31,7 @@ static std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resourc
 static std::string test_url1_gz ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata2/text.gz");
 static std::string test_url2 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir1");
 
-TEST(1)
+TEST (1)
 {
   if (! tl::InputHttpStream::is_available ()) {
     throw tl::CancelException ();
@@ -39,13 +39,13 @@ TEST(1)
 
   tl::InputHttpStream stream (test_url1);
 
-  char b[100];
+  char b [100];
   size_t n = stream.read (b, sizeof (b));
   std::string res (b, n);
   EXPECT_EQ (res, "hello, world.\n");
 }
 
-TEST(2)
+TEST (2)
 {
   if (! tl::InputHttpStream::is_available ()) {
     throw tl::CancelException ();
@@ -57,33 +57,32 @@ TEST(2)
   stream.set_request ("PROPFIND");
   stream.set_data ("<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><resourcetype xmlns=\"DAV:\"/></prop></propfind>");
 
-  char b[10000];
+  char b [10000];
   size_t n = stream.read (b, sizeof (b));
   std::string res (b, n);
 
   EXPECT_EQ (res,
-    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-    "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n"
-    "<D:response xmlns:lp1=\"DAV:\">\n"
-    "<D:href>/svn-public/klayout-resources/trunk/testdata/dir1/</D:href>\n"
-    "<D:propstat>\n"
-    "<D:prop>\n"
-    "<lp1:resourcetype><D:collection/></lp1:resourcetype>\n"
-    "</D:prop>\n"
-    "<D:status>HTTP/1.1 200 OK</D:status>\n"
-    "</D:propstat>\n"
-    "</D:response>\n"
-    "<D:response xmlns:lp1=\"DAV:\">\n"
-    "<D:href>/svn-public/klayout-resources/trunk/testdata/dir1/text</D:href>\n"
-    "<D:propstat>\n"
-    "<D:prop>\n"
-    "<lp1:resourcetype/>\n"
-    "</D:prop>\n"
-    "<D:status>HTTP/1.1 200 OK</D:status>\n"
-    "</D:propstat>\n"
-    "</D:response>\n"
-    "</D:multistatus>\n"
-  );
+             "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+             "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n"
+             "<D:response xmlns:lp1=\"DAV:\">\n"
+             "<D:href>/svn-public/klayout-resources/trunk/testdata/dir1/</D:href>\n"
+             "<D:propstat>\n"
+             "<D:prop>\n"
+             "<lp1:resourcetype><D:collection/></lp1:resourcetype>\n"
+             "</D:prop>\n"
+             "<D:status>HTTP/1.1 200 OK</D:status>\n"
+             "</D:propstat>\n"
+             "</D:response>\n"
+             "<D:response xmlns:lp1=\"DAV:\">\n"
+             "<D:href>/svn-public/klayout-resources/trunk/testdata/dir1/text</D:href>\n"
+             "<D:propstat>\n"
+             "<D:prop>\n"
+             "<lp1:resourcetype/>\n"
+             "</D:prop>\n"
+             "<D:status>HTTP/1.1 200 OK</D:status>\n"
+             "</D:propstat>\n"
+             "</D:response>\n"
+             "</D:multistatus>\n");
 }
 
 namespace
@@ -92,7 +91,7 @@ namespace
 class Receiver : public tl::Object
 {
 public:
-  Receiver () : flag (false) { }
+  Receiver () : flag (false) {}
   void handle () { flag = true; }
   bool flag;
 };
@@ -100,7 +99,7 @@ public:
 }
 
 //  async mode
-TEST(3)
+TEST (3)
 {
   if (! tl::InputHttpStream::is_available ()) {
     throw tl::CancelException ();
@@ -122,14 +121,14 @@ TEST(3)
   EXPECT_EQ (r.flag, true);
   EXPECT_EQ (stream.data_available (), true);
 
-  char b[100];
+  char b [100];
   size_t n = stream.read (b, sizeof (b));
   std::string res (b, n);
   EXPECT_EQ (res, "hello, world.\n");
 }
 
 //  tl::Stream embedding
-TEST(4)
+TEST (4)
 {
   if (! tl::InputHttpStream::is_available ()) {
     throw tl::CancelException ();
@@ -142,7 +141,7 @@ TEST(4)
 }
 
 //  tl::Stream embedding with automatic unzip
-TEST(5)
+TEST (5)
 {
   if (! tl::InputHttpStream::is_available ()) {
     throw tl::CancelException ();
@@ -155,7 +154,7 @@ TEST(5)
 }
 
 //  tl::InputHttpStream timeout
-TEST(6)
+TEST (6)
 {
   if (! tl::InputHttpStream::is_available ()) {
     throw tl::CancelException ();
@@ -167,7 +166,7 @@ TEST(6)
     stream.set_timeout (0.001); //  probably too fast :)
 
     try {
-      char b[100];
+      char b [100];
       stream.read (b, sizeof (b));
       EXPECT_EQ (true, false);
     } catch (tl::HttpErrorException &ex) {
@@ -180,7 +179,7 @@ TEST(6)
     tl::InputHttpStream stream (test_url1);
 
     try {
-      char b[100];
+      char b [100];
       stream.read (b, sizeof (b));
       EXPECT_EQ (true, false);
     } catch (tl::HttpErrorException &ex) {
@@ -190,4 +189,3 @@ TEST(6)
 
   tl::unset_env ("KLAYOUT_HTTP_TIMEOUT");
 }
-

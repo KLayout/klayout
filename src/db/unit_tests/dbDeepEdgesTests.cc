@@ -33,7 +33,7 @@
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
-TEST(1)
+TEST (1)
 {
   db::Layout ly;
   {
@@ -65,10 +65,10 @@ TEST(1)
     db::CellCounter cc (&ly);
     for (db::Layout::top_down_const_iterator c = ly.begin_top_down (); c != ly.end_top_down (); ++c) {
       size_t ns = 0;
-      for (db::Shapes::shape_iterator is = ly.cell (*c).shapes (li1).begin (db::ShapeIterator::Edges); !is.at_end (); ++is) {
+      for (db::Shapes::shape_iterator is = ly.cell (*c).shapes (li1).begin (db::ShapeIterator::Edges); ! is.at_end (); ++is) {
         ++ns;
       }
-      for (db::Shapes::shape_iterator is = ly.cell (*c).shapes (li1).begin (db::ShapeIterator::Regions); !is.at_end (); ++is) {
+      for (db::Shapes::shape_iterator is = ly.cell (*c).shapes (li1).begin (db::ShapeIterator::Regions); ! is.at_end (); ++is) {
         db::Polygon p;
         is->polygon (p);
         ns += p.hull ().size ();
@@ -81,7 +81,6 @@ TEST(1)
     EXPECT_EQ (edges.back ().count (), n);
     EXPECT_EQ (edges.back ().hier_count (), nhier);
     EXPECT_EQ (edges.back ().bbox (), db::Edges (iter).bbox ());
-
   }
 
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -90,11 +89,11 @@ TEST(1)
     target.insert (target_top_cell_index, target_layers [r - edges.begin ()], *r);
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au1.gds");
 }
 
-TEST(2_MergeEdges)
+TEST (2_MergeEdges)
 {
   db::Layout ly;
   {
@@ -124,11 +123,11 @@ TEST(2_MergeEdges)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r2);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3_merged);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au2.gds");
 }
 
-TEST(3_Edge2EdgeBooleans)
+TEST (3_Edge2EdgeBooleans)
 {
   db::Layout ly;
   {
@@ -203,43 +202,43 @@ TEST(3_Edge2EdgeBooleans)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (47, 0)), e21 ^ edots);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (48, 0)), edots ^ e21);
 
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (50, 0)), e3.andnot(e2and3).first);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (51, 0)), e3.andnot(edots).first);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (52, 0)), e3.andnot(eempty).first);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (53, 0)), e3.andnot(e3copy).first);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (54, 0)), eempty.andnot(e2and3).first);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (55, 0)), edots.andnot(edotscopy).first);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (56, 0)), edots.andnot(e2).first);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (57, 0)), e21.andnot(edots).first);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (58, 0)), edots.andnot(e21).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (50, 0)), e3.andnot (e2and3).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (51, 0)), e3.andnot (edots).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (52, 0)), e3.andnot (eempty).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (53, 0)), e3.andnot (e3copy).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (54, 0)), eempty.andnot (e2and3).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (55, 0)), edots.andnot (edotscopy).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (56, 0)), edots.andnot (e2).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (57, 0)), e21.andnot (edots).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (58, 0)), edots.andnot (e21).first);
 
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (60, 0)), e3.andnot(e2and3).second);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (61, 0)), e3.andnot(edots).second);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (62, 0)), e3.andnot(eempty).second);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (63, 0)), e3.andnot(e3copy).second);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (64, 0)), eempty.andnot(e2and3).second);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (65, 0)), edots.andnot(edotscopy).second);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (66, 0)), edots.andnot(e2).second);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (67, 0)), e21.andnot(edots).second);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (68, 0)), edots.andnot(e21).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (60, 0)), e3.andnot (e2and3).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (61, 0)), e3.andnot (edots).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (62, 0)), e3.andnot (eempty).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (63, 0)), e3.andnot (e3copy).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (64, 0)), eempty.andnot (e2and3).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (65, 0)), edots.andnot (edotscopy).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (66, 0)), edots.andnot (e2).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (67, 0)), e21.andnot (edots).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (68, 0)), edots.andnot (e21).second);
 
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (70, 0)), e3.intersections(e2and3));
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (71, 0)), e3.intersections(edots));
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (72, 0)), e3.intersections(eempty));
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (73, 0)), e3.intersections(e3copy));
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (74, 0)), eempty.intersections(e2and3));
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (75, 0)), edots.intersections(edotscopy));
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (76, 0)), edots.intersections(e2));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (70, 0)), e3.intersections (e2and3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (71, 0)), e3.intersections (edots));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (72, 0)), e3.intersections (eempty));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (73, 0)), e3.intersections (e3copy));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (74, 0)), eempty.intersections (e2and3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (75, 0)), edots.intersections (edotscopy));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (76, 0)), edots.intersections (e2));
   //  test, whether dots are not merged
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (77, 0)), edots.intersections(e2).select_interacting(e2));
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (78, 0)), e21.intersections(edots));
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (79, 0)), edots.intersections(e21));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (77, 0)), edots.intersections (e2).select_interacting (e2));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (78, 0)), e21.intersections (edots));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (79, 0)), edots.intersections (e21));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au3.gds");
 }
 
-TEST(4_Edge2PolygonBooleans)
+TEST (4_Edge2PolygonBooleans)
 {
   db::Layout ly;
   {
@@ -280,11 +279,11 @@ TEST(4_Edge2PolygonBooleans)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), e3.outside_part (r2));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), e3.outside_part (r2and3));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au4.gds");
 }
 
-TEST(5_Filters)
+TEST (5_Filters)
 {
   db::Layout ly;
   {
@@ -317,7 +316,7 @@ TEST(5_Filters)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e2.filtered (elf1));
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2.filtered (elf2));
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au5a.gds");
   }
 
@@ -333,12 +332,12 @@ TEST(5_Filters)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e2.filtered (eof1));
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2.filtered (eof2));
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au5b.gds");
   }
 }
 
-TEST(6_Extended)
+TEST (6_Extended)
 {
   db::Layout ly;
   {
@@ -381,11 +380,11 @@ TEST(6_Extended)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), e2e3);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), e2e4);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au6.gds");
 }
 
-TEST(7_Partial)
+TEST (7_Partial)
 {
   db::Layout ly;
   {
@@ -429,11 +428,11 @@ TEST(7_Partial)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), e2f.centers (1000, 0.0));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (33, 0)), e2f.centers (0, 0.2));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au7.gds");
 }
 
-TEST(8_SelectInteracting)
+TEST (8_SelectInteracting)
 {
   db::Layout ly;
   {
@@ -527,11 +526,11 @@ TEST(8_SelectInteracting)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (102, 0)), e3r.selected_interacting (r2r));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (103, 0)), e3r.selected_not_interacting (r2r));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au8.gds");
 }
 
-TEST(9_DRCChecks)
+TEST (9_DRCChecks)
 {
   db::Layout ly;
   {
@@ -574,12 +573,12 @@ TEST(9_DRCChecks)
 
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), e6.enclosing_check (e4, 100, db::EdgesCheckOptions (true, db::Projection, 90, 0)));
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au9.gds");
   }
 }
 
-TEST(10_PullInteracting)
+TEST (10_PullInteracting)
 {
   db::Layout ly;
   {
@@ -654,11 +653,11 @@ TEST(10_PullInteracting)
   e3r.pull_interacting (o, r2r);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (29, 0)), o);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au10.gds");
 }
 
-TEST(11_SelectedInsideWithRegion)
+TEST (11_SelectedInsideWithRegion)
 {
   db::Edges e;
   e.insert (db::Edge (0, 0, 0, 1000));
@@ -722,7 +721,7 @@ TEST(11_SelectedInsideWithRegion)
   EXPECT_EQ (db::compare (eflat.selected_inside_differential (r).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
 }
 
-TEST(12_SelectedInsideWithEdges)
+TEST (12_SelectedInsideWithEdges)
 {
   db::Edges e;
   e.insert (db::Edge (0, 0, 0, 1000));
@@ -790,7 +789,7 @@ TEST(12_SelectedInsideWithEdges)
   EXPECT_EQ (db::compare (eflat.selected_inside_differential (ee).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
 }
 
-TEST(13_SelectedOutsideWithRegion)
+TEST (13_SelectedOutsideWithRegion)
 {
   db::Edges e;
   e.insert (db::Edge (0, 0, 0, 1000));
@@ -854,7 +853,7 @@ TEST(13_SelectedOutsideWithRegion)
   EXPECT_EQ (db::compare (eflat.selected_outside_differential (r).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
 }
 
-TEST(14_SelectedOutsideWithEdges)
+TEST (14_SelectedOutsideWithEdges)
 {
   db::Edges e;
   e.insert (db::Edge (0, 0, 0, 1000));
@@ -922,7 +921,7 @@ TEST(14_SelectedOutsideWithEdges)
   EXPECT_EQ (db::compare (eflat.selected_outside_differential (ee).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
 }
 
-TEST(15_SelectedInteractingWithRegion)
+TEST (15_SelectedInteractingWithRegion)
 {
   db::Edges e;
   e.insert (db::Edge (0, 0, 0, 1000));
@@ -986,7 +985,7 @@ TEST(15_SelectedInteractingWithRegion)
   EXPECT_EQ (db::compare (eflat.selected_interacting_differential (r).second, "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
 }
 
-TEST(16_SelectedInteractingWithEdges)
+TEST (16_SelectedInteractingWithEdges)
 {
   db::Edges e;
   e.insert (db::Edge (0, 0, 0, 1000));
@@ -1054,7 +1053,7 @@ TEST(16_SelectedInteractingWithEdges)
   EXPECT_EQ (db::compare (eflat.selected_interacting_differential (ee).second, "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
 }
 
-TEST(17_InsideOutside)
+TEST (17_InsideOutside)
 {
   db::Edges e;
   e.insert (db::Edge (0, 0, 0, 1000));
@@ -1118,7 +1117,7 @@ TEST(17_InsideOutside)
   EXPECT_EQ (db::compare (eflat.inside_outside_part (r).second, "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
 }
 
-TEST(18_AndNotWithRegion)
+TEST (18_AndNotWithRegion)
 {
   db::Edges e;
   e.insert (db::Edge (0, 0, 0, 1000));
@@ -1182,7 +1181,7 @@ TEST(18_AndNotWithRegion)
   EXPECT_EQ (db::compare (eflat.andnot (r).second, "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
 }
 
-TEST(19_AndNotWithEdges)
+TEST (19_AndNotWithEdges)
 {
   db::Edges e;
   e.insert (db::Edge (0, 0, 0, 1000));
@@ -1250,7 +1249,7 @@ TEST(19_AndNotWithEdges)
   EXPECT_EQ (db::compare (eflat.andnot (ee).second, "(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000);(1700,1500;1600,2500)"), true);
 }
 
-TEST(20_in)
+TEST (20_in)
 {
   db::Layout ly;
   {
@@ -1268,7 +1267,7 @@ TEST(20_in)
 
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
-  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0)); //  empty
 
   db::Edges e1 = db::Edges ((db::Region (db::RecursiveShapeIterator (ly, top_cell, l1), dss)).edges ());
   db::Edges e2 = db::Edges ((db::Region (db::RecursiveShapeIterator (ly, top_cell, l2), dss)).edges ());
@@ -1301,11 +1300,11 @@ TEST(20_in)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), e2r.in (e1r));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), e2r.in (e1r, true));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au20.gds");
 }
 
-TEST(20_in_and_out)
+TEST (20_in_and_out)
 {
   db::Layout ly;
   {
@@ -1323,7 +1322,7 @@ TEST(20_in_and_out)
 
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
-  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0)); //  empty
 
   db::Edges e1 = db::Edges ((db::Region (db::RecursiveShapeIterator (ly, top_cell, l1), dss)).edges ());
   db::Edges e2 = db::Edges ((db::Region (db::RecursiveShapeIterator (ly, top_cell, l2), dss)).edges ());
@@ -1356,22 +1355,22 @@ TEST(20_in_and_out)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), e2r.in_and_out (e1r).first);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), e2r.in_and_out (e1r).second);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au20.gds");
 }
 
-TEST(21_EdgeMergeWithDots)
+TEST (21_EdgeMergeWithDots)
 {
   db::Edges e;
-  e.insert (db::Edge (db::Point(0, 0), db::Point (100, 0)));
-  e.insert (db::Edge (db::Point(110, 0), db::Point (110, 0)));
+  e.insert (db::Edge (db::Point (0, 0), db::Point (100, 0)));
+  e.insert (db::Edge (db::Point (110, 0), db::Point (110, 0)));
 
   db::Edges ee = e;
-  ee.insert (db::Edge (db::Point(100, 0), db::Point (110, 0)));
+  ee.insert (db::Edge (db::Point (100, 0), db::Point (110, 0)));
 
   db::Edges eee;
-  eee.insert (db::Edge (db::Point(110, 0), db::Point (110, 0)));
-  eee.insert (db::Edge (db::Point(110, 0), db::Point (110, 0)));
+  eee.insert (db::Edge (db::Point (110, 0), db::Point (110, 0)));
+  eee.insert (db::Edge (db::Point (110, 0), db::Point (110, 0)));
 
   //  make deep
 
@@ -1402,7 +1401,7 @@ TEST(21_EdgeMergeWithDots)
   EXPECT_EQ (eee.merged ().to_string (), "(110,0;110,0)");
 }
 
-TEST(22_InteractingWithCount)
+TEST (22_InteractingWithCount)
 {
   db::Edges e;
   e.insert (db::Edge (db::Point (0, 0), db::Point (100, 0)));
@@ -1456,56 +1455,56 @@ TEST(22_InteractingWithCount)
 
   EXPECT_EQ (db::compare (e.selected_interacting (e2), "(0,0;200,0);(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
   EXPECT_EQ (db::compare (e.selected_interacting (e2, size_t (2)), "(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
-  EXPECT_EQ (db::compare (e.selected_interacting (e2, size_t (2), size_t(2)), "(0,10;200,10)"), true);
-  EXPECT_EQ (db::compare (e.selected_interacting (e2, size_t (2), size_t(3)), "(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting (e2, size_t (2), size_t (2)), "(0,10;200,10)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting (e2, size_t (2), size_t (3)), "(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
   EXPECT_EQ (db::compare (e.selected_interacting (e2, size_t (3)), "(0,20;200,20);(0,30;200,30)"), true);
   EXPECT_EQ (db::compare (e.selected_interacting (e2, size_t (4)), ""), true);
 
   edup = e;
-  edup.select_interacting (e2, size_t (2), size_t(3));
+  edup.select_interacting (e2, size_t (2), size_t (3));
   EXPECT_EQ (db::compare (edup, "(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
 
   EXPECT_EQ (db::compare (e.selected_not_interacting (e2), ""), true);
   EXPECT_EQ (db::compare (e.selected_not_interacting (e2, size_t (2)), "(0,0;200,0)"), true);
-  EXPECT_EQ (db::compare (e.selected_not_interacting (e2, size_t (2), size_t(2)), "(0,0;200,0);(0,20;200,20);(0,30;200,30)"), true);
-  EXPECT_EQ (db::compare (e.selected_not_interacting (e2, size_t (2), size_t(3)), "(0,0;200,0)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_interacting (e2, size_t (2), size_t (2)), "(0,0;200,0);(0,20;200,20);(0,30;200,30)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_interacting (e2, size_t (2), size_t (3)), "(0,0;200,0)"), true);
   EXPECT_EQ (db::compare (e.selected_not_interacting (e2, size_t (3)), "(0,0;200,0);(0,10;200,10)"), true);
   EXPECT_EQ (db::compare (e.selected_not_interacting (e2, size_t (4)), "(0,0;200,0);(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
 
   edup = e;
-  edup.select_not_interacting (e2, size_t (2), size_t(3));
+  edup.select_not_interacting (e2, size_t (2), size_t (3));
   EXPECT_EQ (db::compare (edup, "(0,0;200,0)"), true);
 
-  EXPECT_EQ (db::compare (e.selected_interacting_differential (e2, size_t (2), size_t(3)).first, "(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
-  EXPECT_EQ (db::compare (e.selected_interacting_differential (e2, size_t (2), size_t(3)).second, "(0,0;200,0)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (e2, size_t (2), size_t (3)).first, "(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (e2, size_t (2), size_t (3)).second, "(0,0;200,0)"), true);
 
   EXPECT_EQ (db::compare (e.selected_interacting (r2), "(0,0;200,0);(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
   EXPECT_EQ (db::compare (e.selected_interacting (r2, size_t (2)), "(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
-  EXPECT_EQ (db::compare (e.selected_interacting (r2, size_t (2), size_t(2)), "(0,10;200,10)"), true);
-  EXPECT_EQ (db::compare (e.selected_interacting (r2, size_t (2), size_t(3)), "(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting (r2, size_t (2), size_t (2)), "(0,10;200,10)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting (r2, size_t (2), size_t (3)), "(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
   EXPECT_EQ (db::compare (e.selected_interacting (r2, size_t (3)), "(0,20;200,20);(0,30;200,30)"), true);
   EXPECT_EQ (db::compare (e.selected_interacting (r2, size_t (4)), ""), true);
 
   edup = e;
-  edup.select_interacting (r2, size_t (2), size_t(3));
+  edup.select_interacting (r2, size_t (2), size_t (3));
   EXPECT_EQ (db::compare (edup, "(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
 
   EXPECT_EQ (db::compare (e.selected_not_interacting (r2), ""), true);
   EXPECT_EQ (db::compare (e.selected_not_interacting (r2, size_t (2)), "(0,0;200,0)"), true);
-  EXPECT_EQ (db::compare (e.selected_not_interacting (r2, size_t (2), size_t(2)), "(0,0;200,0);(0,20;200,20);(0,30;200,30)"), true);
-  EXPECT_EQ (db::compare (e.selected_not_interacting (r2, size_t (2), size_t(3)), "(0,0;200,0)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_interacting (r2, size_t (2), size_t (2)), "(0,0;200,0);(0,20;200,20);(0,30;200,30)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_interacting (r2, size_t (2), size_t (3)), "(0,0;200,0)"), true);
   EXPECT_EQ (db::compare (e.selected_not_interacting (r2, size_t (3)), "(0,0;200,0);(0,10;200,10)"), true);
   EXPECT_EQ (db::compare (e.selected_not_interacting (r2, size_t (4)), "(0,0;200,0);(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
 
   edup = e;
-  edup.select_not_interacting (r2, size_t (2), size_t(3));
+  edup.select_not_interacting (r2, size_t (2), size_t (3));
   EXPECT_EQ (db::compare (edup, "(0,0;200,0)"), true);
 
-  EXPECT_EQ (db::compare (e.selected_interacting_differential (r2, size_t (2), size_t(3)).first, "(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
-  EXPECT_EQ (db::compare (e.selected_interacting_differential (r2, size_t (2), size_t(3)).second, "(0,0;200,0)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (r2, size_t (2), size_t (3)).first, "(0,10;200,10);(0,20;200,20);(0,30;200,30)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (r2, size_t (2), size_t (3)).second, "(0,0;200,0)"), true);
 }
 
-TEST(23_SameInputs)
+TEST (23_SameInputs)
 {
   db::Layout ly;
   {
@@ -1555,7 +1554,7 @@ TEST(23_SameInputs)
   EXPECT_EQ (e2.pull_interacting (e2).to_string (), e2.to_string ());
 }
 
-TEST(deep_edges_and_cheats)
+TEST (deep_edges_and_cheats)
 {
   db::Layout ly;
   {
@@ -1689,6 +1688,6 @@ TEST(deep_edges_and_cheats)
   eo.insert_into (&ly, top_cell_index, l39);
   EXPECT_EQ (dynamic_cast<const db::DeepEdges *> (e1.delegate ())->merged_edges_available (), true);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/cheats_edges_au.gds");
 }

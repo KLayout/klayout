@@ -32,7 +32,7 @@
 namespace bd
 {
 
-int converter_main (int argc, char *argv[], const std::string &format)
+int converter_main (int argc, char *argv [], const std::string &format)
 {
   bd::GenericWriterOptions generic_writer_options;
   bd::GenericReaderOptions generic_reader_options;
@@ -42,7 +42,7 @@ int converter_main (int argc, char *argv[], const std::string &format)
   generic_writer_options.add_options (cmd, format);
   generic_reader_options.add_options (cmd);
 
-  cmd << tl::arg ("input",  &infile,  "The input file (any format, may be gzip compressed)",
+  cmd << tl::arg ("input", &infile, "The input file (any format, may be gzip compressed)",
                   "Multiple files can be combined using '+' or ','. '+' will combine the files in 'blending' mode. "
                   "In this mode it is possible to combine identically named cells into one cell for example. This mode "
                   "needs to be used with care and there some constraints - e.g. the database unit of the involved "
@@ -50,8 +50,7 @@ int converter_main (int argc, char *argv[], const std::string &format)
                   "are merged by first creating two layouts and then combining them into one. This mode is more robust "
                   "but does not allow cell merging. '+' combination has higher priority than ',' - i.e. 'a+b,c' is "
                   "understood as '(a+b),c'.")
-      << tl::arg ("output", &outfile, tl::sprintf ("The output file (%s format)", format))
-    ;
+      << tl::arg ("output", &outfile, tl::sprintf ("The output file (%s format)", format));
 
   cmd.brief (tl::sprintf ("This program will convert the given file to a %s file", format));
 

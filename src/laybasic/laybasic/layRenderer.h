@@ -50,17 +50,17 @@ class CanvasPlane;
  *
  *  The renderer is supposed to render a set of edges to
  *  one or more bitmaps. One bitmap holds the contour
- *  information, one the fill. A third one holds the 
+ *  information, one the fill. A third one holds the
  *  vertex information (dots).
- *  
+ *
  *  The intended use model is first to reserve a number of
  *  points if necessary, the fill the renderer with the
  *  edges and then render the content to the bitmaps.
  *
  *  The coordinate system of the bitmaps is 0,0..w-1,h-1
- *  with 0,0 being the lower left corner. 
+ *  with 0,0 being the lower left corner.
  */
-class LAYBASIC_PUBLIC Renderer 
+class LAYBASIC_PUBLIC Renderer
 {
 public:
   /**
@@ -71,7 +71,7 @@ public:
   /**
    *  @brief The destructor
    */
-  virtual ~Renderer () { }
+  virtual ~Renderer () {}
 
   /**
    *  @brief Control whether draw(db::Shape..) draws precise (does not simplify to box)
@@ -196,7 +196,7 @@ public:
    *  @param texts Currenty not used. Used for drawing properties if drawing of these is required.
    */
   virtual void draw (const db::Shape &shape, const db::CplxTrans &trans,
-                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0; 
+                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
   /**
    *  @brief Render a polygon into a set of bitmaps
@@ -209,19 +209,19 @@ public:
    *  @param texts Currenty not used. No texts to draw.
    */
   virtual void draw (const db::Polygon &poly, const db::CplxTrans &trans,
-                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0; 
+                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
-  /** 
+  /**
    *  @brief Same for double coordinates
    */
   virtual void draw (const db::DPolygon &poly,
-                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0; 
+                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
-  /** 
+  /**
    *  @brief Same for double coordinates and transformation
    */
   virtual void draw (const db::DPolygon &poly, const db::DCplxTrans &trans,
-                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0; 
+                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
   /**
    *  @brief Render a box into a set of bitmaps
@@ -234,25 +234,25 @@ public:
    *  @param texts Currenty not used. No texts to draw.
    */
   virtual void draw (const db::Box &box, const db::CplxTrans &trans,
-                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0; 
+                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
-  /** 
+  /**
    *  @brief Same for short representation
    */
   virtual void draw (const db::ShortBox &box, const db::CplxTrans &trans,
-                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0; 
+                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
-  /** 
+  /**
    *  @brief Same for double coordinates
    */
   virtual void draw (const db::DBox &box,
-                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0; 
+                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
-  /** 
+  /**
    *  @brief Same for double coordinates and transformation
    */
   virtual void draw (const db::DBox &box, const db::DCplxTrans &trans,
-                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0; 
+                     lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
   /**
    *  @brief Render a path into a set of bitmaps
@@ -267,13 +267,13 @@ public:
   virtual void draw (const db::Path &path, const db::CplxTrans &trans,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
-  /** 
+  /**
    *  @brief Same for double coordinates
    */
-  virtual void draw (const db::DPath &path, 
+  virtual void draw (const db::DPath &path,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
-  /** 
+  /**
    *  @brief Same for double coordinates and transformation
    */
   virtual void draw (const db::DPath &path, const db::DCplxTrans &trans,
@@ -292,13 +292,13 @@ public:
   virtual void draw (const db::Text &text, const db::CplxTrans &trans,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
-  /** 
+  /**
    *  @brief Same for double coordinates
    */
   virtual void draw (const db::DText &text,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
-  /** 
+  /**
    *  @brief Same for double coordinates and transformation
    */
   virtual void draw (const db::DText &text, const db::DCplxTrans &trans,
@@ -334,13 +334,13 @@ public:
   virtual void draw (const db::Edge &edge, const db::CplxTrans &trans,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
-  /** 
+  /**
    *  @brief Same for double coordinates
    */
-  virtual void draw (const db::DEdge &edge, 
+  virtual void draw (const db::DEdge &edge,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts) = 0;
 
-  /** 
+  /**
    *  @brief Same for double coordinates and transformation
    */
   virtual void draw (const db::DEdge &edge, const db::DCplxTrans &trans,
@@ -351,7 +351,7 @@ public:
    *
    *  The shape can either be a polygon, box, edge, path or text
    *
-   *  This method draws the properties if "draw_properties" is set to true and/or the 
+   *  This method draws the properties if "draw_properties" is set to true and/or the
    *  "description" property when "draw_description_property" is set to true.
    */
   void draw_propstring (const db::Shape &shape, lay::CanvasPlane *text, const db::CplxTrans &trans);
@@ -381,7 +381,7 @@ public:
   {
     return m_width;
   }
- 
+
   /**
    *  @brief Get the height
    */
@@ -389,7 +389,7 @@ public:
   {
     return m_height;
   }
- 
+
   /**
    *  @brief Get the resolution value
    *
@@ -397,7 +397,7 @@ public:
    *  units. A resolution of 1 means that one canvas unit roughly corresponds to 0.01" (0.25mm).
    *  A resolution value of 2 means that one canvas unit roughly corresponds to 0.02".
    */
-  double resolution () const 
+  double resolution () const
   {
     return m_resolution;
   }
@@ -431,4 +431,3 @@ protected:
 } // namespace lay
 
 #endif
-

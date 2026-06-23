@@ -168,7 +168,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
     os << net_to_string (dev.net_for_terminal (db::DeviceClassMOS3Transistor::terminal_id_G));
     os << " ";
     os << net_to_string (dev.net_for_terminal (db::DeviceClassMOS3Transistor::terminal_id_S));
-      os << " ";
+    os << " ";
 
     if (! mos4) {
       //  we assume for the MOS3 type the bulk is connected to Source
@@ -202,7 +202,6 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
     os << format_name (dev.device_class ()->name ());
     os << " PARAMS:";
     os << format_params (dev);
-
   }
 
   emit_line (os.str ());
@@ -292,7 +291,6 @@ void NetlistSpiceWriter::write (tl::OutputStream &stream, const db::Netlist &net
     mp_netlist = 0;
     mp_delegate->attach_writer (0);
     throw;
-
   }
 }
 
@@ -316,7 +314,7 @@ std::string NetlistSpiceWriter::net_to_string (const db::Net *net) const
       const std::string &n = ni->second;
       std::string nn;
       nn.reserve (n.size () + 1);
-      if (!isalnum (*n.c_str ())) {
+      if (! isalnum (*n.c_str ())) {
         nn += "\\";
       }
       for (const char *cp = n.c_str (); *cp; ++cp) {
@@ -330,7 +328,6 @@ std::string NetlistSpiceWriter::net_to_string (const db::Net *net) const
       }
 
       return nn;
-
     }
 
   } else {
@@ -341,7 +338,6 @@ std::string NetlistSpiceWriter::net_to_string (const db::Net *net) const
     } else {
       return tl::to_string (n->second);
     }
-
   }
 }
 
@@ -430,7 +426,7 @@ void NetlistSpiceWriter::do_write (const std::string &description)
     if (! m_use_net_names) {
 
       for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
-        m_net_to_spice_id.insert (std::make_pair (n.operator-> (), ++m_next_net_id));
+        m_net_to_spice_id.insert (std::make_pair (n.operator->(), ++m_next_net_id));
       }
 
     } else {
@@ -440,7 +436,7 @@ void NetlistSpiceWriter::do_write (const std::string &description)
       for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
         std::string nn = tl::unique_name (n->expanded_name (), names);
         names.insert (nn);
-        m_net_to_spice_name.insert (std::make_pair (n.operator-> (), nn));
+        m_net_to_spice_name.insert (std::make_pair (n.operator->(), nn));
       }
 
       //  determine the next net id for non-connected nets such that there is no clash with
@@ -454,7 +450,6 @@ void NetlistSpiceWriter::do_write (const std::string &description)
           m_next_net_id = std::max (m_next_net_id, num);
         }
       }
-
     }
 
     write_circuit_header (circuit);
@@ -471,18 +466,16 @@ void NetlistSpiceWriter::do_write (const std::string &description)
       }
 
       mp_delegate->write_device (*i);
-
     }
 
     write_circuit_end (circuit);
-
   }
 }
 
 void NetlistSpiceWriter::write_subcircuit_call (const db::SubCircuit &subcircuit) const
 {
   if (m_with_comments) {
-    std::string comment = "cell instance " + subcircuit.expanded_name() + " " + subcircuit.trans ().to_string ();
+    std::string comment = "cell instance " + subcircuit.expanded_name () + " " + subcircuit.trans ().to_string ();
     emit_comment (comment);
   }
 
@@ -527,7 +520,7 @@ void NetlistSpiceWriter::write_circuit_header (const db::Circuit &circuit) const
   if (! m_use_net_names && m_with_comments) {
     for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
       if (! n->name ().empty ()) {
-        emit_comment ("net " + net_to_string (n.operator-> ()) + " " + n->name ());
+        emit_comment ("net " + net_to_string (n.operator->()) + " " + n->name ());
       }
     }
   }

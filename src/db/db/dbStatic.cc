@@ -64,7 +64,7 @@ void set_num_circle_points (unsigned int n)
 }
 
 // -----------------------------------------------------------
-//  undo enable 
+//  undo enable
 
 DB_PUBLIC bool ms_transactions_enabled = true;
 
@@ -74,4 +74,3 @@ void enable_transactions (bool enable)
 }
 
 }
-

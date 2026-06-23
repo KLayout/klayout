@@ -34,7 +34,7 @@
 size_t size (const lay::LayerPropertiesList &list)
 {
   size_t n = 0;
-  for (lay::LayerPropertiesConstIterator i = list.begin_const_recursive (); !i.at_end (); ++i) {
+  for (lay::LayerPropertiesConstIterator i = list.begin_const_recursive (); ! i.at_end (); ++i) {
     ++n;
   }
   return n;
@@ -55,53 +55,65 @@ bool compare_real (const lay::LayerPropertiesList &a, const lay::LayerProperties
     }
     if (! i.at_end () && ! j.at_end ()) {
       if (i->frame_color (true) != j->frame_color (true)) {
-        if (debug) printf ("Difference in frame color at element %d\n", n);
+        if (debug)
+          printf ("Difference in frame color at element %d\n", n);
         return false;
       }
       if (i->fill_color (true) != j->fill_color (true)) {
-        if (debug) printf ("Difference in fill color at element %d\n", n);
+        if (debug)
+          printf ("Difference in fill color at element %d\n", n);
         return false;
       }
       if (i->frame_brightness (true) != j->frame_brightness (true)) {
-        if (debug) printf ("Difference in frame brightness at element %d\n", n);
+        if (debug)
+          printf ("Difference in frame brightness at element %d\n", n);
         return false;
       }
       if (i->fill_brightness (true) != j->fill_brightness (true)) {
-        if (debug) printf ("Difference in fill brightness at element %d\n", n);
+        if (debug)
+          printf ("Difference in fill brightness at element %d\n", n);
         return false;
       }
       if (i->dither_pattern (true) != j->dither_pattern (true)) {
-        if (debug) printf ("Difference in dither pattern at element %d\n", n);
+        if (debug)
+          printf ("Difference in dither pattern at element %d\n", n);
         return false;
       }
       if (i->visible (true) != j->visible (true)) {
-        if (debug) printf ("Difference in visibility at element %d\n", n);
+        if (debug)
+          printf ("Difference in visibility at element %d\n", n);
         return false;
       }
       if (i->transparent (true) != j->transparent (true)) {
-        if (debug) printf ("Difference in transparency at element %d\n", n);
+        if (debug)
+          printf ("Difference in transparency at element %d\n", n);
         return false;
       }
       if (i->width (true) != j->width (true)) {
-        if (debug) printf ("Difference in transparency at element %d\n", n);
+        if (debug)
+          printf ("Difference in transparency at element %d\n", n);
         return false;
       }
       if (i->marked (true) != j->marked (true)) {
-        if (debug) printf ("Difference in marked state at element %d\n", n);
+        if (debug)
+          printf ("Difference in marked state at element %d\n", n);
         return false;
       }
       if (i->animation (true) != j->animation (true)) {
-        if (debug) printf ("Difference in animation mode at element %d\n", n);
+        if (debug)
+          printf ("Difference in animation mode at element %d\n", n);
         return false;
       }
       if (i->source (true) != j->source (true)) {
-        if (debug) printf ("Difference in source at element %d\n", n);
+        if (debug)
+          printf ("Difference in source at element %d\n", n);
         return false;
       }
     } else if (i.at_end () && j.at_end ()) {
       return true;
     } else {
-      if (debug) printf ("Length differs\n");
+      if (debug)
+        printf ("Length differs\n");
       return false;
     }
     ++i;
@@ -892,7 +904,7 @@ TEST (9)
   EXPECT_EQ (size (list), size_t (8));
 
   size_t n, nn;
-  
+
   lay::LayerPropertiesIterator end = list.begin_recursive ();
   while (! end.at_end ()) {
     ++end;
@@ -962,7 +974,7 @@ TEST (10)
 
   while (size (list) > 0) {
     lay::LayerPropertiesIterator iter = list.begin_recursive ();
-    for (unsigned int i = 0; i < size(list) - 1; ++i) {
+    for (unsigned int i = 0; i < size (list) - 1; ++i) {
       ++iter;
     }
     nodes.push_back (*iter);
@@ -998,11 +1010,9 @@ TEST (10)
   }
 
   EXPECT_EQ (list == org_list, true);
-
 }
 
-void
-build_list (lay::LayerPropertiesConstIterator &iter, lay::LayerPropertiesList &list, lay::LayerPropertiesNode *node)
+void build_list (lay::LayerPropertiesConstIterator &iter, lay::LayerPropertiesList &list, lay::LayerPropertiesNode *node)
 {
   while (! iter.at_end ()) {
     lay::LayerProperties props (*iter);
@@ -1066,11 +1076,9 @@ TEST (11)
   EXPECT_EQ (iter.at_end (), true);
 
   EXPECT_EQ (list == new_list, true);
-
 }
 
-void
-test_list (tl::TestBase *_this, lay::LayerPropertiesConstIterator &iter)
+void test_list (tl::TestBase *_this, lay::LayerPropertiesConstIterator &iter)
 {
   lay::LayerPropertiesConstIterator i0 (iter);
   size_t nc = 0;
@@ -1157,8 +1165,8 @@ TEST (13)
   const lay::LayerPropertiesNode &node = *iter;
   lay::LayerProperties flat = node.flat ();
 
-  EXPECT_EQ (node.animation (false /*local*/), 0);  
-  EXPECT_EQ (node.animation (true /*real*/), 2);  
+  EXPECT_EQ (node.animation (false /*local*/), 0);
+  EXPECT_EQ (node.animation (true /*real*/), 2);
 
   EXPECT_EQ (flat.animation (false /*local*/), 2);
   EXPECT_EQ (flat.animation (true /*real*/), 2);
@@ -1229,8 +1237,8 @@ TEST (14)
   EXPECT_EQ (iter->has_children (), false);
 
   const lay::LayerPropertiesNode &node = *iter;
-  EXPECT_EQ (node.animation (false /*local*/), 0);  
-  EXPECT_EQ (node.animation (true /*real*/), 2);  
+  EXPECT_EQ (node.animation (false /*local*/), 0);
+  EXPECT_EQ (node.animation (true /*real*/), 2);
 
   lay::LayerProperties f = node.flat ();
   lay::LayerProperties flat (f);
@@ -1295,9 +1303,9 @@ TEST (15)
   ++iter;
   list.insert (iter, n2);
 
-  EXPECT_EQ (list.begin ()[0].id (), id);
-  EXPECT_EQ (list.begin ()[1].id (), n2.id ());
-  EXPECT_EQ (list.begin ()[2].id (), nn.id ());
+  EXPECT_EQ (list.begin () [0].id (), id);
+  EXPECT_EQ (list.begin () [1].id (), n2.id ());
+  EXPECT_EQ (list.begin () [2].id (), nn.id ());
 }
 
 TEST (16)
@@ -1344,8 +1352,7 @@ TEST (16)
     "  <source>1/0@1</source>\n"
     " </properties>\n"
     " <name/>\n"
-    "</layer-properties>\n"
-  );
+    "</layer-properties>\n");
 
   lay::LayerPropertiesList ref;
   ref.load (s);
@@ -1411,8 +1418,7 @@ TEST (17)
     "  <source>2/0@1</source>\n"
     " </properties>\n"
     " <name/>\n"
-    "</layer-properties>\n"
-  );
+    "</layer-properties>\n");
 
   lay::LayerPropertiesList ref;
   ref.load (s);
@@ -1479,8 +1485,7 @@ TEST (18)
     "  <source>2/0@1</source>\n"
     " </properties>\n"
     " <name/>\n"
-    "</layer-properties>\n"
-  );
+    "</layer-properties>\n");
 
   lay::LayerPropertiesList ref;
   ref.load (s);
@@ -1548,8 +1553,7 @@ TEST (19)
     "  <source>L02 2/0@1 (r90 *1 0,0)</source>\n"
     " </properties>\n"
     " <name/>\n"
-    "</layer-properties>\n"
-  );
+    "</layer-properties>\n");
 
   lay::LayerPropertiesList ref;
   ref.load (s);
@@ -1620,8 +1624,7 @@ TEST (20)
     "  <source>L02 2/0@1 (r90 *1 0,0)</source>\n"
     " </properties>\n"
     " <name/>\n"
-    "</layer-properties>\n"
-  );
+    "</layer-properties>\n");
 
   lay::LayerPropertiesList ref;
   ref.load (s);
@@ -1691,12 +1694,10 @@ TEST (21)
     "  <source>L02 2/0@1 (r90 *1 0,0)</source>\n"
     " </properties>\n"
     " <name/>\n"
-    "</layer-properties>\n"
-  );
+    "</layer-properties>\n");
 
   lay::LayerPropertiesList ref;
   ref.load (s);
 
   EXPECT_EQ (compare_real (ref, list), true);
 }
-

@@ -49,7 +49,7 @@ ShapePropertiesPage::ShapePropertiesPage (const std::string &description, edt::S
 {
   m_selection_ptrs.reserve (service->selection_size ());
   for (edt::EditableSelectionIterator s = service->begin_selection (); ! s.at_end (); ++s) {
-    m_selection_ptrs.push_back (s.operator-> ());
+    m_selection_ptrs.push_back (s.operator->());
   }
   m_prop_id = 0;
   mp_service->clear_highlights ();
@@ -60,8 +60,7 @@ ShapePropertiesPage::~ShapePropertiesPage ()
   mp_service->restore_highlights ();
 }
 
-void 
-ShapePropertiesPage::setup ()
+void ShapePropertiesPage::setup ()
 {
   m_enable_cb_callback = false;
 
@@ -84,8 +83,7 @@ ShapePropertiesPage::count () const
   return m_selection_ptrs.size ();
 }
 
-void
-ShapePropertiesPage::select_entries (const std::vector<size_t> &entries)
+void ShapePropertiesPage::select_entries (const std::vector<size_t> &entries)
 {
   m_indexes = entries;
 }
@@ -127,15 +125,14 @@ ShapePropertiesPage::description (size_t entry) const
   return std::string ();
 }
 
-QIcon
-ShapePropertiesPage::icon (size_t entry, int w, int h) const
+QIcon ShapePropertiesPage::icon (size_t entry, int w, int h) const
 {
   int cv_index = m_selection_ptrs [entry]->cv_index ();
   int layer = m_selection_ptrs [entry]->layer ();
 
   auto *view = mp_service->view ();
   for (auto lp = view->begin_layers (view->current_layer_list ()); ! lp.at_end (); ++lp) {
-    const lay::LayerPropertiesNode *ln = lp.operator-> ();
+    const lay::LayerPropertiesNode *ln = lp.operator->();
     if (ln->cellview_index () == cv_index && ln->layer_index () == layer) {
       return QIcon (QPixmap::fromImage (view->icon_for_layer (lp, w, h).to_image_copy ()));
     }
@@ -150,8 +147,7 @@ ShapePropertiesPage::description () const
   return m_description;
 }
 
-void
-ShapePropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
+void ShapePropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
 {
   std::vector<lay::ObjectInstPath> new_selection;
   for (auto i = remaining_entries.begin (); i != remaining_entries.end (); ++i) {
@@ -163,27 +159,24 @@ ShapePropertiesPage::confine_selection (const std::vector<size_t> &remaining_ent
   m_selection_ptrs.clear ();
   m_selection_ptrs.reserve (mp_service->selection_size ());
   for (edt::EditableSelectionIterator s = mp_service->begin_selection (); ! s.at_end (); ++s) {
-    m_selection_ptrs.push_back (s.operator-> ());
+    m_selection_ptrs.push_back (s.operator->());
   }
 
   m_prop_id = 0;
   mp_service->clear_highlights ();
 }
 
-void
-ShapePropertiesPage::leave ()
+void ShapePropertiesPage::leave ()
 {
   mp_service->clear_highlights ();
 }
 
-bool 
-ShapePropertiesPage::dbu_units () const
+bool ShapePropertiesPage::dbu_units () const
 {
   return dbu_checkbox ()->isChecked ();
 }
 
-bool 
-ShapePropertiesPage::abs_trans () const
+bool ShapePropertiesPage::abs_trans () const
 {
   return abs_checkbox ()->isChecked ();
 }
@@ -192,16 +185,15 @@ db::ICplxTrans
 ShapePropertiesPage::trans () const
 {
   if (abs_trans () && ! m_indexes.empty ()) {
-    return m_selection_ptrs[m_indexes.front ()]->trans ();
+    return m_selection_ptrs [m_indexes.front ()]->trans ();
   } else {
     return db::ICplxTrans ();
   }
 }
 
-void 
-ShapePropertiesPage::display_mode_changed (bool)
+void ShapePropertiesPage::display_mode_changed (bool)
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (! m_enable_cb_callback) {
     return;
@@ -209,11 +201,10 @@ BEGIN_PROTECTED
 
   update_shape ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-ShapePropertiesPage::current_layer_changed ()
+void ShapePropertiesPage::current_layer_changed ()
 {
   if (m_enable_cb_callback) {
     try {
@@ -224,8 +215,7 @@ ShapePropertiesPage::current_layer_changed ()
   }
 }
 
-void 
-ShapePropertiesPage::update ()
+void ShapePropertiesPage::update ()
 {
   std::set<const lay::ObjectInstPath *> highlights;
   for (auto i = m_indexes.begin (); i != m_indexes.end (); ++i) {
@@ -236,13 +226,12 @@ ShapePropertiesPage::update ()
   update_shape ();
 }
 
-void 
-ShapePropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInstPath> &new_sel)
+void ShapePropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInstPath> &new_sel)
 {
   std::map<lay::ObjectInstPath, EditableSelectionIterator::pointer> ptrs;
 
   for (EditableSelectionIterator pos = mp_service->begin_selection (); ! pos.at_end (); ++pos) {
-    ptrs.insert (std::make_pair (*pos, pos.operator-> ()));
+    ptrs.insert (std::make_pair (*pos, pos.operator->()));
   }
 
   m_selection_ptrs.clear ();
@@ -253,8 +242,7 @@ ShapePropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInst
   }
 }
 
-void 
-ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
+void ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
 {
   if (m_indexes.empty ()) {
     return;
@@ -311,12 +299,10 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
         sp->apply_change (other_applicator.get (), cv_index, current_only, relative, commit);
       }
     }
-
   }
 }
 
-void
-ShapePropertiesPage::apply_change (const ChangeApplicator *applicator, unsigned int cv_index, bool current_only, bool relative, bool commit)
+void ShapePropertiesPage::apply_change (const ChangeApplicator *applicator, unsigned int cv_index, bool current_only, bool relative, bool commit)
 {
   if (m_indexes.empty ()) {
     return;
@@ -375,7 +361,7 @@ ShapePropertiesPage::apply_change (const ChangeApplicator *applicator, unsigned 
         db::Shapes &shapes = layout.cell (pos->cell_index ()).shapes (pos->layer ());
         double dbu = layout.dbu ();
 
-        if (!current_only || pos->shape () == current) {
+        if (! current_only || pos->shape () == current) {
           new_shape = applicator->do_apply (shapes, pos->shape (), dbu, pos->cv_index (), pos->layer (), relative_mode);
         }
 
@@ -388,29 +374,26 @@ ShapePropertiesPage::apply_change (const ChangeApplicator *applicator, unsigned 
       if (new_shape != pos->shape ()) {
 
         //  change selection to new shape
-        new_sel[index].set_shape (new_shape);
-        new_sel[index].set_layer (new_shape.layer ());
+        new_sel [index].set_shape (new_shape);
+        new_sel [index].set_layer (new_shape.layer ());
 
         mp_service->select (*pos, lay::Editable::Reset);
-        mp_service->select (new_sel[index], lay::Editable::Add);
+        mp_service->select (new_sel [index], lay::Editable::Add);
 
         update_required = true;
-
       }
 
       //  handle the case of guiding shape updates
-      std::pair<bool, lay::ObjectInstPath> gs = mp_service->handle_guiding_shape_changes (new_sel[index], commit);
+      std::pair<bool, lay::ObjectInstPath> gs = mp_service->handle_guiding_shape_changes (new_sel [index], commit);
       if (gs.first) {
 
-        new_sel[index] = gs.second;
+        new_sel [index] = gs.second;
 
         mp_service->select (*pos, lay::Editable::Reset);
-        mp_service->select (new_sel[index], lay::Editable::Add);
+        mp_service->select (new_sel [index], lay::Editable::Add);
 
         update_required = true;
-
       }
-
     }
 
     if (update_required) {
@@ -427,26 +410,22 @@ ShapePropertiesPage::apply_change (const ChangeApplicator *applicator, unsigned 
   update ();
 }
 
-void 
-ShapePropertiesPage::apply (bool commit)
+void ShapePropertiesPage::apply (bool commit)
 {
   do_apply (true, false, commit);
 }
 
-bool
-ShapePropertiesPage::can_apply_to_all () const
+bool ShapePropertiesPage::can_apply_to_all () const
 {
   return true;
 }
 
-void 
-ShapePropertiesPage::apply_to_all (bool relative, bool commit)
+void ShapePropertiesPage::apply_to_all (bool relative, bool commit)
 {
   do_apply (false, relative, commit);
 }
 
-void 
-ShapePropertiesPage::update_shape ()
+void ShapePropertiesPage::update_shape ()
 {
   if (m_indexes.empty ()) {
     return;
@@ -485,8 +464,7 @@ ShapePropertiesPage::update_shape ()
   do_update (pos->shape (), dbu);
 }
 
-void
-ShapePropertiesPage::show_inst ()
+void ShapePropertiesPage::show_inst ()
 {
   if (m_indexes.empty ()) {
     return;
@@ -496,8 +474,7 @@ ShapePropertiesPage::show_inst ()
   inst_form.show (mp_service->view (), *m_selection_ptrs [m_indexes.front ()]);
 }
 
-void
-ShapePropertiesPage::show_props ()
+void ShapePropertiesPage::show_props ()
 {
   if (m_indexes.empty ()) {
     return;
@@ -509,8 +486,7 @@ ShapePropertiesPage::show_props ()
   }
 }
 
-bool 
-ShapePropertiesPage::readonly ()
+bool ShapePropertiesPage::readonly ()
 {
   return ! mp_service->view ()->is_editable ();
 }
@@ -567,8 +543,7 @@ PolygonPropertiesPage::description (size_t entry) const
   }
 }
 
-void
-PolygonPropertiesPage::do_update (const db::Shape &shape, double dbu)
+void PolygonPropertiesPage::do_update (const db::Shape &shape, double dbu)
 {
   db::Polygon poly;
   shape.polygon (poly);
@@ -597,7 +572,6 @@ PolygonPropertiesPage::do_update (const db::Shape &shape, double dbu)
       ptlist += "\n";
       ptlist += coords_to_string (t * *pt, dbu, du);
     }
-
   }
 
   if (! m_in_text_changed) {
@@ -609,8 +583,7 @@ PolygonPropertiesPage::do_update (const db::Shape &shape, double dbu)
   pointCountLabel->setText (tl::to_qstring (tl::sprintf (tl::to_string (QObject::tr ("(%lu points)")), poly.vertices ())));
 }
 
-void
-PolygonPropertiesPage::text_changed ()
+void PolygonPropertiesPage::text_changed ()
 {
   m_in_text_changed = true;
   try {
@@ -646,7 +619,7 @@ PolygonPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Sha
       unsigned int h = 0;
       while (! ex.at_end ()) {
 
-        std::vector <db::Point> points;
+        std::vector<db::Point> points;
 
         while (! ex.at_end () && ! ex.test ("/")) {
 
@@ -657,7 +630,6 @@ PolygonPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Sha
           ex.test (";");
 
           points.push_back (point_from_dpoint (db::DPoint (dx, dy), dbu, du, t));
-
         }
 
         if (points.size () < 3) {
@@ -671,9 +643,7 @@ PolygonPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Sha
         }
 
         ++h;
-
       }
-
     }
 
     lay::indicate_error (pointListEdit, (tl::Exception *) 0);
@@ -725,7 +695,6 @@ BoxPropertiesPage::BoxPropertiesPage (edt::Service *service, db::Manager *manage
     h_le_2->setReadOnly (true);
     cx_le_2->setReadOnly (true);
     cy_le_2->setReadOnly (true);
-
   }
 
   connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
@@ -740,8 +709,7 @@ BoxPropertiesPage::description (size_t entry) const
   return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Box%s")), (dbu_trans * sh.box ()).to_string ());
 }
 
-void
-BoxPropertiesPage::do_update (const db::Shape &shape, double dbu)
+void BoxPropertiesPage::do_update (const db::Shape &shape, double dbu)
 {
   m_dbu = dbu;
   m_lr_swapped = false;
@@ -771,7 +739,7 @@ BoxPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape &
   }
 }
 
-db::Box 
+db::Box
 BoxPropertiesPage::get_box (int mode) const
 {
   if (mode == 0) {
@@ -823,10 +791,10 @@ BoxPropertiesPage::get_box (int mode) const
     }
 
     if (x1 > x2 + 1e-6) {
-      m_lr_swapped = !m_lr_swapped;
+      m_lr_swapped = ! m_lr_swapped;
     }
     if (y1 > y2 + 1e-6) {
-      m_tb_swapped = !m_tb_swapped;
+      m_tb_swapped = ! m_tb_swapped;
     }
 
     db::VCplxTrans t = db::VCplxTrans (trans ().inverted ());
@@ -879,12 +847,10 @@ BoxPropertiesPage::get_box (int mode) const
     bool du = dbu_units ();
 
     return db::Box (point_from_dpoint (db::DPoint (cx - w * 0.5, cy - h * 0.5), m_dbu, du, t), point_from_dpoint (db::DPoint (cx + w * 0.5, cy + h * 0.5), m_dbu, du, t));
-
   }
 }
 
-void
-BoxPropertiesPage::set_box (const db::Box &box)
+void BoxPropertiesPage::set_box (const db::Box &box)
 {
   if (m_recursion_sentinel) {
     return;
@@ -921,8 +887,7 @@ BoxPropertiesPage::set_box (const db::Box &box)
   m_recursion_sentinel = false;
 }
 
-void 
-BoxPropertiesPage::changed ()
+void BoxPropertiesPage::changed ()
 {
   s_coordinateMode = (mode_tab->currentIndex () == 0);
 
@@ -953,7 +918,6 @@ PointPropertiesPage::PointPropertiesPage (edt::Service *service, db::Manager *ma
 
     x_le->setReadOnly (true);
     y_le->setReadOnly (true);
-
   }
 
   connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
@@ -968,8 +932,7 @@ PointPropertiesPage::description (size_t entry) const
   return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Point%s")), (dbu_trans * sh.point ()).to_string ());
 }
 
-void
-PointPropertiesPage::do_update (const db::Shape &shape, double dbu)
+void PointPropertiesPage::do_update (const db::Shape &shape, double dbu)
 {
   m_dbu = dbu;
 
@@ -1027,8 +990,7 @@ PointPropertiesPage::get_point () const
   return point_from_dpoint (db::DPoint (x, y), m_dbu, du, t);
 }
 
-void
-PointPropertiesPage::set_point (const db::Point &point)
+void PointPropertiesPage::set_point (const db::Point &point)
 {
   db::CplxTrans t = db::CplxTrans (trans ());
   db::DPoint pt = db::DPoint (t (point));
@@ -1039,8 +1001,7 @@ PointPropertiesPage::set_point (const db::Point &point)
   y_le->setText (tl::to_qstring (coord_to_string (pt.y (), m_dbu, du)));
 }
 
-void
-PointPropertiesPage::changed ()
+void PointPropertiesPage::changed ()
 {
   try {
     set_point (get_point ());
@@ -1081,7 +1042,6 @@ TextPropertiesPage::TextPropertiesPage (edt::Service *service, db::Manager *mana
     orient_cbx->setEnabled (false);
     halign_cbx->setEnabled (false);
     valign_cbx->setEnabled (false);
-
   }
 }
 
@@ -1095,8 +1055,7 @@ TextPropertiesPage::description (size_t entry) const
   return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Text%s")), (dbu_trans * text).to_string ());
 }
 
-void
-TextPropertiesPage::do_update (const db::Shape &shape, double dbu)
+void TextPropertiesPage::do_update (const db::Shape &shape, double dbu)
 {
   db::Text text;
   shape.text (text);
@@ -1245,8 +1204,7 @@ PathPropertiesPage::description (size_t entry) const
   return ShapePropertiesPage::description (entry) + " - " + path_description (shape (entry), dbu (entry));
 }
 
-void
-PathPropertiesPage::do_update (const db::Shape &shape, double dbu)
+void PathPropertiesPage::do_update (const db::Shape &shape, double dbu)
 {
   db::Path path;
   shape.path (path);
@@ -1311,7 +1269,7 @@ EditablePathPropertiesPage::EditablePathPropertiesPage (edt::Service *service, d
   connect (type_cb, SIGNAL (activated (int)), this, SIGNAL (edited ()));
 }
 
-static int 
+static int
 path_type_choice (const db::Path &path)
 {
   db::Coord w = path.width ();
@@ -1329,8 +1287,7 @@ path_type_choice (const db::Path &path)
   }
 }
 
-void
-EditablePathPropertiesPage::text_changed ()
+void EditablePathPropertiesPage::text_changed ()
 {
   m_in_text_changed = true;
   try {
@@ -1347,8 +1304,7 @@ EditablePathPropertiesPage::description (size_t entry) const
   return ShapePropertiesPage::description (entry) + " - " + path_description (shape (entry), dbu (entry));
 }
 
-void
-EditablePathPropertiesPage::do_update (const db::Shape &shape, double dbu)
+void EditablePathPropertiesPage::do_update (const db::Shape &shape, double dbu)
 {
   db::Path path;
   shape.path (path);
@@ -1404,7 +1360,7 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
   std::string text (tl::to_string (ptlist_le->toPlainText ()));
   tl::Extractor ex (text.c_str ());
 
-  std::vector <db::Point> points;
+  std::vector<db::Point> points;
 
   try {
 
@@ -1415,7 +1371,6 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
       ex.read (dy);
 
       points.push_back (point_from_dpoint (db::DPoint (dx, dy), dbu, du, t));
-
     }
 
     if (points.size () < 1) {
@@ -1442,9 +1397,9 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
   switch (type_cb->currentIndex ()) {
   case 0: // flush
     break;
-  case 1: // square
-  case 3: // round
-    se = ee = std::numeric_limits <db::Coord>::min ();  //  force to half width
+  case 1:                                             // square
+  case 3:                                             // round
+    se = ee = std::numeric_limits<db::Coord>::min (); //  force to half width
     break;
   case 2: // variable
     try {
@@ -1462,13 +1417,13 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
       has_error = true;
     }
     break;
-  } 
+  }
 
   std::unique_ptr<CombinedChangeApplicator> appl (new CombinedChangeApplicator ());
 
   db::Path org_path;
   shape.path (org_path);
-  std::vector <db::Point> org_points;
+  std::vector<db::Point> org_points;
   for (db::Path::iterator p = org_path.begin (); p != org_path.end (); ++p) {
     org_points.push_back (*p);
   }
@@ -1480,7 +1435,7 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
     appl->add (new PathWidthChangeApplicator (w, org_path.width ()));
   }
 
-  if (type_cb->currentIndex () != path_type_choice (org_path) || 
+  if (type_cb->currentIndex () != path_type_choice (org_path) ||
       (type_cb->currentIndex () == 2 && (se != org_path.extensions ().first || ee != org_path.extensions ().second))) {
     appl->add (new PathStartExtensionChangeApplicator (se));
     appl->add (new PathEndExtensionChangeApplicator (ee));
@@ -1494,8 +1449,7 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
   return appl.release ();
 }
 
-void
-EditablePathPropertiesPage::type_selected (int t)
+void EditablePathPropertiesPage::type_selected (int t)
 {
   start_ext_le->setEnabled (t == 2);
   end_ext_le->setEnabled (t == 2);

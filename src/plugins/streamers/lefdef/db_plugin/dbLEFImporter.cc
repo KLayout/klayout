@@ -58,7 +58,7 @@ LEFImporter::layer_ext (const std::string &layer, double def_ext) const
 std::pair<double, double>
 LEFImporter::min_layer_width (const std::string &layer) const
 {
-  std::map<std::string, std::pair<double, double> >::const_iterator l = m_min_widths.find (layer);
+  std::map<std::string, std::pair<double, double>>::const_iterator l = m_min_widths.find (layer);
   if (l != m_min_widths.end ()) {
     return l->second;
   } else {
@@ -69,9 +69,9 @@ LEFImporter::min_layer_width (const std::string &layer) const
 std::pair<double, double>
 LEFImporter::layer_width (const std::string &layer, const std::string &nondefaultrule, const std::pair<double, double> &def_width) const
 {
-  std::map<std::string, std::map<std::string, std::pair<double, double> > >::const_iterator nd = m_nondefault_widths.find (nondefaultrule);
+  std::map<std::string, std::map<std::string, std::pair<double, double>>>::const_iterator nd = m_nondefault_widths.find (nondefaultrule);
 
-  std::map<std::string, std::pair<double, double> >::const_iterator l;
+  std::map<std::string, std::pair<double, double>>::const_iterator l;
   bool has_width = false;
 
   if (! nondefaultrule.empty () && nd != m_nondefault_widths.end ()) {
@@ -95,7 +95,7 @@ LEFImporter::layer_width (const std::string &layer, const std::string &nondefaul
   }
 }
 
-std::vector <db::Trans> 
+std::vector<db::Trans>
 LEFImporter::get_iteration (double dbu)
 {
   test ("DO");
@@ -107,7 +107,7 @@ LEFImporter::get_iteration (double dbu)
   double dx = get_double ();
   double dy = get_double ();
 
-  std::vector <db::Trans> t;
+  std::vector<db::Trans> t;
   for (long i = 0; i < nx; ++i) {
     for (long j = 0; j < ny; ++j) {
       t.push_back (db::Trans (db::Vector (db::DVector (dx * i / dbu, dy * j / dbu))));
@@ -156,8 +156,7 @@ static db::Box box_for_label (const db::Path &p)
   }
 }
 
-void
-LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, LayerPurpose purpose, std::map<std::string, db::Box> *collect_boxes_for_labels, db::properties_id_type prop_id)
+void LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, LayerPurpose purpose, std::map<std::string, db::Box> *collect_boxes_for_labels, db::properties_id_type prop_id)
 {
   std::string layer_name;
   double w = 0.0;
@@ -176,7 +175,7 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
       layer_name = get ();
 
       w = 0.0;
-      std::map<std::string, std::pair<double, double> >::const_iterator dw = m_default_widths.find (layer_name);
+      std::map<std::string, std::pair<double, double>>::const_iterator dw = m_default_widths.find (layer_name);
       if (dw != m_default_widths.end ()) {
         w = dw->second.first;
       }
@@ -232,9 +231,7 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
           if (collect_boxes_for_labels) {
             collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = box_for_label (p);
           }
-
         }
-
       }
 
       expect (";");
@@ -280,9 +277,7 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
           if (collect_boxes_for_labels) {
             collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = box_for_label (p);
           }
-
         }
-
       }
 
       expect (";");
@@ -305,7 +300,6 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
         double y = get_double ();
         points.push_back (db::Point (db::DPoint (x / dbu, y / dbu)));
         test (")");
-
       }
 
       if (lg) {
@@ -330,9 +324,7 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
           if (collect_boxes_for_labels) {
             collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = b;
           }
-
         }
-
       }
 
       expect (";");
@@ -378,9 +370,7 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
         } else {
 
           lg->add_via (vn, db::Trans (points [0]), mask_bottom, mask_cut, mask_top);
-
         }
-
       }
 
       expect (";");
@@ -394,12 +384,10 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
       //  stop at unknown token
       break;
     }
-
   }
 }
 
-void
-LEFImporter::read_nondefaultrule (db::Layout &layout)
+void LEFImporter::read_nondefaultrule (db::Layout &layout)
 {
   //  read NONDEFAULTRULE sections
   std::string n = get ();
@@ -415,7 +403,7 @@ LEFImporter::read_nondefaultrule (db::Layout &layout)
         if (test ("WIDTH")) {
           double w = get_double ();
           test (";");
-          m_nondefault_widths[n][l] = std::make_pair (w, w);
+          m_nondefault_widths [n][l] = std::make_pair (w, w);
         } else {
           skip_entry ();
         }
@@ -441,16 +429,13 @@ LEFImporter::read_nondefaultrule (db::Layout &layout)
         //  read over lines we do not need
         skip_entry ();
       }
-
     }
-
   }
 
   test (n);
 }
 
-void
-LEFImporter::read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &via_desc, const std::string & /*n*/, double dbu)
+void LEFImporter::read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &via_desc, const std::string & /*n*/, double dbu)
 {
   while (! at_end () && ! test ("END")) {
 
@@ -537,9 +522,7 @@ LEFImporter::read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &via_desc, 
       while (! at_end () && ! test (";")) {
         take ();
       }
-
     }
-
   }
 }
 
@@ -551,8 +534,7 @@ via_size (double dbu, const Shape &shape)
   return db::DVector (box.width () * dbu, box.height () * dbu);
 }
 
-void
-LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc &via_desc, const std::string &n, double dbu)
+void LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc &via_desc, const std::string &n, double dbu)
 {
   std::string layer_name;
   std::set<std::string> seen_layers;
@@ -653,14 +635,13 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc 
       //  stop at unknown token
       break;
     }
-
   }
 
   //  determine m1 and m2 layers
 
   if (routing_layers.size () == 2) {
-    via_desc.m1 = routing_layers[0];
-    via_desc.m2 = routing_layers[1];
+    via_desc.m1 = routing_layers [0];
+    via_desc.m2 = routing_layers [1];
   } else {
     warn (tl::to_string (tr ("Can't determine routing layers for via: ")) + n);
   }
@@ -670,14 +651,13 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc 
   expect ("END");
 }
 
-void
-LEFImporter::read_viadef (Layout &layout, const std::string &nondefaultrule)
+void LEFImporter::read_viadef (Layout &layout, const std::string &nondefaultrule)
 {
   std::string n = get ();
 
-  ViaDesc &via_desc = m_vias[n];
+  ViaDesc &via_desc = m_vias [n];
 
-  while (test ("DEFAULT") || test ("TOPOFSTACKONLY") || test("GENERATED"))
+  while (test ("DEFAULT") || test ("TOPOFSTACKONLY") || test ("GENERATED"))
     ;
   test (";");
 
@@ -756,21 +736,17 @@ read_width_property (const std::string &name, const std::string &value, double &
             w = wmin = v;
           }
         }
-
       }
 
       while (! ex.at_end () && *ex != ';') {
         ++ex;
       }
       ex.test (";");
-
     }
-
   }
 }
 
-void
-LEFImporter::read_layer (Layout & /*layout*/)
+void LEFImporter::read_layer (Layout & /*layout*/)
 {
   std::string ln = get ();
   double wmin = 0.0, wmin_wrongdir = 0.0;
@@ -864,7 +840,6 @@ LEFImporter::read_layer (Layout & /*layout*/)
     }
 
     m_default_widths.insert (std::make_pair (ln, std::make_pair (w, w_wrongdir)));
-
   }
 
   if (wmin > 0.0 || wmin_wrongdir > 0.0) {
@@ -876,12 +851,10 @@ LEFImporter::read_layer (Layout & /*layout*/)
     }
 
     m_min_widths.insert (std::make_pair (ln, std::make_pair (wmin, wmin_wrongdir)));
-
   }
 }
 
-void
-LEFImporter::read_macro (Layout &layout)
+void LEFImporter::read_macro (Layout &layout)
 {
   std::string mn = get ();
 
@@ -961,10 +934,10 @@ LEFImporter::read_macro (Layout &layout)
               prop_id = db::properties_id (props);
             }
 
-            std::map <std::string, db::Box> boxes_for_labels;
+            std::map<std::string, db::Box> boxes_for_labels;
             read_geometries (mg, layout.dbu (), LEFPins, &boxes_for_labels, prop_id);
 
-            for (std::map <std::string, db::Box>::const_iterator b = boxes_for_labels.begin (); b != boxes_for_labels.end (); ++b) {
+            for (std::map<std::string, db::Box>::const_iterator b = boxes_for_labels.begin (); b != boxes_for_labels.end (); ++b) {
               if (! b->second.empty ()) {
                 mg->add_text (b->first, LEFLabel, db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())), 0, 0);
               }
@@ -1017,7 +990,6 @@ LEFImporter::read_macro (Layout &layout)
         if (foreign_name != mn) {
           warn (tl::to_string (tl::sprintf (tl::to_string (tr ("FOREIGN name %s differs from MACRO %s")), foreign_name, mn)));
         }
-
       }
 
     } else if (test ("OBS")) {
@@ -1070,9 +1042,7 @@ LEFImporter::read_macro (Layout &layout)
         //  read over lines we do not need
         skip_entry ();
       }
-
     }
-
   }
 
   mg->add_box (std::string (), Outline, db::Box (-origin, -origin + size), 0, 0);
@@ -1088,8 +1058,7 @@ LEFImporter::read_macro (Layout &layout)
   reset_cellname ();
 }
 
-void 
-LEFImporter::do_read (db::Layout &layout)
+void LEFImporter::do_read (db::Layout &layout)
 {
   db::LayoutLocker locker (&layout);
 
@@ -1106,7 +1075,7 @@ LEFImporter::do_read (db::Layout &layout)
 
     } else if (test ("VERSION")) {
 
-      //  ignore VERSION statement currently 
+      //  ignore VERSION statement currently
       take ();
       expect (";");
 
@@ -1247,22 +1216,18 @@ LEFImporter::do_read (db::Layout &layout)
 
       //  read over entries we do not need
       skip_entry ();
-
     }
-
   }
 }
 
-void
-LEFImporter::skip_entry ()
+void LEFImporter::skip_entry ()
 {
   while (! at_end () && ! test (";")) {
     take ();
   }
 }
 
-void
-LEFImporter::finish_lef (db::Layout &layout)
+void LEFImporter::finish_lef (db::Layout &layout)
 {
   for (std::map<std::string, MacroDesc>::const_iterator m = m_macros.begin (); m != m_macros.end (); ++m) {
     reader_state ()->macro_cell (m->first, layout, std::vector<std::string> (), std::vector<unsigned int> (), m->second, this);
@@ -1270,4 +1235,3 @@ LEFImporter::finish_lef (db::Layout &layout)
 }
 
 }
-

@@ -28,8 +28,8 @@
 
 #if defined(HAVE_QT)
 
-#  include <QImage>
-#  include <QPainter>
+#include <QImage>
+#include <QPainter>
 
 static bool compare_images (const QImage &qimg, const std::string &au)
 {
@@ -39,7 +39,7 @@ static bool compare_images (const QImage &qimg, const std::string &au)
   if (qimg2.width () == (int) qimg.width () && qimg2.height () == (int) qimg.height ()) {
     for (int j = 0; j < qimg.height (); ++j) {
       for (int i = 0; i < qimg.width (); ++i) {
-        if (((const tl::color_t *) qimg.scanLine (j))[i] != ((const tl::color_t *) qimg2.scanLine (j))[i]) {
+        if (((const tl::color_t *) qimg.scanLine (j)) [i] != ((const tl::color_t *) qimg2.scanLine (j)) [i]) {
           return false;
         }
       }
@@ -59,7 +59,7 @@ static bool compare_images_mono (const QImage &qimg, const std::string &au)
     //  NOTE: slooooow ...
     for (int j = 0; j < qimg.height (); ++j) {
       for (int i = 0; i < qimg.width (); ++i) {
-        if ((qimg.scanLine (j)[i / 8] & (0x80 >> (i % 8))) != (qimg2.scanLine (j)[i / 8] & (0x80 >> (i % 8)))) {
+        if ((qimg.scanLine (j) [i / 8] & (0x80 >> (i % 8))) != (qimg2.scanLine (j) [i / 8] & (0x80 >> (i % 8)))) {
           return false;
         }
       }
@@ -83,7 +83,7 @@ static bool compare_images (const tl::BitmapBuffer &img, const tl::BitmapBuffer 
 }
 
 #if defined(HAVE_QT)
-TEST(1)
+TEST (1)
 {
   lay::LayoutView lv (0, false, 0);
   lv.cell_box_color (tl::Color (0, 0, 0));
@@ -105,7 +105,7 @@ TEST(1)
   EXPECT_EQ (compare_images (qimg, au), true);
 }
 
-TEST(2)
+TEST (2)
 {
   lay::LayoutView lv (0, false, 0);
   lv.full_hier_new_cell (true);
@@ -128,7 +128,7 @@ TEST(2)
 }
 
 //  monochrome
-TEST(3)
+TEST (3)
 {
   lay::LayoutView lv (0, false, 0);
   lv.full_hier_new_cell (true);
@@ -151,7 +151,7 @@ TEST(3)
 }
 #endif
 
-TEST(4)
+TEST (4)
 {
   lay::LayoutView lv (0, false, 0);
   lv.set_drawing_workers (2);
@@ -174,7 +174,7 @@ TEST(4)
 }
 
 //  options
-TEST(5)
+TEST (5)
 {
   std::unique_ptr<lay::LayoutView> lv;
 
@@ -210,7 +210,7 @@ TEST(5)
 }
 
 #if defined(HAVE_PNG)
-TEST(11)
+TEST (11)
 {
   lay::LayoutView lv (0, false, 0);
   lv.cell_box_color (tl::Color (0, 0, 0));
@@ -238,7 +238,7 @@ TEST(11)
   EXPECT_EQ (compare_images (img, au_img), true);
 }
 
-TEST(12)
+TEST (12)
 {
   lay::LayoutView lv (0, false, 0);
   lv.full_hier_new_cell (true);
@@ -267,7 +267,7 @@ TEST(12)
 }
 
 //  monochrome
-TEST(13)
+TEST (13)
 {
   lay::LayoutView lv (0, false, 0);
   lv.full_hier_new_cell (true);
@@ -297,7 +297,7 @@ TEST(13)
 #endif
 
 #if defined(HAVE_PNG) && defined(HAVE_QT)
-TEST(21)
+TEST (21)
 {
   lay::LayoutView lv (0, false, 0);
   lv.cell_box_color (tl::Color (0, 0, 0));
@@ -325,7 +325,7 @@ TEST(21)
   EXPECT_EQ (compare_images (img, au_img), true);
 }
 
-TEST(22)
+TEST (22)
 {
   lay::LayoutView lv (0, false, 0);
   lv.full_hier_new_cell (true);
@@ -354,7 +354,7 @@ TEST(22)
 }
 
 //  monochrome
-TEST(23)
+TEST (23)
 {
   lay::LayoutView lv (0, false, 0);
   lv.full_hier_new_cell (true);

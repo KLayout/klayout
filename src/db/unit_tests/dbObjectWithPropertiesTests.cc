@@ -24,9 +24,10 @@
 #include "dbObjectWithProperties.h"
 #include "tlUnitTest.h"
 
-namespace {
+namespace
+{
 
-TEST(1) 
+TEST (1)
 {
   db::PropertiesSet ps;
   ps.insert (tl::Variant (1), tl::Variant ("one"));

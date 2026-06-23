@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "imgMain.h"
-DEFINE_PYMOD(imgcore, "img", "KLayout core module 'img'")
+DEFINE_PYMOD (imgcore, "img", "KLayout core module 'img'")

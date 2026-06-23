@@ -21,31 +21,31 @@
 */
 
 
-#if !defined(HDR_layPluginCommon_h)
-# define HDR_layPluginCommon_h
+#if ! defined(HDR_layPluginCommon_h)
+#define HDR_layPluginCommon_h
 
-# if defined _WIN32 || defined __CYGWIN__
+#if defined _WIN32 || defined __CYGWIN__
 
-#   ifdef MAKE_LAY_PLUGIN_LIBRARY
-#     define LAY_PLUGIN_PUBLIC __declspec(dllexport)
-#   else
-#     define LAY_PLUGIN_PUBLIC __declspec(dllimport)
-#   endif
-#   define LAY_PLUGIN_LOCAL
-#   define LAY_PLUGIN_PUBLIC_TEMPLATE
+#ifdef MAKE_LAY_PLUGIN_LIBRARY
+#define LAY_PLUGIN_PUBLIC __declspec (dllexport)
+#else
+#define LAY_PLUGIN_PUBLIC __declspec (dllimport)
+#endif
+#define LAY_PLUGIN_LOCAL
+#define LAY_PLUGIN_PUBLIC_TEMPLATE
 
-# else
+#else
 
-#   if __GNUC__ >= 4 || defined(__clang__)
-#     define LAY_PLUGIN_PUBLIC __attribute__ ((visibility ("default")))
-#     define LAY_PLUGIN_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
-#     define LAY_PLUGIN_LOCAL  __attribute__ ((visibility ("hidden")))
-#   else
-#     define LAY_PLUGIN_PUBLIC
-#     define LAY_PLUGIN_PUBLIC_TEMPLATE
-#     define LAY_PLUGIN_LOCAL
-#   endif
+#if __GNUC__ >= 4 || defined(__clang__)
+#define LAY_PLUGIN_PUBLIC __attribute__ ((visibility ("default")))
+#define LAY_PLUGIN_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
+#define LAY_PLUGIN_LOCAL __attribute__ ((visibility ("hidden")))
+#else
+#define LAY_PLUGIN_PUBLIC
+#define LAY_PLUGIN_PUBLIC_TEMPLATE
+#define LAY_PLUGIN_LOCAL
+#endif
 
-# endif
+#endif
 
 #endif

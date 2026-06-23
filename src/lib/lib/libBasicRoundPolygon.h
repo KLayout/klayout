@@ -34,7 +34,7 @@ namespace lib
 /**
  *  @brief Implements the "ROUND_POLYGON" PCell of the basic library
  */
-class BasicRoundPolygon 
+class BasicRoundPolygon
   : public db::PCellDeclaration
 {
 public:
@@ -77,5 +77,3 @@ public:
 }
 
 #endif
-
-

@@ -35,12 +35,12 @@ class QTreeView;
 
 namespace tl
 {
-  class GlobPattern;
+class GlobPattern;
 }
 
 namespace db
 {
-  class Library;
+class Library;
 }
 
 namespace lay
@@ -56,34 +56,34 @@ class CellTreeItem;
  *  representation or a hierarchical one.
  */
 
-class CellTreeModel 
+class CellTreeModel
   : public QAbstractItemModel,
     public tl::Object
 {
 public:
   enum Flags {
-    Flat = 1,           //  flat list (rather than hierarchy)
-    Children = 2,       //  direct children of cell "base"
-    Parents = 4,        //  direct parents of cell "base"
-    TopCells = 8,       //  show top cells only
-    BasicCells = 16,    //  show basic cells (PCells included, no proxies)
-    WithVariants = 32,  //  show PCell variants below PCells
-    WithIcons = 64,     //  show icons for the top level cell type
-    NoPadding = 128,    //  disable padding of display string with a blank at the beginning and end
-    HidePrivate = 256   //  hide cells whose name starts with an underscore
+    Flat = 1,          //  flat list (rather than hierarchy)
+    Children = 2,      //  direct children of cell "base"
+    Parents = 4,       //  direct parents of cell "base"
+    TopCells = 8,      //  show top cells only
+    BasicCells = 16,   //  show basic cells (PCells included, no proxies)
+    WithVariants = 32, //  show PCell variants below PCells
+    WithIcons = 64,    //  show icons for the top level cell type
+    NoPadding = 128,   //  disable padding of display string with a blank at the beginning and end
+    HidePrivate = 256  //  hide cells whose name starts with an underscore
   };
 
   enum Sorting {
-    ByName,             //  sort by name
-    ByArea,             //  sort by cell area (small to large)
-    ByAreaReverse       //  sort by cell area (large to small)
+    ByName,       //  sort by name
+    ByArea,       //  sort by cell area (small to large)
+    ByAreaReverse //  sort by cell area (large to small)
   };
 
   /**
    *  @brief Constructor
    *
    *  The LayoutView reference is required to obtain hidden cell state and current state flags.
-   *  The flags member is a combination of the flags given by 
+   *  The flags member is a combination of the flags given by
    *  If flags "Children" or "Parents" are given, "base" must be set to the cell of which
    *  the children or parents should be derived.
    */
@@ -108,7 +108,7 @@ public:
    */
   ~CellTreeModel ();
 
-  //  Implementation of the QAbstractItemModel interface 
+  //  Implementation of the QAbstractItemModel interface
   virtual Qt::ItemFlags flags (const QModelIndex &index) const;
   virtual int columnCount (const QModelIndex &) const;
   virtual QVariant data (const QModelIndex &index, int role) const;
@@ -170,21 +170,21 @@ public:
   /**
    *  @brief Convert a QModelIndex to a cell_index
    */
-  db::cell_index_type cell_index (const QModelIndex &index) const; 
+  db::cell_index_type cell_index (const QModelIndex &index) const;
 
   /**
    *  @brief Convert a QModelIndex to a db::Cell pointer
    *
    *  This method returns 0 if the model index is not valid.
    */
-  const db::Cell *cell (const QModelIndex &index) const; 
+  const db::Cell *cell (const QModelIndex &index) const;
 
   /**
    *  @brief Convert a QModelIndex to a cell name
    *
    *  This method returns 0 if the model index is not valid.
    */
-  const char *cell_name (const QModelIndex &index) const; 
+  const char *cell_name (const QModelIndex &index) const;
 
   /**
    *  @brief Locate an index by name (at least closest)
@@ -215,7 +215,7 @@ public:
   void clear_locate ();
 
   /**
-   *  @brief Set the sorting 
+   *  @brief Set the sorting
    */
   void set_sorting (Sorting s);
 
@@ -264,11 +264,11 @@ private:
   db::Library *mp_library;
   int m_cv_index;
   const db::Cell *mp_base;
-  std::vector <CellTreeItem *> m_toplevel;
-  std::set <void *> m_selected_indexes_set;
+  std::vector<CellTreeItem *> m_toplevel;
+  std::set<void *> m_selected_indexes_set;
   std::set<const CellTreeItem *> m_visible_cell_set;
-  std::vector <QModelIndex> m_selected_indexes;
-  std::vector <QModelIndex>::const_iterator m_current_index;
+  std::vector<QModelIndex> m_selected_indexes;
+  std::vector<QModelIndex>::const_iterator m_current_index;
 
   void build_top_level ();
   void clear_top_level ();
@@ -278,7 +278,7 @@ private:
 };
 
 /**
- *  @brief The cell tree item object 
+ *  @brief The cell tree item object
  *
  *  This object is used to represent a cell in the tree model.
  */
@@ -316,7 +316,7 @@ public:
     return m_index;
   }
 
-  void set_index (size_t index) 
+  void set_index (size_t index)
   {
     m_index = index;
   }
@@ -352,4 +352,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

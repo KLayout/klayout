@@ -37,14 +37,15 @@ namespace db
  *  @brief A visitor for the neighbors of an edge
  */
 class DB_PUBLIC EdgeNeighborhoodVisitor
-  : public gsi::ObjectBase, public tl::Object
+  : public gsi::ObjectBase,
+    public tl::Object
 {
 public:
   typedef std::pair<double, double> position_interval_type;
   typedef unsigned int input_key_type;
   typedef std::vector<db::PolygonWithProperties> neighbor_shapes_type;
   typedef std::map<input_key_type, neighbor_shapes_type> neighbors_per_interval_type;
-  typedef std::vector<std::pair<position_interval_type, neighbors_per_interval_type> > neighbors_type;
+  typedef std::vector<std::pair<position_interval_type, neighbors_per_interval_type>> neighbors_type;
 
   /**
    *  @brief Constructor
@@ -54,7 +55,7 @@ public:
   /**
    *  @brief Destructor
    */
-  virtual ~EdgeNeighborhoodVisitor () { }
+  virtual ~EdgeNeighborhoodVisitor () {}
 
   /**
    *  @brief Configure the polygon output
@@ -86,17 +87,17 @@ public:
    *  Following this event, the edges with their neighborhood are reported.
    *  After the edges are reported, "end_polygon" is called.
    */
-  virtual void begin_polygon (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::PolygonWithProperties & /*polygon*/) { }
+  virtual void begin_polygon (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::PolygonWithProperties & /*polygon*/) {}
 
   /**
    *  @brief Event handler called after the polygon was processed
    */
-  virtual void end_polygon () { }
+  virtual void end_polygon () {}
 
   /**
    *  @brief Event handler for each edge plus it's neighborhood
    */
-  virtual void on_edge (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::EdgeWithProperties & /*edge*/, const neighbors_type & /*neighbors*/) { }
+  virtual void on_edge (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::EdgeWithProperties & /*edge*/, const neighbors_type & /*neighbors*/) {}
 
   /**
    *  @brief Gets a transformation to transform from edge-local space to original space
@@ -174,12 +175,12 @@ protected:
   virtual db::Coord computed_dist () const;
   virtual std::string generated_description () const;
 
-  virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> & /*interactions*/,       std::vector<std::unordered_set<db::PolygonWithProperties> > & /*results*/,     const db::LocalProcessorBase * /*proc*/) const;
-  virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> & /*interactions*/,       std::vector<std::unordered_set<db::EdgeWithProperties> > & /*results*/,        const db::LocalProcessorBase * /*proc*/) const;
-  virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> & /*interactions*/,       std::vector<std::unordered_set<db::EdgePairWithProperties> > & /*results*/,    const db::LocalProcessorBase * /*proc*/) const;
-  virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> & /*interactions*/, std::vector<std::unordered_set<db::PolygonRefWithProperties> > & /*results*/,  const db::LocalProcessorBase * /*proc*/) const;
-  virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> & /*interactions*/, std::vector<std::unordered_set<db::EdgeWithProperties> > & /*results*/,        const db::LocalProcessorBase * /*proc*/) const;
-  virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> & /*interactions*/, std::vector<std::unordered_set<db::EdgePairWithProperties> > & /*results*/,    const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> & /*interactions*/, std::vector<std::unordered_set<db::PolygonWithProperties>> & /*results*/, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> & /*interactions*/, std::vector<std::unordered_set<db::EdgeWithProperties>> & /*results*/, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> & /*interactions*/, std::vector<std::unordered_set<db::EdgePairWithProperties>> & /*results*/, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> & /*interactions*/, std::vector<std::unordered_set<db::PolygonRefWithProperties>> & /*results*/, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> & /*interactions*/, std::vector<std::unordered_set<db::EdgeWithProperties>> & /*results*/, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> & /*interactions*/, std::vector<std::unordered_set<db::EdgePairWithProperties>> & /*results*/, const db::LocalProcessorBase * /*proc*/) const;
 
 private:
   db::Coord m_bext, m_eext, m_din, m_dout;
@@ -188,10 +189,9 @@ private:
   void do_collect_neighbors (db::box_scanner2<db::EdgeWithProperties, unsigned int, db::PolygonWithProperties, unsigned int> &scanner, const db::Layout *layout, const db::Cell *cell) const;
 
   template <class T, class TR>
-  void compute_local_impl (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<T, T> & /*interactions*/, std::vector<std::unordered_set<TR> > & /*results*/, const db::LocalProcessorBase * /*proc*/) const;
+  void compute_local_impl (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<T, T> & /*interactions*/, std::vector<std::unordered_set<TR>> & /*results*/, const db::LocalProcessorBase * /*proc*/) const;
 };
 
 }
 
 #endif
-

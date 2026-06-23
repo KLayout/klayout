@@ -31,7 +31,7 @@
 #include <QApplication>
 #include <QEventLoop>
 #ifdef __APPLE__
-#  include <QEvent>
+#include <QEvent>
 #endif
 
 #include "gsi.h"
@@ -42,22 +42,22 @@
 
 namespace gsi
 {
-  class Interpreter;
+class Interpreter;
 }
 
 namespace gtf
 {
-  class Recorder;
+class Recorder;
 }
 
 namespace lym
 {
-  class MacroCollection;
+class MacroCollection;
 }
 
 namespace db
 {
-  class Manager;
+class Manager;
 }
 
 namespace lay
@@ -77,7 +77,8 @@ class LayoutView;
  *  and one for the GUI version (derived from QApplication).
  */
 class LAY_PUBLIC ApplicationBase
-  : public gsi::ObjectBase, public tl::Object
+  : public gsi::ObjectBase,
+    public tl::Object
 {
 public:
   /**
@@ -357,16 +358,16 @@ private:
     l2ndb_file
   };
 
-  std::vector <std::pair<file_type, std::pair<std::string, std::string> > > m_files;
-  std::set <std::pair<std::string, std::string> > m_tech_macro_paths;
+  std::vector<std::pair<file_type, std::pair<std::string, std::string>>> m_files;
+  std::set<std::pair<std::string, std::string>> m_tech_macro_paths;
   std::string m_layer_props_file;
   bool m_lyp_map_all_cvs, m_lyp_add_default;
   std::string m_session_file;
   std::string m_run_macro;
   bool m_run_macro_and_exit;
-  std::vector<std::pair<std::string, std::string> > m_custom_macro_paths;
+  std::vector<std::pair<std::string, std::string>> m_custom_macro_paths;
   std::vector<std::string> m_load_macros;
-  std::vector <std::string> m_package_inst;
+  std::vector<std::string> m_package_inst;
   bool m_packages_with_dep;
   std::string m_gtf_replay;
   std::vector<std::string> m_config_files;
@@ -377,7 +378,7 @@ private:
   std::string m_inst_path;
   std::string m_appdata_path;
   bool m_write_config_file;
-  std::vector< std::pair<std::string, std::string> > m_variables;
+  std::vector<std::pair<std::string, std::string>> m_variables;
   int m_gtf_replay_rate, m_gtf_replay_stop;
   std::string m_gtf_record;
   bool m_gtf_save_incremental;
@@ -401,7 +402,9 @@ private:
  *  @brief The GUI-enabled application class
  */
 class LAY_PUBLIC GuiApplication
-  : public QApplication, public ApplicationBase, public lay::BusyMode
+  : public QApplication,
+    public ApplicationBase,
+    public lay::BusyMode
 {
 public:
   GuiApplication (int &argc, char **argv);
@@ -496,7 +499,8 @@ private:
  *  @brief The non-GUI-enabled application class
  */
 class LAY_PUBLIC NonGuiApplication
-  : public QCoreApplication, public ApplicationBase
+  : public QCoreApplication,
+    public ApplicationBase
 {
 public:
   NonGuiApplication (int &argc, char **argv);
@@ -550,5 +554,3 @@ private:
 } // namespace lay
 
 #endif
-
-

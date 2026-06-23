@@ -29,7 +29,8 @@
 #include "dbEdgePairsDelegate.h"
 #include "dbRecursiveShapeIterator.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief The delegate for the actual edge set implementation
@@ -93,13 +94,13 @@ public:
   virtual bool has_valid_edge_pairs () const { return true; }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
-  virtual void apply_property_translator (const db::PropertiesTranslator &) { }
+  virtual void apply_property_translator (const db::PropertiesTranslator &) {}
 
   virtual bool equals (const EdgePairs &other) const;
   virtual bool less (const EdgePairs &other) const;
 
-  virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const { }
-  virtual void insert_into_as_polygons (Layout *, db::cell_index_type, unsigned int, db::Coord) const { }
+  virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const {}
+  virtual void insert_into_as_polygons (Layout *, db::cell_index_type, unsigned int, db::Coord) const {}
 
 private:
   EmptyEdgePairs &operator= (const EmptyEdgePairs &other);
@@ -108,4 +109,3 @@ private:
 }
 
 #endif
-

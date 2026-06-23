@@ -38,15 +38,15 @@ namespace db
 /**
  *  @brief A receiver for insert events of the clipboard data object
  */
-class DB_PUBLIC ClipboardDataInsertReceiver 
+class DB_PUBLIC ClipboardDataInsertReceiver
 {
 public:
-  ClipboardDataInsertReceiver () 
+  ClipboardDataInsertReceiver ()
   {
     //  .. nothing yet ..
   }
 
-  virtual ~ClipboardDataInsertReceiver () 
+  virtual ~ClipboardDataInsertReceiver ()
   {
     //  .. nothing yet ..
   }
@@ -58,7 +58,7 @@ public:
    *  @param layer The layer where the shape is inserted
    *  @param shape The (new) shape that was inserted
    */
-  virtual void shape_inserted (db::cell_index_type /*cell*/, int /*layer*/, const db::Shape & /*shape*/) 
+  virtual void shape_inserted (db::cell_index_type /*cell*/, int /*layer*/, const db::Shape & /*shape*/)
   {
     //  .. nothing yet ..
   }
@@ -69,16 +69,16 @@ public:
    *  @param cell The index of the cell where the shape is inserted
    *  @param shape The (new) instance that was inserted
    */
-  virtual void instance_inserted (db::cell_index_type /*cell*/, const db::Instance & /*instance*/) 
+  virtual void instance_inserted (db::cell_index_type /*cell*/, const db::Instance & /*instance*/)
   {
     //  .. nothing yet ..
   }
 };
 
 /**
- *  @brief A container for the clipboard data 
+ *  @brief A container for the clipboard data
  *
- *  This is basically a layout object enhanced with some special data to 
+ *  This is basically a layout object enhanced with some special data to
  *  represent the data on the clipboard.
  */
 class DB_PUBLIC ClipboardData
@@ -97,7 +97,7 @@ public:
   /**
    *  @brief Add a shape to the clipboard data
    *
-   *  It is assumed that all add operations are made from the same layout object for 
+   *  It is assumed that all add operations are made from the same layout object for
    *  one ClipboardData object.
    */
   void add (const db::Layout &layout, unsigned int layer, const db::Shape &shape);
@@ -105,7 +105,7 @@ public:
   /**
    *  @brief Add a transformed shape to the clipboard data, transformed with the given transformation
    *
-   *  It is assumed that all add operations are made from the same layout object for 
+   *  It is assumed that all add operations are made from the same layout object for
    *  one ClipboardData object.
    */
   void add (const db::Layout &layout, unsigned int layer, const db::Shape &shape, const db::ICplxTrans &trans);
@@ -113,9 +113,9 @@ public:
   /**
    *  @brief Add an instance to the clipboard data
    *
-   *  Depending on the mode, not only the instance but the cell which is instantiated 
+   *  Depending on the mode, not only the instance but the cell which is instantiated
    *  is added to the clipboard data as well.
-   *  It is assumed that all add operations are made from the same layout object for 
+   *  It is assumed that all add operations are made from the same layout object for
    *  one ClipboardData object.
    *
    *  @param mode 0, if to copy just the instance, 1 to copy the cell as well (in deep mode)
@@ -125,9 +125,9 @@ public:
   /**
    *  @brief Add an transformed instance to the clipboard data
    *
-   *  Depending on the mode, not only the instance but the cell which is instantiated 
+   *  Depending on the mode, not only the instance but the cell which is instantiated
    *  is added to the clipboard data as well.
-   *  It is assumed that all add operations are made from the same layout object for 
+   *  It is assumed that all add operations are made from the same layout object for
    *  one ClipboardData object.
    *
    *  @param mode 0, if to copy just the instance, 1 to copy the cell as well (in deep mode)
@@ -137,9 +137,9 @@ public:
   /**
    *  @brief Add a cell to the clipboard data
    *
-   *  Depending on the mode, not only the cell but all subcells are added to the clipboard 
+   *  Depending on the mode, not only the cell but all subcells are added to the clipboard
    *  data as well. In "toplevel only" mode, just the instances are copied, not the subcells.
-   *  It is assumed that all add operations are made from the same layout object for 
+   *  It is assumed that all add operations are made from the same layout object for
    *  one ClipboardData object.
    *
    *  @param mode 0, if to copy just the cell, 1 to copy the subcells as well, 2 to copy the first level of the hierarchy.
@@ -152,12 +152,12 @@ public:
    *
    *  Cells that are stored in this object are either looked for (if the cell is copied without
    *  content, i.e as target for an instance) or created newly if stored with content.
-   *  Layers are mapped where required. 
+   *  Layers are mapped where required.
    *  Layer mapping involves looking up the target layer. The target layer is looked up by layer/datatype
    *  first, then name. If a layer is not found, it will be created newly.
    *
    *  @param into The layout into which to insert the new items
-   *  @param cell If non-null, the items will be created in this cell 
+   *  @param cell If non-null, the items will be created in this cell
    *  @param new_top If non-null, this vector will be filled with the indices of the newly
    *                 created top cells in "into" layout
    *  @param insert_receiver A notification object that receives insert events, i.e. for providing a selection
@@ -173,13 +173,13 @@ public:
    *
    *  Cells that are stored in this object are either looked for (if the cell is copied without
    *  content, i.e as target for an instance) or created newly if stored with content.
-   *  Layers are mapped where required. 
+   *  Layers are mapped where required.
    *  Layer mapping involves looking up the target layer. The target layer is looked up by layer/datatype
    *  first, then name. If a layer is not found, it will be created newly.
    *
    *  @param into The layout into which to insert the new items
    *  @param trans The transformation to apply
-   *  @param cell If non-null, the items will be created in this cell 
+   *  @param cell If non-null, the items will be created in this cell
    *  @param new_tops If non-null, this vector will be filled with the indices of the newly
    *                  created top cells in "into" layout
    *  @param insert_receiver A notification object that receives insert events, i.e. for providing a selection
@@ -191,12 +191,12 @@ public:
   }
 
 private:
-  db::Layout m_layout;  //  this is where we store data into.
-  std::set <db::cell_index_type> m_incomplete_cells;
-  std::map <db::cell_index_type, std::vector<std::string> > m_context_info;
-  std::map <db::cell_index_type, db::cell_index_type> m_cell_index_map;
+  db::Layout m_layout; //  this is where we store data into.
+  std::set<db::cell_index_type> m_incomplete_cells;
+  std::map<db::cell_index_type, std::vector<std::string>> m_context_info;
+  std::map<db::cell_index_type, db::cell_index_type> m_cell_index_map;
   db::cell_index_type m_container_cell_index;
-  
+
   db::cell_index_type cell_for_cell (const db::Layout &layout, db::cell_index_type cell_index, bool incomplete);
   std::vector<unsigned int> do_insert (db::Layout &into, const db::ICplxTrans *trans, db::Cell *cell, std::vector<db::cell_index_type> *new_tops, ClipboardDataInsertReceiver *insert_receiver) const;
 
@@ -207,5 +207,3 @@ private:
 }
 
 #endif
-
-

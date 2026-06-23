@@ -86,7 +86,7 @@ public:
   std_writer_impl (tl::OutputStream &stream, double dbu, const std::string &progress_description = std::string ());
 
   void write (const db::LayoutToNetlist *l2n);
-  void write (TokenizedOutput &stream, bool nested, const db::Netlist *netlist, const db::LayoutToNetlist *l2n, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit);
+  void write (TokenizedOutput &stream, bool nested, const db::Netlist *netlist, const db::LayoutToNetlist *l2n, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int>> *net2id_per_circuit);
 
 protected:
   tl::OutputStream &stream ()
@@ -106,8 +106,8 @@ private:
   const db::LayoutToNetlist *mp_l2n;
   tl::AbsoluteProgress m_progress;
 
-  void write (bool nested, TokenizedOutput &stream, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit);
-  void write (TokenizedOutput &stream, const db::Circuit &circuit, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit);
+  void write (bool nested, TokenizedOutput &stream, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int>> *net2id_per_circuit);
+  void write (TokenizedOutput &stream, const db::Circuit &circuit, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int>> *net2id_per_circuit);
   void write (TokenizedOutput &stream, const db::Net &net, unsigned int id);
   void write (TokenizedOutput &stream, const db::SubCircuit &subcircuit, std::map<const Net *, unsigned int> &net2id);
   void write (TokenizedOutput &stream, const db::Device &device, std::map<const Net *, unsigned int> &net2id);

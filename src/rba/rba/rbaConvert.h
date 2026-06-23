@@ -73,7 +73,7 @@ template <>
 inline bool test_type<bool> (VALUE rval, bool loose)
 {
   if (loose) {
-    return true;  // everything can be converted to bool
+    return true; // everything can be converted to bool
   } else {
     unsigned int t = TYPE (rval);
     return (t == T_FALSE || t == T_TRUE || t == T_NIL);
@@ -315,15 +315,15 @@ template <>
 inline std::string ruby2c<std::string> (VALUE rval)
 {
   VALUE str = rba_safe_string_value (rval);
-  return std::string (RSTRING_PTR(str), RSTRING_LEN(str));
+  return std::string (RSTRING_PTR (str), RSTRING_LEN (str));
 }
 
 template <>
-inline std::vector<char> ruby2c<std::vector<char> > (VALUE rval)
+inline std::vector<char> ruby2c<std::vector<char>> (VALUE rval)
 {
   VALUE str = rba_safe_string_value (rval);
-  char *cp = RSTRING_PTR(str);
-  size_t sz = RSTRING_LEN(str);
+  char *cp = RSTRING_PTR (str);
+  size_t sz = RSTRING_LEN (str);
   return std::vector<char> (cp, cp + sz);
 }
 
@@ -332,14 +332,14 @@ template <>
 inline QByteArray ruby2c<QByteArray> (VALUE rval)
 {
   VALUE str = rba_safe_string_value (rval);
-  return QByteArray (RSTRING_PTR(str), RSTRING_LEN(str));
+  return QByteArray (RSTRING_PTR (str), RSTRING_LEN (str));
 }
 
 template <>
 inline QString ruby2c<QString> (VALUE rval)
 {
   VALUE str = rba_safe_string_value (rval);
-  return tl::to_qstring (std::string (RSTRING_PTR(str), RSTRING_LEN(str)));
+  return tl::to_qstring (std::string (RSTRING_PTR (str), RSTRING_LEN (str)));
 }
 #endif
 
@@ -353,7 +353,7 @@ template <>
 inline const char *ruby2c<const char *> (VALUE rval)
 {
   VALUE str = rba_safe_string_value (rval);
-  return RSTRING_PTR(str);
+  return RSTRING_PTR (str);
 }
 
 template <>
@@ -465,7 +465,7 @@ inline VALUE c2ruby<std::string> (const std::string &c)
 }
 
 template <>
-inline VALUE c2ruby<std::vector<char> > (const std::vector<char> &c)
+inline VALUE c2ruby<std::vector<char>> (const std::vector<char> &c)
 {
   return rb_str_new (&c.front (), c.size ());
 }
@@ -494,7 +494,7 @@ inline VALUE c2ruby<QString> (const QString &qs)
 #endif
 
 template <>
-inline VALUE c2ruby<void *> (void * const &s)
+inline VALUE c2ruby<void *> (void *const &s)
 {
   return c2ruby<size_t> (size_t (s));
 }
@@ -503,10 +503,10 @@ template <>
 VALUE c2ruby<tl::Variant> (const tl::Variant &c);
 
 template <>
-inline VALUE c2ruby<const char *> (const char * const & s)
+inline VALUE c2ruby<const char *> (const char *const &s)
 {
   if (! s) {
-    static const char null_string[] = "(null)";
+    static const char null_string [] = "(null)";
     return rb_utf8_str_new (null_string, sizeof (null_string) - 1);
   } else {
     return rb_utf8_str_new (s, long (strlen (s)));

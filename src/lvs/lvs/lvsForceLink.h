@@ -32,9 +32,8 @@
 
 namespace lvs
 {
-  LVS_PUBLIC int _force_link_f ();
-  int _force_link_target = _force_link_f ();
+LVS_PUBLIC int _force_link_f ();
+int _force_link_target = _force_link_f ();
 }
 
 #endif
-

@@ -38,9 +38,9 @@ class QAction;
 
 namespace lay
 {
-  class LayoutViewBase;
-  class DMarker;
-  class Dispatcher;
+class LayoutViewBase;
+class DMarker;
+class Dispatcher;
 }
 
 namespace rdb
@@ -55,7 +55,7 @@ class MarkerBrowserPage
   : public QFrame,
     public Ui::MarkerBrowserPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -120,7 +120,7 @@ public:
   void list_shapes (bool f);
 
   /**
-   *  @brief Update the contents 
+   *  @brief Update the contents
    *
    *  This method must be called when the database has been updated.
    *  Unlike attachment to a RDB, this method will try to keep the current selections, etc.
@@ -130,7 +130,7 @@ public:
   /**
    *  @brief Update the marker objects
    *
-   *  This method should be called if the cellview has changed so the markers can 
+   *  This method should be called if the cellview has changed so the markers can
    *  be recomputed and shown in the new cell context.
    */
   void update_markers ();
@@ -150,8 +150,8 @@ public:
    *
    *  @param color The color or an invalid color to take the default color for selection
    *  @param line_width The line width or negative for the default line width
-   *  @param vertex_size The vertex size or negative for the default vertex size 
-   *  @param halo The halo flag or -1 for default 
+   *  @param vertex_size The vertex size or negative for the default vertex size
+   *  @param halo The halo flag or -1 for default
    *  @param dither_pattern The dither pattern index of -1 to take the default
    */
   void set_marker_style (tl::Color color, int line_width, int vertex_size, int halo, int dither_pattern);
@@ -256,4 +256,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

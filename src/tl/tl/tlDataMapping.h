@@ -34,10 +34,10 @@ namespace tl
 
 /**
  *  @brief A generic class that maps some scalar value to another scalar values
- * 
+ *
  *  The mapping is given by a table of sorted values x and associated y which are
- *  interpolated linearly. A data mapping object must be capable of generating 
- *  such a table. 
+ *  interpolated linearly. A data mapping object must be capable of generating
+ *  such a table.
  *  Data mapping expressions can be built by concatenating data mapping operators.
  */
 class TL_PUBLIC DataMappingBase
@@ -46,26 +46,26 @@ public:
   /**
    *  @brief The constructor
    */
-  DataMappingBase () { }
+  DataMappingBase () {}
 
   /**
    *  @brief The destructor
    */
-  virtual ~DataMappingBase () { }
+  virtual ~DataMappingBase () {}
 
   /**
    *  @brief Get the minimum x value for the data mapping
    *
-   *  Any reimplementation of this class must provide the minimum value for the 
-   *  x value that is data mapping is covering. 
+   *  Any reimplementation of this class must provide the minimum value for the
+   *  x value that is data mapping is covering.
    */
   virtual double xmin () const = 0;
 
   /**
    *  @brief Get the maximum x value for the data mapping
    *
-   *  Any reimplementation of this class must provide the maximum value for the 
-   *  x value that is data mapping is covering. 
+   *  Any reimplementation of this class must provide the maximum value for the
+   *  x value that is data mapping is covering.
    */
   virtual double xmax () const = 0;
 
@@ -75,7 +75,7 @@ public:
    *  Any reimplementation of this class must provide a list of x/y pairs sorted by x.
    *  Mapping for x values outside this range is performed by constant extrapolation.
    */
-  virtual void generate_table (std::vector< std::pair<double, double> > &table) = 0;
+  virtual void generate_table (std::vector<std::pair<double, double>> &table) = 0;
 
   /**
    *  @brief Dump the contents
@@ -85,7 +85,7 @@ public:
 
 /**
  *  @brief A table-based data mapping
- * 
+ *
  *  The table is to be built by adding new entries, whose x values must be sorted.
  */
 class TL_PUBLIC TableDataMapping
@@ -95,20 +95,20 @@ public:
   /**
    *  @brief The constructor
    */
-  TableDataMapping () : m_xmin (0.0), m_xmax (0.0) { }
+  TableDataMapping () : m_xmin (0.0), m_xmax (0.0) {}
 
   /**
    *  @brief The destructor
    */
-  virtual ~TableDataMapping () { }
+  virtual ~TableDataMapping () {}
 
   /**
    *  @brief Get the minimum x value for the data mapping
    *
-   *  Any reimplementation of this class must provide the minimum value for the 
-   *  x value that is data mapping is covering. 
+   *  Any reimplementation of this class must provide the minimum value for the
+   *  x value that is data mapping is covering.
    */
-  virtual double xmin () const 
+  virtual double xmin () const
   {
     return m_xmin;
   }
@@ -116,10 +116,10 @@ public:
   /**
    *  @brief Get the maximum x value for the data mapping
    *
-   *  Any reimplementation of this class must provide the maximum value for the 
-   *  x value that is data mapping is covering. 
+   *  Any reimplementation of this class must provide the maximum value for the
+   *  x value that is data mapping is covering.
    */
-  virtual double xmax () const 
+  virtual double xmax () const
   {
     return m_xmax;
   }
@@ -130,7 +130,7 @@ public:
    *  Any reimplementation of this class must provide a list of x/y pairs sorted by x.
    *  Mapping for x values outside this range is performed by constant extrapolation.
    */
-  virtual void generate_table (std::vector< std::pair<double, double> > &table) 
+  virtual void generate_table (std::vector<std::pair<double, double>> &table)
   {
     table = m_table;
   }
@@ -161,23 +161,23 @@ public:
 
 public:
   double m_xmin, m_xmax;
-  std::vector< std::pair<double, double> > m_table;
+  std::vector<std::pair<double, double>> m_table;
 };
 
 /**
  *  @brief Combination of two data mappings
  *
  *  This data mapping is composed of two mappings o and i where o is the outer
- *  and i the inner mapping. The result is the application of i and then o: 
- *  y = o(i(x)). 
+ *  and i the inner mapping. The result is the application of i and then o:
+ *  y = o(i(x)).
  */
-class TL_PUBLIC CombinedDataMapping 
+class TL_PUBLIC CombinedDataMapping
   : public DataMappingBase
 {
 public:
   /**
    *  @brief Create a combined data mapping
-   *  
+   *
    *  @param o The outer data mapping. This object will be owned by CombinedDataMapping.
    *  @param i The inner data mapping. This object will be owned by CombinedDataMapping.
    */
@@ -207,7 +207,7 @@ public:
    *
    *  Implementation of the DataMappingBase interface.
    */
-  void generate_table (std::vector< std::pair<double, double> > &table);
+  void generate_table (std::vector<std::pair<double, double>> &table);
 
   /**
    *  @brief Dump the contents
@@ -221,17 +221,17 @@ private:
 /**
  *  @brief Linear combination of two data mappings
  *
- *  This data mapping is composed of two mappings a and b and offers two coefficients ca and cb and a constant c. 
+ *  This data mapping is composed of two mappings a and b and offers two coefficients ca and cb and a constant c.
  *  The result is:
  *  y = ca * a(x) + cb * b(x) + c.
  */
-class TL_PUBLIC LinearCombinationDataMapping 
+class TL_PUBLIC LinearCombinationDataMapping
   : public DataMappingBase
 {
 public:
   /**
    *  @brief Create a combined data mapping
-   *  
+   *
    *  @param a The first data mapping. This object will be owned by CombinedDataMapping.
    *  @param ca The first coefficient
    *  @param b The second data mapping. This object will be owned by CombinedDataMapping. This parameter can be 0.
@@ -267,7 +267,7 @@ public:
    *
    *  Implementation of the DataMappingBase interface.
    */
-  void generate_table (std::vector< std::pair<double, double> > &table);
+  void generate_table (std::vector<std::pair<double, double>> &table);
 
   /**
    *  @brief Dump the contents
@@ -280,11 +280,11 @@ private:
 };
 
 /**
- *  @brief Create a lookup table from a data mapping 
+ *  @brief Create a lookup table from a data mapping
  *
  *  This class receives a data mapping object (and will own it) and
- *  is capable of creating a fast lookup table for the given granularity 
- *  of result values. 
+ *  is capable of creating a fast lookup table for the given granularity
+ *  of result values.
  */
 class TL_PUBLIC DataMappingLookupTable
 {
@@ -303,9 +303,9 @@ public:
 
   /**
    *  @brief Update the lookup table
-   * 
+   *
    *  This method must be called to produce a lookup table with the given granularity (resolution)
-   *  of y values and the given x range. 
+   *  of y values and the given x range.
    *  This method must be called when the data mapping base object has been changed.
    *
    *  @param xmin The minimum x value covered. No x value below this value can be mapped.
@@ -318,27 +318,27 @@ public:
   /**
    *  @brief Actually do the mapping
    *
-   *  This method is optimized for performance and does not check for 
+   *  This method is optimized for performance and does not check for
    *  the table actually being created or over- or underflow.
    *  Before this method can be called, update_table() must have been called.
    */
   inline double operator[] (double x) const
   {
     size_t i = size_t ((x - m_xmin) * m_dxinv);
-    return mp_y[i];
+    return mp_y [i];
   }
 
   /**
    *  @brief Actually do the mapping to unsigned char
    *
-   *  This method is optimized for performance and does not check for 
+   *  This method is optimized for performance and does not check for
    *  the table actually being created or over- or underflow.
    *  Before this method can be called, update_table() must have been called.
    */
   inline unsigned int operator() (double x) const
   {
     size_t i = size_t ((x - m_xmin) * m_dxinv);
-    return mp_c[i];
+    return mp_c [i];
   }
 
   /**
@@ -369,4 +369,3 @@ private:
 }
 
 #endif
-

@@ -26,7 +26,7 @@
 #include "tlString.h"
 #include "tlUnitTest.h"
 
-TEST(1) 
+TEST (1)
 {
   db::Point p;
   EXPECT_EQ (p.x (), 0);
@@ -41,7 +41,7 @@ TEST(1)
   EXPECT_EQ ((db::Point () - p).to_string (), "-300,-600");
 }
 
-TEST(2)
+TEST (2)
 {
   db::DPoint p (12.5, -17.1);
   EXPECT_EQ (p.to_string (), "12.5,-17.1");
@@ -55,7 +55,7 @@ TEST(2)
   EXPECT_EQ (ex.test ("a"), true);
 }
 
-TEST(3)
+TEST (3)
 {
   db::Point p (125, -171);
   EXPECT_EQ (p.to_string (), "125,-171");
@@ -68,5 +68,3 @@ TEST(3)
   EXPECT_EQ (pp == p, true);
   EXPECT_EQ (ex.test ("a"), true);
 }
-
-

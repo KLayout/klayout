@@ -77,8 +77,7 @@ private:
   friend class PropertyFunction;
   friend class PutFunction;
 
-  union ShapeRef
-  {
+  union ShapeRef {
     const db::Polygon *poly;
     const db::PolygonRef *poly_ref;
     const db::Edge *edge;
@@ -87,8 +86,7 @@ private:
     void *any;
   };
 
-  enum ShapeType
-  {
+  enum ShapeType {
     None,
     Polygon,
     PolygonRef,
@@ -148,9 +146,8 @@ private:
   friend class NetSkipFunction;
   friend class NetCopyFunction;
 
-  struct AreaAndPerimeter
-  {
-    AreaAndPerimeter () : area (0.0), perimeter (0.0) { }
+  struct AreaAndPerimeter {
+    AreaAndPerimeter () : area (0.0), perimeter (0.0) {}
     double area, perimeter;
   };
 
@@ -164,7 +161,7 @@ private:
   mutable db::cell_index_type m_cell_index;
   mutable size_t m_cluster_id;
   mutable std::map<unsigned int, AreaAndPerimeter> m_area_and_perimeter_cache;
-  mutable std::unique_ptr<std::map<std::pair<db::cell_index_type, size_t>, const db::Net *> > m_nets_per_cell_and_cluster_id;
+  mutable std::unique_ptr<std::map<std::pair<db::cell_index_type, size_t>, const db::Net *>> m_nets_per_cell_and_cluster_id;
 
   AreaAndPerimeter compute_area_and_perimeter (int layer_index) const;
   const std::vector<unsigned int> &layer_indexes () const { return m_layers; }

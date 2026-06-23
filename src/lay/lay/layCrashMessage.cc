@@ -47,23 +47,19 @@ CrashMessage::~CrashMessage ()
   //  .. nothing yet ..
 }
 
-void
-CrashMessage::set_can_resume (bool f)
+void CrashMessage::set_can_resume (bool f)
 {
   buttonBox->button (QDialogButtonBox::Ok)->setVisible (f);
 }
 
-void
-CrashMessage::set_text (const QString &t)
+void CrashMessage::set_text (const QString &t)
 {
   text->setPlainText (t);
 }
 
-void
-CrashMessage::cancel_pressed ()
+void CrashMessage::cancel_pressed ()
 {
   m_cancel_pressed = true;
 }
 
 }
-

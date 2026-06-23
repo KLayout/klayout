@@ -28,9 +28,9 @@
 
 //  uncompressed resources
 
-TEST(1)
+TEST (1)
 {
-  unsigned char hw[] = "hello, world!\n";
+  unsigned char hw [] = "hello, world!\n";
 
   const char *name;
   std::unique_ptr<tl::InputStream> s;
@@ -56,16 +56,34 @@ TEST(1)
 
 //  compressed resources
 
-TEST(2)
+TEST (2)
 {
-  const unsigned char hw[] = {
-    0x78,0x9c, //  zlib header
+  const unsigned char hw [] = {
+    0x78,
+    0x9c, //  zlib header
     //  data:
-    0xcb,0x48,0xcd,0xc9,0xc9,0xd7,0x51,0x28,0xcf,0x2f,0xca,0x49,0x51,0xe4,
-    0x02,0x00,
-    0x26,0xb2,0x04,0xb4,  //  zlib CRC
+    0xcb,
+    0x48,
+    0xcd,
+    0xc9,
+    0xc9,
+    0xd7,
+    0x51,
+    0x28,
+    0xcf,
+    0x2f,
+    0xca,
+    0x49,
+    0x51,
+    0xe4,
+    0x02,
+    0x00,
+    0x26,
+    0xb2,
+    0x04,
+    0xb4, //  zlib CRC
   };
-  unsigned char hw_decoded[] = "hello, world!\n";
+  unsigned char hw_decoded [] = "hello, world!\n";
 
   const char *name;
   std::unique_ptr<tl::InputStream> s;
@@ -88,4 +106,3 @@ TEST(2)
   s.reset (tl::get_resource (name));
   EXPECT_EQ (s.get () == 0, true);
 }
-

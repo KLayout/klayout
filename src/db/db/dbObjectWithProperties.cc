@@ -78,7 +78,6 @@ template <class T> bool _test_extractor_impl (tl::Extractor &ex, db::object_with
     }
 
     p.properties_id (db::properties_id (props));
-
   }
 
   return true;
@@ -132,4 +131,3 @@ template <> void extractor_impl (tl::Extractor &ex, db::object_with_properties<d
 template <> void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DEdgePair> &p) { _extractor_impl (ex, p); }
 
 }
-

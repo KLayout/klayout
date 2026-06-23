@@ -52,15 +52,15 @@ void run_test (tl::TestBase *_this, bool flat, bool flat_nets, const std::string
 
   db::LayerMap lmap;
 
-  unsigned int poly       = define_layer (ly, lmap, 1);
-  unsigned int cont       = define_layer (ly, lmap, 2);
-  unsigned int metal1     = define_layer (ly, lmap, 3);
-  unsigned int via1       = define_layer (ly, lmap, 4);
-  unsigned int metal2     = define_layer (ly, lmap, 5);
-  unsigned int via2       = define_layer (ly, lmap, 6);
-  unsigned int metal3     = define_layer (ly, lmap, 7);
-  unsigned int via3       = define_layer (ly, lmap, 8);
-  unsigned int metal4     = define_layer (ly, lmap, 9);
+  unsigned int poly = define_layer (ly, lmap, 1);
+  unsigned int cont = define_layer (ly, lmap, 2);
+  unsigned int metal1 = define_layer (ly, lmap, 3);
+  unsigned int via1 = define_layer (ly, lmap, 4);
+  unsigned int metal2 = define_layer (ly, lmap, 5);
+  unsigned int via2 = define_layer (ly, lmap, 6);
+  unsigned int metal3 = define_layer (ly, lmap, 7);
+  unsigned int via3 = define_layer (ly, lmap, 8);
+  unsigned int metal4 = define_layer (ly, lmap, 9);
 
   {
     db::LoadLayoutOptions options;
@@ -76,15 +76,15 @@ void run_test (tl::TestBase *_this, bool flat, bool flat_nets, const std::string
 
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
 
-  db::Region rpoly    = make_region (db::RecursiveShapeIterator (ly, tc, poly),   dss, flat);
-  db::Region rcont    = make_region (db::RecursiveShapeIterator (ly, tc, cont),   dss, flat);
-  db::Region rmetal1  = make_region (db::RecursiveShapeIterator (ly, tc, metal1), dss, flat);
-  db::Region rvia1    = make_region (db::RecursiveShapeIterator (ly, tc, via1),   dss, flat);
-  db::Region rmetal2  = make_region (db::RecursiveShapeIterator (ly, tc, metal2), dss, flat);
-  db::Region rvia2    = make_region (db::RecursiveShapeIterator (ly, tc, via2),   dss, flat);
-  db::Region rmetal3  = make_region (db::RecursiveShapeIterator (ly, tc, metal3), dss, flat);
-  db::Region rvia3    = make_region (db::RecursiveShapeIterator (ly, tc, via3),   dss, flat);
-  db::Region rmetal4  = make_region (db::RecursiveShapeIterator (ly, tc, metal4), dss, flat);
+  db::Region rpoly = make_region (db::RecursiveShapeIterator (ly, tc, poly), dss, flat);
+  db::Region rcont = make_region (db::RecursiveShapeIterator (ly, tc, cont), dss, flat);
+  db::Region rmetal1 = make_region (db::RecursiveShapeIterator (ly, tc, metal1), dss, flat);
+  db::Region rvia1 = make_region (db::RecursiveShapeIterator (ly, tc, via1), dss, flat);
+  db::Region rmetal2 = make_region (db::RecursiveShapeIterator (ly, tc, metal2), dss, flat);
+  db::Region rvia2 = make_region (db::RecursiveShapeIterator (ly, tc, via2), dss, flat);
+  db::Region rmetal3 = make_region (db::RecursiveShapeIterator (ly, tc, metal3), dss, flat);
+  db::Region rvia3 = make_region (db::RecursiveShapeIterator (ly, tc, via3), dss, flat);
+  db::Region rmetal4 = make_region (db::RecursiveShapeIterator (ly, tc, metal4), dss, flat);
 
   std::unique_ptr<db::LayoutToNetlist> l2n;
   if (! flat) {
@@ -120,14 +120,14 @@ void run_test (tl::TestBase *_this, bool flat, bool flat_nets, const std::string
   l2n->connect (rvia3);
   l2n->connect (rmetal4);
   //  Inter-layer
-  l2n->connect (rpoly,      rcont);
-  l2n->connect (rcont,      rmetal1);
-  l2n->connect (rmetal1,    rvia1);
-  l2n->connect (rvia1,      rmetal2);
-  l2n->connect (rmetal2,    rvia2);
-  l2n->connect (rvia2,      rmetal3);
-  l2n->connect (rmetal3,    rvia3);
-  l2n->connect (rvia3,      rmetal4);
+  l2n->connect (rpoly, rcont);
+  l2n->connect (rcont, rmetal1);
+  l2n->connect (rmetal1, rvia1);
+  l2n->connect (rvia1, rmetal2);
+  l2n->connect (rmetal2, rvia2);
+  l2n->connect (rvia2, rmetal3);
+  l2n->connect (rmetal3, rvia3);
+  l2n->connect (rvia3, rmetal4);
 
   l2n->extract_netlist ();
 
@@ -158,17 +158,17 @@ void run_test (tl::TestBase *_this, bool flat, bool flat_nets, const std::string
   db::compare_layouts (_this, ly, au_path);
 }
 
-TEST(1_NetSpecificBoolFlat)
+TEST (1_NetSpecificBoolFlat)
 {
   run_test (_this, false, true, "net_proc_au1.gds");
 }
 
-TEST(2_NetSpecificBoolFlatNets)
+TEST (2_NetSpecificBoolFlatNets)
 {
   run_test (_this, false, true, "net_proc_au2.gds");
 }
 
-TEST(3_NetSpecificBoolFullyHier)
+TEST (3_NetSpecificBoolFullyHier)
 {
   run_test (_this, false, false, "net_proc_au3.gds");
 }

@@ -27,7 +27,7 @@
 #include "layEditorOptionsPage.h"
 
 #if defined(HAVE_QT)
-#  include "edtPropertiesPages.h"
+#include "edtPropertiesPages.h"
 #endif
 
 namespace edt
@@ -53,8 +53,7 @@ PolygonService::properties_pages (db::Manager *manager, QWidget *parent)
 }
 #endif
 
-void 
-PolygonService::do_begin_edit (const db::DPoint &p)
+void PolygonService::do_begin_edit (const db::DPoint &p)
 {
   get_edit_layer ();
 
@@ -71,8 +70,7 @@ PolygonService::do_begin_edit (const db::DPoint &p)
   update_marker ();
 }
 
-void 
-PolygonService::set_last_point (const db::DPoint &p)
+void PolygonService::set_last_point (const db::DPoint &p)
 {
   m_points.back () = snap2 (p, m_last);
 
@@ -80,38 +78,34 @@ PolygonService::set_last_point (const db::DPoint &p)
   if (m_points.size () >= 3 && connect_ac () == lay::AC_Ortho) {
 
     db::DPoint p_grid = snap2 (p);
-    std::pair<bool, db::DPoint> ip = interpolate (m_points.end ()[-3], m_last, p_grid);
+    std::pair<bool, db::DPoint> ip = interpolate (m_points.end () [-3], m_last, p_grid);
     if (ip.first) {
 
-      m_points.end ()[-2] = ip.second;
+      m_points.end () [-2] = ip.second;
       m_points.back () = p_grid;
-
     }
 
   } else if (m_points.size () >= 2) {
-    m_points.end ()[-2] = m_last;
+    m_points.end () [-2] = m_last;
   }
 }
 
-void
-PolygonService::do_mouse_move_inactive (const db::DPoint &p)
+void PolygonService::do_mouse_move_inactive (const db::DPoint &p)
 {
   lay::PointSnapToObjectResult snap_details = snap2_details (p);
   mouse_cursor_from_snap_details (snap_details);
 }
 
-void
-PolygonService::do_delete ()
+void PolygonService::do_delete ()
 {
   if (m_points.size () > 2) {
     m_points.erase (m_points.end () - 2);
-    m_last = m_points.end()[-2];
+    m_last = m_points.end () [-2];
     update_marker ();
   }
 }
 
-void
-PolygonService::do_mouse_move (const db::DPoint &p)
+void PolygonService::do_mouse_move (const db::DPoint &p)
 {
   do_mouse_move_inactive (p);
 
@@ -123,8 +117,7 @@ PolygonService::do_mouse_move (const db::DPoint &p)
   update_marker ();
 }
 
-bool 
-PolygonService::do_mouse_click (const db::DPoint &p)
+bool PolygonService::do_mouse_click (const db::DPoint &p)
 {
   if (m_points.size () >= 1) {
     m_last = m_points.back ();
@@ -135,8 +128,7 @@ PolygonService::do_mouse_click (const db::DPoint &p)
   return false;
 }
 
-void 
-PolygonService::do_finish_edit (bool accept)
+void PolygonService::do_finish_edit (bool accept)
 {
   if (accept) {
     //  add a dummy point in this case for the current one
@@ -149,8 +141,7 @@ PolygonService::do_finish_edit (bool accept)
   close_editor_hooks (true);
 }
 
-void
-PolygonService::function (const std::string &name, const std::string &value)
+void PolygonService::function (const std::string &name, const std::string &value)
 {
   if (name == ShapeEditService::connection_function_name ()) {
 
@@ -165,12 +156,10 @@ PolygonService::function (const std::string &name, const std::string &value)
         m_points.push_back (m_last);
 
         update_marker ();
-
       }
 
     } catch (...) {
     }
-
   }
 }
 
@@ -197,7 +186,7 @@ PolygonService::get_polygon (bool editing) const
     points_dbu.push_back (trans () * m_closure);
   }
 
-  poly.assign_hull (points_dbu.begin (), points_dbu.end (), !editing /*compress*/, !editing /*remove reflected*/);
+  poly.assign_hull (points_dbu.begin (), points_dbu.end (), ! editing /*compress*/, ! editing /*remove reflected*/);
 
   if (! editing && poly.hull ().size () < 3) {
     throw tl::Exception (tl::to_string (tr ("A polygon must have at least 3 effective points")));
@@ -206,26 +195,23 @@ PolygonService::get_polygon (bool editing) const
   return poly;
 }
 
-void 
-PolygonService::do_cancel_edit ()
+void PolygonService::do_cancel_edit ()
 {
   close_editor_hooks (false);
 }
 
-bool 
-PolygonService::selection_applies (const lay::ObjectInstPath &sel) const
+bool PolygonService::selection_applies (const lay::ObjectInstPath &sel) const
 {
-  return !sel.is_cell_inst () && sel.shape ().is_polygon ();
+  return ! sel.is_cell_inst () && sel.shape ().is_polygon ();
 }
 
-void
-PolygonService::add_closure ()
+void PolygonService::add_closure ()
 {
   if (connect_ac () == lay::AC_Any || m_points.size () < 3) {
     m_closure_set = false;
   } else {
 
-    std::vector <db::DVector> delta;
+    std::vector<db::DVector> delta;
     delta.reserve (4);
 
     //  Even for diagonal mode, we try to do manhattan closing
@@ -246,17 +232,17 @@ PolygonService::add_closure ()
     m_closure = db::DPoint ();
     m_closure_set = false;
 
-    std::vector <db::DPoint>::const_iterator pi;
+    std::vector<db::DPoint>::const_iterator pi;
 
     db::DPoint p1, pl;
 
-    pi = m_points.begin () + 1; 
+    pi = m_points.begin () + 1;
     while (pi != m_points.end () - 1 && *pi == m_points [0]) {
       ++pi;
     }
     p1 = *pi;
 
-    pi = m_points.end () - 2; 
+    pi = m_points.end () - 2;
     while (pi != m_points.begin () + 1 && *pi == m_points.back ()) {
       --pi;
     }
@@ -264,79 +250,74 @@ PolygonService::add_closure ()
 
     //  first try a direct cut between last and first segment ..
     db::DEdge e1 (m_points [0], m_points [1]);
-    db::DEdge e2 (m_points.end ()[-2], m_points.back ());
+    db::DEdge e2 (m_points.end () [-2], m_points.back ());
 
-    std::pair <bool, db::DPoint> cp = e1.cut_point (e2);
-    if (cp.first && 
+    std::pair<bool, db::DPoint> cp = e1.cut_point (e2);
+    if (cp.first &&
         db::sprod (p1 - m_points [0], cp.second - m_points [0]) < 0.99 * p1.distance (m_points [0]) * cp.second.distance (m_points [0]) + 1e-6 &&
         db::sprod (pl - m_points.back (), cp.second - m_points.back ()) < 0.99 * pl.distance (m_points.back ()) * cp.second.distance (m_points.back ()) + 1e-6) {
       m_closure = cp.second;
       m_closure_set = true;
     }
 
-    //  if that is not working out, try to keep one edge any vary the possible edges emerging from 
+    //  if that is not working out, try to keep one edge any vary the possible edges emerging from
     //  the other point
-    if ( ! m_closure_set) {
+    if (! m_closure_set) {
 
-      for (std::vector <db::DVector>::const_iterator d1 = delta.begin (); d1 != delta.end (); ++d1) {
+      for (std::vector<db::DVector>::const_iterator d1 = delta.begin (); d1 != delta.end (); ++d1) {
 
         db::DEdge e1 (m_points [0], m_points [0] + *d1);
-        db::DEdge e2 (m_points.end ()[-2], m_points.back ());
+        db::DEdge e2 (m_points.end () [-2], m_points.back ());
 
-        std::pair <bool, db::DPoint> cp = e1.cut_point (e2);
-        if (cp.first && (! m_closure_set || cp.second.sq_distance (m_points.back ()) < m_closure.sq_distance (m_points.back ())) && 
+        std::pair<bool, db::DPoint> cp = e1.cut_point (e2);
+        if (cp.first && (! m_closure_set || cp.second.sq_distance (m_points.back ()) < m_closure.sq_distance (m_points.back ())) &&
             db::sprod (p1 - m_points [0], cp.second - m_points [0]) < 0.99 * p1.distance (m_points [0]) * cp.second.distance (m_points [0]) &&
             db::sprod (pl - m_points.back (), cp.second - m_points.back ()) < 0.99 * pl.distance (m_points.back ()) * cp.second.distance (m_points.back ())) {
           m_closure = cp.second;
           m_closure_set = true;
         }
       }
-
     }
 
-    if ( ! m_closure_set) {
+    if (! m_closure_set) {
 
-      for (std::vector <db::DVector>::const_iterator d2 = delta.begin (); d2 != delta.end (); ++d2) {
+      for (std::vector<db::DVector>::const_iterator d2 = delta.begin (); d2 != delta.end (); ++d2) {
 
         db::DEdge e1 (m_points [0], m_points [1]);
         db::DEdge e2 (m_points.back (), m_points.back () + *d2);
 
-        std::pair <bool, db::DPoint> cp = e1.cut_point (e2);
-        if (cp.first && (! m_closure_set || cp.second.sq_distance (m_points.back ()) < m_closure.sq_distance (m_points.back ())) && 
+        std::pair<bool, db::DPoint> cp = e1.cut_point (e2);
+        if (cp.first && (! m_closure_set || cp.second.sq_distance (m_points.back ()) < m_closure.sq_distance (m_points.back ())) &&
             db::sprod (p1 - m_points [0], cp.second - m_points [0]) < 0.99 * p1.distance (m_points [0]) * cp.second.distance (m_points [0]) &&
             db::sprod (pl - m_points.back (), cp.second - m_points.back ()) < 0.99 * pl.distance (m_points.back ()) * cp.second.distance (m_points.back ())) {
           m_closure = cp.second;
           m_closure_set = true;
         }
       }
-
     }
 
     //  if that is not working out, try each possible variations of edges from start and end point
-    if ( ! m_closure_set) {
-      for (std::vector <db::DVector>::const_iterator d1 = delta.begin (); d1 != delta.end (); ++d1) {
-        for (std::vector <db::DVector>::const_iterator d2 = delta.begin (); d2 != delta.end (); ++d2) {
+    if (! m_closure_set) {
+      for (std::vector<db::DVector>::const_iterator d1 = delta.begin (); d1 != delta.end (); ++d1) {
+        for (std::vector<db::DVector>::const_iterator d2 = delta.begin (); d2 != delta.end (); ++d2) {
 
           db::DEdge e1 (m_points [0], m_points [0] + *d1);
           db::DEdge e2 (m_points.back (), m_points.back () + *d2);
 
-          std::pair <bool, db::DPoint> cp = e1.cut_point (e2);
-          if (cp.first && (! m_closure_set || cp.second.sq_distance (m_points.back ()) < m_closure.sq_distance (m_points.back ())) && 
+          std::pair<bool, db::DPoint> cp = e1.cut_point (e2);
+          if (cp.first && (! m_closure_set || cp.second.sq_distance (m_points.back ()) < m_closure.sq_distance (m_points.back ())) &&
               db::sprod (p1 - m_points [0], cp.second - m_points [0]) < 0.99 * p1.distance (m_points [0]) * cp.second.distance (m_points [0]) &&
               db::sprod (pl - m_points.back (), cp.second - m_points.back ()) < 0.99 * pl.distance (m_points.back ()) * cp.second.distance (m_points.back ())) {
             m_closure = cp.second;
             m_closure_set = true;
           }
-
         }
       }
     }
-
   }
 }
 
-void
-PolygonService::update_marker ()
+void PolygonService::update_marker ()
 {
   if (m_points.size () == 2) {
 
@@ -357,7 +338,7 @@ PolygonService::update_marker ()
     db::Path path (points_dbu.begin (), points_dbu.end (), 0);
 
     lay::Marker *marker;
-    
+
     marker = new lay::Marker (view (), cv_index ());
     marker->set (path, db::VCplxTrans (1.0 / layout ().dbu ()) * trans ().inverted ());
     set_edit_marker (marker);
@@ -377,7 +358,6 @@ PolygonService::update_marker ()
       add_edit_marker (marker);
 
       pl = m_closure;
-
     }
 
     db::Edge edge (trans () * pl, trans () * m_points.front ());

@@ -43,7 +43,7 @@ class BrowseShapesConfigPage
   : public lay::ConfigPage,
     private Ui::BrowseShapesConfigPage
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   BrowseShapesConfigPage (QWidget *parent);
@@ -60,11 +60,17 @@ class BrowseShapesForm
   : public lay::Browser,
     private Ui::BrowseShapesForm
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
-  enum mode_type { ToCellView = 0, AnyTop, Local };
-  enum window_type { DontChange = 0, FitCell, FitMarker, Center, CenterSize };
+  enum mode_type { ToCellView = 0,
+                   AnyTop,
+                   Local };
+  enum window_type { DontChange = 0,
+                     FitCell,
+                     FitMarker,
+                     Center,
+                     CenterSize };
 
   BrowseShapesForm (lay::Dispatcher *root, LayoutViewBase *view);
   ~BrowseShapesForm ();
@@ -72,9 +78,9 @@ public:
   bool eventFilter (QObject *watched, QEvent *event);
 
 public slots:
-  void cell_changed(QTreeWidgetItem *, QTreeWidgetItem *);
-  void shape_inst_changed();
-  void cell_inst_changed(QTreeWidgetItem *, QTreeWidgetItem *);
+  void cell_changed (QTreeWidgetItem *, QTreeWidgetItem *);
+  void shape_inst_changed ();
+  void cell_inst_changed (QTreeWidgetItem *, QTreeWidgetItem *);
   void next_cell ();
   void prev_cell ();
   void next_shape ();
@@ -82,12 +88,12 @@ public slots:
   void next_inst ();
   void prev_inst ();
   void configure ();
-  
+
 private:
   lay::CellView m_cellview;
   int m_cv_index;
-  std::vector <lay::LayerPropertiesConstIterator> m_lprops;
-  std::vector <std::string> m_layer_names;
+  std::vector<lay::LayerPropertiesConstIterator> m_lprops;
+  std::vector<std::string> m_layer_names;
 
   bool m_cell_changed_enabled;
   bool m_view_changed;
@@ -129,11 +135,10 @@ private:
 
   //  implementation of the lay::Plugin interface
   void menu_activated (const std::string &symbol);
-
 };
 
 }
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

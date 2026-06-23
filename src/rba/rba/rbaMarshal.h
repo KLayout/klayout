@@ -69,4 +69,3 @@ bool test_arg (const gsi::ArgType &atype, VALUE arg, bool loose, bool object_sub
 #endif
 
 #endif
-

@@ -31,34 +31,33 @@
 
 namespace lay
 {
-  class Dispatcher;
-  class EditorOptionsPage;
-  class LayoutViewBase;
+class Dispatcher;
+class EditorOptionsPage;
+class LayoutViewBase;
 }
 
 namespace edt
 {
-  /**
-   *  @brief A helper class for plugin declarations for editor services
-   */
-  class PluginDeclarationBase
-    : public lay::PluginDeclaration
-  {
-    //  .. nothing yet ..
-  };
+/**
+ *  @brief A helper class for plugin declarations for editor services
+ */
+class PluginDeclarationBase
+  : public lay::PluginDeclaration
+{
+  //  .. nothing yet ..
+};
 
-  /**
-   * @brief Returns a value indicating whether polygons are enabled in the "Select" menu
-   */
-  bool polygons_enabled ();
+/**
+ * @brief Returns a value indicating whether polygons are enabled in the "Select" menu
+ */
+bool polygons_enabled ();
 
-  //  other types ...
-  bool paths_enabled ();
-  bool boxes_enabled ();
-  bool points_enabled ();
-  bool texts_enabled ();
-  bool instances_enabled ();
+//  other types ...
+bool paths_enabled ();
+bool boxes_enabled ();
+bool points_enabled ();
+bool texts_enabled ();
+bool instances_enabled ();
 }
 
 #endif
-

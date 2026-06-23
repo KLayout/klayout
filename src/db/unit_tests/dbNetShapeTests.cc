@@ -26,7 +26,7 @@
 #include "tlUnitTest.h"
 
 
-TEST(1)
+TEST (1)
 {
   db::GenericRepository repo;
 
@@ -51,7 +51,7 @@ TEST(1)
   EXPECT_EQ (db::NetShape (s.text_ref ()).text_ref ().obj ().to_string (), "('abc',r0 0,0)");
 }
 
-TEST(2)
+TEST (2)
 {
   db::GenericRepository repo;
 
@@ -74,7 +74,7 @@ TEST(2)
   EXPECT_EQ (s.text_ref ().obj ().transformed (s.text_ref ().trans ()).to_string (), "('abc',r0 110,220)");
 }
 
-TEST(3)
+TEST (3)
 {
   db::GenericRepository repo;
 
@@ -118,7 +118,7 @@ TEST(3)
   EXPECT_EQ ((s < s2) != (s2 < s), true);
 }
 
-TEST(4)
+TEST (4)
 {
   db::GenericRepository repo;
 
@@ -145,7 +145,7 @@ TEST(4)
   EXPECT_EQ (si.at_end (), true);
 }
 
-TEST(5)
+TEST (5)
 {
   db::GenericRepository repo;
 

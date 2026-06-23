@@ -48,8 +48,7 @@ DeepShapeCollectionDelegateBase::operator= (const DeepShapeCollectionDelegateBas
   return *this;
 }
 
-void
-DeepShapeCollectionDelegateBase::apply_property_translator (const db::PropertiesTranslator &pt)
+void DeepShapeCollectionDelegateBase::apply_property_translator (const db::PropertiesTranslator &pt)
 {
   db::Layout &layout = m_deep_layer.layout ();
   for (auto c = layout.begin (); c != layout.end (); ++c) {
@@ -63,17 +62,14 @@ DeepShapeCollectionDelegateBase::apply_property_translator (const db::Properties
       shapes.swap (new_shapes);
 
       shapes.assign (new_shapes, pt);
-
     }
-
   }
 }
 
 // -------------------------------------------------------------------------------------------------------------
 //  ShapeCollection implementation
 
-void
-ShapeCollection::apply_property_translator (const db::PropertiesTranslator &pt)
+void ShapeCollection::apply_property_translator (const db::PropertiesTranslator &pt)
 {
   if (get_delegate ()) {
     get_delegate ()->apply_property_translator (pt);

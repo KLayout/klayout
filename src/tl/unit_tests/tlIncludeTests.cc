@@ -32,7 +32,7 @@ static std::string np (const std::string &s)
   return tl::replaced (t, "\\", "/");
 }
 
-TEST(1_simple)
+TEST (1_simple)
 {
   std::string fn = tl::testdata () + "/tl/x.txt";
 
@@ -46,7 +46,7 @@ TEST(1_simple)
   EXPECT_EQ (ie.translate_to_original (2).second, 2);
 }
 
-TEST(2_single_include)
+TEST (2_single_include)
 {
   std::string fn = tl::testdata () + "/tl/x_inc1.txt";
 
@@ -65,7 +65,7 @@ TEST(2_single_include)
   EXPECT_EQ (ie.translate_to_original (3).second, 3);
 }
 
-TEST(3_multi_include)
+TEST (3_multi_include)
 {
   std::string fn = tl::testdata () + "/tl/x_inc3.txt";
 
@@ -87,7 +87,7 @@ TEST(3_multi_include)
   EXPECT_EQ (ie.translate_to_original (6).second, 3);
 }
 
-TEST(4_multi_include_interpolate)
+TEST (4_multi_include_interpolate)
 {
   std::string fn = tl::testdata () + "/tl/x_inc3_ip.txt";
 
@@ -109,7 +109,7 @@ TEST(4_multi_include_interpolate)
   EXPECT_EQ (ie.translate_to_original (6).second, 3);
 }
 
-TEST(5_issue946)
+TEST (5_issue946)
 {
   std::string fn = tl::testdata () + "/tl/x_inc4.txt";
 
@@ -136,4 +136,3 @@ TEST(5_issue946)
   //  no quotes here so this string can be used as the original file name if there is no include
   EXPECT_EQ (np (ie.to_string ()), np (tl::testdata () + "/tl/inc 4.txt"));
 }
-

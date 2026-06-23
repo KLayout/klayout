@@ -28,9 +28,9 @@
 
 #include <sstream>
 
-BD_PUBLIC int strmxor (int argc, char *argv[]);
+BD_PUBLIC int strmxor (int argc, char *argv []);
 
-TEST(0_Basic_Flat)
+TEST (0_Basic_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -42,16 +42,15 @@ TEST(0_Basic_Flat)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
+  const char *argv [] = {"x", input_a.c_str (), input_b.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 0);
 
   EXPECT_EQ (cap.captured_text (),
-    "No differences found\n"
-  );
+             "No differences found\n");
 }
 
-TEST(0_Basic_Deep)
+TEST (0_Basic_Deep)
 {
   tl::CaptureChannel cap;
 
@@ -63,16 +62,15 @@ TEST(0_Basic_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-u", input_a.c_str (), input_b.c_str () };
+  const char *argv [] = {"x", "-u", input_a.c_str (), input_b.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 0);
 
   EXPECT_EQ (cap.captured_text (),
-    "No differences found\n"
-  );
+             "No differences found\n");
 }
 
-TEST(1A_Flat)
+TEST (1A_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -87,9 +85,9 @@ TEST(1A_Flat)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -103,20 +101,19 @@ TEST(1A_Flat)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-    "Result summary (layers without differences are not shown):\n"
-    "\n"
-    "  Layer      Output       Differences (shape count)\n"
-    "  ----------------------------------------------------------------\n"
-    "  3/0        3/0          30\n"
-    "  6/0        6/0          41\n"
-    "  8/1        8/1          1\n"
-    "  10/0       -            (no such layer in first layout)\n"
-    "\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n"
+             "Result summary (layers without differences are not shown):\n"
+             "\n"
+             "  Layer      Output       Differences (shape count)\n"
+             "  ----------------------------------------------------------------\n"
+             "  3/0        3/0          30\n"
+             "  6/0        6/0          41\n"
+             "  8/1        8/1          1\n"
+             "  10/0       -            (no such layer in first layout)\n"
+             "\n");
 }
 
-TEST(1A_FlatWithExplicitOutputFormat)
+TEST (1A_FlatWithExplicitOutputFormat)
 {
   tl::CaptureChannel cap;
 
@@ -131,9 +128,9 @@ TEST(1A_FlatWithExplicitOutputFormat)
 
   std::string output = this->tmp_file ("tmp.xxx[oas]");
 
-  const char *argv[] = { "x", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -147,20 +144,19 @@ TEST(1A_FlatWithExplicitOutputFormat)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-    "Result summary (layers without differences are not shown):\n"
-    "\n"
-    "  Layer      Output       Differences (shape count)\n"
-    "  ----------------------------------------------------------------\n"
-    "  3/0        3/0          30\n"
-    "  6/0        6/0          41\n"
-    "  8/1        8/1          1\n"
-    "  10/0       -            (no such layer in first layout)\n"
-    "\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n"
+             "Result summary (layers without differences are not shown):\n"
+             "\n"
+             "  Layer      Output       Differences (shape count)\n"
+             "  ----------------------------------------------------------------\n"
+             "  3/0        3/0          30\n"
+             "  6/0        6/0          41\n"
+             "  8/1        8/1          1\n"
+             "  10/0       -            (no such layer in first layout)\n"
+             "\n");
 }
 
-TEST(1A_Deep)
+TEST (1A_Deep)
 {
   tl::CaptureChannel cap;
 
@@ -175,9 +171,9 @@ TEST(1A_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "--deep", "--drop-empty-cells=false", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "--deep", "--drop-empty-cells=false", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -189,20 +185,19 @@ TEST(1A_Deep)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-    "Result summary (layers without differences are not shown):\n"
-    "\n"
-    "  Layer      Output       Differences (hierarchical/flat count)\n"
-    "  ----------------------------------------------------------------\n"
-    "  3/0        3/0          3      / 30    \n"
-    "  6/0        6/0          314    / 314   \n"
-    "  8/1        8/1          1      / 1     \n"
-    "  10/0       -            (no such layer in first layout)\n"
-    "\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n"
+             "Result summary (layers without differences are not shown):\n"
+             "\n"
+             "  Layer      Output       Differences (hierarchical/flat count)\n"
+             "  ----------------------------------------------------------------\n"
+             "  3/0        3/0          3      / 30    \n"
+             "  6/0        6/0          314    / 314   \n"
+             "  8/1        8/1          1      / 1     \n"
+             "  10/0       -            (no such layer in first layout)\n"
+             "\n");
 }
 
-TEST(1A_DeepNoEmptyCells)
+TEST (1A_DeepNoEmptyCells)
 {
   tl::CaptureChannel cap;
 
@@ -217,9 +212,9 @@ TEST(1A_DeepNoEmptyCells)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "--deep", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "--deep", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -231,20 +226,19 @@ TEST(1A_DeepNoEmptyCells)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-    "Result summary (layers without differences are not shown):\n"
-    "\n"
-    "  Layer      Output       Differences (hierarchical/flat count)\n"
-    "  ----------------------------------------------------------------\n"
-    "  3/0        3/0          3      / 30    \n"
-    "  6/0        6/0          314    / 314   \n"
-    "  8/1        8/1          1      / 1     \n"
-    "  10/0       -            (no such layer in first layout)\n"
-    "\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n"
+             "Result summary (layers without differences are not shown):\n"
+             "\n"
+             "  Layer      Output       Differences (hierarchical/flat count)\n"
+             "  ----------------------------------------------------------------\n"
+             "  3/0        3/0          3      / 30    \n"
+             "  6/0        6/0          314    / 314   \n"
+             "  8/1        8/1          1      / 1     \n"
+             "  10/0       -            (no such layer in first layout)\n"
+             "\n");
 }
 
-TEST(1B_Flat)
+TEST (1B_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -256,25 +250,24 @@ TEST(1B_Flat)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
+  const char *argv [] = {"x", input_a.c_str (), input_b.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-    "Result summary (layers without differences are not shown):\n"
-    "\n"
-    "  Layer      Output       Differences (shape count)\n"
-    "  ----------------------------------------------------------------\n"
-    "  3/0        -            30\n"
-    "  6/0        -            41\n"
-    "  8/1        -            1\n"
-    "  10/0       -            (no such layer in first layout)\n"
-    "\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n"
+             "Result summary (layers without differences are not shown):\n"
+             "\n"
+             "  Layer      Output       Differences (shape count)\n"
+             "  ----------------------------------------------------------------\n"
+             "  3/0        -            30\n"
+             "  6/0        -            41\n"
+             "  8/1        -            1\n"
+             "  10/0       -            (no such layer in first layout)\n"
+             "\n");
 }
 
-TEST(1B_Deep)
+TEST (1B_Deep)
 {
   tl::CaptureChannel cap;
 
@@ -286,25 +279,24 @@ TEST(1B_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-u", input_a.c_str (), input_b.c_str () };
+  const char *argv [] = {"x", "-u", input_a.c_str (), input_b.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-    "Result summary (layers without differences are not shown):\n"
-    "\n"
-    "  Layer      Output       Differences (hierarchical/flat count)\n"
-    "  ----------------------------------------------------------------\n"
-    "  3/0        -            3      / 30    \n"
-    "  6/0        -            314    / 314   \n"
-    "  8/1        -            1      / 1     \n"
-    "  10/0       -            (no such layer in first layout)\n"
-    "\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n"
+             "Result summary (layers without differences are not shown):\n"
+             "\n"
+             "  Layer      Output       Differences (hierarchical/flat count)\n"
+             "  ----------------------------------------------------------------\n"
+             "  3/0        -            3      / 30    \n"
+             "  6/0        -            314    / 314   \n"
+             "  8/1        -            1      / 1     \n"
+             "  10/0       -            (no such layer in first layout)\n"
+             "\n");
 }
 
-TEST(1C_Flat)
+TEST (1C_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -316,16 +308,15 @@ TEST(1C_Flat)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "--no-summary", input_a.c_str (), input_b.c_str () };
+  const char *argv [] = {"x", "--no-summary", input_a.c_str (), input_b.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n");
 }
 
-TEST(1C_Deep)
+TEST (1C_Deep)
 {
   tl::CaptureChannel cap;
 
@@ -337,16 +328,15 @@ TEST(1C_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-u", "--no-summary", input_a.c_str (), input_b.c_str () };
+  const char *argv [] = {"x", "-u", "--no-summary", input_a.c_str (), input_b.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n");
 }
 
-TEST(1D_Flat)
+TEST (1D_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -358,13 +348,13 @@ TEST(1D_Flat)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-s", input_a.c_str (), input_b.c_str () };
+  const char *argv [] = {"x", "-s", input_a.c_str (), input_b.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
   EXPECT_EQ (cap.captured_text (), "");
 }
 
-TEST(1D_Deep)
+TEST (1D_Deep)
 {
   tl::CaptureChannel cap;
 
@@ -376,13 +366,13 @@ TEST(1D_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-u", "-s", input_a.c_str (), input_b.c_str () };
+  const char *argv [] = {"x", "-u", "-s", input_a.c_str (), input_b.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
   EXPECT_EQ (cap.captured_text (), "");
 }
 
-TEST(2_Flat)
+TEST (2_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -397,9 +387,9 @@ TEST(2_Flat)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "--no-summary", "-l", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "--no-summary", "-l", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -411,11 +401,10 @@ TEST(2_Flat)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    ""
-  );
+             "");
 }
 
-TEST(2_Deep)
+TEST (2_Deep)
 {
   tl::CaptureChannel cap;
 
@@ -430,9 +419,9 @@ TEST(2_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-u", "--no-summary", "--drop-empty-cells=false", "-l", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "-u", "--no-summary", "--drop-empty-cells=false", "-l", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -444,11 +433,10 @@ TEST(2_Deep)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    ""
-  );
+             "");
 }
 
-TEST(3_Flat)
+TEST (3_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -463,9 +451,9 @@ TEST(3_Flat)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "--no-summary", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "--no-summary", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -477,11 +465,10 @@ TEST(3_Flat)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n");
 }
 
-TEST(3_FlatCount)
+TEST (3_FlatCount)
 {
   tl::CaptureChannel cap;
 
@@ -496,25 +483,24 @@ TEST(3_FlatCount)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str () };
+  const char *argv [] = {"x", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-    "Result summary (layers without differences are not shown):\n"
-    "\n"
-    "  Layer      Output       Differences (shape count)\n"
-    "  ----------------------------------------------------------------\n"
-    "  3/0        -            31\n"
-    "  6/0        -            217\n"
-    "  8/1        -            168\n"
-    "  10/0       -            (no such layer in first layout)\n"
-    "\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n"
+             "Result summary (layers without differences are not shown):\n"
+             "\n"
+             "  Layer      Output       Differences (shape count)\n"
+             "  ----------------------------------------------------------------\n"
+             "  3/0        -            31\n"
+             "  6/0        -            217\n"
+             "  8/1        -            168\n"
+             "  10/0       -            (no such layer in first layout)\n"
+             "\n");
 }
 
-TEST(3_FlatHeal)
+TEST (3_FlatHeal)
 {
   tl::CaptureChannel cap;
 
@@ -529,9 +515,9 @@ TEST(3_FlatHeal)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "--heal", "--no-summary", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "--heal", "--no-summary", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -543,11 +529,10 @@ TEST(3_FlatHeal)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n");
 }
 
-TEST(3_FlatCountHeal)
+TEST (3_FlatCountHeal)
 {
   tl::CaptureChannel cap;
 
@@ -562,25 +547,24 @@ TEST(3_FlatCountHeal)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-m", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str () };
+  const char *argv [] = {"x", "-m", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-    "Result summary (layers without differences are not shown):\n"
-    "\n"
-    "  Layer      Output       Differences (shape count)\n"
-    "  ----------------------------------------------------------------\n"
-    "  3/0        -            30\n"
-    "  6/0        -            41\n"
-    "  8/1        -            1\n"
-    "  10/0       -            (no such layer in first layout)\n"
-    "\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n"
+             "Result summary (layers without differences are not shown):\n"
+             "\n"
+             "  Layer      Output       Differences (shape count)\n"
+             "  ----------------------------------------------------------------\n"
+             "  3/0        -            30\n"
+             "  6/0        -            41\n"
+             "  8/1        -            1\n"
+             "  10/0       -            (no such layer in first layout)\n"
+             "\n");
 }
 
-TEST(3_Deep)
+TEST (3_Deep)
 {
   tl::CaptureChannel cap;
 
@@ -596,9 +580,9 @@ TEST(3_Deep)
   std::string output = this->tmp_file ("tmp.oas");
 
   //  NOTE: -p is ignored in deep mode
-  const char *argv[] = { "x", "-u", "--drop-empty-cells=false", "--no-summary", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "-u", "--drop-empty-cells=false", "--no-summary", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -610,11 +594,10 @@ TEST(3_Deep)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n");
 }
 
-TEST(4_Flat)
+TEST (4_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -629,9 +612,9 @@ TEST(4_Flat)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "--no-summary", "-p=1.0", "-n=4", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "--no-summary", "-p=1.0", "-n=4", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -643,11 +626,10 @@ TEST(4_Flat)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n");
 }
 
-TEST(4_FlatHeal)
+TEST (4_FlatHeal)
 {
   tl::CaptureChannel cap;
 
@@ -662,9 +644,9 @@ TEST(4_FlatHeal)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "--heal", "--no-summary", "-p=1.0", "-n=4", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "--heal", "--no-summary", "-p=1.0", "-n=4", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -676,11 +658,10 @@ TEST(4_FlatHeal)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n");
 }
 
-TEST(4_Deep)
+TEST (4_Deep)
 {
   tl::CaptureChannel cap;
 
@@ -695,9 +676,9 @@ TEST(4_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-u", "--drop-empty-cells=false", "--no-summary", "-p=1.0", "-n=4", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "-u", "--drop-empty-cells=false", "--no-summary", "-p=1.0", "-n=4", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -709,11 +690,10 @@ TEST(4_Deep)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n");
 }
 
-TEST(5_Flat)
+TEST (5_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -728,9 +708,9 @@ TEST(5_Flat)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "--no-summary", "-b=1000", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "--no-summary", "-b=1000", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -742,11 +722,10 @@ TEST(5_Flat)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n");
 }
 
-TEST(5_Deep)
+TEST (5_Deep)
 {
   tl::CaptureChannel cap;
 
@@ -761,9 +740,9 @@ TEST(5_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-u", "--drop-empty-cells=false", "--no-summary", "-b=1000", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "-u", "--drop-empty-cells=false", "--no-summary", "-b=1000", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -775,11 +754,10 @@ TEST(5_Deep)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n");
 }
 
-TEST(6_Flat)
+TEST (6_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -794,9 +772,9 @@ TEST(6_Flat)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "--no-summary", "-ta=INV2", "-tb=2VNI", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "--no-summary", "-ta=INV2", "-tb=2VNI", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -808,11 +786,10 @@ TEST(6_Flat)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n");
 }
 
-TEST(6_Deep)
+TEST (6_Deep)
 {
   tl::CaptureChannel cap;
 
@@ -827,9 +804,9 @@ TEST(6_Deep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-u", "--no-summary", "-ta=INV2", "-tb=2VNI", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "-u", "--no-summary", "-ta=INV2", "-tb=2VNI", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -841,11 +818,10 @@ TEST(6_Deep)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Layer 10/0 is not present in first layout, but in second\n"
-  );
+             "Layer 10/0 is not present in first layout, but in second\n");
 }
 
-TEST(7_OptimizeDeep)
+TEST (7_OptimizeDeep)
 {
   tl::CaptureChannel cap;
 
@@ -860,9 +836,9 @@ TEST(7_OptimizeDeep)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  const char *argv[] = { "x", "-u", input_a.c_str (), input_b.c_str (), output.c_str () };
+  const char *argv [] = {"x", "-u", input_a.c_str (), input_b.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv [0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -874,12 +850,11 @@ TEST(7_OptimizeDeep)
 
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
-    "Result summary (layers without differences are not shown):\n"
-    "\n"
-    "  Layer      Output       Differences (hierarchical/flat count)\n"
-    "  ----------------------------------------------------------------\n"
-    "  2/0        2/0          1      / 12    \n"
-    "  3/0        3/0          8      / 8     \n"
-    "\n"
-  );
+             "Result summary (layers without differences are not shown):\n"
+             "\n"
+             "  Layer      Output       Differences (hierarchical/flat count)\n"
+             "  ----------------------------------------------------------------\n"
+             "  2/0        2/0          1      / 12    \n"
+             "  3/0        3/0          8      / 8     \n"
+             "\n");
 }

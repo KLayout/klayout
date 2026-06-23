@@ -35,7 +35,7 @@ namespace db
  *  @brief The base class of a database object
  *
  *  The main purpose of the db::Object class is to provide
- *  transaction and recall functionality. Basically this is 
+ *  transaction and recall functionality. Basically this is
  *  an implementation of the strategy pattern that is used
  *  to implement the recall functionality.
  */
@@ -57,11 +57,11 @@ public:
    */
   virtual ~Object ();
 
-  /** 
+  /**
    *  @brief Copy constructor
    *
    *  The copy constructor copies the attachment to
-   *  a manager object. 
+   *  a manager object.
    */
   Object (const Object &);
 
@@ -84,7 +84,7 @@ public:
    */
   void manager (db::Manager *p_manager);
 
-  /** 
+  /**
    *  @brief The undo 'strategy'
    *
    *  For a detailed description of this method see db::Manager::queue.
@@ -92,10 +92,11 @@ public:
    *  assumed that once the operation is successfully queued it can be undone
    *  in every case.
    */
-  virtual void undo (db::Op * /*op*/) 
-  { }
+  virtual void undo (db::Op * /*op*/)
+  {
+  }
 
-  /** 
+  /**
    *  @brief The redo 'strategy'
    *
    *  For a detailed description of this method see db::Manager::queue.
@@ -104,12 +105,13 @@ public:
    *  in every case.
    */
   virtual void redo (db::Op * /*op*/)
-  { }
+  {
+  }
 
   /**
    *  @brief The id getter method
    */
-  db::Manager::ident_t id () const 
+  db::Manager::ident_t id () const
   {
     return m_id;
   }
@@ -162,4 +164,3 @@ private:
 } // namespace db
 
 #endif
-

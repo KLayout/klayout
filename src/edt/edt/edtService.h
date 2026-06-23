@@ -44,11 +44,13 @@
 #include <set>
 #include <vector>
 
-namespace lay {
-  class LayerPropertiesConstIterator;
+namespace lay
+{
+class LayerPropertiesConstIterator;
 }
 
-namespace edt {
+namespace edt
+{
 
 class Service;
 class PluginDeclarationBase;
@@ -62,7 +64,7 @@ class EDT_PUBLIC ClipboardData
   : public db::ClipboardData
 {
 public:
-  ClipboardData () { }
+  ClipboardData () {}
 };
 
 // -------------------------------------------------------------
@@ -88,7 +90,7 @@ public:
 
   EditableSelectionIterator &operator++ ();
   reference operator* () const;
-  pointer operator-> () const;
+  pointer operator->() const;
 
 private:
   std::vector<const edt::Service *> m_services;
@@ -106,8 +108,13 @@ class EDT_PUBLIC Service
   : public lay::EditorServiceBase,
     public db::Object
 {
-public: 
-  enum SnapMode { Any = 0, Diagonal, Ortho, Horizontal, Vertical, NumSnapModes };
+public:
+  enum SnapMode { Any = 0,
+                  Diagonal,
+                  Ortho,
+                  Horizontal,
+                  Vertical,
+                  NumSnapModes };
 
   typedef std::set<lay::ObjectInstPath> objects;
   typedef objects::const_iterator obj_iterator;
@@ -127,12 +134,12 @@ public:
    */
   ~Service ();
 
-  /** 
+  /**
    *  @brief Clear all highlights (for current object highlighting)
    */
   void clear_highlights ();
 
-  /** 
+  /**
    *  @brief Restore all highlights (for current object highlighting)
    */
   void restore_highlights ();
@@ -142,7 +149,7 @@ public:
    */
   void highlight (const std::set<const lay::ObjectInstPath *> &highlights);
 
-  /** 
+  /**
    *  @brief "delete" operation
    */
   virtual void del ();
@@ -151,8 +158,8 @@ public:
    *  @brief Deliver the selection's bbox (reimplementation of lay::Editable interface)
    */
   virtual db::DBox selection_bbox ();
- 
-  /** 
+
+  /**
    *  @brief "transform" operation
    */
   virtual void transform (const db::DCplxTrans &tr)
@@ -160,12 +167,12 @@ public:
     transform (tr, 0);
   }
 
-  /** 
+  /**
    *  @brief "cut" operation
    */
   virtual void cut ();
 
-  /** 
+  /**
    *  @brief "copy" operation
    */
   virtual void copy ();
@@ -210,7 +217,7 @@ public:
    */
   virtual bool has_transient_selection ();
 
-  /** 
+  /**
    *  @brief "select" operation
    */
   virtual double click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mode);
@@ -230,7 +237,7 @@ public:
    */
   virtual bool select (const db::DBox &box, lay::Editable::SelectionMode mode);
 
-  /** 
+  /**
    *  @brief Returns true, if the given selected object is handled by this service
    */
   virtual bool selection_applies (const lay::ObjectInstPath &sel) const;
@@ -238,13 +245,13 @@ public:
   /**
    *  @brief Get the selection for the properties page
    */
-  void get_selection (std::vector <lay::ObjectInstPath> &selection) const;
+  void get_selection (std::vector<lay::ObjectInstPath> &selection) const;
 
   /**
    *  @brief "transform" operation with a transformation vector
    *
    *  This version of the transformation operation allows one to specify a transformation per selected object.
-   *  The transformations in the vector must be ordered in the order the selection is delivered by 
+   *  The transformations in the vector must be ordered in the order the selection is delivered by
    *  the selection iterator.
    *  Either global or per-object transformations can be specified. If a per-object transformation is
    *  specified, the global transformation is ignored.
@@ -321,14 +328,14 @@ public:
   /**
    *  @brief Set the selection
    */
-  void set_selection (std::vector <lay::ObjectInstPath>::const_iterator s1, std::vector <lay::ObjectInstPath>::const_iterator s2);
+  void set_selection (std::vector<lay::ObjectInstPath>::const_iterator s1, std::vector<lay::ObjectInstPath>::const_iterator s2);
 
-  /** 
+  /**
    *  @brief Add one element to the selection
    */
   void add_selection (const lay::ObjectInstPath &sel);
 
-  /** 
+  /**
    *  @brief Removes one element from the selection
    */
   void remove_selection (const lay::ObjectInstPath &sel);
@@ -349,7 +356,7 @@ public:
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
 
   /**
-   *  @brief Implement the mouse mode: button double clicked 
+   *  @brief Implement the mouse mode: button double clicked
    */
   virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
 
@@ -477,28 +484,28 @@ protected:
    *
    *  This method is called when the object is started to be edited
    */
-  virtual void do_begin_edit (const db::DPoint & /*p*/) { }
+  virtual void do_begin_edit (const db::DPoint & /*p*/) {}
 
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors
    *
    *  This method is called when the mouse is moved
    */
-  virtual void do_mouse_move (const db::DPoint & /*p*/) { }
+  virtual void do_mouse_move (const db::DPoint & /*p*/) {}
 
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors
    *
    *  This method is called when the mouse is moved but editing has not started yet
    */
-  virtual void do_mouse_move_inactive (const db::DPoint & /*p*/) { }
+  virtual void do_mouse_move_inactive (const db::DPoint & /*p*/) {}
 
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors
    *
    *  Transform the current edited object by the given fixpoint transformation
    */
-  virtual void do_mouse_transform (const db::DPoint & /*p*/, db::DFTrans /*trans*/) { }
+  virtual void do_mouse_transform (const db::DPoint & /*p*/, db::DFTrans /*trans*/) {}
 
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors
@@ -513,7 +520,7 @@ protected:
    *
    *  This method is called when the backspace button is pressed
    */
-  virtual void do_delete () { }
+  virtual void do_delete () {}
 
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors
@@ -523,14 +530,14 @@ protected:
    *  'accept' is set to true if triggered by the Enter/Return key, false if triggered by a mouse click.
    *  In the latter case, first the mouse click is delivered and then "do_finish_edit" is called.
    */
-  virtual void do_finish_edit (bool /*accept*/) { }
+  virtual void do_finish_edit (bool /*accept*/) {}
 
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors
    *
    *  This method is called when the edit operation should be cancelled
    */
-  virtual void do_cancel_edit () { }
+  virtual void do_cancel_edit () {}
 
   /**
    *  @brief Called when a configuration parameter provided by the service base class has changed
@@ -577,7 +584,7 @@ protected:
   db::DVector snap (db::DVector v) const;
 
   /**
-   *  @brief Snap a point to the edit grid with an angle constraint 
+   *  @brief Snap a point to the edit grid with an angle constraint
    *
    *  @param p The point to snap
    *  @param plast The last point of the connection/move vector
@@ -703,7 +710,7 @@ private:
   lay::LayoutViewBase *mp_view;
 
   //  The marker objects representing the selection
-  std::vector<std::pair<const lay::ObjectInstPath *, lay::ViewObject *> > m_markers;
+  std::vector<std::pair<const lay::ObjectInstPath *, lay::ViewObject *>> m_markers;
 
   //  Marker for the transient selection
   lay::ViewObject *mp_transient_marker;
@@ -876,4 +883,3 @@ EDT_PUBLIC EditableSelectionIterator begin_objects_selected_transient (const lay
 }
 
 #endif
-

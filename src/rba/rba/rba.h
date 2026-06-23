@@ -113,10 +113,10 @@ public:
    *  @brief Implementation of gsi::Interpreter::eval_expr
    */
   tl::Variant eval_expr (const char *string, const char *filename = 0, int line = 1, int context = -1);
- 
+
   /**
    *  @brief Implementation of gsi::Interpreter::eval_string_and_print
-   */ 
+   */
   void eval_string_and_print (const char *string, const char *filename = 0, int line = 1, int context = -1);
 
   /**
@@ -125,7 +125,7 @@ public:
   virtual gsi::Inspector *inspector (int context = -1);
 
   /**
-   *  @brief Defines a global variable with the given name and value 
+   *  @brief Defines a global variable with the given name and value
    */
   void define_variable (const std::string &name, const tl::Variant &value);
 
@@ -252,4 +252,3 @@ private:
 }
 
 #endif
-

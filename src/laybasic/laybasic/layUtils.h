@@ -25,7 +25,8 @@
 
 #include "laybasicCommon.h"
 
-namespace lay {
+namespace lay
+{
 
 /**
  *  @brief Returns true, if GUI is enabled
@@ -35,4 +36,3 @@ LAYBASIC_PUBLIC bool has_gui ();
 }
 
 #endif
-

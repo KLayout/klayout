@@ -36,7 +36,8 @@
 #include "tlException.h"
 #include "tlExceptions.h"
 
-namespace edt {
+namespace edt
+{
 
 // ----------------------------------------------------------------------
 //  edt::InstantiationForm implementation
@@ -61,8 +62,7 @@ InstantiationForm::~InstantiationForm ()
   }
 }
 
-void 
-InstantiationForm::display_mode_changed (bool)
+void InstantiationForm::display_mode_changed (bool)
 {
   if (! m_enable_cb_callbacks) {
     return;
@@ -74,8 +74,7 @@ InstantiationForm::display_mode_changed (bool)
   update ();
 }
 
-void 
-InstantiationForm::double_clicked (QListWidgetItem *item)
+void InstantiationForm::double_clicked (QListWidgetItem *item)
 {
   int row = list->row (item);
   if (row < 0) {
@@ -102,7 +101,7 @@ InstantiationForm::double_clicked (QListWidgetItem *item)
   }
 
   const db::Layout &layout = cv->layout ();
-  db::Box box = layout.cell (row == 0 ? cv.ctx_cell_index (): path.back ()).bbox ();
+  db::Box box = layout.cell (row == 0 ? cv.ctx_cell_index () : path.back ()).bbox ();
 
   //  TODO: this does not consider global transformation and variants of this
   db::ICplxTrans abs_trans;
@@ -117,8 +116,7 @@ InstantiationForm::double_clicked (QListWidgetItem *item)
   mp_marker->set (box, abs_trans, mp_view->cv_transform_variants (cv_index));
 }
 
-void 
-InstantiationForm::show (lay::LayoutViewBase *view, const lay::ObjectInstPath &path)
+void InstantiationForm::show (lay::LayoutViewBase *view, const lay::ObjectInstPath &path)
 {
   mp_view = view;
   mp_path = &path;
@@ -135,8 +133,7 @@ InstantiationForm::show (lay::LayoutViewBase *view, const lay::ObjectInstPath &p
   mp_path = 0;
 }
 
-void 
-InstantiationForm::update ()
+void InstantiationForm::update ()
 {
   bool dbu_coord = dbu_cb->isChecked ();
   bool abs_coord = abs_cb->isChecked ();
@@ -171,9 +168,8 @@ InstantiationForm::update ()
     if (n > 1) {
       line += " " + tl::sprintf (tl::to_string (tr ("(first of %lu array members)")), (unsigned long) n);
     }
-    
-    list->addItem (tl::to_qstring (line));
 
+    list->addItem (tl::to_qstring (line));
   }
 
   //  then, add the actual path to the object within the target cell
@@ -198,7 +194,6 @@ InstantiationForm::update ()
     }
 
     list->addItem (tl::to_qstring (line));
-
   }
 }
 
@@ -218,8 +213,7 @@ CopyModeDialog::~CopyModeDialog ()
   //  .. nothing yet ..
 }
 
-bool 
-CopyModeDialog::exec_dialog (unsigned int &mode, bool &dont_ask)
+bool CopyModeDialog::exec_dialog (unsigned int &mode, bool &dont_ask)
 {
   if (mode == 0) {
     shallow_rb->setChecked (true);
@@ -253,10 +247,9 @@ ChangeLayerOptionsDialog::~ChangeLayerOptionsDialog ()
   //  .. nothing yet ..
 }
 
-bool 
-ChangeLayerOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int cv_index, unsigned int &new_layer)
+bool ChangeLayerOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int cv_index, unsigned int &new_layer)
 {
-  std::vector <std::pair <db::LayerProperties, unsigned int> > ll;
+  std::vector<std::pair<db::LayerProperties, unsigned int>> ll;
 
   const db::Layout &layout = view->cellview (cv_index)->layout ();
   for (unsigned int i = 0; i < layout.layers (); ++i) {
@@ -270,7 +263,7 @@ ChangeLayerOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int cv_index, 
   target_cbx->clear ();
   int initial_sel = -1;
   int i = 0;
-  for (std::vector <std::pair <db::LayerProperties, unsigned int> >::const_iterator lp = ll.begin (); lp != ll.end (); ++lp, ++i) {
+  for (std::vector<std::pair<db::LayerProperties, unsigned int>>::const_iterator lp = ll.begin (); lp != ll.end (); ++lp, ++i) {
     if (lp->second == new_layer) {
       initial_sel = i;
     }
@@ -302,21 +295,20 @@ AlignOptionsDialog::~AlignOptionsDialog ()
   //  .. nothing yet ..
 }
 
-bool 
-AlignOptionsDialog::exec_dialog (int &hmode, int &vmode, bool &visible_layers)
+bool AlignOptionsDialog::exec_dialog (int &hmode, int &vmode, bool &visible_layers)
 {
-  QRadioButton *hmode_buttons [] = { this->h_none_rb, this->h_left_rb, this->h_center_rb, this->h_right_rb };
-  QRadioButton *vmode_buttons [] = { this->v_none_rb, this->v_top_rb, this->v_center_rb, this->v_bottom_rb };
-  QRadioButton *layers_buttons [] = { this->all_layers_rb, this->visible_layers_rb };
-  
+  QRadioButton *hmode_buttons [] = {this->h_none_rb, this->h_left_rb, this->h_center_rb, this->h_right_rb};
+  QRadioButton *vmode_buttons [] = {this->v_none_rb, this->v_top_rb, this->v_center_rb, this->v_bottom_rb};
+  QRadioButton *layers_buttons [] = {this->all_layers_rb, this->visible_layers_rb};
+
   for (int i = 0; i < 4; ++i) {
-    hmode_buttons [i]->setChecked (hmode == i); 
+    hmode_buttons [i]->setChecked (hmode == i);
   }
   for (int i = 0; i < 4; ++i) {
-    vmode_buttons [i]->setChecked (vmode == i); 
+    vmode_buttons [i]->setChecked (vmode == i);
   }
   for (int i = 0; i < 2; ++i) {
-    layers_buttons [i]->setChecked (int (visible_layers) == i); 
+    layers_buttons [i]->setChecked (int (visible_layers) == i);
   }
 
   if (QDialog::exec ()) {
@@ -365,12 +357,11 @@ DistributeOptionsDialog::~DistributeOptionsDialog ()
   //  .. nothing yet ..
 }
 
-bool
-DistributeOptionsDialog::exec_dialog (bool &hdistribute, int &hmode, double &hpitch, double &hspace, bool &vdistribute, int &vmode, double &vpitch, double &vspace, bool &visible_layers)
+bool DistributeOptionsDialog::exec_dialog (bool &hdistribute, int &hmode, double &hpitch, double &hspace, bool &vdistribute, int &vmode, double &vpitch, double &vspace, bool &visible_layers)
 {
-  QRadioButton *hmode_buttons [] = { this->h_none_rb, this->h_left_rb, this->h_center_rb, this->h_right_rb };
-  QRadioButton *vmode_buttons [] = { this->v_none_rb, this->v_top_rb, this->v_center_rb, this->v_bottom_rb };
-  QRadioButton *layers_buttons [] = { this->all_layers_rb, this->visible_layers_rb };
+  QRadioButton *hmode_buttons [] = {this->h_none_rb, this->h_left_rb, this->h_center_rb, this->h_right_rb};
+  QRadioButton *vmode_buttons [] = {this->v_none_rb, this->v_top_rb, this->v_center_rb, this->v_bottom_rb};
+  QRadioButton *layers_buttons [] = {this->all_layers_rb, this->visible_layers_rb};
 
   this->h_distribute->setChecked (hdistribute);
   for (int i = 1; i < 4; ++i) {
@@ -441,31 +432,30 @@ DistributeOptionsDialog::exec_dialog (bool &hdistribute, int &hmode, double &hpi
 
 MakeCellOptionsDialog::MakeCellOptionsDialog (QWidget *parent)
   : QDialog (parent)
-{ 
+{
   setupUi (this);
 
   setObjectName (QString::fromUtf8 ("make_cell_options_dialog"));
 
-  QToolButton *buttons[3][3] = { { lb, cb, rb }, { lc, cc, rc }, { lt, ct, rt } };
+  QToolButton *buttons [3][3] = {{lb, cb, rb}, {lc, cc, rc}, {lt, ct, rt}};
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      connect (buttons[i][j], SIGNAL (clicked ()), this, SLOT (button_clicked ()));
+      connect (buttons [i][j], SIGNAL (clicked ()), this, SLOT (button_clicked ()));
     }
   }
 }
 
-bool 
-MakeCellOptionsDialog::exec_dialog (const db::Layout &layout, std::string &name, int &mode_x, int &mode_y)
+bool MakeCellOptionsDialog::exec_dialog (const db::Layout &layout, std::string &name, int &mode_x, int &mode_y)
 {
   do {
-BEGIN_PROTECTED
+    BEGIN_PROTECTED
 
-    QToolButton *buttons[3][3] = { { lb, cb, rb }, { lc, cc, rc }, { lt, ct, rt } };
+    QToolButton *buttons [3][3] = {{lb, cb, rb}, {lc, cc, rc}, {lt, ct, rt}};
 
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
-        buttons[i][j]->setChecked (j - 1 == mode_x && i - 1 == mode_y);
+        buttons [i][j]->setChecked (j - 1 == mode_x && i - 1 == mode_y);
       }
     }
 
@@ -476,7 +466,7 @@ BEGIN_PROTECTED
       if (origin_groupbox->isChecked ()) {
         for (int i = 0; i < 3; ++i) {
           for (int j = 0; j < 3; ++j) {
-            if (buttons[i][j]->isChecked ()) {
+            if (buttons [i][j]->isChecked ()) {
               mode_x = j - 1;
               mode_y = i - 1;
             }
@@ -499,14 +489,13 @@ BEGIN_PROTECTED
       return false;
     }
 
-END_PROTECTED
+    END_PROTECTED
   } while (true);
 }
 
-void
-MakeCellOptionsDialog::button_clicked ()
+void MakeCellOptionsDialog::button_clicked ()
 {
-  QToolButton *buttons[3][3] = { { lb, cb, rb }, { lc, cc, rc }, { lt, ct, rt } };
+  QToolButton *buttons [3][3] = {{lb, cb, rb}, {lc, cc, rc}, {lt, ct, rt}};
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
@@ -535,8 +524,7 @@ RoundCornerOptionsDialog::~RoundCornerOptionsDialog ()
   //  .. nothing yet ..
 }
 
-void
-RoundCornerOptionsDialog::amend_changed ()
+void RoundCornerOptionsDialog::amend_changed ()
 {
   if (amend_cb->isChecked () && m_has_extracted) {
     router_le->setText (tl::to_qstring (tl::to_string (m_router_extracted)));
@@ -549,8 +537,7 @@ RoundCornerOptionsDialog::amend_changed ()
   }
 }
 
-bool
-RoundCornerOptionsDialog::exec_dialog (const db::Layout &layout, double &router, double &rinner, unsigned int &npoints, bool &undo_before_apply, double router_extracted, double rinner_extracted, unsigned int npoints_extracted, bool has_extracted)
+bool RoundCornerOptionsDialog::exec_dialog (const db::Layout &layout, double &router, double &rinner, unsigned int &npoints, bool &undo_before_apply, double router_extracted, double rinner_extracted, unsigned int npoints_extracted, bool has_extracted)
 {
   m_router_extracted = router_extracted;
   m_rinner_extracted = rinner_extracted;
@@ -597,14 +584,13 @@ RoundCornerOptionsDialog::exec_dialog (const db::Layout &layout, double &router,
   }
 }
 
-void 
-RoundCornerOptionsDialog::accept ()
+void RoundCornerOptionsDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
 
   double rhull = 0.0, rholes = 0.0;
   unsigned int npoints = 0;
-  
+
   tl::from_string_ext (tl::to_string (router_le->text ()), rhull);
   if (rinner_le->text ().isEmpty ()) {
     rholes = rhull;
@@ -634,7 +620,7 @@ BEGIN_PROTECTED;
 
   QDialog::accept ();
 
-END_PROTECTED;
+  END_PROTECTED;
 }
 
 // --------------------------------------------------------------------------------
@@ -642,12 +628,11 @@ END_PROTECTED;
 
 MakeArrayOptionsDialog::MakeArrayOptionsDialog (QWidget *parent)
   : QDialog (parent)
-{ 
+{
   setupUi (this);
 }
 
-bool 
-MakeArrayOptionsDialog::exec_dialog (ArrayOptions &options)
+bool MakeArrayOptionsDialog::exec_dialog (ArrayOptions &options)
 {
   rows_le->setText (tl::to_qstring (tl::to_string (options.na)));
   columns_le->setText (tl::to_qstring (tl::to_string (options.nb)));
@@ -688,13 +673,11 @@ MakeArrayOptionsDialog::exec_dialog (ArrayOptions &options)
   } else {
     return false;
   }
-
 }
 
-void 
-MakeArrayOptionsDialog::accept ()
+void MakeArrayOptionsDialog::accept ()
 {
-BEGIN_PROTECTED;
+  BEGIN_PROTECTED;
 
   double bx = 0.0, by = 0.0;
   double ax = 0.0, ay = 0.0;
@@ -713,7 +696,7 @@ BEGIN_PROTECTED;
 
   QDialog::accept ();
 
-END_PROTECTED;
+  END_PROTECTED;
 }
 
 // --------------------------------------------------------------------------------
@@ -730,8 +713,7 @@ AreaAndPerimeterDialog::~AreaAndPerimeterDialog ()
   //  .. nothing yet ..
 }
 
-bool
-AreaAndPerimeterDialog::exec_dialog (double area, double perimeter)
+bool AreaAndPerimeterDialog::exec_dialog (double area, double perimeter)
 {
   area_le->setText (tl::to_qstring (tl::sprintf ("%.12g", area)));
   perimeter_le->setText (tl::to_qstring (tl::sprintf ("%.12g", perimeter)));
@@ -754,12 +736,12 @@ popup_tap_layer_menu (lay::LayoutViewBase *view, const std::set<db::LayerPropert
     return lay::LayerPropertiesConstIterator ();
   }
 
-  lay::ShapeFinder finder (true,    //  point mode
-                           false,   //  all hierarchy levels
-                           db::ShapeIterator::flags_type (db::ShapeIterator::All - db::ShapeIterator::Texts),  //  do not consider texts - their bounding box may be too large
-                           0,       //  no excludes
-                           true     //  capture all shapes
-                          );
+  lay::ShapeFinder finder (true,                                                                              //  point mode
+                           false,                                                                             //  all hierarchy levels
+                           db::ShapeIterator::flags_type (db::ShapeIterator::All - db::ShapeIterator::Texts), //  do not consider texts - their bounding box may be too large
+                           0,                                                                                 //  no excludes
+                           true                                                                               //  capture all shapes
+  );
 
   //  capture all objects in point mode (default: capture one only)
   finder.set_catch_all (true);
@@ -768,14 +750,13 @@ popup_tap_layer_menu (lay::LayoutViewBase *view, const std::set<db::LayerPropert
   db::DPoint pt = view->canvas ()->mouse_position_um ();
   finder.find (view, db::DBox (pt, pt));
 
-  std::set<std::pair<unsigned int, unsigned int> > layers_in_selection;
+  std::set<std::pair<unsigned int, unsigned int>> layers_in_selection;
 
   for (lay::ShapeFinder::iterator f = finder.begin (); f != finder.end (); ++f) {
     if (cv_index < 0 || int (f->cv_index ()) == cv_index) {
       const db::Layout &ly = view->cellview (f->cv_index ())->layout ();
       //  ignore guiding shapes and only provide layers from the filter
-      if (f->layer () != ly.guiding_shape_layer ()
-          && (! filter || filter->find (ly.get_properties (f->layer ())) != filter->end ())) {
+      if (f->layer () != ly.guiding_shape_layer () && (! filter || filter->find (ly.get_properties (f->layer ())) != filter->end ())) {
         layers_in_selection.insert (std::make_pair (f->cv_index (), f->layer ()));
       }
     }
@@ -783,7 +764,7 @@ popup_tap_layer_menu (lay::LayoutViewBase *view, const std::set<db::LayerPropert
 
   std::vector<lay::LayerPropertiesConstIterator> tapped_layers;
   for (lay::LayerPropertiesConstIterator lp = view->begin_layers (view->current_layer_list ()); ! lp.at_end (); ++lp) {
-    const lay::LayerPropertiesNode *ln = lp.operator-> ();
+    const lay::LayerPropertiesNode *ln = lp.operator->();
     if (layers_in_selection.find (std::make_pair ((unsigned int) ln->cellview_index (), (unsigned int) ln->layer_index ())) != layers_in_selection.end ()) {
       tapped_layers.push_back (lp);
     }
@@ -823,10 +804,8 @@ popup_tap_layer_menu (lay::LayoutViewBase *view, const std::set<db::LayerPropert
   } else {
     return lay::LayerPropertiesConstIterator ();
   }
-
 }
 
 }
 
 #endif
-

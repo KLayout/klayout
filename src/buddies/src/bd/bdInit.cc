@@ -90,8 +90,7 @@ ProgressAdaptor::~ProgressAdaptor ()
   //  .. nothing yet ..
 }
 
-void
-ProgressAdaptor::trigger (tl::Progress *progress)
+void ProgressAdaptor::trigger (tl::Progress *progress)
 {
   if (progress && first () == progress && tl::verbosity () >= m_verbosity) {
 
@@ -107,17 +106,15 @@ ProgressAdaptor::trigger (tl::Progress *progress)
       tl::info << ".. " << value;
       m_progress_value = value;
     }
-
   }
 }
 
-void
-ProgressAdaptor::yield (tl::Progress * /*progress*/)
+void ProgressAdaptor::yield (tl::Progress * /*progress*/)
 {
   //  .. nothing yet ..
 }
 
-int _main_impl (int (*delegate) (int, char *[]), int argc, char *argv[])
+int _main_impl (int (*delegate) (int, char *[]), int argc, char *argv [])
 {
   try {
     ProgressAdaptor progress_adaptor (10);

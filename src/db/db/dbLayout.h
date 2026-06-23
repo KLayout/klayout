@@ -89,8 +89,8 @@ class DB_PUBLIC_TEMPLATE cell_list_iterator
 public:
   typedef C cell_type;
   typedef cell_type value_type;
-  typedef cell_type *pointer; 
-  typedef cell_type &reference; 
+  typedef cell_type *pointer;
+  typedef cell_type &reference;
   typedef std::bidirectional_iterator_tag iterator_category;
   typedef void difference_type;
 
@@ -99,14 +99,16 @@ public:
    */
   cell_list_iterator ()
     : mp_cell (0)
-  { }
+  {
+  }
 
   /**
    *  @brief Constructor pointing to a certain element
    */
   cell_list_iterator (cell_type *cell)
     : mp_cell (cell)
-  { }
+  {
+  }
 
   /**
    *  @brief Equality
@@ -127,7 +129,7 @@ public:
   /**
    *  @brief Increment
    */
-  cell_list_iterator &operator++ () 
+  cell_list_iterator &operator++ ()
   {
     mp_cell = mp_cell->mp_next;
     return *this;
@@ -136,7 +138,7 @@ public:
   /**
    *  @brief Decrement
    */
-  cell_list_iterator &operator-- () 
+  cell_list_iterator &operator-- ()
   {
     mp_cell = mp_cell->mp_last;
     return *this;
@@ -153,7 +155,7 @@ public:
   /**
    *  @brief Access
    */
-  cell_type *operator-> () const
+  cell_type *operator->() const
   {
     return mp_cell;
   }
@@ -173,8 +175,8 @@ class cell_list_const_iterator
 public:
   typedef C cell_type;
   typedef const cell_type value_type;
-  typedef const cell_type *pointer; 
-  typedef const cell_type &reference; 
+  typedef const cell_type *pointer;
+  typedef const cell_type &reference;
   typedef std::bidirectional_iterator_tag iterator_category;
   typedef void difference_type;
 
@@ -183,21 +185,24 @@ public:
    */
   cell_list_const_iterator ()
     : mp_cell (0)
-  { }
+  {
+  }
 
   /**
    *  @brief Constructor pointing to a certain element
    */
   cell_list_const_iterator (const cell_type *cell)
     : mp_cell (cell)
-  { }
+  {
+  }
 
   /**
    *  @brief Default constructor
    */
   cell_list_const_iterator (cell_list_iterator<cell_type> iter)
-    : mp_cell (iter.operator-> ())
-  { }
+    : mp_cell (iter.operator->())
+  {
+  }
 
   /**
    *  @brief Equality
@@ -218,7 +223,7 @@ public:
   /**
    *  @brief Increment
    */
-  cell_list_const_iterator &operator++ () 
+  cell_list_const_iterator &operator++ ()
   {
     mp_cell = mp_cell->mp_next;
     return *this;
@@ -227,7 +232,7 @@ public:
   /**
    *  @brief Decrement
    */
-  cell_list_const_iterator &operator-- () 
+  cell_list_const_iterator &operator-- ()
   {
     mp_cell = mp_cell->mp_last;
     return *this;
@@ -244,7 +249,7 @@ public:
   /**
    *  @brief Access
    */
-  const cell_type *operator-> () const
+  const cell_type *operator->() const
   {
     return mp_cell;
   }
@@ -254,7 +259,7 @@ private:
 };
 
 /**
- *  @brief The cell list 
+ *  @brief The cell list
  */
 template <class C>
 class cell_list
@@ -307,7 +312,7 @@ public:
     }
     mp_last = new_cell;
   }
-  
+
   /**
    *  @brief empty predicate
    *
@@ -317,23 +322,23 @@ public:
   {
     return mp_last == 0 && mp_first == 0;
   }
-  
+
   /**
    *  @brief begin iterator
    */
-  iterator begin () 
+  iterator begin ()
   {
     return iterator (mp_first);
   }
-  
+
   /**
    *  @brief end iterator
    */
-  iterator end () 
+  iterator end ()
   {
     return iterator (0);
   }
-  
+
   /**
    *  @brief begin iterator (const)
    */
@@ -341,7 +346,7 @@ public:
   {
     return const_iterator (mp_first);
   }
-  
+
   /**
    *  @brief end iterator (const)
    */
@@ -354,13 +359,13 @@ public:
    *  @brief Take out an element from the list
    *
    *  This removes the element from the list but does not
-   *  destroy it. The ownership is given back to the 
+   *  destroy it. The ownership is given back to the
    *  caller.
    */
-  cell_type *take (iterator iter) 
+  cell_type *take (iterator iter)
   {
     cell_type *cell = &(*iter);
-    
+
     if (cell->mp_last) {
       cell->mp_last->mp_next = cell->mp_next;
     } else {
@@ -406,7 +411,7 @@ public:
   /**
    *  @brief Destructor
    */
-  virtual ~ImportLayerMapping () { }
+  virtual ~ImportLayerMapping () {}
 
   /**
    *  @brief Perform the mapping, i.e. deliver a layer index for a given LayerProperties information
@@ -414,19 +419,18 @@ public:
    *  This method can return false in the first member of the returned pair to indicate that no mapping shall
    *  be performed. Otherwise it must return the layer index in the second member.
    */
-  virtual std::pair <bool, unsigned int> map_layer (const LayerProperties &lprops) = 0;
+  virtual std::pair<bool, unsigned int> map_layer (const LayerProperties &lprops) = 0;
 };
 
 /**
  *  @brief A binary object representing context information for regenerating library proxies and PCells
  */
-struct DB_PUBLIC LayoutOrCellContextInfo
-{
+struct DB_PUBLIC LayoutOrCellContextInfo {
   std::string lib_name;
   std::string cell_name;
   std::string pcell_name;
   std::map<std::string, tl::Variant> pcell_parameters;
-  std::map<std::string, std::pair<tl::Variant, std::string> > meta_info;
+  std::map<std::string, std::pair<tl::Variant, std::string>> meta_info;
 
   bool operator== (const LayoutOrCellContextInfo &other) const;
   bool operator< (const LayoutOrCellContextInfo &other) const;
@@ -445,7 +449,7 @@ struct DB_PUBLIC LayoutOrCellContextInfo
  *  adds functionality for managing cell names and layer names.
  */
 
-class DB_PUBLIC Layout 
+class DB_PUBLIC Layout
   : public db::Object,
     public db::LayoutStateModel,
     public gsi::ObjectBase,
@@ -483,9 +487,9 @@ public:
   /**
    *  @brief A helper functor to compare "const char *" by the content
    */
-  struct name_cmp_f 
-  {
-    bool operator() (const char *a, const char *b) const {
+  struct name_cmp_f {
+    bool operator() (const char *a, const char *b) const
+    {
       return strcmp (a, b) < 0;
     }
   };
@@ -658,12 +662,12 @@ public:
    *  @param name The name of the cell
    *  @return A pair, telling if the cell was present (first) and
    *          it's index if it is present (second)
-   */ 
+   */
   std::pair<bool, cell_index_type> cell_by_name (const char *name) const;
 
-  /** 
+  /**
    *  @brief Tell the name of a cell with the given index
-   *  
+   *
    *  @param index The index of the cell
    *  @return The name of the cell
    */
@@ -674,7 +678,7 @@ public:
    *
    *  This method is forwarded to the respective method of the cell.
    *  The display name is a nicely formatted name reflecting the
-   *  library source and PCell parameters (if supported by the 
+   *  library source and PCell parameters (if supported by the
    *  PCell implementation).
    */
   std::string display_name (cell_index_type cell_index) const;
@@ -701,10 +705,10 @@ public:
   /**
    *  @brief Add a cell object with the given ID and name
    *
-   *  This method is basically supposed to be used for "undo" and "redo". 
-   *  It is not intended for general use. It requires that the cell was already 
-   *  created before and has gone "invalid" in between. The cell object's ownership is transferred to 
-   *  the layout. 
+   *  This method is basically supposed to be used for "undo" and "redo".
+   *  It is not intended for general use. It requires that the cell was already
+   *  created before and has gone "invalid" in between. The cell object's ownership is transferred to
+   *  the layout.
    *
    *  @param id The name of the new cell
    *  @param name The name of the new cell
@@ -712,10 +716,10 @@ public:
    */
   void insert_cell (cell_index_type ci, const std::string &name, db::Cell *cell);
 
-  /** 
+  /**
    *  @brief Take a cell object with the given ID and name
    *
-   *  This method is basically supposed to be used for "undo" and "redo". 
+   *  This method is basically supposed to be used for "undo" and "redo".
    *  It is not intended for general use. It takes out the cell object and released ownership
    *  within the layout object.
    *
@@ -727,12 +731,12 @@ public:
   /**
    *  @brief Uniquify the given name by appending a suitable suffix
    *
-   *  @param name The input name 
+   *  @param name The input name
    *  @return A similar name that is unique
    */
   std::string uniquify_cell_name (const char *name) const;
 
-  /** 
+  /**
    *  @brief Add a cell with a given name
    *
    *  Since internally just a "const char *" is required, the interface
@@ -774,13 +778,13 @@ public:
   void rename_cell (cell_index_type id, const char *name);
 
   /**
-   *  @brief Delete a cell 
+   *  @brief Delete a cell
    *
    *  This deletes a cell but not the sub cells of the cell.
    *  These subcells will likely become new top cells unless they are used
    *  otherwise.
    *  All instances of this cell are deleted as well.
-   *  Hint: to delete multiple cells, use "delete_cells" which is 
+   *  Hint: to delete multiple cells, use "delete_cells" which is
    *  far more efficient in this case.
    *
    *  @param id The index of the cell to delete
@@ -818,7 +822,7 @@ public:
    */
   void delete_cells (const std::set<cell_index_type> &cells_to_delete);
 
-  /** 
+  /**
    *  @brief Convert a PCell variant to a static cell
    *
    *  @param cell_index The index of the PCell
@@ -826,7 +830,7 @@ public:
    */
   db::cell_index_type convert_cell_to_static (db::cell_index_type cell_index);
 
-  /** 
+  /**
    *  @brief Get a PCell variant
    *
    *  @param pcell_id The Id of the PCell declaration
@@ -836,9 +840,9 @@ public:
   cell_index_type get_pcell_variant (pcell_id_type pcell_id, const std::vector<tl::Variant> &parameters);
 
   /**
-   *  @brief Gets a PCell variant 
+   *  @brief Gets a PCell variant
    *
-   *  Unlike the first version, this one allows specification of the parameters through a 
+   *  Unlike the first version, this one allows specification of the parameters through a
    *  key/value dictionary. Parameters not listed there are replaced by their defaults.
    *
    *  @param pcell_id The Id of the PCell declaration
@@ -847,7 +851,7 @@ public:
    */
   cell_index_type get_pcell_variant_dict (pcell_id_type pcell_id, const std::map<std::string, tl::Variant> &p);
 
-  /** 
+  /**
    *  @brief Get a PCell variant and replace the given cell
    *
    *  @param pcell_id The Id of the PCell declaration
@@ -858,7 +862,7 @@ public:
    */
   void get_pcell_variant_as (pcell_id_type pcell_id, const std::vector<tl::Variant> &parameters, cell_index_type cell_index, ImportLayerMapping *layer_mapping = 0, bool retain_layout = false);
 
-  /** 
+  /**
    *  @brief Get the PCell variant cell of a existing cell with new parameters
    *
    *  This method is intended for internal use.
@@ -909,13 +913,13 @@ public:
   /**
    *  @brief Register a pcell declaration
    *
-   *  If a PCell with that name is already registered, the definition will be overwritten, but 
+   *  If a PCell with that name is already registered, the definition will be overwritten, but
    *  no update of any cell content is performed.
    *  The layout object becomes owner of the declaration object and will delete it when it is destroyed.
    */
   pcell_id_type register_pcell (const std::string &name, pcell_declaration_type *declaration);
 
-  /** 
+  /**
    *  @brief The PCell iterator (begin)
    *
    *  This iterator delivers the PCell names and ID's. iterator->first is the PCell name and iterator->second
@@ -946,12 +950,12 @@ public:
   std::pair<bool, db::pcell_id_type> is_pcell_instance (cell_index_type cell_index) const;
 
   /**
-   *  @brief Returns the library where the cell is finally defined 
+   *  @brief Returns the library where the cell is finally defined
    *
-   *  In the first part of the returned pair, this method returns the pointer to the library 
+   *  In the first part of the returned pair, this method returns the pointer to the library
    *  where the cell is defined. If the cell is not a library proxy, the return value is 0.
    *  If the cell is defined in a library, the second part of the returned pair will contain
-   *  the cell index inside this library. 
+   *  the cell index inside this library.
    */
   std::pair<db::Library *, db::cell_index_type> defining_library (cell_index_type cell_index) const;
 
@@ -1027,12 +1031,12 @@ public:
   /**
    *  @brief Gets a value indicating whether layout context info is provided / needed
    */
-  bool has_context_info() const;
+  bool has_context_info () const;
 
   /**
    *  @brief Gets a value indicating whether layout context info is provided / needed
    */
-  bool has_context_info(cell_index_type cell_index) const;
+  bool has_context_info (cell_index_type cell_index) const;
 
   /**
    *  @brief Get the context information for the layout (for writing into a file)
@@ -1040,7 +1044,7 @@ public:
    *  The context information is a sequence of strings which is pushed onto the given
    *  vector. It can be used to fill meta information with fill_meta_info_from_context.
    */
-  bool get_context_info (std::vector <std::string> &strings) const;
+  bool get_context_info (std::vector<std::string> &strings) const;
 
   /**
    *  @brief Gets the context information as a binary object
@@ -1050,7 +1054,7 @@ public:
   /**
    *  @brief Fills the layout's meta information from the context
    */
-  void fill_meta_info_from_context (std::vector <std::string>::const_iterator from, std::vector <std::string>::const_iterator to);
+  void fill_meta_info_from_context (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to);
 
   /**
    *  @brief Fills the layout's meta information from the binary context
@@ -1064,7 +1068,7 @@ public:
    *  vector. It can be used to recover a respective proxy cell with the recover_proxy method
    *  or to fill meta information using fill_meta_info_from_context.
    */
-  bool get_context_info (cell_index_type cell_index, std::vector <std::string> &context_info) const;
+  bool get_context_info (cell_index_type cell_index, std::vector<std::string> &context_info) const;
 
   /**
    *  @brief Gets the context information as a binary object
@@ -1074,7 +1078,7 @@ public:
   /**
    *  @brief Fills the layout's meta information from the context
    */
-  void fill_meta_info_from_context (cell_index_type cell_index, std::vector <std::string>::const_iterator from, std::vector <std::string>::const_iterator to);
+  void fill_meta_info_from_context (cell_index_type cell_index, std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to);
 
   /**
    *  @brief Fills the layout's meta information from the binary context
@@ -1085,12 +1089,12 @@ public:
    *  @brief Recover a proxy cell from the given context info.
    *
    *  Creates a proxy cell from the context information given by two iterators into a string list.
-   *  If no cell can be created from the context information, null is returned. 
+   *  If no cell can be created from the context information, null is returned.
    *
    *  @param from The begin iterator for the strings from which to recover the cell
    *  @param to The end iterator for the strings from which to recover the cell
    */
-  db::Cell *recover_proxy (std::vector <std::string>::const_iterator from, std::vector <std::string>::const_iterator to);
+  db::Cell *recover_proxy (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to);
 
   /**
    *  @brief Recover a proxy cell from the given binary context info object.
@@ -1101,7 +1105,7 @@ public:
    *  @brief Recover a proxy cell from the given context info.
    *
    *  Creates a proxy cell from the context information given by two iterators into a string list.
-   *  If no cell can be created from the context information, null is returned. 
+   *  If no cell can be created from the context information, null is returned.
    *  This creates the proxy as a cell with the given cell index.
    *
    *  @param cell_index The cell which to prepare
@@ -1110,7 +1114,7 @@ public:
    *  @param layer_mapping The optional layer mapping object that maps the PCell layers to the layout's layers
    *  @return true, if the proxy cell could be created
    */
-  bool recover_proxy_as (cell_index_type cell_index, std::vector <std::string>::const_iterator from, std::vector <std::string>::const_iterator to, ImportLayerMapping *layer_mapping = 0);
+  bool recover_proxy_as (cell_index_type cell_index, std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to, ImportLayerMapping *layer_mapping = 0);
 
   /**
    *  @brief Recover a proxy cell from the given binary context info object
@@ -1196,7 +1200,7 @@ public:
    *  @brief Delete the subcells of the given cell which are not used otherwise
    *
    *  All subcells of the given cell which are referenced directly or indirectly but not used otherwise
-   *  are deleted. 
+   *  are deleted.
    *
    *  @param id The index whose subcells to delete
    *  @param levels The number of hierarchy levels to look for (-1: all, 0: none, 1: one level etc.)
@@ -1245,7 +1249,7 @@ public:
   void flatten (const db::Cell &source_cell, db::Cell &target_cell, const db::ICplxTrans &t, int levels);
 
   /**
-   *  @brief Flatten a cell 
+   *  @brief Flatten a cell
    *
    *  This convenience method is a special version of the other flatten method.
    *
@@ -1292,7 +1296,7 @@ public:
   void insert (db::cell_index_type cell, int layer, const db::Texts &texts);
 
   /**
-   *  @brief Delete a cell plus all subcells 
+   *  @brief Delete a cell plus all subcells
    *
    *  All subcells referenced directly or indirectly are deleted as well.
    *  All instances of these cells are deleted as well.
@@ -1330,7 +1334,7 @@ public:
   {
     return (cell_index_type) m_cell_ptrs.size ();
   }
-  
+
   /**
    *  @brief Address a cell by index
    *
@@ -1361,17 +1365,17 @@ public:
     m_cell_ptrs.reserve (n);
   }
 
-  /**  
+  /**
    *  @brief Swap layers
    *
    *  Swaps the shapes of both layers.
    */
   void swap_layers (unsigned int a, unsigned int b);
 
-  /**  
+  /**
    *  @brief Move a layer
    *
-   *  Move a layer from the source to the target. The target is not cleared before, so that this method 
+   *  Move a layer from the source to the target. The target is not cleared before, so that this method
    *  merges shapes from the source with the target layer. The source layer is empty after that operation.
    */
   void move_layer (unsigned int src, unsigned int dest);
@@ -1387,7 +1391,7 @@ public:
   /**
    *  @brief Copy a layer
    *
-   *  Copy a layer from the source to the target. The target is not cleared before, so that this method 
+   *  Copy a layer from the source to the target. The target is not cleared before, so that this method
    *  merges shapes from the source with the target layer.
    */
   void copy_layer (unsigned int src, unsigned int dest);
@@ -1481,7 +1485,7 @@ public:
 
   /**
    *  @brief Query the number of layers defined so far
-   *  
+   *
    *  TODO: the list of 0 to nlayers-1 also contains the free layers -
    *  we should get a vector containing the layers that are actually
    *  allocated.
@@ -1492,7 +1496,7 @@ public:
   }
 
   /**
-   *  @brief The iterator of valid layers: begin 
+   *  @brief The iterator of valid layers: begin
    */
   layer_iterator begin_layers () const
   {
@@ -1500,7 +1504,7 @@ public:
   }
 
   /**
-   *  @brief The iterator of valid layers: end 
+   *  @brief The iterator of valid layers: end
    */
   layer_iterator end_layers () const
   {
@@ -1518,19 +1522,19 @@ public:
   /**
    *  @brief begin iterator of the unsorted cell list
    */
-  iterator begin () 
+  iterator begin ()
   {
     return m_cells.begin ();
   }
-  
+
   /**
    *  @brief end iterator of the unsorted cell list
    */
-  iterator end () 
+  iterator end ()
   {
     return m_cells.end ();
   }
-  
+
   /**
    *  @brief begin iterator of the unsorted const cell list
    */
@@ -1538,7 +1542,7 @@ public:
   {
     return m_cells.begin ();
   }
-  
+
   /**
    *  @brief end iterator of the unsorted const cell list
    */
@@ -1555,21 +1559,21 @@ public:
    *  The bottom-up iterator does not deliver cells but cell
    *  indices actually.
    */
-  bottom_up_iterator begin_bottom_up () 
+  bottom_up_iterator begin_bottom_up ()
   {
     update ();
     return m_top_down_list.rbegin ();
   }
-  
+
   /**
    *  @brief end iterator of the bottom-up sorted cell list
    */
-  bottom_up_iterator end_bottom_up () 
+  bottom_up_iterator end_bottom_up ()
   {
     update ();
     return m_top_down_list.rend ();
   }
-  
+
   /**
    *  @brief begin iterator of the const bottom-up sorted cell list
    *
@@ -1580,7 +1584,7 @@ public:
     update ();
     return m_top_down_list.rbegin ();
   }
-  
+
   /**
    *  @brief end iterator of the const bottom-up sorted cell list
    */
@@ -1589,7 +1593,7 @@ public:
     update ();
     return m_top_down_list.rend ();
   }
-  
+
   /**
    *  @brief begin iterator of the top-down sorted cell list
    *
@@ -1599,21 +1603,21 @@ public:
    *  The top-down iterator does not deliver cells but cell
    *  indices actually.
    */
-  top_down_iterator begin_top_down () 
+  top_down_iterator begin_top_down ()
   {
     update ();
     return m_top_down_list.begin ();
   }
-  
+
   /**
    *  @brief end iterator of the top-down sorted cell list
    */
-  top_down_iterator end_top_down () 
+  top_down_iterator end_top_down ()
   {
     update ();
     return m_top_down_list.end ();
   }
-  
+
   /**
    *  @brief begin iterator of the const top-down sorted cell list
    *
@@ -1624,7 +1628,7 @@ public:
     update ();
     return m_top_down_list.begin ();
   }
-  
+
   /**
    *  @brief end iterator of the const top-down sorted cell list
    */
@@ -1633,21 +1637,21 @@ public:
     update ();
     return m_top_down_list.end ();
   }
-  
+
   /**
    *  @brief end iterator of the top cells
-   * 
+   *
    *  The begin iterator is identical to begin_top_down()
    */
   top_down_iterator end_top_cells ();
-  
+
   /**
    *  @brief end iterator of the top cells
-   * 
+   *
    *  The begin iterator is identical to begin_top_down()
    */
   top_down_const_iterator end_top_cells () const;
-  
+
   /**
    *  @brief Gets a value indicating whether an update is needed
    *
@@ -1667,7 +1671,7 @@ public:
   /**
    *  @brief Forces an update even if the layout is under construction
    *
-   *  This method behaves like "update" but forces and update even if the 
+   *  This method behaves like "update" but forces and update even if the
    *  "under_construction" state is active. This allows one to do the update
    *  in certain stages without triggering the update automatically and
    *  too frequently.
@@ -1713,7 +1717,7 @@ public:
    */
   virtual void redo (db::Op *op);
 
-  /** 
+  /**
    *  @brief Database unit read accessor
    */
   double dbu () const
@@ -1814,7 +1818,7 @@ public:
    *
    *  This method should be called whenever the layout is
    *  about to be brought into an invalid state. After calling
-   *  this method, "under_construction" returns false which 
+   *  this method, "under_construction" returns false which
    *  tells foreign code (such as update which might be called
    *  asynchronously for example because of a repaint event)
    *  not to use this layout object.
@@ -1841,7 +1845,7 @@ public:
   /**
    *  @brief Tell if the layout object is under construction
    *
-   *  A layout object is either under construction if 
+   *  A layout object is either under construction if
    *  the layout is brought into invalid state by "start_changes".
    */
   bool under_construction () const
@@ -2157,7 +2161,7 @@ public:
    *  @brief This event is raised when cell variants are built
    *  It will specify a list of cells with their new variants.
    */
-  tl::event<const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *> variants_created_event;
+  tl::event<const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type>> *> variants_created_event;
 
 protected:
   /**
@@ -2205,8 +2209,8 @@ private:
   /**
    *  @brief Sort the cells topologically
    *
-   *  Establish a sorting order top-down. The sorted 
-   *  cell list can be retrieved using the begin_bottom_up 
+   *  Establish a sorting order top-down. The sorted
+   *  cell list can be retrieved using the begin_bottom_up
    *  ..end_bottom_up iterator pair. Alternatively the
    *  begin_top_down..end_top_down iterator pair can be used
    *  to retrieve the cell indices in top-down order after
@@ -2220,7 +2224,7 @@ private:
   bool topological_sort ();
 
   /**
-   *  @brief Register a cell name for the cell index 
+   *  @brief Register a cell name for the cell index
    */
   void register_cell_name (const char *name, cell_index_type ci);
 
@@ -2326,11 +2330,8 @@ private:
       mp_layout->start_changes ();
     }
   }
-
 };
 
 }
 
 #endif
-
-

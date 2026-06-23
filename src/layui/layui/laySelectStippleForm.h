@@ -33,7 +33,7 @@ class QListWidgetItem;
 
 namespace Ui
 {
-  class SelectStippleForm;
+class SelectStippleForm;
 }
 
 namespace lay
@@ -42,7 +42,7 @@ namespace lay
 class SelectStippleForm
   : public QDialog
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   SelectStippleForm (QWidget *parent, const lay::DitherPattern &pattern, bool include_nil = false);
@@ -55,9 +55,9 @@ public:
   }
 
   void set_selected (int selected);
-  
+
 public slots:
-  void sel_changed (QListWidgetItem *current, QListWidgetItem *); 
+  void sel_changed (QListWidgetItem *current, QListWidgetItem *);
 
 protected:
   void update ();
@@ -73,4 +73,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

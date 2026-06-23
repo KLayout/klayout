@@ -37,10 +37,10 @@ class QModelIndex;
 namespace gtf
 {
 
-class UiDialog 
+class UiDialog
   : public QMainWindow
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   UiDialog ();
@@ -59,10 +59,10 @@ private:
   gtf::EventList m_current_events;
 };
 
-class StripedBar 
+class StripedBar
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   StripedBar (QWidget *parent);
@@ -82,5 +82,3 @@ private:
 }
 
 #endif
-
-

@@ -26,7 +26,7 @@
 #include "dbEdge.h"
 #include "tlXMLParser.h"
 
-TEST(1) 
+TEST (1)
 {
   rdb::Database db;
 
@@ -36,12 +36,12 @@ TEST(1)
   db.set_description ("descriptions");
 
   EXPECT_EQ (db.filename (), "filename");
-  EXPECT_EQ (db.name(), "name");
-  EXPECT_EQ (db.generator(), "generator");
-  EXPECT_EQ (db.description(), "descriptions");
+  EXPECT_EQ (db.name (), "name");
+  EXPECT_EQ (db.generator (), "generator");
+  EXPECT_EQ (db.description (), "descriptions");
 }
 
-TEST(2) 
+TEST (2)
 {
   rdb::Database db;
 
@@ -73,12 +73,12 @@ TEST(2)
   EXPECT_EQ (db.cell_by_id (c1->id ()) == c1, true);
   EXPECT_EQ (db.cell_by_id (c2->id ()) == c2, true);
   EXPECT_EQ (db.cell_by_id (0) == 0, true);
-  
+
   db.create_item (c1->id (), cath->id ());
   db.create_item (c2->id (), cath2->id ());
   db.create_item (c1->id (), cath2->id ());
 
-  std::pair <rdb::Database::const_item_ref_iterator, rdb::Database::const_item_ref_iterator> be;
+  std::pair<rdb::Database::const_item_ref_iterator, rdb::Database::const_item_ref_iterator> be;
 
   be = db.items_by_cell (c2->id ());
   EXPECT_EQ (be.first != be.second, true);
@@ -110,11 +110,9 @@ TEST(2)
   EXPECT_EQ ((*be.first)->category_id (), cath2->id ());
   ++be.first;
   EXPECT_EQ (be.first == be.second, true);
-
-
 }
 
-TEST(3) 
+TEST (3)
 {
   rdb::Database db;
 
@@ -166,7 +164,7 @@ TEST(3)
   EXPECT_EQ (db.num_items_visited (), size_t (2));
 }
 
-TEST(4) 
+TEST (4)
 {
   rdb::Database db;
 
@@ -183,7 +181,7 @@ TEST(4)
     EXPECT_EQ (tag2.name (), "aber");
     EXPECT_EQ (tag2.description (), "desc");
   }
-  
+
   {
     EXPECT_EQ (db.tags ().has_tag ("nix"), false);
     const rdb::Tag &tag = db.tags ().tag ("nix");
@@ -212,7 +210,7 @@ TEST(4)
   EXPECT_EQ (i1->has_tag (db.tags ().tag ("ich").id ()), false);
 }
 
-TEST(5) 
+TEST (5)
 {
   if (! tl::XMLParser::is_available ()) {
     throw tl::CancelException ();
@@ -314,7 +312,7 @@ TEST(5)
 
     std::pair<rdb::Database::const_item_ref_iterator, rdb::Database::const_item_ref_iterator> be;
 
-    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c1")->id (), db2.category_by_name ("cath_name")->id ()); 
+    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c1")->id (), db2.category_by_name ("cath_name")->id ());
     EXPECT_EQ (be.first != be.second, true);
 
     EXPECT_EQ ((*be.first)->visited (), false);
@@ -330,10 +328,10 @@ TEST(5)
     ++be.first;
     EXPECT_EQ (be.first == be.second, true);
 
-    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c2")->id (), db2.category_by_name ("cath_name")->id ()); 
+    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c2")->id (), db2.category_by_name ("cath_name")->id ());
     EXPECT_EQ (be.first != be.second, false);
 
-    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c2")->id (), db2.category_by_name ("cath2")->id ()); 
+    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c2")->id (), db2.category_by_name ("cath2")->id ());
     EXPECT_EQ (be.first != be.second, true);
 
     EXPECT_EQ ((*be.first)->visited (), true);
@@ -352,14 +350,13 @@ TEST(5)
     ++be.first;
     EXPECT_EQ (be.first == be.second, true);
 
-    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c1")->id (), db2.category_by_name ("cath2.cc")->id ()); 
+    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c1")->id (), db2.category_by_name ("cath2.cc")->id ());
     EXPECT_EQ (be.first != be.second, true);
     EXPECT_EQ ((*be.first)->visited (), true);
-
   }
 }
 
-TEST(5a) 
+TEST (5a)
 {
   if (! tl::XMLParser::is_available ()) {
     throw tl::CancelException ();
@@ -459,7 +456,7 @@ TEST(5a)
 
     std::pair<rdb::Database::const_item_ref_iterator, rdb::Database::const_item_ref_iterator> be;
 
-    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c1:1")->id (), db2.category_by_name ("cath_name")->id ()); 
+    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c1:1")->id (), db2.category_by_name ("cath_name")->id ());
     EXPECT_EQ (be.first != be.second, true);
 
     EXPECT_EQ ((*be.first)->visited (), false);
@@ -475,10 +472,10 @@ TEST(5a)
     ++be.first;
     EXPECT_EQ (be.first == be.second, true);
 
-    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c1:2")->id (), db2.category_by_name ("cath_name")->id ()); 
+    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c1:2")->id (), db2.category_by_name ("cath_name")->id ());
     EXPECT_EQ (be.first != be.second, false);
 
-    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c1:2")->id (), db2.category_by_name ("cath2")->id ()); 
+    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c1:2")->id (), db2.category_by_name ("cath2")->id ());
     EXPECT_EQ (be.first != be.second, true);
 
     EXPECT_EQ ((*be.first)->visited (), true);
@@ -497,14 +494,13 @@ TEST(5a)
     ++be.first;
     EXPECT_EQ (be.first == be.second, true);
 
-    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c1:1")->id (), db2.category_by_name ("cath2.cc")->id ()); 
+    be = db2.items_by_cell_and_category (db2.cell_by_qname ("c1:1")->id (), db2.category_by_name ("cath2.cc")->id ());
     EXPECT_EQ (be.first != be.second, true);
     EXPECT_EQ ((*be.first)->visited (), true);
-
   }
 }
 
-TEST(6) 
+TEST (6)
 {
   rdb::Database db;
 
@@ -518,8 +514,8 @@ TEST(6)
   EXPECT_EQ (c1->qname (), "c1:1")
 
   EXPECT_EQ (db.variants ("c1").size (), size_t (2));
-  EXPECT_EQ (db.variants ("c1")[0], c1->id ());
-  EXPECT_EQ (db.variants ("c1")[1], c1a->id ());
+  EXPECT_EQ (db.variants ("c1") [0], c1->id ());
+  EXPECT_EQ (db.variants ("c1") [1], c1a->id ());
 
   rdb::Cell *c1b = db.create_cell ("c1", "var", std::string ());
   EXPECT_EQ (c1b->qname (), "c1:var")
@@ -548,11 +544,11 @@ TEST(6)
   EXPECT_EQ (c2e->qname (), "c2:4");
 
   EXPECT_EQ (db.variants ("c2").size (), size_t (6));
-  EXPECT_EQ (db.variants ("c2")[0], c2->id ());
-  EXPECT_EQ (db.variants ("c2")[5], c2e->id ());
+  EXPECT_EQ (db.variants ("c2") [0], c2->id ());
+  EXPECT_EQ (db.variants ("c2") [5], c2e->id ());
 }
 
-TEST(7)
+TEST (7)
 {
   rdb::Database db;
   rdb::Category *cath = db.create_category ("cath_name");
@@ -601,7 +597,7 @@ TEST(7)
 }
 
 
-TEST(8_ApplyBasicEmptyValue)
+TEST (8_ApplyBasicEmptyValue)
 {
   rdb::Database db1;
   rdb::Category *cat1 = db1.create_category ("cat_name");
@@ -627,7 +623,7 @@ TEST(8_ApplyBasicEmptyValue)
   EXPECT_EQ (i1->tag_str (), "tag2");
 }
 
-TEST(9_ApplyBasicSomeValue)
+TEST (9_ApplyBasicSomeValue)
 {
   rdb::Database db1;
   rdb::Category *cat1 = db1.create_category ("cat_name");
@@ -682,7 +678,7 @@ TEST(9_ApplyBasicSomeValue)
   EXPECT_EQ (i1->tag_str (), "");
 }
 
-TEST(10_ApplyTaggedValue)
+TEST (10_ApplyTaggedValue)
 {
   rdb::Database db1;
   rdb::Category *cat1 = db1.create_category ("cat_name");
@@ -730,7 +726,7 @@ TEST(10_ApplyTaggedValue)
   EXPECT_EQ (i1->tag_str (), "tag2");
 }
 
-TEST(11_ApplyWrongCat)
+TEST (11_ApplyWrongCat)
 {
   rdb::Database db1;
   rdb::Category *cat1 = db1.create_category ("cat_name");
@@ -756,7 +752,7 @@ TEST(11_ApplyWrongCat)
   EXPECT_EQ (i1->tag_str (), "");
 }
 
-TEST(12_ApplyWrongCell)
+TEST (12_ApplyWrongCell)
 {
   rdb::Database db1;
   rdb::Category *cat1 = db1.create_category ("cat_name");
@@ -782,7 +778,7 @@ TEST(12_ApplyWrongCell)
   EXPECT_EQ (i1->tag_str (), "");
 }
 
-TEST(13_ApplyIgnoreUnknownTag)
+TEST (13_ApplyIgnoreUnknownTag)
 {
   rdb::Database db1;
   rdb::Category *cat1 = db1.create_category ("cat_name");
@@ -822,7 +818,7 @@ TEST(13_ApplyIgnoreUnknownTag)
   EXPECT_EQ (i1->tag_str (), "tag2");
 }
 
-TEST(20_MergeBasic)
+TEST (20_MergeBasic)
 {
   rdb::Database db1;
   db1.set_top_cell_name ("A");
@@ -834,7 +830,8 @@ TEST(20_MergeBasic)
     //  can't merge DB's with different top cell names
     db1.merge (db2);
     EXPECT_EQ (0, 1);
-  } catch (...) { }
+  } catch (...) {
+  }
 
   db1.set_top_cell_name ("TOP");
   db2.set_top_cell_name ("TOP");
@@ -848,7 +845,7 @@ TEST(20_MergeBasic)
     cat->set_description ("A child category");
 
     //  create two tags
-    /*auto t1_id =*/ db2.tags ().tag ("T1").id ();
+    /*auto t1_id =*/db2.tags ().tag ("T1").id ();
     auto t2_id = db2.tags ().tag ("T2", true).id ();
 
     rdb::Item *item = db2.create_item (cell->id (), cat->id ());
@@ -864,7 +861,7 @@ TEST(20_MergeBasic)
 
   auto c = db1.cells ().begin ();
   tl_assert (c != db1.cells ().end ());
-  const rdb::Cell *cell = c.operator-> ();
+  const rdb::Cell *cell = c.operator->();
   ++c;
   EXPECT_EQ (c == db1.cells ().end (), true);
   EXPECT_EQ (cell->name (), "A");
@@ -880,7 +877,7 @@ TEST(20_MergeBasic)
 
   auto i = db1.items ().begin ();
   tl_assert (i != db1.items ().end ());
-  const rdb::Item *item = i.operator-> ();
+  const rdb::Item *item = i.operator->();
   ++i;
   EXPECT_EQ (i == db1.items ().end (), true);
   EXPECT_EQ (item->category_id (), cat->id ());
@@ -893,7 +890,7 @@ TEST(20_MergeBasic)
   EXPECT_EQ (item->tag_str (), "#T2");
 }
 
-TEST(21_MergeCategories)
+TEST (21_MergeCategories)
 {
   rdb::Database db1;
   db1.set_top_cell_name ("TOP");
@@ -959,7 +956,7 @@ TEST(21_MergeCategories)
   EXPECT_EQ (ncat, 5);
 }
 
-TEST(22_MergeCells)
+TEST (22_MergeCells)
 {
   rdb::Database db1;
   db1.set_top_cell_name ("TOP");
@@ -989,7 +986,7 @@ TEST(22_MergeCells)
     parent = db2.create_cell ("TOP");
 
     cell1->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, 0.0)), parent->id ()));
-    cell2->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, 2.5)), parent->id ()));  //  reference not taken as cell will be taken from db1
+    cell2->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, 2.5)), parent->id ())); //  reference not taken as cell will be taken from db1
     cell3->references ().insert (rdb::Reference (db::DCplxTrans (db::DVector (1.0, -1.0)), parent->id ()));
   }
 
@@ -1007,7 +1004,7 @@ TEST(22_MergeCells)
   EXPECT_EQ (tl::join (cells.begin (), cells.end (), ";"), "A:1[r0 *1 1,2:TOP];A:VAR1[r0 *1 1,-2:TOP];A:VAR2[r0 *1 1,-1:TOP];B[r0 *1 1,0:TOP];TOP");
 }
 
-TEST(23_MergeTags)
+TEST (23_MergeTags)
 {
   rdb::Database db1;
   db1.set_top_cell_name ("TOP");
@@ -1030,7 +1027,7 @@ TEST(23_MergeTags)
   EXPECT_EQ (tl::join (tags.begin (), tags.end (), ";"), "#T3;T1;T2");
 }
 
-TEST(24_MergeItems)
+TEST (24_MergeItems)
 {
   rdb::Database db1;
   db1.set_top_cell_name ("TOP");
@@ -1066,7 +1063,7 @@ TEST(24_MergeItems)
 
   std::set<std::string> items;
   for (auto i = db1.items ().begin (); i != db1.items ().end (); ++i) {
-    const rdb::Item *item = i.operator-> ();
+    const rdb::Item *item = i.operator->();
     items.insert (item->cell_qname () + ":" + item->category_name () + "=" + item->comment ());
   }
   EXPECT_EQ (tl::join (items.begin (), items.end (), ";"), "TOP:CAT1=db1a;TOP:CAT1=db2a;TOP:CAT2=db1b;TOP:CAT3=db2b");

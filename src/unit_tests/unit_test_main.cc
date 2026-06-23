@@ -46,28 +46,28 @@
 #if defined(HAVE_QT)
 
 //  For testing the document structure
-#  include "docForceLink.h"
-#  include "iconsForceLink.h"
+#include "docForceLink.h"
+#include "iconsForceLink.h"
 
-#  include "layApplication.h"
-#  include "layMainWindow.h"
-#  include "laySystemPaths.h"
-#  include "layVersion.h"
+#include "layApplication.h"
+#include "layMainWindow.h"
+#include "laySystemPaths.h"
+#include "layVersion.h"
 
-#  include <QDir>
-#  include <QFileInfo>
-#  include <QTextCodec>
+#include <QDir>
+#include <QFileInfo>
+#include <QTextCodec>
 
 #endif
 
-#if !defined(_WIN32)
-#  include <dlfcn.h>
+#if ! defined(_WIN32)
+#include <dlfcn.h>
 #endif
 #if defined(_WIN32)
-#  include <Windows.h>
+#include <Windows.h>
 #endif
 
-//  required to force linking of the "rdb", "lib" and "drc" module 
+//  required to force linking of the "rdb", "lib" and "drc" module
 //  and the plugins/auxiliary modules (some in non-Qt case)
 #include "libForceLink.h"
 #include "rdbForceLink.h"
@@ -77,26 +77,26 @@
 #include "edtForceLink.h"
 #include "lymForceLink.h"
 #if defined(HAVE_RUBY)
-#  include "drcForceLink.h"
-#  include "lvsForceLink.h"
+#include "drcForceLink.h"
+#include "lvsForceLink.h"
 #endif
 
 #if defined(HAVE_QTBINDINGS)
 
 //  pulls in the Qt GSI binding modules - need to be force loaded so they are available
 //  the pya Python module (Python >= 3.8 does not recognize DLL paths on Windows)
-# include "gsiQtGuiExternals.h"
-# include "gsiQtWidgetsExternals.h"
-# include "gsiQtCoreExternals.h"
-# include "gsiQtMultimediaExternals.h"
-# include "gsiQtPrintSupportExternals.h"
-# include "gsiQtXmlExternals.h"
-# include "gsiQtXmlPatternsExternals.h"
-# include "gsiQtSqlExternals.h"
-# include "gsiQtSvgExternals.h"
-# include "gsiQtNetworkExternals.h"
-# include "gsiQtDesignerExternals.h"
-# include "gsiQtUiToolsExternals.h"
+#include "gsiQtGuiExternals.h"
+#include "gsiQtWidgetsExternals.h"
+#include "gsiQtCoreExternals.h"
+#include "gsiQtMultimediaExternals.h"
+#include "gsiQtPrintSupportExternals.h"
+#include "gsiQtXmlExternals.h"
+#include "gsiQtXmlPatternsExternals.h"
+#include "gsiQtSqlExternals.h"
+#include "gsiQtSvgExternals.h"
+#include "gsiQtNetworkExternals.h"
+#include "gsiQtDesignerExternals.h"
+#include "gsiQtUiToolsExternals.h"
 
 FORCE_LINK_GSI_QTCORE
 FORCE_LINK_GSI_QTGUI
@@ -112,7 +112,7 @@ FORCE_LINK_GSI_QTSVG
 FORCE_LINK_GSI_QTUITOOLS
 
 #else
-# define QT_EXTERNAL_BASE(x)
+#define QT_EXTERNAL_BASE(x)
 #endif
 
 static int main_cont (int &argc, char **argv);
@@ -122,16 +122,15 @@ static int main_cont (int &argc, char **argv);
 //  for VC++/MinGW provide a wrapper for main.
 #include <Windows.h>
 
-extern "C"
-int WINAPI 
-WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*prevInstance*/, LPSTR /*lpCmdLine*/, int /*nShowCmd*/)
+extern "C" int WINAPI
+WinMain (HINSTANCE /*hInstance*/, HINSTANCE /*prevInstance*/, LPSTR /*lpCmdLine*/, int /*nShowCmd*/)
 {
   int argCount = 0;
-  LPWSTR *szArgList = CommandLineToArgvW(GetCommandLineW(), &argCount);
+  LPWSTR *szArgList = CommandLineToArgvW (GetCommandLineW (), &argCount);
 
   //  fail safe behaviour
-  if (!szArgList) {
-    MessageBox(NULL, L"Unable to parse command line", L"Error", MB_OK);
+  if (! szArgList) {
+    MessageBox (NULL, L"Unable to parse command line", L"Error", MB_OK);
     return 10;
   }
 
@@ -153,22 +152,21 @@ WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*prevInstance*/, LPSTR /*lpCmdLine*/
   tl::StaticObjects::cleanup ();
 
   for (int i = 0; i < argCount; i++) {
-    delete[] argv [i];
+    delete [] argv [i];
   }
-  delete[] argv;
+  delete [] argv;
 
-  LocalFree(szArgList);
+  LocalFree (szArgList);
   return ret;
 }
 
 #else
 
-int
-main(int a_argc, const char **a_argv)
+int main (int a_argc, const char **a_argv)
 {
   char **argv = new char *[a_argc];
   for (int i = 0; i < a_argc; i++) {
-    tl::string aa = tl::system_to_string (a_argv[i]);
+    tl::string aa = tl::system_to_string (a_argv [i]);
     argv [i] = new char [aa.size () + 1];
     strcpy (argv [i], aa.c_str ());
   }
@@ -180,9 +178,9 @@ main(int a_argc, const char **a_argv)
   tl::StaticObjects::cleanup ();
 
   for (int i = 0; i < a_argc; i++) {
-    delete[] argv [i];
+    delete [] argv [i];
   }
-  delete[] argv;
+  delete [] argv;
 
   return ret;
 }
@@ -220,9 +218,9 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
   grand_timer.start ();
 
   int failed_ne = 0, failed_e = 0;
-  std::vector <tl::TestBase *> failed_tests_e, failed_tests_ne;
+  std::vector<tl::TestBase *> failed_tests_e, failed_tests_ne;
   int skipped_ne = 0, skipped_e = 0;
-  std::vector <tl::TestBase *> skipped_tests_e, skipped_tests_ne;
+  std::vector<tl::TestBase *> skipped_tests_e, skipped_tests_ne;
   int successful_ne = 0, successful_e = 0;
 
   for (int e = 0; e < 2; ++e) {
@@ -241,9 +239,9 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
 #endif
 
       int failed = 0;
-      std::vector <tl::TestBase *> failed_tests;
+      std::vector<tl::TestBase *> failed_tests;
       int skipped = 0;
-      std::vector <tl::TestBase *> skipped_tests;
+      std::vector<tl::TestBase *> skipped_tests;
       int successful = 0;
 
       tl::Timer timer;
@@ -257,11 +255,11 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
         skipped = 0;
         skipped_tests.clear ();
 
-        for (std::vector <tl::TestBase *>::const_iterator t = selected_tests.begin (); t != selected_tests.end (); ++t) {
+        for (std::vector<tl::TestBase *>::const_iterator t = selected_tests.begin (); t != selected_tests.end (); ++t) {
           (*t)->remove_tmp_folder ();
         }
 
-        for (std::vector <tl::TestBase *>::const_iterator t = selected_tests.begin (); t != selected_tests.end (); ++t) {
+        for (std::vector<tl::TestBase *>::const_iterator t = selected_tests.begin (); t != selected_tests.end (); ++t) {
 
           ut::ctrl << "<testcase name=\"" << (*t)->name () << "\">";
 
@@ -273,7 +271,7 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
             ut::ctrl << "<system-out>";
 
             tl::Timer timer;
-            timer.start();
+            timer.start ();
 
             if (! run_test (*t, e != 0, slow, repeat)) {
 
@@ -289,7 +287,7 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
               ut::ctrl << "</system-out>";
             }
 
-            timer.stop();
+            timer.stop ();
 
             ut::noctrl << "Time: " << timer.sec_wall () << "s (wall) " << timer.sec_user () << "s (user) " << timer.sec_sys () << "s (sys)";
             ut::noctrl << "Memory: " << timer.memory_size () / 1024 << "k";
@@ -315,11 +313,9 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
 
             failed_tests.push_back (*t);
             ++failed;
-
           }
 
           ut::ctrl << "</testcase>";
-
         }
 
       } catch (tl::Exception &ex) {
@@ -378,9 +374,7 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
       ut::ctrl << "<x-summary-times mode=\"" << mode << "\" wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";
 
       ut::ctrl << "</testsuite>";
-
     }
-
   }
 
   grand_timer.stop ();
@@ -396,14 +390,14 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
     bool first = true;
     for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
 
-      if (gsi_coverage && !class_names.empty () && class_names.find (c->name ()) == class_names.end ()) {
+      if (gsi_coverage && ! class_names.empty () && class_names.find (c->name ()) == class_names.end ()) {
         continue;
       }
 
       bool first_of_class = true;
       for (gsi::ClassBase::method_iterator m = c->begin_methods (); m != c->end_methods (); ++m) {
 
-        if (!dynamic_cast<const gsi::SpecialMethod *> (*m) && !(*m)->was_called ()) {
+        if (! dynamic_cast<const gsi::SpecialMethod *> (*m) && ! (*m)->was_called ()) {
 
           if (first) {
             first = false;
@@ -414,11 +408,8 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
             first_of_class = false;
           }
           tl::warn << tl::replicate (" ", tl::indent () * 2) << (*m)->to_string ();
-
         }
-
       }
-
     }
 
     if (first) {
@@ -426,7 +417,6 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
     }
 
     ut::ctrl << "</x-gsi-coverage>";
-
   }
 
   ut::noctrl << tl::replicate ("=", ut::TestConsole::instance ()->real_columns ());
@@ -439,13 +429,13 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
   if (skipped_e + skipped_ne > 0) {
     if (non_editable) {
       tl::warn << "Skipped in non-editable mode";
-      for (std::vector <tl::TestBase *>::const_iterator f = skipped_tests_ne.begin (); f != skipped_tests_ne.end (); ++f) {
+      for (std::vector<tl::TestBase *>::const_iterator f = skipped_tests_ne.begin (); f != skipped_tests_ne.end (); ++f) {
         tl::warn << tl::replicate (" ", tl::indent ()) << (*f)->name ();
       }
     }
     if (editable) {
       tl::warn << "Skipped in editable mode";
-      for (std::vector <tl::TestBase *>::const_iterator f = skipped_tests_e.begin (); f != skipped_tests_e.end (); ++f) {
+      for (std::vector<tl::TestBase *>::const_iterator f = skipped_tests_e.begin (); f != skipped_tests_e.end (); ++f) {
         tl::warn << tl::replicate (" ", tl::indent ()) << (*f)->name ();
       }
     }
@@ -456,13 +446,13 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
   if (result > 0) {
     if (non_editable) {
       tl::warn << "Failed in non-editable mode";
-      for (std::vector <tl::TestBase *>::const_iterator f = failed_tests_ne.begin (); f != failed_tests_ne.end (); ++f) {
+      for (std::vector<tl::TestBase *>::const_iterator f = failed_tests_ne.begin (); f != failed_tests_ne.end (); ++f) {
         tl::warn << tl::replicate (" ", tl::indent ()) << (*f)->name ();
       }
     }
     if (editable) {
       tl::warn << "Failed in editable mode";
-      for (std::vector <tl::TestBase *>::const_iterator f = failed_tests_e.begin (); f != failed_tests_e.end (); ++f) {
+      for (std::vector<tl::TestBase *>::const_iterator f = failed_tests_e.begin (); f != failed_tests_e.end (); ++f) {
         tl::warn << tl::replicate (" ", tl::indent ()) << (*f)->name ();
       }
     }
@@ -538,12 +528,10 @@ main_cont (int &argc, char **argv)
           throw tl::Exception (tl::sprintf ("Unable to load plugin tests: %s", ut_file.c_str ()));
         }
 #endif
-
       }
-
     }
 
-    if (! tl::TestRegistrar::instance()) {
+    if (! tl::TestRegistrar::instance ()) {
       throw tl::Exception ("No test libraries found - make sure, the *.ut files are next to the ut_runner executable.");
     }
 
@@ -620,39 +608,35 @@ main_cont (int &argc, char **argv)
         << tl::arg ("-c", &continue_flag, "Continues after an error")
         << tl::arg ("-i", &debug_mode, "Uses debug mode",
                     "In debug mode, execution stops after an error and if possible, fix instructions are "
-                    "printed."
-                   )
+                    "printed.")
         << tl::arg ("-s", &slow, "Includes slow (long runner) tests")
         << tl::arg ("-v", &verbose, "Provides verbose output")
         << tl::arg ("-g", &gsi_coverage, "Produces a GSI test coverage statistics")
         << tl::arg ("-r=n", &repeat, "Repeat the tests n times each")
         << tl::arg ("*-gg=class", &class_names, "Produces a specific GDS coverage statistics",
                     "With this specification, coverage will be printed for this specific class. "
-                    "This option can be used multiple times to add more classes."
-                   )
+                    "This option can be used multiple times to add more classes.")
         << tl::arg ("-x=test", &exclude_test_list, "Exclude the following tests",
                     "This option can be given multiple times or with a comma-separated list "
                     "of pattern. Test tests matching one of the exclude pattern "
-                    "are not executed."
-                   )
-        << tl::arg ("?*test", &test_list, "The pattern for the tests to execute")
-      ;
+                    "are not executed.")
+        << tl::arg ("?*test", &test_list, "The pattern for the tests to execute");
 
     cmd.brief ("The runner executable for execution of the unit tests");
 
     cmd.parse (argc, argv);
 
-    if (!editable && !non_editable) {
+    if (! editable && ! non_editable) {
       editable = non_editable = true;
     }
 
-    if (!class_names.empty ()) {
+    if (! class_names.empty ()) {
       gsi_coverage = true;
     }
 
     if (list_tests) {
       tl::info << "List of installed tests:";
-      for (std::vector<tl::TestBase *>::const_iterator i = tl::TestRegistrar::instance()->tests ().begin (); i != tl::TestRegistrar::instance()->tests ().end (); ++i) {
+      for (std::vector<tl::TestBase *>::const_iterator i = tl::TestRegistrar::instance ()->tests ().begin (); i != tl::TestRegistrar::instance ()->tests ().end (); ++i) {
         tl::info << "  " << (*i)->name ();
       }
       throw tl::CancelException ();
@@ -696,11 +680,11 @@ main_cont (int &argc, char **argv)
 
       ut::noctrl << "Selected tests:";
 
-      for (std::vector<tl::TestBase *>::const_iterator i = tl::TestRegistrar::instance()->tests ().begin (); i != tl::TestRegistrar::instance()->tests ().end (); ++i) {
+      for (std::vector<tl::TestBase *>::const_iterator i = tl::TestRegistrar::instance ()->tests ().begin (); i != tl::TestRegistrar::instance ()->tests ().end (); ++i) {
 
         bool exclude = false;
 
-        for (std::vector<std::string>::const_iterator m = exclude_test_list.begin (); m != exclude_test_list.end () && !exclude; ++m) {
+        for (std::vector<std::string>::const_iterator m = exclude_test_list.begin (); m != exclude_test_list.end () && ! exclude; ++m) {
           tl::GlobPattern re (*m);
           re.set_case_sensitive (false);
           re.set_header_match (true);
@@ -711,14 +695,14 @@ main_cont (int &argc, char **argv)
 
         if (test_list.empty ()) {
 
-          if (!exclude) {
+          if (! exclude) {
             subset.push_back (*i);
             ut::noctrl << "  " << (*i)->name ();
           }
 
         } else {
 
-          for (std::vector<std::string>::const_iterator m = test_list.begin (); !exclude && m != test_list.end (); ++m) {
+          for (std::vector<std::string>::const_iterator m = test_list.begin (); ! exclude && m != test_list.end (); ++m) {
             tl::GlobPattern re (*m);
             re.set_case_sensitive (false);
             re.set_header_match (true);
@@ -728,9 +712,7 @@ main_cont (int &argc, char **argv)
               break;
             }
           }
-
         }
-
       }
 
       result = run_tests (subset, editable, non_editable, slow, repeat, gsi_coverage, class_names);

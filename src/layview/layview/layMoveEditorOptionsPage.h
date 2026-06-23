@@ -29,11 +29,13 @@
 
 class QHBoxLayout;
 
-namespace lay {
-  class DecoratedLineEdit;
+namespace lay
+{
+class DecoratedLineEdit;
 }
 
-namespace lay {
+namespace lay
+{
 
 class MoveEditorOptionsPage
   : public lay::EditorOptionsPageWidget
@@ -56,4 +58,3 @@ private:
 }
 
 #endif
-

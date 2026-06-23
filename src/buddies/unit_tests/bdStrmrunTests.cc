@@ -25,7 +25,7 @@
 #include "tlFileUtils.h"
 
 //  Testing the converter main implementation (CIF)
-TEST(1)
+TEST (1)
 {
 #if defined(HAVE_PYTHON)
   std::string cmd_call;
@@ -74,4 +74,3 @@ TEST(1)
 
 #endif
 }
-

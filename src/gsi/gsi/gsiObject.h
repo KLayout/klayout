@@ -43,13 +43,12 @@ class GSI_PUBLIC ClassBase;
  *
  *  The client index is used to indicate a certain client for the object (Python, Ruby ...)
  */
-struct ClientIndex
-{
+struct ClientIndex {
   enum {
-    Basic           = 0,
-    Ruby            = 1,
-    Python          = 2,
-    MaxClientIndex  = 3
+    Basic = 0,
+    Ruby = 1,
+    Python = 2,
+    MaxClientIndex = 3
   };
 };
 
@@ -71,7 +70,7 @@ public:
   /**
    *  @brief Constructor
    */
-  ObjectBase () 
+  ObjectBase ()
     : mp_status_changed_event (0)
   {
   }
@@ -131,7 +130,7 @@ public:
    *  After calling this method, the script clients no longer will own the object.
    *  If the script object is deleted, the C++ object is not affected.
    */
-  void keep () 
+  void keep ()
   {
     if (has_status_changed_event ()) {
       status_changed_event () (ObjectKeep);
@@ -173,7 +172,7 @@ public:
    */
   tl::event<StatusEventType> &status_changed_event ()
   {
-    if (! has_status_changed_event()) {
+    if (! has_status_changed_event ()) {
       mp_status_changed_event = new tl::event<StatusEventType> ();
     }
     return *mp_status_changed_event;
@@ -251,4 +250,3 @@ private:
 }
 
 #endif
-

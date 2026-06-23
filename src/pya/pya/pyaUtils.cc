@@ -22,7 +22,7 @@
 
 
 #include <Python.h>
-#include <frameobject.h>   //  Python - for traceback
+#include <frameobject.h> //  Python - for traceback
 
 #include "tlString.h"
 
@@ -60,17 +60,17 @@ void check_error ()
 
     //  fetch traceback
     //  TODO: really decref the stack trace? how about the other objects in the stack trace?
-    std::vector <tl::BacktraceElement> backtrace;
+    std::vector<tl::BacktraceElement> backtrace;
     if (exc_traceback) {
-      PyTracebackObject *traceback = (PyTracebackObject*) exc_traceback.get ();
+      PyTracebackObject *traceback = (PyTracebackObject *) exc_traceback.get ();
       for (PyTracebackObject *t = traceback; t; t = t->tb_next) {
         int lineno = t->tb_lineno;
 #if PY_VERSION_HEX >= 0x030B0000
         //  since version 3.11.7, lineno may be -1 and indicates that the frame has to be inspected
         if (lineno < 0) {
-          lineno = PyFrame_GetLineNumber(t->tb_frame);
+          lineno = PyFrame_GetLineNumber (t->tb_frame);
         }
-        backtrace.push_back (tl::BacktraceElement (python2c<std::string> (PyFrame_GetCode(t->tb_frame)->co_filename), lineno));
+        backtrace.push_back (tl::BacktraceElement (python2c<std::string> (PyFrame_GetCode (t->tb_frame)->co_filename), lineno));
 #else
         backtrace.push_back (tl::BacktraceElement (python2c<std::string> (t->tb_frame->f_code->co_filename), lineno));
 #endif
@@ -105,7 +105,6 @@ void check_error ()
           msg += tl::to_string (line);
           msg += ": ";
           msg += msg_arg;
-
         }
 
       } catch (...) {
@@ -150,11 +149,8 @@ void check_error ()
       }
 
       throw PythonError (msg.empty () ? exc_cls.c_str () : msg.c_str (), sourcefile ? sourcefile : "unknown", line, exc_cls.c_str (), backtrace);
-
     }
-
   }
 }
 
 }
-

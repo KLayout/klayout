@@ -69,7 +69,7 @@ static const char *s_by = "by";
 static const char *s_with = "with";
 static const char *s_pass = "pass";
 
-const char *s_reserved_words[] = {
+const char *s_reserved_words [] = {
   s_select,
   s_delete,
   s_or,
@@ -94,14 +94,13 @@ const char *s_reserved_words[] = {
   s_unique,
   s_by,
   s_with,
-  s_pass
-};
+  s_pass};
 
 bool check_trailing_reserved_word (const tl::Extractor &ex0)
 {
   tl::Extractor ex = ex0;
-  for (size_t i = 0; i < sizeof (s_reserved_words) / sizeof (s_reserved_words[0]); ++i) {
-    if (ex.test (s_reserved_words[i])) {
+  for (size_t i = 0; i < sizeof (s_reserved_words) / sizeof (s_reserved_words [0]); ++i) {
+    if (ex.test (s_reserved_words [i])) {
       return true;
     }
   }
@@ -111,7 +110,7 @@ bool check_trailing_reserved_word (const tl::Extractor &ex0)
 // --------------------------------------------------------------------------------
 //  FilterSingleState definition and implementation
 
-class DB_PUBLIC FilterSingleState 
+class DB_PUBLIC FilterSingleState
   : public FilterStateBase
 {
 public:
@@ -121,18 +120,18 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void reset (FilterStateBase *previous) 
+  virtual void reset (FilterStateBase *previous)
   {
     FilterStateBase::reset (previous);
     m_done = false;
   }
 
-  virtual void next (bool) 
+  virtual void next (bool)
   {
     m_done = true;
   }
 
-  virtual bool at_end () 
+  virtual bool at_end ()
   {
     return m_done;
   }
@@ -152,13 +151,13 @@ class DB_PUBLIC NameFilterArgument
 public:
   NameFilterArgument ()
     : m_needs_eval (false)
-  { 
+  {
     //  .. nothing yet ..
   }
 
   NameFilterArgument (const std::string &pattern, bool needs_eval = false)
     : m_pattern (pattern), m_needs_eval (needs_eval)
-  { 
+  {
     //  .. nothing yet ..
   }
 
@@ -175,7 +174,6 @@ public:
       ex.read_word_or_quoted (name, "_$*?");
       m_pattern = name;
       m_needs_eval = false;
-
     }
   }
 
@@ -207,7 +205,7 @@ class DB_PUBLIC NameFilter
 public:
   NameFilter (const NameFilterArgument &arg, tl::Eval &eval)
     : m_needs_eval (arg.m_needs_eval), mp_eval (&eval)
-  { 
+  {
     if (m_needs_eval) {
       eval.parse (m_expression, arg.m_pattern, true);
     } else {
@@ -257,29 +255,28 @@ private:
 // --------------------------------------------------------------------------------
 //  ShapeFilter definition and implementation
 
-struct ShapeFilterPropertyIDs
-{
+struct ShapeFilterPropertyIDs {
   ShapeFilterPropertyIDs (LayoutQuery *q)
   {
-    bbox               = q->register_property ("bbox", LQ_box);
-    dbbox              = q->register_property ("dbbox", LQ_dbox);
-    shape_bbox         = q->register_property ("shape_bbox", LQ_box);
-    shape_dbbox        = q->register_property ("shape_dbbox", LQ_dbox);
-    shape              = q->register_property ("shape", LQ_shape);
-    layer_info         = q->register_property ("layer_info", LQ_layer);
-    layer_index        = q->register_property ("layer_index", LQ_variant);
+    bbox = q->register_property ("bbox", LQ_box);
+    dbbox = q->register_property ("dbbox", LQ_dbox);
+    shape_bbox = q->register_property ("shape_bbox", LQ_box);
+    shape_dbbox = q->register_property ("shape_dbbox", LQ_dbox);
+    shape = q->register_property ("shape", LQ_shape);
+    layer_info = q->register_property ("layer_info", LQ_layer);
+    layer_index = q->register_property ("layer_index", LQ_variant);
     //  for accessing the parent's properties
-    cell_index         = q->register_property ("cell_index", LQ_variant);
+    cell_index = q->register_property ("cell_index", LQ_variant);
   }
 
-  unsigned int bbox;                // bbox                 -> The shape's bounding box
-  unsigned int dbbox;               // dbbox                -> The shape's bounding box in micrometer units
-  unsigned int shape_bbox;          // shape_bbox           -> == box
-  unsigned int shape_dbbox;         // shape_dbbox          -> == dbox
-  unsigned int shape;               // shape                -> The shape object
-  unsigned int layer_info;          // layer_info           -> The layer (a LayerInfo object)
-  unsigned int layer_index;         // layer_index          -> The layer index
-  unsigned int cell_index;          // cell_index           -> The cell index
+  unsigned int bbox;        // bbox                 -> The shape's bounding box
+  unsigned int dbbox;       // dbbox                -> The shape's bounding box in micrometer units
+  unsigned int shape_bbox;  // shape_bbox           -> == box
+  unsigned int shape_dbbox; // shape_dbbox          -> == dbox
+  unsigned int shape;       // shape                -> The shape object
+  unsigned int layer_info;  // layer_info           -> The layer (a LayerInfo object)
+  unsigned int layer_index; // layer_index          -> The layer index
+  unsigned int cell_index;  // cell_index           -> The cell index
 };
 
 class DB_PUBLIC ShapeFilterState
@@ -298,11 +295,11 @@ public:
     }
   }
 
-  virtual void reset (FilterStateBase *previous) 
+  virtual void reset (FilterStateBase *previous)
   {
     FilterStateBase::reset (previous);
 
-    //  Get the parent cell by asking the previous states 
+    //  Get the parent cell by asking the previous states
     mp_parent = 0;
     tl::Variant parent_id;
     if (FilterStateBase::get_property (m_pids.cell_index, parent_id)) {
@@ -327,7 +324,7 @@ public:
     }
   }
 
-  virtual void next (bool) 
+  virtual void next (bool)
   {
     if (mp_parent) {
 
@@ -357,13 +354,12 @@ public:
         }
 
       } while (m_ignored.find (m_s) != m_ignored.end ());
-
-    }  
+    }
   }
 
-  virtual bool at_end () 
+  virtual bool at_end ()
   {
-    return !mp_parent || m_lindex >= m_layers.size ();
+    return ! mp_parent || m_lindex >= m_layers.size ();
   }
 
   bool get_property (unsigned int id, tl::Variant &v)
@@ -390,12 +386,12 @@ public:
 
     } else if (id == m_pids.layer_index) {
 
-      v = m_layers[m_lindex];
+      v = m_layers [m_lindex];
       return true;
 
     } else if (id == m_pids.layer_info) {
 
-      v = tl::Variant::make_variant (layout ()->get_properties (m_layers[m_lindex]));
+      v = tl::Variant::make_variant (layout ()->get_properties (m_layers [m_lindex]));
       return true;
 
     } else {
@@ -426,10 +422,10 @@ class DB_PUBLIC ShapeFilter
 {
 public:
   ShapeFilter (LayoutQuery *q, const db::LayerMap &layers, db::ShapeIterator::flags_type flags, bool reading)
-    : FilterBracket (q), 
+    : FilterBracket (q),
       m_pids (q),
       m_layers (layers),
-      m_flags (flags), 
+      m_flags (flags),
       m_reading (reading)
   {
     // .. nothing yet ..
@@ -450,7 +446,7 @@ public:
     for (unsigned int i = 0; i < l; ++i) {
       std::cout << "  ";
     }
-    std::cout << "ShapeFilter (" << m_layers.to_string () << ", " << (int)m_flags << ") :" << std::endl;
+    std::cout << "ShapeFilter (" << m_layers.to_string () << ", " << (int) m_flags << ") :" << std::endl;
     FilterBracket::dump (l + 1);
   }
 
@@ -464,128 +460,126 @@ private:
 // --------------------------------------------------------------------------------
 //  ChildCellFilter definition and implementation
 
-enum ChildCellFilterInstanceMode
-{
+enum ChildCellFilterInstanceMode {
   NoInstances = 0,
   ExplodedInstances = 1,
   ArrayInstances = 2
 };
 
-struct ChildCellFilterPropertyIDs
-{
+struct ChildCellFilterPropertyIDs {
   ChildCellFilterPropertyIDs (LayoutQuery *q, ChildCellFilterInstanceMode instance_mode)
   {
-    path               = q->register_property ("path", LQ_variant);
-    path_names         = q->register_property ("path_names", LQ_variant);
-    inst_elements      = q->register_property ("inst_elements", LQ_variant);
-    initial_cell       = q->register_property ("initial_cell", LQ_cell);
+    path = q->register_property ("path", LQ_variant);
+    path_names = q->register_property ("path_names", LQ_variant);
+    inst_elements = q->register_property ("inst_elements", LQ_variant);
+    initial_cell = q->register_property ("initial_cell", LQ_cell);
     initial_cell_index = q->register_property ("initial_cell_index", LQ_variant);
-    initial_cell_name  = q->register_property ("initial_cell_name", LQ_variant);
-    cell               = q->register_property ("cell", LQ_cell);
-    cell_index         = q->register_property ("cell_index", LQ_variant);
-    cell_name          = q->register_property ("cell_name", LQ_variant);
-    parent_cell        = q->register_property ("parent_cell", LQ_cell);
-    parent_cell_index  = q->register_property ("parent_cell_index", LQ_variant);
-    parent_cell_name   = q->register_property ("parent_cell_name", LQ_variant);
-    hier_levels        = q->register_property ("hier_levels", LQ_variant);
-    bbox               = q->register_property ("bbox", LQ_box);
-    dbbox              = q->register_property ("dbbox", LQ_dbox);
-    cell_bbox          = q->register_property ("cell_bbox", LQ_box);
-    cell_dbbox         = q->register_property ("cell_dbbox", LQ_dbox);
+    initial_cell_name = q->register_property ("initial_cell_name", LQ_variant);
+    cell = q->register_property ("cell", LQ_cell);
+    cell_index = q->register_property ("cell_index", LQ_variant);
+    cell_name = q->register_property ("cell_name", LQ_variant);
+    parent_cell = q->register_property ("parent_cell", LQ_cell);
+    parent_cell_index = q->register_property ("parent_cell_index", LQ_variant);
+    parent_cell_name = q->register_property ("parent_cell_name", LQ_variant);
+    hier_levels = q->register_property ("hier_levels", LQ_variant);
+    bbox = q->register_property ("bbox", LQ_box);
+    dbbox = q->register_property ("dbbox", LQ_dbox);
+    cell_bbox = q->register_property ("cell_bbox", LQ_box);
+    cell_dbbox = q->register_property ("cell_dbbox", LQ_dbox);
 
     //  with instance_mode == NoInstances:
     if (instance_mode == NoInstances) {
-      references       = q->register_property ("references", LQ_variant);
-      weight           = q->register_property ("weight", LQ_variant);
-      tot_weight       = q->register_property ("tot_weight", LQ_variant);
+      references = q->register_property ("references", LQ_variant);
+      weight = q->register_property ("weight", LQ_variant);
+      tot_weight = q->register_property ("tot_weight", LQ_variant);
     } else {
-      references       = std::numeric_limits<unsigned int>::max ();
-      weight           = std::numeric_limits<unsigned int>::max ();
-      tot_weight       = std::numeric_limits<unsigned int>::max ();
+      references = std::numeric_limits<unsigned int>::max ();
+      weight = std::numeric_limits<unsigned int>::max ();
+      tot_weight = std::numeric_limits<unsigned int>::max ();
     }
 
     //  with instance_mode != NoInstances:
     if (instance_mode != NoInstances) {
-      path_trans       = q->register_property ("path_trans", LQ_trans);
-      path_dtrans      = q->register_property ("path_dtrans", LQ_dtrans);
-      trans            = q->register_property ("trans", LQ_trans);
-      dtrans           = q->register_property ("dtrans", LQ_dtrans);
-      inst_bbox        = q->register_property ("inst_bbox", LQ_box);
-      inst_dbbox       = q->register_property ("inst_dbbox", LQ_box);
-      inst             = q->register_property ("inst", LQ_instance);
-      array_a          = q->register_property ("array_a", LQ_point);
-      array_da         = q->register_property ("array_da", LQ_dpoint);
-      array_na         = q->register_property ("array_na", LQ_variant);
-      array_b          = q->register_property ("array_b", LQ_point);
-      array_db         = q->register_property ("array_db", LQ_dpoint);
-      array_nb         = q->register_property ("array_nb", LQ_variant);
+      path_trans = q->register_property ("path_trans", LQ_trans);
+      path_dtrans = q->register_property ("path_dtrans", LQ_dtrans);
+      trans = q->register_property ("trans", LQ_trans);
+      dtrans = q->register_property ("dtrans", LQ_dtrans);
+      inst_bbox = q->register_property ("inst_bbox", LQ_box);
+      inst_dbbox = q->register_property ("inst_dbbox", LQ_box);
+      inst = q->register_property ("inst", LQ_instance);
+      array_a = q->register_property ("array_a", LQ_point);
+      array_da = q->register_property ("array_da", LQ_dpoint);
+      array_na = q->register_property ("array_na", LQ_variant);
+      array_b = q->register_property ("array_b", LQ_point);
+      array_db = q->register_property ("array_db", LQ_dpoint);
+      array_nb = q->register_property ("array_nb", LQ_variant);
     } else {
-      path_trans       = std::numeric_limits<unsigned int>::max ();
-      path_dtrans      = std::numeric_limits<unsigned int>::max ();
-      trans            = std::numeric_limits<unsigned int>::max ();
-      dtrans           = std::numeric_limits<unsigned int>::max ();
-      inst_bbox        = std::numeric_limits<unsigned int>::max ();
-      inst_dbbox       = std::numeric_limits<unsigned int>::max ();
-      inst             = std::numeric_limits<unsigned int>::max ();
-      array_a          = std::numeric_limits<unsigned int>::max ();
-      array_da         = std::numeric_limits<unsigned int>::max ();
-      array_na         = std::numeric_limits<unsigned int>::max ();
-      array_b          = std::numeric_limits<unsigned int>::max ();
-      array_db         = std::numeric_limits<unsigned int>::max ();
-      array_nb         = std::numeric_limits<unsigned int>::max ();
+      path_trans = std::numeric_limits<unsigned int>::max ();
+      path_dtrans = std::numeric_limits<unsigned int>::max ();
+      trans = std::numeric_limits<unsigned int>::max ();
+      dtrans = std::numeric_limits<unsigned int>::max ();
+      inst_bbox = std::numeric_limits<unsigned int>::max ();
+      inst_dbbox = std::numeric_limits<unsigned int>::max ();
+      inst = std::numeric_limits<unsigned int>::max ();
+      array_a = std::numeric_limits<unsigned int>::max ();
+      array_da = std::numeric_limits<unsigned int>::max ();
+      array_na = std::numeric_limits<unsigned int>::max ();
+      array_b = std::numeric_limits<unsigned int>::max ();
+      array_db = std::numeric_limits<unsigned int>::max ();
+      array_nb = std::numeric_limits<unsigned int>::max ();
     }
 
     //  with instance_mode == ExplodedInstances:
     if (instance_mode == ExplodedInstances) {
-      array_ia         = q->register_property ("array_ia", LQ_variant);
-      array_ib         = q->register_property ("array_ib", LQ_variant);
+      array_ia = q->register_property ("array_ia", LQ_variant);
+      array_ib = q->register_property ("array_ib", LQ_variant);
     } else {
-      array_ia         = std::numeric_limits<unsigned int>::max ();
-      array_ib         = std::numeric_limits<unsigned int>::max ();
+      array_ia = std::numeric_limits<unsigned int>::max ();
+      array_ib = std::numeric_limits<unsigned int>::max ();
     }
   }
 
-  unsigned int path;                // path                 -> Variant array with the indexes of the cells in that path
-  unsigned int path_names;          // path                 -> Variant array with the names of the cells in that path
-  unsigned int initial_cell;        // initial_cell         -> Initial cell object (first of path)
-  unsigned int initial_cell_index;  // initial_cell_index   -> Index of initial cell (first of path)
-  unsigned int initial_cell_name;   // initial_cell_name    -> Name of initial cell (first of path)
-  unsigned int cell;                // cell                 -> Current cell (last of path)
-  unsigned int cell_index;          // cell_index           -> Index of current cell (last of path)
-  unsigned int cell_name;           // cell_name            -> Name of current cell (last of path)
-  unsigned int parent_cell;         // parent_cell          -> Parent cell (next in path) or nil
-  unsigned int parent_cell_index;   // parent_cell_index    -> Index of parent cell (next in path) or nil
-  unsigned int parent_cell_name;    // parent_cell_name     -> Name of parent cell (next in path) or nil
-  unsigned int hier_levels;         // hier_levels          -> Number of hierarchy levels in path (length of path - 1)
-  unsigned int bbox;                // bbox                 -> Cell bounding box
-  unsigned int dbbox;               // dbbox                -> Cell bounding box in micrometer units
-  unsigned int cell_bbox;           // cell_bbox            -> == bbox
-  unsigned int cell_dbbox;          // cell_dbbox           -> == dbbox
+  unsigned int path;               // path                 -> Variant array with the indexes of the cells in that path
+  unsigned int path_names;         // path                 -> Variant array with the names of the cells in that path
+  unsigned int initial_cell;       // initial_cell         -> Initial cell object (first of path)
+  unsigned int initial_cell_index; // initial_cell_index   -> Index of initial cell (first of path)
+  unsigned int initial_cell_name;  // initial_cell_name    -> Name of initial cell (first of path)
+  unsigned int cell;               // cell                 -> Current cell (last of path)
+  unsigned int cell_index;         // cell_index           -> Index of current cell (last of path)
+  unsigned int cell_name;          // cell_name            -> Name of current cell (last of path)
+  unsigned int parent_cell;        // parent_cell          -> Parent cell (next in path) or nil
+  unsigned int parent_cell_index;  // parent_cell_index    -> Index of parent cell (next in path) or nil
+  unsigned int parent_cell_name;   // parent_cell_name     -> Name of parent cell (next in path) or nil
+  unsigned int hier_levels;        // hier_levels          -> Number of hierarchy levels in path (length of path - 1)
+  unsigned int bbox;               // bbox                 -> Cell bounding box
+  unsigned int dbbox;              // dbbox                -> Cell bounding box in micrometer units
+  unsigned int cell_bbox;          // cell_bbox            -> == bbox
+  unsigned int cell_dbbox;         // cell_dbbox           -> == dbbox
 
   //  with instance_mode == NoInstances:
-  unsigned int references;          // references           -> The number of instances (arefs count as 1) of this cell in the parent cell
-  unsigned int weight;              // weight               -> The number of instances (arefs are flattened) of this cell in the parent cell
-  unsigned int tot_weight;          // tot_weight           -> The number of instances of this cell in the initial cell along the given path
+  unsigned int references; // references           -> The number of instances (arefs count as 1) of this cell in the parent cell
+  unsigned int weight;     // weight               -> The number of instances (arefs are flattened) of this cell in the parent cell
+  unsigned int tot_weight; // tot_weight           -> The number of instances of this cell in the initial cell along the given path
 
   //  with instance_mode != NoInstances:
-  unsigned int path_trans;          // path_trans           -> The transformation of that instance into the top cell
-  unsigned int path_dtrans;         // path_dtrans          -> The transformation of that instance into the top cell in micrometer units
-  unsigned int trans;               // trans                -> The transformation of that instance (first instance if an array)
-  unsigned int dtrans;              // dtrans               -> The transformation of that instance (first instance if an array) in micrometer units
-  unsigned int inst_bbox;           // inst_bbox            -> The instance bounding box in the top cell
-  unsigned int inst_dbbox;          // inst_dbbox           -> The instance bounding box in the top cell in micrometer units
-  unsigned int inst;                // inst                 -> The instance object
-  unsigned int inst_elements;       // inst_elements        -> Variant array with the db::InstElement objects for the path
-  unsigned int array_a;             // array_a              -> The a vector for an array instance
-  unsigned int array_da;            // array_da             -> The a vector for an array instance in micrometer units
-  unsigned int array_na;            // array_na             -> The a axis array dimension
-  unsigned int array_b;             // array_b              -> The b vector for an array instance
-  unsigned int array_db;            // array_db             -> The b vector for an array instance in micrometer units
-  unsigned int array_nb;            // array_nb             -> The b axis array dimension
+  unsigned int path_trans;    // path_trans           -> The transformation of that instance into the top cell
+  unsigned int path_dtrans;   // path_dtrans          -> The transformation of that instance into the top cell in micrometer units
+  unsigned int trans;         // trans                -> The transformation of that instance (first instance if an array)
+  unsigned int dtrans;        // dtrans               -> The transformation of that instance (first instance if an array) in micrometer units
+  unsigned int inst_bbox;     // inst_bbox            -> The instance bounding box in the top cell
+  unsigned int inst_dbbox;    // inst_dbbox           -> The instance bounding box in the top cell in micrometer units
+  unsigned int inst;          // inst                 -> The instance object
+  unsigned int inst_elements; // inst_elements        -> Variant array with the db::InstElement objects for the path
+  unsigned int array_a;       // array_a              -> The a vector for an array instance
+  unsigned int array_da;      // array_da             -> The a vector for an array instance in micrometer units
+  unsigned int array_na;      // array_na             -> The a axis array dimension
+  unsigned int array_b;       // array_b              -> The b vector for an array instance
+  unsigned int array_db;      // array_db             -> The b vector for an array instance in micrometer units
+  unsigned int array_nb;      // array_nb             -> The b axis array dimension
 
   //  with instance_mode == ExplodedInstances:
-  unsigned int array_ia;            // array_ia             -> The a index when an array is iterated
-  unsigned int array_ib;             // array_ib             -> The b index when an array is iterated
+  unsigned int array_ia; // array_ia             -> The a index when an array is iterated
+  unsigned int array_ib; // array_ib             -> The b index when an array is iterated
 };
 
 class DB_PUBLIC ChildCellFilterState
@@ -634,7 +628,7 @@ public:
 
         int levels = 1;
         for (size_t i = 0; i < followers ().size (); ++i) {
-          if (followers ()[i] == 0) {
+          if (followers () [i] == 0) {
             //  this is a sign of recursion - collect caller cells from all levels.
             levels = -1;
           }
@@ -649,7 +643,6 @@ public:
         for (std::set<db::cell_index_type>::const_iterator c = callers.begin (); c != callers.end (); ++c) {
           objectives ().request_cell (*c);
         }
-
       }
 
     } else {
@@ -657,12 +650,11 @@ public:
       objectives ().set_wants_all_cells (false);
 
       //  include all matching cells into the objectives
-      for (db::Layout::const_iterator c = layout ()->begin (); c != layout ()->end(); ++c) {
+      for (db::Layout::const_iterator c = layout ()->begin (); c != layout ()->end (); ++c) {
         if (m_pattern.match (c->get_qualified_name ())) {
           objectives ().request_cell (c->cell_index ());
         }
       }
-
     }
   }
 
@@ -675,7 +667,7 @@ public:
   {
     //  during modification or delete, instances may vanish while iterating,
     //  hence we need to check during iteration
-    while (m_inst != m_inst_end && !mp_parent->is_valid (instance ())) {
+    while (m_inst != m_inst_end && ! mp_parent->is_valid (instance ())) {
       ++m_inst;
     }
   }
@@ -693,7 +685,7 @@ public:
     m_pattern.reset ();
     m_ignored.clear ();
 
-    //  Get the parent cell by asking the previous states 
+    //  Get the parent cell by asking the previous states
     mp_parent = 0;
     tl::Variant parent_id;
     if (FilterStateBase::get_property (m_pids.cell_index, parent_id)) {
@@ -704,11 +696,11 @@ public:
 
     m_parent_trans = db::ICplxTrans ();
 
-    if (!mp_parent) {
+    if (! mp_parent) {
 
       m_top_cell = layout ()->begin_top_down ();
       m_top_cell_end = layout ()->end_top_cells ();
-      while (m_top_cell != m_top_cell_end && (!layout ()->is_valid_cell_index (*m_top_cell) || !cell_matches (*m_top_cell))) {
+      while (m_top_cell != m_top_cell_end && (! layout ()->is_valid_cell_index (*m_top_cell) || ! cell_matches (*m_top_cell))) {
         ++m_top_cell;
       }
 
@@ -721,9 +713,9 @@ public:
       if (m_instance_mode == NoInstances) {
 
         m_child_cell = mp_parent->begin_child_cells ();
-        while (! m_child_cell.at_end () && (!layout ()->is_valid_cell_index (*m_child_cell) || !cell_matches (*m_child_cell))) {
+        while (! m_child_cell.at_end () && (! layout ()->is_valid_cell_index (*m_child_cell) || ! cell_matches (*m_child_cell))) {
           ++m_child_cell;
-        } 
+        }
 
       } else {
 
@@ -743,17 +735,15 @@ public:
           while (m_inst != m_inst_end && (*m_inst)->object ().cell_index () == cid) {
             next_valid_instance ();
           }
-
         }
 
-        if (m_inst != m_inst_end && !m_reading) {
+        if (m_inst != m_inst_end && ! m_reading) {
           m_i = mp_parent->sorted_inst_ptr (std::distance (mp_parent->begin_sorted_insts (), m_inst));
         }
 
         if (m_inst != m_inst_end && m_instance_mode == ExplodedInstances) {
           m_array_iter = (*m_inst)->begin ();
         }
-
       }
 
       tl::Variant v;
@@ -763,11 +753,10 @@ public:
 
       m_weight_set = false;
       m_references_set = false;
-
     }
   }
 
-  virtual void next (bool) 
+  virtual void next (bool)
   {
     if (mp_parent) {
 
@@ -775,7 +764,7 @@ public:
 
         do {
           ++m_child_cell;
-        } while (! m_child_cell.at_end () && (!layout ()->is_valid_cell_index (*m_child_cell) || !cell_matches (*m_child_cell)));
+        } while (! m_child_cell.at_end () && (! layout ()->is_valid_cell_index (*m_child_cell) || ! cell_matches (*m_child_cell)));
 
       } else {
 
@@ -807,9 +796,7 @@ public:
                 while (m_inst != m_inst_end && (*m_inst)->object ().cell_index () == cid) {
                   next_valid_instance ();
                 }
-
               }
-
             }
 
             if (! m_reading && m_inst != m_inst_end) {
@@ -823,9 +810,7 @@ public:
           if (m_inst != m_inst_end) {
             m_array_iter = (*m_inst)->begin ();
           }
-
         }
-
       }
 
       m_weight_set = false;
@@ -835,12 +820,11 @@ public:
 
       do {
         ++m_top_cell;
-      } while (m_top_cell != m_top_cell_end && (!layout ()->is_valid_cell_index (*m_top_cell) || !cell_matches (*m_top_cell)));
-
+      } while (m_top_cell != m_top_cell_end && (! layout ()->is_valid_cell_index (*m_top_cell) || ! cell_matches (*m_top_cell)));
     }
   }
 
-  virtual bool at_end () 
+  virtual bool at_end ()
   {
     if (mp_parent) {
       if (m_instance_mode == NoInstances) {
@@ -1121,7 +1105,7 @@ public:
 
           db::ICplxTrans t = m_parent_trans;
           t *= (*m_inst)->complex_trans ();
-          db::box_convert <db::CellInst> bc (*layout ());
+          db::box_convert<db::CellInst> bc (*layout ());
           db::Box box (t * (*m_inst)->bbox (bc));
           v = tl::Variant::make_variant (box);
           return true;
@@ -1150,7 +1134,7 @@ public:
 
           db::ICplxTrans t = m_parent_trans;
           t *= (*m_inst)->complex_trans ();
-          db::box_convert <db::CellInst> bc (*layout ());
+          db::box_convert<db::CellInst> bc (*layout ());
           db::DBox box (db::CplxTrans (layout ()->dbu ()) * t * (*m_inst)->bbox (bc));
           v = tl::Variant::make_variant (box);
           return true;
@@ -1344,7 +1328,7 @@ private:
   ChildCellFilterPropertyIDs m_pids;
   db::Layout::top_down_const_iterator m_top_cell, m_top_cell_end;
   db::Cell::child_cell_iterator m_child_cell, m_child_cell_end;
-  db::Cell::sorted_inst_iterator m_inst, m_inst_end; 
+  db::Cell::sorted_inst_iterator m_inst, m_inst_end;
   db::CellInstArray::iterator m_array_iter;
   db::ICplxTrans m_parent_trans;
   size_t m_weight, m_references;
@@ -1360,7 +1344,7 @@ class DB_PUBLIC ChildCellFilter
 {
 public:
   ChildCellFilter (LayoutQuery *q, const NameFilterArgument &pattern, ChildCellFilterInstanceMode instance_mode, bool reading)
-    : FilterBracket (q), 
+    : FilterBracket (q),
       m_pids (q, instance_mode),
       m_pattern (pattern),
       m_instance_mode (instance_mode),
@@ -1384,7 +1368,7 @@ public:
     for (unsigned int i = 0; i < l; ++i) {
       std::cout << "  ";
     }
-    std::cout << "ChildCellFilter (" << m_pattern.pattern () << ", " << (int)m_instance_mode << ") :" << std::endl;
+    std::cout << "ChildCellFilter (" << m_pattern.pattern () << ", " << (int) m_instance_mode << ") :" << std::endl;
     FilterBracket::dump (l + 1);
   }
 
@@ -1398,54 +1382,53 @@ private:
 // --------------------------------------------------------------------------------
 //  CellFilter definition and implementation
 
-struct CellFilterPropertyIDs
-{
+struct CellFilterPropertyIDs {
   CellFilterPropertyIDs (LayoutQuery *q)
   {
-    path               = q->register_property ("path", LQ_variant);
-    path_names         = q->register_property ("path_names", LQ_variant);
-    initial_cell       = q->register_property ("initial_cell", LQ_cell);
+    path = q->register_property ("path", LQ_variant);
+    path_names = q->register_property ("path_names", LQ_variant);
+    initial_cell = q->register_property ("initial_cell", LQ_cell);
     initial_cell_index = q->register_property ("initial_cell_index", LQ_variant);
-    initial_cell_name  = q->register_property ("initial_cell_name", LQ_variant);
-    cell               = q->register_property ("cell", LQ_cell);
-    cell_index         = q->register_property ("cell_index", LQ_variant);
-    cell_name          = q->register_property ("cell_name", LQ_variant);
-    hier_levels        = q->register_property ("hier_levels", LQ_variant);
-    references         = q->register_property ("references", LQ_variant);
-    weight             = q->register_property ("weight", LQ_variant);
-    tot_weight         = q->register_property ("tot_weight", LQ_variant);
-    instances          = q->register_property ("instances", LQ_variant);
-    bbox               = q->register_property ("bbox", LQ_box);
-    dbbox              = q->register_property ("dbbox", LQ_dbox);
-    cell_bbox          = q->register_property ("cell_bbox", LQ_box);
-    cell_dbbox         = q->register_property ("cell_dbbox", LQ_dbox);
-    path_trans         = q->register_property ("path_trans", LQ_trans);
-    path_dtrans        = q->register_property ("path_dtrans", LQ_dtrans);
+    initial_cell_name = q->register_property ("initial_cell_name", LQ_variant);
+    cell = q->register_property ("cell", LQ_cell);
+    cell_index = q->register_property ("cell_index", LQ_variant);
+    cell_name = q->register_property ("cell_name", LQ_variant);
+    hier_levels = q->register_property ("hier_levels", LQ_variant);
+    references = q->register_property ("references", LQ_variant);
+    weight = q->register_property ("weight", LQ_variant);
+    tot_weight = q->register_property ("tot_weight", LQ_variant);
+    instances = q->register_property ("instances", LQ_variant);
+    bbox = q->register_property ("bbox", LQ_box);
+    dbbox = q->register_property ("dbbox", LQ_dbox);
+    cell_bbox = q->register_property ("cell_bbox", LQ_box);
+    cell_dbbox = q->register_property ("cell_dbbox", LQ_dbox);
+    path_trans = q->register_property ("path_trans", LQ_trans);
+    path_dtrans = q->register_property ("path_dtrans", LQ_dtrans);
   }
 
-  unsigned int path;                // path                 -> Variant array with the indexes of the cells in that path
-  unsigned int path_names;          // path_names           -> Variant array with the names of the cells in that path
-  unsigned int initial_cell;        // initial_cell         -> Pointer to initial cell (first of path)
-  unsigned int initial_cell_index;  // initial_cell_index   -> Index of initial cell (first of path)
-  unsigned int initial_cell_name;   // initial_cell_name    -> Name of initial cell (first of path)
-                                    //                         The path is a dummy path consisting of the cell as a single
-                                    //                         element. It is provided to allow using the CellFilter as the
-                                    //                         front of a instantiation path.
-                                    //                         Also, the initial cell is identical to cell.
-  unsigned int cell;                // cell                 -> Pointer to current cell (last of path)
-  unsigned int cell_index;          // cell_index           -> Index of current cell (last of path)
-  unsigned int cell_name;           // cell_name            -> Name of current cell (last of path)
-  unsigned int hier_levels;         // hier_levels          -> Number of hierarchy levels in path (length of path - 1)
-  unsigned int references;          // references           -> The number of instances (arefs count as 1) of this cell in the parent cell
-  unsigned int weight;              // weight               -> The number of instances (arefs are flattened) of this cell in the parent cell
-  unsigned int tot_weight;          // tot_weight           -> The number of instances of this cell in the initial cell along the given path
-  unsigned int instances;           // instances            -> The number of instances of this cell in the previous cell (or over all if there is no previous cell)
-  unsigned int bbox;                // bbox                 -> Cell bounding box
-  unsigned int dbbox;               // dbbox                -> Cell bounding box in micrometer units
-  unsigned int cell_bbox;           // cell_bbox            -> == bbox
-  unsigned int cell_dbbox;          // cell_dbbox           -> == dbbox
-  unsigned int path_trans;          // parent_trans         -> transformation to initial cell
-  unsigned int path_dtrans;         // parent_dtrans        -> transformation to initial cell in micrometer units
+  unsigned int path;               // path                 -> Variant array with the indexes of the cells in that path
+  unsigned int path_names;         // path_names           -> Variant array with the names of the cells in that path
+  unsigned int initial_cell;       // initial_cell         -> Pointer to initial cell (first of path)
+  unsigned int initial_cell_index; // initial_cell_index   -> Index of initial cell (first of path)
+  unsigned int initial_cell_name;  // initial_cell_name    -> Name of initial cell (first of path)
+                                   //                         The path is a dummy path consisting of the cell as a single
+                                   //                         element. It is provided to allow using the CellFilter as the
+                                   //                         front of a instantiation path.
+                                   //                         Also, the initial cell is identical to cell.
+  unsigned int cell;               // cell                 -> Pointer to current cell (last of path)
+  unsigned int cell_index;         // cell_index           -> Index of current cell (last of path)
+  unsigned int cell_name;          // cell_name            -> Name of current cell (last of path)
+  unsigned int hier_levels;        // hier_levels          -> Number of hierarchy levels in path (length of path - 1)
+  unsigned int references;         // references           -> The number of instances (arefs count as 1) of this cell in the parent cell
+  unsigned int weight;             // weight               -> The number of instances (arefs are flattened) of this cell in the parent cell
+  unsigned int tot_weight;         // tot_weight           -> The number of instances of this cell in the initial cell along the given path
+  unsigned int instances;          // instances            -> The number of instances of this cell in the previous cell (or over all if there is no previous cell)
+  unsigned int bbox;               // bbox                 -> Cell bounding box
+  unsigned int dbbox;              // dbbox                -> Cell bounding box in micrometer units
+  unsigned int cell_bbox;          // cell_bbox            -> == bbox
+  unsigned int cell_dbbox;         // cell_dbbox           -> == dbbox
+  unsigned int path_trans;         // parent_trans         -> transformation to initial cell
+  unsigned int path_dtrans;        // parent_dtrans        -> transformation to initial cell in micrometer units
 };
 
 class DB_PUBLIC CellFilterState
@@ -1481,7 +1464,7 @@ public:
     }
   }
 
-  virtual void reset (FilterStateBase *previous) 
+  virtual void reset (FilterStateBase *previous)
   {
     FilterStateBase::reset (previous);
 
@@ -1490,11 +1473,11 @@ public:
     m_cell = layout ()->begin_top_down ();
     m_cell_end = layout ()->end_top_down ();
 
-    while (m_cell != m_cell_end && !cell_matches (*m_cell)) {
+    while (m_cell != m_cell_end && ! cell_matches (*m_cell)) {
       ++m_cell;
     }
 
-    //  Get the parent cell by asking the previous states 
+    //  Get the parent cell by asking the previous states
     mp_parent = 0;
     tl::Variant parent_id;
     if (FilterStateBase::get_property (m_pids.cell_index, parent_id)) {
@@ -1504,14 +1487,14 @@ public:
     m_cell_counter.reset (0);
   }
 
-  virtual void next (bool) 
+  virtual void next (bool)
   {
     do {
       ++m_cell;
-    } while (m_cell != m_cell_end && !cell_matches (*m_cell));
+    } while (m_cell != m_cell_end && ! cell_matches (*m_cell));
   }
 
-  virtual bool at_end () 
+  virtual bool at_end ()
   {
     return m_cell == m_cell_end;
   }
@@ -1647,7 +1630,7 @@ class DB_PUBLIC CellFilter
 {
 public:
   CellFilter (LayoutQuery *q, const NameFilterArgument &pattern, bool reading)
-    : FilterBracket (q), 
+    : FilterBracket (q),
       m_pids (q),
       m_pattern (pattern),
       m_reading (reading)
@@ -1688,13 +1671,12 @@ private:
 // --------------------------------------------------------------------------------
 //  DeleteFilter definition and implementation
 
-struct DeleteFilterPropertyIDs
-{
+struct DeleteFilterPropertyIDs {
   DeleteFilterPropertyIDs (LayoutQuery *q)
   {
-    cell_index         = q->register_property ("cell_index", LQ_variant);
-    inst               = q->register_property ("inst", LQ_instance);
-    shape              = q->register_property ("shape", LQ_shape);
+    cell_index = q->register_property ("cell_index", LQ_variant);
+    inst = q->register_property ("inst", LQ_instance);
+    shape = q->register_property ("shape", LQ_shape);
   }
 
   //  imported properties
@@ -1713,7 +1695,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void reset (FilterStateBase *previous) 
+  virtual void reset (FilterStateBase *previous)
   {
     FilterStateBase::reset (previous);
 
@@ -1722,19 +1704,19 @@ public:
     } else {
       m_count = 0;
     }
-  } 
+  }
 
-  virtual void next (bool skip) 
+  virtual void next (bool skip)
   {
     if (m_transparent) {
       if (! m_count && ! skip) {
         do_delete ();
-      } 
+      }
       ++m_count;
     }
   }
 
-  virtual bool at_end () 
+  virtual bool at_end ()
   {
     return ! m_transparent || m_count > 0;
   }
@@ -1784,10 +1766,8 @@ private:
       if (layout ()->is_valid_cell_index (cid)) {
         layout ()->delete_cell (cid);
       }
-
     }
   }
-
 };
 
 class DB_PUBLIC DeleteFilter
@@ -1846,7 +1826,7 @@ public:
     }
   }
 
-  virtual void reset (FilterStateBase *previous) 
+  virtual void reset (FilterStateBase *previous)
   {
     FilterStateBase::reset (previous);
     if (m_transparent) {
@@ -1856,19 +1836,19 @@ public:
     }
   }
 
-  virtual void next (bool skip) 
+  virtual void next (bool skip)
   {
     if (m_transparent) {
       if (! m_count && ! skip) {
         m_do_expression.execute ();
-      } 
+      }
       ++m_count;
     }
   }
 
-  virtual bool at_end () 
+  virtual bool at_end ()
   {
-    return !m_transparent || m_count > 0;
+    return ! m_transparent || m_count > 0;
   }
 
   bool get_property (unsigned int id, tl::Variant &v)
@@ -1897,7 +1877,7 @@ class DB_PUBLIC WithDoFilter
 {
 public:
   WithDoFilter (LayoutQuery *q, const std::string &do_expression, bool transparent)
-    : FilterBracket (q), 
+    : FilterBracket (q),
       m_do_expression (do_expression), m_transparent (transparent)
   {
     // .. nothing yet ..
@@ -1937,16 +1917,15 @@ private:
 // --------------------------------------------------------------------------------
 //  SelectFilter definition and implementation
 
-struct SelectFilterPropertyIDs
-{
+struct SelectFilterPropertyIDs {
   SelectFilterPropertyIDs (LayoutQuery *q)
   {
-    data               = q->register_property ("data", LQ_variant);
-    expressions        = q->register_property ("expressions", LQ_variant);
+    data = q->register_property ("data", LQ_variant);
+    expressions = q->register_property ("expressions", LQ_variant);
   }
 
-  unsigned int data;                // data                 -> An array of the selected values
-  unsigned int expressions;         // data                 -> An array with the expressions
+  unsigned int data;        // data                 -> An array of the selected values
+  unsigned int expressions; // data                 -> An array with the expressions
 };
 
 class DB_PUBLIC SelectFilterReportingState
@@ -1964,15 +1943,15 @@ public:
     m_sorted = m_sorted_data.begin ();
   }
 
-  virtual void next (bool) 
+  virtual void next (bool)
   {
-    std::multimap <tl::Variant, tl::Variant>::const_iterator s = m_sorted;
+    std::multimap<tl::Variant, tl::Variant>::const_iterator s = m_sorted;
     do {
       ++m_sorted;
-    } while (m_unique && m_sorted != m_sorted_data.end () && m_sorted->second == s->second); 
+    } while (m_unique && m_sorted != m_sorted_data.end () && m_sorted->second == s->second);
   }
 
-  virtual bool at_end () 
+  virtual bool at_end ()
   {
     return (m_sorted == m_sorted_data.end ());
   }
@@ -1995,8 +1974,8 @@ public:
 private:
   bool m_unique;
   SelectFilterPropertyIDs m_pids;
-  std::multimap <tl::Variant, tl::Variant> m_sorted_data;
-  std::multimap <tl::Variant, tl::Variant>::const_iterator m_sorted;
+  std::multimap<tl::Variant, tl::Variant> m_sorted_data;
+  std::multimap<tl::Variant, tl::Variant>::const_iterator m_sorted;
 };
 
 class DB_PUBLIC SelectFilterState
@@ -2018,7 +1997,7 @@ public:
     }
   }
 
-  void get_data (tl::Variant &v) 
+  void get_data (tl::Variant &v)
   {
     if (m_in_data_eval) {
       v = tl::Variant ();
@@ -2066,24 +2045,22 @@ public:
         }
 
         p->connect (mp_reporter_state);
-
       }
 
       get_data (mp_reporter_state->insert (m_sort_expression.execute ()));
       m_done = true;
-
     }
 
     FilterStateBase::reset (previous);
     m_done = false;
   }
 
-  virtual void next (bool) 
+  virtual void next (bool)
   {
     m_done = true;
   }
 
-  virtual bool at_end () 
+  virtual bool at_end ()
   {
     if (m_has_sorting) {
       return true;
@@ -2116,7 +2093,7 @@ public:
 
 private:
   SelectFilterPropertyIDs m_pids;
-  std::vector <tl::Expression> m_expressions;
+  std::vector<tl::Expression> m_expressions;
   tl::Expression m_sort_expression;
   bool m_has_sorting;
   bool m_unique;
@@ -2130,7 +2107,7 @@ class DB_PUBLIC SelectFilter
 {
 public:
   SelectFilter (LayoutQuery *q, const std::vector<std::string> &expressions, const std::string &sort_expression, bool unique)
-    : FilterBracket (q), 
+    : FilterBracket (q),
       m_pids (q),
       m_expressions (expressions),
       m_sort_expression (sort_expression),
@@ -2159,7 +2136,7 @@ public:
       if (i > 0) {
         std::cout << ",";
       }
-      std::cout << m_expressions[i];
+      std::cout << m_expressions [i];
     }
     if (! m_sort_expression.empty ()) {
       std::cout << " sorted by " << m_sort_expression << " unique=" << m_unique;
@@ -2188,18 +2165,18 @@ public:
     eval.parse (m_expression, expr, true);
   }
 
-  virtual void reset (FilterStateBase *previous) 
+  virtual void reset (FilterStateBase *previous)
   {
     FilterStateBase::reset (previous);
     m_select = m_expression.execute ().to_bool ();
   }
 
-  virtual void next (bool) 
+  virtual void next (bool)
   {
     m_select = false;
   }
 
-  virtual bool at_end () 
+  virtual bool at_end ()
   {
     return ! m_select;
   }
@@ -2276,7 +2253,7 @@ public:
 
 private:
   unsigned int m_prop_id;
-  const std::vector<FilterStateBase *> *mp_states; 
+  const std::vector<FilterStateBase *> *mp_states;
 };
 
 // --------------------------------------------------------------------------------
@@ -2300,7 +2277,7 @@ LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, db::Layout *layo
 }
 
 LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, const db::Layout *layout, const Cell *cell, tl::Eval *parent_eval, tl::AbsoluteProgress *progress)
-  : mp_q (const_cast<db::LayoutQuery *> (&q)), mp_layout (const_cast <db::Layout *> (layout)), m_eval (parent_eval), m_layout_ctx (layout), mp_progress (progress), m_initialized (false)
+  : mp_q (const_cast<db::LayoutQuery *> (&q)), mp_layout (const_cast<db::Layout *> (layout)), m_eval (parent_eval), m_layout_ctx (layout), mp_progress (progress), m_initialized (false)
 {
   //  TODO: check whether the query is a modifying one (with .. do, delete)
 
@@ -2325,8 +2302,7 @@ LayoutQueryIterator::~LayoutQueryIterator ()
   }
 }
 
-void
-LayoutQueryIterator::ensure_initialized ()
+void LayoutQueryIterator::ensure_initialized ()
 {
   if (! m_initialized) {
     init ();
@@ -2334,8 +2310,7 @@ LayoutQueryIterator::ensure_initialized ()
   }
 }
 
-void 
-LayoutQueryIterator::init ()
+void LayoutQueryIterator::init ()
 {
   std::vector<FilterStateBase *> f;
   mp_root_state = mp_q->root ().create_state (f, mp_layout, m_eval, false);
@@ -2348,8 +2323,7 @@ LayoutQueryIterator::init ()
   }
 }
 
-void
-LayoutQueryIterator::cleanup ()
+void LayoutQueryIterator::cleanup ()
 {
   std::set<FilterStateBase *> states;
   collect (mp_root_state, states);
@@ -2360,8 +2334,7 @@ LayoutQueryIterator::cleanup ()
   mp_root_state = 0;
 }
 
-void
-LayoutQueryIterator::reset () 
+void LayoutQueryIterator::reset ()
 {
   if (m_initialized) {
 
@@ -2371,49 +2344,43 @@ LayoutQueryIterator::reset ()
 
     cleanup ();
     init ();
-
   }
 }
 
-bool
-LayoutQueryIterator::at_end () const
+bool LayoutQueryIterator::at_end () const
 {
   const_cast<LayoutQueryIterator *> (this)->ensure_initialized ();
   return m_state.empty ();
 }
 
-bool
-LayoutQueryIterator::get (const std::string &name, tl::Variant &v)
+bool LayoutQueryIterator::get (const std::string &name, tl::Variant &v)
 {
   ensure_initialized ();
-  if (m_state.empty () || !m_state.back () || !mp_q->has_property (name)) {
+  if (m_state.empty () || ! m_state.back () || ! mp_q->has_property (name)) {
     return false;
   } else {
     return m_state.back ()->get_property (mp_q->property_by_name (name), v);
   }
 }
 
-bool
-LayoutQueryIterator::get (unsigned int id, tl::Variant &v)
+bool LayoutQueryIterator::get (unsigned int id, tl::Variant &v)
 {
   ensure_initialized ();
-  if (m_state.empty () || !m_state.back ()) {
+  if (m_state.empty () || ! m_state.back ()) {
     return false;
   } else {
     return m_state.back ()->get_property (id, v);
   }
 }
 
-void 
-LayoutQueryIterator::dump () const
+void LayoutQueryIterator::dump () const
 {
   const_cast<LayoutQueryIterator *> (this)->ensure_initialized ();
   mp_root_state->dump ();
   std::cout << std::endl;
 }
 
-void 
-LayoutQueryIterator::collect (FilterStateBase *state, std::set<FilterStateBase *> &states)
+void LayoutQueryIterator::collect (FilterStateBase *state, std::set<FilterStateBase *> &states)
 {
   if (states.find (state) == states.end ()) {
     states.insert (state);
@@ -2425,8 +2392,7 @@ LayoutQueryIterator::collect (FilterStateBase *state, std::set<FilterStateBase *
   }
 }
 
-void 
-LayoutQueryIterator::next (bool skip)
+void LayoutQueryIterator::next (bool skip)
 {
   ensure_initialized ();
   do {
@@ -2434,8 +2400,7 @@ LayoutQueryIterator::next (bool skip)
   } while (! next_down ());
 }
 
-void 
-LayoutQueryIterator::next_up (bool skip)
+void LayoutQueryIterator::next_up (bool skip)
 {
   while (! m_state.empty ()) {
     if (mp_progress) {
@@ -2450,8 +2415,7 @@ LayoutQueryIterator::next_up (bool skip)
   }
 }
 
-bool 
-LayoutQueryIterator::next_down ()
+bool LayoutQueryIterator::next_down ()
 {
   if (! m_state.empty ()) {
 
@@ -2469,14 +2433,11 @@ LayoutQueryIterator::next_down ()
         new_state->reset (m_state.back ());
         if (! new_state->at_end ()) {
           m_state.push_back (new_state);
-        } else { 
+        } else {
           return false;
         }
-
       }
-
     }
-
   }
 
   return true;
@@ -2506,8 +2467,8 @@ parse_cell_name_filter_element (tl::Extractor &ex, LayoutQuery *q, ChildCellFilt
     } while (ex.test (",") || ex.test (s_or));
 
     //  TODO: do this in the optimization
-    if (b->children ().size () == 1 && dynamic_cast<FilterBracket *> (b->children ()[0])) {
-      FilterBracket *binner = dynamic_cast<FilterBracket *> (b->children ()[0]->clone (q));
+    if (b->children ().size () == 1 && dynamic_cast<FilterBracket *> (b->children () [0])) {
+      FilterBracket *binner = dynamic_cast<FilterBracket *> (b->children () [0]->clone (q));
       if (binner) {
         b.reset (binner);
       }
@@ -2515,18 +2476,18 @@ parse_cell_name_filter_element (tl::Extractor &ex, LayoutQuery *q, ChildCellFilt
 
     ex.expect (")");
 
-    if (ex.test("*")) {
+    if (ex.test ("*")) {
 
       b->set_loopmin (0);
       b->set_loopmax (std::numeric_limits<unsigned int>::max ());
 
-    } else if (ex.test("?")) {
+    } else if (ex.test ("?")) {
 
       b->set_loopmin (0);
       b->set_loopmax (1);
 
     } else if (ex.test ("[")) {
-    
+
       unsigned int v1 = 0, v2 = std::numeric_limits<unsigned int>::max ();
       if (ex.try_read (v1)) {
         if (ex.test ("..")) {
@@ -2542,15 +2503,14 @@ parse_cell_name_filter_element (tl::Extractor &ex, LayoutQuery *q, ChildCellFilt
       b->set_loopmax (v2);
 
       ex.expect ("]");
-
     }
 
     return b.release ();
 
-  } else if (*ex.skip () == '.' && ex.get ()[1] == '.') {
+  } else if (*ex.skip () == '.' && ex.get () [1] == '.') {
 
     //  take the first dots in ".." or "..." as abbreviation for (.*)*
-    while (ex.get ()[0] == '.' && ex.get ()[1] == '.') {
+    while (ex.get () [0] == '.' && ex.get () [1] == '.') {
       ++ex;
     }
 
@@ -2576,7 +2536,6 @@ parse_cell_name_filter_element (tl::Extractor &ex, LayoutQuery *q, ChildCellFilt
     if (! name_filter.empty ()) {
       return new CellFilter (q, name_filter, reading);
     }
-
   }
 
   return 0;
@@ -2590,7 +2549,7 @@ parse_cell_name_filter_seq (tl::Extractor &ex, LayoutQuery *q, FilterBracket *br
   FilterBase *f;
 
   while (! ex.at_end ()) {
-    
+
     if (check_trailing_reserved_word (ex) || (f = parse_cell_name_filter_element (ex, q, instance_mode, reading)) == 0) {
       break;
     }
@@ -2605,7 +2564,6 @@ parse_cell_name_filter_seq (tl::Extractor &ex, LayoutQuery *q, FilterBracket *br
     }
 
     fl = f;
-
   }
 
   //  satisfy instance mode if there is just a cell name filter
@@ -2617,19 +2575,17 @@ parse_cell_name_filter_seq (tl::Extractor &ex, LayoutQuery *q, FilterBracket *br
 
     cf->name_filter () = NameFilterArgument ("*");
     cf->connect (fl);
-
   }
 
   if (f0) {
     bracket->connect_entry (f0);
-  } 
+  }
   if (fl) {
     bracket->connect_exit (fl);
   }
 }
 
-void
-parse_cell_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool with_where_clause, bool reading)
+void parse_cell_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool with_where_clause, bool reading)
 {
   if (ex.test ("(")) {
 
@@ -2672,16 +2628,13 @@ parse_cell_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bo
       f = b.release ();
       bracket->add_child (f);
       bracket->connect_entry (f);
-
     }
 
     bracket->connect_exit (f);
-
   }
 }
 
-void
-parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool reading)
+void parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool reading)
 {
   unsigned int sf = (unsigned int) db::ShapeIterator::Nothing;
   do {
@@ -2719,7 +2672,7 @@ parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool re
     parse_cell_filter (ex, q, b.get (), false, reading);
 
     FilterBase *f = 0, *fl = 0;
-    
+
     f = b.release ();
     bracket->add_child (f);
     bracket->connect_entry (f);
@@ -2737,7 +2690,6 @@ parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool re
       f = new ConditionalFilter (q, expr);
       bracket->add_child (f);
       fl->connect (f);
-
     }
 
     bracket->connect_exit (f);
@@ -2747,8 +2699,7 @@ parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool re
   }
 }
 
-void
-parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool reading)
+void parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool reading)
 {
   if (ex.test (s_select)) {
 
@@ -2849,14 +2800,12 @@ LayoutQuery::~LayoutQuery ()
   mp_root = 0;
 }
 
-void
-LayoutQuery::dump () const
+void LayoutQuery::dump () const
 {
   mp_root->dump (0);
 }
 
-void
-LayoutQuery::execute (db::Layout &layout, db::Cell *cell, tl::Eval *context)
+void LayoutQuery::execute (db::Layout &layout, db::Cell *cell, tl::Eval *context)
 {
   LayoutQueryIterator iq (*this, &layout, cell, context);
   while (! iq.at_end ()) {
@@ -2864,10 +2813,10 @@ LayoutQuery::execute (db::Layout &layout, db::Cell *cell, tl::Eval *context)
   }
 }
 
-unsigned int 
+unsigned int
 LayoutQuery::register_property (const std::string &name, LayoutQueryPropertyType type)
 {
-  std::map <std::string, unsigned int>::const_iterator p = m_property_ids_by_name.find (name);
+  std::map<std::string, unsigned int>::const_iterator p = m_property_ids_by_name.find (name);
   if (p != m_property_ids_by_name.end ()) {
     //  TODO: check, if the type is identical
     return p->second;
@@ -2879,32 +2828,31 @@ LayoutQuery::register_property (const std::string &name, LayoutQueryPropertyType
   }
 }
 
-const std::string & 
+const std::string &
 LayoutQuery::property_name (unsigned int index) const
 {
   tl_assert (index < properties ());
   return m_properties [index].name;
 }
 
-LayoutQueryPropertyType  
+LayoutQueryPropertyType
 LayoutQuery::property_type (unsigned int index) const
 {
   tl_assert (index < properties ());
   return m_properties [index].type;
 }
 
-unsigned int  
+unsigned int
 LayoutQuery::property_by_name (const std::string &name) const
 {
-  std::map <std::string, unsigned int>::const_iterator p = m_property_ids_by_name.find (name);
+  std::map<std::string, unsigned int>::const_iterator p = m_property_ids_by_name.find (name);
   tl_assert (p != m_property_ids_by_name.end ());
   return p->second;
 }
 
-bool  
-LayoutQuery::has_property (const std::string &name) const
+bool LayoutQuery::has_property (const std::string &name) const
 {
-  std::map <std::string, unsigned int>::const_iterator p = m_property_ids_by_name.find (name);
+  std::map<std::string, unsigned int>::const_iterator p = m_property_ids_by_name.find (name);
   return p != m_property_ids_by_name.end ();
 }
 
@@ -2925,14 +2873,12 @@ FilterBase::create_state (const std::vector<FilterStateBase *> &followers, db::L
   return b;
 }
 
-void 
-FilterBase::connect (FilterBase *follower)
+void FilterBase::connect (FilterBase *follower)
 {
   m_followers.push_back (follower);
 }
 
-void 
-FilterBase::connect (const std::vector<FilterBase *> &followers)
+void FilterBase::connect (const std::vector<FilterBase *> &followers)
 {
   m_followers.insert (m_followers.end (), followers.begin (), followers.end ());
 }
@@ -2949,14 +2895,13 @@ FilterBase::do_create_state (db::Layout *layout, tl::Eval &eval) const
   return new FilterSingleState (this, layout, eval);
 }
 
-unsigned int 
+unsigned int
 FilterBase::register_property (const std::string &name, LayoutQueryPropertyType type)
 {
   return mp_q->register_property (name, type);
 }
 
-void
-FilterBase::dump (unsigned int l) const
+void FilterBase::dump (unsigned int l) const
 {
   for (unsigned int i = 0; i < l; ++i) {
     std::cout << "  ";
@@ -2990,13 +2935,13 @@ FilterBracket::~FilterBracket ()
 FilterStateBase *
 FilterBracket::create_state (const std::vector<FilterStateBase *> &followers, db::Layout *layout, tl::Eval &eval, bool single) const
 {
-  bool greedy = false; // TODO: make variable. In greedy mode (true), the children are reported before the nodes, hence the longest match is reported first. 
+  bool greedy = false; // TODO: make variable. In greedy mode (true), the children are reported before the nodes, hence the longest match is reported first.
 
   if ((m_loopmin == 1 && m_loopmax == 1) || single) {
-    
+
     if (m_children.empty ()) {
 
-      //  shortcut for the simple case 
+      //  shortcut for the simple case
       FilterStateBase *b = do_create_state (layout, eval);
       b->connect (followers);
       return b;
@@ -3005,26 +2950,25 @@ FilterBracket::create_state (const std::vector<FilterStateBase *> &followers, db
 
       //  create a terminal state for the graph inside this bracket
       FilterStateBase *b = new FilterSingleState (this, layout, eval);
-      b->connect (followers); 
+      b->connect (followers);
 
       //  create the graph inside this bracket
       std::map<const FilterBase *, FilterStateBase *> fmap;
       b = create_state_helper (fmap, &m_initial, b, layout, eval);
       return b;
-
     }
 
   } else if (m_loopmax == 0) {
 
     //  a dummy state for the case of loop count 0
     FilterStateBase *b = new FilterSingleState (this, layout, eval);
-    b->connect (followers); 
+    b->connect (followers);
     return b;
 
   } else {
 
     FilterStateBase *closure_state = new FilterSingleState (this, layout, eval);
-    closure_state->connect (followers); 
+    closure_state->connect (followers);
 
     FilterStateBase *b = 0;
 
@@ -3062,28 +3006,24 @@ FilterBracket::create_state (const std::vector<FilterStateBase *> &followers, db
         } else {
           b = new FilterSingleState (this, layout, eval);
         }
-        b->connect (f); 
+        b->connect (f);
 
       } else {
 
         //  create a terminal state for the graph inside this bracket
         b = new FilterSingleState (this, layout, eval);
-        b->connect (f); 
+        b->connect (f);
 
         if (l > 0) {
           //  create the graph inside this bracket
           std::map<const FilterBase *, FilterStateBase *> fmap;
           b = create_state_helper (fmap, &m_initial, b, layout, eval);
         }
-
       }
-
     }
 
     return b;
-
   }
-
 }
 
 const std::vector<FilterBase *> &
@@ -3092,8 +3032,7 @@ FilterBracket::children () const
   return m_children;
 }
 
-void 
-FilterBracket::add_child (FilterBase *follower)
+void FilterBracket::add_child (FilterBase *follower)
 {
   //  in case there are already connections move them to the closure
   if (m_children.empty ()) {
@@ -3103,14 +3042,12 @@ FilterBracket::add_child (FilterBase *follower)
   m_children.push_back (follower);
 }
 
-void 
-FilterBracket::connect_entry (FilterBase *child)
+void FilterBracket::connect_entry (FilterBase *child)
 {
   m_initial.connect (child);
 }
 
-void 
-FilterBracket::connect_exit (FilterBase *child)
+void FilterBracket::connect_exit (FilterBase *child)
 {
   child->connect (&m_closure);
 }
@@ -3175,8 +3112,7 @@ FilterBracket::create_state_helper (std::map<const FilterBase *, FilterStateBase
   return child->create_state (followers, layout, eval, false);
 }
 
-void
-FilterBracket::dump (unsigned int l) const
+void FilterBracket::dump (unsigned int l) const
 {
   if (! m_children.empty ()) {
 
@@ -3207,7 +3143,6 @@ FilterBracket::dump (unsigned int l) const
           todo.push_back (*c);
         }
       }
-
     }
 
     for (std::vector<const FilterBase *>::const_iterator f = filters.begin (); f != filters.end (); ++f) {
@@ -3235,12 +3170,10 @@ FilterBracket::dump (unsigned int l) const
       std::cout << "  ";
     }
     std::cout << "FilterBracket (" << m_loopmin << ".." << m_loopmax << ")" << std::endl;
-
   }
 }
 
-void
-FilterBracket::optimize ()
+void FilterBracket::optimize ()
 {
   // TODO: implement
 }
@@ -3278,23 +3211,20 @@ FilterStateObjectives::operator+= (const FilterStateObjectives &other)
   return *this;
 }
 
-void
-FilterStateObjectives::set_wants_all_cells (bool f)
+void FilterStateObjectives::set_wants_all_cells (bool f)
 {
   m_wants_cells.clear ();
   m_wants_all_cells = f;
 }
 
-void
-FilterStateObjectives::request_cell (db::cell_index_type ci)
+void FilterStateObjectives::request_cell (db::cell_index_type ci)
 {
   if (! m_wants_all_cells) {
     m_wants_cells.insert (ci);
   }
 }
 
-bool
-FilterStateObjectives::wants_cell (db::cell_index_type ci) const
+bool FilterStateObjectives::wants_cell (db::cell_index_type ci) const
 {
   return m_wants_all_cells || m_wants_cells.find (ci) != m_wants_cells.end ();
 }
@@ -3307,8 +3237,7 @@ FilterStateBase::FilterStateBase (const FilterBase *filter, db::Layout *layout, 
 {
 }
 
-void
-FilterStateBase::init (bool recursive)
+void FilterStateBase::init (bool recursive)
 {
   if (m_followers.empty ()) {
 
@@ -3324,20 +3253,17 @@ FilterStateBase::init (bool recursive)
         m_objectives += (*f)->objectives ();
       }
     }
-
   }
 
   do_init ();
 }
 
-void
-FilterStateBase::do_init ()
+void FilterStateBase::do_init ()
 {
   //  .. nothing yet ..
 }
 
-void
-FilterStateBase::dump () const
+void FilterStateBase::dump () const
 {
   std::cout << "[";
   for (size_t i = 0; i < m_followers.size (); ++i) {
@@ -3345,10 +3271,10 @@ FilterStateBase::dump () const
       std::cout << ",";
     }
     std::cout << (i == m_follower ? "+" : "");
-    if (! m_followers[i]) {
+    if (! m_followers [i]) {
       std::cout << "0";
     } else {
-      m_followers[i]->dump ();
+      m_followers [i]->dump ();
     }
   }
   std::cout << "]";
@@ -3370,24 +3296,20 @@ FilterStateBase::child () const
     }
 
     return b;
-
   }
 }
 
-void 
-FilterStateBase::connect (FilterStateBase *follower)
+void FilterStateBase::connect (FilterStateBase *follower)
 {
   m_followers.push_back (follower);
 }
 
-void 
-FilterStateBase::connect (const std::vector<FilterStateBase *> &followers)
+void FilterStateBase::connect (const std::vector<FilterStateBase *> &followers)
 {
   m_followers.insert (m_followers.end (), followers.begin (), followers.end ());
 }
 
-void 
-FilterStateBase::proceed (bool skip) 
+void FilterStateBase::proceed (bool skip)
 {
   if (m_followers.empty ()) {
     next (skip);
@@ -3401,4 +3323,3 @@ FilterStateBase::proceed (bool skip)
 }
 
 }
-

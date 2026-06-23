@@ -34,7 +34,7 @@
 
 namespace Ui
 {
-  class BookmarkManagementForm;
+class BookmarkManagementForm;
 }
 
 namespace lay
@@ -43,7 +43,7 @@ namespace lay
 class LAYUI_PUBLIC BookmarkManagementForm
   : public QDialog
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   BookmarkManagementForm (QWidget *parent, const char *name, const lay::BookmarkList &bookmarks, const std::set<size_t> &selected);
@@ -70,4 +70,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

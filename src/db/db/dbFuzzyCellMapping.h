@@ -38,7 +38,7 @@ class Layout;
 class DB_PUBLIC FuzzyCellMapping
 {
 public:
-  typedef std::map <db::cell_index_type, db::cell_index_type>::const_iterator iterator;
+  typedef std::map<db::cell_index_type, db::cell_index_type>::const_iterator iterator;
 
   /**
    *  @brief Constructor - creates an empty mapping
@@ -96,14 +96,12 @@ public:
   }
 
 private:
-  void dump_mapping (const std::map <db::cell_index_type, std::vector<db::cell_index_type> > &candidates, 
+  void dump_mapping (const std::map<db::cell_index_type, std::vector<db::cell_index_type>> &candidates,
                      const db::Layout &layout_a, const db::Layout &layout_b);
 
-  std::map <db::cell_index_type, db::cell_index_type> m_b2a_mapping;
+  std::map<db::cell_index_type, db::cell_index_type> m_b2a_mapping;
 };
 
 }
 
 #endif
-
-

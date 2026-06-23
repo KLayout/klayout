@@ -30,13 +30,13 @@
 
 namespace db
 {
-  class Layout;
-  class Cell;
-  class RecursiveShapeIterator;
-  class Shapes;
-  class Region;
-  class Edges;
-  class EdgePairs;
+class Layout;
+class Cell;
+class RecursiveShapeIterator;
+class Shapes;
+class Region;
+class Edges;
+class EdgePairs;
 }
 
 namespace rdb
@@ -49,7 +49,7 @@ namespace rdb
  *  It will scan the layer hierarchically, i.e. shapes are put into every cell.
  *  It will use the given category to store the items.
  *
- *  If "from" is 0, all cells will be scanned. Levels are the number of hierarchy levels scanned if 
+ *  If "from" is 0, all cells will be scanned. Levels are the number of hierarchy levels scanned if
  *  "from" is given. -1 means "all levels".
  *
  *  If "with_properties" is true, user properties are translated into values with tags corresponding
@@ -196,9 +196,8 @@ RDB_PUBLIC ValueBase *add_item_value (rdb::Item *item, const tl::Variant &v, dou
  *
  *  This version takes a db::CplxTrans for converting integer-unit geometry objects to micron-unit ones.
  */
-RDB_PUBLIC ValueBase *add_item_value(rdb::Item *item, const tl::Variant &v, const db::CplxTrans &trans, rdb::id_type tag_id = 0);
+RDB_PUBLIC ValueBase *add_item_value (rdb::Item *item, const tl::Variant &v, const db::CplxTrans &trans, rdb::id_type tag_id = 0);
 
 }
 
 #endif
-

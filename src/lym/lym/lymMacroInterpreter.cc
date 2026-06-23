@@ -40,8 +40,7 @@ MacroInterpreter::executable (const lym::Macro *) const
   throw tl::Exception (tl::to_string (tr ("executable() implementation missing for DSL interpreter")));
 }
 
-bool 
-MacroInterpreter::can_run (const lym::Macro *macro)
+bool MacroInterpreter::can_run (const lym::Macro *macro)
 {
   for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
     if (cls.current_name () == macro->dsl_interpreter ()) {
@@ -58,7 +57,7 @@ class MacroIncludeFileResolver
   : public tl::IncludeFileResolver
 {
 public:
-  MacroIncludeFileResolver () { }
+  MacroIncludeFileResolver () {}
 
   std::string get_text (const std::string &path) const
   {
@@ -102,11 +101,11 @@ MacroInterpreter::include_expansion (const lym::Macro *macro)
       const std::string file_const ("__FILE__");
       const std::string line_const ("__LINE__");
 
-      for (const char *cp = res.second.c_str (); *cp; ) {
-        if (strncmp (cp, file_const.c_str (), file_const.size ()) == 0 && !isalnum (cp[file_const.size ()]) && cp[file_const.size ()] != '_') {
+      for (const char *cp = res.second.c_str (); *cp;) {
+        if (strncmp (cp, file_const.c_str (), file_const.size ()) == 0 && ! isalnum (cp [file_const.size ()]) && cp [file_const.size ()] != '_') {
           subst += "RBA::Macro::real_path(__FILE__, __LINE__)";
           cp += file_const.size ();
-        } else if (strncmp (cp, line_const.c_str (), line_const.size ()) == 0 && !isalnum (cp[line_const.size ()]) && cp[line_const.size ()] != '_') {
+        } else if (strncmp (cp, line_const.c_str (), line_const.size ()) == 0 && ! isalnum (cp [line_const.size ()]) && cp [line_const.size ()] != '_') {
           subst += "RBA::Macro::real_line(__FILE__, __LINE__)";
           cp += line_const.size ();
         } else {
@@ -115,16 +114,13 @@ MacroInterpreter::include_expansion (const lym::Macro *macro)
       }
 
       res.second = subst;
-
     }
-
   }
 
   return res;
 }
 
-void 
-MacroInterpreter::execute_macro (const lym::Macro *macro)
+void MacroInterpreter::execute_macro (const lym::Macro *macro)
 {
   for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
 
@@ -136,15 +132,13 @@ MacroInterpreter::execute_macro (const lym::Macro *macro)
       }
 
       return;
-
     }
-
   }
 
   throw tl::Exception (tl::to_string (tr ("No interpreter registered for DSL type '")) + macro->dsl_interpreter () + "'");
 }
 
-std::string 
+std::string
 MacroInterpreter::syntax_scheme (const std::string &dsl_name)
 {
   for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
@@ -180,7 +174,7 @@ MacroInterpreter::debugger_scheme (const std::string &dsl_name)
   return Macro::Ruby;
 }
 
-std::string 
+std::string
 MacroInterpreter::description (const std::string &dsl_name)
 {
   for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
@@ -192,7 +186,7 @@ MacroInterpreter::description (const std::string &dsl_name)
   return std::string ();
 }
 
-std::string 
+std::string
 MacroInterpreter::suffix (const std::string &dsl_name)
 {
   for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {

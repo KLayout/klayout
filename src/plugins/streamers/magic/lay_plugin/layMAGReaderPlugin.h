@@ -30,7 +30,7 @@
 
 namespace Ui
 {
-  class MAGReaderOptionPage;
+class MAGReaderOptionPage;
 }
 
 namespace lay
@@ -39,7 +39,7 @@ namespace lay
 class MAGReaderOptionPage
   : public StreamReaderOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MAGReaderOptionPage (QWidget *parent);
@@ -59,5 +59,3 @@ private:
 }
 
 #endif
-
-

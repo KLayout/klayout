@@ -53,18 +53,18 @@
 #if defined(HAVE_QTBINDINGS)
 
 //  pulls in the Qt GSI binding modules
-# include "gsiQtGuiExternals.h"
-# include "gsiQtWidgetsExternals.h"
-# include "gsiQtCoreExternals.h"
-# include "gsiQtMultimediaExternals.h"
-# include "gsiQtPrintSupportExternals.h"
-# include "gsiQtXmlExternals.h"
-# include "gsiQtXmlPatternsExternals.h"
-# include "gsiQtSqlExternals.h"
-# include "gsiQtSvgExternals.h"
-# include "gsiQtNetworkExternals.h"
-# include "gsiQtDesignerExternals.h"
-# include "gsiQtUiToolsExternals.h"
+#include "gsiQtGuiExternals.h"
+#include "gsiQtWidgetsExternals.h"
+#include "gsiQtCoreExternals.h"
+#include "gsiQtMultimediaExternals.h"
+#include "gsiQtPrintSupportExternals.h"
+#include "gsiQtXmlExternals.h"
+#include "gsiQtXmlPatternsExternals.h"
+#include "gsiQtSqlExternals.h"
+#include "gsiQtSvgExternals.h"
+#include "gsiQtNetworkExternals.h"
+#include "gsiQtDesignerExternals.h"
+#include "gsiQtUiToolsExternals.h"
 
 FORCE_LINK_GSI_QTCORE
 FORCE_LINK_GSI_QTGUI
@@ -80,7 +80,7 @@ FORCE_LINK_GSI_QTSVG
 FORCE_LINK_GSI_QTUITOOLS
 
 #else
-# define QT_EXTERNAL_BASE(x)
+#define QT_EXTERNAL_BASE(x)
 #endif
 
 #include <QTranslator>
@@ -99,16 +99,15 @@ int klayout_main (int &argc, char **argv);
 //  for VC++/MinGW provide a wrapper for main.
 #include <Windows.h>
 
-extern "C"
-int WINAPI 
-WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*prevInstance*/, LPSTR /*lpCmdLine*/, int /*nShowCmd*/)
+extern "C" int WINAPI
+WinMain (HINSTANCE /*hInstance*/, HINSTANCE /*prevInstance*/, LPSTR /*lpCmdLine*/, int /*nShowCmd*/)
 {
   int argCount = 0;
-  LPWSTR *szArgList = CommandLineToArgvW(GetCommandLineW(), &argCount);
+  LPWSTR *szArgList = CommandLineToArgvW (GetCommandLineW (), &argCount);
 
   //  fail safe behaviour
-  if (!szArgList) {
-    MessageBox(NULL, L"Unable to parse command line", L"Error", MB_OK);
+  if (! szArgList) {
+    MessageBox (NULL, L"Unable to parse command line", L"Error", MB_OK);
     return 10;
   }
 
@@ -126,22 +125,21 @@ WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*prevInstance*/, LPSTR /*lpCmdLine*/
   int ret = klayout_main (argCount, argv);
 
   for (int i = 0; i < argCount; i++) {
-    delete[] argv [i];
+    delete [] argv [i];
   }
-  delete[] argv;
+  delete [] argv;
 
-  LocalFree(szArgList);
+  LocalFree (szArgList);
   return ret;
 }
 
 #else
 
-int
-main(int a_argc, const char **a_argv)
+int main (int a_argc, const char **a_argv)
 {
   char **argv = new char *[a_argc];
   for (int i = 0; i < a_argc; i++) {
-    tl::string aa = tl::system_to_string (a_argv[i]);
+    tl::string aa = tl::system_to_string (a_argv [i]);
     argv [i] = new char [aa.size () + 1];
     strcpy (argv [i], aa.c_str ());
   }
@@ -149,9 +147,9 @@ main(int a_argc, const char **a_argv)
   int ret = klayout_main (a_argc, argv);
 
   for (int i = 0; i < a_argc; i++) {
-    delete[] argv [i];
+    delete [] argv [i];
   }
-  delete[] argv;
+  delete [] argv;
 
   return ret;
 }
@@ -159,53 +157,54 @@ main(int a_argc, const char **a_argv)
 #endif
 
 #if QT_VERSION >= 0x050000
-void custom_message_handler(QtMsgType type, const QMessageLogContext & /*ctx*/, const QString &msg)
+void custom_message_handler (QtMsgType type, const QMessageLogContext & /*ctx*/, const QString &msg)
 {
   switch (type) {
   case QtDebugMsg:
-    fprintf(stderr, "Debug: %s\n", msg.toLocal8Bit ().constData ());
+    fprintf (stderr, "Debug: %s\n", msg.toLocal8Bit ().constData ());
     break;
   case QtWarningMsg:
     if (tl::verbosity () > 0) {
-      fprintf(stderr, "Warning: %s\n", msg.toLocal8Bit ().constData ());
+      fprintf (stderr, "Warning: %s\n", msg.toLocal8Bit ().constData ());
     }
     break;
   case QtCriticalMsg:
-    fprintf(stderr, "Critical: %s\n", msg.toLocal8Bit ().constData ());
+    fprintf (stderr, "Critical: %s\n", msg.toLocal8Bit ().constData ());
     break;
   case QtFatalMsg:
-    fprintf(stderr, "Fatal: %s\n", msg.toLocal8Bit ().constData ());
-    abort();
+    fprintf (stderr, "Fatal: %s\n", msg.toLocal8Bit ().constData ());
+    abort ();
   case QtInfoMsg:
-    fprintf(stderr, "Info: %s\n", msg.toLocal8Bit ().constData ());
+    fprintf (stderr, "Info: %s\n", msg.toLocal8Bit ().constData ());
     break;
   }
 }
 #else
-void custom_message_handler(QtMsgType type, const char *msg)
+void custom_message_handler (QtMsgType type, const char *msg)
 {
   switch (type) {
   case QtDebugMsg:
-    fprintf(stderr, "Debug: %s\n", msg);
+    fprintf (stderr, "Debug: %s\n", msg);
     break;
   case QtWarningMsg:
     if (tl::verbosity () > 0) {
-      fprintf(stderr, "Warning: %s\n", msg);
+      fprintf (stderr, "Warning: %s\n", msg);
     }
     break;
   case QtCriticalMsg:
-    fprintf(stderr, "Critical: %s\n", msg);
+    fprintf (stderr, "Critical: %s\n", msg);
     break;
   case QtFatalMsg:
-    fprintf(stderr, "Fatal: %s\n", msg);
-    abort();
+    fprintf (stderr, "Fatal: %s\n", msg);
+    abort ();
   }
 }
 #endif
 
 static int klayout_main_cont (int &argc, char **argv);
 
-namespace {
+namespace
+{
 
 class LogFileWriter
   : public tl::Channel
@@ -215,7 +214,8 @@ public:
 
   LogFileWriter (int min_verbosity, const std::string &prefix)
     : m_min_verbosity (min_verbosity), m_prefix (prefix), m_new_line (true)
-  { }
+  {
+  }
 
   static bool open (const std::string &path)
   {
@@ -251,7 +251,7 @@ public:
     }
   }
 
-  void yield () { }
+  void yield () {}
 
 private:
   int m_min_verbosity;
@@ -277,8 +277,7 @@ static void set_log_file (const std::string &log_file)
  *  @brief The basic entry point
  *  Note that by definition, klayout_main receives arguments in UTF-8
  */
-int
-klayout_main (int &argc, char **argv)
+int klayout_main (int &argc, char **argv)
 {
   //  install the version strings
   lay::Version::set_exe_name (prg_exe_name);
@@ -324,9 +323,7 @@ klayout_main (int &argc, char **argv)
       int v = 0;
       tl::from_string (argv [++i], v);
       tl::verbosity (v);
-
     }
-
   }
 
   //  This special initialization is required by the Ruby interpreter because it wants to mark the stack
@@ -340,8 +337,7 @@ klayout_main (int &argc, char **argv)
   return ret;
 }
 
-int 
-klayout_main_cont (int &argc, char **argv)
+int klayout_main_cont (int &argc, char **argv)
 {
 #if QT_VERSION >= 0x050000
   qInstallMessageHandler (custom_message_handler);
@@ -400,7 +396,8 @@ klayout_main_cont (int &argc, char **argv)
 
       result = app->run ();
 
-      END_PROTECTED_CLEANUP {
+      END_PROTECTED_CLEANUP
+      {
         result = 1;
       }
 
@@ -422,7 +419,4 @@ klayout_main_cont (int &argc, char **argv)
   }
 
   return result;
-
 }
-
-

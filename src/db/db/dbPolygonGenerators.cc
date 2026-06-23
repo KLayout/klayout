@@ -39,10 +39,9 @@ namespace db
 // -------------------------------------------------------------------------------
 //  PolygonGenerator implementation
 
-struct PGPoint
-{
-  PGPoint () : point (), contour (0), first (false) { }
-  PGPoint (const db::Point &p, size_t i, bool f) : point (p), contour (i), first (f) { }
+struct PGPoint {
+  PGPoint () : point (), contour (0), first (false) {}
+  PGPoint (const db::Point &p, size_t i, bool f) : point (p), contour (i), first (f) {}
 
   db::Point point;
   size_t contour;
@@ -52,7 +51,7 @@ struct PGPoint
 class PGPolyContour
 {
 public:
-  typedef std::list <db::Point> contour_type;
+  typedef std::list<db::Point> contour_type;
   typedef contour_type::const_iterator const_iterator;
   typedef contour_type::iterator iterator;
 
@@ -128,7 +127,7 @@ public:
   bool empty () const { return m_contour.empty (); }
   size_t size () const { return m_size; }
 
-  void last (long n) 
+  void last (long n)
   {
     m_last = n;
   }
@@ -138,7 +137,7 @@ public:
     return m_last;
   }
 
-  void next (long n) 
+  void next (long n)
   {
     m_next = n;
   }
@@ -159,7 +158,7 @@ public:
   }
 
   void clear ()
-  { 
+  {
     m_size = 0;
     m_next = -1;
     m_last = -1;
@@ -204,8 +203,7 @@ private:
   size_t m_size;
 };
 
-static inline
-PGPolyContour::const_iterator operator+ (PGPolyContour::const_iterator i, int n)
+static inline PGPolyContour::const_iterator operator+ (PGPolyContour::const_iterator i, int n)
 {
   while (n-- > 0) {
     ++i;
@@ -213,8 +211,7 @@ PGPolyContour::const_iterator operator+ (PGPolyContour::const_iterator i, int n)
   return i;
 }
 
-static inline
-PGPolyContour::iterator operator+ (PGPolyContour::iterator i, int n)
+static inline PGPolyContour::iterator operator+ (PGPolyContour::iterator i, int n)
 {
   while (n-- > 0) {
     ++i;
@@ -222,8 +219,7 @@ PGPolyContour::iterator operator+ (PGPolyContour::iterator i, int n)
   return i;
 }
 
-static inline
-PGPolyContour::const_iterator operator- (PGPolyContour::const_iterator i, int n)
+static inline PGPolyContour::const_iterator operator- (PGPolyContour::const_iterator i, int n)
 {
   while (n-- > 0) {
     --i;
@@ -231,8 +227,7 @@ PGPolyContour::const_iterator operator- (PGPolyContour::const_iterator i, int n)
   return i;
 }
 
-static inline
-PGPolyContour::iterator operator- (PGPolyContour::iterator i, int n)
+static inline PGPolyContour::iterator operator- (PGPolyContour::iterator i, int n)
 {
   while (n-- > 0) {
     --i;
@@ -243,20 +238,21 @@ PGPolyContour::iterator operator- (PGPolyContour::iterator i, int n)
 class PGContourList
 {
 public:
-  PGContourList () 
+  PGContourList ()
     : m_free_contours (-1)
-  { }
+  {
+  }
 
-  PGPolyContour &operator[] (size_t n) 
+  PGPolyContour &operator[] (size_t n)
   {
     return m_contours [n];
   }
-  
+
   const PGPolyContour &operator[] (size_t n) const
   {
     return m_contours [n];
   }
-  
+
   size_t size () const
   {
     return m_contours.size ();
@@ -331,37 +327,37 @@ public:
 
 private:
   long m_free_contours;
-  std::vector <PGPolyContour> m_contours;
+  std::vector<PGPolyContour> m_contours;
 };
 
 
-PolygonGenerator::PolygonGenerator (PolygonSink &psink, bool resolve_holes, bool min_coherence) 
-  : EdgeSink (), 
+PolygonGenerator::PolygonGenerator (PolygonSink &psink, bool resolve_holes, bool min_coherence)
+  : EdgeSink (),
     mp_contours (new PGContourList ()),
     m_y (std::numeric_limits<db::Coord>::min ()),
-    m_open_pos (m_open.end ()), 
+    m_open_pos (m_open.end ()),
     mp_psink (&psink),
     mp_spsink (0),
     m_resolve_holes (resolve_holes),
     m_open_contours (false),
     m_min_coherence (min_coherence),
     m_compress (true)
-{ 
+{
   //  .. nothing yet ..
 }
 
-PolygonGenerator::PolygonGenerator (SimplePolygonSink &spsink, bool min_coherence) 
-  : EdgeSink (), 
+PolygonGenerator::PolygonGenerator (SimplePolygonSink &spsink, bool min_coherence)
+  : EdgeSink (),
     mp_contours (new PGContourList ()),
     m_y (std::numeric_limits<db::Coord>::min ()),
-    m_open_pos (m_open.end ()), 
+    m_open_pos (m_open.end ()),
     mp_psink (0),
     mp_spsink (&spsink),
     m_resolve_holes (true),
     m_open_contours (false),
     m_min_coherence (min_coherence),
     m_compress (true)
-{ 
+{
   //  .. nothing yet ..
 }
 
@@ -371,8 +367,7 @@ PolygonGenerator::~PolygonGenerator ()
   mp_contours = 0;
 }
 
-void
-PolygonGenerator::start ()
+void PolygonGenerator::start ()
 {
   if (mp_psink) {
     mp_psink->start ();
@@ -382,13 +377,12 @@ PolygonGenerator::start ()
   }
 }
 
-void 
-PolygonGenerator::flush ()
+void PolygonGenerator::flush ()
 {
 #ifdef DEBUG_POLYGON_GENERATOR
-  for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
-    printf ("%ld:%s%c%c ", i->contour, i->point.to_string().c_str(), i->first ? '!' : ' ', i == m_open_pos ? '*' : ' ');
-  } 
+  for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) {
+    printf ("%ld:%s%c%c ", i->contour, i->point.to_string ().c_str (), i->first ? '!' : ' ', i == m_open_pos ? '*' : ' ');
+  }
   printf ("\n");
 #endif
   tl_assert (m_open.empty ());
@@ -404,8 +398,7 @@ PolygonGenerator::flush ()
   }
 }
 
-void 
-PolygonGenerator::begin_scanline (db::Coord y)
+void PolygonGenerator::begin_scanline (db::Coord y)
 {
 #ifdef DEBUG_POLYGON_GENERATOR
   printf ("begin y=%d\n", y);
@@ -416,27 +409,26 @@ PolygonGenerator::begin_scanline (db::Coord y)
 #ifdef DEBUG_POLYGON_GENERATOR
   printf ("m_open=");
   for (open_map_type::const_iterator o = m_open.begin (); o != m_open.end (); ++o) {
-    printf ("%ld:%s ", o->contour, o->point.to_string().c_str());
-  } 
+    printf ("%ld:%s ", o->contour, o->point.to_string ().c_str ());
+  }
   printf ("\n");
-  printf ("contours:\n"); 
-  for (size_t j = 0; j < mp_contours->size (); ++j) { 
-    printf ("c%ld%s: ", j, (*mp_contours)[j].is_hole () ? "H" : "");
-    for (size_t i = 0; i < (*mp_contours)[j].size (); ++i) { 
-      printf ("%s ", ((*mp_contours)[j].begin () + i)->to_string().c_str ()); 
-    } 
-    printf ("\n"); 
+  printf ("contours:\n");
+  for (size_t j = 0; j < mp_contours->size (); ++j) {
+    printf ("c%ld%s: ", j, (*mp_contours) [j].is_hole () ? "H" : "");
+    for (size_t i = 0; i < (*mp_contours) [j].size (); ++i) {
+      printf ("%s ", ((*mp_contours) [j].begin () + i)->to_string ().c_str ());
+    }
+    printf ("\n");
   }
 #endif
 }
 
-void 
-PolygonGenerator::end_scanline (db::Coord /*y*/)
+void PolygonGenerator::end_scanline (db::Coord /*y*/)
 {
   join_contours (std::numeric_limits<db::Coord>::max ());
 }
 
-void 
+void
 #ifdef DEBUG_POLYGON_GENERATOR
 PolygonGenerator::crossing_edge (const db::Edge &e)
 #else
@@ -444,14 +436,13 @@ PolygonGenerator::crossing_edge (const db::Edge & /*e*/)
 #endif
 {
 #ifdef DEBUG_POLYGON_GENERATOR
-  printf ("xing(%s)\n", e.to_string().c_str());
+  printf ("xing(%s)\n", e.to_string ().c_str ());
 #endif
   join_contours (std::numeric_limits<db::Coord>::max ());
   ++m_open_pos;
 }
 
-void 
-PolygonGenerator::skip_n (size_t n)
+void PolygonGenerator::skip_n (size_t n)
 {
   join_contours (std::numeric_limits<db::Coord>::max ());
 #ifdef DEBUG_POLYGON_GENERATOR
@@ -462,14 +453,13 @@ PolygonGenerator::skip_n (size_t n)
   }
 }
 
-void 
-PolygonGenerator::put (const db::Edge &e)
+void PolygonGenerator::put (const db::Edge &e)
 {
 #ifdef DEBUG_POLYGON_GENERATOR
-  printf ("put(%s) y=%d m_open(%ld)=", e.to_string().c_str(),m_y,std::distance (m_open.begin (), m_open_pos));
-  for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
-    printf ("%ld:%s%c%c ", i->contour, i->point.to_string().c_str(), i->first ? '!' : ' ', i == m_open_pos ? '*' : ' ');
-  } 
+  printf ("put(%s) y=%d m_open(%ld)=", e.to_string ().c_str (), m_y, std::distance (m_open.begin (), m_open_pos));
+  for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) {
+    printf ("%ld:%s%c%c ", i->contour, i->point.to_string ().c_str (), i->first ? '!' : ' ', i == m_open_pos ? '*' : ' ');
+  }
   printf ("\n");
 #endif
 
@@ -535,16 +525,14 @@ PolygonGenerator::put (const db::Edge &e)
     m_open.insert (m_open_pos, PGPoint (hole ? e.p2 () : e.p1 (), inew, false));
 
     --m_open_pos;
-
   }
 
 #ifdef DEBUG_POLYGON_GENERATOR
-  for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
-    printf ("%ld:%s%c%c ", i->contour, i->point.to_string().c_str(), i->first ? '!' : ' ', i == m_open_pos ? '*' : ' ');
-  } 
+  for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) {
+    printf ("%ld:%s%c%c ", i->contour, i->point.to_string ().c_str (), i->first ? '!' : ' ', i == m_open_pos ? '*' : ' ');
+  }
   printf ("\n");
 #endif
-
 }
 
 void PolygonGenerator::eliminate_hole ()
@@ -556,7 +544,7 @@ void PolygonGenerator::eliminate_hole ()
   size_t ic = m_open_pos->contour;
 
   PGPolyContour &c = (*mp_contours) [ic];
-  if (!c.is_hole () || m_open_pos->first) {
+  if (! c.is_hole () || m_open_pos->first) {
     return;
   }
 
@@ -609,8 +597,7 @@ void PolygonGenerator::eliminate_hole ()
   m_open_pos->contour = iprev;
 }
 
-void
-PolygonGenerator::join_contours (db::Coord x) 
+void PolygonGenerator::join_contours (db::Coord x)
 {
   while (m_open_pos != m_open.end ()) {
 
@@ -619,16 +606,16 @@ PolygonGenerator::join_contours (db::Coord x)
     if (n == m_open.end () || m_open_pos->point.y () != m_y || m_open_pos->point != n->point || m_open_pos->point.x () > x) {
       return;
     }
-    
+
     open_map_iterator_type nn = n;
     open_map_iterator_type next = ++nn;
 
     //  don't join, except -/+ pair (for max. coherence) or +/- pair (for min coherence)
     bool minus0 = (m_open_pos->first == (*mp_contours) [m_open_pos->contour].is_hole ());
     bool minus1 = (n->first == (*mp_contours) [n->contour].is_hole ());
-    if (! (minus0 == !m_min_coherence && minus1 == m_min_coherence)) {
+    if (! (minus0 == ! m_min_coherence && minus1 == m_min_coherence)) {
 
-      //  join a southward pair consisting of the next and second-next edge. 
+      //  join a southward pair consisting of the next and second-next edge.
       if (nn != m_open.end () && m_open_pos->point == nn->point) {
         next = m_open_pos;
         m_open_pos = n;
@@ -637,24 +624,23 @@ PolygonGenerator::join_contours (db::Coord x)
       } else if (m_open_pos->point.x () == x) {
         return;
       }
-
     }
 
     size_t i1 = m_open_pos->contour;
     size_t i2 = n->contour;
 #ifdef DEBUG_POLYGON_GENERATOR
     printf ("join %ld and %ld\n", i1, i2);
-    for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
-      printf ("%ld:%s%c%c%c%c ", i->contour, i->point.to_string().c_str(), i->first ? '!' : ' ', i == m_open_pos ? '*' : ' ', i == n ? '+' : ' ', i == nn ? '#' : ' ');
-    } 
+    for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) {
+      printf ("%ld:%s%c%c%c%c ", i->contour, i->point.to_string ().c_str (), i->first ? '!' : ' ', i == m_open_pos ? '*' : ' ', i == n ? '+' : ' ', i == nn ? '#' : ' ');
+    }
     printf ("\n");
-    printf ("--> input contours:\n"); 
-    for (size_t j = 0; j < mp_contours->size (); ++j) { 
-      printf ("--> c%ld%s: ", j, (*mp_contours)[j].is_hole () ? "H" : "");
-      for (size_t i = 0; i < (*mp_contours)[j].size (); ++i) { 
-        printf ("%s ", ((*mp_contours)[j].begin () + i)->to_string().c_str ()); 
-      } 
-      printf ("\n"); 
+    printf ("--> input contours:\n");
+    for (size_t j = 0; j < mp_contours->size (); ++j) {
+      printf ("--> c%ld%s: ", j, (*mp_contours) [j].is_hole () ? "H" : "");
+      for (size_t i = 0; i < (*mp_contours) [j].size (); ++i) {
+        printf ("%s ", ((*mp_contours) [j].begin () + i)->to_string ().c_str ());
+      }
+      printf ("\n");
     }
 #endif
 
@@ -668,8 +654,8 @@ PolygonGenerator::join_contours (db::Coord x)
 
       tl_assert (! c2.empty ());
       tl_assert (! c1.empty ());
-      
-      if (m_open_contours && !c1.is_hole () && !c2.is_hole ()) {
+
+      if (m_open_contours && ! c1.is_hole () && ! c2.is_hole ()) {
 
         //  join with next contour by creating a stitch line
         tl_assert (m_open_pos != m_open.begin ());
@@ -711,7 +697,6 @@ PolygonGenerator::join_contours (db::Coord x)
           cprev.is_hole (false);
 
           mp_contours->join (iprev, i1);
-
         }
 
         if ((c2.end () - 2)->y () == m_y) {
@@ -721,7 +706,7 @@ PolygonGenerator::join_contours (db::Coord x)
         }
         c2.push_back (np->point);
 
-        if (!np->first) {
+        if (! np->first) {
 
           open_map_iterator_type o = np;
           while (o != m_open.begin ()) {
@@ -742,7 +727,6 @@ PolygonGenerator::join_contours (db::Coord x)
           }
           tl_assert (o->contour == i1);
           o->contour = iprev;
-
         }
 
         np->contour = i2;
@@ -772,7 +756,7 @@ PolygonGenerator::join_contours (db::Coord x)
       } else {
 
         //  remove c1 from list of contours, join with c2
-        if (c2.is_hole ()) {  // yes! c2 is correct!
+        if (c2.is_hole ()) { // yes! c2 is correct!
           c2.pop_front ();
           c1.splice (c1.end (), c2);
         } else {
@@ -792,7 +776,6 @@ PolygonGenerator::join_contours (db::Coord x)
         if (m_open_pos->first && n->first) {
           o->first = true;
         }
-
       }
 
     } else {
@@ -837,15 +820,14 @@ PolygonGenerator::join_contours (db::Coord x)
 
         for (PGPolyContour::iterator i = ins; i > cprev.begin () + 1; --i) {
 
-          db::Edge ecut (i[-2], i[-1]);
-          db::Coord xcut = db::coord_traits<db::Coord>::rounded (edge_xaty (db::Edge (i[-2], i[-1]), m_y));
+          db::Edge ecut (i [-2], i [-1]);
+          db::Coord xcut = db::coord_traits<db::Coord>::rounded (edge_xaty (db::Edge (i [-2], i [-1]), m_y));
 
-          if (ins == i || (i[-1].y () >= m_y && i[-2].y () < m_y && xcut < c1.back ().x () && xcut > xprev)) {
+          if (ins == i || (i [-1].y () >= m_y && i [-2].y () < m_y && xcut < c1.back ().x () && xcut > xprev)) {
             xprev = xcut;
             eprev = ecut;
             ins = i;
           }
-
         }
 #endif
 
@@ -880,9 +862,7 @@ PolygonGenerator::join_contours (db::Coord x)
         tl_assert (nn != m_open.end ());
 
         mp_contours->append (i1, nn->contour);
-
       }
-
     }
 
     m_open.erase (m_open_pos);
@@ -897,24 +877,22 @@ PolygonGenerator::join_contours (db::Coord x)
     }
 
 #ifdef DEBUG_POLYGON_GENERATOR
-    printf ("--> output contours:\n"); 
-    for (size_t j = 0; j < mp_contours->size (); ++j) { 
-      printf ("--> c%ld%s: ", j, (*mp_contours)[j].is_hole () ? "H" : "");
-      for (size_t i = 0; i < (*mp_contours)[j].size (); ++i) { 
-        printf ("%s ", ((*mp_contours)[j].begin () + i)->to_string().c_str ()); 
-      } 
-      printf ("\n"); 
+    printf ("--> output contours:\n");
+    for (size_t j = 0; j < mp_contours->size (); ++j) {
+      printf ("--> c%ld%s: ", j, (*mp_contours) [j].is_hole () ? "H" : "");
+      for (size_t i = 0; i < (*mp_contours) [j].size (); ++i) {
+        printf ("%s ", ((*mp_contours) [j].begin () + i)->to_string ().c_str ());
+      }
+      printf ("\n");
     }
 #endif
-
   }
 }
 
 bool
-PolygonGenerator::ms_compress = true;
+  PolygonGenerator::ms_compress = true;
 
-void 
-PolygonGenerator::produce_poly (const PGPolyContour &c)
+void PolygonGenerator::produce_poly (const PGPolyContour &c)
 {
   size_t n = 0;
   for (long inext = c.next (); inext >= 0; inext = (*mp_contours) [inext].next ()) {
@@ -952,26 +930,21 @@ PolygonGenerator::produce_poly (const PGPolyContour &c)
         tl_assert (*p1 == *p0);
 
         m_poly.insert_hole (p0, p1, reduce /*compress*/);
-
       }
 
       m_poly.sort_holes ();
-
     }
 
     mp_psink->put (m_poly);
-
-  } 
+  }
 
   if (mp_spsink) {
 
-    tl_assert (n == 0);  //  there should not be holes since we forced resolve_holes to true ...
+    tl_assert (n == 0); //  there should not be holes since we forced resolve_holes to true ...
     m_spoly.assign_hull (c.begin (), c.end (), reduce /*compress*/);
 
     mp_spsink->put (m_spoly);
-
-  } 
-
+  }
 }
 
 // -------------------------------------------------------------------------------
@@ -1000,8 +973,7 @@ TrapezoidGenerator::~TrapezoidGenerator ()
   //  .. nothing yet ..
 }
 
-void
-TrapezoidGenerator::start ()
+void TrapezoidGenerator::start ()
 {
   if (mp_psink) {
     mp_psink->start ();
@@ -1011,8 +983,7 @@ TrapezoidGenerator::start ()
   }
 }
 
-void
-TrapezoidGenerator::flush ()
+void TrapezoidGenerator::flush ()
 {
   tl_assert (m_edges.empty ());
 
@@ -1026,8 +997,7 @@ TrapezoidGenerator::flush ()
   }
 }
 
-void
-TrapezoidGenerator::begin_scanline (db::Coord y)
+void TrapezoidGenerator::begin_scanline (db::Coord y)
 {
   m_y = y;
   m_current_edge = m_edges.begin ();
@@ -1035,8 +1005,7 @@ TrapezoidGenerator::begin_scanline (db::Coord y)
   m_new_edge_refs.clear ();
 }
 
-void
-TrapezoidGenerator::make_trap (const db::Point (&pts)[4])
+void TrapezoidGenerator::make_trap (const db::Point (&pts) [4])
 {
   if (mp_psink) {
     m_poly.assign_hull (&pts [0], &pts [4], true);
@@ -1047,15 +1016,14 @@ TrapezoidGenerator::make_trap (const db::Point (&pts)[4])
   }
 }
 
-void
-TrapezoidGenerator::end_scanline (db::Coord y)
+void TrapezoidGenerator::end_scanline (db::Coord y)
 {
   tl_assert ((m_edges.size () % 2) == 0);
   tl_assert ((m_new_edges.size () % 2) == 0);
 
   //  create trapezoids for the finished pairs
   std::vector<size_t>::const_iterator rr = m_new_edge_refs.begin ();
-  for (edge_map_type_iterator e = m_edges.begin (); e != m_edges.end (); ) {
+  for (edge_map_type_iterator e = m_edges.begin (); e != m_edges.end ();) {
 
     edge_map_type_iterator e1 = e;
     ++e;
@@ -1076,39 +1044,37 @@ TrapezoidGenerator::end_scanline (db::Coord y)
 
     if (e1->second.p2 ().y () == y && e2->second.p1 ().y () == y) {
 
-      db::Point pts[4];
-      pts[0] = e1->second.p1 ();
-      pts[1] = e1->second.p2 ();
-      pts[2] = e2->second.p1 ();
-      pts[3] = e2->second.p2 ();
+      db::Point pts [4];
+      pts [0] = e1->second.p1 ();
+      pts [1] = e1->second.p2 ();
+      pts [2] = e2->second.p1 ();
+      pts [3] = e2->second.p2 ();
 
       make_trap (pts);
 
     } else if ((e1->second.p2 ().y () == y && e2->second.p2 ().y () < y) || (e2->second.p1 ().y () == y && e1->second.p1 ().y () < y)) {
 
       //  Create trapezoid and continue
-      db::Point pts[4];
-      pts[0] = e1->second.p1 ();
-      pts[1] = db::Point (db::coord_traits<db::Coord>::rounded (db::edge_xaty (e1->first, y)), y);
-      pts[2] = db::Point (db::coord_traits<db::Coord>::rounded (db::edge_xaty (e2->first, y)), y);
-      pts[3] = e2->second.p2 ();
+      db::Point pts [4];
+      pts [0] = e1->second.p1 ();
+      pts [1] = db::Point (db::coord_traits<db::Coord>::rounded (db::edge_xaty (e1->first, y)), y);
+      pts [2] = db::Point (db::coord_traits<db::Coord>::rounded (db::edge_xaty (e2->first, y)), y);
+      pts [3] = e2->second.p2 ();
 
       if (r1 != std::numeric_limits<size_t>::max ()) {
         tl_assert (r1 < m_new_edges.size ());
-        m_new_edges[r1].second.set_p1 (pts[1]);
+        m_new_edges [r1].second.set_p1 (pts [1]);
       }
       if (r2 != std::numeric_limits<size_t>::max ()) {
         tl_assert (r2 < m_new_edges.size ());
-        m_new_edges[r2].second.set_p2 (pts[2]);
+        m_new_edges [r2].second.set_p2 (pts [2]);
       }
 
       make_trap (pts);
-
     }
-
   }
 
-  for (edge_map_type_iterator e = m_new_edges.begin (); e != m_new_edges.end (); ) {
+  for (edge_map_type_iterator e = m_new_edges.begin (); e != m_new_edges.end ();) {
 
     edge_map_type_iterator e1 = e;
     ++e;
@@ -1124,7 +1090,7 @@ TrapezoidGenerator::end_scanline (db::Coord y)
       //  A trapezoid that continues below a hole to the right
       edge_map_type_iterator ee = e2;
       ++ee;
-      for ( ; ee != m_new_edges.end (); ++ee) {
+      for (; ee != m_new_edges.end (); ++ee) {
         if (ee->second.dy () < 0 && ee->second.p2 ().y () < y) {
           break;
         }
@@ -1133,29 +1099,26 @@ TrapezoidGenerator::end_scanline (db::Coord y)
       tl_assert (ee != m_new_edges.end ());
 
       //  Create trapezoid and continue
-      db::Point pts[4];
-      pts[0] = e1->second.p1 ();
-      pts[1] = db::Point (db::coord_traits<db::Coord>::rounded (db::edge_xaty (e1->first, y)), y);
-      pts[2] = db::Point (db::coord_traits<db::Coord>::rounded (db::edge_xaty (ee->first, y)), y);
-      pts[3] = ee->second.p2 ();
+      db::Point pts [4];
+      pts [0] = e1->second.p1 ();
+      pts [1] = db::Point (db::coord_traits<db::Coord>::rounded (db::edge_xaty (e1->first, y)), y);
+      pts [2] = db::Point (db::coord_traits<db::Coord>::rounded (db::edge_xaty (ee->first, y)), y);
+      pts [3] = ee->second.p2 ();
 
-      e1->second.set_p1 (pts[1]);
-      ee->second.set_p2 (pts[2]);
+      e1->second.set_p1 (pts [1]);
+      ee->second.set_p2 (pts [2]);
 
       make_trap (pts);
 
       e = ee;
       ++e;
-
     }
-
   }
 
   m_new_edges.swap (m_edges);
 }
 
-void
-TrapezoidGenerator::crossing_edge (const db::Edge &e)
+void TrapezoidGenerator::crossing_edge (const db::Edge &e)
 {
   //  ignore horizontal edges
   if (e.dy () == 0) {
@@ -1182,8 +1145,7 @@ TrapezoidGenerator::crossing_edge (const db::Edge &e)
   ++m_current_edge;
 }
 
-void
-TrapezoidGenerator::skip_n (size_t n)
+void TrapezoidGenerator::skip_n (size_t n)
 {
   //  skip those edges that have terminated
   while (m_current_edge != m_edges.end () && db::edge_ymax (m_current_edge->second) == m_y) {
@@ -1198,12 +1160,10 @@ TrapezoidGenerator::skip_n (size_t n)
     m_new_edge_refs.push_back (m_new_edges.size ());
     m_new_edges.push_back (*m_current_edge);
     ++m_current_edge;
-
   }
 }
 
-void
-TrapezoidGenerator::put (const db::Edge &e)
+void TrapezoidGenerator::put (const db::Edge &e)
 {
   db::Coord x;
   if (e.dy () == 0) {
@@ -1236,8 +1196,7 @@ TrapezoidGenerator::put (const db::Edge &e)
 // -------------------------------------------------------------------------------
 //  SizingPolygonSink implementation
 
-void 
-SizingPolygonFilter::put (const db::Polygon &polygon)
+void SizingPolygonFilter::put (const db::Polygon &polygon)
 {
   m_sizing_processor.clear ();
   m_sizing_processor.insert (polygon.sized (m_dx, m_dy, m_mode));
@@ -1248,4 +1207,3 @@ SizingPolygonFilter::put (const db::Polygon &polygon)
 }
 
 } // namespace db
-

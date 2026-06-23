@@ -34,12 +34,12 @@
 #include "tlUnitTest.h"
 
 
-TEST(1) 
+TEST (1)
 {
   db::GenericRepository rep;
 
   db::Polygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (100, 0));
   c1.push_back (db::Point (100, 1000));
   c1.push_back (db::Point (200, 1000));
@@ -58,9 +58,9 @@ TEST(1)
   EXPECT_EQ (rep.repository (db::Polygon::tag ()).size (), size_t (1));
 
   EXPECT_EQ (pref1.trans (), db::Disp (db::Vector (100, 0)));
-  EXPECT_EQ (pref1.instantiate (), p1); 
+  EXPECT_EQ (pref1.instantiate (), p1);
   EXPECT_EQ (pref2.trans (), db::Disp (db::Vector (0, 100)));
-  EXPECT_EQ (pref2.instantiate (), p2); 
+  EXPECT_EQ (pref2.instantiate (), p2);
 
   //  transform the polygon reference and original
   db::Disp t (db::Vector (1234, -789));
@@ -71,44 +71,47 @@ TEST(1)
   p1 = p1.transformed (t);
   p2 = t * p2;
 
-  EXPECT_EQ (pref1.instantiate (), p1); 
-  EXPECT_EQ (pref2.instantiate (), p2); 
+  EXPECT_EQ (pref1.instantiate (), p1);
+  EXPECT_EQ (pref2.instantiate (), p2);
 
   //  Test, if the edge iterators deliver the right sequence
   db::PolygonRef::polygon_edge_iterator e1;
   db::Polygon::polygon_edge_iterator e2;
-  std::set <db::Edge> s1, s2;
+  std::set<db::Edge> s1, s2;
 
   e1 = pref1.begin_edge ();
   e2 = p1.begin_edge ();
 
-  while (! e1.at_end () && ! e2.at_end  ()) {
+  while (! e1.at_end () && ! e2.at_end ()) {
     s1.insert (*e1);
     s2.insert (*e2);
-    ++e1; ++e2;
+    ++e1;
+    ++e2;
   }
 
   EXPECT_EQ (s1 == s2, true);
 
   e1 = pref2.begin_edge ();
   e2 = p2.begin_edge ();
-  s1.clear (); s2.clear ();
+  s1.clear ();
+  s2.clear ();
 
   while (! e1.at_end () && ! e2.at_end ()) {
     s1.insert (*e1);
     s2.insert (*e2);
-    ++e1; ++e2;
+    ++e1;
+    ++e2;
   }
 
   EXPECT_EQ (s1 == s2, true);
 }
 
-TEST(2) 
+TEST (2)
 {
   db::GenericRepository *rep = new db::GenericRepository ();
 
   db::Polygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (100, 0));
   c1.push_back (db::Point (100, 1000));
   c1.push_back (db::Point (200, 1000));
@@ -138,18 +141,18 @@ TEST(2)
   EXPECT_EQ (rep2.repository (db::Polygon::tag ()).size (), size_t (1));
 
   EXPECT_EQ (pref1.trans (), db::Disp (db::Vector (100, 0)));
-  EXPECT_EQ (pref1.instantiate (), p1); 
+  EXPECT_EQ (pref1.instantiate (), p1);
   EXPECT_EQ (pref2.trans (), db::Disp (db::Vector (0, 100)));
-  EXPECT_EQ (pref2.instantiate (), p2); 
+  EXPECT_EQ (pref2.instantiate (), p2);
 }
 
 
-TEST(1SIMPLE) 
+TEST (1SIMPLE)
 {
   db::GenericRepository rep;
 
   db::SimplePolygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (100, 0));
   c1.push_back (db::Point (100, 1000));
   c1.push_back (db::Point (200, 1000));
@@ -168,9 +171,9 @@ TEST(1SIMPLE)
   EXPECT_EQ (rep.repository (db::SimplePolygon::tag ()).size (), size_t (1));
 
   EXPECT_EQ (pref1.trans (), db::Disp (db::Vector (100, 0)));
-  EXPECT_EQ (pref1.instantiate (), p1); 
+  EXPECT_EQ (pref1.instantiate (), p1);
   EXPECT_EQ (pref2.trans (), db::Disp (db::Vector (0, 100)));
-  EXPECT_EQ (pref2.instantiate (), p2); 
+  EXPECT_EQ (pref2.instantiate (), p2);
 
   //  transform the polygon reference and original
   db::Disp t (db::Vector (1234, -789));
@@ -181,13 +184,13 @@ TEST(1SIMPLE)
   p1 = p1.transformed (t);
   p2 = t * p2;
 
-  EXPECT_EQ (pref1.instantiate (), p1); 
-  EXPECT_EQ (pref2.instantiate (), p2); 
+  EXPECT_EQ (pref1.instantiate (), p1);
+  EXPECT_EQ (pref2.instantiate (), p2);
 
   //  Test, if the edge iterators deliver the right sequence
   db::SimplePolygonRef::polygon_edge_iterator e1;
   db::SimplePolygon::polygon_edge_iterator e2;
-  std::set <db::Edge> s1, s2;
+  std::set<db::Edge> s1, s2;
 
   e1 = pref1.begin_edge ();
   e2 = p1.begin_edge ();
@@ -195,30 +198,33 @@ TEST(1SIMPLE)
   while (! e1.at_end () && ! e2.at_end ()) {
     s1.insert (*e1);
     s2.insert (*e2);
-    ++e1; ++e2;
+    ++e1;
+    ++e2;
   }
 
   EXPECT_EQ (s1 == s2, true);
 
   e1 = pref2.begin_edge ();
   e2 = p2.begin_edge ();
-  s1.clear (); s2.clear ();
+  s1.clear ();
+  s2.clear ();
 
   while (! e1.at_end () && ! e2.at_end ()) {
     s1.insert (*e1);
     s2.insert (*e2);
-    ++e1; ++e2;
+    ++e1;
+    ++e2;
   }
 
   EXPECT_EQ (s1 == s2, true);
 }
 
-TEST(2SIMPLE) 
+TEST (2SIMPLE)
 {
   db::GenericRepository *rep = new db::GenericRepository ();
 
   db::SimplePolygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (100, 0));
   c1.push_back (db::Point (100, 1000));
   c1.push_back (db::Point (200, 1000));
@@ -248,17 +254,17 @@ TEST(2SIMPLE)
   EXPECT_EQ (rep2.repository (db::SimplePolygon::tag ()).size (), size_t (1));
 
   EXPECT_EQ (pref1.trans (), db::Disp (db::Vector (100, 0)));
-  EXPECT_EQ (pref1.instantiate (), p1); 
+  EXPECT_EQ (pref1.instantiate (), p1);
   EXPECT_EQ (pref2.trans (), db::Disp (db::Vector (0, 100)));
-  EXPECT_EQ (pref2.instantiate (), p2); 
+  EXPECT_EQ (pref2.instantiate (), p2);
 }
 
-TEST(3) 
+TEST (3)
 {
   db::GenericRepository *rep = new db::GenericRepository ();
   db::Manager m (true);
 
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (100, 0));
   c1.push_back (db::Point (100, 1000));
   c1.push_back (db::Point (200, 1000));
@@ -281,13 +287,13 @@ TEST(3)
   db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::All);
   unsigned int n = 0;
   while (! s.at_end ()) {
-    
+
     db::Polygon px;
     s->polygon (px);
 
     EXPECT_EQ (px, p1);
-    
-    ++n; 
+
+    ++n;
 
     db::Shapes::polygon_edge_iterator pe = s->begin_edge ();
     db::Polygon::polygon_edge_iterator pe2 = p1.begin_edge ();
@@ -301,7 +307,6 @@ TEST(3)
     EXPECT_EQ (pe2.at_end (), true);
 
     ++s;
-
   }
 
   EXPECT_EQ (n, (unsigned int) 4);
@@ -329,14 +334,13 @@ TEST(3)
   }
 
   EXPECT_EQ (n, size_t (4));
-
 }
 
-TEST(4) 
+TEST (4)
 {
   db::GenericRepository rep;
 
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (100, 0));
   c1.push_back (db::Point (100, 1000));
   c1.push_back (db::Point (200, 1000));
@@ -399,12 +403,9 @@ TEST(4)
       EXPECT_EQ (r == c1.end (), true);
     }
 
-    ++n; 
+    ++n;
     ++s;
-
   }
 
   EXPECT_EQ (n, size_t (8));
-
 }
-

@@ -28,39 +28,46 @@
 
 CAPNP_BEGIN_HEADER
 
-namespace capnp {
+namespace capnp
+{
 
 struct Data {
-  Data() = delete;
+  Data () = delete;
   class Reader;
   class Builder;
-  class Pipeline {};
+  class Pipeline
+  {
+  };
 };
 
 struct Text {
-  Text() = delete;
+  Text () = delete;
   class Reader;
   class Builder;
-  class Pipeline {};
+  class Pipeline
+  {
+  };
 };
 
-class Data::Reader: public kj::ArrayPtr<const byte> {
+class Data::Reader : public kj::ArrayPtr<const byte>
+{
   // Points to a blob of bytes.  The usual Reader rules apply -- Data::Reader behaves like a simple
   // pointer which does not own its target, can be passed by value, etc.
 
 public:
   typedef Data Reads;
 
-  Reader() = default;
-  inline Reader(decltype(nullptr)): ArrayPtr<const byte>(nullptr) {}
-  inline Reader(const byte* value, size_t size): ArrayPtr<const byte>(value, size) {}
-  inline Reader(const kj::Array<const byte>& value): ArrayPtr<const byte>(value) {}
-  inline Reader(const ArrayPtr<const byte>& value): ArrayPtr<const byte>(value) {}
-  inline Reader(const kj::Array<byte>& value): ArrayPtr<const byte>(value) {}
-  inline Reader(const ArrayPtr<byte>& value): ArrayPtr<const byte>(value) {}
+  Reader () = default;
+  inline Reader (decltype (nullptr)) : ArrayPtr<const byte> (nullptr) {}
+  inline Reader (const byte *value, size_t size) : ArrayPtr<const byte> (value, size) {}
+  inline Reader (const kj::Array<const byte> &value) : ArrayPtr<const byte> (value) {}
+  inline Reader (const ArrayPtr<const byte> &value) : ArrayPtr<const byte> (value) {}
+  inline Reader (const kj::Array<byte> &value) : ArrayPtr<const byte> (value) {}
+  inline Reader (const ArrayPtr<byte> &value) : ArrayPtr<const byte> (value) {}
 };
 
-class Text::Reader: public kj::StringPtr {
+class Text::Reader : public kj::StringPtr
+{
   // Like Data::Reader, but points at NUL-terminated UTF-8 text.  The NUL terminator is not counted
   // in the size but must be present immediately after the last byte.
   //
@@ -71,149 +78,164 @@ class Text::Reader: public kj::StringPtr {
 public:
   typedef Text Reads;
 
-  Reader() = default;
-  inline Reader(decltype(nullptr)): StringPtr(nullptr) {}
-  inline Reader(const char* value): StringPtr(value) {}
-  inline Reader(const char* value, size_t size): StringPtr(value, size) {}
-  inline Reader(const kj::String& value): StringPtr(value) {}
-  inline Reader(const StringPtr& value): StringPtr(value) {}
+  Reader () = default;
+  inline Reader (decltype (nullptr)) : StringPtr (nullptr) {}
+  inline Reader (const char *value) : StringPtr (value) {}
+  inline Reader (const char *value, size_t size) : StringPtr (value, size) {}
+  inline Reader (const kj::String &value) : StringPtr (value) {}
+  inline Reader (const StringPtr &value) : StringPtr (value) {}
 
 #if KJ_COMPILER_SUPPORTS_STL_STRING_INTEROP
-  template <typename T, typename = decltype(kj::instance<T>().c_str())>
-  inline Reader(const T& t): StringPtr(t) {}
+  template <typename T, typename = decltype (kj::instance<T> ().c_str ())>
+  inline Reader (const T &t) : StringPtr (t) {}
   // Allow implicit conversion from any class that has a c_str() method (namely, std::string).
   // We use a template trick to detect std::string in order to avoid including the header for
   // those who don't want it.
 #endif
 };
 
-class Data::Builder: public kj::ArrayPtr<byte> {
+class Data::Builder : public kj::ArrayPtr<byte>
+{
   // Like Data::Reader except the pointers aren't const.
 
 public:
   typedef Data Builds;
 
-  Builder() = default;
-  inline Builder(decltype(nullptr)): ArrayPtr<byte>(nullptr) {}
-  inline Builder(byte* value, size_t size): ArrayPtr<byte>(value, size) {}
-  inline Builder(kj::Array<byte>& value): ArrayPtr<byte>(value) {}
-  inline Builder(ArrayPtr<byte> value): ArrayPtr<byte>(value) {}
+  Builder () = default;
+  inline Builder (decltype (nullptr)) : ArrayPtr<byte> (nullptr) {}
+  inline Builder (byte *value, size_t size) : ArrayPtr<byte> (value, size) {}
+  inline Builder (kj::Array<byte> &value) : ArrayPtr<byte> (value) {}
+  inline Builder (ArrayPtr<byte> value) : ArrayPtr<byte> (value) {}
 
-  inline Data::Reader asReader() const {
-    return Data::Reader(kj::implicitCast<const kj::ArrayPtr<byte>&>(*this));
+  inline Data::Reader asReader () const
+  {
+    return Data::Reader (kj::implicitCast<const kj::ArrayPtr<byte> &> (*this));
   }
-  inline operator Reader() const { return asReader(); }
+  inline operator Reader () const { return asReader (); }
 };
 
-class Text::Builder: public kj::DisallowConstCopy {
+class Text::Builder : public kj::DisallowConstCopy
+{
   // Basically identical to kj::StringPtr, except that the contents are non-const.
 
 public:
-  inline Builder(): content(nulstr, 1) {}
-  inline Builder(decltype(nullptr)): content(nulstr, 1) {}
-  inline Builder(char* value): content(value, strlen(value) + 1) {}
-  inline Builder(char* value, size_t size): content(value, size + 1) {
-    KJ_IREQUIRE(value[size] == '\0', "StringPtr must be NUL-terminated.");
+  inline Builder () : content (nulstr, 1) {}
+  inline Builder (decltype (nullptr)) : content (nulstr, 1) {}
+  inline Builder (char *value) : content (value, strlen (value) + 1) {}
+  inline Builder (char *value, size_t size) : content (value, size + 1)
+  {
+    KJ_IREQUIRE (value [size] == '\0', "StringPtr must be NUL-terminated.");
   }
 
-  inline Reader asReader() const { return Reader(content.begin(), content.size() - 1); }
-  inline operator Reader() const { return asReader(); }
+  inline Reader asReader () const { return Reader (content.begin (), content.size () - 1); }
+  inline operator Reader () const { return asReader (); }
 
-  inline operator kj::ArrayPtr<char>();
-  inline kj::ArrayPtr<char> asArray();
-  inline operator kj::ArrayPtr<const char>() const;
-  inline kj::ArrayPtr<const char> asArray() const;
-  inline kj::ArrayPtr<byte> asBytes() { return asArray().asBytes(); }
-  inline kj::ArrayPtr<const byte> asBytes() const { return asArray().asBytes(); }
+  inline operator kj::ArrayPtr<char> ();
+  inline kj::ArrayPtr<char> asArray ();
+  inline operator kj::ArrayPtr<const char> () const;
+  inline kj::ArrayPtr<const char> asArray () const;
+  inline kj::ArrayPtr<byte> asBytes () { return asArray ().asBytes (); }
+  inline kj::ArrayPtr<const byte> asBytes () const { return asArray ().asBytes (); }
   // Result does not include NUL terminator.
 
-  inline operator kj::StringPtr() const;
-  inline kj::StringPtr asString() const;
+  inline operator kj::StringPtr () const;
+  inline kj::StringPtr asString () const;
 
-  inline const char* cStr() const { return content.begin(); }
+  inline const char *cStr () const { return content.begin (); }
   // Returns NUL-terminated string.
 
-  inline size_t size() const { return content.size() - 1; }
+  inline size_t size () const { return content.size () - 1; }
   // Result does not include NUL terminator.
 
-  inline char operator[](size_t index) const { return content[index]; }
-  inline char& operator[](size_t index) { return content[index]; }
+  inline char operator[] (size_t index) const { return content [index]; }
+  inline char &operator[] (size_t index) { return content [index]; }
 
-  inline char* begin() { return content.begin(); }
-  inline char* end() { return content.end() - 1; }
-  inline const char* begin() const { return content.begin(); }
-  inline const char* end() const { return content.end() - 1; }
+  inline char *begin () { return content.begin (); }
+  inline char *end () { return content.end () - 1; }
+  inline const char *begin () const { return content.begin (); }
+  inline const char *end () const { return content.end () - 1; }
 
-  inline bool operator==(decltype(nullptr)) const { return content.size() <= 1; }
-  inline bool operator!=(decltype(nullptr)) const { return content.size() > 1; }
+  inline bool operator== (decltype (nullptr)) const { return content.size () <= 1; }
+  inline bool operator!= (decltype (nullptr)) const { return content.size () > 1; }
 
-  inline bool operator==(Builder other) const { return asString() == other.asString(); }
-  inline bool operator!=(Builder other) const { return asString() != other.asString(); }
-  inline bool operator< (Builder other) const { return asString() <  other.asString(); }
-  inline bool operator> (Builder other) const { return asString() >  other.asString(); }
-  inline bool operator<=(Builder other) const { return asString() <= other.asString(); }
-  inline bool operator>=(Builder other) const { return asString() >= other.asString(); }
+  inline bool operator== (Builder other) const { return asString () == other.asString (); }
+  inline bool operator!= (Builder other) const { return asString () != other.asString (); }
+  inline bool operator< (Builder other) const { return asString () < other.asString (); }
+  inline bool operator> (Builder other) const { return asString () > other.asString (); }
+  inline bool operator<= (Builder other) const { return asString () <= other.asString (); }
+  inline bool operator>= (Builder other) const { return asString () >= other.asString (); }
 
-  inline kj::StringPtr slice(size_t start) const;
-  inline kj::ArrayPtr<const char> slice(size_t start, size_t end) const;
-  inline Builder slice(size_t start);
-  inline kj::ArrayPtr<char> slice(size_t start, size_t end);
+  inline kj::StringPtr slice (size_t start) const;
+  inline kj::ArrayPtr<const char> slice (size_t start, size_t end) const;
+  inline Builder slice (size_t start);
+  inline kj::ArrayPtr<char> slice (size_t start, size_t end);
   // A string slice is only NUL-terminated if it is a suffix, so slice() has a one-parameter
   // version that assumes end = size().
 
 private:
-  inline explicit Builder(kj::ArrayPtr<char> content): content(content) {}
+  inline explicit Builder (kj::ArrayPtr<char> content) : content (content) {}
 
   kj::ArrayPtr<char> content;
 
-  static char nulstr[1];
+  static char nulstr [1];
 };
 
-inline kj::StringPtr KJ_STRINGIFY(Text::Builder builder) {
-  return builder.asString();
+inline kj::StringPtr KJ_STRINGIFY (Text::Builder builder)
+{
+  return builder.asString ();
 }
 
-inline bool operator==(const char* a, const Text::Builder& b) { return b.asString() == a; }
-inline bool operator!=(const char* a, const Text::Builder& b) { return b.asString() != a; }
+inline bool operator== (const char *a, const Text::Builder &b) { return b.asString () == a; }
+inline bool operator!= (const char *a, const Text::Builder &b) { return b.asString () != a; }
 
-inline Text::Builder::operator kj::StringPtr() const {
-  return kj::StringPtr(content.begin(), content.size() - 1);
-}
-
-inline kj::StringPtr Text::Builder::asString() const {
-  return kj::StringPtr(content.begin(), content.size() - 1);
+inline Text::Builder::operator kj::StringPtr () const
+{
+  return kj::StringPtr (content.begin (), content.size () - 1);
 }
 
-inline Text::Builder::operator kj::ArrayPtr<char>() {
-  return content.slice(0, content.size() - 1);
+inline kj::StringPtr Text::Builder::asString () const
+{
+  return kj::StringPtr (content.begin (), content.size () - 1);
 }
 
-inline kj::ArrayPtr<char> Text::Builder::asArray() {
-  return content.slice(0, content.size() - 1);
+inline Text::Builder::operator kj::ArrayPtr<char> ()
+{
+  return content.slice (0, content.size () - 1);
 }
 
-inline Text::Builder::operator kj::ArrayPtr<const char>() const {
-  return content.slice(0, content.size() - 1);
+inline kj::ArrayPtr<char> Text::Builder::asArray ()
+{
+  return content.slice (0, content.size () - 1);
 }
 
-inline kj::ArrayPtr<const char> Text::Builder::asArray() const {
-  return content.slice(0, content.size() - 1);
+inline Text::Builder::operator kj::ArrayPtr<const char> () const
+{
+  return content.slice (0, content.size () - 1);
 }
 
-inline kj::StringPtr Text::Builder::slice(size_t start) const {
-  return asReader().slice(start);
-}
-inline kj::ArrayPtr<const char> Text::Builder::slice(size_t start, size_t end) const {
-  return content.slice(start, end);
+inline kj::ArrayPtr<const char> Text::Builder::asArray () const
+{
+  return content.slice (0, content.size () - 1);
 }
 
-inline Text::Builder Text::Builder::slice(size_t start) {
-  return Text::Builder(content.slice(start, content.size()));
+inline kj::StringPtr Text::Builder::slice (size_t start) const
+{
+  return asReader ().slice (start);
 }
-inline kj::ArrayPtr<char> Text::Builder::slice(size_t start, size_t end) {
-  return content.slice(start, end);
+inline kj::ArrayPtr<const char> Text::Builder::slice (size_t start, size_t end) const
+{
+  return content.slice (start, end);
 }
 
-}  // namespace capnp
+inline Text::Builder Text::Builder::slice (size_t start)
+{
+  return Text::Builder (content.slice (start, content.size ()));
+}
+inline kj::ArrayPtr<char> Text::Builder::slice (size_t start, size_t end)
+{
+  return content.slice (start, end);
+}
+
+} // namespace capnp
 
 CAPNP_END_HEADER

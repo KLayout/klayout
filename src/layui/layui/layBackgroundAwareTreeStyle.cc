@@ -39,8 +39,7 @@ BackgroundAwareTreeStyle::BackgroundAwareTreeStyle (QStyle *org_style)
   //  .. nothing yet ..
 }
 
-void
-BackgroundAwareTreeStyle::drawPrimitive (QStyle::PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *w) const
+void BackgroundAwareTreeStyle::drawPrimitive (QStyle::PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *w) const
 {
   if (pe == PE_IndicatorBranch) {
 
@@ -54,14 +53,14 @@ BackgroundAwareTreeStyle::drawPrimitive (QStyle::PrimitiveElement pe, const QSty
       QColor c;
 
       QPalette::ColorGroup cg = QPalette::Disabled;
-      if ((w && w->isEnabled ()) || (!w && (opt->state & State_Enabled))) {
-        if ((w && w->hasFocus ()) || (!w && (opt->state & State_HasFocus))) {
+      if ((w && w->isEnabled ()) || (! w && (opt->state & State_Enabled))) {
+        if ((w && w->hasFocus ()) || (! w && (opt->state & State_HasFocus))) {
           cg = QPalette::Normal;
         } else {
           cg = QPalette::Inactive;
         }
       }
-      if ((opt->state & State_Selected) && styleHint(QStyle::SH_ItemView_ShowDecorationSelected, opt, w)) {
+      if ((opt->state & State_Selected) && styleHint (QStyle::SH_ItemView_ShowDecorationSelected, opt, w)) {
         c = opt->palette.color (cg, QPalette::HighlightedText);
       } else {
         c = opt->palette.color (cg, QPalette::Text);
@@ -82,28 +81,24 @@ BackgroundAwareTreeStyle::drawPrimitive (QStyle::PrimitiveElement pe, const QSty
       p->setRenderHints (QPainter::Antialiasing);
 
       if (opt->state & State_Open) {
-        QPoint points[] = {
+        QPoint points [] = {
           QPoint (mid_h - sz / 2, mid_v - sz / 3),
           QPoint (mid_h + sz / 2, mid_v - sz / 3),
-          QPoint (mid_h, mid_v + sz / 3)
-        };
-        p->drawPolygon (points, sizeof (points) / sizeof (points[0]));
+          QPoint (mid_h, mid_v + sz / 3)};
+        p->drawPolygon (points, sizeof (points) / sizeof (points [0]));
       } else {
-        QPoint points[] = {
+        QPoint points [] = {
           QPoint (mid_h - sz / 3, mid_v - sz / 2),
           QPoint (mid_h + sz / 3, mid_v),
-          QPoint (mid_h - sz / 3, mid_v + sz / 2)
-        };
-        p->drawPolygon (points, sizeof (points) / sizeof (points[0]));
+          QPoint (mid_h - sz / 3, mid_v + sz / 2)};
+        p->drawPolygon (points, sizeof (points) / sizeof (points [0]));
       }
 
       p->setPen (old_pen);
       p->setBrush (old_brush);
       p->setRenderHints (old_rh);
       return;
-
     }
-
   }
 
   QProxyStyle::drawPrimitive (pe, opt, p, w);
@@ -112,4 +107,3 @@ BackgroundAwareTreeStyle::drawPrimitive (QStyle::PrimitiveElement pe, const QSty
 }
 
 #endif
-

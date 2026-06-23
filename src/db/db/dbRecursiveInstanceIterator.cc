@@ -76,7 +76,6 @@ RecursiveInstanceIterator &RecursiveInstanceIterator::operator= (const Recursive
     m_needs_reinit = d.m_needs_reinit;
     m_inst_quad_id = d.m_inst_quad_id;
     m_inst_quad_id_stack = d.m_inst_quad_id_stack;
-
   }
   return *this;
 }
@@ -126,30 +125,27 @@ RecursiveInstanceIterator::RecursiveInstanceIterator (const layout_type &layout,
 
 RecursiveInstanceIterator::~RecursiveInstanceIterator ()
 {
-    //  .. nothing yet ..
+  //  .. nothing yet ..
 }
 
 
-void 
-RecursiveInstanceIterator::init ()
+void RecursiveInstanceIterator::init ()
 {
   m_needs_reinit = true;
   m_max_depth = std::numeric_limits<int>::max (); // all
-  m_min_depth = 0; // from the beginning
+  m_min_depth = 0;                                // from the beginning
   m_inst_quad_id = 0;
   mp_cell = 0;
   m_all_targets = true;
 }
 
-void
-RecursiveInstanceIterator::init_region (const RecursiveInstanceIterator::box_type &region)
+void RecursiveInstanceIterator::init_region (const RecursiveInstanceIterator::box_type &region)
 {
   m_region = region;
   mp_complex_region.reset (0);
 }
 
-void
-RecursiveInstanceIterator::init_region (const RecursiveInstanceIterator::region_type &region)
+void RecursiveInstanceIterator::init_region (const RecursiveInstanceIterator::region_type &region)
 {
   if (region.empty ()) {
 
@@ -167,12 +163,10 @@ RecursiveInstanceIterator::init_region (const RecursiveInstanceIterator::region_
     m_region = region.bbox ();
     //  A small optimization. We can do this since we merge and translate to trapezoids anyway.
     mp_complex_region->set_strict_handling (false);
-
   }
 }
 
-void
-RecursiveInstanceIterator::set_region (const box_type &region)
+void RecursiveInstanceIterator::set_region (const box_type &region)
 {
   if (m_region != region || mp_complex_region.get () != 0) {
     init_region (region);
@@ -180,15 +174,13 @@ RecursiveInstanceIterator::set_region (const box_type &region)
   }
 }
 
-void
-RecursiveInstanceIterator::set_region (const region_type &region)
+void RecursiveInstanceIterator::set_region (const region_type &region)
 {
   init_region (region);
   reset ();
 }
 
-void
-RecursiveInstanceIterator::confine_region (const box_type &region)
+void RecursiveInstanceIterator::confine_region (const box_type &region)
 {
   if (m_region.empty ()) {
     //  no more confinement
@@ -200,8 +192,7 @@ RecursiveInstanceIterator::confine_region (const box_type &region)
   reset ();
 }
 
-void
-RecursiveInstanceIterator::confine_region (const region_type &region)
+void RecursiveInstanceIterator::confine_region (const region_type &region)
 {
   if (m_region.empty ()) {
     //  no more confinement
@@ -213,8 +204,7 @@ RecursiveInstanceIterator::confine_region (const region_type &region)
   reset ();
 }
 
-void
-RecursiveInstanceIterator::enable_all_targets ()
+void RecursiveInstanceIterator::enable_all_targets ()
 {
   if (! m_all_targets) {
     m_all_targets = true;
@@ -223,8 +213,7 @@ RecursiveInstanceIterator::enable_all_targets ()
   }
 }
 
-void
-RecursiveInstanceIterator::set_targets (const std::set<db::cell_index_type> &tgt)
+void RecursiveInstanceIterator::set_targets (const std::set<db::cell_index_type> &tgt)
 {
   if (m_all_targets || m_targets != tgt) {
     m_targets = tgt;
@@ -233,11 +222,11 @@ RecursiveInstanceIterator::set_targets (const std::set<db::cell_index_type> &tgt
   }
 }
 
-namespace {
+namespace
+{
 
 struct BoxTreePusher
-  : public db::SimplePolygonSink
-{
+  : public db::SimplePolygonSink {
   BoxTreePusher (RecursiveInstanceIterator::box_tree_type *bt)
     : mp_bt (bt)
   {
@@ -255,8 +244,7 @@ private:
 
 }
 
-void
-RecursiveInstanceIterator::validate (RecursiveInstanceReceiver *receiver) const
+void RecursiveInstanceIterator::validate (RecursiveInstanceReceiver *receiver) const
 {
   if (! m_needs_reinit) {
     return;
@@ -289,7 +277,7 @@ RecursiveInstanceIterator::validate (RecursiveInstanceReceiver *receiver) const
 
     db::EdgeProcessor ep;
     size_t n = 0;
-    for (region_type::const_iterator p = mp_complex_region->begin (); !p.at_end (); ++p, ++n) {
+    for (region_type::const_iterator p = mp_complex_region->begin (); ! p.at_end (); ++p, ++n) {
       ep.insert (*p, n);
     }
 
@@ -299,8 +287,7 @@ RecursiveInstanceIterator::validate (RecursiveInstanceReceiver *receiver) const
     db::MergeOp op (0);
     ep.process (tg, op);
 
-    m_local_complex_region_stack.back ().sort (db::box_convert <db::Box> ());
-
+    m_local_complex_region_stack.back ().sort (db::box_convert<db::Box> ());
   }
 
   if (mp_top_cell && mp_layout) {
@@ -311,23 +298,20 @@ RecursiveInstanceIterator::validate (RecursiveInstanceReceiver *receiver) const
 
     new_cell (receiver);
     next_instance (receiver);
-
   }
 
   if (mp_layout && ! at_end ()) {
-    m_locker = db::LayoutLocker (const_cast <db::Layout *> (mp_layout.get ()), true);
+    m_locker = db::LayoutLocker (const_cast<db::Layout *> (mp_layout.get ()), true);
   }
 }
 
-void
-RecursiveInstanceIterator::reset ()
+void RecursiveInstanceIterator::reset ()
 {
   m_needs_reinit = true;
   m_locker = db::LayoutLocker ();
 }
 
-void 
-RecursiveInstanceIterator::reset_selection ()
+void RecursiveInstanceIterator::reset_selection ()
 {
   if (mp_layout) {
 
@@ -335,12 +319,10 @@ RecursiveInstanceIterator::reset_selection ()
     m_stop.clear ();
 
     reset ();
-
   }
 }
 
-void 
-RecursiveInstanceIterator::unselect_cells (const std::set<db::cell_index_type> &cells)
+void RecursiveInstanceIterator::unselect_cells (const std::set<db::cell_index_type> &cells)
 {
   if (mp_layout) {
 
@@ -350,12 +332,10 @@ RecursiveInstanceIterator::unselect_cells (const std::set<db::cell_index_type> &
     }
 
     reset ();
-
   }
 }
 
-void 
-RecursiveInstanceIterator::unselect_all_cells ()
+void RecursiveInstanceIterator::unselect_all_cells ()
 {
   if (mp_layout) {
 
@@ -365,12 +345,10 @@ RecursiveInstanceIterator::unselect_all_cells ()
     }
 
     reset ();
-
   }
 }
 
-void 
-RecursiveInstanceIterator::select_cells (const std::set<db::cell_index_type> &cells)
+void RecursiveInstanceIterator::select_cells (const std::set<db::cell_index_type> &cells)
 {
   if (mp_layout) {
 
@@ -380,12 +358,10 @@ RecursiveInstanceIterator::select_cells (const std::set<db::cell_index_type> &ce
     }
 
     reset ();
-
   }
 }
 
-void 
-RecursiveInstanceIterator::select_all_cells ()
+void RecursiveInstanceIterator::select_all_cells ()
 {
   if (mp_layout) {
 
@@ -395,20 +371,18 @@ RecursiveInstanceIterator::select_all_cells ()
     }
 
     reset ();
-
   }
 }
 
 const RecursiveInstanceIterator::instance_element_type *
-RecursiveInstanceIterator::operator-> () const
+RecursiveInstanceIterator::operator->() const
 {
   validate (0);
   m_combined_instance = db::InstElement (*m_inst, m_inst_array);
   return &m_combined_instance;
 }
 
-bool
-RecursiveInstanceIterator::at_end () const
+bool RecursiveInstanceIterator::at_end () const
 {
   validate (0);
   return m_inst.at_end ();
@@ -424,8 +398,7 @@ RecursiveInstanceIterator::path () const
   return elements;
 }
 
-void
-RecursiveInstanceIterator::skip_inst_iter_for_complex_region () const
+void RecursiveInstanceIterator::skip_inst_iter_for_complex_region () const
 {
   while (! m_inst.at_end ()) {
 
@@ -447,12 +420,10 @@ RecursiveInstanceIterator::skip_inst_iter_for_complex_region () const
         ++m_inst;
       }
     }
-
   }
 }
 
-void
-RecursiveInstanceIterator::next (RecursiveInstanceReceiver *receiver)
+void RecursiveInstanceIterator::next (RecursiveInstanceReceiver *receiver)
 {
   if (! at_end ()) {
 
@@ -473,14 +444,12 @@ RecursiveInstanceIterator::next (RecursiveInstanceReceiver *receiver)
   }
 }
 
-bool
-RecursiveInstanceIterator::needs_visit () const
+bool RecursiveInstanceIterator::needs_visit () const
 {
   return int (m_inst_iterators.size ()) >= m_min_depth && ! is_inactive () && (m_all_targets || m_targets.find (m_inst->cell_index ()) != m_targets.end ());
 }
 
-void
-RecursiveInstanceIterator::next_instance (RecursiveInstanceReceiver *receiver) const
+void RecursiveInstanceIterator::next_instance (RecursiveInstanceReceiver *receiver) const
 {
   while (true) {
 
@@ -501,9 +470,7 @@ RecursiveInstanceIterator::next_instance (RecursiveInstanceReceiver *receiver) c
           up (receiver);
         }
         break;
-
       }
-
     }
 
     if (m_inst.at_end ()) {
@@ -521,12 +488,10 @@ RecursiveInstanceIterator::next_instance (RecursiveInstanceReceiver *receiver) c
     } else {
       break;
     }
-
   }
 }
 
-void
-RecursiveInstanceIterator::down (RecursiveInstanceReceiver *receiver) const
+void RecursiveInstanceIterator::down (RecursiveInstanceReceiver *receiver) const
 {
   tl_assert (mp_layout);
 
@@ -558,7 +523,7 @@ RecursiveInstanceIterator::down (RecursiveInstanceReceiver *receiver) const
   if (! m_local_complex_region_stack.empty ()) {
 
     m_local_complex_region_stack.push_back (box_tree_type ());
-    const box_tree_type &pcl = m_local_complex_region_stack.end ()[-2];
+    const box_tree_type &pcl = m_local_complex_region_stack.end () [-2];
 
     if (! new_region.empty ()) {
 
@@ -582,9 +547,7 @@ RecursiveInstanceIterator::down (RecursiveInstanceReceiver *receiver) const
       //  re-adjust the new local region, so we take into account additional clipping by the complex region.
       //  in the extreme case, this box is empty:
       m_local_region_stack.back () = bb;
-
     }
-
   }
 
   if (receiver) {
@@ -594,8 +557,7 @@ RecursiveInstanceIterator::down (RecursiveInstanceReceiver *receiver) const
   new_cell (receiver);
 }
 
-void
-RecursiveInstanceIterator::up (RecursiveInstanceReceiver *receiver) const
+void RecursiveInstanceIterator::up (RecursiveInstanceReceiver *receiver) const
 {
   if (receiver) {
     receiver->leave_cell (this, cell ());
@@ -618,8 +580,7 @@ RecursiveInstanceIterator::up (RecursiveInstanceReceiver *receiver) const
   }
 }
 
-void 
-RecursiveInstanceIterator::new_cell (RecursiveInstanceReceiver *receiver) const
+void RecursiveInstanceIterator::new_cell (RecursiveInstanceReceiver *receiver) const
 {
   bool new_cell_inactive = is_child_inactive (cell_index ());
   if (is_inactive () != new_cell_inactive) {
@@ -638,8 +599,7 @@ RecursiveInstanceIterator::new_cell (RecursiveInstanceReceiver *receiver) const
   new_inst (receiver);
 }
 
-void 
-RecursiveInstanceIterator::new_inst (RecursiveInstanceReceiver *receiver) const
+void RecursiveInstanceIterator::new_inst (RecursiveInstanceReceiver *receiver) const
 {
   //  look for the next instance with a non-empty array iterator. The array iterator can be empty because we
   //  use a lookup region.
@@ -688,12 +648,10 @@ RecursiveInstanceIterator::new_inst (RecursiveInstanceReceiver *receiver) const
     } else {
       ++m_inst;
     }
-
   }
 }
 
-void
-RecursiveInstanceIterator::new_inst_member (RecursiveInstanceReceiver *receiver) const
+void RecursiveInstanceIterator::new_inst_member (RecursiveInstanceReceiver *receiver) const
 {
   if (! m_local_complex_region_stack.empty ()) {
 
@@ -706,7 +664,6 @@ RecursiveInstanceIterator::new_inst_member (RecursiveInstanceReceiver *receiver)
         ++m_inst_array;
       }
     }
-
   }
 
   while (! m_inst_array.at_end () && receiver) {
@@ -732,8 +689,7 @@ RecursiveInstanceIterator::correct_box_overlapping (const box_type &box) const
   }
 }
 
-bool
-RecursiveInstanceIterator::is_outside_complex_region (const box_type &box) const
+bool RecursiveInstanceIterator::is_outside_complex_region (const box_type &box) const
 {
   if (m_overlapping) {
     return m_local_complex_region_stack.back ().begin_overlapping (box, db::box_convert<box_type> ()).at_end ();
@@ -742,8 +698,7 @@ RecursiveInstanceIterator::is_outside_complex_region (const box_type &box) const
   }
 }
 
-bool
-RecursiveInstanceIterator::is_child_inactive (db::cell_index_type new_child) const
+bool RecursiveInstanceIterator::is_child_inactive (db::cell_index_type new_child) const
 {
   bool inactive = is_inactive ();
   if (! m_start.empty () && m_start.find (new_child) != m_start.end ()) {
@@ -754,8 +709,7 @@ RecursiveInstanceIterator::is_child_inactive (db::cell_index_type new_child) con
   return inactive;
 }
 
-void
-RecursiveInstanceIterator::push (RecursiveInstanceReceiver *receiver)
+void RecursiveInstanceIterator::push (RecursiveInstanceReceiver *receiver)
 {
   //  force reset so we can validate with a receiver
   reset ();
@@ -776,9 +730,7 @@ RecursiveInstanceIterator::push (RecursiveInstanceReceiver *receiver)
 
     receiver->end (this);
     throw;
-
   }
 }
 
 }
-

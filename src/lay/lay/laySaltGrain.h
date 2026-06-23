@@ -33,7 +33,7 @@
 
 namespace tl
 {
-  class InputHttpStreamCallback;
+class InputHttpStreamCallback;
 }
 
 namespace lay
@@ -47,10 +47,10 @@ namespace lay
  *  The version is the minimum required version. If empty, any version is
  *  allowed to resolve this dependency.
  */
-struct SaltGrainDependency
-{
+struct SaltGrainDependency {
   SaltGrainDependency ()
-  { }
+  {
+  }
 
   std::string name;
   std::string url;
@@ -78,7 +78,7 @@ public:
   /**
    *  @brief Destructor
    */
-  virtual ~SaltGrain () { }
+  virtual ~SaltGrain () {}
 
   /**
    *  @brief Equality
@@ -90,7 +90,7 @@ public:
    */
   bool operator!= (const SaltGrain &other) const
   {
-    return !operator== (other);
+    return ! operator== (other);
   }
 
   /**

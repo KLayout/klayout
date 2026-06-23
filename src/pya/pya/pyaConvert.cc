@@ -47,7 +47,7 @@ long python2c_func<long>::operator() (PyObject *rval)
     return PyInt_AsLong (rval);
   } else
 #endif
-  if (PyLong_Check (rval)) {
+    if (PyLong_Check (rval)) {
     return PyLong_AsLong (rval);
   } else if (PyFloat_Check (rval)) {
     return (long) (PyFloat_AsDouble (rval));
@@ -70,7 +70,7 @@ char python2c_func<char>::operator() (PyObject *rval)
     return char (PyInt_AsLong (rval));
   } else
 #endif
-  if (PyLong_Check (rval)) {
+    if (PyLong_Check (rval)) {
     return char (PyLong_AsLong (rval));
   } else if (PyFloat_Check (rval)) {
     return char (PyFloat_AsDouble (rval));
@@ -87,7 +87,7 @@ unsigned long python2c_func<unsigned long>::operator() (PyObject *rval)
     return PyInt_AsUnsignedLongMask (rval);
   } else
 #endif
-  if (PyLong_Check (rval)) {
+    if (PyLong_Check (rval)) {
     return PyLong_AsUnsignedLongMask (rval);
   } else if (PyFloat_Check (rval)) {
     return (unsigned long) (PyFloat_AsDouble (rval));
@@ -104,7 +104,7 @@ long long python2c_func<long long>::operator() (PyObject *rval)
     return PyInt_AsLong (rval);
   } else
 #endif
-  if (PyLong_Check (rval)) {
+    if (PyLong_Check (rval)) {
     return PyLong_AsLongLong (rval);
   } else if (PyFloat_Check (rval)) {
     return (long long) (PyFloat_AsDouble (rval));
@@ -121,7 +121,7 @@ unsigned long long python2c_func<unsigned long long>::operator() (PyObject *rval
     return PyInt_AsUnsignedLongMask (rval);
   } else
 #endif
-  if (PyLong_Check (rval)) {
+    if (PyLong_Check (rval)) {
     return PyLong_AsUnsignedLongLongMask (rval);
   } else if (PyFloat_Check (rval)) {
     return (unsigned long long) (PyFloat_AsDouble (rval));
@@ -140,7 +140,7 @@ __int128 python2c_func<__int128>::operator() (PyObject *rval)
     return PyInt_AsLong (rval);
   } else
 #endif
-  if (PyLong_Check (rval)) {
+    if (PyLong_Check (rval)) {
     return PyLong_AsLongLong (rval);
   } else if (PyFloat_Check (rval)) {
     return PyFloat_AsDouble (rval);
@@ -158,7 +158,7 @@ double python2c_func<double>::operator() (PyObject *rval)
     return PyInt_AsLong (rval);
   } else
 #endif
-  if (PyLong_Check (rval)) {
+    if (PyLong_Check (rval)) {
     return PyLong_AsLongLong (rval);
   } else if (PyFloat_Check (rval)) {
     return PyFloat_AsDouble (rval);
@@ -179,7 +179,7 @@ std::string python2c_func<std::string>::operator() (PyObject *rval)
     return std::string (PyBytes_AsString (rval), PyBytes_Size (rval));
   } else
 #endif
-  if (PyUnicode_Check (rval)) {
+    if (PyUnicode_Check (rval)) {
     PythonRef ba (PyUnicode_AsUTF8String (rval));
     if (! ba) {
       check_error ();
@@ -193,7 +193,7 @@ std::string python2c_func<std::string>::operator() (PyObject *rval)
 }
 
 template <>
-std::vector<char> python2c_func<std::vector<char> >::operator() (PyObject *rval)
+std::vector<char> python2c_func<std::vector<char>>::operator() (PyObject *rval)
 {
 #if PY_MAJOR_VERSION < 3
   if (PyString_Check (rval)) {
@@ -209,7 +209,7 @@ std::vector<char> python2c_func<std::vector<char> >::operator() (PyObject *rval)
     return std::vector<char> (cp, cp + sz);
   } else
 #endif
-  if (PyUnicode_Check (rval)) {
+    if (PyUnicode_Check (rval)) {
     PythonRef ba (PyUnicode_AsUTF8String (rval));
     if (! ba) {
       check_error ();
@@ -241,7 +241,7 @@ QByteArray python2c_func<QByteArray>::operator() (PyObject *rval)
     return QByteArray (PyBytes_AsString (rval), PyBytes_Size (rval));
   } else
 #endif
-  if (PyUnicode_Check (rval)) {
+    if (PyUnicode_Check (rval)) {
     PythonRef ba (PyUnicode_AsUTF8String (rval));
     if (! ba) {
       check_error ();
@@ -282,12 +282,12 @@ tl::Variant python2c_func<tl::Variant>::operator() (PyObject *rval)
     return tl::Variant (python2c<std::string> (rval));
 #else
   } else if (PyBytes_Check (rval)) {
-    return tl::Variant (python2c<std::vector<char> > (rval));
+    return tl::Variant (python2c<std::vector<char>> (rval));
 #endif
   } else if (PyUnicode_Check (rval)) {
     return tl::Variant (python2c<std::string> (rval));
   } else if (PyByteArray_Check (rval)) {
-    return tl::Variant (python2c<std::vector<char> > (rval));
+    return tl::Variant (python2c<std::vector<char>> (rval));
   } else if (PyList_Check (rval)) {
 
     size_t len = PyList_Size (rval);
@@ -345,7 +345,7 @@ tl::Variant python2c_func<tl::Variant>::operator() (PyObject *rval)
         tl_assert (var_cls != 0);
 
         gsi::Proxy *gsi_proxy = cls->gsi_object (obj)->find_client<gsi::Proxy> ();
-        if (!gsi_proxy) {
+        if (! gsi_proxy) {
           //  establish a new proxy
           gsi_proxy = new gsi::Proxy (cls);
           gsi_proxy->set (obj, false, p->const_ref (), false);
@@ -369,20 +369,18 @@ tl::Variant python2c_func<tl::Variant>::operator() (PyObject *rval)
         m = python2c<std::string> (msg_str.get ());
       }
       return tl::Variant (m);
-
     }
-
   }
 }
 
 PyObject *
 object_to_python (void *obj, PYAObjectBase *self, const gsi::ArgType &atype)
 {
-  const gsi::ClassBase *cls = atype.cls()->subclass_decl (obj);
+  const gsi::ClassBase *cls = atype.cls ()->subclass_decl (obj);
 
-  bool is_direct   = !(atype.is_ptr () || atype.is_ref () || atype.is_cptr () || atype.is_cref ());
-  bool pass_obj    = atype.pass_obj () || is_direct;
-  bool is_const    = atype.is_cptr () || atype.is_cref ();
+  bool is_direct = ! (atype.is_ptr () || atype.is_ref () || atype.is_cptr () || atype.is_cref ());
+  bool pass_obj = atype.pass_obj () || is_direct;
+  bool is_const = atype.is_cptr () || atype.is_cref ();
   bool prefer_copy = atype.prefer_copy ();
   bool can_destroy = prefer_copy || atype.is_ptr ();
 
@@ -428,7 +426,7 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
 
     StatusChangedListener *client = clsact->gsi_object (obj)->find_client<StatusChangedListener> ();
     if (client) {
-      pya_object = client->pya_object();
+      pya_object = client->pya_object ();
     }
 
   } else if (clsact->adapted_type_info ()) {
@@ -442,7 +440,6 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
 
     //  we will own the new object
     pass_obj = true;
-
   }
 
   if (! pass_obj && prefer_copy && ! clsact->adapted_type_info () && ! clsact->is_managed () && clsact->can_copy () && clsact->can_default_create ()) {
@@ -455,7 +452,7 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
     //  of the exposed property. Hence copying is safer.
 
     PyTypeObject *type = PythonModule::type_for_cls (clsact);
-    if (!type) {
+    if (! type) {
       throw tl::Exception (tl::sprintf (tl::to_string (tr ("Requested type %s.%s is not bound to a Python class (did you load the '%s' module?)")), clsact->module (), clsact->name (), clsact->module ()));
     }
 
@@ -479,7 +476,7 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
   } else {
 
     PyTypeObject *type = PythonModule::type_for_cls (clsact);
-    if (!type) {
+    if (! type) {
       throw tl::Exception (tl::sprintf (tl::to_string (tr ("Requested type %s.%s is not bound to a Python class (did you load the '%s' module?)")), clsact->module (), clsact->name (), clsact->module ()));
     }
 
@@ -490,7 +487,6 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
     new_object->set (obj, pass_obj, is_const, can_destroy);
 
     return new_pyobject;
-
   }
 }
 

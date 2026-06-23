@@ -27,7 +27,7 @@
 namespace db
 {
 
-CellInst::box_type 
+CellInst::box_type
 CellInst::bbox (const db::Layout &g) const
 {
   return g.cell (m_cell_index).bbox ();
@@ -45,11 +45,10 @@ CellInst::bbox (const db::Layout &g, unsigned int l) const
   return g.cell (m_cell_index).bbox (l);
 }
 
-std::string 
+std::string
 CellInst::to_string () const
 {
   return "[" + tl::to_string (m_cell_index) + "]";
 }
 
 }
-

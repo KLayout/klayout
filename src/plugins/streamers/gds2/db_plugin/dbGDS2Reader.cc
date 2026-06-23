@@ -37,7 +37,7 @@ namespace db
 //  GDS2Reader
 
 GDS2Reader::GDS2Reader (tl::InputStream &s)
-  : m_stream (s), 
+  : m_stream (s),
     m_recnum (0),
     m_reclen (0),
     m_recptr (0),
@@ -55,8 +55,7 @@ GDS2Reader::~GDS2Reader ()
   //  .. nothing yet ..
 }
 
-void
-GDS2Reader::init (const db::LoadLayoutOptions &options)
+void GDS2Reader::init (const db::LoadLayoutOptions &options)
 {
   GDS2ReaderBase::init (options);
 
@@ -67,16 +66,14 @@ GDS2Reader::init (const db::LoadLayoutOptions &options)
   m_reclen = 0;
 }
 
-void 
-GDS2Reader::unget_record (short rec_id)
-{  
+void GDS2Reader::unget_record (short rec_id)
+{
   m_stored_rec = rec_id;
-  m_recptr = 0; 
+  m_recptr = 0;
 }
 
-short 
-GDS2Reader::get_record ()
-{  
+short GDS2Reader::get_record ()
+{
   if (m_stored_rec) {
     short ret = m_stored_rec;
     m_stored_rec = 0;
@@ -91,11 +88,11 @@ GDS2Reader::get_record ()
 
   m_recnum++;
 
-  uint16_t l = *((uint16_t *)b);
+  uint16_t l = *((uint16_t *) b);
   gds2h ((int16_t &) l);
   m_reclen = size_t (l);
 
-  uint16_t rec_id = ((uint16_t *)b) [1];
+  uint16_t rec_id = ((uint16_t *) b) [1];
   gds2h ((int16_t &) rec_id);
 
   if (m_reclen < 4) {
@@ -122,18 +119,17 @@ GDS2Reader::get_record ()
   } else {
     mp_rec_buf = 0;
   }
-   
-  m_recptr = 0; 
+
+  m_recptr = 0;
   return rec_id;
 }
 
-void
-GDS2Reader::record_underflow_error ()
+void GDS2Reader::record_underflow_error ()
 {
   error (tl::to_string (tr ("Record too short")));
 }
 
-inline int 
+inline int
 GDS2Reader::get_int ()
 {
   unsigned char *b = mp_rec_buf + m_recptr;
@@ -141,12 +137,12 @@ GDS2Reader::get_int ()
     record_underflow_error ();
   }
 
-  int32_t l = *((int32_t *)b);
+  int32_t l = *((int32_t *) b);
   gds2h (l);
   return l;
 }
 
-inline short 
+inline short
 GDS2Reader::get_short ()
 {
   unsigned char *b = mp_rec_buf + m_recptr;
@@ -154,12 +150,12 @@ GDS2Reader::get_short ()
     record_underflow_error ();
   }
 
-  int16_t s = *((int16_t *)b);
+  int16_t s = *((int16_t *) b);
   gds2h (s);
   return s;
 }
 
-inline unsigned short 
+inline unsigned short
 GDS2Reader::get_ushort ()
 {
   unsigned char *b = mp_rec_buf + m_recptr;
@@ -167,12 +163,12 @@ GDS2Reader::get_ushort ()
     record_underflow_error ();
   }
 
-  uint16_t s = *((uint16_t *)b);
+  uint16_t s = *((uint16_t *) b);
   gds2h ((int16_t &) s);
   return s;
 }
 
-inline double 
+inline double
 GDS2Reader::get_double ()
 {
   unsigned char *b = mp_rec_buf + m_recptr;
@@ -180,19 +176,19 @@ GDS2Reader::get_double ()
     record_underflow_error ();
   }
 
-  uint32_t l0 = ((uint32_t *)b) [0];
+  uint32_t l0 = ((uint32_t *) b) [0];
   gds2h ((int32_t &) l0);
   l0 &= 0xffffff;
-  uint32_t l1 = ((uint32_t *)b) [1];
+  uint32_t l1 = ((uint32_t *) b) [1];
   gds2h ((int32_t &) l1);
 
   double x = 4294967296.0 * double (l0) + double (l1);
 
-  if (b[0] & 0x80) {
+  if (b [0] & 0x80) {
     x = -x;
   }
-  
-  int e = int (b[0] & 0x7f) - (64 + 14);
+
+  int e = int (b [0] & 0x7f) - (64 + 14);
   if (e != 0) {
     x *= pow (16.0, double (e));
   }
@@ -217,8 +213,7 @@ GDS2Reader::get_string ()
   }
 }
 
-void
-GDS2Reader::get_string (std::string &s) const
+void GDS2Reader::get_string (std::string &s) const
 {
   if (m_reclen == 0) {
     s.clear ();
@@ -232,8 +227,7 @@ GDS2Reader::get_string (std::string &s) const
   }
 }
 
-void
-GDS2Reader::get_time (unsigned int *mod_time, unsigned int *access_time)
+void GDS2Reader::get_time (unsigned int *mod_time, unsigned int *access_time)
 {
   unsigned int length = (unsigned int) (m_reclen / sizeof (uint16_t));
   for (unsigned int l = 0; l < length && l < 6; ++l) {
@@ -267,8 +261,7 @@ GDS2Reader::get_xy_data (unsigned int &length)
   return (GDS2XY *) mp_rec_buf;
 }
 
-void  
-GDS2Reader::progress_checkpoint () 
+void GDS2Reader::progress_checkpoint ()
 {
   m_progress.set (m_stream.pos ());
 }
@@ -279,14 +272,12 @@ GDS2Reader::path () const
   return m_stream.source ();
 }
 
-void 
-GDS2Reader::error (const std::string &msg)
+void GDS2Reader::error (const std::string &msg)
 {
   throw GDS2ReaderException (msg, m_stream.pos (), m_recnum, cellname ().c_str (), m_stream.source ());
 }
 
-void 
-GDS2Reader::warn (const std::string &msg, int wl)
+void GDS2Reader::warn (const std::string &msg, int wl)
 {
   if (warn_level () < wl) {
     return;
@@ -309,4 +300,3 @@ GDS2Reader::warn (const std::string &msg, int wl)
 }
 
 }
-

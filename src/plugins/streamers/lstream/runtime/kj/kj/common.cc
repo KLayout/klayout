@@ -23,27 +23,31 @@
 #include "debug.h"
 #include <stdlib.h>
 
-namespace kj {
-namespace _ {  // private
+namespace kj
+{
+namespace _
+{ // private
 
-void inlineRequireFailure(const char* file, int line, const char* expectation,
-                          const char* macroArgs, const char* message) {
+void inlineRequireFailure (const char *file, int line, const char *expectation,
+                           const char *macroArgs, const char *message)
+{
   if (message == nullptr) {
-    Debug::Fault f(file, line, kj::Exception::Type::FAILED, expectation, macroArgs);
-    f.fatal();
+    Debug::Fault f (file, line, kj::Exception::Type::FAILED, expectation, macroArgs);
+    f.fatal ();
   } else {
-    Debug::Fault f(file, line, kj::Exception::Type::FAILED, expectation, macroArgs, message);
-    f.fatal();
+    Debug::Fault f (file, line, kj::Exception::Type::FAILED, expectation, macroArgs, message);
+    f.fatal ();
   }
 }
 
-void unreachable() {
-  KJ_FAIL_ASSERT("Supposedly-unreachable branch executed.");
+void unreachable ()
+{
+  KJ_FAIL_ASSERT ("Supposedly-unreachable branch executed.");
 
   // Really make sure we abort.
-  KJ_KNOWN_UNREACHABLE(abort());
+  KJ_KNOWN_UNREACHABLE (abort ());
 }
 
-}  // namespace _ (private)
+} // namespace _ (private)
 
-}  // namespace kj
+} // namespace kj

@@ -60,8 +60,7 @@ static inline const db::PolygonRefWithProperties *push_polygon_to_heap (db::Layo
 }
 
 template <class TR>
-struct result_counting_inserter
-{
+struct result_counting_inserter {
   typedef TR value_type;
 
   result_counting_inserter (std::unordered_map<TR, size_t> &result)
@@ -72,12 +71,12 @@ struct result_counting_inserter
 
   void insert (const TR &p)
   {
-    (*mp_result)[p] += 1;
+    (*mp_result) [p] += 1;
   }
 
   void init (const TR &p)
   {
-    (*mp_result)[p] = 0;
+    (*mp_result) [p] = 0;
   }
 
 private:
@@ -85,8 +84,7 @@ private:
 };
 
 template <class TR>
-struct simple_result_inserter
-{
+struct simple_result_inserter {
   typedef TR value_type;
 
   simple_result_inserter (std::unordered_set<TR> &result)
@@ -150,8 +148,7 @@ void insert_into_hash (std::unordered_set<T> &hash, const T &shape)
 }
 
 template <class TS>
-static
-uint32_t compute_error_pattern (const TS &subject, std::unordered_set<db::EdgePair> &result, std::map<db::Edge, uint32_t> &edges_with_errors)
+static uint32_t compute_error_pattern (const TS &subject, std::unordered_set<db::EdgePair> &result, std::map<db::Edge, uint32_t> &edges_with_errors)
 {
   uint32_t p = 1;
   for (typename TS::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end (); ++e) {
@@ -193,7 +190,6 @@ static bool rect_filter_can_be_waived (uint32_t error_pattern, uint32_t rect_fil
         p4 = ((p4 << 1) & 0xf) | ((p4 & 0x8) >> 3);
       }
     }
-
   }
 
   return can_be_waived;
@@ -210,8 +206,7 @@ check_local_operation_base<TS, TI>::check_local_operation_base (const EdgeRelati
 }
 
 template <class TS, class TI>
-void
-check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cell *subject_cell, const std::vector<const TS *> &subjects, const std::set<const TI *> &intruders, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result, const db::LocalProcessorBase *proc) const
+void check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cell *subject_cell, const std::vector<const TS *> &subjects, const std::set<const TI *> &intruders, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result, const db::LocalProcessorBase *proc) const
 {
   //  NOTE: the rectangle and opposite filters are unsymmetric
   bool symmetric_edge_pairs = ! m_has_other && m_options.opposite_filter == db::NoOppositeFilter && m_options.rect_filter == RectFilter::NoRectFilter;
@@ -220,7 +215,7 @@ check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cel
   EdgeRelationFilter check = m_check;
   check.set_distance (proc->dist_for_cell (subject_cell, check.distance ()));
 
-  edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (check, result, intra_polygon_result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded, symmetric_edge_pairs);
+  edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair>> edge_check (check, result, intra_polygon_result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded, symmetric_edge_pairs);
   poly2poly_check<TS> poly_check (edge_check);
 
   std::unordered_set<TI> polygons;
@@ -260,9 +255,7 @@ check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cel
       }
 
       common_box &= all_intruders_box;
-
     }
-
   }
 
   if (m_has_other) {
@@ -309,7 +302,6 @@ check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cel
         }
         n += 2;
       }
-
     }
 
     //  merge the intruders to remove inner edges
@@ -379,7 +371,6 @@ check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cel
         }
         n += 2;
       }
-
     }
 
   } else {
@@ -497,20 +488,20 @@ check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cel
 
         std::set<typename TI::edge_type> partial_edges;
 
-        EdgeBooleanClusterCollector<std::set<typename TI::edge_type> > cluster_collector (&partial_edges, n == 0 ? db::EdgeAnd : db::EdgeNot);
+        EdgeBooleanClusterCollector<std::set<typename TI::edge_type>> cluster_collector (&partial_edges, n == 0 ? db::EdgeAnd : db::EdgeNot);
 
         db::box_scanner<typename TI::edge_type, size_t> scanner;
         scanner.reserve (edges.size () + subject_edges.size ());
 
         for (auto i = edges.begin (); i != edges.end (); ++i) {
           if (! i->is_degenerate ()) {
-            scanner.insert (i.operator-> (), 0);
+            scanner.insert (i.operator->(), 0);
           }
         }
 
         for (auto i = subject_edges.begin (); i != subject_edges.end (); ++i) {
           if (! i->is_degenerate ()) {
-            scanner.insert (i.operator-> (), 1);
+            scanner.insert (i.operator->(), 1);
           }
         }
 
@@ -523,11 +514,8 @@ check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cel
             poly_check.enter (*e, n);
           }
         }
-
       }
-
     }
-
   }
 
   do {
@@ -536,8 +524,7 @@ check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cel
 }
 
 template <class TS, class TI>
-void
-check_local_operation_base<TS, TI>::apply_opposite_filter (const std::vector<const TS *> &subjects, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result) const
+void check_local_operation_base<TS, TI>::apply_opposite_filter (const std::vector<const TS *> &subjects, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result) const
 {
   db::EdgeRelationFilter opp (db::WidthRelation, std::numeric_limits<db::EdgeRelationFilter::distance_type>::max (), db::Projection);
 
@@ -572,9 +559,7 @@ check_local_operation_base<TS, TI>::apply_opposite_filter (const std::vector<con
           if (! shielded) {
             projections.push_back (ep_opp.first ());
           }
-
         }
-
       }
 
       if (! projections.empty ()) {
@@ -590,7 +575,6 @@ check_local_operation_base<TS, TI>::apply_opposite_filter (const std::vector<con
       } else if (m_options.opposite_filter == db::NotOpposite) {
         cleaned_result.insert (*ep1);
       }
-
     }
 
   } else {
@@ -633,9 +617,7 @@ check_local_operation_base<TS, TI>::apply_opposite_filter (const std::vector<con
           if (! shielded) {
             projections.push_back (ep_opp.first ());
           }
-
         }
-
       }
 
       if (! projections.empty ()) {
@@ -651,17 +633,14 @@ check_local_operation_base<TS, TI>::apply_opposite_filter (const std::vector<con
       } else if (m_options.opposite_filter == db::NotOpposite) {
         cleaned_result.insert (db::EdgePair (*e1, e1->swapped_points ()));
       }
-
     }
-
   }
 
   result.swap (cleaned_result);
 }
 
 template <class TS, class TI>
-void
-check_local_operation_base<TS, TI>::apply_rectangle_filter (const std::vector<const TS *> &subjects, std::unordered_set<db::EdgePair> &result) const
+void check_local_operation_base<TS, TI>::apply_rectangle_filter (const std::vector<const TS *> &subjects, std::unordered_set<db::EdgePair> &result) const
 {
   std::unordered_set<db::EdgePair> waived;
 
@@ -682,9 +661,7 @@ check_local_operation_base<TS, TI>::apply_rectangle_filter (const std::vector<co
           waived.insert (*ep);
         }
       }
-
     }
-
   }
 
   if (! waived.empty ()) {
@@ -706,7 +683,6 @@ check_local_operation_base<TS, TI>::apply_rectangle_filter (const std::vector<co
     }
 
     result.swap (filtered);
-
   }
 }
 
@@ -720,8 +696,7 @@ check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &
 }
 
 template <class TS, class TI>
-void
-check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase *proc) const
+void check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair>> &results, const db::LocalProcessorBase *proc) const
 {
   std::vector<const TS *> subjects;
   subjects.reserve (interactions.size ());
@@ -759,10 +734,9 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *s
 }
 
 template <class TS, class TI>
-void
-check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, const db::LocalProcessorBase *proc) const
+void check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties>> &results, const db::LocalProcessorBase *proc) const
 {
-  std::vector<std::unordered_set<db::EdgePair> > tmp_results;
+  std::vector<std::unordered_set<db::EdgePair>> tmp_results;
   tmp_results.push_back (std::unordered_set<db::EdgePair> ());
 
   do_compute_local (layout, subject_cell, interactions, tmp_results, proc);
@@ -811,8 +785,7 @@ check_local_operation_with_properties<TS, TI>::check_local_operation_with_proper
 }
 
 template <class TS, class TI>
-void
-check_local_operation_with_properties<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, const db::LocalProcessorBase *proc) const
+void check_local_operation_with_properties<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI>> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties>> &results, const db::LocalProcessorBase *proc) const
 {
   tl_assert (results.size () == 1);
 
@@ -844,7 +817,6 @@ check_local_operation_with_properties<TS, TI>::do_compute_local (db::Layout *lay
     for (auto r = result.begin (); r != result.end (); ++r) {
       results.front ().insert (db::EdgePairWithProperties (*r, pc_norm (check_local_operation_base<TS, TI>::m_options.prop_constraint, s2p->first)));
     }
-
   }
 }
 
@@ -876,7 +848,8 @@ template class DB_PUBLIC check_local_operation_with_properties<db::Polygon, db::
 
 // ---------------------------------------------------------------------------------------------------------------
 
-namespace {
+namespace
+{
 
 class PolygonToEdgeProcessor
   : public db::PolygonSink
@@ -884,7 +857,8 @@ class PolygonToEdgeProcessor
 public:
   PolygonToEdgeProcessor (db::EdgeProcessor *target, size_t *id)
     : mp_target (target), mp_id (id)
-  { }
+  {
+  }
 
   virtual void put (const db::Polygon &poly)
   {
@@ -912,7 +886,7 @@ db::Coord interacting_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
+void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const
 {
   if (m_output_mode == None) {
     return;
@@ -945,7 +919,6 @@ void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*l
     }
 
     nstart = n;
-
   }
 
   if (m_mode != -2 && m_min_count == size_t (1) && m_max_count == std::numeric_limits<size_t>::max ()) {
@@ -981,7 +954,6 @@ void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*l
       ep.insert (*o, n);
       n++;
     }
-
   }
 
   if (m_mode >= -1) {
@@ -992,7 +964,6 @@ void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*l
       const TS &subject = interactions.subject_shape (i->first);
       ep.insert (subject, n);
     }
-
   }
 
   if (nstart == 0) {
@@ -1006,13 +977,13 @@ void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*l
   ep.process (es, id);
   id.finish ();
 
-  std::map <size_t, size_t> interaction_counts;
+  std::map<size_t, size_t> interaction_counts;
   for (db::InteractionDetector::iterator i = id.begin (); i != id.end (); ++i) {
     if (i->first < nstart && i->second >= nstart) {
       if (m_mode < -1) {
-        interaction_counts[i->first] += 1;
+        interaction_counts [i->first] += 1;
       } else {
-        interaction_counts[i->second] += 1;
+        interaction_counts [i->second] += 1;
       }
     }
   }
@@ -1020,7 +991,7 @@ void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*l
   n = (m_mode < -1 ? 0 : nstart);
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
     size_t count = 0;
-    std::map <size_t, size_t>::const_iterator c = interaction_counts.find (n);
+    std::map<size_t, size_t>::const_iterator c = interaction_counts.find (n);
     if (c != interaction_counts.end ()) {
       count = c->second;
     }
@@ -1089,11 +1060,11 @@ contained_local_operation<TS, TI, TR>::contained_local_operation (InteractingOut
 template <class TS, class TI, class TR>
 db::Coord contained_local_operation<TS, TI, TR>::dist () const
 {
-  return 1;   // touching included for degenerated polygons and edges
+  return 1; // touching included for degenerated polygons and edges
 }
 
 template <class TS, class TI, class TR>
-void contained_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
+void contained_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const
 {
   if (m_output_mode == None) {
     return;
@@ -1171,7 +1142,7 @@ db::Coord pull_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void pull_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
+void pull_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -1188,14 +1159,14 @@ void pull_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/
 
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     const TS &subject = interactions.subject_shape (i->first);
-    for (typename TS::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+    for (typename TS::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end (); ++e) {
       ep.insert (*e, 0);
     }
   }
 
   size_t n = 1;
   for (typename std::set<TI>::const_iterator o = others.begin (); o != others.end (); ++o, ++n) {
-    for (typename TI::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+    for (typename TI::polygon_edge_iterator e = o->begin_edge (); ! e.at_end (); ++e) {
       ep.insert (*e, n);
     }
   }
@@ -1206,7 +1177,7 @@ void pull_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/
   ep.process (es, id);
   id.finish ();
 
-  std::set <size_t> selected;
+  std::set<size_t> selected;
   for (db::InteractionDetector::iterator i = id.begin (); i != id.end () && i->first == 0; ++i) {
     selected.insert (i->second);
   }
@@ -1253,7 +1224,7 @@ db::Coord interacting_with_edge_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
+void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const
 {
   if (m_output_mode == None) {
     return;
@@ -1264,12 +1235,12 @@ void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::La
   }
 
   std::unordered_map<TR, size_t> counted_results;
-  bool counting = !(m_min_count == 1 && m_max_count == std::numeric_limits<size_t>::max ());
+  bool counting = ! (m_min_count == 1 && m_max_count == std::numeric_limits<size_t>::max ());
 
   db::box_scanner2<TS, size_t, TI, size_t> scanner;
 
   result_counting_inserter<TR> inserter (counted_results);
-  region_to_edge_interaction_filter<TS, TI, result_counting_inserter<TR> > filter (inserter, false, counting /*get all in counting mode*/);
+  region_to_edge_interaction_filter<TS, TI, result_counting_inserter<TR>> filter (inserter, false, counting /*get all in counting mode*/);
 
   std::set<unsigned int> intruder_ids;
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -1282,7 +1253,7 @@ void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::La
   std::unordered_set<TI> merged_heap;
   if (! m_other_is_merged && counting) {
 
-    EdgeBooleanClusterCollector<std::unordered_set<TI> > cluster_collector (&merged_heap, EdgeOr);
+    EdgeBooleanClusterCollector<std::unordered_set<TI>> cluster_collector (&merged_heap, EdgeOr);
 
     db::box_scanner<TI, size_t> merge_scanner;
 
@@ -1296,15 +1267,14 @@ void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::La
     merge_scanner.process (cluster_collector, 1, db::box_convert<TI> ());
 
     for (typename std::unordered_set<TI>::const_iterator e = merged_heap.begin (); e != merged_heap.end (); ++e) {
-      scanner.insert2 (e.operator-> (), 0);
+      scanner.insert2 (e.operator->(), 0);
     }
 
   } else {
 
     for (std::set<unsigned int>::const_iterator j = intruder_ids.begin (); j != intruder_ids.end (); ++j) {
-      scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
+      scanner.insert2 (&interactions.intruder_shape (*j).second, 0);
     }
-
   }
 
   std::list<TR> heap;
@@ -1318,7 +1288,6 @@ void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::La
     if (m_output_mode == Negative || m_output_mode == PositiveAndNegative) {
       inserter.init (*addressable);
     }
-
   }
 
   scanner.process (filter, 1, db::box_convert<TS> (), db::box_convert<TI> ());
@@ -1382,7 +1351,7 @@ db::Coord pull_with_edge_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void pull_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
+void pull_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -1390,7 +1359,7 @@ void pull_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *l
   db::box_scanner2<TS, size_t, TI, size_t> scanner;
 
   simple_result_inserter<TR> inserter (result);
-  region_to_edge_interaction_filter<TS, TI, simple_result_inserter<TR> > filter (inserter, false);
+  region_to_edge_interaction_filter<TS, TI, simple_result_inserter<TR>> filter (inserter, false);
 
   std::list<TS> heap;
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -1406,7 +1375,7 @@ void pull_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *l
   }
 
   for (std::set<unsigned int>::const_iterator j = intruder_ids.begin (); j != intruder_ids.end (); ++j) {
-    scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
+    scanner.insert2 (&interactions.intruder_shape (*j).second, 0);
   }
 
   scanner.process (filter, 1, db::box_convert<TS> (), db::box_convert<TI> ());
@@ -1445,7 +1414,7 @@ db::Coord pull_with_text_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void pull_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
+void pull_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -1453,11 +1422,11 @@ void pull_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *l
   db::box_scanner2<TS, size_t, TI, size_t> scanner;
 
   simple_result_inserter<TR> inserter (result);
-  region_to_text_interaction_filter<TS, TI, simple_result_inserter<TR> > filter (inserter, false);
+  region_to_text_interaction_filter<TS, TI, simple_result_inserter<TR>> filter (inserter, false);
 
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
+      scanner.insert2 (&interactions.intruder_shape (*j).second, 0);
     }
   }
 
@@ -1469,7 +1438,7 @@ void pull_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *l
   }
 
   for (std::set<unsigned int>::const_iterator j = intruder_ids.begin (); j != intruder_ids.end (); ++j) {
-    scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
+    scanner.insert2 (&interactions.intruder_shape (*j).second, 0);
   }
 
   std::list<TS> heap;
@@ -1516,7 +1485,7 @@ db::Coord interacting_with_text_local_operation<TS, TI, TR>::dist () const
 
 
 template <class TS, class TI, class TR>
-void interacting_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
+void interacting_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const
 {
   if (m_output_mode == None) {
     return;
@@ -1527,12 +1496,12 @@ void interacting_with_text_local_operation<TS, TI, TR>::do_compute_local (db::La
   }
 
   std::unordered_map<TR, size_t> counted_results;
-  bool counting = !(m_min_count == 1 && m_max_count == std::numeric_limits<size_t>::max ());
+  bool counting = ! (m_min_count == 1 && m_max_count == std::numeric_limits<size_t>::max ());
 
   db::box_scanner2<TR, size_t, TI, size_t> scanner;
 
   result_counting_inserter<TR> inserter (counted_results);
-  region_to_text_interaction_filter<TS, TI, result_counting_inserter<TR> > filter (inserter, false, counting /*get all in counting mode*/);
+  region_to_text_interaction_filter<TS, TI, result_counting_inserter<TR>> filter (inserter, false, counting /*get all in counting mode*/);
 
   std::set<unsigned int> intruder_ids;
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -1542,7 +1511,7 @@ void interacting_with_text_local_operation<TS, TI, TR>::do_compute_local (db::La
   }
 
   for (std::set<unsigned int>::const_iterator j = intruder_ids.begin (); j != intruder_ids.end (); ++j) {
-    scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
+    scanner.insert2 (&interactions.intruder_shape (*j).second, 0);
   }
 
   std::list<TR> heap;
@@ -1554,7 +1523,6 @@ void interacting_with_text_local_operation<TS, TI, TR>::do_compute_local (db::La
     if (m_output_mode == Negative || m_output_mode == PositiveAndNegative) {
       inserter.init (*addressable);
     }
-
   }
 
   scanner.process (filter, 1, db::box_convert<TR> (), db::box_convert<TI> ());
@@ -1629,8 +1597,7 @@ bool_and_or_not_local_operation<TS, TI, TR>::description () const
 }
 
 template <class TS, class TI, class TR>
-void
-bool_and_or_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const
+void bool_and_or_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase *proc) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -1675,18 +1642,17 @@ bool_and_or_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layou
       }
 
     } else {
-      for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
+      for (auto e = subject.begin_edge (); ! e.at_end (); ++e) {
         ep.insert (*e, p1);
       }
       p1 += 2;
     }
-
   }
 
   if (! others.empty () && p1 > 0) {
 
     for (auto o = others.begin (); o != others.end (); ++o) {
-      for (auto e = o->begin_edge (); ! e.at_end(); ++e) {
+      for (auto e = o->begin_edge (); ! e.at_end (); ++e) {
         ep.insert (*e, p2);
       }
       p2 += 2;
@@ -1696,7 +1662,6 @@ bool_and_or_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layou
     db::PolygonGenerator pg (splitter, true, true);
     ep.set_base_verbosity (50);
     ep.process (pg, op);
-
   }
 }
 
@@ -1730,15 +1695,14 @@ bool_and_or_not_local_operation_with_properties<TS, TI, TR>::description () cons
 }
 
 template <class TS, class TI, class TR>
-void
-bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, const db::LocalProcessorBase *proc) const
+void bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI>> &interactions, std::vector<std::unordered_set<db::object_with_properties<TR>>> &results, const db::LocalProcessorBase *proc) const
 {
   tl_assert (results.size () == 1);
-  std::unordered_set<db::object_with_properties<TR> > &result = results.front ();
+  std::unordered_set<db::object_with_properties<TR>> &result = results.front ();
 
   db::EdgeProcessor ep;
 
-  std::map<db::properties_id_type, std::pair<tl::slist<TS>, std::set<TI> >, ComparePropertiesIds> by_prop_id;
+  std::map<db::properties_id_type, std::pair<tl::slist<TS>, std::set<TI>>, ComparePropertiesIds> by_prop_id;
 
   for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 
@@ -1763,9 +1727,7 @@ bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (d
           shapes_by_prop.second.insert (intruder);
         }
       }
-
     }
-
   }
 
   for (auto p2s = by_prop_id.begin (); p2s != by_prop_id.end (); ++p2s) {
@@ -1789,32 +1751,29 @@ bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (d
           result.insert (db::object_with_properties<TR> (subject, prop_id));
         }
       } else {
-        for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
+        for (auto e = subject.begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, p1);
         }
         p1 += 2;
       }
-
     }
 
     if (! others.empty () && p1 > 0) {
 
       for (auto o = others.begin (); o != others.end (); ++o) {
-        for (auto e = o->begin_edge (); ! e.at_end(); ++e) {
+        for (auto e = o->begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, p2);
         }
         p2 += 2;
       }
 
       db::BooleanOp op (m_is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
-      db::polygon_ref_generator_with_properties<db::object_with_properties<TR> > pr (layout, result, prop_id);
+      db::polygon_ref_generator_with_properties<db::object_with_properties<TR>> pr (layout, result, prop_id);
       db::PolygonSplitter splitter (pr, proc->area_ratio (), proc->max_vertex_count ());
       db::PolygonGenerator pg (splitter, true, true);
       ep.set_base_verbosity (50);
       ep.process (pg, op);
-
     }
-
   }
 }
 
@@ -1832,8 +1791,7 @@ two_bool_and_not_local_operation<TS, TI, TR>::two_bool_and_not_local_operation (
 }
 
 template <class TS, class TI, class TR>
-void
-two_bool_and_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const
+void two_bool_and_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase *proc) const
 {
   tl_assert (results.size () == 2);
 
@@ -1860,18 +1818,17 @@ two_bool_and_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layo
       //  shortcut (not: keep, and: drop)
       result1.insert (subject);
     } else {
-      for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
+      for (auto e = subject.begin_edge (); ! e.at_end (); ++e) {
         ep.insert (*e, p1);
       }
       p1 += 2;
     }
-
   }
 
   if (! others.empty () && p1 > 0) {
 
     for (auto o = others.begin (); o != others.end (); ++o) {
-      for (auto e = o->begin_edge (); ! e.at_end(); ++e) {
+      for (auto e = o->begin_edge (); ! e.at_end (); ++e) {
         ep.insert (*e, p2);
       }
       p2 += 2;
@@ -1889,13 +1846,11 @@ two_bool_and_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layo
 
     ep.set_base_verbosity (50);
 
-    std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+    std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *>> procs;
     procs.push_back (std::make_pair (&pg0, &op0));
     procs.push_back (std::make_pair (&pg1, &op1));
     ep.process (procs);
-
   }
-
 }
 
 template <class TS, class TI, class TR>
@@ -1912,23 +1867,22 @@ template class DB_PUBLIC two_bool_and_not_local_operation<db::Polygon, db::Polyg
 
 template <class TS, class TI, class TR>
 two_bool_and_not_local_operation_with_properties<TS, TI, TR>::two_bool_and_not_local_operation_with_properties (db::PropertyConstraint property_constraint)
-  : db::local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> > (),
+  : db::local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR>> (),
     m_property_constraint (property_constraint)
 {
   //  .. nothing yet ..
 }
 
 template <class TS, class TI, class TR>
-void
-two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, const db::LocalProcessorBase *proc) const
+void two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI>> &interactions, std::vector<std::unordered_set<db::object_with_properties<TR>>> &results, const db::LocalProcessorBase *proc) const
 {
   tl_assert (results.size () == 2);
-  std::unordered_set<db::object_with_properties<TR> > &result0 = results [0];
-  std::unordered_set<db::object_with_properties<TR> > &result1 = results [1];
+  std::unordered_set<db::object_with_properties<TR>> &result0 = results [0];
+  std::unordered_set<db::object_with_properties<TR>> &result1 = results [1];
 
   db::EdgeProcessor ep;
 
-  std::map<db::properties_id_type, std::pair<tl::slist<TS>, std::set<TI> >, ComparePropertiesIds> by_prop_id;
+  std::map<db::properties_id_type, std::pair<tl::slist<TS>, std::set<TI>>, ComparePropertiesIds> by_prop_id;
 
   for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 
@@ -1951,9 +1905,7 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
           shapes_by_prop.second.insert (intruder);
         }
       }
-
     }
-
   }
 
   for (auto p2s = by_prop_id.begin (); p2s != by_prop_id.end (); ++p2s) {
@@ -1973,18 +1925,17 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
         //  shortcut (not: keep, and: drop)
         result1.insert (db::object_with_properties<TR> (subject, prop_id));
       } else {
-        for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
+        for (auto e = subject.begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, p1);
         }
         p1 += 2;
       }
-
     }
 
     if (! others.empty () && p1 > 0) {
 
       for (auto o = others.begin (); o != others.end (); ++o) {
-        for (auto e = o->begin_edge (); ! e.at_end(); ++e) {
+        for (auto e = o->begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, p2);
         }
         p2 += 2;
@@ -2005,7 +1956,7 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
 
       ep.set_base_verbosity (50);
 
-      std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+      std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *>> procs;
       procs.push_back (std::make_pair (&pg0, &op0));
       procs.push_back (std::make_pair (&pg1, &op1));
       ep.process (procs);
@@ -2016,9 +1967,7 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
       for (auto r = result1_wo_props.begin (); r != result1_wo_props.end (); ++r) {
         result1.insert (db::object_with_properties<TR> (*r, prop_id));
       }
-
     }
-
   }
 }
 
@@ -2063,8 +2012,7 @@ sized_inside_local_operation<TS, TI, TR>::description () const
 }
 
 template <class TS, class TI, class TR>
-void
-sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const
+void sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase *proc) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -2115,7 +2063,6 @@ sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, 
     ep.process (ec, op);
 
     inside.clear ();
-
   }
 
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -2176,9 +2123,7 @@ sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, 
       }
 
       sized_subjects.swap (subjects);
-
     }
-
   }
 
   db::polygon_ref_generator<TR> gen (layout, result);
@@ -2198,8 +2143,7 @@ SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wra
   //  .. nothing yet ..
 }
 
-void
-SelfOverlapMergeLocalOperation::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, const db::LocalProcessorBase * /*proc*/) const
+void SelfOverlapMergeLocalOperation::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef>> &results, const db::LocalProcessorBase * /*proc*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<db::PolygonRef> &result = results.front ();
@@ -2218,7 +2162,7 @@ SelfOverlapMergeLocalOperation::do_compute_local (db::Layout *layout, db::Cell *
     if (seen.find (i->first) == seen.end ()) {
       seen.insert (i->first);
       const db::PolygonRef &subject = interactions.subject_shape (i->first);
-      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end (); ++e) {
         ep.insert (*e, p1);
       }
       p1 += 2;
@@ -2230,13 +2174,12 @@ SelfOverlapMergeLocalOperation::do_compute_local (db::Layout *layout, db::Cell *
       if (seen.find (*o) == seen.end ()) {
         seen.insert (*o);
         const db::PolygonRef &intruder = interactions.intruder_shape (*o).second;
-        for (db::PolygonRef::polygon_edge_iterator e = intruder.begin_edge (); ! e.at_end(); ++e) {
+        for (db::PolygonRef::polygon_edge_iterator e = intruder.begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, p2);
         }
         p2 += 2;
       }
     }
-
   }
 
   db::MergeOp op (m_wrap_count - 1);
@@ -2270,8 +2213,7 @@ PolygonToEdgeLocalOperation::description () const
   return std::string ("polygon to edges");
 }
 
-void
-PolygonToEdgeLocalOperation::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties> > &results, const db::LocalProcessorBase * /*proc*/) const
+void PolygonToEdgeLocalOperation::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties>> &results, const db::LocalProcessorBase * /*proc*/) const
 {
   db::EdgeProcessor ep;
   ep.set_base_verbosity (50);
@@ -2285,11 +2227,11 @@ PolygonToEdgeLocalOperation::do_compute_local (db::Layout * /*layout*/, db::Cell
       ep.insert (**s);
     }
 
-    db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > results_with_properties (&results.front (), prop_id);
+    db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties>> results_with_properties (&results.front (), prop_id);
 
     if (shapes_by_prop_id->second.second.empty ()) {
 
-      db::edge_to_edge_set_generator<db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > > eg (results_with_properties, prop_id);
+      db::edge_to_edge_set_generator<db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties>>> eg (results_with_properties, prop_id);
       db::MergeOp op (0);
       ep.process (eg, op);
 
@@ -2323,19 +2265,16 @@ PolygonToEdgeLocalOperation::do_compute_local (db::Layout * /*layout*/, db::Cell
       scanner.reserve (edges1.size () + edges2.size ());
 
       for (std::vector<Edge>::const_iterator i = edges1.begin (); i != edges1.end (); ++i) {
-        scanner.insert (i.operator-> (), 0);
+        scanner.insert (i.operator->(), 0);
       }
       for (std::vector<Edge>::const_iterator i = edges2.begin (); i != edges2.end (); ++i) {
-        scanner.insert (i.operator-> (), 1);
+        scanner.insert (i.operator->(), 1);
       }
 
-      EdgeBooleanClusterCollector<db::property_injector<Edge, std::unordered_set<db::EdgeWithProperties> > > cluster_collector (&results_with_properties, EdgeAnd);
+      EdgeBooleanClusterCollector<db::property_injector<Edge, std::unordered_set<db::EdgeWithProperties>>> cluster_collector (&results_with_properties, EdgeAnd);
       scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
-
     }
-
   }
-
 }
 
 }

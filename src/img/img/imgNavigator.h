@@ -29,11 +29,11 @@
 
 namespace lay
 {
-  class Dispatcher;
-  class LayoutViewWidget;
-  class LayoutView;
-  class ZoomService;
-  class ViewService;
+class Dispatcher;
+class LayoutViewWidget;
+class LayoutView;
+class ZoomService;
+class ViewService;
 }
 
 namespace img
@@ -42,12 +42,12 @@ namespace img
 class Object;
 
 /**
- *  @brief The navigator window 
+ *  @brief The navigator window
  */
-class Navigator 
+class Navigator
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   Navigator (QWidget *parent);

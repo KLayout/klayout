@@ -48,7 +48,7 @@ LibraryManager::instance ()
   return *sp_instance;
 }
 
-bool LibraryManager::initialized () 
+bool LibraryManager::initialized ()
 {
   return sp_instance != 0;
 }
@@ -67,8 +67,7 @@ LibraryManager::~LibraryManager ()
   clear ();
 }
 
-void
-LibraryManager::rename (lib_id_type lib_id, const std::string &name)
+void LibraryManager::rename (lib_id_type lib_id, const std::string &name)
 {
   db::Library *lib = 0;
 
@@ -82,7 +81,7 @@ LibraryManager::rename (lib_id_type lib_id, const std::string &name)
 
     std::string org_name = lib->get_name ();
 
-    for (auto it = m_lib_by_name.find (org_name);it != m_lib_by_name.end () && it->first == org_name; ++it) {
+    for (auto it = m_lib_by_name.find (org_name); it != m_lib_by_name.end () && it->first == org_name; ++it) {
       if (it->second == lib_id) {
         m_lib_by_name.erase (it);
         break;
@@ -100,7 +99,7 @@ LibraryManager::rename (lib_id_type lib_id, const std::string &name)
   changed_event ();
 }
 
-std::pair<bool, lib_id_type> 
+std::pair<bool, lib_id_type>
 LibraryManager::lib_by_name (const std::string &name, const std::set<std::string> &for_technologies) const
 {
   tl::MutexLocker locker (&m_lock);
@@ -123,7 +122,6 @@ LibraryManager::lib_by_name (const std::string &name, const std::set<std::string
       }
       ++l;
     }
-
   }
 
   //  fallback: technology-unspecific libs
@@ -138,8 +136,7 @@ LibraryManager::lib_by_name (const std::string &name, const std::set<std::string
   return std::make_pair (false, lib_id_type (0));
 }
 
-void
-LibraryManager::unregister_lib (Library *library)
+void LibraryManager::unregister_lib (Library *library)
 {
   if (! library) {
     return;
@@ -165,8 +162,7 @@ LibraryManager::unregister_lib (Library *library)
   changed_event ();
 }
 
-void
-LibraryManager::delete_lib (Library *library)
+void LibraryManager::delete_lib (Library *library)
 {
   if (library) {
     unregister_lib (library);
@@ -174,7 +170,7 @@ LibraryManager::delete_lib (Library *library)
   }
 }
 
-lib_id_type 
+lib_id_type
 LibraryManager::register_lib (Library *library)
 {
   lib_id_type id = std::numeric_limits<size_t>::max ();
@@ -241,7 +237,6 @@ LibraryManager::register_lib (Library *library)
     old_lib->set_id (std::numeric_limits<lib_id_type>::max ());
     delete old_lib;
     old_lib = 0;
-
   }
 
   //  take care of cold referrers - these may not get valid
@@ -273,9 +268,7 @@ LibraryManager::register_lib (Library *library)
         any = true;
         needs_cleanup.insert (*l);
       }
-
     }
-
   }
 
   //  do the cleanup
@@ -306,13 +299,12 @@ LibraryManager::lib_internal (lib_id_type id) const
   }
 }
 
-void
-LibraryManager::refresh_all ()
+void LibraryManager::refresh_all ()
 {
   //  NOTE: libraries may get deleted during the refresh, so better use weak pointers here
   //  to track lifetime. Libraries appearing are not considered.
 
-  std::vector<tl::weak_ptr<Library> > libs;
+  std::vector<tl::weak_ptr<Library>> libs;
   libs.reserve (m_libs.size ());
   for (auto l = m_libs.begin (); l != m_libs.end (); ++l) {
     libs.push_back (tl::weak_ptr<Library> (*l));
@@ -334,8 +326,7 @@ LibraryManager::refresh_all ()
   }
 }
 
-void
-LibraryManager::clear ()
+void LibraryManager::clear ()
 {
   std::vector<Library *> libs;
 
@@ -363,4 +354,3 @@ LibraryManager::clear ()
 }
 
 }
-

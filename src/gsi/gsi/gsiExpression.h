@@ -31,7 +31,7 @@
 #include <string>
 #include <map>
 
-namespace gsi 
+namespace gsi
 {
 
 class GSI_PUBLIC ClassBase;
@@ -80,4 +80,3 @@ initialize_expressions ();
 }
 
 #endif
-

@@ -33,5 +33,3 @@ void initialize_external ()
 }
 
 }
-
-

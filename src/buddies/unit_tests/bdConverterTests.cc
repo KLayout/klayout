@@ -28,16 +28,16 @@
 #include "tlUnitTest.h"
 
 //  Testing the converter main implementation (CIF)
-TEST(1)
+TEST (1)
 {
   std::string input = tl::testdata ();
   input += "/gds/t10.gds";
 
   std::string output = this->tmp_file ();
 
-  const char *argv[] = { "x", input.c_str (), output.c_str () };
+  const char *argv [] = {"x", input.c_str (), output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::cif_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::cif_format_name), 0);
 
   db::Layout layout;
 
@@ -53,16 +53,16 @@ TEST(1)
 }
 
 //  Testing the converter main implementation (DXF)
-TEST(2)
+TEST (2)
 {
   std::string input = tl::testdata ();
   input += "/gds/t10.gds";
 
   std::string output = this->tmp_file ();
 
-  const char *argv[] = { "x", input.c_str (), output.c_str () };
+  const char *argv [] = {"x", input.c_str (), output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::dxf_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::dxf_format_name), 0);
 
   db::Layout layout;
 
@@ -84,16 +84,16 @@ TEST(2)
 }
 
 //  Testing the converter main implementation (GDS2)
-TEST(3)
+TEST (3)
 {
   std::string input = tl::testdata ();
   input += "/gds/t10.gds";
 
   std::string output = this->tmp_file ();
 
-  const char *argv[] = { "x", input.c_str (), output.c_str () };
+  const char *argv [] = {"x", input.c_str (), output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::gds2_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::gds2_format_name), 0);
 
   db::Layout layout;
 
@@ -109,16 +109,16 @@ TEST(3)
 }
 
 //  Testing the converter main implementation (GDS2Text)
-TEST(4)
+TEST (4)
 {
   std::string input = tl::testdata ();
   input += "/gds/t10.gds";
 
   std::string output = this->tmp_file ();
 
-  const char *argv[] = { "x", input.c_str (), output.c_str () };
+  const char *argv [] = {"x", input.c_str (), output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::gds2text_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::gds2text_format_name), 0);
 
   db::Layout layout;
 
@@ -134,16 +134,16 @@ TEST(4)
 }
 
 //  Testing the converter main implementation (OASIS)
-TEST(5)
+TEST (5)
 {
   std::string input = tl::testdata ();
   input += "/gds/t10.gds";
 
   std::string output = this->tmp_file ();
 
-  const char *argv[] = { "x", input.c_str (), output.c_str () };
+  const char *argv [] = {"x", input.c_str (), output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
 
   db::Layout layout;
 
@@ -159,7 +159,7 @@ TEST(5)
 }
 
 //  Testing the converter main implementation (MAG)
-TEST(6)
+TEST (6)
 {
   std::string input = tl::testdata ();
   input += "/gds/t10.gds";
@@ -169,9 +169,9 @@ TEST(6)
 
   std::string output = this->tmp_file ("RINGO.mag");
 
-  const char *argv[] = { "x", input.c_str (), output.c_str (), "--magic-lambda-out=0.005" };
+  const char *argv [] = {"x", input.c_str (), output.c_str (), "--magic-lambda-out=0.005"};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::mag_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::mag_format_name), 0);
 
   db::Layout layout;
 
@@ -188,16 +188,16 @@ TEST(6)
 }
 
 //  Testing the converter main implementation (LStream)
-TEST(7)
+TEST (7)
 {
   std::string input = tl::testdata ();
   input += "/gds/t10.gds";
 
   std::string output = this->tmp_file ();
 
-  const char *argv[] = { "x", input.c_str (), output.c_str () };
+  const char *argv [] = {"x", input.c_str (), output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::lstream_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::lstream_format_name), 0);
 
   db::Layout layout;
 
@@ -213,7 +213,7 @@ TEST(7)
 }
 
 //  Small DEF example with explicit format
-TEST(8)
+TEST (8)
 {
   std::string input = tl::testdata ();
   input += "/lefdef/strm2oas_small/in.defok[def]";
@@ -223,9 +223,9 @@ TEST(8)
 
   std::string output = this->tmp_file ("small_def");
 
-  const char *argv[] = { "x", input.c_str (), output.c_str () };
+  const char *argv [] = {"x", input.c_str (), output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
 
   db::Layout layout;
 
@@ -241,7 +241,7 @@ TEST(8)
 }
 
 //  Large LEF/DEF to OAS converter test
-TEST(10)
+TEST (10)
 {
   test_is_long_runner ();
 
@@ -257,7 +257,7 @@ TEST(10)
   std::string output = this->tmp_file ("strm2oas.oas");
   std::string map_arg = "--lefdef-map=" + input_dir + "/sky130.map";
 
-  const char *lef_files[] = {
+  const char *lef_files [] = {
     "sky130_fd_sc_hd.tlef",
     "sky130_fd_sc_hd_merged.lef",
     "sky130_fd_sc_hs_merged.lef",
@@ -398,18 +398,17 @@ TEST(10)
     "simple_por.lef",
     "user_id_programming.lef",
     "user_id_textblock-stub.lef",
-    "RAM128.lef"
-  };
+    "RAM128.lef"};
 
   std::string lefs_arg = "--lefdef-lefs=";
-  for (size_t i = 0; i < sizeof (lef_files) / sizeof (lef_files[0]); ++i) {
+  for (size_t i = 0; i < sizeof (lef_files) / sizeof (lef_files [0]); ++i) {
     if (i > 0) {
       lefs_arg += ",";
     }
-    lefs_arg += lef_dir + "/" + lef_files[i];
+    lefs_arg += lef_dir + "/" + lef_files [i];
   }
 
-  const char *lefdef_layout_files[] = {
+  const char *lefdef_layout_files [] = {
     "sky130_fd_sc_hd.gds",
     "sky130_fd_sc_hvl__sdlxtp_1.gds",
     "sky130_fd_sc_hvl__decap_8.gds",
@@ -506,18 +505,17 @@ TEST(10)
     "simple_por.gds.gz",
     "user_id_programming.gds.gz",
     "user_id_textblock.gds.gz",
-    "RAM128.gds.gz"
-  };
+    "RAM128.gds.gz"};
 
   std::string lefdef_layouts_arg = "--lefdef-lef-layouts=";
-  for (size_t i = 0; i < sizeof (lefdef_layout_files) / sizeof (lefdef_layout_files[0]); ++i) {
+  for (size_t i = 0; i < sizeof (lefdef_layout_files) / sizeof (lefdef_layout_files [0]); ++i) {
     if (i > 0) {
       lefdef_layouts_arg += ",";
     }
-    lefdef_layouts_arg += gds_dir + "/" + lefdef_layout_files[i];
+    lefdef_layouts_arg += gds_dir + "/" + lefdef_layout_files [i];
   }
 
-  const char *def_files[] = {
+  const char *def_files [] = {
     "caravel.def",
     "caravel_clocking.def",
     "caravel_core.def.gz",
@@ -530,27 +528,25 @@ TEST(10)
     "mprj_logic_high.def",
     "spare_logic_block.def",
     "user_project_wrapper.def",
-    "xres_buf.def"
-  };
+    "xres_buf.def"};
 
   std::string input;
-  for (size_t i = 0; i < sizeof (def_files) / sizeof (def_files[0]); ++i) {
+  for (size_t i = 0; i < sizeof (def_files) / sizeof (def_files [0]); ++i) {
     if (i > 0) {
       input += "+";
     }
-    input += def_dir + "/" + def_files[i];
+    input += def_dir + "/" + def_files [i];
   }
 
-  const char *argv[] = { "x",
+  const char *argv [] = {"x",
                          "--lefdef-no-implicit-lef",
                          map_arg.c_str (),
                          lefs_arg.c_str (),
                          lefdef_layouts_arg.c_str (),
                          input.c_str (),
-                         output.c_str ()
-                       };
+                         output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
 
   db::Layout layout;
 
@@ -565,7 +561,7 @@ TEST(10)
 }
 
 //  Merging with +
-TEST(11_1)
+TEST (11_1)
 {
   std::string input_dir = tl::testdata ();
   input_dir += "/bd";
@@ -574,13 +570,12 @@ TEST(11_1)
   std::string input = input_dir + "/strm2oas_1.oas+" + input_dir + "/strm2oas_2.oas";
 
   std::string output = this->tmp_file ("strm2oas_1.oas");
-  const char *argv[] = { "x",
+  const char *argv [] = {"x",
                          "--blend-mode=0",
                          input.c_str (),
-                         output.c_str ()
-                       };
+                         output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
 
   db::Layout layout;
   {
@@ -594,7 +589,7 @@ TEST(11_1)
 }
 
 //  Merging with + not allowed on different DBUs
-TEST(11_2)
+TEST (11_2)
 {
   std::string input_dir = tl::testdata ();
   input_dir += "/bd";
@@ -603,14 +598,13 @@ TEST(11_2)
   std::string input = input_dir + "/strm2oas_1.oas+" + input_dir + "/strm2oas_2_10nm.oas";
 
   std::string output = this->tmp_file ("strm2oas_1.oas");
-  const char *argv[] = { "x",
+  const char *argv [] = {"x",
                          "--blend-mode=0",
                          input.c_str (),
-                         output.c_str ()
-                       };
+                         output.c_str ()};
 
   try {
-    bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name);
+    bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name);
     EXPECT_EQ (1, 0);
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg (), "Former and present database units are not compatible: 0.001 (former) vs. 0.01 (present)");
@@ -618,7 +612,7 @@ TEST(11_2)
 }
 
 //  Merging with + not allowed on different DBUs
-TEST(11_3)
+TEST (11_3)
 {
   std::string input_dir = tl::testdata ();
   input_dir += "/bd";
@@ -627,13 +621,12 @@ TEST(11_3)
   std::string input = input_dir + "/strm2oas_1.oas," + input_dir + "/strm2oas_2_10nm.oas";
 
   std::string output = this->tmp_file ("strm2oas_3.oas");
-  const char *argv[] = { "x",
+  const char *argv [] = {"x",
                          "--blend-mode=0",
                          input.c_str (),
-                         output.c_str ()
-                       };
+                         output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
 
   db::Layout layout;
   {
@@ -647,7 +640,7 @@ TEST(11_3)
 }
 
 //  Merging with + and , under the presence of ghost cells: test+test,top->(test)
-TEST(12_1)
+TEST (12_1)
 {
   std::string input_dir = tl::testdata ();
   input_dir += "/bd";
@@ -656,13 +649,12 @@ TEST(12_1)
   std::string input = input_dir + "/strm2oas_a.oas+" + input_dir + "/strm2oas_b.oas," + input_dir + "/strm2oas_c.oas";
 
   std::string output = this->tmp_file ("strm2oas_12_1.oas");
-  const char *argv[] = { "x",
+  const char *argv [] = {"x",
                          "--blend-mode=0",
                          input.c_str (),
-                         output.c_str ()
-                       };
+                         output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
 
   db::Layout layout;
   {
@@ -676,7 +668,7 @@ TEST(12_1)
 }
 
 //  Merging with + and , under the presence of ghost cells: top->(test),test+test
-TEST(12_2)
+TEST (12_2)
 {
   std::string input_dir = tl::testdata ();
   input_dir += "/bd";
@@ -685,13 +677,12 @@ TEST(12_2)
   std::string input = input_dir + "/strm2oas_c.oas," + input_dir + "/strm2oas_a.oas+" + input_dir + "/strm2oas_b.oas";
 
   std::string output = this->tmp_file ("strm2oas_12_2.oas");
-  const char *argv[] = { "x",
+  const char *argv [] = {"x",
                          "--blend-mode=0",
                          input.c_str (),
-                         output.c_str ()
-                       };
+                         output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
 
   db::Layout layout;
   {
@@ -705,7 +696,7 @@ TEST(12_2)
 }
 
 //  Merging with + and , under the presence of ghost cells: test+test,toptop->top->(test)
-TEST(12_3)
+TEST (12_3)
 {
   std::string input_dir = tl::testdata ();
   input_dir += "/bd";
@@ -714,13 +705,12 @@ TEST(12_3)
   std::string input = input_dir + "/strm2oas_a.oas+" + input_dir + "/strm2oas_b.oas," + input_dir + "/strm2oas_cc.oas";
 
   std::string output = this->tmp_file ("strm2oas_12_3.oas");
-  const char *argv[] = { "x",
+  const char *argv [] = {"x",
                          "--blend-mode=0",
                          input.c_str (),
-                         output.c_str ()
-                       };
+                         output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
 
   db::Layout layout;
   {
@@ -734,7 +724,7 @@ TEST(12_3)
 }
 
 //  Merging with + and , under the presence of ghost cells: toptop->top->(test),test+test
-TEST(12_4)
+TEST (12_4)
 {
   std::string input_dir = tl::testdata ();
   input_dir += "/bd";
@@ -743,13 +733,12 @@ TEST(12_4)
   std::string input = input_dir + "/strm2oas_cc.oas," + input_dir + "/strm2oas_a.oas+" + input_dir + "/strm2oas_b.oas";
 
   std::string output = this->tmp_file ("strm2oas_12_4.oas");
-  const char *argv[] = { "x",
+  const char *argv [] = {"x",
                          "--blend-mode=0",
                          input.c_str (),
-                         output.c_str ()
-                       };
+                         output.c_str ()};
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv [0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
 
   db::Layout layout;
   {

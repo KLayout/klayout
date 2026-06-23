@@ -39,15 +39,16 @@ namespace rdb
 {
 
 class RVEReaderException
-  : public ReaderException 
+  : public ReaderException
 {
 public:
   RVEReaderException (const std::string &msg, size_t line)
     : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%lu)")), msg, line))
-  { }
+  {
+  }
 };
 
-class RVEReader 
+class RVEReader
   : public ReaderBase
 {
 public:
@@ -59,14 +60,14 @@ public:
     m_progress.set_unit (1024 * 1024);
   }
 
-  virtual void read (Database &db) 
+  virtual void read (Database &db)
   {
     try {
       //  TODO: do not allow waivers here?
       //  (otherwise, description lines like "WE0 ..." would be read as waivers)
       do_read (db);
     } catch (tl::Exception &ex) {
-      error (ex.msg ()); 
+      error (ex.msg ());
     }
 
     try {
@@ -102,8 +103,8 @@ public:
     std::string cell_name;
     db::DCplxTrans trans;
     db::DCplxTrans shape_trans;
-    std::vector <db::DPoint> points;
-    std::vector <db::DEdge> edges;
+    std::vector<db::DPoint> points;
+    std::vector<db::DEdge> edges;
 
     ex = tl::Extractor (get_line ().c_str ());
     ex.read (s, " ");
@@ -123,10 +124,10 @@ public:
 
     while (! at_end ()) {
 
-      //  TODO: check if this is correct: when a new category is started the 
+      //  TODO: check if this is correct: when a new category is started the
       //  cell name is reset. Any shape not having a specific cell will go into the
       //  top cell then.
-      cell_name.clear (); 
+      cell_name.clear ();
 
       //  Read the category name unless we have some already (that we got when parsing the shapes).
       if (cat_name.empty ()) {
@@ -139,7 +140,7 @@ public:
           while (end > start && isspace (end [-1])) {
             --end;
           }
-          if (end > start && end[-1] == '.') {
+          if (end > start && end [-1] == '.') {
             --end;
           }
           cat_name = std::string (start, end - start);
@@ -169,7 +170,7 @@ public:
         }
 
         std::string l = m_input_stream.get_line ();
-        if (l.size () > 3 && l[0] == 'W' && l[1] == 'E' && isdigit (l[2])) {
+        if (l.size () > 3 && l [0] == 'W' && l [1] == 'E' && isdigit (l [2])) {
 
           size_t n = 0;
           const char *cp;
@@ -196,9 +197,7 @@ public:
             desc += "\n";
           }
           desc += l;
-
         }
-
       }
 
       cath->set_description (desc);
@@ -240,7 +239,7 @@ public:
             while (end > start && isspace (end [-1])) {
               --end;
             }
-            if (end > start && end[-1] == '.') {
+            if (end > start && end [-1] == '.') {
               --end;
             }
             cat_name = std::string (start, end - start);
@@ -250,7 +249,7 @@ public:
         }
 
         while (true) {
-        
+
           if (at_end ()) {
             error (tl::to_string (tr ("Unexpected end of file")));
           }
@@ -281,7 +280,6 @@ public:
 
                 ex.read (x);
                 ex.read (y);
-
               }
 
               int f = 0;
@@ -316,7 +314,7 @@ public:
 
               double v = 0.0;
               if (ex.try_read (v)) {
-                
+
                 //  custom properties get a tag name with a hash
                 id_type tag_id = db.tags ().tag (prop_name, true).id ();
 
@@ -326,17 +324,14 @@ public:
               } else {
 
                 //  TODO: other property formats?
-
               }
-            
             }
 
           } else {
             break;
           }
-
         }
-        
+
         const Cell *cell;
 
         //  Use the last cell or the top cell if no cell is specified since the start of the category.
@@ -355,9 +350,7 @@ public:
             nc_cell->references ().insert (ref);
 
             cell = nc_cell;
-
           }
-
         }
 
         m_progress.set (m_input_stream.raw_stream ().pos ());
@@ -375,7 +368,6 @@ public:
               }
 
               ex = tl::Extractor (get_line ().c_str ());
-
             }
 
             int64_t x, y;
@@ -383,7 +375,6 @@ public:
             ex.read (y);
             ex.expect_end ();
             points.push_back (db::DPoint (x * dbu, y * dbu));
-
           }
 
           Value<db::DPolygon> *value = new Value<db::DPolygon> (db::DPolygon ());
@@ -403,7 +394,6 @@ public:
               }
 
               ex = tl::Extractor (get_line ().c_str ());
-
             }
 
             int64_t x1, y1;
@@ -417,14 +407,13 @@ public:
             ex.expect_end ();
 
             edges.push_back (db::DEdge (db::DPoint (x1 * dbu, y1 * dbu), db::DPoint (x2 * dbu, y2 * dbu)).transformed (shape_trans));
-
           }
 
           if (edges.size () == 2) {
             //  produce an edge pair from two edges
             values.add (new Value<db::DEdgePair> (db::DEdgePair (edges [0], edges [1])));
           } else {
-            for (std::vector <db::DEdge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+            for (std::vector<db::DEdge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
               values.add (new Value<db::DEdge> (*e));
             }
           }
@@ -440,14 +429,11 @@ public:
         }
 
         item->values ().swap (values);
-
       }
-
     }
-
   }
 
-  virtual const char *format () const 
+  virtual const char *format () const
   {
     return "RVE";
   }
@@ -468,7 +454,7 @@ private:
     while (! m_input_stream.at_end ()) {
       m_line = m_input_stream.get_line ();
       //  skip lines starting with "//" (#522)
-      if (m_line.size () < 2 || m_line[0] != '/' || m_line[1] != '/') {
+      if (m_line.size () < 2 || m_line [0] != '/' || m_line [1] != '/') {
         break;
       }
       m_line.clear ();
@@ -477,7 +463,7 @@ private:
   }
 
   void warn (const std::string &msg)
-  { 
+  {
     tl::warn << tl::sprintf (tl::to_string (tr ("%s (line=%lu)")), msg, m_input_stream.line_number ());
   }
 
@@ -487,7 +473,7 @@ private:
   }
 };
 
-class RVEFormatDeclaration 
+class RVEFormatDeclaration
   : public FormatDeclaration
 {
   virtual std::string format_name () const { return "RVE"; }
@@ -547,12 +533,12 @@ class RVEFormatDeclaration
     if (! ex.try_read (i)) {
       return false;
     }
-    
+
     //  That's it.
     return true;
   }
 
-  virtual ReaderBase *create_reader (tl::InputStream &s) const 
+  virtual ReaderBase *create_reader (tl::InputStream &s) const
   {
     return new RVEReader (s);
   }
@@ -561,4 +547,3 @@ class RVEFormatDeclaration
 static tl::RegisteredClass<rdb::FormatDeclaration> format_decl (new RVEFormatDeclaration (), 0, "RVE");
 
 }
-

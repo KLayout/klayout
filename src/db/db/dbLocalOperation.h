@@ -83,19 +83,19 @@ public:
   /**
    *  @brief Constructor
    */
-  local_operation () { }
+  local_operation () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~local_operation () { }
+  virtual ~local_operation () {}
 
   /**
    *  @brief Computes the results from a given set of interacting shapes
    *
    *  If the operation requests single subject mode, the interactions will be split into single subject/intruder clusters
    */
-  void compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const;
+  void compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase *proc) const;
 
   /**
    *  @brief Indicates the desired behaviour when a shape does not have an intruder
@@ -130,10 +130,9 @@ protected:
    *  @param interactions The interaction set
    *  @param result The container to which the results are written
    */
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &result, const db::LocalProcessorBase *proc) const = 0;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &result, const db::LocalProcessorBase *proc) const = 0;
 };
 
 }
 
 #endif
-

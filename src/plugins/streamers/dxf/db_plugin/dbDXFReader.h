@@ -55,11 +55,13 @@ class DB_PLUGIN_PUBLIC DXFReaderException
 public:
   DXFReaderException (const std::string &msg, size_t p, const std::string &cell, const std::string &source)
     : ReaderException (tl::sprintf (tl::to_string (tr ("%s (position=%ld, cell=%s), in file: %s")), msg.c_str (), p, cell, source))
-  { }
+  {
+  }
 
   DXFReaderException (const std::string &msg, int line, const std::string &cell, const std::string &source)
     : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%d, cell=%s), in file: %s")), msg.c_str (), line, cell, source))
-  { }
+  {
+  }
 };
 
 /**
@@ -69,7 +71,7 @@ class DB_PLUGIN_PUBLIC DXFReader
   : public NamedLayerReader,
     public DXFDiagnostics
 {
-public: 
+public:
   typedef std::vector<tl::Variant> property_value_list;
 
   /**
@@ -79,13 +81,13 @@ public:
    */
   DXFReader (tl::InputStream &s);
 
-  /**  
+  /**
    *  @brief Destructor
    */
   ~DXFReader ();
 
-  /** 
-   *  @brief The basic read method 
+  /**
+   *  @brief The basic read method
    *
    *  This method will read the stream data and translate this to
    *  insert calls into the layout object. This will not do much
@@ -102,7 +104,7 @@ public:
    */
   virtual const LayerMap &read (db::Layout &layout, const LoadLayoutOptions &options);
 
-  /** 
+  /**
    *  @brief The basic read method (without mapping)
    *
    *  This method will read the stream data and translate this to
@@ -137,15 +139,15 @@ public:
   virtual void warn (const std::string &txt, int warn_level = 1);
 
 private:
-  struct VariantKey
-  {
+  struct VariantKey {
     db::cell_index_type cell_index;
     unsigned int layer;
     double sx, sy;
 
     VariantKey (db::cell_index_type ci, unsigned int l, double x, double y)
       : cell_index (ci), layer (l), sx (x), sy (y)
-    { }
+    {
+    }
 
     bool operator== (const VariantKey &other) const
     {
@@ -185,12 +187,12 @@ private:
   bool m_initial;
   bool m_render_texts_as_polygons;
   bool m_keep_other_cells;
-  int m_line_number; 
+  int m_line_number;
   unsigned int m_zero_layer;
-  std::map <db::cell_index_type, std::string> m_template_cells;
-  std::set <db::cell_index_type> m_used_template_cells;
-  std::map <std::string, db::cell_index_type> m_block_per_name;
-  std::map <VariantKey, db::cell_index_type> m_block_to_variant;
+  std::map<db::cell_index_type, std::string> m_template_cells;
+  std::set<db::cell_index_type> m_used_template_cells;
+  std::map<std::string, db::cell_index_type> m_block_per_name;
+  std::map<VariantKey, db::cell_index_type> m_block_to_variant;
 
   void do_read (db::Layout &layout, db::cell_index_type top);
 
@@ -212,7 +214,7 @@ private:
   int determine_polyline_mode ();
   void parse_entity (const std::string &entity_code, size_t &nsolids, size_t &closed_polylines);
   void add_bulge_segment (std::vector<db::DPoint> &points, const db::DPoint &p, double b);
-  std::list<db::DPoint> spline_interpolation (std::vector<std::pair<db::DPoint, double> > &points, int n, const std::vector<double> &knots);
+  std::list<db::DPoint> spline_interpolation (std::vector<std::pair<db::DPoint, double>> &points, int n, const std::vector<double> &knots);
   void arc_interpolation (std::vector<db::DPoint> &points, const std::vector<double> &rad, const std::vector<double> &start, const std::vector<double> &end, const std::vector<int> &ccw);
   void elliptic_interpolation (std::vector<db::DPoint> &points, const std::vector<double> &rmin, const std::vector<db::DPoint> &vmaj, const std::vector<double> &start, const std::vector<double> &end, const std::vector<int> &ccw);
   void deliver_points_to_edges (std::vector<db::DPoint> &points, const std::vector<db::DPoint> &points2, const db::DCplxTrans &tt, int edge_type, int value94, const std::vector<double> &value40, const std::vector<double> &value50, const std::vector<double> &value51, const std::vector<int> &value73, std::vector<db::Edge> &iedges);
@@ -235,4 +237,3 @@ private:
 }
 
 #endif
-

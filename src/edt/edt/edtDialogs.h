@@ -50,22 +50,23 @@
 
 namespace lay
 {
-  class Marker;
-  class ObjectInstPath;
+class Marker;
+class ObjectInstPath;
 }
 
-namespace edt {
+namespace edt
+{
 
 class ArrayOptions;
 
 /**
  *  @brief The copy mode dialog
  */
-class CopyModeDialog 
+class CopyModeDialog
   : public QDialog,
     public Ui::CopyModeDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   CopyModeDialog (QWidget *parent);
@@ -77,11 +78,11 @@ public:
 /**
  *  @brief The instantiation report form
  */
-class InstantiationForm 
+class InstantiationForm
   : public QDialog,
     public Ui::InstantiationForm
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   InstantiationForm (QWidget *parent);
@@ -105,11 +106,11 @@ private:
 /**
  *  @brief The change layer options dialog
  */
-class ChangeLayerOptionsDialog 
+class ChangeLayerOptionsDialog
   : public QDialog,
     public Ui::ChangeLayerOptionsDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   ChangeLayerOptionsDialog (QWidget *parent);
@@ -121,11 +122,11 @@ public:
 /**
  *  @brief Align function options dialog
  */
-class AlignOptionsDialog 
+class AlignOptionsDialog
   : public QDialog,
     public Ui::AlignOptionsDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   AlignOptionsDialog (QWidget *parent);
@@ -141,7 +142,7 @@ class DistributeOptionsDialog
   : public QDialog,
     public Ui::DistributeOptionsDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   DistributeOptionsDialog (QWidget *parent);
@@ -154,10 +155,10 @@ public:
  *  @brief Options dialog for the "make cell" function
  */
 class MakeCellOptionsDialog
-  : public QDialog, 
+  : public QDialog,
     private Ui::MakeCellOptionsDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MakeCellOptionsDialog (QWidget *parent);
@@ -171,12 +172,11 @@ private slots:
  *  @brief Options dialog for the "make array" function
  */
 class MakeArrayOptionsDialog
-  : public QDialog, 
+  : public QDialog,
     private Ui::MakeArrayOptionsDialog
 {
-Q_OBJECT
+  Q_OBJECT
 public:
-
   MakeArrayOptionsDialog (QWidget *parent);
   bool exec_dialog (ArrayOptions &options);
 
@@ -187,10 +187,10 @@ public:
  *  @brief Options dialog for the "round corners" function
  */
 class RoundCornerOptionsDialog
-  : public QDialog, 
+  : public QDialog,
     private Ui::RoundCornerOptionsDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   RoundCornerOptionsDialog (QWidget *parent);
@@ -217,7 +217,7 @@ class AreaAndPerimeterDialog
   : public QDialog,
     private Ui::AreaAndPerimeterDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   AreaAndPerimeterDialog (QWidget *parent);
@@ -242,4 +242,3 @@ lay::LayerPropertiesConstIterator popup_tap_layer_menu (lay::LayoutViewBase *vie
 #endif
 
 #endif
-

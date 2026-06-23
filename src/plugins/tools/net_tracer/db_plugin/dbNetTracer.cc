@@ -32,7 +32,7 @@
 //  -O3 appears not to work properly for gcc 4.4.7 (RHEL 6)
 //  In that case, the net tracer function crashes.
 #if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR == 4 && defined(__OPTIMIZE__)
-#  pragma GCC optimize("O2")
+#pragma GCC optimize("O2")
 #endif
 
 namespace db
@@ -60,7 +60,6 @@ interacts (const db::Box &box, const NetTracerShape &net_shape)
       box_poly.transform (db::ICplxTrans (net_shape.trans ()));
 
       return (db::interact (box_poly, box));
-
     }
 
   } else if (net_shape.shape ().is_polygon () || net_shape.shape ().is_path ()) {
@@ -74,7 +73,6 @@ interacts (const db::Box &box, const NetTracerShape &net_shape)
   } else {
 
     return false;
-
   }
 }
 
@@ -97,7 +95,6 @@ interacts (const db::Polygon &polygon, const NetTracerShape &net_shape)
       box_poly.transform (db::ICplxTrans (net_shape.trans ()));
 
       return db::interact (polygon, box_poly);
-
     }
 
   } else if (net_shape.shape ().is_polygon () || net_shape.shape ().is_path ()) {
@@ -111,7 +108,6 @@ interacts (const db::Polygon &polygon, const NetTracerShape &net_shape)
   } else {
 
     return false;
-
   }
 }
 
@@ -123,7 +119,7 @@ NetTracerShapeHeap::NetTracerShapeHeap ()
   //  .. nothing yet ..
 }
 
-db::Shape 
+db::Shape
 NetTracerShapeHeap::insert (const db::Polygon &p)
 {
   std::map<db::Polygon, db::Shape>::const_iterator c = m_cache.find (p);
@@ -133,8 +129,7 @@ NetTracerShapeHeap::insert (const db::Polygon &p)
   return c->second;
 }
 
-void
-NetTracerShapeHeap::clear ()
+void NetTracerShapeHeap::clear ()
 {
   m_container.clear ();
   m_cache.clear ();
@@ -160,12 +155,12 @@ NetTracerData::operator= (const NetTracerData &other)
 {
   if (this != &other) {
 
-    for (std::map <unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {
+    for (std::map<unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {
       delete l->second;
     }
     m_log_layers.clear ();
 
-    for (std::map <unsigned int, NetTracerLayerExpression *>::const_iterator l = other.m_log_layers.begin (); l != other.m_log_layers.end (); ++l) {
+    for (std::map<unsigned int, NetTracerLayerExpression *>::const_iterator l = other.m_log_layers.begin (); l != other.m_log_layers.end (); ++l) {
       m_log_layers.insert (std::make_pair (l->first, new NetTracerLayerExpression (*l->second)));
     }
 
@@ -176,7 +171,6 @@ NetTracerData::operator= (const NetTracerData &other)
     m_log_connection_graph = other.m_log_connection_graph;
     m_requires_booleans = other.m_requires_booleans;
     m_symbols = other.m_symbols;
-
   }
 
   return *this;
@@ -184,7 +178,7 @@ NetTracerData::operator= (const NetTracerData &other)
 
 NetTracerData::~NetTracerData ()
 {
-  for (std::map <unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {
+  for (std::map<unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {
     delete l->second;
   }
   m_log_layers.clear ();
@@ -192,8 +186,7 @@ NetTracerData::~NetTracerData ()
   clean_l2n_regions ();
 }
 
-void 
-NetTracerData::add_connection (const NetTracerConnection &connection)
+void NetTracerData::add_connection (const NetTracerConnection &connection)
 {
   if (connection.layer_a () >= 0 && connection.layer_b () >= 0 && (! connection.has_via_layer () || connection.via_layer () >= 0)) {
     m_connections.push_back (connection);
@@ -210,47 +203,45 @@ NetTracerData::add_connection (const NetTracerConnection &connection)
   }
 }
 
-void 
-NetTracerData::add_layer_pair (unsigned int a, unsigned int b)
+void NetTracerData::add_layer_pair (unsigned int a, unsigned int b)
 {
   add_layers (a, b);
   add_layers (b, a);
 }
 
-void 
-NetTracerData::add_layers (unsigned int a, unsigned int b)
+void NetTracerData::add_layers (unsigned int a, unsigned int b)
 {
   if (m_log_connection_graph.find (a) == m_log_connection_graph.end ()) {
-    m_log_connection_graph.insert (std::make_pair (a, std::set <unsigned int> ())).first->second.insert (a);
+    m_log_connection_graph.insert (std::make_pair (a, std::set<unsigned int> ())).first->second.insert (a);
   }
-  m_log_connection_graph.insert (std::make_pair (a, std::set <unsigned int> ())).first->second.insert (b);
+  m_log_connection_graph.insert (std::make_pair (a, std::set<unsigned int> ())).first->second.insert (b);
 
   if (m_connection_graph.find (a) == m_connection_graph.end ()) {
-    std::set <unsigned int> aa = expression (a).original_layers ();
-    m_connection_graph.insert (std::make_pair (a, std::set <unsigned int> ())).first->second.insert (aa.begin (), aa.end ());
+    std::set<unsigned int> aa = expression (a).original_layers ();
+    m_connection_graph.insert (std::make_pair (a, std::set<unsigned int> ())).first->second.insert (aa.begin (), aa.end ());
     m_original_layers.insert (std::make_pair (a, aa));
   }
-  std::set <unsigned int> bb = expression (b).original_layers ();
-  m_connection_graph.insert (std::make_pair (a, std::set <unsigned int> ())).first->second.insert (bb.begin (), bb.end ());
+  std::set<unsigned int> bb = expression (b).original_layers ();
+  m_connection_graph.insert (std::make_pair (a, std::set<unsigned int> ())).first->second.insert (bb.begin (), bb.end ());
 }
 
 const std::set<unsigned int> &
 NetTracerData::connections (unsigned int from_layer) const
 {
-  std::map <unsigned int, std::set <unsigned int> >::const_iterator g = m_connection_graph.find (from_layer);
+  std::map<unsigned int, std::set<unsigned int>>::const_iterator g = m_connection_graph.find (from_layer);
   if (g != m_connection_graph.end ()) {
     return g->second;
   } else {
     static std::set<unsigned int> empty;
     return empty;
   }
-} 
+}
 
-std::set<unsigned int> 
+std::set<unsigned int>
 NetTracerData::log_layers_for (unsigned int original_layer) const
 {
-  std::set <unsigned int> log_layers;
-  for (std::map <unsigned int, std::set <unsigned int> >::const_iterator g = m_original_layers.begin (); g != m_original_layers.end (); ++g) {
+  std::set<unsigned int> log_layers;
+  for (std::map<unsigned int, std::set<unsigned int>>::const_iterator g = m_original_layers.begin (); g != m_original_layers.end (); ++g) {
     if (g->second.find (original_layer) != g->second.end ()) {
       log_layers.insert (g->first);
     }
@@ -261,7 +252,7 @@ NetTracerData::log_layers_for (unsigned int original_layer) const
 const std::set<unsigned int> &
 NetTracerData::log_connections (unsigned int from_layer) const
 {
-  std::map <unsigned int, std::set <unsigned int> >::const_iterator g = m_log_connection_graph.find (from_layer);
+  std::map<unsigned int, std::set<unsigned int>>::const_iterator g = m_log_connection_graph.find (from_layer);
   if (g != m_log_connection_graph.end ()) {
     return g->second;
   } else {
@@ -270,8 +261,7 @@ NetTracerData::log_connections (unsigned int from_layer) const
   }
 }
 
-int 
-NetTracerData::find_symbol (const std::string &symbol) const
+int NetTracerData::find_symbol (const std::string &symbol) const
 {
   std::map<std::string, unsigned int>::const_iterator s = m_symbols.find (symbol);
   if (s == m_symbols.end ()) {
@@ -281,7 +271,7 @@ NetTracerData::find_symbol (const std::string &symbol) const
   }
 }
 
-unsigned int 
+unsigned int
 NetTracerData::register_logical_layer (NetTracerLayerExpression *expr, const char *symbol)
 {
   unsigned int l = ++m_next_log_layer;
@@ -294,10 +284,10 @@ NetTracerData::register_logical_layer (NetTracerLayerExpression *expr, const cha
   return l;
 }
 
-const NetTracerLayerExpression & 
+const NetTracerLayerExpression &
 NetTracerData::expression (unsigned int ll) const
 {
-  std::map <unsigned int, NetTracerLayerExpression *>::iterator l = m_log_layers.find (ll);
+  std::map<unsigned int, NetTracerLayerExpression *>::iterator l = m_log_layers.find (ll);
   if (l == m_log_layers.end ()) {
     l = m_log_layers.insert (std::make_pair (ll, new NetTracerLayerExpression (ll))).first;
   }
@@ -309,30 +299,29 @@ NetTracerData::expression (unsigned int ll) const
  *  The result pair will contain the ones which do not require booleans in the first element, and the ones which
  *  do in the second.
  */
-const std::pair <std::set <unsigned int>, std::set <unsigned int> > &
+const std::pair<std::set<unsigned int>, std::set<unsigned int>> &
 NetTracerData::requires_booleans (unsigned int from_layer) const
 {
-  std::map <unsigned int, std::pair <std::set <unsigned int>, std::set <unsigned int> > >::iterator r = m_requires_booleans.find (from_layer);
+  std::map<unsigned int, std::pair<std::set<unsigned int>, std::set<unsigned int>>>::iterator r = m_requires_booleans.find (from_layer);
   if (r == m_requires_booleans.end ()) {
 
-    std::set <unsigned int> layers_without_booleans = connections (from_layer);
-    std::set <unsigned int> layers_with_booleans;
+    std::set<unsigned int> layers_without_booleans = connections (from_layer);
+    std::set<unsigned int> layers_with_booleans;
 
-    std::set <unsigned int> ll = log_connections (from_layer);
-    for (std::set <unsigned int>::const_iterator i = ll.begin (); i != ll.end (); ++i) {
+    std::set<unsigned int> ll = log_connections (from_layer);
+    for (std::set<unsigned int>::const_iterator i = ll.begin (); i != ll.end (); ++i) {
       if (! expression (*i).is_alias ()) {
-        std::map <unsigned int, std::set <unsigned int> >::const_iterator ol = m_original_layers.find (*i);
+        std::map<unsigned int, std::set<unsigned int>>::const_iterator ol = m_original_layers.find (*i);
         tl_assert (ol != m_original_layers.end ());
         layers_with_booleans.insert (ol->second.begin (), ol->second.end ());
-        for (std::set <unsigned int>::const_iterator j = ol->second.begin (); j != ol->second.end (); ++j) {
+        for (std::set<unsigned int>::const_iterator j = ol->second.begin (); j != ol->second.end (); ++j) {
           layers_without_booleans.erase (*j);
         }
       }
     }
 
     r = m_requires_booleans.insert (std::make_pair (from_layer, std::make_pair (layers_without_booleans, layers_with_booleans))).first;
-
-  } 
+  }
 
   return r->second;
 }
@@ -341,20 +330,18 @@ std::set<unsigned int>
 NetTracerData::original_layers () const
 {
   std::set<unsigned int> ol;
-  for (std::map <unsigned int, std::set <unsigned int> >::const_iterator g = m_original_layers.begin (); g != m_original_layers.end (); ++g) {
+  for (std::map<unsigned int, std::set<unsigned int>>::const_iterator g = m_original_layers.begin (); g != m_original_layers.end (); ++g) {
     ol.insert (g->second.begin (), g->second.end ());
   }
   return ol;
 }
 
-void
-NetTracerData::clean_l2n_regions ()
+void NetTracerData::clean_l2n_regions ()
 {
   m_l2n_regions.clear ();
 }
 
-void
-NetTracerData::configure_l2n (db::LayoutToNetlist &l2n)
+void NetTracerData::configure_l2n (db::LayoutToNetlist &l2n)
 {
   clean_l2n_regions ();
 
@@ -364,12 +351,12 @@ NetTracerData::configure_l2n (db::LayoutToNetlist &l2n)
     layer_to_symbol.insert (std::make_pair (s->second, s->first));
   }
 
-  std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> > regions_per_org_layer;
+  std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder>> regions_per_org_layer;
 
   tl::RelativeProgress progress (tl::to_string (tr ("Computing input layers")), m_log_layers.size ());
 
   //  first fetch all the alias expressions
-  for (std::map <unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {
+  for (std::map<unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {
     if (l->second->is_alias ()) {
       tl::shared_ptr<NetTracerLayerExpression::RegionHolder> rh = l->second->make_l2n_region (l2n, regions_per_org_layer, layer_to_symbol [l->first]);
       m_l2n_regions [l->first] = rh;
@@ -378,7 +365,7 @@ NetTracerData::configure_l2n (db::LayoutToNetlist &l2n)
   }
 
   //  then compute all the symbolic expressions
-  for (std::map <unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {
+  for (std::map<unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {
     if (! l->second->is_alias ()) {
       tl::shared_ptr<NetTracerLayerExpression::RegionHolder> rh = l->second->make_l2n_region (l2n, regions_per_org_layer, layer_to_symbol [l->first]);
       m_l2n_regions [l->first] = rh;
@@ -387,13 +374,13 @@ NetTracerData::configure_l2n (db::LayoutToNetlist &l2n)
   }
 
   //  make all connections (intra and inter-layer)
-  for (std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> >::const_iterator r = m_l2n_regions.begin (); r != m_l2n_regions.end (); ++r) {
+  for (std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder>>::const_iterator r = m_l2n_regions.begin (); r != m_l2n_regions.end (); ++r) {
     const std::set<unsigned int> &connections_to = log_connections (r->first);
     if (! connections_to.empty ()) {
       l2n.connect (*r->second->get ());
     }
     for (std::set<unsigned int>::const_iterator c = connections_to.begin (); c != connections_to.end (); ++c) {
-      std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> >::const_iterator rc = m_l2n_regions.find (*c);
+      std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder>>::const_iterator rc = m_l2n_regions.find (*c);
       if (rc != m_l2n_regions.end ()) {
         l2n.connect (*r->second->get (), *rc->second->get ());
       }
@@ -451,7 +438,6 @@ NetTracerLayerExpression::operator= (const NetTracerLayerExpression &other)
     if (other.mp_b) {
       mp_b = new NetTracerLayerExpression (*other.mp_b);
     }
-
   }
 
   return *this;
@@ -469,8 +455,7 @@ NetTracerLayerExpression::~NetTracerLayerExpression ()
   }
 }
 
-void 
-NetTracerLayerExpression::merge (Operator op, NetTracerLayerExpression *other)
+void NetTracerLayerExpression::merge (Operator op, NetTracerLayerExpression *other)
 {
   if (m_op != OPNone) {
     NetTracerLayerExpression *e = new NetTracerLayerExpression (*this);
@@ -492,8 +477,7 @@ NetTracerLayerExpression::merge (Operator op, NetTracerLayerExpression *other)
   }
 }
 
-void 
-NetTracerLayerExpression::collect_original_layers (std::set<unsigned int> &l) const
+void NetTracerLayerExpression::collect_original_layers (std::set<unsigned int> &l) const
 {
   if (! mp_a) {
     if (m_a >= 0) {
@@ -515,7 +499,7 @@ NetTracerLayerExpression::collect_original_layers (std::set<unsigned int> &l) co
 
 
 class PartialShapeDetection
-  : public db::EdgeEvaluatorBase 
+  : public db::EdgeEvaluatorBase
 {
 public:
   PartialShapeDetection ()
@@ -557,7 +541,6 @@ public:
       }
 
       return 1;
-
     }
   }
 
@@ -569,8 +552,8 @@ public:
     return 0;
   }
 
-  virtual bool is_reset () const 
-  { 
+  virtual bool is_reset () const
+  {
     return m_inside.empty ();
   }
 
@@ -580,16 +563,15 @@ public:
   }
 
 private:
-  std::vector <int> m_wcv;
-  mutable std::set <db::EdgeEvaluatorBase::property_type> m_inside;
-  mutable std::set <db::EdgeEvaluatorBase::property_type> m_outside;
+  std::vector<int> m_wcv;
+  mutable std::set<db::EdgeEvaluatorBase::property_type> m_inside;
+  mutable std::set<db::EdgeEvaluatorBase::property_type> m_outside;
 };
 
-void 
-NetTracerLayerExpression::compute_results (unsigned int layer, db::cell_index_type cell_index, const std::vector<db::Polygon> *mask, const std::set <std::pair<NetTracerShape, const NetTracerShape *> > &input, const HitTestDataBoxTree *seeds_tree, NetTracerShapeHeap &shape_heap, std::set <std::pair<NetTracerShape, const NetTracerShape *> > &output, const NetTracerData &data, db::EdgeProcessor &ep) const
+void NetTracerLayerExpression::compute_results (unsigned int layer, db::cell_index_type cell_index, const std::vector<db::Polygon> *mask, const std::set<std::pair<NetTracerShape, const NetTracerShape *>> &input, const HitTestDataBoxTree *seeds_tree, NetTracerShapeHeap &shape_heap, std::set<std::pair<NetTracerShape, const NetTracerShape *>> &output, const NetTracerData &data, db::EdgeProcessor &ep) const
 {
-  std::set <std::pair<NetTracerShape, const NetTracerShape *> >::const_iterator i1, i2;
-  std::set <std::pair<NetTracerShape, const NetTracerShape *> > shapes, shapes2;
+  std::set<std::pair<NetTracerShape, const NetTracerShape *>>::const_iterator i1, i2;
+  std::set<std::pair<NetTracerShape, const NetTracerShape *>> shapes, shapes2;
   NetTracerShapeHeap local_shape_heap;
   std::vector<db::Polygon> output_polygons;
   std::vector<const NetTracerShape *> input_shapes;
@@ -601,13 +583,13 @@ NetTracerLayerExpression::compute_results (unsigned int layer, db::cell_index_ty
   } else {
     i1 = input.end (), i2 = input.end ();
     if (m_a >= 0) {
-      for (i1 = input.begin (); i1 != input.end () && i1->first.layer () != (unsigned int) m_a; ++i1) { }
-      for (i2 = i1; i2 != input.end () && i2->first.layer () == (unsigned int) m_a; ++i2) { }
+      for (i1 = input.begin (); i1 != input.end () && i1->first.layer () != (unsigned int) m_a; ++i1) {}
+      for (i2 = i1; i2 != input.end () && i2->first.layer () == (unsigned int) m_a; ++i2) {}
     }
   }
 
   std::vector<db::Polygon> input_a;
-  for (std::set <std::pair<NetTracerShape, const NetTracerShape *> >::const_iterator i = i1; i != i2; ++i) {
+  for (std::set<std::pair<NetTracerShape, const NetTracerShape *>>::const_iterator i = i1; i != i2; ++i) {
     if (i->first.shape ().is_box () || i->first.shape ().is_polygon () || i->first.shape ().is_path ()) {
       input_a.push_back (db::Polygon ());
       i->first.shape ().polygon (input_a.back ());
@@ -629,8 +611,8 @@ NetTracerLayerExpression::compute_results (unsigned int layer, db::cell_index_ty
     } else {
       i1 = input.end (), i2 = input.end ();
       if (m_b >= 0) {
-        for (i1 = input.begin (); i1 != input.end () && i1->first.layer () != (unsigned int) m_b; ++i1) { }
-        for (i2 = i1; i2 != input.end () && i2->first.layer () == (unsigned int) m_b; ++i2) { }
+        for (i1 = input.begin (); i1 != input.end () && i1->first.layer () != (unsigned int) m_b; ++i1) {}
+        for (i2 = i1; i2 != input.end () && i2->first.layer () == (unsigned int) m_b; ++i2) {}
       }
     }
 
@@ -638,7 +620,7 @@ NetTracerLayerExpression::compute_results (unsigned int layer, db::cell_index_ty
 
       output_polygons.swap (input_a);
 
-      for (std::set <std::pair<NetTracerShape, const NetTracerShape *> >::const_iterator i = i1; i != i2; ++i) {
+      for (std::set<std::pair<NetTracerShape, const NetTracerShape *>>::const_iterator i = i1; i != i2; ++i) {
         if (i->first.shape ().is_box () || i->first.shape ().is_polygon () || i->first.shape ().is_path ()) {
           output_polygons.push_back (db::Polygon ());
           i->first.shape ().polygon (output_polygons.back ());
@@ -650,7 +632,7 @@ NetTracerLayerExpression::compute_results (unsigned int layer, db::cell_index_ty
     } else {
 
       std::vector<db::Polygon> input_b;
-      for (std::set <std::pair<NetTracerShape, const NetTracerShape *> >::const_iterator i = i1; i != i2; ++i) {
+      for (std::set<std::pair<NetTracerShape, const NetTracerShape *>>::const_iterator i = i1; i != i2; ++i) {
         if (i->first.shape ().is_box () || i->first.shape ().is_polygon () || i->first.shape ().is_path ()) {
           input_b.push_back (db::Polygon ());
           i->first.shape ().polygon (input_b.back ());
@@ -665,9 +647,7 @@ NetTracerLayerExpression::compute_results (unsigned int layer, db::cell_index_ty
       } else if (m_op == OPXor) {
         ep.boolean (input_a, input_b, output_polygons, db::BooleanOp::Xor);
       }
-
     }
-
   }
 
   //  Apply the mask
@@ -677,8 +657,8 @@ NetTracerLayerExpression::compute_results (unsigned int layer, db::cell_index_ty
     ep.boolean (input_a, *mask, output_polygons, db::BooleanOp::And);
   }
 
-  std::vector <db::Polygon> full_shapes;
-  std::vector <db::Polygon> partial_shapes;
+  std::vector<db::Polygon> full_shapes;
+  std::vector<db::Polygon> partial_shapes;
 
   //  Determine what shapes are outside the masked output region
   db::ShapeProcessor sp;
@@ -734,7 +714,6 @@ NetTracerLayerExpression::compute_results (unsigned int layer, db::cell_index_ty
     } else {
       partial_shapes.push_back (ip);
     }
-
   }
 
   if (! partial_shapes.empty ()) {
@@ -761,9 +740,7 @@ NetTracerLayerExpression::compute_results (unsigned int layer, db::cell_index_ty
       } else {
         output.insert (std::make_pair (NetTracerShape (db::ICplxTrans (), os, layer, cell_index), (const NetTracerShape *) 0));
       }
-
     }
-
   }
 }
 
@@ -796,9 +773,9 @@ NetTracerLayerExpression::to_string () const
 }
 
 tl::shared_ptr<NetTracerLayerExpression::RegionHolder>
-NetTracerLayerExpression::make_l2n_region_for_org (db::LayoutToNetlist &l2n, std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> > &region_cache, int org_index, const std::string &name)
+NetTracerLayerExpression::make_l2n_region_for_org (db::LayoutToNetlist &l2n, std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder>> &region_cache, int org_index, const std::string &name)
 {
-  std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> >::iterator r = region_cache.find ((unsigned int) org_index);
+  std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder>>::iterator r = region_cache.find ((unsigned int) org_index);
   if (r != region_cache.end ()) {
     return r->second;
   } else {
@@ -809,7 +786,7 @@ NetTracerLayerExpression::make_l2n_region_for_org (db::LayoutToNetlist &l2n, std
 }
 
 tl::shared_ptr<NetTracerLayerExpression::RegionHolder>
-NetTracerLayerExpression::make_l2n_region (db::LayoutToNetlist &l2n, std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> > &region_cache, const std::string &name)
+NetTracerLayerExpression::make_l2n_region (db::LayoutToNetlist &l2n, std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder>> &region_cache, const std::string &name)
 {
   tl::shared_ptr<NetTracerLayerExpression::RegionHolder> rha;
   if (mp_a) {
@@ -855,8 +832,7 @@ NetTracer::NetTracer ()
   //  .. nothing yet ..
 }
 
-void 
-NetTracer::clear ()
+void NetTracer::clear ()
 {
   m_shapes_graph.clear ();
   m_shapes_found.clear ();
@@ -869,14 +845,12 @@ NetTracer::name () const
   return m_name;
 }
 
-void 
-NetTracer::set_name (const std::string &n)
+void NetTracer::set_name (const std::string &n)
 {
   m_name = n;
 }
 
-void 
-NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const db::Point &pt_start, unsigned int l_start, const NetTracerData &data)
+void NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const db::Point &pt_start, unsigned int l_start, const NetTracerData &data)
 {
   db::Shape s_start = m_shape_heap.insert (db::Polygon (db::Box (pt_start - db::Vector (1, 1), pt_start + db::Vector (1, 1))));
 
@@ -884,8 +858,8 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const db::Poin
   trace (layout, cell, start, data);
 
   //  remove the artificial point-like seed from the shape list
-  for (std::set <NetTracerShape>::iterator s = m_shapes_found.begin (); s != m_shapes_found.end (); ) {
-    std::set <NetTracerShape>::iterator s1 = s;
+  for (std::set<NetTracerShape>::iterator s = m_shapes_found.begin (); s != m_shapes_found.end ();) {
+    std::set<NetTracerShape>::iterator s1 = s;
     ++s;
     if (s1->shape () == s_start) {
       m_shapes_found.erase (s1);
@@ -895,14 +869,12 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const db::Poin
   m_shapes_graph.clear ();
 }
 
-void
-NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTracerShape &start, const NetTracerData &data)
+void NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTracerShape &start, const NetTracerData &data)
 {
   trace (layout, cell, start, NetTracerShape (), data);
 }
 
-void 
-NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const db::Point &pt_start, unsigned int l_start, const db::Point &pt_stop, unsigned int l_stop, const NetTracerData &data)
+void NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const db::Point &pt_start, unsigned int l_start, const db::Point &pt_stop, unsigned int l_stop, const NetTracerData &data)
 {
   db::Shape s_start = m_shape_heap.insert (db::Polygon (db::Box (pt_start - db::Vector (1, 1), pt_start + db::Vector (1, 1))));
   db::Shape s_stop = m_shape_heap.insert (db::Polygon (db::Box (pt_stop - db::Vector (1, 1), pt_stop + db::Vector (1, 1))));
@@ -912,8 +884,8 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const db::Poin
   trace (layout, cell, start, stop, data);
 
   //  remove the artificial point-like seeds from the shape list
-  for (std::set <NetTracerShape>::iterator s = m_shapes_found.begin (); s != m_shapes_found.end (); ) {
-    std::set <NetTracerShape>::iterator s1 = s;
+  for (std::set<NetTracerShape>::iterator s = m_shapes_found.begin (); s != m_shapes_found.end ();) {
+    std::set<NetTracerShape>::iterator s1 = s;
     ++s;
     if (s1->shape () == s_start || s1->shape () == s_stop) {
       m_shapes_found.erase (s1);
@@ -923,33 +895,30 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const db::Poin
   m_shapes_graph.clear ();
 }
 
-void
-NetTracer::compute_results_for_next_iteration (const std::vector <const NetTracerShape *> &new_seeds, unsigned int seed_layer, const std::set<unsigned int> &output_layers, std::set <std::pair<NetTracerShape, const NetTracerShape *> > &current, std::set <std::pair<NetTracerShape, const NetTracerShape *> > &output, const NetTracerData &data)
+void NetTracer::compute_results_for_next_iteration (const std::vector<const NetTracerShape *> &new_seeds, unsigned int seed_layer, const std::set<unsigned int> &output_layers, std::set<std::pair<NetTracerShape, const NetTracerShape *>> &current, std::set<std::pair<NetTracerShape, const NetTracerShape *>> &output, const NetTracerData &data)
 {
   //  Compute the seed hull used to collect all interacting shapes and also to mask them out.
   db::Box secondary_box;
-  std::vector <db::Polygon> secondary_seed_polygons;
+  std::vector<db::Polygon> secondary_seed_polygons;
   secondary_seed_polygons.reserve (current.size ());
-  for (std::set <std::pair<NetTracerShape, const NetTracerShape *> >::const_iterator s = current.begin (); s != current.end (); ++s) {
+  for (std::set<std::pair<NetTracerShape, const NetTracerShape *>>::const_iterator s = current.begin (); s != current.end (); ++s) {
 
     if (s->first.shape ().is_polygon () || s->first.shape ().is_path () || s->first.shape ().is_box ()) {
 
       secondary_seed_polygons.push_back (db::Polygon ());
       s->first.shape ().polygon (secondary_seed_polygons.back ());
-      secondary_seed_polygons.back ().transform(s->first.trans ());
+      secondary_seed_polygons.back ().transform (s->first.trans ());
       secondary_box += secondary_seed_polygons.back ().box ();
-
     }
-
   }
 
-  std::vector <db::Polygon> secondary_seed_hull;
+  std::vector<db::Polygon> secondary_seed_hull;
   m_ep.simple_merge (secondary_seed_polygons, secondary_seed_hull, false);
 
   const std::set<unsigned int> &connected_layers = data.connections (seed_layer);
 
   //  collect all shapes related to that seed hull
-  for (std::vector <db::Polygon>::const_iterator s = secondary_seed_hull.begin (); s != secondary_seed_hull.end (); ++s) {
+  for (std::vector<db::Polygon>::const_iterator s = secondary_seed_hull.begin (); s != secondary_seed_hull.end (); ++s) {
     determine_interactions (*s, 0, connected_layers, current);
   }
 
@@ -973,16 +942,14 @@ TODO: optimization idea:
 
   for (std::set<unsigned int>::const_iterator c = output_layers.begin (); c != output_layers.end (); ++c) {
 
-    //  From new_entries compute the results of this operation, use only results interacting with the 
+    //  From new_entries compute the results of this operation, use only results interacting with the
     //  quad tree entries and store them in the output. Use seed_tree to assign the pieces back to the seeds for
-    //  building the shape graph. 
+    //  building the shape graph.
     data.expression (*c).compute_results (*c, cell ().cell_index (), &secondary_seed_hull, current, &seed_tree, m_shape_heap, output, data, m_ep);
-
   }
 }
 
-void
-NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTracerShape &start, const NetTracerShape &stop, const NetTracerData &data)
+void NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTracerShape &start, const NetTracerShape &stop, const NetTracerData &data)
 {
   mp_layout = &layout;
   mp_cell = &cell;
@@ -1015,16 +982,15 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
       std::set<unsigned int> ll = data.log_layers_for (start.layer ());
       for (std::set<unsigned int>::const_iterator l = ll.begin (); l != ll.end (); ++l) {
 
-        std::vector <const NetTracerShape *> new_seeds;
+        std::vector<const NetTracerShape *> new_seeds;
         new_seeds.push_back (start_shape);
 
-        std::set <std::pair<NetTracerShape, const NetTracerShape *> > new_entries;
+        std::set<std::pair<NetTracerShape, const NetTracerShape *>> new_entries;
         new_entries.insert (std::make_pair (m_start_shape, (const NetTracerShape *) 0));
 
         std::set<unsigned int> cl;
         cl.insert (*l);
         compute_results_for_next_iteration (new_seeds, *l, cl, new_entries, m_hit_test_queue, data);
-
       }
 
       if (m_stop_shape.is_valid ()) {
@@ -1037,27 +1003,23 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
           std::set<unsigned int> ll = data.log_layers_for (stop.layer ());
           for (std::set<unsigned int>::const_iterator l = ll.begin (); l != ll.end (); ++l) {
 
-            std::vector <const NetTracerShape *> new_seeds;
+            std::vector<const NetTracerShape *> new_seeds;
             new_seeds.push_back (stop_shape);
 
-            std::set <std::pair<NetTracerShape, const NetTracerShape *> > new_entries;
+            std::set<std::pair<NetTracerShape, const NetTracerShape *>> new_entries;
             new_entries.insert (std::make_pair (m_stop_shape, (const NetTracerShape *) 0));
 
             std::set<unsigned int> cl;
             cl.insert (*l);
             compute_results_for_next_iteration (new_seeds, *l, cl, new_entries, m_hit_test_queue, data);
-
           }
-
         }
-
       }
-
     }
 
     while (! m_hit_test_queue.empty ()) {
 
-      std::set<std::pair<NetTracerShape, const NetTracerShape *> >::iterator new_seed = m_hit_test_queue.end ();
+      std::set<std::pair<NetTracerShape, const NetTracerShape *>>::iterator new_seed = m_hit_test_queue.end ();
       --new_seed;
 
       db::Box combined_box = new_seed->first.bbox ();
@@ -1065,9 +1027,9 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
 
       unsigned int seed_layer = new_seed->first.layer ();
 
-      std::set<std::pair<NetTracerShape, const NetTracerShape *> >::iterator c;
+      std::set<std::pair<NetTracerShape, const NetTracerShape *>>::iterator c;
       size_t n = 1;
-      for (c = new_seed; c != m_hit_test_queue.begin (); ) {
+      for (c = new_seed; c != m_hit_test_queue.begin ();) {
 
         --c;
         ++n;
@@ -1093,16 +1055,14 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
           ++c;
           --n;
           break;
-
         }
-
       }
 
       //  Take out the new seeds and deliver them
-      std::vector <const NetTracerShape *> new_seeds;
+      std::vector<const NetTracerShape *> new_seeds;
       new_seeds.reserve (n);
 
-      for (std::set <std::pair<NetTracerShape, const NetTracerShape *> >::const_iterator td = c; td != m_hit_test_queue.end (); ++td) {
+      for (std::set<std::pair<NetTracerShape, const NetTracerShape *>>::const_iterator td = c; td != m_hit_test_queue.end (); ++td) {
         const NetTracerShape *shape = deliver_shape (td->first, td->second);
         if (shape) {
           new_seeds.push_back (shape);
@@ -1111,16 +1071,16 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
 
       m_hit_test_queue.erase (c, m_hit_test_queue.end ());
 
-      const std::pair <std::set <unsigned int>, std::set <unsigned int> > &bb = data.requires_booleans (seed_layer);
+      const std::pair<std::set<unsigned int>, std::set<unsigned int>> &bb = data.requires_booleans (seed_layer);
       const std::set<unsigned int> &connected_layers_with_booleans = bb.second;
       const std::set<unsigned int> &connected_layers_without_booleans = bb.first;
 
       if (! connected_layers_with_booleans.empty ()) {
 
-        //  In the boolean case, we do a collection step first. Then we determine the 
-        //  next generation interactions to get all the involved shapes, compute the 
+        //  In the boolean case, we do a collection step first. Then we determine the
+        //  next generation interactions to get all the involved shapes, compute the
         //  results of the boolean operations and do a shape-to-seed assignment later
-        std::set <std::pair<NetTracerShape, const NetTracerShape *> > new_entries;
+        std::set<std::pair<NetTracerShape, const NetTracerShape *>> new_entries;
 
         //  Determine next-generation interactions
         if (new_seeds.size () == 1) {
@@ -1148,17 +1108,16 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
           determine_interactions (new_seeds, combined_box, connected_layers_with_booleans, new_entries, true /*do not do seed assignment*/);
         }
 
-        std::set <unsigned int> computed_layers;
-        std::set <unsigned int> all_connected = data.log_connections (seed_layer);
-        std::set <unsigned int> involved = data.log_connections (seed_layer);
-        for (std::set <unsigned int>::const_iterator i = connected_layers_with_booleans.begin (); i != connected_layers_with_booleans.end (); ++i) {
-          std::set <unsigned int> ll = data.log_layers_for (*i);
+        std::set<unsigned int> computed_layers;
+        std::set<unsigned int> all_connected = data.log_connections (seed_layer);
+        std::set<unsigned int> involved = data.log_connections (seed_layer);
+        for (std::set<unsigned int>::const_iterator i = connected_layers_with_booleans.begin (); i != connected_layers_with_booleans.end (); ++i) {
+          std::set<unsigned int> ll = data.log_layers_for (*i);
           std::set_intersection (all_connected.begin (), all_connected.end (), ll.begin (), ll.end (), std::inserter (computed_layers, computed_layers.begin ()));
         }
 
         compute_results_for_next_iteration (new_seeds, seed_layer, computed_layers, new_entries, m_hit_test_queue, data);
-
-      } 
+      }
 
       if (! connected_layers_without_booleans.empty ()) {
 
@@ -1188,9 +1147,7 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
         } else if (! new_seeds.empty ()) {
           determine_interactions (new_seeds, combined_box, connected_layers_without_booleans, m_hit_test_queue, true);
         }
-
       }
-
     }
 
     m_hit_test_queue.clear ();
@@ -1217,7 +1174,6 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
     mp_progress = 0;
 
     throw;
-
   }
 
   try {
@@ -1241,10 +1197,10 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
       bool found = false;
 
       while (! cost.empty ()) {
-        
+
         ++search_progress;
 
-        size_t min_cost = std::numeric_limits <size_t>::max ();
+        size_t min_cost = std::numeric_limits<size_t>::max ();
         for (std::map<const NetTracerShape *, size_t>::const_iterator ac = cost.begin (); ac != cost.end (); ++ac) {
           if (ac->second < min_cost) {
             min_cost = ac->second;
@@ -1262,11 +1218,11 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
         }
 
         if (! current) {
-          break; 
+          break;
         }
 
-        const std::vector <const NetTracerShape *> &adj = m_shapes_graph[*current];
-        for (std::vector <const NetTracerShape *>::const_iterator a = adj.begin (); a != adj.end (); ++a) {
+        const std::vector<const NetTracerShape *> &adj = m_shapes_graph [*current];
+        for (std::vector<const NetTracerShape *>::const_iterator a = adj.begin (); a != adj.end (); ++a) {
           if (visited.find (*a) == visited.end ()) {
             std::map<const NetTracerShape *, size_t>::iterator ac = cost.find (*a);
             if (ac == cost.end ()) {
@@ -1283,7 +1239,6 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
           found = true;
           break;
         }
-
       }
 
       m_shapes_found.clear ();
@@ -1304,7 +1259,6 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
       }
 
       m_shapes_graph.clear ();
-
     }
 
   } catch (...) {
@@ -1314,8 +1268,7 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
   }
 }
 
-void 
-NetTracer::evaluate_text (const db::RecursiveShapeIterator &iter)
+void NetTracer::evaluate_text (const db::RecursiveShapeIterator &iter)
 {
   if (iter.shape ().is_text ()) {
     if (m_name.empty () || m_name_hier_depth < 0 || m_name_hier_depth > int (iter.depth ())) {
@@ -1336,7 +1289,7 @@ NetTracer::deliver_shape (const NetTracerShape &net_shape, const NetTracerShape 
       throw tl::BreakException ();
     }
 
-    std::pair<std::set <NetTracerShape>::iterator, bool> f = m_shapes_found.insert (net_shape);
+    std::pair<std::set<NetTracerShape>::iterator, bool> f = m_shapes_found.insert (net_shape);
     if (f.second) {
       if (mp_progress) {
         ++(*mp_progress);
@@ -1347,8 +1300,8 @@ NetTracer::deliver_shape (const NetTracerShape &net_shape, const NetTracerShape 
     }
 
   } else {
-    
-    std::map <NetTracerShape, std::vector<const NetTracerShape *> >::iterator n = m_shapes_graph.find (net_shape);
+
+    std::map<NetTracerShape, std::vector<const NetTracerShape *>>::iterator n = m_shapes_graph.find (net_shape);
     if (n == m_shapes_graph.end ()) {
 
       if (m_trace_depth > 0 && m_shapes_graph.size () >= m_trace_depth) {
@@ -1372,18 +1325,15 @@ NetTracer::deliver_shape (const NetTracerShape &net_shape, const NetTracerShape 
       n->second.push_back (adjacent);
 
       //  Record the reverse interaction
-      std::map <NetTracerShape, std::vector<const NetTracerShape *> >::iterator m = m_shapes_graph.find (*adjacent);
+      std::map<NetTracerShape, std::vector<const NetTracerShape *>>::iterator m = m_shapes_graph.find (*adjacent);
       m->second.push_back (&n->first);
-
     }
-
-  } 
+  }
 
   return ret;
 }
 
-void
-NetTracer::determine_interactions (const std::vector<const NetTracerShape *> &seeds, const db::Box &combined_box, const std::set<unsigned int> &layers, std::set <std::pair<NetTracerShape, const NetTracerShape *> > &delivery, bool do_seed_assignment)
+void NetTracer::determine_interactions (const std::vector<const NetTracerShape *> &seeds, const db::Box &combined_box, const std::set<unsigned int> &layers, std::set<std::pair<NetTracerShape, const NetTracerShape *>> &delivery, bool do_seed_assignment)
 {
   bool extract_full_graph = m_stop_shape.is_valid ();
 
@@ -1410,7 +1360,7 @@ NetTracer::determine_interactions (const std::vector<const NetTracerShape *> &se
 
         if (seed->trans ().is_ortho ()) {
           interact = interacts (seed->bbox (), net_shape);
-        } else  {
+        } else {
           db::Polygon box_poly (seed->shape ().box ());
           box_poly.transform (db::ICplxTrans (seed->trans ()));
           interact = interacts (box_poly, net_shape);
@@ -1429,16 +1379,13 @@ NetTracer::determine_interactions (const std::vector<const NetTracerShape *> &se
           break;
         }
       }
-
     }
 
     ++net_shapes;
-
   }
 }
 
-void
-NetTracer::determine_interactions (const db::Box &seed, const NetTracerShape *shape, const std::set<unsigned int> &layers, std::set <std::pair<NetTracerShape, const NetTracerShape *> > &delivery)
+void NetTracer::determine_interactions (const db::Box &seed, const NetTracerShape *shape, const std::set<unsigned int> &layers, std::set<std::pair<NetTracerShape, const NetTracerShape *>> &delivery)
 {
   db::RecursiveShapeIterator net_shapes (layout (), cell (), layers, seed);
   while (! net_shapes.at_end ()) {
@@ -1452,12 +1399,10 @@ NetTracer::determine_interactions (const db::Box &seed, const NetTracerShape *sh
     }
 
     ++net_shapes;
-
   }
 }
 
-void
-NetTracer::determine_interactions (const db::Polygon &seed, const NetTracerShape *shape, const std::set<unsigned int> &layers, std::set <std::pair<NetTracerShape, const NetTracerShape *> > &delivery)
+void NetTracer::determine_interactions (const db::Polygon &seed, const NetTracerShape *shape, const std::set<unsigned int> &layers, std::set<std::pair<NetTracerShape, const NetTracerShape *>> &delivery)
 {
   int area_ratio = 2;
 
@@ -1484,21 +1429,18 @@ NetTracer::determine_interactions (const db::Polygon &seed, const NetTracerShape
       }
 
       ++net_shapes;
-
     }
 
   } else {
 
     //  otherwise split polygon and recursively treat these parts ...
-    std::vector <db::Polygon> polygons;
+    std::vector<db::Polygon> polygons;
     db::split_polygon (seed, polygons);
 
     for (std::vector<db::Polygon>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
       determine_interactions (*p, shape, layers, delivery);
     }
-
   }
 }
 
 }
-

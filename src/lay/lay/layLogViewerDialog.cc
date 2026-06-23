@@ -40,15 +40,14 @@ namespace lay
 // -----------------------------------------------------------------
 //  LogReceiver implementation
 
-LogReceiver::LogReceiver (LogFile *file, int verbosity, void (LogFile::*method)(const std::string &, bool)) 
-    : mp_file (file), m_method (method), m_verbosity (verbosity)
-{ 
-  // .. nothing yet ..  
+LogReceiver::LogReceiver (LogFile *file, int verbosity, void (LogFile::*method) (const std::string &, bool))
+  : mp_file (file), m_method (method), m_verbosity (verbosity)
+{
+  // .. nothing yet ..
 }
 
-void 
-LogReceiver::puts (const char *s) 
-{ 
+void LogReceiver::puts (const char *s)
+{
   if (tl::verbosity () >= m_verbosity) {
 
     while (*s) {
@@ -60,7 +59,7 @@ LogReceiver::puts (const char *s)
 
       {
         QMutexLocker locker (&m_lock);
-        m_text += std::string (s0, s - s0); 
+        m_text += std::string (s0, s - s0);
       }
 
       if (*s == '\n') {
@@ -69,15 +68,12 @@ LogReceiver::puts (const char *s)
         m_text.clear ();
         ++s;
       }
-
     }
-
   }
 }
 
-void 
-LogReceiver::endl () 
-{ 
+void LogReceiver::endl ()
+{
   if (tl::verbosity () >= m_verbosity) {
     QMutexLocker locker (&m_lock);
     (mp_file->*m_method) (m_text, false);
@@ -85,21 +81,18 @@ LogReceiver::endl ()
   }
 }
 
-void
-LogReceiver::yield ()
+void LogReceiver::yield ()
 {
   mp_file->yield ();
 }
 
-void 
-LogReceiver::end () 
-{ 
+void LogReceiver::end ()
+{
   //  .. nothing yet ..
 }
 
-void 
-LogReceiver::begin () 
-{ 
+void LogReceiver::begin ()
+{
   //  .. nothing yet ..
 }
 
@@ -112,7 +105,7 @@ LogFile::LogFile (size_t max_entries, bool register_global)
     m_log_receiver (this, 10, &LogFile::add_info),
     m_info_receiver (this, 0, &LogFile::add_info),
     m_max_entries (max_entries),
-    m_generation_id (0), 
+    m_generation_id (0),
     m_last_generation_id (0),
     m_has_errors (false),
     m_has_warnings (false),
@@ -133,32 +126,28 @@ LogFile::LogFile (size_t max_entries, bool register_global)
   }
 }
 
-void
-LogFile::clear ()
+void LogFile::clear ()
 {
   QMutexLocker locker (&m_lock);
 
-  if (!m_messages.empty ()) {
+  if (! m_messages.empty ()) {
     m_messages.clear ();
     m_has_errors = m_has_warnings = false;
     ++m_generation_id;
   }
 }
 
-bool
-LogFile::has_errors () const
+bool LogFile::has_errors () const
 {
   return m_has_errors;
 }
 
-bool
-LogFile::has_warnings () const
+bool LogFile::has_warnings () const
 {
   return m_has_warnings;
 }
 
-void
-LogFile::separator ()
+void LogFile::separator ()
 {
   m_lock.lock ();
   bool has_separator = false;
@@ -172,8 +161,7 @@ LogFile::separator ()
   }
 }
 
-void 
-LogFile::copy ()
+void LogFile::copy ()
 {
   QMutexLocker locker (&m_lock);
 
@@ -185,8 +173,7 @@ LogFile::copy ()
   QApplication::clipboard ()->setText (text);
 }
 
-void 
-LogFile::timeout ()
+void LogFile::timeout ()
 {
   bool changed = false;
   bool attn = false, last_attn = false;
@@ -213,8 +200,7 @@ LogFile::timeout ()
   }
 }
 
-void
-LogFile::set_max_entries (size_t n)
+void LogFile::set_max_entries (size_t n)
 {
   QMutexLocker locker (&m_lock);
 
@@ -231,8 +217,7 @@ LogFile::max_entries () const
   return m_max_entries;
 }
 
-void 
-LogFile::add (LogFileEntry::mode_type mode, const std::string &msg, bool continued)
+void LogFile::add (LogFileEntry::mode_type mode, const std::string &msg, bool continued)
 {
   QMutexLocker locker (&m_lock);
 
@@ -255,8 +240,7 @@ LogFile::add (LogFileEntry::mode_type mode, const std::string &msg, bool continu
   ++m_generation_id;
 }
 
-void
-LogFile::yield ()
+void LogFile::yield ()
 {
   //  will update on next processEvents
   if (lay::ApplicationBase::instance ()->qapp_gui () && QThread::currentThread () == lay::ApplicationBase::instance ()->qapp_gui ()->thread ()) {
@@ -266,16 +250,15 @@ LogFile::yield ()
   }
 }
 
-int 
-LogFile::rowCount(const QModelIndex & /*parent*/) const
+int LogFile::rowCount (const QModelIndex & /*parent*/) const
 {
   QMutexLocker locker (&m_lock);
 
   return int (m_messages.size ());
 }
 
-QVariant 
-LogFile::data(const QModelIndex &index, int role) const
+QVariant
+LogFile::data (const QModelIndex &index, int role) const
 {
   QMutexLocker locker (&m_lock);
 
@@ -298,7 +281,7 @@ LogFile::data(const QModelIndex &index, int role) const
 
     if (index.row () < int (m_messages.size ()) && index.row () >= 0) {
       return QVariant (tl::to_qstring (m_messages [index.row ()].text ()));
-    } 
+    }
 
   } else if (role == Qt::FontRole) {
 
@@ -313,7 +296,7 @@ LogFile::data(const QModelIndex &index, int role) const
         f.setItalic (true);
         return QVariant (f);
       }
-    } 
+    }
 
   } else if (role == Qt::ForegroundRole) {
 
@@ -326,9 +309,8 @@ LogFile::data(const QModelIndex &index, int role) const
       } else if (mode == LogFileEntry::Warning || mode == LogFileEntry::WarningContinued) {
         return QColor (0, 0, 255);
       }
-    } 
-
-  } 
+    }
+  }
 
   return QVariant ();
 }
@@ -337,13 +319,13 @@ LogFile::data(const QModelIndex &index, int role) const
 //  LogViewerDialog implementation
 
 LogViewerDialog::LogViewerDialog (QWidget *parent, bool register_global, bool interactive)
-  : QDialog (parent), 
-    m_file (50000, register_global)  //  TODO: make this variable ..
+  : QDialog (parent),
+    m_file (50000, register_global) //  TODO: make this variable ..
 {
   setupUi (this);
 
   //  For non-global log views, the verbosity selector does not make sense
-  if (!register_global) {
+  if (! register_global) {
     verbosity_cbx->hide ();
     verbosity_label->hide ();
   } else {
@@ -351,7 +333,7 @@ LogViewerDialog::LogViewerDialog (QWidget *parent, bool register_global, bool in
     connect (verbosity_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (verbosity_changed (int)));
   }
 
-  if (!interactive) {
+  if (! interactive) {
     clear_pb->hide ();
     separator_pb->hide ();
     copy_pb->hide ();
@@ -368,8 +350,7 @@ LogViewerDialog::LogViewerDialog (QWidget *parent, bool register_global, bool in
   connect (&m_file, SIGNAL (attention_changed (bool)), attn_frame, SLOT (setVisible (bool)));
 }
 
-void
-LogViewerDialog::verbosity_changed (int index)
+void LogViewerDialog::verbosity_changed (int index)
 {
   tl::verbosity ((index - 2) * 10 + 1);
 }
@@ -386,8 +367,7 @@ AlertLogButton::AlertLogButton (QWidget *parent)
   connect (this, SIGNAL (clicked ()), mp_logger, SLOT (exec ()));
 }
 
-void
-AlertLogButton::attention_changed (bool attn)
+void AlertLogButton::attention_changed (bool attn)
 {
   setVisible (attn);
 
@@ -401,9 +381,15 @@ AlertLogButton::attention_changed (bool attn)
       int l = 0, t = 0, r = 0, b = 0;
       frame->layout ()->getContentsMargins (&l, &t, &r, &b);
       if (attn) {
-        l += 3; t += 3; r += 2; b += 2;
+        l += 3;
+        t += 3;
+        r += 2;
+        b += 2;
       } else {
-        l -= 3; t -= 3; r -= 2; b -= 2;
+        l -= 3;
+        t -= 3;
+        r -= 2;
+        b -= 2;
       }
       frame->layout ()->setContentsMargins (l, t, r, b);
     }
@@ -419,11 +405,8 @@ AlertLogButton::attention_changed (bool attn)
 
       frame->setAutoFillBackground (false);
       frame->setPalette (QPalette ());
-
     }
-
   }
 }
 
 }
-

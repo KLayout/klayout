@@ -29,13 +29,13 @@
 namespace tl
 {
 
-namespace {
+namespace
+{
 
 class ResourceDict
 {
 public:
-  struct DictEntry
-  {
+  struct DictEntry {
     std::string name;
     const unsigned char *data;
     size_t data_size;
@@ -44,11 +44,11 @@ public:
 
   typedef std::vector<DictEntry>::const_iterator iterator;
 
-  ResourceDict () { }
+  ResourceDict () {}
 
   resource_id_type add (const char *name, bool compressed, const unsigned char *data, size_t data_size)
   {
-    m_dict[std::string (name)] = m_entries.size ();
+    m_dict [std::string (name)] = m_entries.size ();
     m_entries.push_back (DictEntry ());
     m_entries.back ().name = name;
     m_entries.back ().data = data;
@@ -133,9 +133,7 @@ std::pair<tl::InputStreamBase *, bool> get_resource_reader (const char *name)
 
     //  raw data
     return std::make_pair (new tl::InputMemoryStream ((const char *) entry->data, entry->data_size), false);
-
   }
-
 }
 
 tl::InputStream *get_resource (const char *name)
@@ -172,4 +170,3 @@ find_resources (const std::string &pattern)
 }
 
 }
-

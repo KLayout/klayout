@@ -125,66 +125,64 @@ void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gs
 {
   PYTHON_BEGIN_EXEC
 
-    tl::Heap heap;
+  tl::Heap heap;
 
-    int args_avail = int (std::distance (meth->begin_arguments (), meth->end_arguments ()));
-    PythonRef argv (PyTuple_New (args_avail));
-    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
-      PyTuple_SetItem (argv.get (), int (a - meth->begin_arguments ()), pull_arg (*a, args, 0, heap).release ());
+  int args_avail = int (std::distance (meth->begin_arguments (), meth->end_arguments ()));
+  PythonRef argv (PyTuple_New (args_avail));
+  for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
+    PyTuple_SetItem (argv.get (), int (a - meth->begin_arguments ()), pull_arg (*a, args, 0, heap).release ());
+  }
+
+  //  NOTE: in case one event handler deletes the object, it's safer to first collect the handlers and
+  //  then call them.
+  std::vector<PythonRef> callables;
+  callables.reserve (m_cbfuncs.size ());
+  for (std::vector<CallbackFunction>::const_iterator c = m_cbfuncs.begin (); c != m_cbfuncs.end (); ++c) {
+    PythonRef callable = c->callable ();
+    if (callable) {
+      callables.push_back (c->callable ());
     }
+  }
 
-    //  NOTE: in case one event handler deletes the object, it's safer to first collect the handlers and
-    //  then call them.
-    std::vector<PythonRef> callables;
-    callables.reserve (m_cbfuncs.size ());
-    for (std::vector<CallbackFunction>::const_iterator c = m_cbfuncs.begin (); c != m_cbfuncs.end (); ++c) {
-      PythonRef callable = c->callable ();
-      if (callable) {
-        callables.push_back (c->callable ());
-      }
-    }
+  PythonRef result;
 
-    PythonRef result;
+  for (std::vector<PythonRef>::const_iterator c = callables.begin (); c != callables.end (); ++c) {
 
-    for (std::vector<PythonRef>::const_iterator c = callables.begin (); c != callables.end (); ++c) {
+    //  determine the number of arguments required
+    int arg_count = args_avail;
+    if (args_avail > 0) {
 
-      //  determine the number of arguments required
-      int arg_count = args_avail;
-      if (args_avail > 0) {
-
-        PythonRef fc (PyObject_GetAttrString (c->get (), "__code__"));
-        if (fc) {
-          PythonRef ac (PyObject_GetAttrString (fc.get (), "co_argcount"));
-          if (ac) {
-            arg_count = python2c<int> (ac.get ());
-            if (PyObject_HasAttrString (c->get (), "__self__")) {
-              arg_count -= 1;
-            }
+      PythonRef fc (PyObject_GetAttrString (c->get (), "__code__"));
+      if (fc) {
+        PythonRef ac (PyObject_GetAttrString (fc.get (), "co_argcount"));
+        if (ac) {
+          arg_count = python2c<int> (ac.get ());
+          if (PyObject_HasAttrString (c->get (), "__self__")) {
+            arg_count -= 1;
           }
         }
-
       }
-
-      //  use less arguments if applicable
-      if (arg_count == 0) {
-        result = PythonRef (PyObject_CallObject (c->get (), NULL));
-      } else if (arg_count < args_avail) {
-        PythonRef argv_less (PyTuple_GetSlice (argv.get (), 0, arg_count));
-        result = PythonRef (PyObject_CallObject (c->get (), argv_less.get ()));
-      } else {
-        result = PythonRef (PyObject_CallObject (c->get (), argv.get ()));
-      }
-
-      if (! result) {
-        check_error ();
-      }
-
     }
 
-    push_arg (meth->ret_type (), ret, result.get (), heap);
+    //  use less arguments if applicable
+    if (arg_count == 0) {
+      result = PythonRef (PyObject_CallObject (c->get (), NULL));
+    } else if (arg_count < args_avail) {
+      PythonRef argv_less (PyTuple_GetSlice (argv.get (), 0, arg_count));
+      result = PythonRef (PyObject_CallObject (c->get (), argv_less.get ()));
+    } else {
+      result = PythonRef (PyObject_CallObject (c->get (), argv.get ()));
+    }
 
-    //  a Python callback must not leave temporary objects
-    tl_assert (heap.empty ());
+    if (! result) {
+      check_error ();
+    }
+  }
+
+  push_arg (meth->ret_type (), ret, result.get (), heap);
+
+  //  a Python callback must not leave temporary objects
+  tl_assert (heap.empty ());
 
   PYTHON_END_EXEC
 }

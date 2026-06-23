@@ -31,8 +31,7 @@
 namespace ant
 {
 
-int
-Template::current_version ()
+int Template::current_version ()
 {
   return 1;
 }
@@ -79,7 +78,7 @@ Template::Template ()
 }
 
 Template::Template (const std::string &title,
-                    const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt, 
+                    const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt,
                     style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraint,
                     const std::string &cat)
   : m_version (current_version ()),
@@ -139,13 +138,13 @@ Template::operator= (const ant::Template &d)
   return *this;
 }
 
-std::vector<Template> 
+std::vector<Template>
 Template::from_string (const std::string &s)
 {
   std::vector<Template> r;
 
   try {
-    
+
     tl::Extractor ex (s.c_str ());
 
     if (! ex.at_end ()) {
@@ -174,9 +173,9 @@ Template::from_string (const std::string &s)
           r.back ().set_mode (mode);
 
         } else if (key == "title") {
-          
+
           r.back ().title (s);
-          
+
         } else if (key == "category") {
 
           r.back ().category (s);
@@ -268,27 +267,23 @@ Template::from_string (const std::string &s)
           lay::angle_constraint_type sm;
           sc.from_string (s, sm);
           r.back ().angle_constraint (sm);
-
         }
 
         ex.test (",");
-        
+
         if (ex.test (";")) {
 
           r.push_back (Template ());
           r.back ().version (0);
-
         }
-
       }
 
       //  downgrade version
       if (r.back ().version () > current_version ()) {
         r.back ().version (current_version ());
       }
-
     }
-    
+
   } catch (tl::Exception &ex) {
     tl::error << ex.msg ();
     r.clear ();
@@ -303,9 +298,9 @@ std::string
 Template::to_string (const std::vector<Template> &v)
 {
   std::string r;
-  
+
   for (std::vector<Template>::const_iterator t = v.begin (); t != v.end (); ++t) {
-    
+
     if (! r.empty ()) {
       r += ";";
     }
@@ -333,7 +328,7 @@ Template::to_string (const std::vector<Template> &v)
     r += "fmt_y=";
     r += tl::to_word_or_quoted_string (t->fmt_y ());
     r += ",";
-    
+
     r += "position=";
     ant::PositionConverter pc;
     r += pc.to_string (t->main_position ());
@@ -363,12 +358,12 @@ Template::to_string (const std::vector<Template> &v)
     ant::StyleConverter sc;
     r += sc.to_string (t->style ());
     r += ",";
-    
+
     r += "outline=";
     ant::OutlineConverter oc;
     r += oc.to_string (t->outline ());
     r += ",";
-    
+
     r += "snap=";
     r += tl::to_string (t->snap ());
     r += ",";
@@ -376,12 +371,10 @@ Template::to_string (const std::vector<Template> &v)
     r += "angle_constraint=";
     lay::ACConverter acc;
     r += acc.to_string (t->angle_constraint ());
-
   }
- 
+
   return r;
 }
 
 
 } // namespace ant
-

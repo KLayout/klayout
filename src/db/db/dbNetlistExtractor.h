@@ -129,14 +129,14 @@ public:
    *  NOTE: this feature is not really used as must-connect nets are handled now in the LayoutToNetlist extractor.
    *  Remove this function later.
    */
-  void set_joined_nets (const std::list<std::set<std::string> > &jnn);
+  void set_joined_nets (const std::list<std::set<std::string>> &jnn);
 
   /**
    *  @brief Sets the joined nets attribute per cell
    *  NOTE: this feature is not really used as must-connect nets are handled now in the LayoutToNetlist extractor.
    *  Remove this function later.
    */
-  void set_joined_nets (const std::string &cell_name, const std::list<std::set<std::string> > &jnn);
+  void set_joined_nets (const std::string &cell_name, const std::list<std::set<std::string>> &jnn);
 
   /**
    *  @brief Extract the nets
@@ -152,9 +152,9 @@ private:
   std::pair<bool, db::property_names_id_type> m_device_annot_name_id;
   std::pair<bool, db::property_names_id_type> m_terminal_annot_name_id;
   std::list<tl::GlobPattern> m_joined_net_names;
-  std::list<std::pair<std::string, std::list<tl::GlobPattern> > > m_joined_net_names_per_cell;
-  std::list<std::set<std::string> > m_joined_nets;
-  std::list<std::pair<std::string, std::list<std::set<std::string> > > > m_joined_nets_per_cell;
+  std::list<std::pair<std::string, std::list<tl::GlobPattern>>> m_joined_net_names_per_cell;
+  std::list<std::set<std::string>> m_joined_nets;
+  std::list<std::pair<std::string, std::list<std::set<std::string>>>> m_joined_nets_per_cell;
   bool m_include_floating_subcircuits;
 
   bool instance_is_device (db::properties_id_type prop_id) const;
@@ -205,7 +205,7 @@ private:
                                      db::Net *net,
                                      std::map<std::pair<cell_index_type, ICplxTrans>, SubCircuit *> &subcircuits,
                                      const std::map<db::cell_index_type, db::Circuit *> &circuits,
-                                     const std::map<db::cell_index_type, std::map<size_t, size_t> > &pins_per_cluster);
+                                     const std::map<db::cell_index_type, std::map<size_t, size_t>> &pins_per_cluster);
 
   /**
    *  @brief Connects the devices
@@ -234,7 +234,6 @@ private:
    *  @brief Makes the terminal to cluster ID connections of the device abstract
    */
   void make_device_abstract_connections (db::DeviceAbstract *dm, connected_clusters_type &clusters);
-
 };
 
 }

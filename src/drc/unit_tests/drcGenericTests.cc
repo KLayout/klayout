@@ -47,12 +47,11 @@ static void run_test (tl::TestBase *_this, const std::string &number, bool deep)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = %s\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-        "$drc_test_deep = %s\n"
-      , force_gc, input, output, deep ? "true" : "false")
-    );
+      "$drc_force_gc = %s\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n"
+      "$drc_test_deep = %s\n",
+      force_gc, input, output, deep ? "true" : "false"));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -72,182 +71,182 @@ static void run_test (tl::TestBase *_this, const std::string &number, bool deep)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(1)
+TEST (1)
 {
   run_test (_this, "1", false);
 }
 
-TEST(1d)
+TEST (1d)
 {
   run_test (_this, "1", true);
 }
 
-TEST(2)
+TEST (2)
 {
   run_test (_this, "2", false);
 }
 
-TEST(2d)
+TEST (2d)
 {
   run_test (_this, "2", true);
 }
 
-TEST(3)
+TEST (3)
 {
   run_test (_this, "3", false);
 }
 
-TEST(3d)
+TEST (3d)
 {
   run_test (_this, "3", true);
 }
 
-TEST(4)
+TEST (4)
 {
   run_test (_this, "4", false);
 }
 
-TEST(4d)
+TEST (4d)
 {
   run_test (_this, "4", true);
 }
 
-TEST(5)
+TEST (5)
 {
   run_test (_this, "5", false);
 }
 
-TEST(5d)
+TEST (5d)
 {
   run_test (_this, "5", true);
 }
 
-TEST(6)
+TEST (6)
 {
   run_test (_this, "6", false);
 }
 
-TEST(6d)
+TEST (6d)
 {
   run_test (_this, "6", true);
 }
 
-TEST(7)
+TEST (7)
 {
   run_test (_this, "7", false);
 }
 
-TEST(7d)
+TEST (7d)
 {
   run_test (_this, "7", true);
 }
 
-TEST(8)
+TEST (8)
 {
   run_test (_this, "8", false);
 }
 
-TEST(8d)
+TEST (8d)
 {
   run_test (_this, "8", true);
 }
 
-TEST(9)
+TEST (9)
 {
   run_test (_this, "9", false);
 }
 
-TEST(9d)
+TEST (9d)
 {
   run_test (_this, "9", true);
 }
 
-TEST(10)
+TEST (10)
 {
   run_test (_this, "10", false);
 }
 
-TEST(10d)
+TEST (10d)
 {
   run_test (_this, "10", true);
 }
 
-TEST(11)
+TEST (11)
 {
   run_test (_this, "11", false);
 }
 
-TEST(11d)
+TEST (11d)
 {
   run_test (_this, "11", true);
 }
 
-TEST(12)
+TEST (12)
 {
   run_test (_this, "12", false);
 }
 
-TEST(12d)
+TEST (12d)
 {
   run_test (_this, "12", true);
 }
 
-TEST(13)
+TEST (13)
 {
   run_test (_this, "13", false);
 }
 
-TEST(13d)
+TEST (13d)
 {
   run_test (_this, "13", true);
 }
 
-TEST(14)
+TEST (14)
 {
   run_test (_this, "14", false);
 }
 
-TEST(14d)
+TEST (14d)
 {
   run_test (_this, "14", true);
 }
 
-TEST(15)
+TEST (15)
 {
   run_test (_this, "15", false);
 }
 
-TEST(15d)
+TEST (15d)
 {
   run_test (_this, "15", true);
 }
 
-TEST(16)
+TEST (16)
 {
   run_test (_this, "16", false);
 }
 
-TEST(16d)
+TEST (16d)
 {
   run_test (_this, "16", true);
 }
 
-TEST(17)
+TEST (17)
 {
   run_test (_this, "17", false);
 }
 
-TEST(17d)
+TEST (17d)
 {
   run_test (_this, "17", true);
 }
 
-TEST(18)
+TEST (18)
 {
   run_test (_this, "18", false);
 }
 
-TEST(18d)
+TEST (18d)
 {
   run_test (_this, "18", true);
 }

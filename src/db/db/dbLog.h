@@ -35,10 +35,10 @@ namespace db
  *  @brief An enum describing the severity for a log entry
  */
 enum Severity {
-  NoSeverity = 0,   //  unspecific
-  Info = 1,         //  information only
-  Warning = 2,      //  a warning
-  Error = 3         //  an error
+  NoSeverity = 0, //  unspecific
+  Info = 1,       //  information only
+  Warning = 2,    //  a warning
+  Error = 3       //  an error
 };
 
 /**

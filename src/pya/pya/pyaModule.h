@@ -37,8 +37,8 @@
 
 namespace gsi
 {
-  class ClassBase;
-  class MethodBase;
+class ClassBase;
+class MethodBase;
 }
 
 namespace pya

@@ -63,7 +63,7 @@ render_scanline_std_edge (const uint32_t *dp, unsigned int ds, const lay::Bitmap
   const uint32_t *dm = dp;
 
   unsigned int b = (y % (32 * ds));
-  bool vflag = (dp[b / 32] & (1 << (b % 32))) != 0;
+  bool vflag = (dp [b / 32] & (1 << (b % 32))) != 0;
 
   uint32_t ddp = 0;
 
@@ -145,9 +145,9 @@ render_scanline_std_edge (const uint32_t *dp, unsigned int ds, const lay::Bitmap
 
      */
 
-    uint32_t sol      = d - (d & (dhi | dvi | dhn | dvn));
-    uint32_t with_hm  = (d - (d & dvi)) & dhn;
-    uint32_t with_vm  = (d - (d & dhi)) & dvn;
+    uint32_t sol = d - (d & (dhi | dvi | dhn | dvn));
+    uint32_t with_hm = (d - (d & dvi)) & dhn;
+    uint32_t with_vm = (d - (d & dhi)) & dvn;
     uint32_t with_hvm = d & dhi & dvi & dhn & dvn;
 
     uint32_t hm = *dm++;
@@ -199,12 +199,12 @@ render_scanline_std_edge (const uint32_t *dp, unsigned int ds, const lay::Bitmap
 
      */
 
-    uint32_t sol    = d - (d & (dhi | dvi | dhn | dvn));
-    uint32_t twin   = (d - (d & (dhi | dvi))) & (dhn ^ dvn);
+    uint32_t sol = d - (d & (dhi | dvi | dhn | dvn));
+    uint32_t twin = (d - (d & (dhi | dvi))) & (dhn ^ dvn);
     uint32_t corner = (d - (d & (dhi | dvi))) & dhn & dvn;
-    uint32_t hbar   = (d - (d & dvi)) & dhi;
-    uint32_t vbar   = (d - (d & dhi)) & dvi;
-    uint32_t inner  = d & dhi & dvi;
+    uint32_t hbar = (d - (d & dvi)) & dhi;
+    uint32_t vbar = (d - (d & dhi)) & dvi;
+    uint32_t inner = d & dhi & dvi;
 
     uint32_t hm = *dm++;
     uint32_t dd = 0;
@@ -227,7 +227,6 @@ render_scanline_std_edge (const uint32_t *dp, unsigned int ds, const lay::Bitmap
 
     x -= lay::wordlen;
     ddp = d;
-
   }
 }
 
@@ -249,20 +248,20 @@ render_scanline_px (const uint32_t *dp, unsigned int ds, const lay::Bitmap *pbit
   unsigned int px1 = (pixels - 1) / 2;
   unsigned int px2 = (pixels - 1) - px1;
 
-  const uint32_t *ps[16];
+  const uint32_t *ps [16];
   for (unsigned int p = 0; p < pixels; ++p) {
     if (y + p < px1) {
-      ps[p] = pbitmap->scanline (0);
+      ps [p] = pbitmap->scanline (0);
     } else if ((y + p - px1) >= h) {
-      ps[p] = pbitmap->scanline (h - 1);
+      ps [p] = pbitmap->scanline (h - 1);
     } else {
-      ps[p] = pbitmap->scanline (y + p - px1);
+      ps [p] = pbitmap->scanline (y + p - px1);
     }
   }
 
   uint32_t d, dd = 0, dn = 0;
   for (unsigned int p = 0; p < pixels; ++p) {
-    dn |= *(ps[p]++);
+    dn |= *(ps [p]++);
   }
 
   unsigned int x = w;
@@ -273,7 +272,7 @@ render_scanline_px (const uint32_t *dp, unsigned int ds, const lay::Bitmap *pbit
     dn = 0;
     if (x > lay::wordlen) {
       for (unsigned int p = 0; p < pixels; ++p) {
-        dn |= *(ps[p]++);
+        dn |= *(ps [p]++);
       }
     }
 
@@ -297,9 +296,7 @@ render_scanline_px (const uint32_t *dp, unsigned int ds, const lay::Bitmap *pbit
     } else {
       break;
     }
-
   }
-
 }
 
 static void
@@ -326,14 +323,14 @@ render_scanline_cross (const uint32_t *dp, unsigned int ds, const lay::Bitmap *p
   unsigned int spx1 = (lw - 1) / 2;
   unsigned int spx2 = (lw - 1) - spx1;
 
-  const uint32_t *ps[max_pixels + 1];
+  const uint32_t *ps [max_pixels + 1];
   for (unsigned int p = 0; p < pixels; ++p) {
     if (y + p < px1) {
-      ps[p] = pbitmap->scanline (0);
+      ps [p] = pbitmap->scanline (0);
     } else if ((y + p - px1) >= h) {
-      ps[p] = pbitmap->scanline (h - 1);
+      ps [p] = pbitmap->scanline (h - 1);
     } else {
-      ps[p] = pbitmap->scanline (y + p - px1);
+      ps [p] = pbitmap->scanline (y + p - px1);
     }
   }
 
@@ -358,7 +355,7 @@ render_scanline_cross (const uint32_t *dp, unsigned int ds, const lay::Bitmap *p
     if (bpx1 > 0 || bpx2 > 0) {
 
       uint32_t d, dd = 0, dn;
-      dn = *(ps[o]++);
+      dn = *(ps [o]++);
 
       unsigned int x = w;
       while (true) {
@@ -367,7 +364,7 @@ render_scanline_cross (const uint32_t *dp, unsigned int ds, const lay::Bitmap *p
 
         dn = 0;
         if (x > lay::wordlen) {
-          dn = *(ps[o]++);
+          dn = *(ps [o]++);
         }
 
         uint32_t d0 = d;
@@ -402,7 +399,6 @@ render_scanline_cross (const uint32_t *dp, unsigned int ds, const lay::Bitmap *p
         } else {
           break;
         }
-
       }
 
     } else {
@@ -410,7 +406,7 @@ render_scanline_cross (const uint32_t *dp, unsigned int ds, const lay::Bitmap *p
       unsigned int x = w;
       while (true) {
 
-        uint32_t d = *(ps[o]++);
+        uint32_t d = *(ps [o]++);
 
         *dpp++ |= d & *dm++;
         if (dm == dp + ds) {
@@ -422,15 +418,12 @@ render_scanline_cross (const uint32_t *dp, unsigned int ds, const lay::Bitmap *p
         } else {
           break;
         }
-
       }
-
     }
-
   }
 }
 
-static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_in, const std::vector <unsigned int> &vo_map, const std::vector<lay::Bitmap *> &pbitmaps_in, const std::vector<unsigned int> &bm_map, const lay::LineStyles &ls, unsigned int width, unsigned int height, std::map<unsigned int, lay::Bitmap> &precursors, tl::Mutex *mutex)
+static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_in, const std::vector<unsigned int> &vo_map, const std::vector<lay::Bitmap *> &pbitmaps_in, const std::vector<unsigned int> &bm_map, const lay::LineStyles &ls, unsigned int width, unsigned int height, std::map<unsigned int, lay::Bitmap> &precursors, tl::Mutex *mutex)
 {
   tl_assert (bm_map.size () == vo_map.size ());
 
@@ -459,21 +452,18 @@ static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_i
       if (mutex) {
         mutex->unlock ();
       }
-
     }
-
   }
 }
 
-void
-bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
-                  const std::vector<lay::Bitmap *> &pbitmaps_in,
-                  const lay::DitherPattern &dp,
-                  const lay::LineStyles &ls,
-                  double dpr,
-                  tl::PixelBuffer *pimage, unsigned int width, unsigned int height,
-                  bool use_bitmap_index,
-                  tl::Mutex *mutex)
+void bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
+                       const std::vector<lay::Bitmap *> &pbitmaps_in,
+                       const lay::DitherPattern &dp,
+                       const lay::LineStyles &ls,
+                       double dpr,
+                       tl::PixelBuffer *pimage, unsigned int width, unsigned int height,
+                       bool use_bitmap_index,
+                       tl::Mutex *mutex)
 {
   bool transparent = pimage->transparent ();
 
@@ -497,7 +487,6 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
       bm_map.push_back (bi);
       ++n_in;
     }
-
   }
 
   //  Styled lines with width > 1 are not rendered directly, but through an intermediate step.
@@ -507,7 +496,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
 
   std::vector<lay::ViewOp> view_ops;
   std::vector<const lay::Bitmap *> pbitmaps;
-  std::vector<std::pair <tl::color_t, tl::color_t> > masks;
+  std::vector<std::pair<tl::color_t, tl::color_t>> masks;
   std::vector<uint32_t> non_empty_sls;
 
   view_ops.reserve (n_in);
@@ -519,7 +508,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
   //  for emptyness in slices of "slice" scanlines
   unsigned int slice = 32;
 
-  //  allocate a pixel buffer large enough to hold a scanline for all 
+  //  allocate a pixel buffer large enough to hold a scanline for all
   //  planes.
   unsigned int nwords = (width + 31) / 32;
   uint32_t *buffer = new uint32_t [n_in * nwords];
@@ -531,19 +520,19 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
       mutex->lock ();
     }
 
-    //  every "slice" scan lines test what bitmaps are empty 
-    if (y % slice == 0) { 
+    //  every "slice" scan lines test what bitmaps are empty
+    if (y % slice == 0) {
 
       view_ops.erase (view_ops.begin (), view_ops.end ());
       pbitmaps.erase (pbitmaps.begin (), pbitmaps.end ());
       non_empty_sls.erase (non_empty_sls.begin (), non_empty_sls.end ());
       for (unsigned int i = 0; i < n_in; ++i) {
 
-        const lay::ViewOp &vop = view_ops_in [vo_map[i]];
+        const lay::ViewOp &vop = view_ops_in [vo_map [i]];
         unsigned int w = vop.width ();
 
         const lay::Bitmap *pb = 0;
-        unsigned int bm_index = bm_map[i];
+        unsigned int bm_index = bm_map [i];
         if (bm_map [i] < pbitmaps_in.size ()) {
           if (w > 1 && ls.style (vop.line_style_index ()).width () > 0) {
             tl_assert (precursors.find (bm_index) != precursors.end ());
@@ -553,10 +542,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
           }
         }
 
-        if (pb != 0 
-            && w > 0
-            && ((pb->first_scanline () < y + slice && pb->last_scanline () > y) || w > 1)
-            && (vop.ormask () | ~vop.andmask ()) != 0) {
+        if (pb != 0 && w > 0 && ((pb->first_scanline () < y + slice && pb->last_scanline () > y) || w > 1) && (vop.ormask () | ~vop.andmask ()) != 0) {
 
           uint32_t non_empty_sl = 0;
           uint32_t m = 1;
@@ -572,19 +558,16 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
             pbitmaps.push_back (pb);
             non_empty_sls.push_back (non_empty_sl);
           }
-
         }
-
       }
-
-    } 
+    }
 
     //  Collect all necessary information to transfer a single scanline ..
-    
+
     masks.erase (masks.begin (), masks.end ());
 
     const uint32_t needed_bits = 0x00ffffff; // alpha channel not needed
-    const uint32_t fill_bits   = 0xff000000; // fill alpha value with ones
+    const uint32_t fill_bits = 0xff000000;   // fill alpha value with ones
     uint32_t *dptr = buffer;
     uint32_t ne_mask = (1 << (y % slice));
     for (unsigned int i = 0; i < view_ops.size (); ++i) {
@@ -617,11 +600,8 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
           }
 
           dptr += nwords;
-
         }
-
       }
-
     }
 
     //  unlock bitmaps against change by the redraw thread
@@ -634,31 +614,55 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
     if (masks.size () > 0) {
 
       tl::color_t *pt = (tl::color_t *) pimage->scan_line (height - 1 - y);
-      uint32_t *dptr_end = dptr; 
+      uint32_t *dptr_end = dptr;
 
       unsigned int i = 0;
       for (unsigned int x = 0; x < width; x += 32, ++i) {
 
-        tl::color_t y[32];
+        tl::color_t y [32];
         if (transparent) {
           for (int i = 0; i < 32; ++i) {
-            y[i] = 0;
+            y [i] = 0;
           }
         } else {
           for (int i = 0; i < 32; ++i) {
-            y[i] = fill_bits;
+            y [i] = fill_bits;
           }
         };
 
-        tl::color_t z[32] = { 
-          lay::wordones, lay::wordones, lay::wordones, lay::wordones, 
-          lay::wordones, lay::wordones, lay::wordones, lay::wordones, 
-          lay::wordones, lay::wordones, lay::wordones, lay::wordones, 
-          lay::wordones, lay::wordones, lay::wordones, lay::wordones, 
-          lay::wordones, lay::wordones, lay::wordones, lay::wordones, 
-          lay::wordones, lay::wordones, lay::wordones, lay::wordones, 
-          lay::wordones, lay::wordones, lay::wordones, lay::wordones, 
-          lay::wordones, lay::wordones, lay::wordones, lay::wordones, 
+        tl::color_t z [32] = {
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
+          lay::wordones,
         };
 
         dptr = dptr_end - nwords + i;
@@ -684,37 +688,31 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
                 }
               }
             }
-
           }
 
           dptr -= nwords;
-
         }
 
         for (unsigned int k = 0; k < 32 && x + k < width; ++k) {
-          *pt = (*pt & z[k]) | y[k];
+          *pt = (*pt & z [k]) | y [k];
           ++pt;
         }
-
       }
-
     }
-
   }
 
   //  free the pixel buffer
   delete [] buffer;
 }
 
-void
-bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
-                  const std::vector<lay::Bitmap *> &pbitmaps_in,
-                  const lay::DitherPattern &dp,
-                  const lay::LineStyles &ls,
-                  double dpr,
-                  tl::BitmapBuffer *pimage, unsigned int width, unsigned int height,
-                  bool use_bitmap_index,
-                  tl::Mutex *mutex)
+void bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
+                       const std::vector<lay::Bitmap *> &pbitmaps_in,
+                       const lay::DitherPattern &dp,
+                       const lay::LineStyles &ls,
+                       double dpr,
+                       tl::BitmapBuffer *pimage, unsigned int width, unsigned int height,
+                       bool use_bitmap_index,
+                       tl::Mutex *mutex)
 {
   std::vector<unsigned int> bm_map;
   std::vector<unsigned int> vo_map;
@@ -736,7 +734,6 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
       bm_map.push_back (bi);
       ++n_in;
     }
-
   }
 
   //  Styled lines with width > 1 are not rendered directly, but through an intermediate step.
@@ -746,7 +743,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
 
   std::vector<lay::ViewOp> view_ops;
   std::vector<const lay::Bitmap *> pbitmaps;
-  std::vector<std::pair <tl::color_t, tl::color_t> > masks;
+  std::vector<std::pair<tl::color_t, tl::color_t>> masks;
   std::vector<uint32_t> non_empty_sls;
 
   view_ops.reserve (n_in);
@@ -758,7 +755,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
   //  for emptyness in slices of "slice" scanlines
   unsigned int slice = 32;
 
-  //  allocate a pixel buffer large enough to hold a scanline for all 
+  //  allocate a pixel buffer large enough to hold a scanline for all
   //  planes.
   unsigned int nwords = (width + 31) / 32;
   uint32_t *buffer = new uint32_t [n_in * nwords];
@@ -770,19 +767,19 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
       mutex->lock ();
     }
 
-    //  every "slice" scan lines test what bitmaps are empty 
-    if (y % slice == 0) { 
+    //  every "slice" scan lines test what bitmaps are empty
+    if (y % slice == 0) {
 
       view_ops.erase (view_ops.begin (), view_ops.end ());
       pbitmaps.erase (pbitmaps.begin (), pbitmaps.end ());
       non_empty_sls.erase (non_empty_sls.begin (), non_empty_sls.end ());
       for (unsigned int i = 0; i < n_in; ++i) {
 
-        const lay::ViewOp &vop = view_ops_in [vo_map[i]];
+        const lay::ViewOp &vop = view_ops_in [vo_map [i]];
         unsigned int w = vop.width ();
 
         const lay::Bitmap *pb = 0;
-        unsigned int bm_index = bm_map[i];
+        unsigned int bm_index = bm_map [i];
         if (bm_map [i] < pbitmaps_in.size ()) {
           if (w > 1 && ls.style (vop.line_style_index ()).width () > 0) {
             tl_assert (precursors.find (bm_index) != precursors.end ());
@@ -792,10 +789,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
           }
         }
 
-        if (pb != 0
-            && w > 0
-            && ((pb->first_scanline () < y + slice && pb->last_scanline () > y) || w > 1)
-            && (vop.ormask () | ~vop.andmask ()) != 0) {
+        if (pb != 0 && w > 0 && ((pb->first_scanline () < y + slice && pb->last_scanline () > y) || w > 1) && (vop.ormask () | ~vop.andmask ()) != 0) {
 
           uint32_t non_empty_sl = 0;
           uint32_t m = 1;
@@ -811,15 +805,12 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
             pbitmaps.push_back (pb);
             non_empty_sls.push_back (non_empty_sl);
           }
-
         }
-
       }
-
-    } 
+    }
 
     //  Collect all necessary information to transfer a single scanline ..
-    
+
     masks.erase (masks.begin (), masks.end ());
 
     uint32_t needed_bits = 0x008000; // only green bit 7 required
@@ -855,11 +846,8 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
           }
 
           dptr += nwords;
-
         }
-
       }
-
     }
 
     //  unlock bitmaps against change by the redraw thread
@@ -872,7 +860,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
     if (masks.size () > 0) {
 
       tl::color_t *pt = (tl::color_t *) pimage->scan_line (height - 1 - y);
-      uint32_t *dptr_end = dptr; 
+      uint32_t *dptr_end = dptr;
 
       unsigned int i = 0;
       for (unsigned int x = 0; x < width; x += 32, ++i) {
@@ -886,7 +874,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
           if (d != 0) {
             uint32_t m = 1;
             for (unsigned int k = 0; k < 32 && x + k < width; ++k, m <<= 1) {
-              if ((d & m) != 0) { 
+              if ((d & m) != 0) {
                 if (masks [j].first & needed_bits) {
                   y |= (z & m);
                 }
@@ -901,24 +889,20 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
 
         *pt = (*pt & z) | y;
         ++pt;
-
       }
-
     }
-
   }
 
   //  free the pixel buffer
   delete [] buffer;
 }
 
-void
-bitmap_to_bitmap (const lay::ViewOp &view_op, const lay::Bitmap &bitmap,
-                  unsigned char *data,
-                  unsigned int width, unsigned int height,
-                  const lay::DitherPattern &dp,
-                  const lay::LineStyles &ls,
-                  double dpr)
+void bitmap_to_bitmap (const lay::ViewOp &view_op, const lay::Bitmap &bitmap,
+                       unsigned char *data,
+                       unsigned int width, unsigned int height,
+                       const lay::DitherPattern &dp,
+                       const lay::LineStyles &ls,
+                       double dpr)
 {
   //  quick exit, if line width is zero
   if (view_op.width () == 0) {
@@ -970,7 +954,6 @@ bitmap_to_bitmap (const lay::ViewOp &view_op, const lay::Bitmap &bitmap,
           }
 
           bp = &precursor;
-
         }
 
         if (view_op.shape () == lay::ViewOp::Rect) {
@@ -982,7 +965,7 @@ bitmap_to_bitmap (const lay::ViewOp &view_op, const lay::Bitmap &bitmap,
 
       const uint32_t *p = buffer;
       uint32_t d = 0;
-      const char *dp = (const char *)&d;
+      const char *dp = (const char *) &d;
 
       if (x0 == 0xc0) {
 
@@ -990,10 +973,10 @@ bitmap_to_bitmap (const lay::ViewOp &view_op, const lay::Bitmap &bitmap,
         while (nbytes >= 4) {
           d = *p++;
           if (d) {
-            *data++ |= dp[3];
-            *data++ |= dp[2];
-            *data++ |= dp[1];
-            *data++ |= dp[0];
+            *data++ |= dp [3];
+            *data++ |= dp [2];
+            *data++ |= dp [1];
+            *data++ |= dp [0];
           } else {
             data += 4;
           }
@@ -1018,10 +1001,10 @@ bitmap_to_bitmap (const lay::ViewOp &view_op, const lay::Bitmap &bitmap,
         while (nbytes >= 4) {
           d = *p++;
           if (d) {
-            *data++ |= dp[0];
-            *data++ |= dp[1];
-            *data++ |= dp[2];
-            *data++ |= dp[3];
+            *data++ |= dp [0];
+            *data++ |= dp [1];
+            *data++ |= dp [2];
+            *data++ |= dp [3];
           } else {
             data += 4;
           }
@@ -1047,11 +1030,9 @@ bitmap_to_bitmap (const lay::ViewOp &view_op, const lay::Bitmap &bitmap,
     } else {
       data += nbytes;
     }
-    
   }
 
   delete [] buffer;
 }
 
 }
-

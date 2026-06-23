@@ -37,14 +37,14 @@ namespace gsi
 ClassBase::class_collection *ClassBase::mp_class_collection = 0;
 ClassBase::class_collection *ClassBase::mp_new_class_collection = 0;
 
-namespace {
-  struct type_info_compare
+namespace
+{
+struct type_info_compare {
+  bool operator() (const std::type_info *a, const std::type_info *b) const
   {
-    bool operator() (const std::type_info *a, const std::type_info *b) const
-    {
-      return a->before (*b);
-    }
-  };
+    return a->before (*b);
+  }
+};
 }
 
 //  TODO: thread-safe? Unlikely that multiple threads access this member -
@@ -59,7 +59,7 @@ static tname_to_class_map_t *sp_tname_to_class = 0;
 
 ClassBase::ClassBase (const std::string &doc, const Methods &mm, bool do_register)
   : m_initialized (false), mp_base (0), mp_parent (0), m_doc (doc), m_methods (mm)
-{ 
+{
   if (do_register) {
 
     //  enter the class into the "new" collection
@@ -85,7 +85,6 @@ ClassBase::ClassBase (const std::string &doc, const Methods &mm, bool do_registe
       delete sp_tname_to_class;
       sp_tname_to_class = 0;
     }
-
   }
 }
 
@@ -94,8 +93,7 @@ ClassBase::~ClassBase ()
   //  .. nothing yet ..
 }
 
-void
-ClassBase::set_parent (const ClassBase *p)
+void ClassBase::set_parent (const ClassBase *p)
 {
   if (mp_parent != p) {
     mp_parent = p;
@@ -103,8 +101,7 @@ ClassBase::set_parent (const ClassBase *p)
   }
 }
 
-void
-ClassBase::set_base (const ClassBase *b)
+void ClassBase::set_base (const ClassBase *b)
 {
   if (mp_base != b) {
     mp_base = b;
@@ -112,7 +109,7 @@ ClassBase::set_base (const ClassBase *b)
   }
 }
 
-std::string 
+std::string
 ClassBase::qname () const
 {
   std::string qn = name ();
@@ -124,8 +121,7 @@ ClassBase::qname () const
   return qn;
 }
 
-void
-ClassBase::add_subclass (const ClassBase *cls)
+void ClassBase::add_subclass (const ClassBase *cls)
 {
   //  TODO: ugly const_cast hack
   ClassBase *non_const_cls = const_cast<ClassBase *> (cls);
@@ -133,8 +129,7 @@ ClassBase::add_subclass (const ClassBase *cls)
   m_initialized = false;
 }
 
-void
-ClassBase::add_child_class (const ClassBase *cls)
+void ClassBase::add_child_class (const ClassBase *cls)
 {
   //  TODO: ugly const_cast hack
   ClassBase *non_const_cls = const_cast<ClassBase *> (cls);
@@ -145,14 +140,13 @@ ClassBase::add_child_class (const ClassBase *cls)
   m_initialized = false;
 }
 
-bool 
-ClassBase::is_derived_from (const ClassBase *base) const
+bool ClassBase::is_derived_from (const ClassBase *base) const
 {
   if (! base) {
     return false;
   } else if (base == this) {
     return true;
-  } else if (!mp_base) {
+  } else if (! mp_base) {
     return false;
   } else {
     return mp_base->is_derived_from (base);
@@ -162,7 +156,7 @@ ClassBase::is_derived_from (const ClassBase *base) const
 /**
  *  @brief This function returns true if the given method m of target can convert an object of type from into target.
  */
-static bool 
+static bool
 is_constructor_of (const ClassBase *target, const MethodBase *m, const ClassBase *from)
 {
   if (m->ret_type ().cls () != target) {
@@ -191,8 +185,7 @@ is_constructor_of (const ClassBase *target, const MethodBase *m, const ClassBase
   }
 }
 
-bool 
-ClassBase::can_convert_to (const ClassBase *target) const
+bool ClassBase::can_convert_to (const ClassBase *target) const
 {
   for (method_iterator m = target->begin_constructors (); m != target->end_constructors (); ++m) {
     if (is_constructor_of (target, *m, this)) {
@@ -235,9 +228,9 @@ ClassBase::create_obj_from (const ClassBase *from, void *obj) const
 }
 
 const ClassBase::class_collection &
-ClassBase::collection () 
+ClassBase::collection ()
 {
-  if (!mp_class_collection) {
+  if (! mp_class_collection) {
     static const class_collection empty;
     return empty;
   } else {
@@ -248,7 +241,7 @@ ClassBase::collection ()
 const ClassBase::class_collection &
 ClassBase::new_collection ()
 {
-  if (!mp_new_class_collection) {
+  if (! mp_new_class_collection) {
     static const class_collection empty;
     return empty;
   } else {
@@ -260,10 +253,10 @@ static SpecialMethod *
 sm_default_ctor (const char *name, const gsi::ClassBase *cls)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (tr ("@brief Creates a new object of this class\n")),
-    false,   //  non-const
-    true,    //  static
-    MethodBase::DefaultCtor);
+                                         tl::to_string (tr ("@brief Creates a new object of this class\n")),
+                                         false, //  non-const
+                                         true,  //  static
+                                         MethodBase::DefaultCtor);
 
   gsi::ArgType ret;
   ret.set_is_ptr (true);
@@ -279,11 +272,11 @@ static SpecialMethod *
 sm_destroy (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (tr ("@brief Explicitly destroys the object\nExplicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.\n"
-                       "If the object is not owned by the script, this method will do nothing.")),
-    false,   //  non-const
-    false,   //  non-static
-    MethodBase::Destroy);
+                                         tl::to_string (tr ("@brief Explicitly destroys the object\nExplicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.\n"
+                                                            "If the object is not owned by the script, this method will do nothing.")),
+                                         false, //  non-const
+                                         false, //  non-static
+                                         MethodBase::Destroy);
 
   return sm;
 }
@@ -292,12 +285,12 @@ static SpecialMethod *
 sm_create (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (tr ("@brief Ensures the C++ object is created\n"
-                       "Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. "
-                       "Usually C++ objects are created on demand and not necessarily when the script object is created.")),
-    false,   //  non-const
-    false,   //  non-static
-    MethodBase::Create);
+                                         tl::to_string (tr ("@brief Ensures the C++ object is created\n"
+                                                            "Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. "
+                                                            "Usually C++ objects are created on demand and not necessarily when the script object is created.")),
+                                         false, //  non-const
+                                         false, //  non-static
+                                         MethodBase::Create);
 
   return sm;
 }
@@ -306,16 +299,16 @@ static SpecialMethod *
 sm_keep (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (tr ("@brief Marks the object as no longer owned by the script side.\n"
-                       "Calling this method will make this object no longer owned by the script's memory management. "
-                       "Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. "
-                       "Technically speaking, this method will turn the script's reference into a weak reference. "
-                       "After the script engine decides to delete the reference, the object itself will still exist. "
-                       "If the object is not managed otherwise, memory leaks will occur.\n\n"
-                       "Usually it's not required to call this method. It has been introduced in version 0.24.")),
-    false,   //  non-const
-    false,   //  non-static
-    MethodBase::Keep);
+                                         tl::to_string (tr ("@brief Marks the object as no longer owned by the script side.\n"
+                                                            "Calling this method will make this object no longer owned by the script's memory management. "
+                                                            "Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. "
+                                                            "Technically speaking, this method will turn the script's reference into a weak reference. "
+                                                            "After the script engine decides to delete the reference, the object itself will still exist. "
+                                                            "If the object is not managed otherwise, memory leaks will occur.\n\n"
+                                                            "Usually it's not required to call this method. It has been introduced in version 0.24.")),
+                                         false, //  non-const
+                                         false, //  non-static
+                                         MethodBase::Keep);
 
   return sm;
 }
@@ -324,14 +317,14 @@ static SpecialMethod *
 sm_release (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (tr ("@brief Marks the object as managed by the script side.\n"
-                       "After calling this method on an object, the script side will be responsible for the management of the object. "
-                       "This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. "
-                       "If necessary, the script side may delete the object if the script's reference is no longer required.\n\n"
-                       "Usually it's not required to call this method. It has been introduced in version 0.24.")),
-    false,   //  non-const
-    false,   //  non-static
-    MethodBase::Release);
+                                         tl::to_string (tr ("@brief Marks the object as managed by the script side.\n"
+                                                            "After calling this method on an object, the script side will be responsible for the management of the object. "
+                                                            "This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. "
+                                                            "If necessary, the script side may delete the object if the script's reference is no longer required.\n\n"
+                                                            "Usually it's not required to call this method. It has been introduced in version 0.24.")),
+                                         false, //  non-const
+                                         false, //  non-static
+                                         MethodBase::Release);
 
   return sm;
 }
@@ -340,11 +333,11 @@ static SpecialMethod *
 sm_is_const (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (tr ("@brief Returns a value indicating whether the reference is a const reference\nThis method returns true, if self is a const reference.\n"
-                       "In that case, only const methods may be called on self.")),
-    true,    //  const
-    false,   //  non-static
-    MethodBase::IsConst);
+                                         tl::to_string (tr ("@brief Returns a value indicating whether the reference is a const reference\nThis method returns true, if self is a const reference.\n"
+                                                            "In that case, only const methods may be called on self.")),
+                                         true,  //  const
+                                         false, //  non-static
+                                         MethodBase::IsConst);
 
   gsi::ArgType ret;
   ret.set_type (gsi::T_bool);
@@ -357,10 +350,10 @@ static SpecialMethod *
 sm_to_const (const char *name, const gsi::ClassBase *cls)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (tr ("@hide")),  //  provided for test purposes mainly
-    true,    //  const
-    false,   //  non-static
-    MethodBase::ToConst);
+                                         tl::to_string (tr ("@hide")), //  provided for test purposes mainly
+                                         true,                         //  const
+                                         false,                        //  non-static
+                                         MethodBase::ToConst);
 
   gsi::ArgType ret;
   ret.set_is_cptr (true);
@@ -376,14 +369,14 @@ static SpecialMethod *
 sm_const_cast (const char *name, const gsi::ClassBase *cls)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (tr ("@brief Returns a non-const reference to self.\n"
-                       "Basically, this method allows turning a const object reference to a non-const one. "
-                       "This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.\n"
-                       "\n"
-                       "This method has been introduced in version 0.29.6.")),
-    true,    //  const
-    false,   //  non-static
-    MethodBase::ConstCast);
+                                         tl::to_string (tr ("@brief Returns a non-const reference to self.\n"
+                                                            "Basically, this method allows turning a const object reference to a non-const one. "
+                                                            "This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.\n"
+                                                            "\n"
+                                                            "This method has been introduced in version 0.29.6.")),
+                                         true,  //  const
+                                         false, //  non-static
+                                         MethodBase::ConstCast);
 
   gsi::ArgType ret;
   ret.set_is_ptr (true);
@@ -399,11 +392,11 @@ static SpecialMethod *
 sm_destroyed (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (tr ("@brief Returns a value indicating whether the object was already destroyed\nThis method returns true, if the object was destroyed, either explicitly or by the C++ side.\n"
-                       "The latter may happen, if the object is owned by a C++ object which got destroyed itself.")),
-    true,    //  const
-    false,   //  non-static
-    MethodBase::Destroyed);
+                                         tl::to_string (tr ("@brief Returns a value indicating whether the object was already destroyed\nThis method returns true, if the object was destroyed, either explicitly or by the C++ side.\n"
+                                                            "The latter may happen, if the object is owned by a C++ object which got destroyed itself.")),
+                                         true,  //  const
+                                         false, //  non-static
+                                         MethodBase::Destroyed);
 
   gsi::ArgType ret;
   ret.set_type (gsi::T_bool);
@@ -416,10 +409,10 @@ static SpecialMethod *
 sm_dup (const char *name, const gsi::ClassBase *cls)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (tr ("@brief Creates a copy of self\n")),
-    true,    //  const
-    false,   //  non-static
-    MethodBase::Dup);
+                                         tl::to_string (tr ("@brief Creates a copy of self\n")),
+                                         true,  //  const
+                                         false, //  non-static
+                                         MethodBase::Dup);
 
   gsi::ArgType ret;
   ret.set_is_ptr (true);
@@ -435,10 +428,10 @@ static SpecialMethod *
 sm_assign (const char *name, const gsi::ClassBase *cls)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (tr ("@brief Assigns another object to self")),
-    false,   //  non-const
-    false,   //  non-static
-    MethodBase::Assign);
+                                         tl::to_string (tr ("@brief Assigns another object to self")),
+                                         false, //  non-const
+                                         false, //  non-static
+                                         MethodBase::Assign);
 
   gsi::ArgType a;
   a.init<void> (new gsi::ArgSpecBase ("other"));
@@ -450,19 +443,19 @@ sm_assign (const char *name, const gsi::ClassBase *cls)
   return sm;
 }
 
-static const std::set<std::pair<std::string, bool> > &name_map_for_class (const gsi::ClassBase *cls, std::map<const gsi::ClassBase *, std::set<std::pair<std::string, bool> > > &cache)
+static const std::set<std::pair<std::string, bool>> &name_map_for_class (const gsi::ClassBase *cls, std::map<const gsi::ClassBase *, std::set<std::pair<std::string, bool>>> &cache)
 {
   if (! cls) {
-    static std::set<std::pair<std::string, bool> > empty;
+    static std::set<std::pair<std::string, bool>> empty;
     return empty;
   }
 
-  std::map<const gsi::ClassBase *, std::set<std::pair<std::string, bool> > >::iterator cc = cache.find (cls);
+  std::map<const gsi::ClassBase *, std::set<std::pair<std::string, bool>>>::iterator cc = cache.find (cls);
   if (cc != cache.end ()) {
     return cc->second;
   }
 
-  cc = cache.insert (std::make_pair ((const gsi::ClassBase *) 0, std::set<std::pair<std::string, bool> > ())).first;
+  cc = cache.insert (std::make_pair ((const gsi::ClassBase *) 0, std::set<std::pair<std::string, bool>> ())).first;
   cc->second = name_map_for_class (cls->base (), cache);
 
   for (gsi::ClassBase::method_iterator m = cls->begin_methods (); m != cls->end_methods (); ++m) {
@@ -521,8 +514,7 @@ static std::string signature (const gsi::MethodBase *m, const gsi::MethodBase::M
 }
 #endif
 
-void
-ClassBase::merge_declarations ()
+void ClassBase::merge_declarations ()
 {
   if (gsi::ClassBase::begin_new_classes () == gsi::ClassBase::end_new_classes ()) {
     //  Nothing to do.
@@ -533,15 +525,15 @@ ClassBase::merge_declarations ()
   std::set<const std::type_info *> types;
   std::set<std::string> names;
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
-    if (c->declaration () == &*c && !types.insert (&c->type ()).second) {
+    if (c->declaration () == &*c && ! types.insert (&c->type ()).second) {
       tl::warn << "Duplicate GSI declaration of type " << c->type ().name ();
     }
-    if (c->declaration () == &*c && !names.insert (c->declaration ()->name ()).second) {
+    if (c->declaration () == &*c && ! names.insert (c->declaration ()->name ()).second) {
       tl::warn << "Duplicate GSI declaration of name " << c->declaration ()->name ();
     }
   }
 
-  std::vector <const gsi::ClassBase *> to_remove;
+  std::vector<const gsi::ClassBase *> to_remove;
 
   //  Consolidate the classes (merge, remove etc.)
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_new_classes (); c != gsi::ClassBase::end_new_classes (); ++c) {
@@ -551,7 +543,7 @@ ClassBase::merge_declarations ()
   }
 
   //  removed the classes which are no longer required
-  for (std::vector <const gsi::ClassBase *>::const_iterator ed = to_remove.begin (); ed != to_remove.end (); ++ed) {
+  for (std::vector<const gsi::ClassBase *>::const_iterator ed = to_remove.begin (); ed != to_remove.end (); ++ed) {
     //  TODO: ugly const_cast hack
     mp_new_class_collection->erase (const_cast<gsi::ClassBase *> (*ed));
   }
@@ -560,11 +552,11 @@ ClassBase::merge_declarations ()
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_new_classes (); c != gsi::ClassBase::end_new_classes (); ++c) {
     if (c->base ()) {
       //  TODO: ugly const_cast hack
-      const_cast<gsi::ClassBase *> (c->base ())->add_subclass (c.operator-> ());
+      const_cast<gsi::ClassBase *> (c->base ())->add_subclass (c.operator->());
     }
   }
 
-  std::map<const gsi::ClassBase *, std::set<std::pair<std::string, bool> > > name_maps;
+  std::map<const gsi::ClassBase *, std::set<std::pair<std::string, bool>>> name_maps;
 
   //  Add to the classes the special methods and clean up the method table
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_new_classes (); c != gsi::ClassBase::end_new_classes (); ++c) {
@@ -574,11 +566,11 @@ ClassBase::merge_declarations ()
       continue;
     }
 
-    const std::set<std::pair<std::string, bool> > &name_map = name_map_for_class (c.operator-> (), name_maps);
+    const std::set<std::pair<std::string, bool>> &name_map = name_map_for_class (c.operator->(), name_maps);
 
     //  We don't want the declaration object to be non-const except for this case. So
     //  we const_cast here.
-    gsi::ClassBase *non_const_decl = const_cast<gsi::ClassBase *> (c.operator-> ());
+    gsi::ClassBase *non_const_decl = const_cast<gsi::ClassBase *> (c.operator->());
 
     if (name_map.find (std::make_pair ("new", true)) == name_map.end ()) {
       non_const_decl->add_method (sm_default_ctor ("new", &*c), false);
@@ -621,7 +613,6 @@ ClassBase::merge_declarations ()
         //  fallback name is "_assign" to avoid conflicts
         non_const_decl->add_method (sm_assign ("_assign", &*c));
       }
-
     }
 
     if (name_map.find (std::make_pair ("destroyed", false)) == name_map.end ()) {
@@ -642,7 +633,6 @@ ClassBase::merge_declarations ()
 
     non_const_decl->add_method (sm_to_const ("_to_const_object", &*c));
     non_const_decl->add_method (sm_const_cast ("_const_cast", &*c));
-
   }
 
   //  finally merge the new classes into the existing ones
@@ -650,7 +640,7 @@ ClassBase::merge_declarations ()
     mp_class_collection = new class_collection ();
   }
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_new_classes (); c != gsi::ClassBase::end_new_classes (); ++c) {
-    gsi::ClassBase *non_const_decl = const_cast<gsi::ClassBase *> (c.operator-> ());
+    gsi::ClassBase *non_const_decl = const_cast<gsi::ClassBase *> (c.operator->());
     mp_class_collection->push_back (non_const_decl);
   }
   mp_new_class_collection->clear ();
@@ -696,10 +686,8 @@ ClassBase::merge_declarations ()
         tl::warn << "Ambiguous method declarations in class " << c->name () << " for method " << mc->first;
       }
     }
-
   }
 #endif
-
 }
 
 static void collect_classes (const gsi::ClassBase *cls, std::list<const gsi::ClassBase *> &unsorted_classes)
@@ -707,7 +695,7 @@ static void collect_classes (const gsi::ClassBase *cls, std::list<const gsi::Cla
   unsorted_classes.push_back (cls);
 
   for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
-    collect_classes (cc.operator-> (), unsorted_classes);
+    collect_classes (cc.operator->(), unsorted_classes);
   }
 }
 
@@ -718,7 +706,7 @@ static bool all_parts_available (const gsi::ClassBase *cls, const std::set<const
   }
 
   for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
-    if (! all_parts_available (cc.operator-> (), taken)) {
+    if (! all_parts_available (cc.operator->(), taken)) {
       return false;
     }
   }
@@ -737,10 +725,10 @@ ClassBase::classes_in_definition_order (const char *mod_name)
     if (! mod_name || c->module () == mod_name) {
       //  only handle top-level classed from the requested modules
       //  (children or base classes from outside the module may be part of the returned list!)
-      collect_classes (c.operator-> (), unsorted_classes);
+      collect_classes (c.operator->(), unsorted_classes);
     } else {
       //  we assume that these classes are taken by another run (i.e. "import x" in Python)
-      taken.insert (c.operator-> ());
+      taken.insert (c.operator->());
     }
   }
 
@@ -778,7 +766,6 @@ ClassBase::classes_in_definition_order (const char *mod_name)
       sorted_classes.push_back (*c);
       taken.insert (*c);
       any = true;
-
     }
 
     if (! any && ! more_classes.empty ()) {
@@ -798,23 +785,19 @@ ClassBase::classes_in_definition_order (const char *mod_name)
           //  can't produce this class yet. The base class needs to be handled first.
           tl::error << tl::sprintf ("base of class %s.%s not available (%s.%s)", (*c)->module (), (*c)->name (), (*c)->base ()->module (), (*c)->base ()->name ());
         }
-
       }
 
       //  prevent infinite recursion
       throw tl::Exception ("Internal error: infinite recursion on class building. See error log for analysis");
-
     }
 
     unsorted_classes.swap (more_classes);
-
   }
 
   return sorted_classes;
 }
 
-void
-ClassBase::initialize ()
+void ClassBase::initialize ()
 {
   //  don't initialize again
   if (m_initialized) {
@@ -840,8 +823,7 @@ ClassBase::initialize ()
   m_initialized = true;
 }
 
-void
-ClassBase::add_method (MethodBase *method, bool /*base_class*/)
+void ClassBase::add_method (MethodBase *method, bool /*base_class*/)
 {
   m_initialized = false;
   m_methods.add_method (method);
@@ -857,18 +839,16 @@ const ClassBase *class_by_name_no_assert (const std::string &name)
 
     for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
 
-      if (c->declaration () != c.operator-> ()) {
+      if (c->declaration () != c.operator->()) {
         continue;
       }
 
-      if (!s_name_to_class.insert (std::make_pair (c->name (), c.operator-> ())).second) {
+      if (! s_name_to_class.insert (std::make_pair (c->name (), c.operator->())).second) {
         //  Duplicate registration of this class
         tl::error << "Duplicate registration of class " << c->name ();
         tl_assert (false);
       }
-
     }
-
   }
 
   std::map<std::string, const ClassBase *>::const_iterator c = s_name_to_class.find (name);
@@ -924,7 +904,7 @@ static void add_class_to_map (const gsi::ClassBase *c)
     sp_classes->push_back (c);
   }
 
-  if (!sp_ti_to_class_index->insert (std::make_pair (ti, c2i->second)).second) {
+  if (! sp_ti_to_class_index->insert (std::make_pair (ti, c2i->second)).second) {
     //  Duplicate registration of this class
     tl::error << "Duplicate registration of class " << c->name () << " (type " << ti->name () << ")";
     tl_assert (false);
@@ -937,10 +917,10 @@ const ClassBase *class_by_typeinfo_no_assert (const std::type_info &ti)
 {
   if (! sp_ti_to_class_index || sp_ti_to_class_index->empty ()) {
     for (auto c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
-      add_class_to_map (c.operator-> ());
+      add_class_to_map (c.operator->());
     }
     for (auto c = gsi::ClassBase::begin_new_classes (); c != gsi::ClassBase::end_new_classes (); ++c) {
-      add_class_to_map (c.operator-> ());
+      add_class_to_map (c.operator->());
     }
   }
 

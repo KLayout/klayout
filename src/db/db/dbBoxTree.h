@@ -42,7 +42,7 @@ struct complex_bbox_tag;
 /// @brief a helper class required for the box_tree implementation
 
 template <class Box, class Obj, class BoxConv, class Vector>
-class box_tree_picker 
+class box_tree_picker
 {
 public:
   typedef Box box_type;
@@ -50,18 +50,20 @@ public:
   typedef typename object_vector_type::const_iterator const_iterator;
 
   box_tree_picker ()
-  { }
+  {
+  }
 
   box_tree_picker (const BoxConv &box_conv)
     : m_box_conv (box_conv)
-  { }
+  {
+  }
 
-  box_type operator() (const Obj *o) const 
+  box_type operator() (const Obj *o) const
   {
     return m_box_conv (*o);
   }
 
-  void rotate_boxes (int /*q*/, const_iterator /*e*/, const_iterator /*o0*/, const_iterator /*o1*/, const_iterator /*o2*/, const_iterator /*o3*/, const_iterator /*o4*/) 
+  void rotate_boxes (int /*q*/, const_iterator /*e*/, const_iterator /*o0*/, const_iterator /*o1*/, const_iterator /*o2*/, const_iterator /*o3*/, const_iterator /*o4*/)
   {
     //  .. nothing yet ..
   }
@@ -71,7 +73,7 @@ private:
 };
 
 
-/// @brief a helper class providing a linear-time iterator difference which is not necessarily 
+/// @brief a helper class providing a linear-time iterator difference which is not necessarily
 ///        the actual difference but monotonous
 
 template <class X, bool R>
@@ -101,7 +103,7 @@ size_t box_tree_lt_difference_ptr (const X *a, const Iter &b)
 /// @brief a helper class required for the box_tree implementation
 
 template <class Obj, class Box, class BoxConv, class Vector>
-class box_tree_cached_picker 
+class box_tree_cached_picker
 {
 public:
   typedef Box box_type;
@@ -109,11 +111,12 @@ public:
   typedef typename object_vector_type::const_iterator const_iterator;
 
   box_tree_cached_picker ()
-  { }
+  {
+  }
 
   box_tree_cached_picker (const BoxConv &box_conv, const_iterator from, const_iterator to)
     : m_from (from)
-  { 
+  {
     m_boxes.resize (box_tree_lt_difference (to, from), box_type ());
 
     for (const_iterator o = from; o != to; ++o) {
@@ -123,7 +126,7 @@ public:
     }
   }
 
-  const box_type &operator() (const Obj *o) const 
+  const box_type &operator() (const Obj *o) const
   {
     return m_boxes [box_tree_lt_difference_ptr (o, m_from)];
   }
@@ -133,15 +136,14 @@ public:
     return m_bbox;
   }
 
-  void rotate_boxes (int q, const_iterator e, const_iterator o0, const_iterator o1, const_iterator o2, const_iterator o3, const_iterator o4) 
+  void rotate_boxes (int q, const_iterator e, const_iterator o0, const_iterator o1, const_iterator o2, const_iterator o3, const_iterator o4)
   {
     size_t qi [5] = {
-      box_tree_lt_difference (o0, m_from), 
-      box_tree_lt_difference (o1, m_from), 
-      box_tree_lt_difference (o2, m_from), 
-      box_tree_lt_difference (o3, m_from), 
-      box_tree_lt_difference (o4, m_from)
-    };
+      box_tree_lt_difference (o0, m_from),
+      box_tree_lt_difference (o1, m_from),
+      box_tree_lt_difference (o2, m_from),
+      box_tree_lt_difference (o3, m_from),
+      box_tree_lt_difference (o4, m_from)};
 
     box_type bx = m_boxes [box_tree_lt_difference (e, m_from)];
     for (int i = 4; i > q; --i) {
@@ -219,7 +221,7 @@ public:
     }
   }
 
-  void lenq (int i, size_t l) 
+  void lenq (int i, size_t l)
   {
     if (i < 0) {
       m_lenq = l;
@@ -249,17 +251,17 @@ public:
 
   box_tree_node *parent () const
   {
-    return (box_tree_node *)((char *) mp_parent - (size_t (mp_parent) & 3));
+    return (box_tree_node *) ((char *) mp_parent - (size_t (mp_parent) & 3));
   }
 
   int quad () const
   {
-    return (int)(size_t (mp_parent) & 3);
+    return (int) (size_t (mp_parent) & 3);
   }
 
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent)
   {
-    if (!no_self) {
+    if (! no_self) {
       stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
     }
     for (int i = 0; i < 4; ++i) {
@@ -282,11 +284,16 @@ public:
     }
 
     switch (quad) {
-    case 0: return box_type (m_center, qb.upper_right ());
-    case 1: return box_type (m_center, qb.upper_left ());
-    case 2: return box_type (m_center, qb.lower_left ());
-    case 3: return box_type (m_center, qb.lower_right ());
-    default: return qb;
+    case 0:
+      return box_type (m_center, qb.upper_right ());
+    case 1:
+      return box_type (m_center, qb.upper_left ());
+    case 2:
+      return box_type (m_center, qb.lower_left ());
+    case 3:
+      return box_type (m_center, qb.lower_right ());
+    default:
+      return qb;
     }
   }
 
@@ -314,7 +321,7 @@ private:
       m_childrefs [i] = 0;
     }
 
-    mp_parent = (box_tree_node *)((char *) parent + quad);
+    mp_parent = (box_tree_node *) ((char *) parent + quad);
     if (parent) {
       m_len = (parent->m_childrefs [quad] >> 1);
       parent->m_childrefs [quad] = size_t (this);
@@ -328,8 +335,8 @@ private:
  *  The iterator provides a flat, all-elements iterator for the box tree.
  *  Unlike the primitive iterator, which is based on the container inside
  *  the box tree, this iterator iterates "registered" elements, i.e. such that
- *  are within the sorted list. Since this list is maintained even if elements 
- *  are inserted, this iterator is less susceptible to changes in the container, 
+ *  are within the sorted list. Since this list is maintained even if elements
+ *  are inserted, this iterator is less susceptible to changes in the container,
  *  i.e. by inserting or deleting elements while iterating.
  *  This iterator is therefore recommended for being used in interleaved access/change
  *  operations.
@@ -350,37 +357,37 @@ public:
 
   box_tree_flat_it ()
     : mp_tree (0)
-  { 
+  {
     m_index = 0;
   }
 
   box_tree_flat_it (const Tree &t)
     : mp_tree (&t)
-  { 
+  {
     m_index = 0;
   }
 
-  box_tree_flat_it<Tree> &operator++ () 
+  box_tree_flat_it<Tree> &operator++ ()
   {
     ++m_index;
     return *this;
   }
 
-  const object_type &operator* () const 
+  const object_type &operator* () const
   {
     return mp_tree->objects ().item (mp_tree->elements () [m_index]);
   }
-  
-  const object_type *operator-> () const 
+
+  const object_type *operator->() const
   {
     return &mp_tree->objects ().item (mp_tree->elements () [m_index]);
   }
-  
-  size_t position () const 
+
+  size_t position () const
   {
     return m_index;
   }
-  
+
   bool operator== (const box_tree_flat_it<Tree> &i) const
   {
     return m_index == i.m_index;
@@ -428,17 +435,17 @@ public:
   typedef db::box_tree_node<Tree> box_tree_node;
 
   box_tree_it ()
-    : mp_tree (0), m_picker (), m_compare () 
-  { 
+    : mp_tree (0), m_picker (), m_compare ()
+  {
     mp_node = 0;
     m_index = 0;
     m_offset = 0;
     m_quad = -1;
   }
 
-  box_tree_it (const Tree &t, value_picker_type p, const Cmp &c) 
-    : mp_tree (&t), m_picker (p), m_compare (c) 
-  { 
+  box_tree_it (const Tree &t, value_picker_type p, const Cmp &c)
+    : mp_tree (&t), m_picker (p), m_compare (c)
+  {
     mp_node = t.root ();
     m_index = 0;
     m_offset = 0;
@@ -459,7 +466,7 @@ public:
     }
   }
 
-  box_tree_it<Tree, Cmp> &operator++ () 
+  box_tree_it<Tree, Cmp> &operator++ ()
   {
     while (true) {
       inc ();
@@ -470,21 +477,21 @@ public:
     return *this;
   }
 
-  const object_type &operator* () const 
+  const object_type &operator* () const
   {
     return mp_tree->objects ().item (mp_tree->elements () [m_index + m_offset]);
   }
-  
-  const object_type *operator-> () const 
+
+  const object_type *operator->() const
   {
     return &mp_tree->objects ().item (mp_tree->elements () [m_index + m_offset]);
   }
-  
-  size_t position () const 
+
+  size_t position () const
   {
     return m_index + m_offset;
   }
-  
+
   bool operator== (const box_tree_it<Tree, Cmp> &i) const
   {
     return mp_node == i.mp_node;
@@ -509,7 +516,7 @@ public:
    *  The quad ID is a value that can be used to determine whether the iterator entered the next quad.
    *  It is possible to optimize the search if there is no need to look into that quad and skip it.
    */
-  size_t quad_id () const 
+  size_t quad_id () const
   {
     return mp_node ? size_t (mp_node) + size_t (m_quad + 1) : size_t (mp_tree);
   }
@@ -561,7 +568,7 @@ private:
     bool ret = m_compare.matches_obj (**this);
     return ret;
   }
-  
+
   //  check if the current quad needs visit
   bool need_visit () const
   {
@@ -586,8 +593,8 @@ private:
     }
   }
 
-  //  one level up. 
-  bool up () 
+  //  one level up.
+  bool up ()
   {
     box_tree_node *p = mp_node->parent ();
     if (p) {
@@ -610,7 +617,7 @@ private:
 
   //  move to next quad
   //  returns true if this is possible
-  bool next () 
+  bool next ()
   {
     m_index += mp_node->lenq (m_quad);
     ++m_quad;
@@ -647,7 +654,6 @@ private:
         //  stay in main chunk
         return true;
       }
-
     }
   }
 
@@ -678,13 +684,13 @@ public:
 
   box_tree_sel ()
     : m_b (), m_bpred (), m_conv ()
-  { 
+  {
     //  .. nothing yet ..
   }
 
-  box_tree_sel (const Box &b, const BoxConv &conv) 
+  box_tree_sel (const Box &b, const BoxConv &conv)
     : m_b (b), m_bpred (), m_conv (conv)
-  { 
+  {
     //  .. nothing yet ..
   }
 
@@ -704,21 +710,21 @@ private:
   BoxConv m_conv;
 };
 
-/** 
+/**
  *  @brief box tree object
  *
  *  A box tree is a vector with special sorting and
  *  query capabilities. It contains objects of type
  *  Obj that can be converted to db::box<C> objects with
- *  the BoxConv function. 
+ *  the BoxConv function.
  *  A box tree can be in state "inserting", in which the
- *  insertion of new objects is supported, or can be 
- *  sorted, after which it can be queried for objects 
+ *  insertion of new objects is supported, or can be
+ *  sorted, after which it can be queried for objects
  *  whose box overlaps or touches a specified test box.
  */
 
 template <class Box, class Obj, class BoxConv, size_t min_bin = 100, size_t min_quads = 100, unsigned int thin_aspect = 4>
-class box_tree 
+class box_tree
 {
 public:
   typedef Box box_type;
@@ -735,15 +741,15 @@ public:
   typedef typename element_vector_type::iterator element_iterator;
   typedef box_tree<box_type, object_type, box_conv_type, min_bin, min_quads> box_tree_type;
   typedef db::box_tree_node<box_tree_type> box_tree_node;
-  typedef box_tree_sel<box_type, object_type, box_conv_type, db::boxes_overlap<box_type> > box_tree_sel_overlap_type;
-  typedef box_tree_sel<box_type, object_type, box_conv_type, db::boxes_touch<box_type> > box_tree_sel_touch_type;
+  typedef box_tree_sel<box_type, object_type, box_conv_type, db::boxes_overlap<box_type>> box_tree_sel_overlap_type;
+  typedef box_tree_sel<box_type, object_type, box_conv_type, db::boxes_touch<box_type>> box_tree_sel_touch_type;
   typedef box_tree_it<box_tree_type, box_tree_sel_touch_type> touching_iterator;
   typedef box_tree_it<box_tree_type, box_tree_sel_overlap_type> overlapping_iterator;
   typedef box_tree_flat_it<box_tree_type> flat_iterator;
   typedef box_tree_picker<Box, Obj, BoxConv, obj_vector_type> box_tree_picker_type;
 
   /**
-   *  @brief Creates a empty box tree object 
+   *  @brief Creates a empty box tree object
    */
   box_tree ()
     : mp_root (0)
@@ -770,7 +776,7 @@ public:
   }
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   box_tree &operator= (const box_tree &b)
   {
@@ -813,7 +819,7 @@ public:
    *  @brief Insert a new object into the box tree
    *
    *  Inserts a new object into the box tree. The object
-   *  is appended at the end of the vector. Sorting is 
+   *  is appended at the end of the vector. Sorting is
    *  invalidated through this operation.
    *
    *  @param o The object to insert
@@ -839,13 +845,13 @@ public:
     m_objects.resize (n);
   }
 
-  /** 
+  /**
    *  @brief Insert a range of objects
    *
    *  Analogous to the other insert method, but accepting
    *  and range of objects [start,end).
    */
-  template <class I> 
+  template <class I>
   void insert (I from, I to)
   {
     m_objects.reserve (m_objects.size () + std::distance (from, to));
@@ -856,7 +862,7 @@ public:
 
   /**
    *  @brief Replace an object
-   *  
+   *
    *  Replace the object at the given (const) iterator position
    *  with the object given. Replacing an object invalidates
    *  the sorting state.
@@ -879,7 +885,7 @@ public:
 
   /**
    *  @brief Erase an object
-   *  
+   *
    *  Erase the object pointed to by the given iterator.
    *  Erasing an object will invalidate sorting. Erasing is
    *  not a cheap operation and its complexity is O(n).
@@ -893,7 +899,7 @@ public:
 
   /**
    *  @brief Erase an object sequence
-   *  
+   *
    *  Erase the objects [from,to) to by the given iterator.
    *  Erasing an object will invalidate sorting. Erasing is
    *  not a cheap operation and its complexity is O(n).
@@ -907,7 +913,7 @@ public:
 
   /**
    *  @brief Erase several objects
-   *  
+   *
    *  Erase the objects given by a set of iterators (given by a sequence [from,to)).
    *  The iterators given must be sorted in ascending order.
    *  Erasing an object will invalidate sorting. Erasing is
@@ -946,7 +952,7 @@ public:
     return m_objects.size ();
   }
 
-  /** 
+  /**
    *  @brief Empty the vector.
    */
   void clear ()
@@ -960,7 +966,7 @@ public:
   }
 
   /**
-   *  @brief Make the index 
+   *  @brief Make the index
    *
    *  Only after making the index, the flat iterators are available.
    *  Complexity is O(N).
@@ -997,7 +1003,7 @@ public:
   {
     return m_objects;
   }
-  
+
   /**
    *  @brief Direct access to the underlying element vector
    *
@@ -1007,15 +1013,15 @@ public:
   {
     return m_elements;
   }
-  
+
   /**
    *  @brief Get the iterator for an object given by a pointer (non-const version)
    */
-  iterator iterator_from_pointer (object_type *p) 
+  iterator iterator_from_pointer (object_type *p)
   {
     return m_objects.iterator_from_pointer (p);
   }
-  
+
   /**
    *  @brief Get the iterator for an object given by a pointer
    */
@@ -1023,7 +1029,7 @@ public:
   {
     return m_objects.iterator_from_pointer (p);
   }
-  
+
   /**
    *  @brief Test, if an object is member of this tree
    */
@@ -1032,7 +1038,7 @@ public:
   {
     return m_objects.is_member_of (p);
   }
-  
+
   /**
    *  @brief Test, if the box tree is empty
    */
@@ -1040,7 +1046,7 @@ public:
   {
     return m_objects.empty ();
   }
-  
+
   /**
    *  @brief Sequential access begin iterator
    *
@@ -1069,7 +1075,7 @@ public:
   {
     return m_objects.end ();
   }
-  
+
   /**
    *  @brief Sequential access begin iterator
    *
@@ -1081,7 +1087,7 @@ public:
    *  @return A non-const iterator pointing to the first
    *  element in the vector
    */
-  iterator begin () 
+  iterator begin ()
   {
     return m_objects.begin ();
   }
@@ -1094,7 +1100,7 @@ public:
    *  @return A non-const iterator pointing past the end
    *  of the vector
    */
-  iterator end () 
+  iterator end ()
   {
     return m_objects.end ();
   }
@@ -1102,18 +1108,18 @@ public:
   /**
    *  @brief flat iterator
    *
-   *  This delivers the flat (non-constrained) iterator. 
+   *  This delivers the flat (non-constrained) iterator.
    *  Unlike the primitive iterator, the flat iterator delivers
    *  elements that are registered upon sort() - i.e. the sequence
    *  does not change if elements are inserted or deleted unless
    *  sort() is being called.
    */
-  flat_iterator begin_flat () const 
+  flat_iterator begin_flat () const
   {
     return box_tree_flat_it<box_tree_type> (*this);
   }
-  
-  /** 
+
+  /**
    *  @brief selection of objects touching the test box
    *
    *  The const iterator returned by this method will
@@ -1126,14 +1132,14 @@ public:
    *
    *  @return The const touching iterator pointing to the first Object.
    */
-  touching_iterator begin_touching (const Box &b, BoxConv conv) const 
+  touching_iterator begin_touching (const Box &b, BoxConv conv) const
   {
     box_tree_picker_type p (conv);
     box_tree_sel_touch_type s (b, conv);
     return box_tree_it<box_tree_type, box_tree_sel_touch_type> (*this, p, s);
   }
-  
-  /** 
+
+  /**
    *  @brief selection of objects overlapping the test box
    *
    *  The const iterator returned by this method will
@@ -1146,13 +1152,13 @@ public:
    *
    *  @return The const overlapping iterator pointing to the first Object.
    */
-  overlapping_iterator begin_overlapping (const Box &b, BoxConv conv) const 
+  overlapping_iterator begin_overlapping (const Box &b, BoxConv conv) const
   {
     box_tree_picker_type p (conv);
     box_tree_sel_overlap_type s (b, conv);
     return box_tree_it<box_tree_type, box_tree_sel_overlap_type> (*this, p, s);
   }
-  
+
   /**
    *  @brief Access to the root node object
    *
@@ -1178,7 +1184,7 @@ public:
    */
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
   {
-    if (!no_self) {
+    if (! no_self) {
       stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
     }
     db::mem_stat (stat, purpose, cat, m_objects, true, (void *) this);
@@ -1186,7 +1192,6 @@ public:
   }
 
 private:
-
   /// The basic object and element vector
   obj_vector_type m_objects;
   element_vector_type m_elements;
@@ -1194,7 +1199,7 @@ private:
 
   /// Sort implementation for simple bboxes - no caching
   template <class BC>
-  void sort (const BC &conv, const db::simple_bbox_tag &/*complexity*/)
+  void sort (const BC &conv, const db::simple_bbox_tag & /*complexity*/)
   {
     m_elements.clear ();
     m_elements.reserve (m_objects.size ());
@@ -1218,13 +1223,12 @@ private:
       //  TODO: resize m_elements to actual size ?
 
       tree_sort (0, m_elements.begin (), m_elements.end (), picker, bbox, 0);
-
     }
   }
 
   /// Sort implementation for complex bboxes - with caching
   template <class BC>
-  void sort (const BC &conv, const db::complex_bbox_tag &/*complexity*/)
+  void sort (const BC &conv, const db::complex_bbox_tag & /*complexity*/)
   {
     m_elements.clear ();
     m_elements.reserve (m_objects.size ());
@@ -1245,7 +1249,6 @@ private:
       //  TODO: resize m_elements to actual size ?
 
       tree_sort (0, m_elements.begin (), m_elements.end (), picker, picker.bbox (), 0);
-
     }
   }
 
@@ -1255,10 +1258,10 @@ private:
     size_t ntot = size_t (to - from);
     if (ntot <= min_bin || (bbox.width () < 2 && bbox.height () < 2)) {
       return; //  not worth splitting
-    } 
+    }
 
     //  the bins are: overall, ur, ul, ll, lr, empty
-    element_iterator qloc [6] = { from, from, from, from, from, from };
+    element_iterator qloc [6] = {from, from, from, from, from, from};
     point_type center;
     if (bbox.width () < bbox.height () / thin_aspect) {
       //  separate by height only
@@ -1291,7 +1294,7 @@ private:
         }
       }
 
-      //  make space for the element and swap the new element into position 
+      //  make space for the element and swap the new element into position
       if (q < 5) {
         element el = *e;
         for (int i = 5; i > q; --i) {
@@ -1301,16 +1304,15 @@ private:
         *qloc [q] = el;
       }
       ++qloc [q];
-      
     }
 
     //  compute sizes of quad fields
-    size_t nx, n[4];
+    size_t nx, n [4];
     size_t nn = 0;
-    nx = std::distance (from, qloc[0]);
+    nx = std::distance (from, qloc [0]);
     for (int i = 0; i < 4; ++i) {
-      n[i] = std::distance (qloc [i], qloc[i + 1]);
-      nn += n[i];
+      n [i] = std::distance (qloc [i], qloc [i + 1]);
+      nn += n [i];
     }
 
     //  is it worth to split into sub-quads?
@@ -1327,21 +1329,18 @@ private:
 
       //  yes: create sub-quads
       box_type qboxes [4];
-      qboxes [0] = box_type (center, bbox.p2 ()); 
+      qboxes [0] = box_type (center, bbox.p2 ());
       qboxes [1] = box_type (bbox.left (), center.y (), center.x (), bbox.top ());
       qboxes [2] = box_type (bbox.p1 (), center);
       qboxes [3] = box_type (center.x (), bbox.bottom (), bbox.right (), center.y ());
       for (unsigned int q = 0; q < 4; ++q) {
-        if (n[q] > 0) {
-          node->lenq (q, n[q]);
-          tree_sort (node, qloc[q], qloc[q + 1], picker, qboxes [q], int (q));
+        if (n [q] > 0) {
+          node->lenq (q, n [q]);
+          tree_sort (node, qloc [q], qloc [q + 1], picker, qboxes [q], int (q));
         }
       }
-
-    } 
-
+    }
   }
-
 };
 
 /**
@@ -1359,8 +1358,8 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
  *  The iterator provides a flat, all-elements iterator for the box tree.
  *  Unlike the primitive iterator, which is based on the container inside
  *  the box tree, this iterator iterates "registered" elements, i.e. such that
- *  are within the sorted list. Since this list is maintained even if elements 
- *  are inserted, this iterator is less susceptible to changes in the container, 
+ *  are within the sorted list. Since this list is maintained even if elements
+ *  are inserted, this iterator is less susceptible to changes in the container,
  *  i.e. by inserting or deleting elements while iterating.
  *  This iterator is therefore recommended for being used in interleaved access/change
  *  operations.
@@ -1380,32 +1379,32 @@ public:
 
   unstable_box_tree_flat_it ()
     : mp_tree (0)
-  { 
+  {
     m_index = 0;
   }
 
   unstable_box_tree_flat_it (const Tree &t)
     : mp_tree (&t)
-  { 
+  {
     m_index = 0;
   }
 
-  unstable_box_tree_flat_it<Tree> &operator++ () 
+  unstable_box_tree_flat_it<Tree> &operator++ ()
   {
     ++m_index;
     return *this;
   }
 
-  const object_type &operator* () const 
+  const object_type &operator* () const
   {
     return mp_tree->objects () [m_index];
   }
-  
-  const object_type *operator-> () const 
+
+  const object_type *operator->() const
   {
     return &mp_tree->objects () [m_index];
   }
-  
+
   bool operator== (const unstable_box_tree_flat_it<Tree> &i) const
   {
     return m_index == i.m_index;
@@ -1451,17 +1450,17 @@ public:
   typedef db::box_tree_node<Tree> box_tree_node;
 
   unstable_box_tree_it ()
-    : mp_tree (0), m_picker (), m_compare () 
-  { 
+    : mp_tree (0), m_picker (), m_compare ()
+  {
     mp_node = 0;
     m_index = 0;
     m_offset = 0;
     m_quad = -1;
   }
 
-  unstable_box_tree_it (const Tree &t, value_picker_type p, const Cmp &c) 
-    : mp_tree (&t), m_picker (p), m_compare (c) 
-  { 
+  unstable_box_tree_it (const Tree &t, value_picker_type p, const Cmp &c)
+    : mp_tree (&t), m_picker (p), m_compare (c)
+  {
     mp_node = t.root ();
     m_index = 0;
     m_offset = 0;
@@ -1482,7 +1481,7 @@ public:
     }
   }
 
-  unstable_box_tree_it<Tree, Cmp> &operator++ () 
+  unstable_box_tree_it<Tree, Cmp> &operator++ ()
   {
     while (true) {
       inc ();
@@ -1493,21 +1492,21 @@ public:
     return *this;
   }
 
-  const object_type &operator* () const 
+  const object_type &operator* () const
   {
     return mp_tree->objects () [m_index + m_offset];
   }
-  
-  const object_type *operator-> () const 
+
+  const object_type *operator->() const
   {
     return &(mp_tree->objects () [m_index + m_offset]);
   }
-  
-  const_iterator position () const 
+
+  const_iterator position () const
   {
     return mp_tree->objects ().begin () + (m_index + m_offset);
   }
-  
+
   /**
    *  @brief Return the index of the position indicated by this iterator
    */
@@ -1540,9 +1539,9 @@ public:
    *  The quad ID is a value that can be used to determine whether the iterator entered the next quad.
    *  It is possible to optimize the search if there is no need to look into that quad and skip it.
    */
-  size_t quad_id () const 
+  size_t quad_id () const
   {
-    return mp_node ? size_t (mp_node) + size_t (m_quad + 1): size_t (mp_tree);
+    return mp_node ? size_t (mp_node) + size_t (m_quad + 1) : size_t (mp_tree);
   }
 
   /**
@@ -1592,7 +1591,7 @@ private:
     bool ret = m_compare.matches_obj (mp_tree->objects () [m_index + m_offset]);
     return ret;
   }
-  
+
   //  check if the current quad needs visit
   bool need_visit () const
   {
@@ -1617,8 +1616,8 @@ private:
     }
   }
 
-  //  one level up. 
-  bool up () 
+  //  one level up.
+  bool up ()
   {
     box_tree_node *p = mp_node->parent ();
     if (p) {
@@ -1641,7 +1640,7 @@ private:
 
   //  move to next quad
   //  returns true if this is possible
-  bool next () 
+  bool next ()
   {
     m_index += mp_node->lenq (m_quad);
     ++m_quad;
@@ -1678,7 +1677,6 @@ private:
         //  stay in main chunk
         return true;
       }
-
     }
   }
 
@@ -1699,16 +1697,16 @@ private:
   }
 };
 
-/** 
+/**
  *  @brief "unstable" box tree object
  *
  *  A box tree is a vector with special sorting and
  *  query capabilities. It contains objects of type
  *  Obj that can be converted to db::box<C> objects with
- *  the BoxConv function. 
+ *  the BoxConv function.
  *  A box tree can be in state "inserting", in which the
- *  insertion of new objects is supported, or can be 
- *  sorted, after which it can be queried for objects 
+ *  insertion of new objects is supported, or can be
+ *  sorted, after which it can be queried for objects
  *  whose box overlaps or touches a specified test box.
  *  This incarnation is "unstable". That means, the original
  *  order of the elements is not maintained when the tree
@@ -1716,7 +1714,7 @@ private:
  */
 
 template <class Box, class Obj, class BoxConv, size_t min_bin = 100, size_t min_quads = 100, unsigned int thin_aspect = 4>
-class unstable_box_tree 
+class unstable_box_tree
 {
 public:
   typedef Box box_type;
@@ -1731,15 +1729,15 @@ public:
   typedef typename obj_vector_type::iterator iterator;
   typedef unstable_box_tree<box_type, object_type, box_conv_type, min_bin, min_quads> box_tree_type;
   typedef db::box_tree_node<box_tree_type> box_tree_node;
-  typedef box_tree_sel<box_type, object_type, box_conv_type, db::boxes_overlap<box_type> > box_tree_sel_overlap_type;
-  typedef box_tree_sel<box_type, object_type, box_conv_type, db::boxes_touch<box_type> > box_tree_sel_touch_type;
+  typedef box_tree_sel<box_type, object_type, box_conv_type, db::boxes_overlap<box_type>> box_tree_sel_overlap_type;
+  typedef box_tree_sel<box_type, object_type, box_conv_type, db::boxes_touch<box_type>> box_tree_sel_touch_type;
   typedef unstable_box_tree_flat_it<box_tree_type> flat_iterator;
   typedef unstable_box_tree_it<box_tree_type, box_tree_sel_touch_type> touching_iterator;
   typedef unstable_box_tree_it<box_tree_type, box_tree_sel_overlap_type> overlapping_iterator;
   typedef box_tree_picker<box_type, object_type, box_conv_type, obj_vector_type> box_tree_picker_type;
 
   /**
-   *  @brief Creates a empty box tree object 
+   *  @brief Creates a empty box tree object
    */
   unstable_box_tree ()
     : mp_root (0)
@@ -1766,7 +1764,7 @@ public:
   }
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   unstable_box_tree &operator= (const unstable_box_tree &b)
   {
@@ -1807,7 +1805,7 @@ public:
    *  @brief Insert a new object into the box tree
    *
    *  Inserts a new object into the box tree. The object
-   *  is appended at the end of the vector. Sorting is 
+   *  is appended at the end of the vector. Sorting is
    *  invalidated through this operation.
    *
    *  @param o The object to insert
@@ -1834,13 +1832,13 @@ public:
     m_objects.resize (n);
   }
 
-  /** 
+  /**
    *  @brief Insert a range of objects
    *
    *  Analogous to the other insert method, but accepting
    *  and range of objects [start,end).
    */
-  template <class I> 
+  template <class I>
   void insert (I from, I to)
   {
     m_objects.insert (m_objects.end (), from, to);
@@ -1848,7 +1846,7 @@ public:
 
   /**
    *  @brief Replace an object
-   *  
+   *
    *  Replace the object at the given (const) iterator position
    *  with the object given. Replacing an object invalidates
    *  the sorting state.
@@ -1863,7 +1861,7 @@ public:
 
   /**
    *  @brief Erase an object
-   *  
+   *
    *  Erase the object pointed to by the given iterator.
    *  Erasing an object will invalidate sorting. Erasing is
    *  not a cheap operation and its complexity is O(n).
@@ -1877,7 +1875,7 @@ public:
 
   /**
    *  @brief Erase multiple objects
-   *  
+   *
    *  Erase the objects pointed to by the given iterators.
    *  Erasing an object will invalidate sorting. Erasing is
    *  not a cheap operation and its complexity is O(n).
@@ -1905,7 +1903,7 @@ public:
 
   /**
    *  @brief Erase an object sequence
-   *  
+   *
    *  Erase the objects [from,to) to by the given iterator.
    *  Erasing an object will invalidate sorting. Erasing is
    *  not a cheap operation and its complexity is O(n).
@@ -1919,7 +1917,7 @@ public:
 
   /**
    *  @brief Erase several objects
-   *  
+   *
    *  Erase the objects given by a set of iterators (given by a sequence [from,to)).
    *  The iterators given must be sorted in ascending order.
    *  Erasing an object will invalidate sorting. Erasing is
@@ -1951,11 +1949,11 @@ public:
   /**
    *  @brief Get the iterator for an object given by a pointer (non-const version)
    */
-  iterator iterator_from_pointer (object_type *p) 
+  iterator iterator_from_pointer (object_type *p)
   {
     return m_objects.begin () + (p - &m_objects.front ());
   }
-  
+
   /**
    *  @brief Get the iterator for an object given by a pointer
    */
@@ -1963,7 +1961,7 @@ public:
   {
     return m_objects.begin () + (p - &m_objects.front ());
   }
-  
+
   /**
    *  @brief Returns the size of the vector.
    *
@@ -1981,8 +1979,8 @@ public:
   {
     return m_objects.empty ();
   }
-  
-  /** 
+
+  /**
    *  @brief Empty the vector.
    */
   void clear ()
@@ -2045,7 +2043,7 @@ public:
   {
     return m_objects.end ();
   }
-  
+
   /**
    *  @brief Sequential access begin iterator
    *
@@ -2057,7 +2055,7 @@ public:
    *  @return A non-const iterator pointing to the first
    *  element in the vector
    */
-  iterator begin () 
+  iterator begin ()
   {
     return m_objects.begin ();
   }
@@ -2070,24 +2068,24 @@ public:
    *  @return A non-const iterator pointing past the end
    *  of the vector
    */
-  iterator end () 
+  iterator end ()
   {
     return m_objects.end ();
   }
-  
+
   /**
    *  @brief flat iterator
    *
-   *  This iterator is provided for compatibility between stable and unstable 
+   *  This iterator is provided for compatibility between stable and unstable
    *  box trees mainly. It delivers a iterator similar to the primitive one
    *  but with at_end semantics.
    */
-  flat_iterator begin_flat () const 
+  flat_iterator begin_flat () const
   {
     return unstable_box_tree_flat_it<box_tree_type> (*this);
   }
-  
-  /** 
+
+  /**
    *  @brief selection of objects touching the test box
    *
    *  The const iterator returned by this method will
@@ -2100,14 +2098,14 @@ public:
    *
    *  @return The const touching iterator pointing to the first Object.
    */
-  touching_iterator begin_touching (const Box &b, BoxConv conv) const 
+  touching_iterator begin_touching (const Box &b, BoxConv conv) const
   {
     box_tree_picker_type p (conv);
     box_tree_sel_touch_type s (b, conv);
     return unstable_box_tree_it<box_tree_type, box_tree_sel_touch_type> (*this, p, s);
   }
-  
-  /** 
+
+  /**
    *  @brief selection of objects overlapping the test box
    *
    *  The const iterator returned by this method will
@@ -2120,13 +2118,13 @@ public:
    *
    *  @return The const overlapping iterator pointing to the first Object.
    */
-  overlapping_iterator begin_overlapping (const Box &b, BoxConv conv) const 
+  overlapping_iterator begin_overlapping (const Box &b, BoxConv conv) const
   {
     box_tree_picker_type p (conv);
     box_tree_sel_overlap_type s (b, conv);
     return unstable_box_tree_it<box_tree_type, box_tree_sel_overlap_type> (*this, p, s);
   }
-  
+
   /**
    *  @brief Access to the root node object
    *
@@ -2164,7 +2162,7 @@ private:
 
   /// Sort implementation for simple bboxes - no caching
   template <class BC>
-  void sort (const BC &conv, const db::simple_bbox_tag &/*complexity*/)
+  void sort (const BC &conv, const db::simple_bbox_tag & /*complexity*/)
   {
     if (m_objects.empty ()) {
       return;
@@ -2190,7 +2188,7 @@ private:
 
   /// Sort implementation for complex bboxes - with caching
   template <class BC>
-  void sort (const BC &conv, const db::complex_bbox_tag &/*complexity*/)
+  void sort (const BC &conv, const db::complex_bbox_tag & /*complexity*/)
   {
     if (m_objects.empty ()) {
       return;
@@ -2212,9 +2210,9 @@ private:
     size_t ntot = size_t (to - from);
     if (ntot <= min_bin || (bbox.width () < 2 && bbox.height () < 2)) {
       return; //  not worth splitting
-    } 
+    }
 
-    obj_iterator qloc [5] = { from, from, from, from, from };
+    obj_iterator qloc [5] = {from, from, from, from, from};
     point_type center;
     if (bbox.width () < bbox.height () / thin_aspect) {
       //  separate by height only
@@ -2247,12 +2245,12 @@ private:
         }
       }
 
-      //  make space for the element and swap the new element into position 
+      //  make space for the element and swap the new element into position
       if (q < 4) {
 
-        //  since for the unstable tree there is no guarantee of stability of the 
+        //  since for the unstable tree there is no guarantee of stability of the
         //  objects, we have to rotate the box cache of the caching picker as well:
-        picker.rotate_boxes (q, e, qloc[0], qloc[1], qloc[2], qloc[3], qloc[4]);
+        picker.rotate_boxes (q, e, qloc [0], qloc [1], qloc [2], qloc [3], qloc [4]);
 
         object_type el = *e;
         for (int i = 4; i > q; --i) {
@@ -2260,19 +2258,17 @@ private:
           ++qloc [i];
         }
         *qloc [q] = el;
-
       }
       ++qloc [q];
-      
     }
 
     //  compute sizes of quad fields
-    size_t nx, n[4];
+    size_t nx, n [4];
     size_t nn = 0;
-    nx = std::distance (from, qloc[0]);
+    nx = std::distance (from, qloc [0]);
     for (int i = 0; i < 4; ++i) {
-      n[i] = std::distance (qloc [i], qloc[i + 1]);
-      nn += n[i];
+      n [i] = std::distance (qloc [i], qloc [i + 1]);
+      nn += n [i];
     }
 
     //  is it worth to split into sub-quads?
@@ -2289,21 +2285,18 @@ private:
 
       //  yes: create sub-quads
       box_type qboxes [4];
-      qboxes [0] = box_type (center, bbox.p2 ()); 
+      qboxes [0] = box_type (center, bbox.p2 ());
       qboxes [1] = box_type (bbox.left (), center.y (), center.x (), bbox.top ());
       qboxes [2] = box_type (bbox.p1 (), center);
       qboxes [3] = box_type (center.x (), bbox.bottom (), bbox.right (), center.y ());
       for (unsigned int q = 0; q < 4; ++q) {
-        if (n[q] > 0) {
-          node->lenq (q, n[q]);
-          tree_sort (node, qloc[q], qloc[q + 1], picker, qboxes [q], int (q));
+        if (n [q] > 0) {
+          node->lenq (q, n [q]);
+          tree_sort (node, qloc [q], qloc [q + 1], picker, qboxes [q], int (q));
         }
       }
-
-    } 
-
+    }
   }
-
 };
 
 /**
@@ -2318,4 +2311,3 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
 }
 
 #endif
-

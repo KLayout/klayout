@@ -67,27 +67,27 @@ void run_rve_test (tl::TestBase *_this, const std::string &fn_rve, const std::st
   EXPECT_EQ (au_txt == txt, true);
 }
 
-TEST(1)
+TEST (1)
 {
   run_rve_test (_this, "rve1.db", "rve1_au_2.txt");
 }
 
-TEST(2)
+TEST (2)
 {
   run_rve_test (_this, "rve2.db", "rve2_au_2.txt");
 }
 
-TEST(3)
+TEST (3)
 {
   run_rve_test (_this, "rve3.db", "rve3_au_2.txt");
 }
 
-TEST(4)
+TEST (4)
 {
   run_rve_test (_this, "rve4.db", "rve4_au.txt");
 }
 
-TEST(5)
+TEST (5)
 {
   run_rve_test (_this, "rve5.db", "rve5_au.txt");
 }

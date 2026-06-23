@@ -32,7 +32,7 @@ namespace bd
 /**
  *  @brief A common main() implementation for the "to" converters
  */
-BD_PUBLIC int converter_main (int argc, char *argv[], const std::string &format);
+BD_PUBLIC int converter_main (int argc, char *argv [], const std::string &format);
 
 }
 

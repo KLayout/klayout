@@ -45,7 +45,7 @@ std::string to_string (const tl::vector<db::Point> &pts)
   return s;
 }
 
-TEST(1) 
+TEST (1)
 {
   db::Path p;
   db::Path empty;
@@ -53,7 +53,7 @@ TEST(1)
 
   EXPECT_EQ (empty == p, true);
 
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   p.assign (c1.begin (), c1.end ());
@@ -88,12 +88,12 @@ TEST(1)
   EXPECT_EQ (to_string (pts), "(50,0;50,1000;150,1000;150,0)");
 }
 
-TEST(2) 
+TEST (2)
 {
   db::Path p;
   db::Box b;
 
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (10, 1000));
@@ -109,12 +109,12 @@ TEST(2)
   EXPECT_EQ (to_string (pts), "(-100,0;-100,1100;10,1100;10,900;100,900;100,0)");
 }
 
-TEST(2a) 
+TEST (2a)
 {
   db::Path p;
   db::Box b;
 
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (1000, 1000));
@@ -135,13 +135,13 @@ TEST(2a)
 }
 
 
-TEST(3) 
+TEST (3)
 {
   db::Path p;
   db::Box b;
 
 
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (1000, 0));
@@ -158,11 +158,11 @@ TEST(3)
   EXPECT_EQ (to_string (pts), "(-100,0;-100,1100;0,1142;1071,71;929,-71;100,758;100,0)");
 }
 
-TEST(4) 
+TEST (4)
 {
   db::Path p;
 
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (1000, 2000));
@@ -182,11 +182,11 @@ TEST(4)
   EXPECT_EQ (p.box (), bx);
 }
 
-TEST(5) 
+TEST (5)
 {
   db::Path p;
 
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (1000, 2000));
@@ -207,11 +207,11 @@ TEST(5)
   EXPECT_EQ (p.box (), bx);
 }
 
-TEST(6) 
+TEST (6)
 {
   db::Path p;
 
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (1000, 2000));
@@ -225,7 +225,7 @@ TEST(6)
   p.width (150);
   EXPECT_EQ (p.to_string (), "(0,0;0,1000;1000,2000) w=150 bx=50 ex=150 r=true");
 
-  p.round(false);
+  p.round (false);
   EXPECT_EQ (p.to_string (), "(0,0;0,1000;1000,2000) w=150 bx=50 ex=150 r=false");
 
   p.width (200);
@@ -245,7 +245,7 @@ TEST(6)
   EXPECT_EQ (p.box (), bx);
 }
 
-TEST(7)
+TEST (7)
 {
   db::DPath path;
   std::string s ("(0,0;0,1000;1000,2000) w=200 bx=50 ex=150 r=true");
@@ -264,7 +264,7 @@ TEST(7)
   v.clear ();
 }
 
-TEST(8a)
+TEST (8a)
 {
   db::DPath path;
   std::string s ("(0,0;0,1000;1000,2000) w=200 bx=50 ex=150 r=true");
@@ -276,7 +276,7 @@ TEST(8a)
   EXPECT_EQ (tl::to_string (path.length ()), "2614.21356237");
 }
 
-TEST(8b)
+TEST (8b)
 {
   db::DPath path;
   std::string s ("(0,0;0,1000;1000,2000) w=200 bx=50 ex=150");
@@ -287,7 +287,7 @@ TEST(8b)
   EXPECT_EQ (tl::to_string (path.length ()), "2614.21356237");
 }
 
-TEST(9)
+TEST (9)
 {
   db::Path path;
   {
@@ -308,17 +308,17 @@ TEST(9)
   db::DPath::pointlist_type pts;
   path.transformed (trans).hull (pts);
   std::string sres;
-  for (size_t i = 0; i < pts.size(); ++i) {
+  for (size_t i = 0; i < pts.size (); ++i) {
     if (i > 0) {
       sres += ",";
     }
-    sres += db::Point(pts[i]).to_string();
+    sres += db::Point (pts [i]).to_string ();
   }
 
   EXPECT_EQ (sref, sres);
 }
 
-TEST(10)
+TEST (10)
 {
   db::Path path;
   std::string s ("(0,0;0,1000000000;1000000000,2000000000) w=200000000 bx=50000000 ex=150000000 r=false");
@@ -329,7 +329,7 @@ TEST(10)
   EXPECT_EQ (tl::to_string (path.perimeter ()), "5628427125");
 }
 
-TEST(11)
+TEST (11)
 {
   db::Path path;
   db::Path::pointlist_type pts;
@@ -339,7 +339,7 @@ TEST(11)
   EXPECT_EQ (tl::to_string (path.perimeter ()), "4000");
   EXPECT_EQ (tl::to_string (path.area ()), "0");
 
-  pts.clear();
+  pts.clear ();
   path.hull (pts, 4);
   EXPECT_EQ (to_string (pts), "(0,0;1000,0;1000,0;0,0;0,0;1000,0;1000,0;0,0)");
 
@@ -348,7 +348,7 @@ TEST(11)
   EXPECT_EQ (tl::to_string (path.perimeter ()), "4200");
   EXPECT_EQ (tl::to_string (path.area ()), "0");
 
-  pts.clear();
+  pts.clear ();
   path.hull (pts, 4);
   EXPECT_EQ (to_string (pts), "(-100,0;1000,0;1000,0;0,0;0,0;1000,0;1000,0;-100,0)");
 
@@ -357,13 +357,13 @@ TEST(11)
   EXPECT_EQ (tl::to_string (path.perimeter ()), "4240");
   EXPECT_EQ (tl::to_string (path.area ()), "42000");
 
-  pts.clear();
+  pts.clear ();
   path.hull (pts, 4);
   EXPECT_EQ (to_string (pts), "(-100,10;1010,10;1010,-10;0,-10;0,10;1010,10;1010,-10;-100,-10)");
 }
 
 //  issue #2002
-TEST(12)
+TEST (12)
 {
   db::Path path;
   db::Path::pointlist_type pts;
@@ -378,4 +378,3 @@ TEST(12)
   path.hull (pts, 4);
   EXPECT_EQ (to_string (pts), "(286,521;454,350;522,282;240,0;70,170;0,241;499,732;564,666;735,495;27,-213;-40,-146;-213,30)");
 }
-

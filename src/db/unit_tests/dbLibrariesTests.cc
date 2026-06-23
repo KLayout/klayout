@@ -41,24 +41,24 @@
 
 #include <memory>
 
-class LIBT_PD 
+class LIBT_PD
   : public db::PCellDeclaration
 {
   virtual std::vector<db::PCellLayerDeclaration> get_layer_declarations (const db::pcell_parameters_type &) const
   {
     std::vector<db::PCellLayerDeclaration> layers;
 
-    layers.push_back(db::PCellLayerDeclaration ());
+    layers.push_back (db::PCellLayerDeclaration ());
     layers.back ().symbolic = "gate";
     layers.back ().layer = 16;
     layers.back ().datatype = 0;
 
-    layers.push_back(db::PCellLayerDeclaration ());
+    layers.push_back (db::PCellLayerDeclaration ());
     layers.back ().symbolic = "metal0";
     layers.back ().layer = 24;
     layers.back ().datatype = 0;
 
-    layers.push_back(db::PCellLayerDeclaration ());
+    layers.push_back (db::PCellLayerDeclaration ());
     layers.back ().symbolic = "cont";
     layers.back ().layer = 23;
     layers.back ().datatype = 0;
@@ -82,14 +82,14 @@ class LIBT_PD
 
   virtual void produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
   {
-    db::Coord width = db::coord_traits<db::Coord>::rounded (parameters[0].to_double () / layout.dbu ());
-    db::Coord height = db::coord_traits<db::Coord>::rounded (parameters[1].to_double () / layout.dbu ());
+    db::Coord width = db::coord_traits<db::Coord>::rounded (parameters [0].to_double () / layout.dbu ());
+    db::Coord height = db::coord_traits<db::Coord>::rounded (parameters [1].to_double () / layout.dbu ());
 
-    int orientation = parameters[2].to_long ();
+    int orientation = parameters [2].to_long ();
 
-    //unsigned int l_gate = layer_ids[0];
-    unsigned int l_metal0 = layer_ids[1];
-    //unsigned int l_cont = layer_ids[2];
+    // unsigned int l_gate = layer_ids[0];
+    unsigned int l_metal0 = layer_ids [1];
+    // unsigned int l_cont = layer_ids[2];
 
     const db::Cell &cell_a = layout.cell (layout.cell_by_name ("A").second);
 
@@ -104,13 +104,13 @@ class LIBT_L
 {
 public:
   LIBT_L (tl::TestBase *_this)
-    : Library () 
+    : Library ()
   {
-    set_name("L");
-    set_description("A test library.");
+    set_name ("L");
+    set_description ("A test library.");
 
     layout ().dbu (0.001);
-    
+
     db::LayerProperties p;
 
     p.layer = 23;
@@ -122,8 +122,8 @@ public:
     unsigned int l_gate = layout ().insert_layer (p);
 
     db::Cell &cell_a = layout ().cell (layout ().add_cell ("A"));
-    cell_a.shapes(l_cont).insert(db::Box (50, 50, 150, 150));
-    cell_a.shapes(l_gate).insert(db::Box (0, 0, 200, 1000));
+    cell_a.shapes (l_cont).insert (db::Box (50, 50, 150, 150));
+    cell_a.shapes (l_gate).insert (db::Box (0, 0, 200, 1000));
 
     db::Cell &top = layout ().cell (layout ().add_cell ("TOP"));
 
@@ -133,9 +133,9 @@ public:
     parameters.push_back (tl::Variant ());
     parameters.push_back (tl::Variant ());
     parameters.push_back (tl::Variant ());
-    tl::Variant &width = parameters[0];
-    tl::Variant &height = parameters[1];
-    tl::Variant &orientation = parameters[2];
+    tl::Variant &width = parameters [0];
+    tl::Variant &height = parameters [1];
+    tl::Variant &orientation = parameters [2];
 
     width = 0.5;
     height = 1.0;
@@ -160,7 +160,7 @@ public:
     db::Instance i3 = top.insert (db::CellInstArray (db::CellInst (pd3), db::Trans (db::Vector (2000, 0))));
   }
 
-  ~LIBT_L()
+  ~LIBT_L ()
   {
     // .. nothing yet ..
   }
@@ -170,13 +170,13 @@ class LIBT_A
   : public db::Library
 {
 public:
-  LIBT_A () 
-    : Library () 
+  LIBT_A ()
+    : Library ()
   {
-    set_name("A");
+    set_name ("A");
 
     layout ().dbu (0.001);
-    
+
     db::LayerProperties p;
 
     p.layer = 1;
@@ -188,8 +188,8 @@ public:
     unsigned int l2 = layout ().insert_layer (p);
 
     db::Cell &cell_a = layout ().cell (layout ().add_cell ("A"));
-    cell_a.shapes(l1).insert(db::Box (50, 50, 150, 150));
-    cell_a.shapes(l2).insert(db::Box (0, 0, 200, 1000));
+    cell_a.shapes (l1).insert (db::Box (50, 50, 150, 150));
+    cell_a.shapes (l2).insert (db::Box (0, 0, 200, 1000));
   }
 
   void modify ()
@@ -197,7 +197,7 @@ public:
     db::Cell &cell_a = layout ().cell (layout ().cell_by_name ("A").second);
     unsigned int l1 = layout ().get_layer (db::LayerProperties (1, 0));
     cell_a.shapes (l1).clear ();
-    cell_a.shapes (l1).insert(db::Box (60, 60, 160, 160));
+    cell_a.shapes (l1).insert (db::Box (60, 60, 160, 160));
   }
 };
 
@@ -205,13 +205,13 @@ class LIBT_B
   : public db::Library
 {
 public:
-  LIBT_B () 
-    : Library () 
+  LIBT_B ()
+    : Library ()
   {
-    set_name("B");
+    set_name ("B");
 
     layout ().dbu (0.001);
-    
+
     db::LayerProperties p;
 
     p.layer = 1;
@@ -223,22 +223,21 @@ public:
     unsigned int l3 = layout ().insert_layer (p);
 
     db::Cell &cell_b = layout ().cell (layout ().add_cell ("B"));
-    cell_b.shapes(l1).insert(db::Box (10, 20, 30, 40));
-    cell_b.shapes(l3).insert(db::Box (0, 0, 10, 20));
+    cell_b.shapes (l1).insert (db::Box (10, 20, 30, 40));
+    cell_b.shapes (l3).insert (db::Box (0, 0, 10, 20));
 
     db::Library *lib_a = db::LibraryManager::instance ().lib_ptr_by_name ("A");
     tl_assert (lib_a != 0);
 
     std::pair<bool, db::cell_index_type> a = lib_a->layout ().cell_by_name ("A");
     tl_assert (a.first);
-      
+
     db::cell_index_type cp = layout ().get_lib_proxy (lib_a, a.second);
     cell_b.insert (db::CellInstArray (db::CellInst (cp), db::ICplxTrans (0.1, 0.0, false, db::Vector (1.0, 2.0))));
-     
   }
 };
 
-TEST(1) 
+TEST (1)
 {
   std::vector<std::string> libnames_before;
   for (db::LibraryManager::iterator il = db::LibraryManager::instance ().begin (); il != db::LibraryManager::instance ().end (); ++il) {
@@ -274,12 +273,12 @@ TEST(1)
   EXPECT_EQ (lib->get_name (), "L");
   EXPECT_EQ (lib->get_description (), "A test library.");
 
-  EXPECT_EQ (lib->layout ().get_properties(0).to_string (), "23/0");
-  EXPECT_EQ (lib->layout ().get_properties(1).to_string (), "16/0");
-  EXPECT_EQ (lib->layout ().get_properties(2).to_string (), "24/0");
+  EXPECT_EQ (lib->layout ().get_properties (0).to_string (), "23/0");
+  EXPECT_EQ (lib->layout ().get_properties (1).to_string (), "16/0");
+  EXPECT_EQ (lib->layout ().get_properties (2).to_string (), "24/0");
 
   db::Manager m (true);
-  db::Layout layout(&m);
+  db::Layout layout (&m);
   layout.dbu (0.001);
 
   db::Cell &top = layout.cell (layout.add_cell ("TOP"));
@@ -292,9 +291,9 @@ TEST(1)
   EXPECT_EQ (layout.basic_name (lp1), "TOP");
   EXPECT_EQ (layout.display_name (lp1), "L.TOP");
 
-  EXPECT_EQ (layout.get_properties(0).to_string (), "23/0");
-  EXPECT_EQ (layout.get_properties(1).to_string (), "16/0");
-  EXPECT_EQ (layout.get_properties(2).to_string (), "24/0");
+  EXPECT_EQ (layout.get_properties (0).to_string (), "23/0");
+  EXPECT_EQ (layout.get_properties (1).to_string (), "16/0");
+  EXPECT_EQ (layout.get_properties (2).to_string (), "24/0");
 
   db::Instance i1 = top.insert (db::CellInstArray (db::CellInst (lp1), db::Trans (db::Vector (0, 0))));
 
@@ -302,12 +301,12 @@ TEST(1)
   parameters.push_back (tl::Variant ());
   parameters.push_back (tl::Variant ());
   parameters.push_back (tl::Variant ());
-  tl::Variant &width = parameters[0];
-  tl::Variant &height = parameters[1];
-  tl::Variant &orientation = parameters[2];
+  tl::Variant &width = parameters [0];
+  tl::Variant &height = parameters [1];
+  tl::Variant &orientation = parameters [2];
   width = 2.0;
   height = 10.0;
-  orientation = (long)3;
+  orientation = (long) 3;
 
   EXPECT_EQ (lib->layout ().pcell_by_name ("PD").first, true);
   db::pcell_id_type pd = lib->layout ().pcell_by_name ("PD").second;
@@ -322,8 +321,8 @@ TEST(1)
   EXPECT_EQ (lp2_cell->is_proxy (), true);
   EXPECT_EQ (layout.is_pcell_instance (lp2).first, true);
   EXPECT_EQ (layout.is_pcell_instance (lp2).second, pd);
-  EXPECT_EQ (layout.get_pcell_parameters (lp2)[0].to_string(), std::string ("2"));
-  EXPECT_EQ (layout.get_pcell_parameters (lp2)[1].to_string(), std::string ("10"));
+  EXPECT_EQ (layout.get_pcell_parameters (lp2) [0].to_string (), std::string ("2"));
+  EXPECT_EQ (layout.get_pcell_parameters (lp2) [1].to_string (), std::string ("10"));
 
   db::Instance i2 = top.insert (db::CellInstArray (db::CellInst (lp2), db::Trans (db::Vector (10000, 0))));
 
@@ -405,7 +404,7 @@ TEST(1)
   EXPECT_EQ (tl::join (libnames_before, ","), tl::join (libnames_after, ","));
 }
 
-TEST(2) 
+TEST (2)
 {
   std::unique_ptr<LIBT_L> lib (new LIBT_L (_this));
   db::LibraryManager::instance ().register_lib (lib.get ());
@@ -417,7 +416,7 @@ TEST(2)
   db::Writer writer = db::Writer (db::SaveLayoutOptions ());
 
   db::Manager m (true);
-  db::Layout layout(&m);
+  db::Layout layout (&m);
   layout.dbu (0.001);
 
   db::Cell &top = layout.cell (layout.add_cell ("TOP"));
@@ -430,12 +429,12 @@ TEST(2)
   parameters.push_back (tl::Variant ());
   parameters.push_back (tl::Variant ());
   parameters.push_back (tl::Variant ());
-  tl::Variant &width = parameters[0];
-  tl::Variant &height = parameters[1];
-  tl::Variant &orientation = parameters[2];
+  tl::Variant &width = parameters [0];
+  tl::Variant &height = parameters [1];
+  tl::Variant &orientation = parameters [2];
   width = 2.0;
   height = 10.0;
-  orientation = (long)3;
+  orientation = (long) 3;
 
   db::pcell_id_type pd = lib->layout ().pcell_by_name ("PD").second;
   db::cell_index_type lib_pd1 = lib->layout ().get_pcell_variant (pd, parameters);
@@ -470,9 +469,9 @@ TEST(2)
   std::vector<tl::Variant> new_param = tmp.get_pcell_parameters (tmp_pd2.second);
 
   EXPECT_EQ (new_param.size (), size_t (3));
-  EXPECT_EQ (new_param[0].to_string (), std::string ("2"));
-  EXPECT_EQ (new_param[1].to_string (), std::string ("10"));
-  EXPECT_EQ (new_param[2].to_string (), std::string ("3"));
+  EXPECT_EQ (new_param [0].to_string (), std::string ("2"));
+  EXPECT_EQ (new_param [1].to_string (), std::string ("10"));
+  EXPECT_EQ (new_param [2].to_string (), std::string ("3"));
 
   std::pair<bool, db::cell_index_type> tt = tmp.cell_by_name ("TOP");
   EXPECT_EQ (tt.first, true);
@@ -480,7 +479,7 @@ TEST(2)
 
   if (db::default_editable_mode ()) {
 
-    new_param[1] = 5.0;
+    new_param [1] = 5.0;
     db::cell_index_type tmp_i2_cid = tmp_i2.cell_index ();
     tmp_i2 = tmp_top.change_pcell_parameters (tmp_i2, new_param);
 
@@ -492,7 +491,6 @@ TEST(2)
 
     CHECKPOINT ();
     db::compare_layouts (this, tmp, tl::testdata () + "/gds/lib_test2.gds", db::NormalizationMode (db::WriteGDS2 + db::NoContext));
-
   }
 
   //  unregister the library through the destructor
@@ -501,7 +499,7 @@ TEST(2)
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("L").first, false);
 }
 
-TEST(3) 
+TEST (3)
 {
   std::unique_ptr<LIBT_A> lib_a (new LIBT_A ());
   db::LibraryManager::instance ().register_lib (lib_a.get ());
@@ -523,7 +521,7 @@ TEST(3)
   //  the ability to persist that and whether this survives a write/read cycle.
 
   db::Manager m (true);
-  db::Layout layout(&m);
+  db::Layout layout (&m);
   layout.dbu (0.001);
 
   db::Cell &top = layout.cell (layout.add_cell ("TOP"));
@@ -553,7 +551,7 @@ TEST(3)
   db::compare_layouts (this, tmp, tl::testdata () + "/gds/lib_test4.gds", db::NormalizationMode (db::WriteGDS2 + db::NoContext));
 }
 
-TEST(4)
+TEST (4)
 {
   std::unique_ptr<LIBT_A> lib_a1_inst (new LIBT_A ());
   tl::weak_ptr<LIBT_A> lib_a1 (lib_a1_inst.get ());
@@ -647,10 +645,10 @@ TEST(4)
   EXPECT_EQ (lib_a4.get () == 0, true);
 }
 
-namespace {
+namespace
+{
 
-class PCell1Declaration :
-  public db::PCellDeclaration
+class PCell1Declaration : public db::PCellDeclaration
 {
   void produce (const db::Layout & /*layout*/, const std::vector<unsigned int> & /*layer_ids*/, const db::pcell_parameters_type & /*parameters*/, db::Cell & /*cell*/) const
   {
@@ -658,8 +656,7 @@ class PCell1Declaration :
   }
 };
 
-class PCell2Declaration :
-  public db::PCellDeclaration
+class PCell2Declaration : public db::PCellDeclaration
 {
   void produce (const db::Layout & /*layout*/, const std::vector<unsigned int> & /*layer_ids*/, const db::pcell_parameters_type & /*parameters*/, db::Cell &cell) const
   {
@@ -679,7 +676,7 @@ class PCell2Declaration :
 }
 
 //  self-referencing libraries
-TEST(5_issue905)
+TEST (5_issue905)
 {
   std::unique_ptr<db::Library> lib (new db::Library ());
   lib->set_name ("__PCellLibrary");
@@ -699,7 +696,7 @@ TEST(5_issue905)
 }
 
 //  refresh function
-TEST(6_issue996)
+TEST (6_issue996)
 {
   std::unique_ptr<LIBT_A> lib (new LIBT_A ());
   db::LibraryManager::instance ().register_lib (lib.get ());
@@ -751,7 +748,7 @@ static size_t num_defunct (const db::Layout &layout)
 {
   size_t ndefunct = 0;
   for (auto c = layout.begin (); c != layout.end (); ++c) {
-    if (dynamic_cast<const db::ColdProxy *> (c.operator-> ())) {
+    if (dynamic_cast<const db::ColdProxy *> (c.operator->())) {
       ++ndefunct;
     }
   }
@@ -760,7 +757,7 @@ static size_t num_defunct (const db::Layout &layout)
 
 //  monster lib refresh issue
 //  (monster lib is a layout with manifold library references to existing and non-existing libraries)
-TEST(7_monsterlib)
+TEST (7_monsterlib)
 {
   std::pair<bool, db::lib_id_type> lib;
 
@@ -863,10 +860,10 @@ TEST(7_monsterlib)
   db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au5.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
 }
 
-namespace {
+namespace
+{
 
-class PCellWithChildDeclaration :
-  public db::PCellDeclaration
+class PCellWithChildDeclaration : public db::PCellDeclaration
 {
   void produce (const db::Layout &layout, const std::vector<unsigned int> & /*layer_ids*/, const db::pcell_parameters_type & /*parameters*/, db::Cell &cell) const
   {
@@ -892,7 +889,7 @@ static std::string l2s (const db::Layout &layout)
 }
 
 //  PCells with subcells with properties
-TEST(8_issue2344)
+TEST (8_issue2344)
 {
   std::unique_ptr<db::Library> lib (new db::Library ());
   lib->set_name ("__PCellLibrary");
@@ -907,19 +904,17 @@ TEST(8_issue2344)
   ly.get_lib_proxy (lib.get (), lib_cell);
 
   EXPECT_EQ (l2s (ly),
-    "begin_lib 0.001\n"
-    "begin_cell {CHILD}\n"
-    "end_cell\n"
-    "begin_cell {PCell1}\n"
-    "set props {\n"
-    "  {{id} {my_id}}\n"
-    "}\n"
-    "srefp $props {CHILD} 0 0 1 {0 0}\n"
-    "end_cell\n"
-    "end_lib\n"
-  );
+             "begin_lib 0.001\n"
+             "begin_cell {CHILD}\n"
+             "end_cell\n"
+             "begin_cell {PCell1}\n"
+             "set props {\n"
+             "  {{id} {my_id}}\n"
+             "}\n"
+             "srefp $props {CHILD} 0 0 1 {0 0}\n"
+             "end_cell\n"
+             "end_lib\n");
 
   db::LibraryManager::instance ().delete_lib (lib.release ());
   EXPECT (true);
 }
-

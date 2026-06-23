@@ -27,7 +27,7 @@
 #include "layEditorOptionsPage.h"
 
 #if defined(HAVE_QT)
-#  include "edtPropertiesPages.h"
+#include "edtPropertiesPages.h"
 #endif
 
 namespace edt
@@ -41,10 +41,10 @@ const char *BoxService::function_name () { return "box-toolkit-widget-commit"; }
 
 BoxService::BoxService (db::Manager *manager, lay::LayoutViewBase *view)
   : ShapeEditService (manager, view, db::ShapeIterator::Boxes), m_centered (false)
-{ 
+{
   //  .. nothing yet ..
 }
-  
+
 #if defined(HAVE_QT)
 std::vector<lay::PropertiesPage *>
 BoxService::properties_pages (db::Manager *manager, QWidget *parent)
@@ -55,8 +55,7 @@ BoxService::properties_pages (db::Manager *manager, QWidget *parent)
 }
 #endif
 
-void 
-BoxService::do_begin_edit (const db::DPoint &p)
+void BoxService::do_begin_edit (const db::DPoint &p)
 {
   get_edit_layer ();
 
@@ -69,8 +68,7 @@ BoxService::do_begin_edit (const db::DPoint &p)
   update_marker ();
 }
 
-void
-BoxService::function (const std::string &name, const std::string &value)
+void BoxService::function (const std::string &name, const std::string &value)
 {
   if (name == function_name ()) {
 
@@ -92,7 +90,6 @@ BoxService::function (const std::string &name, const std::string &value)
 
     } catch (...) {
     }
-
   }
 }
 
@@ -107,8 +104,7 @@ BoxService::get_box () const
   }
 }
 
-void
-BoxService::update_marker ()
+void BoxService::update_marker ()
 {
   lay::Marker *marker = dynamic_cast<lay::Marker *> (edit_marker ());
   if (marker) {
@@ -127,7 +123,6 @@ BoxService::update_marker ()
     if (p) {
       p->configure (configure_name (), dim.to_string ());
     }
-
   }
 
   //  call hooks with new shape
@@ -142,19 +137,17 @@ BoxService::update_marker ()
   }
 }
 
-void
-BoxService::do_mouse_move_inactive (const db::DPoint &p)
+void BoxService::do_mouse_move_inactive (const db::DPoint &p)
 {
   lay::PointSnapToObjectResult snap_details = snap2_details (p);
   mouse_cursor_from_snap_details (snap_details);
 }
 
-void
-BoxService::do_mouse_move (const db::DPoint &p)
+void BoxService::do_mouse_move (const db::DPoint &p)
 {
   //  snap to square if Ctrl button is pressed
   bool snap_square = (mouse_buttons () & lay::ControlButton) != 0;
-  bool centered = (mouse_buttons ()  & lay::ShiftButton) != 0;
+  bool centered = (mouse_buttons () & lay::ShiftButton) != 0;
 
   lay::PointSnapToObjectResult snap_details = snap2_details (p, m_p1, snap_square ? lay::AC_DiagonalOnly : lay::AC_Any);
   db::DPoint ps = snap_details.snapped_point;
@@ -201,31 +194,27 @@ BoxService::do_mouse_move (const db::DPoint &p)
   update_marker ();
 }
 
-bool 
-BoxService::do_mouse_click (const db::DPoint &p)
+bool BoxService::do_mouse_click (const db::DPoint &p)
 {
   do_mouse_move (p);
   return true;
 }
 
-void 
-BoxService::do_finish_edit (bool /*accept*/)
+void BoxService::do_finish_edit (bool /*accept*/)
 {
   deliver_shape (get_box ());
   commit_recent ();
   close_editor_hooks (true);
 }
 
-void 
-BoxService::do_cancel_edit ()
+void BoxService::do_cancel_edit ()
 {
   close_editor_hooks (false);
 }
 
-bool 
-BoxService::selection_applies (const lay::ObjectInstPath &sel) const
+bool BoxService::selection_applies (const lay::ObjectInstPath &sel) const
 {
-  return !sel.is_cell_inst () && sel.shape ().is_box ();
+  return ! sel.is_cell_inst () && sel.shape ().is_box ();
 }
 
 } // namespace edt

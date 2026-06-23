@@ -59,18 +59,17 @@ public:
    */
   void extract (const RExtractorTech &tech,
                 const std::map<unsigned int, db::Region> &geo,
-                const std::map<unsigned int, std::vector<db::Point> > &vertex_ports,
-                const std::map<unsigned int, std::vector<db::Polygon> > &polygon_ports,
+                const std::map<unsigned int, std::vector<db::Point>> &vertex_ports,
+                const std::map<unsigned int, std::vector<db::Polygon>> &polygon_ports,
                 RNetwork &rnetwork);
 
   /**
    *  @brief A structure describing a via port
    *  This structure is used internally
    */
-  struct ViaPort
-  {
-    ViaPort () : node (0) { }
-    ViaPort (const db::Point &p, RNode *n) : position (p), node (n) { }
+  struct ViaPort {
+    ViaPort () : node (0) {}
+    ViaPort (const db::Point &p, RNode *n) : position (p), node (n) {}
     db::Point position;
     RNode *node;
   };
@@ -78,7 +77,7 @@ public:
 protected:
   void create_via_ports (const RExtractorTech &tech,
                          const std::map<unsigned int, db::Region> &geo,
-                         std::map<unsigned int, std::vector<ViaPort> > &vias,
+                         std::map<unsigned int, std::vector<ViaPort>> &vias,
                          RNetwork &rnetwork);
 
   void extract_conductor (const RExtractorTechConductor &cond,
@@ -95,7 +94,7 @@ private:
                         double conductance,
                         const db::Polygon &poly,
                         unsigned int &port_index,
-                        std::map<unsigned int, std::vector<ViaPort> > &vias,
+                        std::map<unsigned int, std::vector<ViaPort>> &vias,
                         RNetwork &rnetwork);
 };
 

@@ -32,7 +32,7 @@ namespace gsi
 // --------------------------------------------------------------------------------
 //  Implementation of gsi::initialize
 
-void GSI_PUBLIC 
+void GSI_PUBLIC
 initialize ()
 {
   //  do something only if there are new classes
@@ -70,11 +70,8 @@ initialize ()
       if (lc != lc_trans) {
         tl::VariantUserClassBase::register_user_class (lc_trans, c->var_cls (false));
       }
-
     }
-
   }
 }
 
 }
-

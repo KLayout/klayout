@@ -21,31 +21,31 @@
 */
 
 
-#if !defined(HDR_bdCommon_h)
-# define HDR_bdCommon_h
+#if ! defined(HDR_bdCommon_h)
+#define HDR_bdCommon_h
 
-# if defined _WIN32 || defined __CYGWIN__
+#if defined _WIN32 || defined __CYGWIN__
 
-#   ifdef MAKE_BD_LIBRARY
-#     define BD_PUBLIC __declspec(dllexport)
-#   else
-#     define BD_PUBLIC __declspec(dllimport)
-#   endif
-#   define BD_LOCAL
-#   define BD_PUBLIC_TEMPLATE
+#ifdef MAKE_BD_LIBRARY
+#define BD_PUBLIC __declspec (dllexport)
+#else
+#define BD_PUBLIC __declspec (dllimport)
+#endif
+#define BD_LOCAL
+#define BD_PUBLIC_TEMPLATE
 
-# else
+#else
 
-#   if __GNUC__ >= 4 || defined(__clang__)
-#     define BD_PUBLIC __attribute__ ((visibility ("default")))
-#     define BD_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
-#     define BD_LOCAL  __attribute__ ((visibility ("hidden")))
-#   else
-#     define BD_PUBLIC
-#     define BD_PUBLIC_TEMPLATE
-#     define BD_LOCAL
-#   endif
+#if __GNUC__ >= 4 || defined(__clang__)
+#define BD_PUBLIC __attribute__ ((visibility ("default")))
+#define BD_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
+#define BD_LOCAL __attribute__ ((visibility ("hidden")))
+#else
+#define BD_PUBLIC
+#define BD_PUBLIC_TEMPLATE
+#define BD_LOCAL
+#endif
 
-# endif
+#endif
 
 #endif

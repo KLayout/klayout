@@ -37,10 +37,10 @@
 #include <set>
 
 #if QT_VERSION >= 0x040400
-#  include <QPlainTextEdit>
+#include <QPlainTextEdit>
 typedef QPlainTextEdit TextEditWidget;
 #else
-#  include <QTextEdit>
+#include <QTextEdit>
 typedef QTextEdit TextEditWidget;
 #endif
 
@@ -57,7 +57,7 @@ namespace lay
 class MacroEditorPage;
 
 /**
- *  @brief A collection of highlighters 
+ *  @brief A collection of highlighters
  */
 class MacroEditorHighlighters
 {
@@ -72,8 +72,8 @@ public:
   std::string to_string () const;
   void load (const std::string &s);
 
-  typedef std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes> >::const_iterator const_iterator;
-  typedef std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes> >::iterator iterator;
+  typedef std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes>>::const_iterator const_iterator;
+  typedef std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes>>::iterator iterator;
 
   const_iterator begin () const
   {
@@ -85,18 +85,18 @@ public:
     return m_attributes.end ();
   }
 
-  iterator begin () 
+  iterator begin ()
   {
     return m_attributes.begin ();
   }
 
-  iterator end () 
+  iterator end ()
   {
     return m_attributes.end ();
   }
 
 private:
-  std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes> > m_attributes;
+  std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes>> m_attributes;
   GenericSyntaxHighlighterAttributes m_basic_attributes;
 
   lay::GenericSyntaxHighlighter *highlighter_for_scheme (QObject *parent, const std::string &scheme, GenericSyntaxHighlighterAttributes *attributes, bool initialize);
@@ -106,13 +106,13 @@ private:
 /**
  *  @brief The execution model
  *
- *  The execution model stores the breakpoints and current execution line for a given 
+ *  The execution model stores the breakpoints and current execution line for a given
  *  file.
  */
 class MacroEditorExecutionModel
   : public QObject
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MacroEditorExecutionModel (QObject *parent);
@@ -135,7 +135,7 @@ public:
 
   void remove_breakpoint (int line);
 
-  void toggle_breakpoint (int line); 
+  void toggle_breakpoint (int line);
 
   int current_line () const
   {
@@ -169,7 +169,7 @@ private:
 class MacroEditorTextWidget
   : public TextEditWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MacroEditorTextWidget (QWidget *parent);
@@ -189,11 +189,11 @@ private:
 class MacroEditorSidePanel
   : public QWidget
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   MacroEditorSidePanel (QWidget *parent, MacroEditorTextWidget *text, MacroEditorExecutionModel *exec_model);
-  
+
   QSize sizeHint () const;
   void paintEvent (QPaintEvent *event);
   void mousePressEvent (QMouseEvent *event);
@@ -202,7 +202,7 @@ public:
   void set_debugging_on (bool debugging_on);
 
 private slots:
-  void redraw ();     
+  void redraw ();
 
 private:
   MacroEditorTextWidget *mp_text;
@@ -235,7 +235,7 @@ public:
     m_actions.push_back (std::make_pair (name, title));
   }
 
-  const std::vector<std::pair<std::string, std::string> > &actions () const
+  const std::vector<std::pair<std::string, std::string>> &actions () const
   {
     return m_actions;
   }
@@ -255,7 +255,7 @@ public:
     return m_parameter;
   }
 
-  bool operator<(const MacroEditorNotification &other) const
+  bool operator< (const MacroEditorNotification &other) const
   {
     if (m_name != other.name ()) {
       return m_name < other.name ();
@@ -263,7 +263,7 @@ public:
     return m_parameter < other.parameter ();
   }
 
-  bool operator==(const MacroEditorNotification &other) const
+  bool operator== (const MacroEditorNotification &other) const
   {
     if (m_name != other.name ()) {
       return false;
@@ -275,7 +275,7 @@ private:
   std::string m_name;
   std::string m_title;
   tl::Variant m_parameter;
-  std::vector<std::pair<std::string, std::string> > m_actions;
+  std::vector<std::pair<std::string, std::string>> m_actions;
 };
 
 /**
@@ -284,7 +284,7 @@ private:
 class MacroEditorNotificationWidget
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MacroEditorNotificationWidget (MacroEditorPage *parent, const MacroEditorNotification *notification);
@@ -302,7 +302,7 @@ private:
 class MacroEditorPage
   : public QWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MacroEditorPage (QWidget *parent, MacroEditorHighlighters *highlighters);
@@ -389,8 +389,7 @@ protected slots:
 private:
   friend class MacroEditorNotificationWidget;
 
-  struct CompareNotificationPointers
-  {
+  struct CompareNotificationPointers {
     bool operator() (const MacroEditorNotification *a, const MacroEditorNotification *b) const
     {
       return *a < *b;
@@ -439,4 +438,3 @@ private:
 }
 
 #endif
-

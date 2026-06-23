@@ -63,8 +63,7 @@ IncludeExpander::expand (const std::string &path, const std::string &original_te
   return ie;
 }
 
-void
-IncludeExpander::read (const std::string &path, tl::InputStream &is, std::string &expanded_text, int &line_counter, const IncludeFileResolver *resolver)
+void IncludeExpander::read (const std::string &path, tl::InputStream &is, std::string &expanded_text, int &line_counter, const IncludeFileResolver *resolver)
 {
   m_sections [line_counter] = std::make_pair (path, 1 - line_counter);
 
@@ -127,9 +126,7 @@ IncludeExpander::read (const std::string &path, tl::InputStream &is, std::string
       expanded_text += l;
       expanded_text += "\n";
       ++line_counter;
-
     }
-
   }
 }
 
@@ -157,7 +154,7 @@ IncludeExpander::to_string () const
     //  "@" indicates a mapping table
     std::string res ("@");
 
-    for (std::map<int, std::pair<std::string, int> >::const_iterator m = m_sections.begin (); m != m_sections.end (); ++m) {
+    for (std::map<int, std::pair<std::string, int>>::const_iterator m = m_sections.begin (); m != m_sections.end (); ++m) {
       res += tl::to_string (m->first);
       res += "*";
       res += tl::to_word_or_quoted_string (m->second.first, valid_fn_chars);
@@ -167,7 +164,6 @@ IncludeExpander::to_string () const
     }
 
     return res;
-
   }
 }
 
@@ -199,13 +195,11 @@ IncludeExpander::from_string (const std::string &s)
       ex.read (si.second);
 
       ex.test (";");
-
     }
 
   } else {
 
     ie.m_sections [1].first = s;
-
   }
 
   return ie;
@@ -214,7 +208,7 @@ IncludeExpander::from_string (const std::string &s)
 std::pair<std::string, int>
 IncludeExpander::translate_to_original (int line_number)
 {
-  std::map<int, std::pair<std::string, int> >::const_iterator m = m_sections.lower_bound (line_number);
+  std::map<int, std::pair<std::string, int>>::const_iterator m = m_sections.lower_bound (line_number);
   if (m != m_sections.begin () && (m == m_sections.end () || m->first > line_number)) {
     --m;
   }

@@ -37,8 +37,7 @@ static const char *font_name = "Liberation Mono";
  *  @brief A small utility program to produce the fixed font definition file
  *  Run this binary and redirect the output to "laybasic/fixedFont.h".
  */
-int 
-main (int argc, char *argv [])
+int main (int argc, char *argv [])
 {
   QApplication app (argc, argv);
 
@@ -49,21 +48,21 @@ main (int argc, char *argv [])
   std::string table;
 
   //  33% increments:
-  int sz[]              = { 9,       11,       13,      16,       21,        27         };
-  const char *sz_name[] = { "Small", "Medium", "Large", "XLarge", "XXLarge", "XXXLarge" };
+  int sz [] = {9, 11, 13, 16, 21, 27};
+  const char *sz_name [] = {"Small", "Medium", "Large", "XLarge", "XXLarge", "XXXLarge"};
 
   int resolutions = 6;
 
-  int font_sizes = int (sizeof (sz) / sizeof (sz[0]));
+  int font_sizes = int (sizeof (sz) / sizeof (sz [0]));
 
-  printf("\nconst int ff_resolutions = %d;\n", resolutions);
-  printf("const int ff_sizes = %d;\n", font_sizes);
+  printf ("\nconst int ff_resolutions = %d;\n", resolutions);
+  printf ("const int ff_sizes = %d;\n", font_sizes);
 
-  printf("\nconst char *ff_size_name (int sz) {\n");
+  printf ("\nconst char *ff_size_name (int sz) {\n");
   for (int s = 0; s < font_sizes; ++s) {
-    printf("  if (sz == %d) { return \"%s\"; }\n", s, sz_name [s]);
+    printf ("  if (sz == %d) { return \"%s\"; }\n", s, sz_name [s]);
   }
-  printf("  return \"\";\n}\n");
+  printf ("  return \"\";\n}\n");
 
   int os = 1;
 
@@ -71,12 +70,12 @@ main (int argc, char *argv [])
 
     for (int s = 0; s < font_sizes; ++s) {
 
-      char b[1024];
+      char b [1024];
       sprintf (b, "  FixedFont (ff%d_height, ff%d_line_height, ff%d_width, ff%d_first_char, sizeof (ff%d_data) / sizeof (uint32_t) / (ff%d_height * ff%d_stride), ff%d_data, ff%d_stride),\n", os, os, os, os, os, os, os, os, os);
       table += b;
 
-      QFont f (QString::fromLatin1 (font_name), r * sz[s]);
-      f.setStyleStrategy(QFont::StyleStrategy ((f.styleStrategy() & ~QFont::PreferAntialias) | QFont::NoAntialias));
+      QFont f (QString::fromLatin1 (font_name), r * sz [s]);
+      f.setStyleStrategy (QFont::StyleStrategy ((f.styleStrategy () & ~QFont::PreferAntialias) | QFont::NoAntialias));
 
       QFontMetrics fm (f);
 
@@ -84,7 +83,7 @@ main (int argc, char *argv [])
 
       printf ("\n// Font: %s\n", f.toString ().toLatin1 ().constData ());
       printf ("const unsigned int ff%d_height = %d;\nconst unsigned int ff%d_line_height = %d;\nconst unsigned int ff%d_width = %d;\nconst unsigned int ff%d_stride = %d;\n",
-        os, fm.height (), os, fm.lineSpacing (), os, w, os, (w + 31) / 32);
+              os, fm.height (), os, fm.lineSpacing (), os, w, os, (w + 31) / 32);
 
       printf ("const unsigned char ff%d_first_char = ' ';\n\nuint32_t ff%d_data [] = {\n", os, os);
 
@@ -97,9 +96,9 @@ main (int argc, char *argv [])
         p.setRenderHints (QPainter::TextAntialiasing, false);
         p.setFont (f);
 
-        char t[2];
-        t[0] = c;
-        t[1] = 0;
+        char t [2];
+        t [0] = c;
+        t [1] = 0;
         p.drawText (0, fm.ascent (), QString::fromLatin1 (t));
 
         QImage b = img.convertToFormat (QImage::Format_MonoLSB);
@@ -123,18 +122,14 @@ main (int argc, char *argv [])
             ++sl;
 
           } while (ww > 0);
-
         }
         printf ("\n");
-
       }
 
       printf ("};\n");
 
       ++os;
-
     }
-
   }
 
   printf ("\nstatic FixedFont fonts[] = {\n%s};\n", table.c_str ());
@@ -143,5 +138,3 @@ main (int argc, char *argv [])
 
   return 0;
 }
-
-

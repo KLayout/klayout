@@ -34,8 +34,7 @@ namespace db
 /**
  *  @brief The CellConflictResolution enum
  */
-enum CellConflictResolution
-{
+enum CellConflictResolution {
   AddToCell = 0,
   OverwriteCell = 1,
   SkipNewCell = 2,
@@ -135,7 +134,7 @@ public:
 class DB_PUBLIC CommonReaderBase
 {
 public:
-  typedef tl::interval_map <db::ld_type, tl::interval_map <db::ld_type, std::string> > layer_name_map;
+  typedef tl::interval_map<db::ld_type, tl::interval_map<db::ld_type, std::string>> layer_name_map;
 
   /**
    *  @brief Constructor
@@ -276,23 +275,23 @@ protected:
   /**
    *  @brief Enters the layer with a given layer/datatype
    */
-  std::pair <bool, unsigned int> open_dl (db::Layout &layout, const LDPair &dl);
+  std::pair<bool, unsigned int> open_dl (db::Layout &layout, const LDPair &dl);
 
 private:
-  std::map<size_t, std::pair<std::string, db::cell_index_type> > m_id_map;
-  std::map<std::string, std::pair<size_t, db::cell_index_type> > m_name_map;
+  std::map<size_t, std::pair<std::string, db::cell_index_type>> m_id_map;
+  std::map<std::string, std::pair<size_t, db::cell_index_type>> m_name_map;
   std::set<db::cell_index_type> m_temp_cells;
   std::map<size_t, std::string> m_name_for_id;
   CellConflictResolution m_cc_resolution;
   bool m_create_layers;
   db::LayerMap m_layer_map;
   db::LayerMap m_layer_map_out;
-  tl::interval_map <db::ld_type, tl::interval_map <db::ld_type, std::string> > m_layer_names;
-  std::map<db::LDPair, std::pair <bool, unsigned int> > m_layer_cache;
+  tl::interval_map<db::ld_type, tl::interval_map<db::ld_type, std::string>> m_layer_names;
+  std::map<db::LDPair, std::pair<bool, unsigned int>> m_layer_cache;
   std::map<std::set<unsigned int>, unsigned int> m_multi_mapping_placeholders;
   std::set<unsigned int> m_layers_created;
 
-  std::pair <bool, unsigned int> open_dl_uncached (db::Layout &layout, const LDPair &dl);
+  std::pair<bool, unsigned int> open_dl_uncached (db::Layout &layout, const LDPair &dl);
 };
 
 
@@ -301,10 +300,11 @@ private:
  *  @brief A common reader base for GDS2 and OASIS providing common services for both readers
  */
 class DB_PUBLIC CommonReader
-  : public ReaderBase, public CommonReaderBase
+  : public ReaderBase,
+    public CommonReaderBase
 {
 public:
-  typedef tl::interval_map <db::ld_type, tl::interval_map <db::ld_type, std::string> > layer_name_map;
+  typedef tl::interval_map<db::ld_type, tl::interval_map<db::ld_type, std::string>> layer_name_map;
 
   /**
    *  @brief Constructor
@@ -353,4 +353,3 @@ private:
 }
 
 #endif
-

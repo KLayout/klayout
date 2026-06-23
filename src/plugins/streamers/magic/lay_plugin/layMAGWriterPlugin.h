@@ -29,7 +29,7 @@
 
 namespace Ui
 {
-  class MAGWriterOptionPage;
+class MAGWriterOptionPage;
 }
 
 namespace lay
@@ -38,7 +38,7 @@ namespace lay
 class MAGWriterOptionPage
   : public StreamWriterOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MAGWriterOptionPage (QWidget *parent);
@@ -54,5 +54,3 @@ private:
 }
 
 #endif
-
-

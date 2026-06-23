@@ -31,15 +31,17 @@
 
 class QMouseEvent;
 
-namespace lay {
+namespace lay
+{
 
 class LayoutCanvas;
 class LayoutViewBase;
 
 class MouseTracker
-  : public lay::ViewService, public lay::Plugin
+  : public lay::ViewService,
+    public lay::Plugin
 {
-public: 
+public:
   MouseTracker (lay::LayoutViewBase *view);
 
   virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio);
@@ -62,4 +64,3 @@ private:
 }
 
 #endif
-

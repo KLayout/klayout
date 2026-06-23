@@ -26,22 +26,23 @@
 #include "laybasicCommon.h"
 #include "layCanvasPlane.h"
 
-namespace lay {
+namespace lay
+{
 
 /**
  *  @brief A renderer edge object
  */
-class RenderEdge : public db::DEdge 
+class RenderEdge : public db::DEdge
 {
 public:
   RenderEdge (const db::DEdge &d)
     : db::DEdge (d), m_d (true)
   {
-    //  RenderEdges are normalized such that 
+    //  RenderEdges are normalized such that
     //  p1 < p2. m_d is false if the points have been swapped.
     if (p2 () < p1 ()) {
       swap_points ();
-      m_d = !m_d;
+      m_d = ! m_d;
     }
 
     //  Horizontal is true, if the edge is horizontal within render_epsilon
@@ -63,8 +64,8 @@ public:
     return m_pos;
   }
 
-  void set_pos (double p) 
-  { 
+  void set_pos (double p)
+  {
     m_pos = p;
   }
 
@@ -84,7 +85,7 @@ public:
     return m_slope;
   }
 
-  bool is_horizontal () const 
+  bool is_horizontal () const
   {
     return m_horizontal;
   }
@@ -104,11 +105,11 @@ public:
     return (y <= y1 ());
   }
 
-  void update_pos (double y) 
+  void update_pos (double y)
   {
     m_pos = pos (y);
   }
-  
+
 private:
   bool m_d, m_horizontal;
   double m_pos;
@@ -118,8 +119,7 @@ private:
 /**
  *  @brief A rendered text object
  */
-struct RenderText
-{
+struct RenderText {
   db::DBox b;
   std::string text;
   db::Font font;
@@ -135,10 +135,10 @@ struct RenderText
  *  shapes. The basic ability is to provide scanlines. A scanline
  *  is an array of uint32_t. It is up to the renderer how the
  *  scanlines are used.
- *  
+ *
  */
 
-class LAYBASIC_PUBLIC Bitmap 
+class LAYBASIC_PUBLIC Bitmap
   : public CanvasPlane
 {
 public:
@@ -154,7 +154,7 @@ public:
    *
    *  Creates a bitmap of w*h pixels max.
    *
-   *  @param w The width of the bitmap 
+   *  @param w The width of the bitmap
    *  @param h The height of the bitmap
    *  @param r The resolution of the bitmap
    *  @param rf The font resolution of the bitmap
@@ -175,8 +175,8 @@ public:
    *  @brief Destructor
    */
   virtual ~Bitmap ();
-  
-  /**  
+
+  /**
    *  @brief Clear the bitmap but do not resize
    */
   virtual void clear ();
@@ -235,7 +235,7 @@ public:
   unsigned int height () const;
 
   /**
-   *  @brief Fill method 
+   *  @brief Fill method
    *
    *  Fills a line at scanline y, starting from x1 and ending
    *  with x2 (exclusive). x1 must not be larger or equal than m_width.
@@ -269,7 +269,7 @@ public:
    */
   void merge (const lay::Bitmap *from, int dx, int dy);
 
-  /**  
+  /**
    *  @brief Test whether the bitmap is empty
    */
   bool empty () const;
@@ -327,10 +327,10 @@ private:
   void init (unsigned int w, unsigned int h);
 
   /**
-   *  @brief Fill a bit pattern 
+   *  @brief Fill a bit pattern
    *
-   *  Fills a line at scanline y, starting from x1 and using the 
-   *  bit pattern in p. The lowest bit of p is the leftmost one of 
+   *  Fills a line at scanline y, starting from x1 and using the
+   *  bit pattern in p. The lowest bit of p is the leftmost one of
    *  the pattern. Always a 32 bit pattern is or'd with the contents
    *  of the scanline. If x1 is large enough that the pattern would extend over
    *  the end of the scanline, the pattern is cut. If x is negative, the
@@ -361,7 +361,7 @@ inline double
 Bitmap::resolution () const
 {
   return m_resolution;
-}  
+}
 
 inline double
 Bitmap::font_resolution () const
@@ -373,25 +373,25 @@ inline unsigned int
 Bitmap::width () const
 {
   return m_width;
-}  
+}
 
 inline unsigned int
 Bitmap::height () const
 {
   return m_height;
-}  
+}
 
 inline unsigned int
 Bitmap::first_scanline () const
 {
   return m_first_sl;
-}  
+}
 
 inline unsigned int
 Bitmap::last_scanline () const
 {
   return m_last_sl;
-}  
+}
 
 inline const uint32_t *
 Bitmap::scanline (unsigned n) const

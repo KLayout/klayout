@@ -44,7 +44,7 @@
 #include "pya.h"
 
 #if defined(HAVE_QT)
-#  include <QResource>
+#include <QResource>
 #endif
 
 #include <fstream>
@@ -211,7 +211,7 @@ void MacroCollection::on_macro_changed (Macro *macro)
   }
 }
 
-void MacroCollection::collect_used_nodes (std::set <Macro *> &macros, std::set <MacroCollection *> &macro_collections)
+void MacroCollection::collect_used_nodes (std::set<Macro *> &macros, std::set<MacroCollection *> &macro_collections)
 {
   for (MacroCollection::child_iterator c = begin_children (); c != end_children (); ++c) {
     macro_collections.insert (c->second);
@@ -224,7 +224,7 @@ void MacroCollection::collect_used_nodes (std::set <Macro *> &macros, std::set <
 
 Macro *MacroCollection::macro_by_name (const std::string &name, Macro::Format format)
 {
-  std::multimap <std::string, Macro *>::iterator i = m_macros.find (name);
+  std::multimap<std::string, Macro *>::iterator i = m_macros.find (name);
   while (i != m_macros.end () && i->first == name) {
     if (format == Macro::NoFormat || i->second->format () == format) {
       return i->second;
@@ -236,7 +236,7 @@ Macro *MacroCollection::macro_by_name (const std::string &name, Macro::Format fo
 
 const Macro *MacroCollection::macro_by_name (const std::string &name, Macro::Format format) const
 {
-  std::multimap <std::string, Macro *>::const_iterator i = m_macros.find (name);
+  std::multimap<std::string, Macro *>::const_iterator i = m_macros.find (name);
   while (i != m_macros.end () && i->first == name) {
     if (format == Macro::NoFormat || i->second->format () == format) {
       return i->second;
@@ -248,7 +248,7 @@ const Macro *MacroCollection::macro_by_name (const std::string &name, Macro::For
 
 MacroCollection *MacroCollection::folder_by_name (const std::string &name)
 {
-  std::map <std::string, MacroCollection *>::iterator i = m_folders.find (name);
+  std::map<std::string, MacroCollection *>::iterator i = m_folders.find (name);
   if (i != m_folders.end ()) {
     return i->second;
   } else {
@@ -258,7 +258,7 @@ MacroCollection *MacroCollection::folder_by_name (const std::string &name)
 
 const MacroCollection *MacroCollection::folder_by_name (const std::string &name) const
 {
-  std::map <std::string, MacroCollection *>::const_iterator i = m_folders.find (name);
+  std::map<std::string, MacroCollection *>::const_iterator i = m_folders.find (name);
   if (i != m_folders.end ()) {
     return i->second;
   } else {
@@ -290,8 +290,7 @@ std::string MacroCollection::display_string () const
   }
 }
 
-void
-MacroCollection::make_readonly (bool f)
+void MacroCollection::make_readonly (bool f)
 {
   if (m_readonly != f) {
     begin_changes ();
@@ -303,7 +302,7 @@ MacroCollection::make_readonly (bool f)
 MacroCollection *
 MacroCollection::add_folder (const std::string &description, const std::string &p, const std::string &cat, bool readonly, bool auto_create)
 {
-  if (! p.empty () && p[0] == ':') {
+  if (! p.empty () && p [0] == ':') {
 
     readonly = true;
 
@@ -336,7 +335,6 @@ MacroCollection::add_folder (const std::string &description, const std::string &
           return 0;
         }
       }
-
     }
 
     if (! tl::is_dir (fp)) {
@@ -359,7 +357,6 @@ MacroCollection::add_folder (const std::string &description, const std::string &
         tl::log << tl::to_string (tr ("Folder is read-only: ")) << fp;
       }
     }
-
   }
 
   begin_changes ();
@@ -380,24 +377,25 @@ MacroCollection::add_folder (const std::string &description, const std::string &
 
 void MacroCollection::rescan ()
 {
-  for (std::map <std::string, MacroCollection *>::const_iterator m = m_folders.begin (); m != m_folders.end (); ++m) {
+  for (std::map<std::string, MacroCollection *>::const_iterator m = m_folders.begin (); m != m_folders.end (); ++m) {
     m->second->scan ();
   }
 }
 
 #if defined(HAVE_QT)
-namespace {
+namespace
+{
 
-  /**
-   *  @brief A QResource variant that allows access to the children
-   */
-  class ResourceWithChildren
-    : public QResource
-  {
-  public:
-    ResourceWithChildren (const QString &path) : QResource (path) { }
-    using QResource::children;
-  };
+/**
+ *  @brief A QResource variant that allows access to the children
+ */
+class ResourceWithChildren
+  : public QResource
+{
+public:
+  ResourceWithChildren (const QString &path) : QResource (path) {}
+  using QResource::children;
+};
 
 }
 #endif
@@ -405,7 +403,7 @@ namespace {
 //  Some directories are ignored in addition to dotfiles
 static bool dir_is_ignored (const std::string &dn)
 {
-  static std::set <std::string> ignored;
+  static std::set<std::string> ignored;
   static bool initialized = false;
 
   if (! initialized) {
@@ -426,7 +424,7 @@ void MacroCollection::scan ()
     tl::info << tl::to_string (tr ("Scanning macro path ")) << p << " (readonly=" << m_readonly << ")";
   }
 
-  if (! p.empty () && p[0] == ':') {
+  if (! p.empty () && p [0] == ':') {
 
 #if defined(HAVE_QT)
 
@@ -441,7 +439,6 @@ void MacroCollection::scan ()
       if (res.size () > 0) {
         create_entry (url);
       }
-
     }
 
 #else
@@ -506,14 +503,11 @@ void MacroCollection::scan ()
       } catch (tl::Exception &ex) {
         tl::error << ex.msg ();
       }
-
     }
-
   }
 }
 
-void
-MacroCollection::create_entry (const std::string &path)
+void MacroCollection::create_entry (const std::string &path)
 {
   try {
 
@@ -553,7 +547,6 @@ MacroCollection::create_entry (const std::string &path)
         m->set_is_file ();
         m->set_parent (this);
       }
-
     }
 
     if (new_macro.get ()) {
@@ -774,11 +767,8 @@ bool MacroCollection::add (lym::Macro *m)
         on_changed ();
 
         return mc->add (m);
-
       }
-
     }
-
   }
 
   return false;
@@ -852,7 +842,7 @@ static bool sync_macros (lym::MacroCollection *current, lym::MacroCollection *ac
         cm = current->create_folder (m->first.c_str (), false);
         ret = true;
       }
-      if (sync_macros(cm, m->second, safe)) {
+      if (sync_macros (cm, m->second, safe)) {
         ret = true;
       }
     }
@@ -922,7 +912,7 @@ static bool has_autorun_for (const lym::MacroCollection &collection, bool early)
   }
 
   for (lym::MacroCollection::const_iterator c = collection.begin (); c != collection.end (); ++c) {
-    if (((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ())) && ! c->second->was_autorun ()) {
+    if (((early && c->second->is_autorun_early ()) || (! early && c->second->is_autorun () && ! c->second->is_autorun_early ())) && ! c->second->was_autorun ()) {
       return true;
     }
   }
@@ -952,7 +942,7 @@ static int collect_priority (lym::MacroCollection &collection, bool early, int f
   }
 
   for (lym::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
-    if (c->second->can_run () && ((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ()))) {
+    if (c->second->can_run () && ((early && c->second->is_autorun_early ()) || (! early && c->second->is_autorun () && ! c->second->is_autorun_early ()))) {
       int pp = c->second->priority ();
       if (pp >= from_prio && (p < 0 || pp < p)) {
         p = pp;
@@ -971,16 +961,14 @@ static void autorun_for_prio (lym::MacroCollection &collection, bool early, int 
 
   for (lym::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
 
-    if (! c->second->was_autorun () && c->second->priority () == prio && c->second->can_run () && ((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ()))) {
+    if (! c->second->was_autorun () && c->second->priority () == prio && c->second->can_run () && ((early && c->second->is_autorun_early ()) || (! early && c->second->is_autorun () && ! c->second->is_autorun_early ()))) {
 
       BEGIN_PROTECTED_SILENT
-        c->second->run ();
-        c->second->set_was_autorun (true);
-        c->second->install_doc ();
+      c->second->run ();
+      c->second->set_was_autorun (true);
+      c->second->install_doc ();
       END_PROTECTED_SILENT
-
     }
-
   }
 }
 
@@ -1009,31 +997,53 @@ void MacroCollection::autorun_early ()
 
 void MacroCollection::dump (int l)
 {
-  for (int i = 0; i < l; ++i) { printf ("  "); }
+  for (int i = 0; i < l; ++i) {
+    printf ("  ");
+  }
   printf ("----\n");
-  for (int i = 0; i < l; ++i) { printf ("  "); }
+  for (int i = 0; i < l; ++i) {
+    printf ("  ");
+  }
   printf ("Collection: %s\n", name ().c_str ());
-  for (int i = 0; i < l; ++i) { printf ("  "); }
+  for (int i = 0; i < l; ++i) {
+    printf ("  ");
+  }
   printf ("Collection-path: %s\n", path ().c_str ());
-  for (int i = 0; i < l; ++i) { printf ("  "); }
+  for (int i = 0; i < l; ++i) {
+    printf ("  ");
+  }
   printf ("Collection-description: %s\n", description ().c_str ());
-  for (int i = 0; i < l; ++i) { printf ("  "); }
-  printf("Collection-readonly: %d\n", is_readonly ());
+  for (int i = 0; i < l; ++i) {
+    printf ("  ");
+  }
+  printf ("Collection-readonly: %d\n", is_readonly ());
   printf ("\n");
 
   for (iterator m = begin (); m != end (); ++m) {
-    for (int i = 0; i < l; ++i) { printf ("  "); }
-    printf("Name: %s%s\n", m->second->name ().c_str (), m->second->is_modified() ? "*" : "");
-    for (int i = 0; i < l; ++i) { printf ("  "); }
-    printf("  Path: %s\n", m->second->path ().c_str ());
-    for (int i = 0; i < l; ++i) { printf ("  "); }
-    printf("  Readonly: %d\n", m->second->is_readonly ());
-    for (int i = 0; i < l; ++i) { printf ("  "); }
-    printf("  Autorun: %d\n", m->second->is_autorun ());
-    for (int i = 0; i < l; ++i) { printf ("  "); }
-    printf("  Autorun-early: %d\n", m->second->is_autorun_early ());
-    for (int i = 0; i < l; ++i) { printf ("  "); }
-    printf("  Description: %s\n", m->second->description ().c_str ());
+    for (int i = 0; i < l; ++i) {
+      printf ("  ");
+    }
+    printf ("Name: %s%s\n", m->second->name ().c_str (), m->second->is_modified () ? "*" : "");
+    for (int i = 0; i < l; ++i) {
+      printf ("  ");
+    }
+    printf ("  Path: %s\n", m->second->path ().c_str ());
+    for (int i = 0; i < l; ++i) {
+      printf ("  ");
+    }
+    printf ("  Readonly: %d\n", m->second->is_readonly ());
+    for (int i = 0; i < l; ++i) {
+      printf ("  ");
+    }
+    printf ("  Autorun: %d\n", m->second->is_autorun ());
+    for (int i = 0; i < l; ++i) {
+      printf ("  ");
+    }
+    printf ("  Autorun-early: %d\n", m->second->is_autorun_early ());
+    for (int i = 0; i < l; ++i) {
+      printf ("  ");
+    }
+    printf ("  Description: %s\n", m->second->description ().c_str ());
   }
 
   for (child_iterator m = begin_children (); m != end_children (); ++m) {
@@ -1042,4 +1052,3 @@ void MacroCollection::dump (int l)
 }
 
 }
-

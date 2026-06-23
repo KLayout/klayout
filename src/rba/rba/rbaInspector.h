@@ -25,7 +25,7 @@
 
 namespace gsi
 {
-  class Inspector;
+class Inspector;
 }
 
 namespace rba
@@ -42,4 +42,3 @@ gsi::Inspector *create_inspector (int context);
 }
 
 #endif
-

@@ -35,9 +35,8 @@ namespace lay
 //  A helper compare functor
 
 template <class X, class Y>
-struct first_of_pair_cmp_f 
-{
-  bool operator() (const std::pair<X,Y> &p1, const std::pair<X,Y> &p2) const
+struct first_of_pair_cmp_f {
+  bool operator() (const std::pair<X, Y> &p1, const std::pair<X, Y> &p2) const
   {
     return p1.first < p2.first;
   }
@@ -54,8 +53,7 @@ Editable::Editable (lay::Editables *editables)
   }
 }
 
-void
-Editable::init (lay::Editables *editables)
+void Editable::init (lay::Editables *editables)
 {
   mp_editables = editables;
   if (editables) {
@@ -75,15 +73,13 @@ Editable::~Editable ()
   }
 }
 
-void
-Editable::reset_proposed_move_transformation ()
+void Editable::reset_proposed_move_transformation ()
 {
   m_move_transformation = db::DTrans ();
   m_move_transformation_priority = -1;
 }
 
-void
-Editable::propose_move_transformation (const db::DTrans &t, unsigned int priority)
+void Editable::propose_move_transformation (const db::DTrans &t, unsigned int priority)
 {
   m_move_transformation = t;
   m_move_transformation_priority = priority;
@@ -102,8 +98,7 @@ Editables::~Editables ()
   cancel_edits ();
 }
 
-void 
-Editables::del (db::Transaction *transaction)
+void Editables::del (db::Transaction *transaction)
 {
   std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (tr ("Delete"))));
 
@@ -130,12 +125,10 @@ Editables::del (db::Transaction *transaction)
       trans_holder->cancel ();
       throw;
     }
-
   }
 }
 
-void 
-Editables::cut ()
+void Editables::cut ()
 {
   if (has_selection ()) {
 
@@ -150,12 +143,10 @@ Editables::cut ()
     for (iterator e = begin (); e != end (); ++e) {
       e->cut ();
     }
-
   }
 }
 
-void 
-Editables::copy ()
+void Editables::copy ()
 {
   if (has_selection ()) {
     db::Clipboard::instance ().clear ();
@@ -165,7 +156,7 @@ Editables::copy ()
   }
 }
 
-db::DBox 
+db::DBox
 Editables::selection_bbox ()
 {
   db::DBox sel_bbox;
@@ -189,8 +180,7 @@ Editables::selection_catch_bbox ()
   return sel_bbox;
 }
 
-void
-Editables::transform (const db::DCplxTrans &t)
+void Editables::transform (const db::DCplxTrans &t)
 {
   std::unique_ptr<db::Transaction> trans_holder (new db::Transaction (manager (), tl::to_string (tr ("Transform"))));
 
@@ -213,12 +203,10 @@ Editables::transform (const db::DCplxTrans &t)
       trans_holder->cancel ();
       throw;
     }
-
   }
 }
 
-void 
-Editables::paste ()
+void Editables::paste ()
 {
   if (! db::Clipboard::instance ().empty ()) {
 
@@ -232,24 +220,21 @@ Editables::paste ()
     for (iterator e = begin (); e != end (); ++e) {
       e->paste ();
     }
-
   }
 }
 
-void 
-Editables::enable (lay::Editable *obj, bool en)
+void Editables::enable (lay::Editable *obj, bool en)
 {
   if (en) {
     m_enabled.insert (obj);
   } else {
     cancel_edits ();
-    obj->select (db::DBox (), lay::Editable::Reset);  //  clear selection
+    obj->select (db::DBox (), lay::Editable::Reset); //  clear selection
     m_enabled.erase (obj);
   }
 }
 
-void 
-Editables::transient_select (const db::DPoint &pt)
+void Editables::transient_select (const db::DPoint &pt)
 {
   bool same_point = (m_last_selected_point.is_point () && m_last_selected_point.center ().sq_double_distance (pt) < 1e-10);
   if (! same_point) {
@@ -259,7 +244,7 @@ Editables::transient_select (const db::DPoint &pt)
   //  in a first pass evaluate the point selection proximity value to select
   //  those plugins that are active. This code is a copy of the code for the single-point selection below.
 
-  std::vector< std::pair <double, iterator> > plugins;
+  std::vector<std::pair<double, iterator>> plugins;
 
   for (iterator e = begin (); e != end (); ++e) {
     if (m_enabled.find (&*e) != m_enabled.end ()) {
@@ -272,16 +257,16 @@ Editables::transient_select (const db::DPoint &pt)
 
   //  and call select on those objects until the first one (with the least proximity)
   //  has something selected
-  std::vector< std::pair<double, iterator> >::const_iterator pi = plugins.begin (); 
-  for ( ; pi != plugins.end (); ++pi) {
+  std::vector<std::pair<double, iterator>>::const_iterator pi = plugins.begin ();
+  for (; pi != plugins.end (); ++pi) {
     if (pi->second->transient_select (pt)) {
       break;
     }
   }
 
-  //  if no plugin has selected anything, try a reset (clear previous selection) and select again: this is supposed 
+  //  if no plugin has selected anything, try a reset (clear previous selection) and select again: this is supposed
   //  to implement the cycling protocol which allows the plugins to cycle through different
-  //  selections for repeated clicks on the same point. Let this happen for replace mode 
+  //  selections for repeated clicks on the same point. Let this happen for replace mode
   //  only because otherwise clearing the selection does not make sense.
   if (same_point && pi == plugins.end ()) {
 
@@ -303,7 +288,6 @@ Editables::transient_select (const db::DPoint &pt)
         break;
       }
     }
-
   }
 
   m_last_selected_point = db::DBox (pt, pt);
@@ -312,8 +296,7 @@ Editables::transient_select (const db::DPoint &pt)
   signal_transient_selection_changed ();
 }
 
-void 
-Editables::clear_previous_selection ()
+void Editables::clear_previous_selection ()
 {
   m_last_selected_point = db::DBox ();
   for (iterator e = begin (); e != end (); ++e) {
@@ -321,8 +304,7 @@ Editables::clear_previous_selection ()
   }
 }
 
-void 
-Editables::clear_transient_selection ()
+void Editables::clear_transient_selection ()
 {
   bool had_transient_selection = false;
   for (iterator e = begin (); e != end (); ++e) {
@@ -338,8 +320,7 @@ Editables::clear_transient_selection ()
   }
 }
 
-void
-Editables::transient_to_selection ()
+void Editables::transient_to_selection ()
 {
   bool had_transient_selection = false;
   bool had_selection = false;
@@ -350,7 +331,7 @@ Editables::transient_to_selection ()
     if (e->has_transient_selection ()) {
       had_transient_selection = true;
     }
-    e->select (db::DBox (), lay::Editable::Reset);  //  clear selection
+    e->select (db::DBox (), lay::Editable::Reset); //  clear selection
     e->clear_previous_selection ();
     e->transient_to_selection ();
     e->clear_transient_selection ();
@@ -365,8 +346,7 @@ Editables::transient_to_selection ()
   }
 }
 
-void 
-Editables::clear_selection ()
+void Editables::clear_selection ()
 {
   cancel_edits ();
 
@@ -380,7 +360,7 @@ Editables::clear_selection ()
     if (e->has_transient_selection ()) {
       had_transient_selection = true;
     }
-    e->select (db::DBox (), lay::Editable::Reset);  //  clear selection
+    e->select (db::DBox (), lay::Editable::Reset); //  clear selection
     e->clear_transient_selection ();
     e->clear_previous_selection ();
   }
@@ -394,8 +374,7 @@ Editables::clear_selection ()
   }
 }
 
-void 
-Editables::select (const db::DBox &box, lay::Editable::SelectionMode mode)
+void Editables::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 {
   if (box.is_point ()) {
     select (box.center (), mode);
@@ -407,18 +386,16 @@ Editables::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 
     for (iterator e = begin (); e != end (); ++e) {
       if (m_enabled.find (&*e) != m_enabled.end ()) {
-        e->select (box, mode); 
+        e->select (box, mode);
       }
     }
 
     //  send a signal to the observers
     signal_selection_changed ();
-
   }
 }
 
-void 
-Editables::select (const db::DPoint &pt, lay::Editable::SelectionMode mode)
+void Editables::select (const db::DPoint &pt, lay::Editable::SelectionMode mode)
 {
   bool same_point = (m_last_selected_point.is_point () && m_last_selected_point.center ().sq_double_distance (pt) < 1e-10);
   if (! same_point) {
@@ -431,7 +408,7 @@ Editables::select (const db::DPoint &pt, lay::Editable::SelectionMode mode)
   //  in a first pass evaluate the point selection proximity value to select
   //  those plugins that are active.
 
-  std::vector< std::pair <double, iterator> > plugins;
+  std::vector<std::pair<double, iterator>> plugins;
 
   for (iterator e = begin (); e != end (); ++e) {
     if (m_enabled.find (&*e) != m_enabled.end ()) {
@@ -444,16 +421,16 @@ Editables::select (const db::DPoint &pt, lay::Editable::SelectionMode mode)
 
   //  and call select on those objects until the first one (with the least proximity)
   //  has something selected
-  std::vector< std::pair<double, iterator> >::const_iterator pi = plugins.begin (); 
-  for ( ; pi != plugins.end (); ++pi) {
+  std::vector<std::pair<double, iterator>>::const_iterator pi = plugins.begin ();
+  for (; pi != plugins.end (); ++pi) {
     if (pi->second->select (db::DBox (pt, pt), mode)) {
       break;
     }
   }
 
-  //  if no plugin has selected anything, try a reset (clear_previous selection) and select again: this is supposed 
+  //  if no plugin has selected anything, try a reset (clear_previous selection) and select again: this is supposed
   //  to implement the cycling protocol which allows the plugins to cycle through different
-  //  selections for repeated clicks on the same point. Let this happen for replace mode 
+  //  selections for repeated clicks on the same point. Let this happen for replace mode
   //  only because otherwise clearing the selection does not make sense.
   if (same_point && pi == plugins.end () && mode == lay::Editable::Replace) {
 
@@ -474,12 +451,11 @@ Editables::select (const db::DPoint &pt, lay::Editable::SelectionMode mode)
         break;
       }
     }
-
   }
 
   //  in replace mode clear the selections on the following plugins
   if (mode == lay::Editable::Replace && pi != plugins.end ()) {
-    for (++pi ; pi != plugins.end (); ++pi) {
+    for (++pi; pi != plugins.end (); ++pi) {
       pi->second->select (db::DBox (), lay::Editable::Reset);
     }
   }
@@ -490,16 +466,14 @@ Editables::select (const db::DPoint &pt, lay::Editable::SelectionMode mode)
   signal_selection_changed ();
 }
 
-void
-Editables::repeat_selection (Editable::SelectionMode mode)
+void Editables::repeat_selection (Editable::SelectionMode mode)
 {
   if (m_last_selected_point.is_point ()) {
     select (m_last_selected_point, mode);
   }
 }
 
-bool 
-Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
+bool Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
 {
   cancel_edits ();
   clear_previous_selection ();
@@ -512,7 +486,7 @@ Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
 
   //  In a first pass evaluate the point selection proximity value to select
   //  those plugins that are close to the given point. This code is a copy of the code for the single-point selection below.
-  std::vector< std::pair <double, iterator> > plugins;
+  std::vector<std::pair<double, iterator>> plugins;
 
   for (iterator e = begin (); e != end (); ++e) {
     if (m_enabled.find (&*e) != m_enabled.end ()) {
@@ -525,23 +499,21 @@ Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
 
   if (has_selection () && selection_catch_bbox ().contains (p)) {
 
-    //  if anything is selected and we are within the selection bbox, 
+    //  if anything is selected and we are within the selection bbox,
     //  issue a move operation on all editables: first try a Partial mode begin_move
-    for (std::vector< std::pair<double, iterator> >::const_iterator pi = plugins.begin (); pi != plugins.end (); ++pi) {
+    for (std::vector<std::pair<double, iterator>>::const_iterator pi = plugins.begin (); pi != plugins.end (); ++pi) {
 
       if (pi->second->begin_move (Editable::Partial, p, ac)) {
 
         //  clear the selection on all other plugins, because we focus on one plugin
-        for (std::vector< std::pair<double, iterator> >::const_iterator pii = plugins.begin (); pii != plugins.end (); ++pii) {
+        for (std::vector<std::pair<double, iterator>>::const_iterator pii = plugins.begin (); pii != plugins.end (); ++pii) {
           if (pii->second != pi->second) {
             pii->second->select (db::DBox (), lay::Editable::Reset);
           }
         }
 
         return true;
-
       }
-
     }
 
     //  if something is selected, issue a move operation on all editables
@@ -557,7 +529,7 @@ Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
     clear_selection ();
 
     //  if nothing is selected, issue a move operation on all editables
-    std::vector< std::pair<double, iterator> >::const_iterator pi = plugins.begin ();
+    std::vector<std::pair<double, iterator>>::const_iterator pi = plugins.begin ();
     //  HACK: only the first plugin (measured through click_proximity) has a chance to intercept
     //  the standard procedure which is select + move selected. The reason behind that is that
     //  for example edtService does not implement Any but rather relies on select + Selected mode.
@@ -580,7 +552,6 @@ Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
     } else {
       return false;
     }
-
   }
 }
 
@@ -604,14 +575,12 @@ Editables::move (const db::DPoint &p, lay::angle_constraint_type ac)
       move_transformation_priority = pmv.first;
       move_transformation = pmv.second;
     }
-
   }
 
   return std::make_pair (move_transformation_priority, move_transformation);
 }
 
-void 
-Editables::move_transform (const db::DPoint &p, db::DFTrans t, lay::angle_constraint_type ac)
+void Editables::move_transform (const db::DPoint &p, db::DFTrans t, lay::angle_constraint_type ac)
 {
   m_any_move_operation = true;
   m_move_transform *= t;
@@ -621,8 +590,7 @@ Editables::move_transform (const db::DPoint &p, db::DFTrans t, lay::angle_constr
   }
 }
 
-void
-Editables::end_move (const db::DVector &v, db::Transaction *transaction)
+void Editables::end_move (const db::DVector &v, db::Transaction *transaction)
 {
   std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (tr ("Move"))));
 
@@ -648,12 +616,10 @@ Editables::end_move (const db::DVector &v, db::Transaction *transaction)
 
     trans_holder->cancel ();
     edit_cancel ();
-
   }
 }
 
-void
-Editables::end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Transaction *transaction)
+void Editables::end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Transaction *transaction)
 {
   std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (tr ("Move"))));
 
@@ -683,11 +649,10 @@ Editables::end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Tra
     //  replaces a complex selection by a simple one
     edit_cancel ();
     select (p, Editable::Replace);
-
   }
 }
 
-size_t 
+size_t
 Editables::selection_size ()
 {
   size_t c = 0;
@@ -697,8 +662,7 @@ Editables::selection_size ()
   return c;
 }
 
-bool
-Editables::has_selection ()
+bool Editables::has_selection ()
 {
   for (iterator e = begin (); e != end (); ++e) {
     if (e->has_selection ()) {
@@ -708,8 +672,7 @@ Editables::has_selection ()
   return false;
 }
 
-void
-Editables::edit_cancel ()
+void Editables::edit_cancel ()
 {
   clear_previous_selection ();
   for (iterator e = begin (); e != end (); ++e) {
@@ -717,8 +680,7 @@ Editables::edit_cancel ()
   }
 }
 
-void
-Editables::edit_finish ()
+void Editables::edit_finish ()
 {
   clear_previous_selection ();
   for (iterator e = begin (); e != end (); ++e) {
@@ -726,27 +688,23 @@ Editables::edit_finish ()
   }
 }
 
-void
-Editables::cancel_edits ()
+void Editables::cancel_edits ()
 {
   for (iterator e = begin (); e != end (); ++e) {
     e->edit_cancel ();
   }
 }
 
-void
-Editables::finish_edits ()
+void Editables::finish_edits ()
 {
   for (iterator e = begin (); e != end (); ++e) {
     e->edit_finish ();
   }
 }
 
-void
-Editables::show_properties ()
+void Editables::show_properties ()
 {
   //  The default implementation does nothing
 }
 
 }
-

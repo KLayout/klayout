@@ -47,14 +47,13 @@ void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$lvs_test_source = '%s'\n"
-        "$lvs_test_target_lvsdb = '%s'\n"
-        "$lvs_test_target_cir = '%s'\n"
-        "$lvs_test_target_l2n = '%s'\n"
-        "%s"
-      , ly, output_lvsdb, output_cir, output_l2n, added)
-    );
+      "$drc_force_gc = true\n"
+      "$lvs_test_source = '%s'\n"
+      "$lvs_test_target_lvsdb = '%s'\n"
+      "$lvs_test_target_cir = '%s'\n"
+      "$lvs_test_target_l2n = '%s'\n"
+      "%s",
+      ly, output_lvsdb, output_cir, output_l2n, added));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -85,115 +84,115 @@ void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string
   }
 }
 
-TEST(1_full)
+TEST (1_full)
 {
   test_is_long_runner ();
   run_test (_this, "vexriscv.lvs", "vexriscv.cir.gz", "vexriscv.oas.gz");
 }
 
-TEST(2_fullWithAlign)
+TEST (2_fullWithAlign)
 {
   test_is_long_runner ();
   run_test (_this, "vexriscv_align.lvs", "vexriscv.cir.gz", "vexriscv.oas.gz");
 }
 
-TEST(3_fullSoft)
+TEST (3_fullSoft)
 {
   test_is_long_runner ();
   run_test (_this, "vexriscv_soft.lvs", "vexriscv.cir.gz", "vexriscv.oas.gz");
 }
 
-TEST(10_private)
+TEST (10_private)
 {
   // test_is_long_runner ();
   run_test (_this, "test_10.lvs", "test_10.cir.gz", "test_10.gds.gz", true);
 }
 
-TEST(11_private)
+TEST (11_private)
 {
   // test_is_long_runner ();
   run_test (_this, "test_11.lvs", "test_11.cir.gz", "test_11.gds.gz", true);
 }
 
-TEST(12_private)
+TEST (12_private)
 {
   // test_is_long_runner ();
   run_test (_this, "test_12.lvs", "test_12b.cir.gz", "test_12.gds.gz", true);
 }
 
-TEST(121_private)
+TEST (121_private)
 {
   // test_is_long_runner ();
   run_test (_this, "test_121.lvs", "test_121.cir.gz", "test_121.gds.gz", true);
 }
 
-TEST(13_private)
+TEST (13_private)
 {
   // test_is_long_runner ();
   run_test (_this, "test_13.lvs", "test_13b.cir.gz", "test_13.gds.gz", true);
 }
 
-TEST(14_private)
+TEST (14_private)
 {
   test_is_long_runner ();
   run_test (_this, "test_14.lvs", "test_14.cir.gz", "test_14.gds.gz", true);
 }
 
-TEST(15_private)
+TEST (15_private)
 {
   // test_is_long_runner ();
   run_test (_this, "test_15.lvs", "test_15.cir.gz", "test_15.gds.gz", true);
 }
 
-TEST(16_private)
+TEST (16_private)
 {
   // test_is_long_runner ();lvs-blackbox
   run_test (_this, "test_16.lvs", "test_16.cir.gz", "test_16.gds.gz", true);
 }
 
-TEST(17_private)
+TEST (17_private)
 {
   test_is_long_runner ();
   run_test (_this, "test_17.lylvs", "test_17b.cir.gz", "test_17.gds.gz", true, "test_17b_7.lvsdb");
 }
 
-TEST(18_private)
+TEST (18_private)
 {
   // test_is_long_runner ();
   run_test (_this, "test_18.lvs", "test_18.cir.gz", "test_18.gds.gz", true);
 }
 
-TEST(19_private)
+TEST (19_private)
 {
   // test_is_long_runner ();
   run_test (_this, "test_19.lvs", "test_19.cir.gz", "test_19.gds.gz", true);
 }
 
-TEST(20_private)
+TEST (20_private)
 {
   // test_is_long_runner ();
   run_test (_this, "test_20.lylvs", "test_20.cir.gz", "test_20.gds.gz", true, "test_20_6.lvsdb");
 }
 
-TEST(21_private)
+TEST (21_private)
 {
   run_test (_this, "test_21.lylvs", "test_21.cir.gz", "test_21.gds.gz", true, "test_21_7.lvsdb");
 }
 
 //  issue #1021
-TEST(22a_SP6TArray2X4)
+TEST (22a_SP6TArray2X4)
 {
   run_test (_this, "SP6TArray_2X4.lvs", "test_22a.cir", "SP6TArray_2X4.gds", false, "test_22a.lvsdb", "$test22_texts = false\n$test22_deep = false");
 }
-TEST(22b_SP6TArray2X4)
+TEST (22b_SP6TArray2X4)
 {
   run_test (_this, "SP6TArray_2X4.lvs", "test_22b.cir", "SP6TArray_2X4.gds", false, "test_22b.lvsdb", "$test22_texts = true\n$test22_deep = false");
 }
-TEST(22c_SP6TArray2X4)
+TEST (22c_SP6TArray2X4)
 {
   run_test (_this, "SP6TArray_2X4.lvs", "test_22c.cir", "SP6TArray_2X4.gds", false, "test_22c.lvsdb", "$test22_texts = false\n$test22_deep = true");
 }
-TEST(22d_SP6TArray2X4)
+TEST (22d_SP6TArray2X4)
 {
   run_test (_this, "SP6TArray_2X4.lvs", "test_22d.cir", "SP6TArray_2X4.gds", false, "test_22d.lvsdb", "$test22_texts = true\n$test22_deep = true");
 }

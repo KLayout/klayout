@@ -45,7 +45,7 @@ std::string menu_to_string (const lay::AbstractMenu &menu)
   return node_to_string (menu.root ());
 }
 
-TEST(1)
+TEST (1)
 {
   lay::AbstractMenu menu (0);
   EXPECT_EQ (menu_to_string (menu), "");
@@ -131,7 +131,7 @@ TEST(1)
   EXPECT_EQ (menu_to_string (menu), "(n2,n1)");
 }
 
-TEST(2_ActionReferences)
+TEST (2_ActionReferences)
 {
   tl::weak_ptr<lay::Action> action (new lay::Action ("title:n1"));
 
@@ -156,7 +156,7 @@ TEST(2_ActionReferences)
   EXPECT_EQ (action.get () == 0, true);
 }
 
-TEST(3_ActionReferences)
+TEST (3_ActionReferences)
 {
   tl::weak_ptr<lay::Action> action (new lay::Action ("title:n1"));
 

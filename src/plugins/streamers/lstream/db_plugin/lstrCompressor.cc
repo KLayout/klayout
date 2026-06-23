@@ -57,18 +57,17 @@ inline R safe_diff (R a, R b)
 // ---------------------------------------------------------------------------------
 
 template <class Obj>
-void 
-Compressor<Obj>::flush (CompressorDelivery *writer) 
+void Compressor<Obj>::flush (CompressorDelivery *writer)
 {
   //  produce the repetitions
 
   std::vector<db::Vector> empty_irregular;
   RegularArray empty_regular;
-  
+
   disp_vector displacements;
-  typedef std::vector <std::pair <db::Vector, std::pair <db::Coord, int> > > tmp_rep_vector;
+  typedef std::vector<std::pair<db::Vector, std::pair<db::Coord, int>>> tmp_rep_vector;
   tmp_rep_vector repetitions;
-  std::vector<std::pair<db::Vector, RegularArray> > rep_vector;
+  std::vector<std::pair<db::Vector, RegularArray>> rep_vector;
 
   for (auto n = m_normalized.begin (); n != m_normalized.end (); ++n) {
 
@@ -81,7 +80,7 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
       std::sort (n->second.begin (), n->second.end (), vector_cmp_x ());
 
     } else {
-    
+
       disp_vector::iterator d;
       tmp_rep_vector::iterator rw;
 
@@ -99,12 +98,12 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
       double array_cost = 0;
 
       //  Try single-point compression to repetitions in the x and y direction. For the first
-      //  direction, use the one with more distinct values. For this, a better compression is 
+      //  direction, use the one with more distinct values. For this, a better compression is
       //  expected.
       for (int xypass = 0; xypass <= 1; ++xypass) {
 
         bool xrep = (xfirst == (xypass == 0));
-      
+
         displacements.clear ();
         repetitions.clear ();
 
@@ -117,14 +116,14 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
 
         if (xypass == 0 && m_level > 1) {
           //  Establish a baseline for the repetition cost
-          simple_rep_cost += cost_of (displacements.front ().x ()) + cost_of (displacements.front ().y ()); 
+          simple_rep_cost += cost_of (displacements.front ().x ()) + cost_of (displacements.front ().y ());
           for (d = displacements.begin () + 1; d != displacements.end (); ++d) {
-            simple_rep_cost += std::max (1.0, cost_of (double (d->x ()) - double (d[-1].x ())) + cost_of (double (d->y ()) - double (d[-1].y ()))); 
+            simple_rep_cost += std::max (1.0, cost_of (double (d->x ()) - double (d [-1].x ())) + cost_of (double (d->y ()) - double (d [-1].y ())));
           }
         }
 
         disp_vector::iterator dwindow = displacements.begin ();
-        for (d = displacements.begin (); d != displacements.end (); ) {
+        for (d = displacements.begin (); d != displacements.end ();) {
 
           if (m_level < 2) {
 
@@ -137,11 +136,10 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
             if (dd != displacements.end ()) {
 
               dxy = xrep ? db::Vector (safe_diff (dd->x (), d->x ()), 0) : db::Vector (0, safe_diff (dd->y (), d->y ()));
-              while (dd != displacements.end () && *dd == dd[-1] + dxy) {
+              while (dd != displacements.end () && *dd == dd [-1] + dxy) {
                 ++dd;
                 ++nxy;
-              } 
-
+              }
             }
 
             //  Note in level 1 optimization, no cost estimation is done, hence small arrays won't be removed.
@@ -154,7 +152,6 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
 
               repetitions.push_back (std::make_pair (*d, std::make_pair (xrep ? dxy.x () : dxy.y (), nxy)));
               d = dd;
-
             }
 
           } else {
@@ -165,7 +162,7 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
 
             //  move the window of identical x/y coordinates if necessary
             if (d == dwindow) {
-              for (dwindow = d + 1; dwindow != displacements.end () && (xrep ? (dwindow->y () == d->y ()) : (dwindow->x () == d->x ())); ++dwindow) 
+              for (dwindow = d + 1; dwindow != displacements.end () && (xrep ? (dwindow->y () == d->y ()) : (dwindow->x () == d->x ())); ++dwindow)
                 ;
             }
 
@@ -192,7 +189,6 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
                 nxy_max = nxy;
                 nn_max = nn;
               }
-
             }
 
             if (nxy_max < 2) {
@@ -221,18 +217,15 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
               repetitions.push_back (std::make_pair (*d, std::make_pair (xrep ? dxy_max.x () : dxy_max.y (), nxy_max)));
 
               d = dt;
-
             }
-
           }
-
         }
 
         //  Apply some heuristic criterion that allows the algorithm to determine whether it's worth doing the compression
 
         //  Try to compact these repetitions further, y direction first, then x direction
         for (int xypass2 = 1; xypass2 >= 0; --xypass2) {
-        
+
           if (xypass2) {
             std::sort (repetitions.begin (), repetitions.end (), rep_vector_cmp<vector_cmp_y> ());
           } else {
@@ -240,7 +233,7 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
           }
 
           rw = repetitions.begin ();
-          for (auto r = repetitions.begin (); r != repetitions.end (); ) {
+          for (auto r = repetitions.begin (); r != repetitions.end ();) {
 
             auto rr = r;
             ++rr;
@@ -273,13 +266,10 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
             }
 
             r = rr;
-
           }
 
           repetitions.erase (rw, repetitions.end ());
-
         }
-
       }
 
       if (m_level > 1) {
@@ -288,9 +278,9 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
 
         if (! n->second.empty ()) {
           //  irregular repetition contribution
-          array_cost += cost_of (n->second.front ().x ()) + cost_of (n->second.front ().y ()); 
+          array_cost += cost_of (n->second.front ().x ()) + cost_of (n->second.front ().y ());
           for (auto d = n->second.begin () + 1; d != n->second.end (); ++d) {
-            array_cost += std::max(1.0, cost_of (d->x () - d[-1].x ()) + cost_of (d->y () - d[-1].y ())); 
+            array_cost += std::max (1.0, cost_of (d->x () - d [-1].x ()) + cost_of (d->y () - d [-1].y ()));
           }
         }
 
@@ -308,10 +298,10 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
           array_cost += 2; // two bytes for the shape
 
           //  The cost of the first point (takes into account compression by reuse of one coordinate)
-          if (!ref_set || x_ref != r->first.x ()) {
+          if (! ref_set || x_ref != r->first.x ()) {
             array_cost += cost_of (r->first.x ());
           }
-          if (!ref_set || y_ref != r->first.y ()) {
+          if (! ref_set || y_ref != r->first.y ()) {
             array_cost += cost_of (r->first.y ());
           }
           ref_set = true;
@@ -331,7 +321,6 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
           }
 
           //  Note: the pointlist is reused, hence does not contribute
-
         }
 
         //  And resolve the repetitions if it does not make sense to keep them
@@ -346,9 +335,7 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
           rep_vector.clear ();
           std::sort (n->second.begin (), n->second.end (), vector_cmp_x ());
         }
-
       }
-
     }
 
     for (auto r = rep_vector.begin (); r != rep_vector.end (); ++r) {
@@ -361,7 +348,7 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
 
       //  need to normalize?
       db::Vector p0 = n->second.front ();
-      std::vector<db::Vector>::iterator pw = n->second.begin();
+      std::vector<db::Vector>::iterator pw = n->second.begin ();
       for (auto p = pw + 1; p != n->second.end (); ++p) {
         *pw++ = *p - p0;
       }
@@ -376,9 +363,7 @@ Compressor<Obj>::flush (CompressorDelivery *writer)
       Obj obj = n->first;
       obj.move (n->second.front ());
       writer->write (obj, empty_regular, empty_irregular);
-
     }
-
   }
 }
 

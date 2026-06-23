@@ -39,8 +39,7 @@ namespace lay
 {
 
 struct CurrentPatternOp
-  : public db::Op
-{
+  : public db::Op {
   CurrentPatternOp (int pi, int ni)
     : db::Op (), prev_index (pi), new_index (ni)
   {
@@ -63,15 +62,15 @@ EditStipplesForm::EditStipplesForm (QWidget *parent, lay::LayoutViewBase *view, 
   mp_ui->h_spin_box->setValue (32);
   mp_ui->w_spin_box->setValue (32);
 
-  manager (& m_manager);
-  mp_ui->editor->manager (& m_manager);
-  m_pattern.manager (& m_manager);
+  manager (&m_manager);
+  mp_ui->editor->manager (&m_manager);
+  m_pattern.manager (&m_manager);
 
   update ();
 
-  connect (mp_ui->stipple_items, SIGNAL (currentItemChanged(QListWidgetItem*, QListWidgetItem*)), 
+  connect (mp_ui->stipple_items, SIGNAL (currentItemChanged (QListWidgetItem *, QListWidgetItem *)),
            this, SLOT (sel_changed (QListWidgetItem *, QListWidgetItem *)));
-  connect (mp_ui->stipple_items, SIGNAL (itemDoubleClicked(QListWidgetItem*)), 
+  connect (mp_ui->stipple_items, SIGNAL (itemDoubleClicked (QListWidgetItem *)),
            this, SLOT (double_clicked (QListWidgetItem *)));
   connect (mp_ui->new_button, SIGNAL (clicked ()), this, SLOT (new_button_clicked ()));
   connect (mp_ui->delete_button, SIGNAL (clicked ()), this, SLOT (delete_button_clicked ()));
@@ -112,8 +111,7 @@ EditStipplesForm::~EditStipplesForm ()
   mp_ui = 0;
 }
 
-static 
-QIcon icon_from_data (const uint32_t * const *p)
+static QIcon icon_from_data (const uint32_t *const *p)
 {
   unsigned char data [5 * 36];
   memset (data, 0x00, sizeof (data));
@@ -142,18 +140,17 @@ QIcon icon_from_data (const uint32_t * const *p)
   return icon;
 }
 
-namespace {
-  struct display_order
+namespace
+{
+struct display_order {
+  bool operator() (lay::DitherPattern::iterator a, lay::DitherPattern::iterator b)
   {
-    bool operator () (lay::DitherPattern::iterator a, lay::DitherPattern::iterator b)
-    {
-      return a->order_index () < b->order_index ();
-    }
-  };
+    return a->order_index () < b->order_index ();
+  }
+};
 }
 
-void 
-EditStipplesForm::update ()
+void EditStipplesForm::update ()
 {
   bool en = m_selection_changed_enabled;
   m_selection_changed_enabled = false;
@@ -162,7 +159,7 @@ EditStipplesForm::update ()
 
   mp_ui->stipple_items->clear ();
 
-  std::vector <lay::DitherPattern::iterator> iters; 
+  std::vector<lay::DitherPattern::iterator> iters;
   for (lay::DitherPattern::iterator i = m_pattern.begin_custom (); i != m_pattern.end (); ++i) {
     iters.push_back (i);
   }
@@ -170,8 +167,8 @@ EditStipplesForm::update ()
 
   QColor c0 = palette ().color (QPalette::Base);
   QColor c1 = palette ().color (QPalette::Text);
-  QColor cdis ((c0.red () + c1.red ()) / 2, 
-               (c0.green () + c1.green ()) / 2, 
+  QColor cdis ((c0.red () + c1.red ()) / 2,
+               (c0.green () + c1.green ()) / 2,
                (c0.blue () + c1.blue ()) / 2);
 
   //  fill the list of stipple items
@@ -187,7 +184,7 @@ EditStipplesForm::update ()
     item->setTextColor (cdis);
 #endif
   }
-  for (std::vector <lay::DitherPattern::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
+  for (std::vector<lay::DitherPattern::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
     if ((*i)->order_index () > 0) {
       std::string name ((*i)->name ());
       if (name.empty ()) {
@@ -205,27 +202,25 @@ EditStipplesForm::update ()
   m_selection_changed_enabled = en;
 }
 
-void
-EditStipplesForm::double_clicked (QListWidgetItem *citem)
+void EditStipplesForm::double_clicked (QListWidgetItem *citem)
 {
   lay::DitherPattern::iterator i = index_of (citem);
   if (i != m_pattern.end () && i >= m_pattern.begin_custom ()) {
     bool ok = false;
-    QString new_name = QInputDialog::getText (this, 
+    QString new_name = QInputDialog::getText (this,
                                               QObject::tr ("Edit Stipple Description"),
                                               QObject::tr ("Enter new description of pattern"),
                                               QLineEdit::Normal, tl::to_qstring (i->name ()), &ok);
     if (ok) {
       lay::DitherPatternInfo p (*i);
       p.set_name (tl::to_string (new_name));
-      m_pattern.replace_pattern (std::distance (m_pattern.begin (), i), p); 
+      m_pattern.replace_pattern (std::distance (m_pattern.begin (), i), p);
       update ();
     }
   }
 }
 
-void 
-EditStipplesForm::sel_changed (QListWidgetItem *, QListWidgetItem *)
+void EditStipplesForm::sel_changed (QListWidgetItem *, QListWidgetItem *)
 {
   if (! m_selection_changed_enabled) {
     return;
@@ -240,8 +235,7 @@ EditStipplesForm::sel_changed (QListWidgetItem *, QListWidgetItem *)
   update_current_item ();
 }
 
-void
-EditStipplesForm::update_current_item ()
+void EditStipplesForm::update_current_item ()
 {
   mp_ui->w_spin_box->blockSignals (true);
   mp_ui->h_spin_box->blockSignals (true);
@@ -261,20 +255,18 @@ EditStipplesForm::update_current_item ()
     mp_ui->editor->set_pattern (i->pattern (), i->width (), i->height ());
     bool readonly = (i < m_pattern.begin_custom ());
     mp_ui->editor->set_readonly (readonly);
-    mp_ui->toolbar->setEnabled (!readonly);
+    mp_ui->toolbar->setEnabled (! readonly);
     mp_ui->w_spin_box->setValue (i->width ());
     mp_ui->h_spin_box->setValue (i->height ());
 
     m_selected = std::distance (m_pattern.begin (), i);
-
   }
 
   mp_ui->w_spin_box->blockSignals (false);
   mp_ui->h_spin_box->blockSignals (false);
 }
 
-void
-EditStipplesForm::select_item (int index)
+void EditStipplesForm::select_item (int index)
 {
   bool en = m_selection_changed_enabled;
   m_selection_changed_enabled = false;
@@ -291,15 +283,14 @@ EditStipplesForm::select_item (int index)
   m_selection_changed_enabled = en;
 }
 
-void
-EditStipplesForm::new_button_clicked ()
+void EditStipplesForm::new_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("New pattern")));
   }
 
   lay::DitherPatternInfo p;
-  unsigned int oi = m_pattern.begin ()[m_pattern.add_pattern (p)].order_index () - 1;
+  unsigned int oi = m_pattern.begin () [m_pattern.add_pattern (p)].order_index () - 1;
 
   update ();
   select_item (oi + std::distance (m_pattern.begin (), m_pattern.begin_custom ()));
@@ -309,8 +300,7 @@ EditStipplesForm::new_button_clicked ()
   }
 }
 
-void 
-EditStipplesForm::clone_button_clicked ()
+void EditStipplesForm::clone_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Clone pattern")));
@@ -325,7 +315,7 @@ EditStipplesForm::clone_button_clicked ()
       iempty = i;
     } else if (i->order_index () > oi) {
       oi = i->order_index ();
-    } 
+    }
   }
 
   lay::DitherPatternInfo p;
@@ -334,7 +324,7 @@ EditStipplesForm::clone_button_clicked ()
   }
   p.set_order_index (oi + 1);
   p.set_name ("");
-  m_pattern.replace_pattern (std::distance (m_pattern.begin (), iempty), p); 
+  m_pattern.replace_pattern (std::distance (m_pattern.begin (), iempty), p);
 
   update ();
   select_item (oi + std::distance (m_pattern.begin (), m_pattern.begin_custom ()));
@@ -344,8 +334,7 @@ EditStipplesForm::clone_button_clicked ()
   }
 }
 
-void 
-EditStipplesForm::delete_button_clicked ()
+void EditStipplesForm::delete_button_clicked ()
 {
   BEGIN_PROTECTED
 
@@ -376,14 +365,12 @@ EditStipplesForm::delete_button_clicked ()
     if (manager ()) {
       manager ()->commit ();
     }
-
   }
 
   END_PROTECTED
 }
 
-void 
-EditStipplesForm::up_button_clicked ()
+void EditStipplesForm::up_button_clicked ()
 {
   lay::DitherPattern::iterator c = current ();
 
@@ -416,17 +403,13 @@ EditStipplesForm::up_button_clicked ()
           }
 
           return;
-
         }
       }
-
     }
-
   }
 }
 
-void 
-EditStipplesForm::down_button_clicked ()
+void EditStipplesForm::down_button_clicked ()
 {
   lay::DitherPattern::iterator c = current ();
 
@@ -458,15 +441,12 @@ EditStipplesForm::down_button_clicked ()
         }
 
         return;
-
       }
     }
-
   }
 }
 
-void
-EditStipplesForm::editor_size_changed ()
+void EditStipplesForm::editor_size_changed ()
 {
   mp_ui->w_spin_box->blockSignals (true);
   mp_ui->h_spin_box->blockSignals (true);
@@ -476,8 +456,7 @@ EditStipplesForm::editor_size_changed ()
   mp_ui->h_spin_box->blockSignals (false);
 }
 
-void
-EditStipplesForm::size_changed ()
+void EditStipplesForm::size_changed ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Change pattern size")));
@@ -488,8 +467,7 @@ EditStipplesForm::size_changed ()
   }
 }
 
-void 
-EditStipplesForm::invert_button_clicked ()
+void EditStipplesForm::invert_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Invert pattern")));
@@ -500,8 +478,7 @@ EditStipplesForm::invert_button_clicked ()
   }
 }
 
-void 
-EditStipplesForm::clear_button_clicked ()
+void EditStipplesForm::clear_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Clear pattern")));
@@ -512,8 +489,7 @@ EditStipplesForm::clear_button_clicked ()
   }
 }
 
-void 
-EditStipplesForm::rotate_button_clicked ()
+void EditStipplesForm::rotate_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Rotate pattern")));
@@ -524,8 +500,7 @@ EditStipplesForm::rotate_button_clicked ()
   }
 }
 
-void 
-EditStipplesForm::fliph_button_clicked ()
+void EditStipplesForm::fliph_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Flip horizontal")));
@@ -536,8 +511,7 @@ EditStipplesForm::fliph_button_clicked ()
   }
 }
 
-void 
-EditStipplesForm::flipv_button_clicked ()
+void EditStipplesForm::flipv_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Flip vertical")));
@@ -548,8 +522,7 @@ EditStipplesForm::flipv_button_clicked ()
   }
 }
 
-void 
-EditStipplesForm::sleft_button_clicked ()
+void EditStipplesForm::sleft_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Shift left")));
@@ -560,8 +533,7 @@ EditStipplesForm::sleft_button_clicked ()
   }
 }
 
-void 
-EditStipplesForm::sup_button_clicked ()
+void EditStipplesForm::sup_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Shift up")));
@@ -572,8 +544,7 @@ EditStipplesForm::sup_button_clicked ()
   }
 }
 
-void 
-EditStipplesForm::sright_button_clicked ()
+void EditStipplesForm::sright_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Shift right")));
@@ -584,8 +555,7 @@ EditStipplesForm::sright_button_clicked ()
   }
 }
 
-void 
-EditStipplesForm::sdown_button_clicked ()
+void EditStipplesForm::sdown_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Shift down")));
@@ -596,28 +566,26 @@ EditStipplesForm::sdown_button_clicked ()
   }
 }
 
-void 
-EditStipplesForm::undo_button_clicked ()
+void EditStipplesForm::undo_button_clicked ()
 {
   m_manager.undo ();
   update ();
 }
 
-void 
-EditStipplesForm::redo_button_clicked ()
+void EditStipplesForm::redo_button_clicked ()
 {
   m_manager.redo ();
   update ();
 }
 
 
-lay::DitherPattern::iterator 
+lay::DitherPattern::iterator
 EditStipplesForm::current ()
 {
   return index_of (mp_ui->stipple_items->currentItem ());
 }
 
-lay::DitherPattern::iterator 
+lay::DitherPattern::iterator
 EditStipplesForm::index_of (QListWidgetItem *item)
 {
   int row = mp_ui->stipple_items->row (item);
@@ -631,12 +599,11 @@ EditStipplesForm::index_of (QListWidgetItem *item)
   } else if (row >= 0) {
     return m_pattern.begin () + row;
   }
-  
+
   return m_pattern.end ();
 }
 
-void
-EditStipplesForm::edited ()
+void EditStipplesForm::edited ()
 {
   if (mp_ui->stipple_items->currentItem ()) {
 
@@ -649,14 +616,11 @@ EditStipplesForm::edited ()
       m_pattern.replace_pattern (std::distance (m_pattern.begin (), i), info);
 
       mp_ui->stipple_items->currentItem ()->setIcon (icon_from_data (info.pattern ()));
-
     }
-
   }
 }
 
-void 
-EditStipplesForm::handle_op (db::Op *op, bool undo)
+void EditStipplesForm::handle_op (db::Op *op, bool undo)
 {
   CurrentPatternOp *cp_op = dynamic_cast<CurrentPatternOp *> (op);
   if (cp_op) {
@@ -669,18 +633,15 @@ EditStipplesForm::handle_op (db::Op *op, bool undo)
     update_current_item ();
 
     m_selection_changed_enabled = true;
-
   }
 }
 
-void
-EditStipplesForm::undo (db::Op *op)
+void EditStipplesForm::undo (db::Op *op)
 {
   handle_op (op, true);
 }
 
-void
-EditStipplesForm::redo (db::Op *op)
+void EditStipplesForm::redo (db::Op *op)
 {
   handle_op (op, false);
 }

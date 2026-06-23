@@ -57,8 +57,7 @@ LCPRemitter::LCPRemitter (int index, QObject *parent, const char *name)
   setObjectName (QString::fromUtf8 (name));
 }
 
-void 
-LCPRemitter::the_slot ()
+void LCPRemitter::the_slot ()
 {
   emit the_signal (m_index);
 }
@@ -75,8 +74,7 @@ LCPActiveLabel::LCPActiveLabel (int index, QWidget *parent, const char *name)
   setBackgroundRole (QPalette::Window);
 }
 
-void 
-LCPActiveLabel::mousePressEvent (QMouseEvent *e)
+void LCPActiveLabel::mousePressEvent (QMouseEvent *e)
 {
   if (! m_grabbed && e->button () == Qt::LeftButton) {
     setFrameShadow (QFrame::Sunken);
@@ -84,18 +82,16 @@ LCPActiveLabel::mousePressEvent (QMouseEvent *e)
   }
 }
 
-void 
-LCPActiveLabel::mouseReleaseEvent (QMouseEvent *e)
+void LCPActiveLabel::mouseReleaseEvent (QMouseEvent *e)
 {
   if (m_grabbed) {
-   
+
     setFrameShadow (QFrame::Raised);
     m_grabbed = false;
 
     if (e->button () == Qt::LeftButton && rect ().contains (e->pos ())) {
       emit clicked (m_index);
     }
-
   }
 }
 
@@ -122,7 +118,7 @@ LCPDitherPalette::LCPDitherPalette (QWidget *parent, const char *name)
     ll->setSpacing (0);
 
     for (unsigned int j = 0; j < 4; ++j) {
-      
+
       LCPActiveLabel *b = new LCPActiveLabel (n, f);
 
       b->setMinimumSize (28, 28);
@@ -142,9 +138,7 @@ LCPDitherPalette::LCPDitherPalette (QWidget *parent, const char *name)
       ll->addWidget (b);
 
       ++n;
-
     }
-
   }
 
   {
@@ -166,7 +160,7 @@ LCPDitherPalette::LCPDitherPalette (QWidget *parent, const char *name)
     connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
     ll->addWidget (b);
 
-    //  More pattern 
+    //  More pattern
     b = new LCPActiveLabel (-2, f);
     b->setFrameStyle (QFrame::Panel | QFrame::Raised);
     b->setLineWidth (1);
@@ -177,7 +171,7 @@ LCPDitherPalette::LCPDitherPalette (QWidget *parent, const char *name)
   }
 
   {
-    //  Edit pattern 
+    //  Edit pattern
     LCPActiveLabel *b;
     b = new LCPActiveLabel (-1, this, "dp_l2");
     b->setFrameStyle (QFrame::Panel | QFrame::Raised);
@@ -187,13 +181,11 @@ LCPDitherPalette::LCPDitherPalette (QWidget *parent, const char *name)
     connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
     l->addWidget (b);
   }
-
 }
 
-void
-LCPDitherPalette::create_pixmap_for (LCPActiveLabel *b, int n)
+void LCPDitherPalette::create_pixmap_for (LCPActiveLabel *b, int n)
 {
-  lay::DitherPattern pattern = !mp_view ? lay::DitherPattern::default_pattern () : mp_view->dither_pattern ();
+  lay::DitherPattern pattern = ! mp_view ? lay::DitherPattern::default_pattern () : mp_view->dither_pattern ();
 
   QColor color0 = b->palette ().color (QPalette::Normal, b->backgroundRole ());
   QColor color1 = b->palette ().color (QPalette::Normal, b->foregroundRole ());
@@ -226,8 +218,7 @@ LCPDitherPalette::create_pixmap_for (LCPActiveLabel *b, int n)
   b->setPixmap (pixmap);
 }
 
-void
-LCPDitherPalette::set_palette (const lay::StipplePalette &palette)
+void LCPDitherPalette::set_palette (const lay::StipplePalette &palette)
 {
   if (palette != m_palette) {
 
@@ -239,22 +230,20 @@ LCPDitherPalette::set_palette (const lay::StipplePalette &palette)
         n = m_palette.stipple_by_index (i);
       }
       if (m_stipple_buttons [i]) {
-        create_pixmap_for (m_stipple_buttons[i], n);
+        create_pixmap_for (m_stipple_buttons [i], n);
       }
     }
-
   }
 }
 
-void 
-LCPDitherPalette::button_clicked (int index)
+void LCPDitherPalette::button_clicked (int index)
 {
   if (! mp_view) {
     return;
   }
 
   if (index == -1) {
-    
+
     //  edit pattern
     lay::DitherPattern pattern (mp_view->dither_pattern ());
     lay::EditStipplesForm stipples_form (this, mp_view, pattern);
@@ -263,7 +252,7 @@ LCPDitherPalette::button_clicked (int index)
     }
 
   } else if (index == -2) {
-    
+
     //  select pattern
     lay::SelectStippleForm stipples_form (0, mp_view->dither_pattern ());
     if (stipples_form.exec () && stipples_form.selected () >= 0) {
@@ -271,7 +260,7 @@ LCPDitherPalette::button_clicked (int index)
     }
 
   } else if (index == -3) {
-    
+
     emit dither_selected (-1);
 
   } else {
@@ -353,8 +342,7 @@ LCPVisibilityPalette::LCPVisibilityPalette (QWidget *parent, const char *name)
   ll->addWidget (b);
 }
 
-void 
-LCPVisibilityPalette::button_clicked (int index)
+void LCPVisibilityPalette::button_clicked (int index)
 {
   if (index == 0) {
     emit visibility_change (true);
@@ -437,8 +425,7 @@ LCPAnimationPalette::LCPAnimationPalette (QWidget *parent, const char *name)
   ll->addWidget (b);
 }
 
-void 
-LCPAnimationPalette::button_clicked (int index)
+void LCPAnimationPalette::button_clicked (int index)
 {
   emit animation_selected (index);
 }
@@ -482,7 +469,6 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
 
     connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
     ll->addWidget (b);
-
   }
 
   f = new QFrame (this);
@@ -603,8 +589,7 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   ll->addWidget (b);
 }
 
-void
-LCPStylePalette::set_palette (const LineStylePalette &palette)
+void LCPStylePalette::set_palette (const LineStylePalette &palette)
 {
   if (palette != m_palette) {
 
@@ -616,17 +601,15 @@ LCPStylePalette::set_palette (const LineStylePalette &palette)
         n = m_palette.style_by_index (i);
       }
       if (m_style_buttons [i]) {
-        create_pixmap_for_line_style (m_style_buttons[i], n);
+        create_pixmap_for_line_style (m_style_buttons [i], n);
       }
     }
-
   }
 }
 
-void
-LCPStylePalette::create_pixmap_for_line_style (LCPActiveLabel *b, int n)
+void LCPStylePalette::create_pixmap_for_line_style (LCPActiveLabel *b, int n)
 {
-  const lay::LineStyles &styles = !mp_view ? lay::LineStyles::default_style () : mp_view->line_styles ();
+  const lay::LineStyles &styles = ! mp_view ? lay::LineStyles::default_style () : mp_view->line_styles ();
 
   QColor color0 = b->palette ().color (QPalette::Normal, b->backgroundRole ());
   QColor color1 = b->palette ().color (QPalette::Normal, b->foregroundRole ());
@@ -650,8 +633,7 @@ LCPStylePalette::create_pixmap_for_line_style (LCPActiveLabel *b, int n)
   b->setPixmap (pixmap);
 }
 
-void
-LCPStylePalette::button_clicked (int index)
+void LCPStylePalette::button_clicked (int index)
 {
   if (index >= 0 && index < 16) {
     emit width_selected (index);
@@ -719,7 +701,7 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
     ll->setSpacing (0);
 
     for (unsigned int j = 0; j < 7; ++j) {
-      
+
       unsigned int n = j * 6 + i;
 
       LCPActiveLabel *b = new LCPActiveLabel (n, f);
@@ -734,9 +716,7 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
       connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
 
       ll->addWidget (b);
-
     }
-
   }
 
   {
@@ -809,13 +789,10 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
     b->setAlignment (Qt::AlignHCenter);
     connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
     ll->addWidget (b);
-
   }
-
 }
 
-void
-LCPColorPalette::set_palette (const lay::ColorPalette &palette)
+void LCPColorPalette::set_palette (const lay::ColorPalette &palette)
 {
   if (palette != m_palette) {
 
@@ -832,12 +809,10 @@ LCPColorPalette::set_palette (const lay::ColorPalette &palette)
         m_color_buttons [i]->setPalette (pl);
       }
     }
-
   }
 }
 
-void 
-LCPColorPalette::button_clicked (int index)
+void LCPColorPalette::button_clicked (int index)
 {
   if (index >= 0) {
     QColor color;
@@ -906,7 +881,7 @@ LayerToolbox::LayerToolbox (QWidget *parent, const char *name)
   connect (p, SIGNAL (color_selected (QColor)), this, SLOT (fill_color_changed (QColor)));
   connect (p, SIGNAL (color_brightness_selected (int)), this, SLOT (fill_color_brightness (int)));
 
-  //  make the height equal to the computed height 
+  //  make the height equal to the computed height
   int h = sizeHint ().height ();
   setMinimumHeight (h);
   setMaximumHeight (h);
@@ -917,16 +892,14 @@ LayerToolbox::~LayerToolbox ()
   //  .. nothing yet ..
 }
 
-void 
-LayerToolbox::set_view (LayoutViewBase *view)
+void LayerToolbox::set_view (LayoutViewBase *view)
 {
   mp_dither_palette->set_view (view);
   mp_style_palette->set_view (view);
   mp_view = view;
 }
 
-void 
-LayerToolbox::add_panel (QWidget *panel_widget, const char *text)
+void LayerToolbox::add_panel (QWidget *panel_widget, const char *text)
 {
   panel_widget->hide ();
 
@@ -953,25 +926,24 @@ LayerToolbox::add_panel (QWidget *panel_widget, const char *text)
   b->setMaximumSize (QSize (b->maximumSize ().width (), b->sizeHint ().height () - 4));
 
   LCPRemitter *e = new LCPRemitter (int (m_tool_panels.size ()), this);
-  connect (b, SIGNAL(clicked ()), e, SLOT (the_slot ()));
-  connect (e, SIGNAL(the_signal (int)), this, SLOT (panel_button_clicked (int)));
+  connect (b, SIGNAL (clicked ()), e, SLOT (the_slot ()));
+  connect (e, SIGNAL (the_signal (int)), this, SLOT (panel_button_clicked (int)));
 
   m_tool_panels.push_back (std::make_pair (f, panel_widget));
 }
 
-QSize
-LayerToolbox::sizeHint () const
+QSize LayerToolbox::sizeHint () const
 {
   //  override the min width to account for the tree behaviour of Qt 4.5.x:
   int w = 148;
-  for (std::vector <std::pair <QWidget *, QWidget *> >::const_iterator i = m_tool_panels.begin (); i != m_tool_panels.end (); ++i) {
+  for (std::vector<std::pair<QWidget *, QWidget *>>::const_iterator i = m_tool_panels.begin (); i != m_tool_panels.end (); ++i) {
     w = std::max (std::max (i->first->sizeHint ().width (), i->second->sizeHint ().width ()), w);
   }
 
   //  get the required height
   int h = 0;
-  for (std::vector <std::pair <QWidget *, QWidget *> >::const_iterator i = m_tool_panels.begin (); i != m_tool_panels.end (); ++i) {
-    if (!i->second->isHidden ()) {
+  for (std::vector<std::pair<QWidget *, QWidget *>>::const_iterator i = m_tool_panels.begin (); i != m_tool_panels.end (); ++i) {
+    if (! i->second->isHidden ()) {
       h += i->second->sizeHint ().height ();
     }
     h += i->first->sizeHint ().height ();
@@ -980,34 +952,30 @@ LayerToolbox::sizeHint () const
   return QSize (w, h);
 }
 
-void 
-LayerToolbox::resizeEvent (QResizeEvent *re)
+void LayerToolbox::resizeEvent (QResizeEvent *re)
 {
   rearrange (re->size ().width (), re->size ().height ());
 }
 
-void 
-LayerToolbox::resize (int w, int h)
+void LayerToolbox::resize (int w, int h)
 {
   QWidget::resize (w, h);
   rearrange (w, h);
 }
 
-void 
-LayerToolbox::setGeometry (int x, int y, int w, int h)
+void LayerToolbox::setGeometry (int x, int y, int w, int h)
 {
   QWidget::setGeometry (x, y, w, h);
   rearrange (w, h);
 }
 
-void 
-LayerToolbox::rearrange (int w, int h)
+void LayerToolbox::rearrange (int w, int h)
 {
-  for (std::vector <std::pair <QWidget *, QWidget *> >::iterator i = m_tool_panels.begin (); i != m_tool_panels.end (); ++i) {
+  for (std::vector<std::pair<QWidget *, QWidget *>>::iterator i = m_tool_panels.begin (); i != m_tool_panels.end (); ++i) {
 
     int hh;
 
-    if (!i->second->isHidden ()) {
+    if (! i->second->isHidden ()) {
       hh = i->second->sizeHint ().height ();
       h -= hh;
       i->second->setGeometry (0, h, w, hh);
@@ -1016,24 +984,22 @@ LayerToolbox::rearrange (int w, int h)
     hh = i->first->sizeHint ().height ();
     h -= hh;
     i->first->setGeometry (0, h, w, hh);
-
   }
 }
 
-void 
-LayerToolbox::panel_button_clicked (int index)
+void LayerToolbox::panel_button_clicked (int index)
 {
   if (index < 0 || index >= int (m_tool_panels.size ())) {
     return;
   }
 
-  if (!m_tool_panels [index].second->isHidden ()) {
+  if (! m_tool_panels [index].second->isHidden ()) {
     m_tool_panels [index].second->hide ();
   } else {
     m_tool_panels [index].second->show ();
   }
 
-  //  make the height equal to the computed height 
+  //  make the height equal to the computed height
   int h = sizeHint ().height ();
   setMinimumHeight (h);
   setMaximumHeight (h);
@@ -1042,8 +1008,7 @@ LayerToolbox::panel_button_clicked (int index)
 }
 
 template <class Op>
-void 
-LayerToolbox::foreach_selected (const Op &op)
+void LayerToolbox::foreach_selected (const Op &op)
 {
   std::vector<lay::LayerPropertiesConstIterator> sel = mp_view->selected_layers ();
 
@@ -1054,9 +1019,8 @@ LayerToolbox::foreach_selected (const Op &op)
   }
 }
 
-struct SetColor
-{
-  /** 
+struct SetColor {
+  /**
    *  @brief set (some) colors of the properties
    *
    *  @param flags Bitmask that defines which colors to change: #0=fill,#1=frame,#2=vertex,#3=text
@@ -1077,7 +1041,7 @@ struct SetColor
         props.set_fill_color (m_color.rgb ());
         props.set_fill_brightness (0);
       }
-    } 
+    }
     if (m_flags & 1) {
       if (! m_color.isValid ()) {
         props.clear_frame_color ();
@@ -1093,8 +1057,7 @@ private:
   unsigned int m_flags;
 };
 
-void 
-LayerToolbox::fill_color_changed (QColor c)
+void LayerToolbox::fill_color_changed (QColor c)
 {
   if (! mp_view) {
     return;
@@ -1106,8 +1069,7 @@ LayerToolbox::fill_color_changed (QColor c)
   foreach_selected (op);
 }
 
-void 
-LayerToolbox::frame_color_changed (QColor c)
+void LayerToolbox::frame_color_changed (QColor c)
 {
   if (! mp_view) {
     return;
@@ -1119,9 +1081,8 @@ LayerToolbox::frame_color_changed (QColor c)
   foreach_selected (op);
 }
 
-struct SetBrightness
-{
-  /** 
+struct SetBrightness {
+  /**
    *  @brief set (some) colors of the properties
    *
    *  @param flags Bitmask that defines which colors to change: #0=fill,#1=frame,#2=vertex,#3=text
@@ -1141,7 +1102,7 @@ struct SetBrightness
       } else {
         props.set_fill_brightness (props.fill_brightness (false) + m_delta);
       }
-    } 
+    }
     if (m_flags & 1) {
       if (m_delta == 0) {
         props.set_frame_brightness (0);
@@ -1156,8 +1117,7 @@ private:
   unsigned int m_flags;
 };
 
-void 
-LayerToolbox::fill_color_brightness (int delta)
+void LayerToolbox::fill_color_brightness (int delta)
 {
   if (! mp_view) {
     return;
@@ -1169,8 +1129,7 @@ LayerToolbox::fill_color_brightness (int delta)
   foreach_selected (op);
 }
 
-void 
-LayerToolbox::frame_color_brightness (int delta)
+void LayerToolbox::frame_color_brightness (int delta)
 {
   if (! mp_view) {
     return;
@@ -1182,11 +1141,11 @@ LayerToolbox::frame_color_brightness (int delta)
   foreach_selected (op);
 }
 
-struct SetDither
-{
+struct SetDither {
   SetDither (int di)
     : m_di (di)
-  { }
+  {
+  }
 
   void operator() (lay::LayerProperties &props) const
   {
@@ -1201,8 +1160,7 @@ private:
   int m_di;
 };
 
-void
-LayerToolbox::line_styles_changed (const lay::LineStyles &styles)
+void LayerToolbox::line_styles_changed (const lay::LineStyles &styles)
 {
   if (! mp_view) {
     return;
@@ -1212,8 +1170,7 @@ LayerToolbox::line_styles_changed (const lay::LineStyles &styles)
   mp_view->set_line_styles (styles);
 }
 
-void
-LayerToolbox::dither_pattern_changed (const lay::DitherPattern &pattern)
+void LayerToolbox::dither_pattern_changed (const lay::DitherPattern &pattern)
 {
   if (! mp_view) {
     return;
@@ -1223,8 +1180,7 @@ LayerToolbox::dither_pattern_changed (const lay::DitherPattern &pattern)
   mp_view->set_dither_pattern (pattern);
 }
 
-void
-LayerToolbox::dither_changed (int di)
+void LayerToolbox::dither_changed (int di)
 {
   if (! mp_view) {
     return;
@@ -1236,11 +1192,11 @@ LayerToolbox::dither_changed (int di)
   foreach_selected (op);
 }
 
-struct SetVisible
-{
+struct SetVisible {
   SetVisible (bool v)
     : m_visible (v)
-  { }
+  {
+  }
 
   void operator() (lay::LayerProperties &props) const
   {
@@ -1251,8 +1207,7 @@ private:
   bool m_visible;
 };
 
-void 
-LayerToolbox::visibility_changed (bool visible)
+void LayerToolbox::visibility_changed (bool visible)
 {
   if (! mp_view) {
     return;
@@ -1264,11 +1219,11 @@ LayerToolbox::visibility_changed (bool visible)
   foreach_selected (op);
 }
 
-struct SetTransparency
-{
+struct SetTransparency {
   SetTransparency (bool t)
     : m_transparent (t)
-  { }
+  {
+  }
 
   void operator() (lay::LayerProperties &props) const
   {
@@ -1279,8 +1234,7 @@ private:
   bool m_transparent;
 };
 
-void 
-LayerToolbox::transparency_changed (bool transparent)
+void LayerToolbox::transparency_changed (bool transparent)
 {
   if (! mp_view) {
     return;
@@ -1292,11 +1246,11 @@ LayerToolbox::transparency_changed (bool transparent)
   foreach_selected (op);
 }
 
-struct SetAnimation
-{
+struct SetAnimation {
   SetAnimation (int mode)
     : m_mode (mode)
-  { }
+  {
+  }
 
   void operator() (lay::LayerProperties &props) const
   {
@@ -1307,8 +1261,7 @@ private:
   int m_mode;
 };
 
-void 
-LayerToolbox::animation_changed (int mode)
+void LayerToolbox::animation_changed (int mode)
 {
   if (! mp_view) {
     return;
@@ -1320,11 +1273,11 @@ LayerToolbox::animation_changed (int mode)
   foreach_selected (op);
 }
 
-struct SetWidth
-{
+struct SetWidth {
   SetWidth (int w)
     : m_width (w)
-  { }
+  {
+  }
 
   void operator() (lay::LayerProperties &props) const
   {
@@ -1335,8 +1288,7 @@ private:
   int m_width;
 };
 
-void 
-LayerToolbox::width_changed (int width)
+void LayerToolbox::width_changed (int width)
 {
   if (! mp_view) {
     return;
@@ -1348,11 +1300,11 @@ LayerToolbox::width_changed (int width)
   foreach_selected (op);
 }
 
-struct SetXFill
-{
+struct SetXFill {
   SetXFill (bool x)
     : m_xfill (x)
-  { }
+  {
+  }
 
   void operator() (lay::LayerProperties &props) const
   {
@@ -1363,8 +1315,7 @@ private:
   bool m_xfill;
 };
 
-void
-LayerToolbox::xfill_changed (bool xf)
+void LayerToolbox::xfill_changed (bool xf)
 {
   if (! mp_view) {
     return;
@@ -1376,11 +1327,11 @@ LayerToolbox::xfill_changed (bool xf)
   foreach_selected (op);
 }
 
-struct SetLineStyle
-{
+struct SetLineStyle {
   SetLineStyle (int x)
     : m_style (x)
-  { }
+  {
+  }
 
   void operator() (lay::LayerProperties &props) const
   {
@@ -1391,8 +1342,7 @@ private:
   int m_style;
 };
 
-void
-LayerToolbox::line_style_changed (int ls)
+void LayerToolbox::line_style_changed (int ls)
 {
   if (! mp_view) {
     return;
@@ -1404,11 +1354,11 @@ LayerToolbox::line_style_changed (int ls)
   foreach_selected (op);
 }
 
-struct SetMarked
-{
+struct SetMarked {
   SetMarked (bool m)
     : m_marked (m)
-  { }
+  {
+  }
 
   void operator() (lay::LayerProperties &props) const
   {
@@ -1419,8 +1369,7 @@ private:
   bool m_marked;
 };
 
-void 
-LayerToolbox::marked_changed (bool marked)
+void LayerToolbox::marked_changed (bool marked)
 {
   if (! mp_view) {
     return;
@@ -1432,21 +1381,18 @@ LayerToolbox::marked_changed (bool marked)
   foreach_selected (op);
 }
 
-void
-LayerToolbox::set_palette (const lay::ColorPalette &p)
+void LayerToolbox::set_palette (const lay::ColorPalette &p)
 {
   mp_palette->set_palette (p);
   mp_frame_palette->set_palette (p);
 }
 
-void
-LayerToolbox::set_palette (const lay::StipplePalette &p)
+void LayerToolbox::set_palette (const lay::StipplePalette &p)
 {
   mp_dither_palette->set_palette (p);
 }
 
-void
-LayerToolbox::set_palette (const lay::LineStylePalette &p)
+void LayerToolbox::set_palette (const lay::LineStylePalette &p)
 {
   mp_style_palette->set_palette (p);
 }

@@ -52,11 +52,11 @@ public:
 protected:
   void insert (size_t index1, size_t index2)
   {
-    m_interactions[index1].insert (index2);
+    m_interactions [index1].insert (index2);
   }
 
 private:
-  std::map<size_t, std::set<size_t> > m_interactions;
+  std::map<size_t, std::set<size_t>> m_interactions;
 };
 
 class PolygonPortInteractionReceiver
@@ -85,8 +85,7 @@ public:
   }
 };
 
-struct JoinEdgeSets
-{
+struct JoinEdgeSets {
   void operator() (std::set<db::Edge> &a, const std::set<db::Edge> &b) const
   {
     a.insert (b.begin (), b.end ());
@@ -104,8 +103,7 @@ SquareCountingRExtractor::SquareCountingRExtractor (double dbu)
   m_decomp_param.with_segments = false;
 }
 
-static
-double yatx (const db::Edge &e, int x)
+static double yatx (const db::Edge &e, int x)
 {
   db::Point p1 = e.p1 (), p2 = e.p2 ();
   if (p1.x () > p2.x ()) {
@@ -115,8 +113,7 @@ double yatx (const db::Edge &e, int x)
   return p1.y () + double (p2.y () - p1.y ()) * double (x - p1.x ()) / double (p2.x () - p1.x ());
 }
 
-static
-double calculate_squares (db::Coord x1, db::Coord x2, const std::set<db::Edge> &edges)
+static double calculate_squares (db::Coord x1, db::Coord x2, const std::set<db::Edge> &edges)
 {
   tl_assert (edges.size () == 2);
 
@@ -138,8 +135,7 @@ double calculate_squares (db::Coord x1, db::Coord x2, const std::set<db::Edge> &
   }
 }
 
-void
-SquareCountingRExtractor::do_extract (const db::Polygon &db_poly, const std::vector<std::pair<PortDefinition, pex::RNode *> > &ports, pex::RNetwork &rnetwork)
+void SquareCountingRExtractor::do_extract (const db::Polygon &db_poly, const std::vector<std::pair<PortDefinition, pex::RNode *>> &ports, pex::RNetwork &rnetwork)
 {
   //  "trans" will orient the polygon to be flat rather than tall
   db::Trans trans;
@@ -150,7 +146,7 @@ SquareCountingRExtractor::do_extract (const db::Polygon &db_poly, const std::vec
   //  sort the edges into an interval map - as the polygons are convex, there
   //  can only be two edges in each interval.
 
-  tl::interval_map<db::Coord, std::set<db::Edge> > edges;
+  tl::interval_map<db::Coord, std::set<db::Edge>> edges;
   for (auto e = db_poly.begin_edge (); ! e.at_end (); ++e) {
     db::Edge et = trans * *e;
     if (et.x1 () != et.x2 ()) {
@@ -196,12 +192,10 @@ SquareCountingRExtractor::do_extract (const db::Polygon &db_poly, const std::vec
     } else {
       rnetwork.create_element (1.0 / r, pl->second, pl_next->second);
     }
-
   }
 }
 
-void
-SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector<db::Point> &vertex_ports, const std::vector<db::Polygon> &polygon_ports, pex::RNetwork &rnetwork)
+void SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector<db::Point> &vertex_ports, const std::vector<db::Polygon> &polygon_ports, pex::RNetwork &rnetwork)
 {
   rnetwork.clear ();
 
@@ -216,9 +210,9 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
 
   //  create a heap for the scanners
 
-  std::vector<std::pair<db::Polygon, const db::plc::Polygon *> > decomp_polygons;
+  std::vector<std::pair<db::Polygon, const db::plc::Polygon *>> decomp_polygons;
   for (auto p = plc.begin (); p != plc.end (); ++p) {
-    decomp_polygons.push_back (std::make_pair (db::Polygon (), p.operator-> ()));
+    decomp_polygons.push_back (std::make_pair (db::Polygon (), p.operator->()));
     decomp_polygons.back ().first = inv_trans * p->polygon ();
   }
 
@@ -236,12 +230,11 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
     }
 
     for (auto i = polygon_ports.begin (); i != polygon_ports.end (); ++i) {
-      scanner.insert2 (i.operator-> (), i - polygon_ports.begin ());
+      scanner.insert2 (i.operator->(), i - polygon_ports.begin ());
     }
 
     db::box_convert<db::Polygon> bc;
     scanner.process (interactions_pp, 1, bc, bc);
-
   }
 
   //  Set up a scanner to detect interactions between vertex ports
@@ -258,20 +251,19 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
     }
 
     for (auto i = vertex_ports.begin (); i != vertex_ports.end (); ++i) {
-      scanner.insert2 (i.operator-> (), i - vertex_ports.begin ());
+      scanner.insert2 (i.operator->(), i - vertex_ports.begin ());
     }
 
     db::box_convert<db::Polygon> bc1;
     db::box_convert<db::Point> bc2;
     scanner.process (interactions_vp, 1, bc1, bc2);
-
   }
 
   //  Generate the internal ports: those are defined by edges connecting two polygons
 
   std::vector<const db::plc::Edge *> internal_port_edges;
   std::map<const db::plc::Edge *, size_t> internal_ports;
-  std::vector<std::vector<size_t> > internal_port_indexes;
+  std::vector<std::vector<size_t>> internal_port_indexes;
 
   for (auto i = decomp_polygons.begin (); i != decomp_polygons.end (); ++i) {
 
@@ -290,16 +282,13 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
           ip = internal_ports.insert (std::make_pair (e, n)).first;
         }
         internal_port_indexes.back ().push_back (ip->second);
-
       }
-
     }
-
   }
 
   //  Now we can extract the resistors
 
-  std::vector<std::pair<PortDefinition, pex::RNode *> > ports;
+  std::vector<std::pair<PortDefinition, pex::RNode *>> ports;
   std::map<PortDefinition, pex::RNode *> nodes_for_ports;
 
   for (auto p = decomp_polygons.begin (); p != decomp_polygons.end (); ++p) {
@@ -345,7 +334,6 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
     }
 
     do_extract (db_poly, ports, rnetwork);
-
   }
 
   if (! m_skip_simplify) {
@@ -354,5 +342,3 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
 }
 
 }
-
-

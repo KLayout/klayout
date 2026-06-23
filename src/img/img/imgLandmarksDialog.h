@@ -39,18 +39,20 @@ class LandmarkEditorService;
 /**
  *  @brief The landmark editor for the image dialog
  */
-class LandmarksDialog :
-  public QDialog,
-  public Ui::ImageLandmarksDialog,
-  public tl::Object
+class LandmarksDialog : public QDialog,
+                        public Ui::ImageLandmarksDialog,
+                        public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LandmarksDialog (QWidget *parent, img::Object &img);
   ~LandmarksDialog ();
 
-  enum mode_t { Move, Add, Delete, None } m_mode;
+  enum mode_t { Move,
+                Add,
+                Delete,
+                None } m_mode;
 
 private slots:
   void update_mode ();

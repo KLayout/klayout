@@ -111,5 +111,3 @@ private:
 }
 
 #endif
-
-

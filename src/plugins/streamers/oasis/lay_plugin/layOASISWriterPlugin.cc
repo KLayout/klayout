@@ -40,8 +40,8 @@ OASISWriterOptionPage::OASISWriterOptionPage (QWidget *parent)
   mp_ui = new Ui::OASISWriterOptionPage ();
   mp_ui->setupUi (this);
 
-  connect (mp_ui->write_cblocks, SIGNAL (clicked(bool)), this, SLOT (flags_changed()));
-  connect (mp_ui->strict_mode, SIGNAL (clicked(bool)), this, SLOT (flags_changed()));
+  connect (mp_ui->write_cblocks, SIGNAL (clicked (bool)), this, SLOT (flags_changed ()));
+  connect (mp_ui->strict_mode, SIGNAL (clicked (bool)), this, SLOT (flags_changed ()));
 }
 
 OASISWriterOptionPage::~OASISWriterOptionPage ()
@@ -49,8 +49,7 @@ OASISWriterOptionPage::~OASISWriterOptionPage ()
   delete mp_ui;
 }
 
-void 
-OASISWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
+void OASISWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
 {
   const db::OASISWriterOptions *options = dynamic_cast<const db::OASISWriterOptions *> (o);
   if (options) {
@@ -65,15 +64,13 @@ OASISWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db
   }
 }
 
-void
-OASISWriterOptionPage::flags_changed ()
+void OASISWriterOptionPage::flags_changed ()
 {
   mp_ui->cblock_warning_frame->setEnabled (! mp_ui->write_cblocks->isChecked ());
   mp_ui->strict_mode_warning_frame->setEnabled (! mp_ui->strict_mode->isChecked ());
 }
 
-void 
-OASISWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool gzip)
+void OASISWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool gzip)
 {
   if (gzip && mp_ui->write_cblocks->isChecked ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("gzip compression cannot be used with CBLOCK compression")));
@@ -101,7 +98,7 @@ class OASISWriterPluginDeclaration
   : public StreamWriterPluginDeclaration
 {
 public:
-  OASISWriterPluginDeclaration () 
+  OASISWriterPluginDeclaration ()
     : StreamWriterPluginDeclaration (db::OASISWriterOptions ().format_name ())
   {
     // .. nothing yet ..
@@ -121,7 +118,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::OASISWriterPluginDeclaration (), 10000, "OASISWriter");
 
 }
-
-
-
-

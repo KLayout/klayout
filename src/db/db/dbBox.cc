@@ -28,21 +28,21 @@
 namespace tl
 {
 
-template<> void extractor_impl (tl::Extractor &ex, db::Box &b)
+template <> void extractor_impl (tl::Extractor &ex, db::Box &b)
 {
   if (! test_extractor_impl (ex, b)) {
     ex.error (tl::to_string (tr ("Expected an box specification")));
   }
 }
 
-template<> void extractor_impl (tl::Extractor &ex, db::DBox &b)
+template <> void extractor_impl (tl::Extractor &ex, db::DBox &b)
 {
   if (! test_extractor_impl (ex, b)) {
     ex.error (tl::to_string (tr ("Expected an box specification")));
   }
 }
 
-template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::box<C> &b)
+template <class C> bool _test_extractor_impl (tl::Extractor &ex, db::box<C> &b)
 {
   typedef db::point<C> point_type;
 
@@ -60,7 +60,6 @@ template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::box<C> &b)
       b = db::box<C> (p1, p2);
 
       ex.expect (")");
-
     }
 
     return true;
@@ -70,16 +69,14 @@ template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::box<C> &b)
   }
 }
 
-template<> bool test_extractor_impl (tl::Extractor &ex, db::Box &b)
+template <> bool test_extractor_impl (tl::Extractor &ex, db::Box &b)
 {
   return _test_extractor_impl (ex, b);
 }
 
-template<> bool test_extractor_impl (tl::Extractor &ex, db::DBox &b)
+template <> bool test_extractor_impl (tl::Extractor &ex, db::DBox &b)
 {
   return _test_extractor_impl (ex, b);
 }
 
 }
-
-

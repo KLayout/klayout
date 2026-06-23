@@ -34,7 +34,7 @@ class QListWidgetItem;
 
 namespace Ui
 {
-  class EditStipplesForm;
+class EditStipplesForm;
 }
 
 namespace lay
@@ -43,9 +43,10 @@ namespace lay
 class LayoutViewBase;
 
 class EditStipplesForm
-  : public QDialog, public db::Object
+  : public QDialog,
+    public db::Object
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   EditStipplesForm (QWidget *parent, lay::LayoutViewBase *view, const lay::DitherPattern &pattern);
@@ -62,13 +63,13 @@ public:
   {
     return m_selected;
   }
-  
+
   void undo (db::Op *op);
   void redo (db::Op *op);
 
 public slots:
-  void sel_changed (QListWidgetItem *current, QListWidgetItem *); 
-  void double_clicked (QListWidgetItem *item); 
+  void sel_changed (QListWidgetItem *current, QListWidgetItem *);
+  void double_clicked (QListWidgetItem *item);
   void new_button_clicked ();
   void delete_button_clicked ();
   void clone_button_clicked ();
@@ -112,4 +113,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

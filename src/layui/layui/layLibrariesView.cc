@@ -67,7 +67,7 @@ class CellClipboardData
   : public db::ClipboardData
 {
 public:
-  CellClipboardData () { }
+  CellClipboardData () {}
 };
 
 // --------------------------------------------------------------------
@@ -83,8 +83,7 @@ LibraryTreeWidget::LibraryTreeWidget (QWidget *parent, const char *name, QWidget
 }
 
 
-bool
-LibraryTreeWidget::event (QEvent *event)
+bool LibraryTreeWidget::event (QEvent *event)
 {
 #if 0
   //  Handling this event makes the widget receive all keystrokes.
@@ -100,17 +99,15 @@ LibraryTreeWidget::event (QEvent *event)
   return QTreeView::event (event);
 }
 
-bool
-LibraryTreeWidget::focusNextPrevChild (bool /*next*/)
+bool LibraryTreeWidget::focusNextPrevChild (bool /*next*/)
 {
   return false;
 }
 
-void
-LibraryTreeWidget::keyPressEvent (QKeyEvent *event)
+void LibraryTreeWidget::keyPressEvent (QKeyEvent *event)
 {
   QString t = event->text ();
-  if (! t.isEmpty () && t[0].isPrint ()) {
+  if (! t.isEmpty () && t [0].isPrint ()) {
     // "/" is a search initiator
     if (t == QString::fromUtf8 ("/")) {
       t.clear ();
@@ -125,8 +122,7 @@ LibraryTreeWidget::keyPressEvent (QKeyEvent *event)
   }
 }
 
-void
-LibraryTreeWidget::startDrag (Qt::DropActions supportedActions)
+void LibraryTreeWidget::startDrag (Qt::DropActions supportedActions)
 {
   QModelIndex index = selectionModel ()->currentIndex ();
   if (index.isValid ()) {
@@ -134,14 +130,14 @@ LibraryTreeWidget::startDrag (Qt::DropActions supportedActions)
     QModelIndexList indexes;
     indexes << index;
     QMimeData *data = model ()->mimeData (indexes);
-    if (!data) {
+    if (! data) {
       return;
     }
 
     lay::BusySection busy_section; // issue 984
 
     QDrag *drag = new QDrag (this);
-    drag->setMimeData(data);
+    drag->setMimeData (data);
     QPixmap px (1, 1);
     px.fill (QColor (0, 0, 0));
     px.createMaskFromColor (QColor (0, 0, 0), Qt::MaskOutColor);
@@ -152,13 +148,11 @@ LibraryTreeWidget::startDrag (Qt::DropActions supportedActions)
       defaultDropAction = Qt::CopyAction;
     }
 
-    drag->exec(supportedActions, defaultDropAction);
-
+    drag->exec (supportedActions, defaultDropAction);
   }
 }
 
-void
-LibraryTreeWidget::mouseDoubleClickEvent (QMouseEvent *event)
+void LibraryTreeWidget::mouseDoubleClickEvent (QMouseEvent *event)
 {
   QModelIndex index (indexAt (event->pos ()));
   if (index.isValid ()) {
@@ -166,8 +160,7 @@ LibraryTreeWidget::mouseDoubleClickEvent (QMouseEvent *event)
   }
 }
 
-void
-LibraryTreeWidget::mousePressEvent (QMouseEvent *event)
+void LibraryTreeWidget::mousePressEvent (QMouseEvent *event)
 {
   if (event->button () == Qt::MiddleButton) {
     //  eat this event.
@@ -180,8 +173,7 @@ LibraryTreeWidget::mousePressEvent (QMouseEvent *event)
   }
 }
 
-void
-LibraryTreeWidget::mouseReleaseEvent (QMouseEvent *event)
+void LibraryTreeWidget::mouseReleaseEvent (QMouseEvent *event)
 {
   if (event->button () == Qt::MiddleButton) {
     QModelIndex index (indexAt (event->pos ()));
@@ -308,15 +300,13 @@ LibrariesView::~LibrariesView ()
   //  .. nothing yet ..
 }
 
-QSize
-LibrariesView::sizeHint () const
+QSize LibrariesView::sizeHint () const
 {
   int w = 120; // TODO: better(?): mp_cell_list->sizeHint ().width ();
   return QSize (w, 0);
 }
 
-bool
-LibrariesView::event (QEvent *e)
+bool LibrariesView::event (QEvent *e)
 {
   if (e->type () == QEvent::MaxUser) {
     //  GTF probe event
@@ -327,8 +317,7 @@ LibrariesView::event (QEvent *e)
   }
 }
 
-void
-LibrariesView::context_menu (const QPoint &p)
+void LibrariesView::context_menu (const QPoint &p)
 {
   QTreeView *cell_list = dynamic_cast<QTreeView *> (sender ());
   if (cell_list) {
@@ -337,8 +326,7 @@ LibrariesView::context_menu (const QPoint &p)
   }
 }
 
-void
-LibrariesView::set_split_mode (bool f)
+void LibrariesView::set_split_mode (bool f)
 {
   if (f != m_split_mode) {
     m_split_mode = f;
@@ -346,8 +334,7 @@ LibrariesView::set_split_mode (bool f)
   }
 }
 
-void
-LibrariesView::clear_all ()
+void LibrariesView::clear_all ()
 {
   m_libraries.clear ();
   m_needs_update.clear ();
@@ -361,8 +348,7 @@ LibrariesView::clear_all ()
   mp_cell_lists.clear ();
 }
 
-void
-LibrariesView::search_triggered (const QString &t)
+void LibrariesView::search_triggered (const QString &t)
 {
   mp_search_model = 0;
   lay::LibraryTreeWidget *w = dynamic_cast<lay::LibraryTreeWidget *> (sender ());
@@ -386,12 +372,11 @@ LibrariesView::search_triggered (const QString &t)
   }
 }
 
-void
-LibrariesView::search_edited ()
+void LibrariesView::search_edited ()
 {
   QString t = mp_search_edit_box->text ();
 
-  for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
+  for (std::vector<QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
     if ((*v)->model () == mp_search_model) {
       mp_search_model->set_filter_mode (mp_filter->isChecked ());
       if (t.isEmpty ()) {
@@ -409,10 +394,9 @@ LibrariesView::search_edited ()
   }
 }
 
-void
-LibrariesView::search_next ()
+void LibrariesView::search_next ()
 {
-  for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
+  for (std::vector<QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
     if ((*v)->model () == mp_search_model) {
       QModelIndex found = mp_search_model->locate_next ();
       if (found.isValid ()) {
@@ -424,10 +408,9 @@ LibrariesView::search_next ()
   }
 }
 
-void
-LibrariesView::search_prev ()
+void LibrariesView::search_prev ()
 {
-  for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
+  for (std::vector<QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
     if ((*v)->model () == mp_search_model) {
       QModelIndex found = mp_search_model->locate_prev ();
       if (found.isValid ()) {
@@ -439,14 +422,13 @@ LibrariesView::search_prev ()
   }
 }
 
-void
-LibrariesView::search_editing_finished ()
+void LibrariesView::search_editing_finished ()
 {
   if (! mp_search_frame->isVisible ()) {
     return;
   }
 
-  for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
+  for (std::vector<QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
     CellTreeModel *m = dynamic_cast<CellTreeModel *> ((*v)->model ());
     if (m) {
       m->clear_locate ();
@@ -465,60 +447,52 @@ LibrariesView::search_editing_finished ()
   mp_search_model = 0;
 }
 
-void
-LibrariesView::middle_clicked (const QModelIndex & /*index*/)
+void LibrariesView::middle_clicked (const QModelIndex & /*index*/)
 {
   //  ... nothing yet ..
 }
 
-void
-LibrariesView::header_clicked ()
+void LibrariesView::header_clicked ()
 {
   //  ... nothing yet ..
 }
 
-void
-LibrariesView::clicked (const QModelIndex & /*index*/)
+void LibrariesView::clicked (const QModelIndex & /*index*/)
 {
   //  ... nothing yet ..
 }
 
-void
-LibrariesView::double_clicked (const QModelIndex & /*index*/)
+void LibrariesView::double_clicked (const QModelIndex & /*index*/)
 {
   //  ... nothing yet ..
 }
 
-void
-LibrariesView::set_background_color (tl::Color c)
+void LibrariesView::set_background_color (tl::Color c)
 {
   m_background_color = c;
-  for (std::vector <QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
+  for (std::vector<QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
     QPalette pl ((*f)->palette ());
     pl.setColor (QPalette::Base, QColor (c.rgb ()));
     (*f)->setPalette (pl);
   }
 }
 
-void
-LibrariesView::set_text_color (tl::Color c)
+void LibrariesView::set_text_color (tl::Color c)
 {
   m_text_color = c;
-  for (std::vector <QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
+  for (std::vector<QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
     QPalette pl ((*f)->palette ());
     pl.setColor (QPalette::Text, QColor (c.rgb ()));
     (*f)->setPalette (pl);
   }
 }
 
-void
-LibrariesView::update_required ()
+void LibrariesView::update_required ()
 {
   m_do_full_update_content_dm ();
 }
 
-void
-LibrariesView::do_full_update_content ()
+void LibrariesView::do_full_update_content ()
 {
   size_t i = 0;
   for (db::LibraryManager::iterator lib = db::LibraryManager::instance ().begin (); lib != db::LibraryManager::instance ().end (); ++lib, ++i) {
@@ -533,15 +507,14 @@ LibrariesView::do_full_update_content ()
   do_update_content ();
 }
 
-void
-LibrariesView::do_update_content (int lib_index)
+void LibrariesView::do_update_content (int lib_index)
 {
   //  close the search box since we will modify the model
   mp_search_frame->hide ();
   mp_search_model = 0;
 
   size_t imin = (lib_index < 0 ? 0 : (size_t) lib_index);
-  size_t imax = (lib_index < 0 ? std::numeric_limits <size_t>::max () : (size_t) lib_index);
+  size_t imax = (lib_index < 0 ? std::numeric_limits<size_t>::max () : (size_t) lib_index);
   std::string tech_name;
 
   //  rebuild all events
@@ -567,7 +540,7 @@ LibrariesView::do_update_content (int lib_index)
   }
 
   for (size_t i = imin; i < libraries.size () && i <= imax; ++i) {
-    if (i < m_libraries.size () && ! m_libraries[i].get ()) {
+    if (i < m_libraries.size () && ! m_libraries [i].get ()) {
       tl_assert (i < m_force_close.size ());
       m_force_close [i] = true;
     }
@@ -592,7 +565,6 @@ LibrariesView::do_update_content (int lib_index)
     }
 
     m_libraries [i].reset (libraries [i]);
-
   }
 
   if (m_libraries.size () < libraries.size ()) {
@@ -662,7 +634,6 @@ LibrariesView::do_update_content (int lib_index)
     mp_cell_list_headers.push_back (header);
 
     mp_splitter->addWidget (cl_frame);
-
   }
 
   while (mp_cell_lists.size () > m_libraries.size ()) {
@@ -705,31 +676,27 @@ LibrariesView::do_update_content (int lib_index)
 
         m_force_close [i] = false;
 
-        CellTreeModel *model = dynamic_cast <CellTreeModel *> (mp_cell_lists [i]->model ());
+        CellTreeModel *model = dynamic_cast<CellTreeModel *> (mp_cell_lists [i]->model ());
         if (model) {
           model->configure (m_libraries [i].get (), CellTreeModel::Flat | CellTreeModel::TopCells | CellTreeModel::BasicCells | CellTreeModel::HidePrivate | CellTreeModel::WithVariants | CellTreeModel::WithIcons, 0);
         }
-
       }
 
       m_needs_update [i] = false;
 
-      mp_cell_lists [i]->doItemsLayout ();   //  triggers a redraw -> the model might need this
-
+      mp_cell_lists [i]->doItemsLayout (); //  triggers a redraw -> the model might need this
     }
 
     mp_cell_list_headers [i]->setVisible (split_mode && m_libraries.size () > 1);
     mp_cell_list_headers [i]->setChecked (int (i) == m_active_index);
 
     mp_cell_list_frames [i]->setVisible (int (i) == m_active_index || split_mode);
-
   }
 }
 
-void
-LibrariesView::select_active_lib_by_name (const std::string &name)
+void LibrariesView::select_active_lib_by_name (const std::string &name)
 {
-  for (std::vector<tl::weak_ptr<db::Library> >::const_iterator i = m_libraries.begin (); i != m_libraries.end (); ++i) {
+  for (std::vector<tl::weak_ptr<db::Library>>::const_iterator i = m_libraries.begin (); i != m_libraries.end (); ++i) {
     if (i->get () && (*i)->get_name () == name) {
       select_active (int (i - m_libraries.begin ()));
       break;
@@ -737,8 +704,7 @@ LibrariesView::select_active_lib_by_name (const std::string &name)
   }
 }
 
-void
-LibrariesView::select_active (int lib_index)
+void LibrariesView::select_active (int lib_index)
 {
   if (lib_index != m_active_index) {
     mp_selector->setCurrentIndex (lib_index);
@@ -755,8 +721,7 @@ LibrariesView::active_lib ()
   return 0;
 }
 
-void
-LibrariesView::selection_changed (int index)
+void LibrariesView::selection_changed (int index)
 {
   if (index != m_active_index) {
 
@@ -771,7 +736,7 @@ LibrariesView::selection_changed (int index)
     }
 
     int i = 0;
-    for (std::vector <QFrame *>::const_iterator f = mp_cell_list_frames.begin (); f != mp_cell_list_frames.end (); ++f, ++i) {
+    for (std::vector<QFrame *>::const_iterator f = mp_cell_list_frames.begin (); f != mp_cell_list_frames.end (); ++f, ++i) {
       (*f)->setVisible (i == index || split_mode);
       if (i == index) {
         mp_cell_lists [i]->setFocus ();
@@ -779,12 +744,11 @@ LibrariesView::selection_changed (int index)
     }
 
     i = 0;
-    for (std::vector <QToolButton *>::const_iterator f = mp_cell_list_headers.begin (); f != mp_cell_list_headers.end (); ++f, ++i) {
+    for (std::vector<QToolButton *>::const_iterator f = mp_cell_list_headers.begin (); f != mp_cell_list_headers.end (); ++f, ++i) {
       (*f)->setChecked (i == index);
     }
 
     emit active_library_changed (index);
-
   }
 }
 
@@ -817,8 +781,7 @@ LibrariesView::current_item () const
   }
 }
 
-bool
-LibrariesView::has_focus () const
+bool LibrariesView::has_focus () const
 {
   return m_active_index >= 0 && m_active_index < int (mp_cell_lists.size ()) && mp_cell_lists [m_active_index]->hasFocus ();
 }

@@ -33,22 +33,22 @@ class TestableTriangulationRExtractor
 public:
   TestableTriangulationRExtractor ()
     : pex::TriangulationRExtractor (0.001)
-  { }
+  {
+  }
 };
 
 }
 
-TEST(extraction)
+TEST (extraction)
 {
-  db::Point contour[] = {
+  db::Point contour [] = {
     db::Point (0, 0),
     db::Point (0, 100),
     db::Point (1000, 100),
-    db::Point (1000, 0)
-  };
+    db::Point (1000, 0)};
 
   db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour [0]));
 
   double dbu = 0.001;
 
@@ -56,29 +56,27 @@ TEST(extraction)
   pex::TriangulationRExtractor rex (dbu);
 
   std::vector<db::Point> vertex_ports;
-  vertex_ports.push_back (db::Point (0, 50));     //  V0
-  vertex_ports.push_back (db::Point (1000, 50));  //  V1
+  vertex_ports.push_back (db::Point (0, 50));    //  V0
+  vertex_ports.push_back (db::Point (1000, 50)); //  V1
 
   std::vector<db::Polygon> polygon_ports;
 
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (true),
-    "R V0(0,0.05;0,0.05) V1(1,0.05;1,0.05) 10.0938"
-  )
+             "R V0(0,0.05;0,0.05) V1(1,0.05;1,0.05) 10.0938")
 }
 
-TEST(extraction_with_polygon_ports)
+TEST (extraction_with_polygon_ports)
 {
-  db::Point contour[] = {
+  db::Point contour [] = {
     db::Point (0, 0),
     db::Point (0, 100),
     db::Point (1000, 100),
-    db::Point (1000, 0)
-  };
+    db::Point (1000, 0)};
 
   db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour [0]));
 
   double dbu = 0.001;
 
@@ -94,21 +92,19 @@ TEST(extraction_with_polygon_ports)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (true),
-    "R P0(-0.1,0;0,0.1) P1(1,0;1.1,0.1) 10"
-  )
+             "R P0(-0.1,0;0,0.1) P1(1,0;1.1,0.1) 10")
 }
 
-TEST(extraction_with_polygon_ports_inside)
+TEST (extraction_with_polygon_ports_inside)
 {
-  db::Point contour[] = {
+  db::Point contour [] = {
     db::Point (-100, 0),
     db::Point (-100, 100),
     db::Point (1100, 100),
-    db::Point (1100, 0)
-  };
+    db::Point (1100, 0)};
 
   db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour [0]));
 
   double dbu = 0.001;
 
@@ -124,21 +120,19 @@ TEST(extraction_with_polygon_ports_inside)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P0 P1 10"
-  )
+             "R P0 P1 10")
 }
 
-TEST(extraction_split_by_ports)
+TEST (extraction_split_by_ports)
 {
-  db::Point contour[] = {
+  db::Point contour [] = {
     db::Point (-100, 0),
     db::Point (-100, 100),
     db::Point (1100, 100),
-    db::Point (1100, 0)
-  };
+    db::Point (1100, 0)};
 
   db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour [0]));
 
   double dbu = 0.001;
 
@@ -155,22 +149,20 @@ TEST(extraction_split_by_ports)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P0 P2 5\n"
-    "R P1 P2 5"
-  )
+             "R P0 P2 5\n"
+             "R P1 P2 5")
 }
 
-TEST(extraction_split_by_butting_port)
+TEST (extraction_split_by_butting_port)
 {
-  db::Point contour[] = {
+  db::Point contour [] = {
     db::Point (-100, 0),
     db::Point (-100, 100),
     db::Point (1100, 100),
-    db::Point (1100, 0)
-  };
+    db::Point (1100, 0)};
 
   db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour [0]));
 
   double dbu = 0.001;
 
@@ -187,23 +179,21 @@ TEST(extraction_split_by_butting_port)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P0 P2 4.84211\n"
-    "R P1 P2 4.84211\n"
-    "R P0 P1 281.111"
-  )
+             "R P0 P2 4.84211\n"
+             "R P1 P2 4.84211\n"
+             "R P0 P1 281.111")
 }
 
-TEST(extraction_with_outside_polygon_port)
+TEST (extraction_with_outside_polygon_port)
 {
-  db::Point contour[] = {
+  db::Point contour [] = {
     db::Point (-100, 0),
     db::Point (-100, 100),
     db::Point (1100, 100),
-    db::Point (1100, 0)
-  };
+    db::Point (1100, 0)};
 
   db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour [0]));
 
   double dbu = 0.001;
 
@@ -220,21 +210,19 @@ TEST(extraction_with_outside_polygon_port)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P0 P1 11"
-  )
+             "R P0 P1 11")
 }
 
-TEST(extraction_with_polygon_ports_and_vertex_port_inside)
+TEST (extraction_with_polygon_ports_and_vertex_port_inside)
 {
-  db::Point contour[] = {
+  db::Point contour [] = {
     db::Point (-100, 0),
     db::Point (-100, 100),
     db::Point (1100, 100),
-    db::Point (1100, 0)
-  };
+    db::Point (1100, 0)};
 
   db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour [0]));
 
   double dbu = 0.001;
 
@@ -251,9 +239,8 @@ TEST(extraction_with_polygon_ports_and_vertex_port_inside)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P0 V0 0\n"    //  shorted because V0 is inside P0
-    "R P0 P1 10"
-  )
+             "R P0 V0 0\n" //  shorted because V0 is inside P0
+             "R P0 P1 10")
 }
 
 static db::Polygon ellipse (const db::Box &box, int npoints)
@@ -275,7 +262,7 @@ static db::Polygon ellipse (const db::Box &box, int npoints)
   return c;
 }
 
-TEST(extraction_analytic_disc)
+TEST (extraction_analytic_disc)
 {
   db::Coord r1 = 2000;
   db::Coord r2 = 10000;
@@ -301,7 +288,7 @@ TEST(extraction_analytic_disc)
   rex.extract (disc, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P0 P1 0.245558"    //  theoretical: 1/(2*PI)*log(r2/r1) = 0.25615 with r2=10000, r1=2000
+             "R P0 P1 0.245558" //  theoretical: 1/(2*PI)*log(r2/r1) = 0.25615 with r2=10000, r1=2000
   )
 
   rex.triangulation_parameters ().max_area = 100000 * dbu * dbu;
@@ -309,13 +296,13 @@ TEST(extraction_analytic_disc)
   rex.extract (disc, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P0 P1 0.255609"    //  theoretical: 1/(2*PI)*log(r2/r1) = 0.25615 with r2=10000, r1=2000
+             "R P0 P1 0.255609" //  theoretical: 1/(2*PI)*log(r2/r1) = 0.25615 with r2=10000, r1=2000
   )
 }
 
-TEST(extraction_meander)
+TEST (extraction_meander)
 {
-  db::Point contour[] = {
+  db::Point contour [] = {
     db::Point (0, 0),
     db::Point (0, 1000),
     db::Point (1600, 1000),
@@ -335,11 +322,10 @@ TEST(extraction_meander)
     db::Point (1000, 0),
     db::Point (1000, 400),
     db::Point (600, 400),
-    db::Point (600, 0)
-  };
+    db::Point (600, 0)};
 
   db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour [0]));
 
   double dbu = 0.001;
 
@@ -349,31 +335,30 @@ TEST(extraction_meander)
   rex.triangulation_parameters ().min_b = 0.3;
 
   std::vector<db::Point> vertex_ports;
-  vertex_ports.push_back (db::Point (300, 0));      //  V0
-  vertex_ports.push_back (db::Point (4300, 1000));  //  V1
+  vertex_ports.push_back (db::Point (300, 0));     //  V0
+  vertex_ports.push_back (db::Point (4300, 1000)); //  V1
 
   std::vector<db::Polygon> polygon_ports;
 
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R V0 V1 8.61417"          //  what is the "real" value?
+             "R V0 V1 8.61417" //  what is the "real" value?
   )
 }
 
-TEST(extraction_issue2111)
+TEST (extraction_issue2111)
 {
-  db::Point contour[] = {
+  db::Point contour [] = {
     db::Point (0, 0),
     db::Point (0, 740),
     db::Point (435, 740),
     db::Point (435, 100),
     db::Point (365, 100),
-    db::Point (365, 0)
-  };
+    db::Point (365, 0)};
 
   db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour [0]));
 
   double dbu = 0.001;
 
@@ -391,7 +376,5 @@ TEST(extraction_issue2111)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P0 V0 0.133103"
-  )
+             "R P0 V0 0.133103")
 }
-

@@ -81,53 +81,53 @@ static void run_test_public (tl::TestBase *_this, const char *file, const char *
   do_run_test (_this, layout, fn_au, opt);
 }
 
-TEST(Polygons1a)
+TEST (Polygons1a)
 {
   db::DXFWriterOptions opt;
   run_test_public (_this, "dxf1.gds", "dxf1a_au.dxf", opt);
 }
 
-TEST(Polygons1b)
+TEST (Polygons1b)
 {
   db::DXFWriterOptions opt;
   opt.polygon_mode = 1;
   run_test_public (_this, "dxf1.gds", "dxf1b_au.dxf", opt);
 }
 
-TEST(Polygons1c)
+TEST (Polygons1c)
 {
   db::DXFWriterOptions opt;
   opt.polygon_mode = 2;
   run_test_public (_this, "dxf1.gds", "dxf1c_au.dxf", opt);
 }
 
-TEST(Polygons1d)
+TEST (Polygons1d)
 {
   db::DXFWriterOptions opt;
   opt.polygon_mode = 3;
   run_test_public (_this, "dxf1.gds", "dxf1d_au.dxf", opt);
 }
 
-TEST(Polygons1e)
+TEST (Polygons1e)
 {
   db::DXFWriterOptions opt;
   opt.polygon_mode = 4;
   run_test_public (_this, "dxf1.gds", "dxf1e_au.dxf", opt);
 }
 
-TEST(Polygons2)
+TEST (Polygons2)
 {
   db::DXFWriterOptions opt;
   run_test_public (_this, "dxf2.gds", "dxf2_au.dxf", opt);
 }
 
-TEST(Polygons3)
+TEST (Polygons3)
 {
   db::DXFWriterOptions opt;
   run_test_public (_this, "dxf3.gds", "dxf3_au.dxf", opt);
 }
 
-TEST(Polygons4a)
+TEST (Polygons4a)
 {
   db::Layout l;
   std::string fn = tl::testdata () + "/dxf/dxf4.gds";
@@ -150,7 +150,7 @@ TEST(Polygons4a)
   do_run_test (_this, l, tl::testdata () + std::string ("/dxf/") + "dxf4a_au.dxf", opt);
 }
 
-TEST(Polygons4b)
+TEST (Polygons4b)
 {
   db::Layout l;
   std::string fn = tl::testdata () + "/dxf/dxf4.gds";
@@ -174,7 +174,7 @@ TEST(Polygons4b)
   do_run_test (_this, l, tl::testdata () + std::string ("/dxf/") + "dxf4b_au.dxf", opt);
 }
 
-TEST(Polygons4c)
+TEST (Polygons4c)
 {
   db::Layout l;
   std::string fn = tl::testdata () + "/dxf/dxf4.gds";
@@ -198,7 +198,7 @@ TEST(Polygons4c)
   do_run_test (_this, l, tl::testdata () + std::string ("/dxf/") + "dxf4c_au.dxf", opt);
 }
 
-TEST(Polygons4d)
+TEST (Polygons4d)
 {
   db::Layout l;
   std::string fn = tl::testdata () + "/dxf/dxf4.gds";
@@ -222,7 +222,7 @@ TEST(Polygons4d)
   do_run_test (_this, l, tl::testdata () + std::string ("/dxf/") + "dxf4d_au.dxf", opt);
 }
 
-TEST(Polygons4e)
+TEST (Polygons4e)
 {
   db::Layout l;
   std::string fn = tl::testdata () + "/dxf/dxf4.gds";

@@ -44,10 +44,11 @@ namespace db
 class TilingProcessor;
 
 /**
- *  @brief A receiver for the output data 
+ *  @brief A receiver for the output data
  */
 class DB_PUBLIC TileOutputReceiver
-  : public gsi::ObjectBase, public tl::Object
+  : public gsi::ObjectBase,
+    public tl::Object
 {
 public:
   /**
@@ -68,7 +69,7 @@ public:
   }
 
   /**
-   *  @brief Initiate the deliver 
+   *  @brief Initiate the deliver
    *
    *  This method is called before the first tile delivers it's data.
    *
@@ -79,17 +80,17 @@ public:
    *  @param dy The tile's y dimension
    *  @param frame The overall frame covered
    *
-   *  The tile's coordinates will be p0+(ix*dx,iy*dy),p0+((ix+1)*dx,(iy+1)*dy) 
+   *  The tile's coordinates will be p0+(ix*dx,iy*dy),p0+((ix+1)*dx,(iy+1)*dy)
    *  where ix=0..nx-1, iy=0..ny-1.
    *
    *  All coordinates are given in micron. If tiles are not used, nx and ny are 0.
    */
-  virtual void begin (size_t /*nx*/, size_t /*ny*/, const db::DPoint &/*p0*/, double /*dx*/, double /*dy*/, const db::DBox & /*frame*/) { }
+  virtual void begin (size_t /*nx*/, size_t /*ny*/, const db::DPoint & /*p0*/, double /*dx*/, double /*dy*/, const db::DBox & /*frame*/) {}
 
   /**
    *  @brief Deliver an object for one tile
    *
-   *  Delivery is protected by a mutex - only one thread will access the 
+   *  Delivery is protected by a mutex - only one thread will access the
    *  receiver at one time.
    *
    *  The interpretation of the object remains subject to the implementation.
@@ -103,13 +104,13 @@ public:
    *  @param trans The transformation
    *  @param clip If true, clipping at the tile box is requested
    */
-  virtual void put (size_t /*ix*/, size_t /*iy*/, const db::Box &/*tile*/, size_t /*id*/, const tl::Variant & /*obj*/, double /*dbu*/, const db::ICplxTrans & /*trans*/, bool /*clip*/) { }
+  virtual void put (size_t /*ix*/, size_t /*iy*/, const db::Box & /*tile*/, size_t /*id*/, const tl::Variant & /*obj*/, double /*dbu*/, const db::ICplxTrans & /*trans*/, bool /*clip*/) {}
 
   /**
    *  @brief Indicate the end of the execution
    *  @param success Will be true if all tiles executed successfully
    */
-  virtual void finish (bool /*success*/) { }
+  virtual void finish (bool /*success*/) {}
 
   /**
    *  @brief Gets the tiling processor the receiver is attached to
@@ -171,9 +172,9 @@ void insert (X &inserter, const db::Polygon &o, const db::Box &tile, bool clip)
   } else if (clip && ! o.box ().inside (tile)) {
     //  apply clipping
     if (o.box ().touches (tile)) {
-      std::vector <db::Polygon> clipped_poly;
+      std::vector<db::Polygon> clipped_poly;
       db::clip_poly (o, tile, clipped_poly);
-      for (std::vector <db::Polygon>::const_iterator cp = clipped_poly.begin (); cp != clipped_poly.end (); ++cp) {
+      for (std::vector<db::Polygon>::const_iterator cp = clipped_poly.begin (); cp != clipped_poly.end (); ++cp) {
         inserter (*cp);
       }
     }
@@ -198,9 +199,9 @@ void insert (X &inserter, const db::SimplePolygon &o, const db::Box &tile, bool 
   } else if (clip && ! o.box ().inside (tile)) {
     //  apply clipping
     if (o.box ().touches (tile)) {
-      std::vector <db::SimplePolygon> clipped_poly;
+      std::vector<db::SimplePolygon> clipped_poly;
       db::clip_poly (o, tile, clipped_poly);
-      for (std::vector <db::SimplePolygon>::const_iterator cp = clipped_poly.begin (); cp != clipped_poly.end (); ++cp) {
+      for (std::vector<db::SimplePolygon>::const_iterator cp = clipped_poly.begin (); cp != clipped_poly.end (); ++cp) {
         inserter (*cp);
       }
     }
@@ -291,17 +292,15 @@ void insert (X &inserter, const db::Edge &o, const db::Box &tile, bool clip)
         db::Coord dy = ce.second.dy ();
         db::Coord x = ce.second.p1 ().x ();
         db::Coord y = ce.second.p1 ().y ();
-        if ((dx == 0 && x == tile.left ()   && dy < 0) ||
-            (dx == 0 && x == tile.right ()  && dy > 0) ||
-            (dy == 0 && y == tile.top ()    && dx < 0) ||
+        if ((dx == 0 && x == tile.left () && dy < 0) ||
+            (dx == 0 && x == tile.right () && dy > 0) ||
+            (dy == 0 && y == tile.top () && dx < 0) ||
             (dy == 0 && y == tile.bottom () && dx > 0)) {
           //  not counted -> box is at outside side of the edge
         } else {
           inserter (ce.second);
         }
-
       }
-
     }
 
   } else {
@@ -423,10 +422,10 @@ bool insert_var (X &inserter, const tl::Variant &obj, const db::Box &tile, bool 
  *  (written in tl::Expressions language) on tiles of a layout. Multiple
  *  scripts can be registered per tile.
  *
- *  Multiple inputs can be specified. Custom functions can be registered to 
+ *  Multiple inputs can be specified. Custom functions can be registered to
  *  implement additional functionality.
  *  Multiple outputs can also be specified. Each output channel is assigned a name
- *  which will be available to the script through a variable. To output an object 
+ *  which will be available to the script through a variable. To output an object
  *  use _output(name, object).
  *
  *  Inside the scripts provided, the following variables and functions are
@@ -440,7 +439,10 @@ bool insert_var (X &inserter, const tl::Variant &obj, const db::Box &tile, bool 
 class DB_PUBLIC TilingProcessor
 {
 public:
-  enum Type { TypeRegion, TypeEdges, TypeEdgePairs, TypeTexts };
+  enum Type { TypeRegion,
+              TypeEdges,
+              TypeEdgePairs,
+              TypeTexts };
 
   /**
    *  @brief Constructor
@@ -449,7 +451,7 @@ public:
 
   /**
    *  @brief Destructor
-   */ 
+   */
   ~TilingProcessor ();
 
   /**
@@ -463,16 +465,16 @@ public:
    *  @brief Specifies an input
    *
    *  The name is the variable name which will receive the shapes for the individual tile.
-   *  The transformation can be used to convert between database units.  
+   *  The transformation can be used to convert between database units.
    *  If "as_region" is false, the input is taken as edge input.
    */
   void input (const std::string &name, const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans = db::ICplxTrans (), Type type = TypeRegion, bool merged_semantics = true);
 
   /**
-   *  @brief Specifies the output 
+   *  @brief Specifies the output
    *
    *  The name is the variable which carries the context information.
-   *  In the script, the output given by this specification can be referred to as 
+   *  In the script, the output given by this specification can be referred to as
    *  _output(name, object).
    *
    *  This version will employ the output receiver given by "rec". "id" will be passed
@@ -485,7 +487,7 @@ public:
   /**
    *  @brief Specifies output to a layout
    *
-   *  This version will specify output to a layout object to the specified cell and layer. 
+   *  This version will specify output to a layout object to the specified cell and layer.
    *  The ep_ext parameter specifies what extension to apply when converting edge pairs to polygons.
    */
   void output (const std::string &name, db::Layout &layout, db::cell_index_type cell, const db::LayerProperties &lp, db::Coord ep_ext = 1);
@@ -493,7 +495,7 @@ public:
   /**
    *  @brief Specifies output to a layout
    *
-   *  This version will specify output to a layout object to the specified cell and layer. 
+   *  This version will specify output to a layout object to the specified cell and layer.
    *  The ep_ext parameter specifies what extension to apply when converting edge pairs to polygons.
    */
   void output (const std::string &name, db::Layout &layout, db::cell_index_type cell, unsigned int layer, db::Coord ep_ext = 1);
@@ -540,10 +542,10 @@ public:
   /**
    *  @brief Sets the database unit under which the computation will be done
    *
-   *  Using this method will establish the given database unit as the target unit. 
+   *  Using this method will establish the given database unit as the target unit.
    *  Otherwise, the first input's database unit will be used.
    */
-  void set_dbu (double dbu) 
+  void set_dbu (double dbu)
   {
     m_dbu_specific_set = true;
     m_dbu_specific = dbu;
@@ -589,7 +591,7 @@ public:
   }
 
   /**
-   *  @brief Sets the tile size 
+   *  @brief Sets the tile size
    *
    *  The tile size is given in micron units.
    *  Alternatively, the tiling can be specified in terms of tile number (tiles method).
@@ -598,7 +600,7 @@ public:
   void tile_size (double w, double h);
 
   /**
-   *  @brief Sets the tile number 
+   *  @brief Sets the tile number
    *
    *  Specifies how many tiles to use.
    *  Alternatively, the tiling can be specified in terms of tile size (tile_size method).
@@ -607,7 +609,7 @@ public:
   void tiles (size_t nx, size_t ny);
 
   /**
-   *  @brief Sets the tile border 
+   *  @brief Sets the tile border
    *
    *  The tile border specifies the amount by which the tiles overlap.
    *  The tile border is given in micron units.
@@ -617,8 +619,8 @@ public:
   /**
    *  @brief Sets the tile origin
    *
-   *  If the tile origin is specified, the lower left corner of the 
-   *  lower left tile is fixed and will not be moved. 
+   *  If the tile origin is specified, the lower left corner of the
+   *  lower left tile is fixed and will not be moved.
    */
   void tile_origin (double xo, double yo);
 
@@ -638,7 +640,7 @@ public:
   /**
    *  @brief Queue a script for execution with "execute"
    *
-   *  Multiple scripts can be installed. They will be executed in parallel (if the number 
+   *  Multiple scripts can be installed. They will be executed in parallel (if the number
    *  of threads allows).
    */
   void queue (const std::string &script);
@@ -663,9 +665,8 @@ private:
   friend class TilingProcessorOutputFunction;
   friend class TilingProcessorReceiverFunction;
 
-  struct InputSpec
-  {
-    InputSpec () : type (TilingProcessor::TypeRegion), merged_semantics (false) { }
+  struct InputSpec {
+    InputSpec () : type (TilingProcessor::TypeRegion), merged_semantics (false) {}
     std::string name;
     db::RecursiveShapeIterator iter;
     db::ICplxTrans trans;
@@ -673,9 +674,8 @@ private:
     bool merged_semantics;
   };
 
-  struct OutputSpec
-  {
-    OutputSpec () : id (0) { }
+  struct OutputSpec {
+    OutputSpec () : id (0) {}
     std::string name;
     size_t id;
     tl::shared_ptr<db::TileOutputReceiver> receiver;
@@ -710,4 +710,3 @@ private:
 }
 
 #endif
-

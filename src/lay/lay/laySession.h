@@ -37,11 +37,11 @@ namespace lay
 
 class MainWindow;
 
-struct SessionLayoutDescriptor
-{
+struct SessionLayoutDescriptor {
   SessionLayoutDescriptor ()
     : save_options_valid (false)
-  { }
+  {
+  }
 
   std::string name;
   std::string file_path;
@@ -50,16 +50,14 @@ struct SessionLayoutDescriptor
   bool save_options_valid;
 };
 
-struct SessionAnnotationDescriptor
-{
+struct SessionAnnotationDescriptor {
   std::string class_name;
   std::string value_string;
 };
 
-struct SessionHiddenCellNames
-{
+struct SessionHiddenCellNames {
   std::vector<std::string> hidden_cell_names;
-  
+
   std::vector<std::string>::const_iterator begin () const { return hidden_cell_names.begin (); }
   std::vector<std::string>::const_iterator end () const { return hidden_cell_names.end (); }
   void push_back (const std::string &name) { hidden_cell_names.push_back (name); }
@@ -67,17 +65,15 @@ struct SessionHiddenCellNames
   void reserve (size_t n) { hidden_cell_names.reserve (n); }
 };
 
-struct SessionCellViewDescriptor
-{
+struct SessionCellViewDescriptor {
   std::string layout_name;
   std::string tech_name;
   SessionHiddenCellNames hidden_cell_names;
 };
 
-struct SessionCellViewDescriptors
-{
+struct SessionCellViewDescriptors {
   std::vector<SessionCellViewDescriptor> cellviews;
-  
+
   std::vector<SessionCellViewDescriptor>::const_iterator begin () const { return cellviews.begin (); }
   std::vector<SessionCellViewDescriptor>::const_iterator end () const { return cellviews.end (); }
   void push_back (const SessionCellViewDescriptor &desc) { cellviews.push_back (desc); }
@@ -85,8 +81,7 @@ struct SessionCellViewDescriptors
   void reserve (size_t n) { cellviews.reserve (n); }
 };
 
-struct SessionAnnotationShapes
-{
+struct SessionAnnotationShapes {
   std::vector<SessionAnnotationDescriptor> annotation_shapes;
 
   std::vector<SessionAnnotationDescriptor>::const_iterator begin_annotation_shapes () const { return annotation_shapes.begin (); }
@@ -95,12 +90,11 @@ struct SessionAnnotationShapes
   SessionAnnotationDescriptor &back () { return annotation_shapes.back (); }
 };
 
-struct SessionViewDescriptor
-{
-  SessionViewDescriptor () : current_layer_list (0), active_cellview (-1) { }
+struct SessionViewDescriptor {
+  SessionViewDescriptor () : current_layer_list (0), active_cellview (-1) {}
 
   //  backward compatibility helper
-  void set_layer_properties(const lay::LayerPropertiesList &list)
+  void set_layer_properties (const lay::LayerPropertiesList &list)
   {
     layer_properties_lists.clear ();
     layer_properties_lists.push_back (list);
@@ -182,4 +176,3 @@ private:
 }
 
 #endif
-

@@ -49,7 +49,7 @@ struct PyGetSetDef;
 
 namespace gsi
 {
-  class MethodBase;
+class MethodBase;
 }
 
 namespace pya
@@ -59,15 +59,23 @@ namespace pya
  *  Two helper macros that frame a piece of code which potentially executes Python code
  */
 
-#define PYTHON_BEGIN_EXEC \
-  try { \
-    if (PythonInterpreter::instance ()) { PythonInterpreter::instance ()->begin_execution (); }
+#define PYTHON_BEGIN_EXEC                                 \
+  try {                                                   \
+    if (PythonInterpreter::instance ()) {                 \
+      PythonInterpreter::instance ()->begin_execution (); \
+    }
 
-#define PYTHON_END_EXEC \
-    if (PythonInterpreter::instance ()) { PythonInterpreter::instance ()->end_execution (); } \
-  } catch (...) { \
-    if (PythonInterpreter::instance ()) { PythonInterpreter::instance ()->end_execution (); } \
-    throw; \
+#define PYTHON_END_EXEC                                 \
+  if (PythonInterpreter::instance ()) {                 \
+    PythonInterpreter::instance ()->end_execution ();   \
+  }                                                     \
+  }                                                     \
+  catch (...)                                           \
+  {                                                     \
+    if (PythonInterpreter::instance ()) {               \
+      PythonInterpreter::instance ()->end_execution (); \
+    }                                                   \
+    throw;                                              \
   }
 
 /**
@@ -77,8 +85,8 @@ class PYA_PUBLIC PythonError
   : public tl::ScriptError
 {
 public:
-  PythonError (const char *msg, const char *cls, const std::vector <tl::BacktraceElement> &backtrace);
-  PythonError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <tl::BacktraceElement> &backtrace);
+  PythonError (const char *msg, const char *cls, const std::vector<tl::BacktraceElement> &backtrace);
+  PythonError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector<tl::BacktraceElement> &backtrace);
   PythonError (const PythonError &d);
 };
 

@@ -43,7 +43,7 @@ namespace tl
  *
  *    typedef long_uint<4, uint32_t, uint64_t> __uint128;
  */
-template<unsigned int N, class B, class BI>
+template <unsigned int N, class B, class BI>
 class long_uint
 {
 public:
@@ -58,7 +58,7 @@ public:
   long_uint ()
   {
     for (unsigned int i = 0; i < N; ++i) {
-      b[i] = 0;
+      b [i] = 0;
     }
   }
 
@@ -73,15 +73,15 @@ public:
     unsigned int tbits = sizeof (T) * 8;
 
     while (tbits > 0) {
-      b[i] = B (t);
+      b [i] = B (t);
       if (tbits > bits) {
         t >>= bits;
       }
       tbits -= bits;
       ++i;
     }
-    for ( ; i < N; ++i) {
-      b[i] = 0;
+    for (; i < N; ++i) {
+      b [i] = 0;
     }
   }
 
@@ -97,13 +97,13 @@ public:
     T t = 0;
 
     if (tbits <= bits) {
-      t = T (b[0]);
+      t = T (b [0]);
     } else {
       unsigned int i = sizeof (T) / sizeof (B);
-      for ( ; i > 0 && tbits > 0; ) {
+      for (; i > 0 && tbits > 0;) {
         --i;
         t <<= bits;
-        t |= b[i];
+        t |= b [i];
         tbits -= bits;
       }
     }
@@ -114,11 +114,11 @@ public:
   /**
    *  @brief Initialize the universal unsigned int from another one with a different width
    */
-  template<unsigned int N2>
+  template <unsigned int N2>
   long_uint (const long_uint<N2, B, BI> &o)
   {
     for (unsigned int i = 0; i < N; ++i) {
-      b[i] = i < N2 ? o.b[i] : 0;
+      b [i] = i < N2 ? o.b [i] : 0;
     }
   }
 
@@ -129,7 +129,7 @@ public:
   bool is_zero () const
   {
     for (unsigned int i = 0; i < N; ++i) {
-      if (b[i]) {
+      if (b [i]) {
         return false;
       }
     }
@@ -142,7 +142,7 @@ public:
   bool operator== (const long_uint<N, B, BI> &o) const
   {
     for (unsigned int i = 0; i < N; ++i) {
-      if (b[i] != o.b[i]) {
+      if (b [i] != o.b [i]) {
         return false;
       }
     }
@@ -154,7 +154,7 @@ public:
    */
   bool operator!= (const long_uint<N, B, BI> &b) const
   {
-    return !operator== (b);
+    return ! operator== (b);
   }
 
   /**
@@ -162,10 +162,10 @@ public:
    */
   bool operator< (const long_uint<N, B, BI> &o) const
   {
-    for (unsigned int i = N; i > 0; ) {
+    for (unsigned int i = N; i > 0;) {
       --i;
-      if (b[i] != o.b[i]) {
-        return b[i] < o.b[i];
+      if (b [i] != o.b [i]) {
+        return b [i] < o.b [i];
       }
     }
     return false;
@@ -176,7 +176,7 @@ public:
    */
   bool operator>= (const long_uint<N, B, BI> &b) const
   {
-    return !operator< (b);
+    return ! operator< (b);
   }
 
   /**
@@ -205,10 +205,10 @@ public:
 
     for (unsigned int i = 0; i < N; ++i) {
       for (unsigned int j = 0; j < N2; ++j) {
-        BI p = BI (b[i]) * BI (o.b[j]);
+        BI p = BI (b [i]) * BI (o.b [j]);
         unsigned int n = i + j;
         while (p > 0) {
-          B &r = res.b[n];
+          B &r = res.b [n];
           B rold = r;
           r += B (p);
           p >>= bits;
@@ -236,11 +236,11 @@ public:
   /**
    *  @brief Bitwise inversion
    */
-  long_uint<N, B, BI> operator~ () const
+  long_uint<N, B, BI> operator~() const
   {
     long_uint<N, B, BI> res = *this;
     for (unsigned int i = 0; i < N; ++i) {
-      res.b[i] = ~res.b[i];
+      res.b [i] = ~res.b [i];
     }
     return res;
   }
@@ -261,7 +261,7 @@ public:
   long_uint<N, B, BI> &operator&= (const long_uint<N, B, BI> &o)
   {
     for (unsigned int i = 0; i < N; ++i) {
-      b[i] &= o.b[i];
+      b [i] &= o.b [i];
     }
     return *this;
   }
@@ -282,7 +282,7 @@ public:
   long_uint<N, B, BI> &operator^= (const long_uint<N, B, BI> &o)
   {
     for (unsigned int i = 0; i < N; ++i) {
-      b[i] ^= o.b[i];
+      b [i] ^= o.b [i];
     }
     return *this;
   }
@@ -303,7 +303,7 @@ public:
   long_uint<N, B, BI> &operator|= (const long_uint<N, B, BI> &o)
   {
     for (unsigned int i = 0; i < N; ++i) {
-      b[i] |= o.b[i];
+      b [i] |= o.b [i];
     }
     return *this;
   }
@@ -336,22 +336,22 @@ public:
     unsigned int w = n / bits;
     if (w > 0) {
       n -= w * bits;
-      for (unsigned int i = N - w; i > 0; ) {
+      for (unsigned int i = N - w; i > 0;) {
         --i;
-        b[i + w] = b[i];
+        b [i + w] = b [i];
       }
       for (unsigned int i = 0; i < w; ++i) {
-        b[i] = 0;
+        b [i] = 0;
       }
     }
 
     B carry = 0;
     for (unsigned int i = 0; i < N; ++i) {
-      BI p = b[i];
+      BI p = b [i];
       p <<= n;
       p |= carry;
       carry = B (p >> bits);
-      b[i] = B (p);
+      b [i] = B (p);
     }
   }
 
@@ -385,22 +385,22 @@ public:
     if (w > 0) {
       n -= w * bits;
       for (unsigned int i = 0; i < N - w; ++i) {
-        b[i] = b[i + w];
+        b [i] = b [i + w];
       }
       for (unsigned int i = N - w; i < N; ++i) {
-        b[i] = sign ? ~B (0) : B (0);
+        b [i] = sign ? ~B (0) : B (0);
       }
     }
 
     if (n > 0) {
       B carry = sign ? (~B (0) << (bits - n)) : 0;
-      for (unsigned int i = N; i > 0; ) {
+      for (unsigned int i = N; i > 0;) {
         --i;
-        BI p = BI (b[i]) << bits;
+        BI p = BI (b [i]) << bits;
         p >>= n;
         p |= (BI (carry) << bits);
         carry = B (p);
-        b[i] = B (p >> bits);
+        b [i] = B (p >> bits);
       }
     }
   }
@@ -414,7 +414,7 @@ public:
     unsigned int i = n / bits;
     n -= i * bits;
     if (i < N) {
-      b[i] |= (1 << n);
+      b [i] |= (1 << n);
     }
   }
 
@@ -424,13 +424,13 @@ public:
   unsigned int zero_bits_from_msb () const
   {
     unsigned int zb = 0;
-    for (unsigned int i = N; i > 0; ) {
+    for (unsigned int i = N; i > 0;) {
       --i;
-      if (!b[i]) {
+      if (! b [i]) {
         zb += bits;
       } else {
         B m = 1 << (bits - 1);
-        B n = b[i];
+        B n = b [i];
         while (! (n & m)) {
           ++zb;
           n <<= 1;
@@ -446,7 +446,7 @@ public:
    *  This method returns the division of *this and d (the divider) in the first
    *  element of the returned pair and the modulo value (remainder) in the second.
    */
-  std::pair<long_uint<N, B, BI>, long_uint<N, B, BI> > divmod (const long_uint<N, B, BI> &d) const
+  std::pair<long_uint<N, B, BI>, long_uint<N, B, BI>> divmod (const long_uint<N, B, BI> &d) const
   {
     long_uint<N, B, BI> rem = *this;
     long_uint<N, B, BI> div;
@@ -476,7 +476,6 @@ public:
         div.set_bit (shift);
         rem -= sub;
       }
-
     }
 
     return std::make_pair (div, rem);
@@ -525,8 +524,8 @@ public:
 
     B carry = o;
     for (unsigned int i = 0; i < N; ++i) {
-      B &r = res.b[i];
-      r = b[i];
+      B &r = res.b [i];
+      r = b [i];
       B rold = r;
       r += carry;
       carry = 0;
@@ -545,7 +544,7 @@ public:
   {
     B carry = o;
     for (unsigned int i = 0; i < N; ++i) {
-      B &r = b[i];
+      B &r = b [i];
       B rold = r;
       r += carry;
       carry = 0;
@@ -566,8 +565,8 @@ public:
 
     B carry = 0;
     for (unsigned int i = 0; i < N; ++i) {
-      B &r = res.b[i];
-      r = b[i];
+      B &r = res.b [i];
+      r = b [i];
       B rold = r;
       r += carry;
       carry = 0;
@@ -575,7 +574,7 @@ public:
         carry = 1;
       }
       rold = r;
-      r += o.b[i];
+      r += o.b [i];
       if (r < rold) {
         carry = 1;
       }
@@ -591,7 +590,7 @@ public:
   {
     B carry = 0;
     for (unsigned int i = 0; i < N; ++i) {
-      B &r = b[i];
+      B &r = b [i];
       B rold = r;
       r += carry;
       carry = 0;
@@ -599,7 +598,7 @@ public:
         carry = 1;
       }
       rold = r;
-      r += o.b[i];
+      r += o.b [i];
       if (r < rold) {
         carry = 1;
       }
@@ -617,8 +616,8 @@ public:
 
     B carry = 0;
     for (unsigned int i = 0; i < N; ++i) {
-      B &r = res.b[i];
-      r = b[i];
+      B &r = res.b [i];
+      r = b [i];
       B rold = r;
       r -= carry;
       carry = 0;
@@ -626,7 +625,7 @@ public:
         carry = 1;
       }
       rold = r;
-      r -= o.b[i];
+      r -= o.b [i];
       if (r > rold) {
         carry = 1;
       }
@@ -642,7 +641,7 @@ public:
   {
     B carry = 0;
     for (unsigned int i = 0; i < N; ++i) {
-      B &r = b[i];
+      B &r = b [i];
       B rold = r;
       r -= carry;
       carry = 0;
@@ -650,7 +649,7 @@ public:
         carry = 1;
       }
       rold = r;
-      r -= o.b[i];
+      r -= o.b [i];
       if (r > rold) {
         carry = 1;
       }
@@ -668,8 +667,8 @@ public:
 
     B carry = o;
     for (unsigned int i = 0; i < N; ++i) {
-      B &r = res.b[i];
-      r = b[i];
+      B &r = res.b [i];
+      r = b [i];
       B rold = r;
       r -= carry;
       carry = 0;
@@ -688,7 +687,7 @@ public:
   {
     B carry = o;
     for (unsigned int i = 0; i < N; ++i) {
-      B &r = b[i];
+      B &r = b [i];
       B rold = r;
       r -= carry;
       carry = 0;
@@ -700,7 +699,7 @@ public:
     return *this;
   }
 
-  B b[N];
+  B b [N];
 };
 
 /**
@@ -717,7 +716,7 @@ public:
  *
  *    typedef long_int<4, uint32_t, uint64_t> __int128;
  */
-template<unsigned int N, class B, class BI>
+template <unsigned int N, class B, class BI>
 class long_int
   : public long_uint<N, B, BI>
 {
@@ -742,7 +741,7 @@ public:
     unsigned int tbits = sizeof (T) * 8;
 
     for (unsigned int i = 0; i < N; ++i) {
-      long_uint<N, B, BI>::b[i] = B (t);
+      long_uint<N, B, BI>::b [i] = B (t);
       if (tbits <= long_uint<N, B, BI>::bits) {
         t = (t < 0 ? ~B (0) : 0);
       } else {
@@ -763,13 +762,13 @@ public:
     T t = 0;
 
     if (tbits <= long_uint<N, B, BI>::bits) {
-      t = T (long_uint<N, B, BI>::b[0]);
+      t = T (long_uint<N, B, BI>::b [0]);
     } else {
       unsigned int i = sizeof (T) / sizeof (B);
-      for ( ; i > 0 && tbits > 0; ) {
+      for (; i > 0 && tbits > 0;) {
         --i;
         t <<= long_uint<N, B, BI>::bits;
-        t |= long_uint<N, B, BI>::b[i];
+        t |= long_uint<N, B, BI>::b [i];
         tbits -= long_uint<N, B, BI>::bits;
       }
     }
@@ -782,7 +781,7 @@ public:
    *  Sign inversion will happen, if the unsigned int is bigger than the maximum value
    *  representable by our type.
    */
-  template<unsigned int N2>
+  template <unsigned int N2>
   long_int (const long_uint<N2, B, BI> &o)
     : long_uint<N, B, BI> (o)
   {
@@ -792,7 +791,7 @@ public:
   /**
    *  @brief Initialize the universal int from another one with a different width
    */
-  template<unsigned int N2>
+  template <unsigned int N2>
   long_int (const long_int<N2, B, BI> &o)
     : long_uint<N, B, BI> (o)
   {
@@ -805,7 +804,7 @@ public:
    */
   bool is_neg () const
   {
-    return (long_uint<N, B, BI>::b[N - 1] & (1 << (long_uint<N, B, BI>::bits - 1))) != 0;
+    return (long_uint<N, B, BI>::b [N - 1] & (1 << (long_uint<N, B, BI>::bits - 1))) != 0;
   }
 
   /**
@@ -815,7 +814,7 @@ public:
   bool is_zero () const
   {
     for (unsigned int i = 0; i < N; ++i) {
-      if (long_uint<N, B, BI>::b[i]) {
+      if (long_uint<N, B, BI>::b [i]) {
         return false;
       }
     }
@@ -848,7 +847,7 @@ public:
    */
   bool operator>= (const long_uint<N, B, BI> &b) const
   {
-    return !operator< (b);
+    return ! operator< (b);
   }
 
   /**
@@ -856,7 +855,7 @@ public:
    */
   bool operator>= (const long_int<N, B, BI> &b) const
   {
-    return !operator< (b);
+    return ! operator< (b);
   }
 
   /**
@@ -933,7 +932,7 @@ public:
   template <unsigned int N2>
   long_int<N, B, BI> &operator*= (const long_uint<N2, B, BI> &o)
   {
-    long_uint<N, B, BI>::operator= (*this * o);
+    long_uint<N, B, BI>::operator= (*this *o);
     return *this;
   }
 
@@ -990,7 +989,7 @@ public:
    *  This method returns the division of *this and d (the divider) in the first
    *  element of the returned pair and the modulo value (remainder) in the second.
    */
-  std::pair<long_uint<N, B, BI>, long_uint<N, B, BI> > divmod (const long_uint<N, B, BI> &d) const
+  std::pair<long_uint<N, B, BI>, long_uint<N, B, BI>> divmod (const long_uint<N, B, BI> &d) const
   {
     return long_uint<N, B, BI>::divmod (d);
   }
@@ -1034,21 +1033,21 @@ public:
    *  This method returns the division of *this and d (the divider) in the first
    *  element of the returned pair and the modulo value (remainder) in the second.
    */
-  std::pair<long_int<N, B, BI>, long_int<N, B, BI> > divmod (const long_int<N, B, BI> &d) const
+  std::pair<long_int<N, B, BI>, long_int<N, B, BI>> divmod (const long_int<N, B, BI> &d) const
   {
-    if (is_neg () && !d.is_neg ()) {
-      std::pair<long_uint<N, B, BI>, long_uint<N, B, BI> > res = (-*this).long_uint<N, B, BI>::divmod (d);
+    if (is_neg () && ! d.is_neg ()) {
+      std::pair<long_uint<N, B, BI>, long_uint<N, B, BI>> res = (-*this).long_uint<N, B, BI>::divmod (d);
       return std::make_pair (-long_int<N, B, BI> (res.first), -long_int<N, B, BI> (res.second));
     } else if (! is_neg () && d.is_neg ()) {
-      std::pair<long_uint<N, B, BI>, long_uint<N, B, BI> > res = long_uint<N, B, BI>::divmod (-d);
+      std::pair<long_uint<N, B, BI>, long_uint<N, B, BI>> res = long_uint<N, B, BI>::divmod (-d);
       //  The definition of the modulo sign is consistent with int arithmetics
       return std::make_pair (-long_int<N, B, BI> (res.first), long_int<N, B, BI> (res.second));
     } else if (is_neg () && d.is_neg ()) {
-      std::pair<long_uint<N, B, BI>, long_uint<N, B, BI> > res = (-*this).long_uint<N, B, BI>::divmod (-d);
+      std::pair<long_uint<N, B, BI>, long_uint<N, B, BI>> res = (-*this).long_uint<N, B, BI>::divmod (-d);
       //  The definition of the modulo sign is consistent with int arithmetics
       return std::make_pair (long_int<N, B, BI> (res.first), -long_int<N, B, BI> (res.second));
     } else {
-      std::pair<long_uint<N, B, BI>, long_uint<N, B, BI> > res = long_uint<N, B, BI>::divmod (d);
+      std::pair<long_uint<N, B, BI>, long_uint<N, B, BI>> res = long_uint<N, B, BI>::divmod (d);
       return std::make_pair (long_int<N, B, BI> (res.first), long_int<N, B, BI> (res.second));
     }
   }
@@ -1193,7 +1192,7 @@ public:
 /**
  *  @brief Less operator with unsigned and signed
  */
-template<unsigned int N, class B, class BI>
+template <unsigned int N, class B, class BI>
 bool operator< (const long_uint<N, B, BI> &a, const long_int<N, B, BI> &b)
 {
   //  we cast both arguments to unsigned (as C++ does)
@@ -1203,16 +1202,16 @@ bool operator< (const long_uint<N, B, BI> &a, const long_int<N, B, BI> &b)
 /**
  *  @brief Less or equal operator with unsigned and signed
  */
-template<unsigned int N, class B, class BI>
+template <unsigned int N, class B, class BI>
 bool operator<= (const long_uint<N, B, BI> &a, const long_int<N, B, BI> &b)
 {
-  return !(b < a);
+  return ! (b < a);
 }
 
 /**
  *  @brief Greater operator with unsigned and signed
  */
-template<unsigned int N, class B, class BI>
+template <unsigned int N, class B, class BI>
 bool operator> (const long_uint<N, B, BI> &a, const long_int<N, B, BI> &b)
 {
   return b < a;
@@ -1221,16 +1220,16 @@ bool operator> (const long_uint<N, B, BI> &a, const long_int<N, B, BI> &b)
 /**
  *  @brief Greater or equal operator with unsigned and signed
  */
-template<unsigned int N, class B, class BI>
+template <unsigned int N, class B, class BI>
 bool operator>= (const long_uint<N, B, BI> &a, const long_int<N, B, BI> &b)
 {
-  return !(a < b);
+  return ! (a < b);
 }
 
 /**
  *  @brief Multiplication with unsigned and signed
  */
-template<unsigned int N, unsigned int N2, class B, class BI>
+template <unsigned int N, unsigned int N2, class B, class BI>
 long_uint<N, B, BI> operator* (const long_uint<N, B, BI> &a, const long_int<N2, B, BI> &b)
 {
   return a.operator* (b);
@@ -1239,7 +1238,7 @@ long_uint<N, B, BI> operator* (const long_uint<N, B, BI> &a, const long_int<N2, 
 /**
  *  @brief Division with unsigned and signed
  */
-template<unsigned int N, class B, class BI>
+template <unsigned int N, class B, class BI>
 long_uint<N, B, BI> operator/ (const long_uint<N, B, BI> &a, const long_int<N, B, BI> &b)
 {
   return a.operator/ (b);
@@ -1248,7 +1247,7 @@ long_uint<N, B, BI> operator/ (const long_uint<N, B, BI> &a, const long_int<N, B
 /**
  *  @brief Modulo with unsigned and signed
  */
-template<unsigned int N, class B, class BI>
+template <unsigned int N, class B, class BI>
 long_uint<N, B, BI> operator% (const long_uint<N, B, BI> &a, const long_int<N, B, BI> &b)
 {
   return a.operator% (b);
@@ -1257,7 +1256,7 @@ long_uint<N, B, BI> operator% (const long_uint<N, B, BI> &a, const long_int<N, B
 /**
  *  @brief Addition with unsigned and signed
  */
-template<unsigned int N, class B, class BI>
+template <unsigned int N, class B, class BI>
 long_uint<N, B, BI> operator+ (const long_uint<N, B, BI> &a, const long_int<N, B, BI> &b)
 {
   return a.operator+ (b);
@@ -1266,7 +1265,7 @@ long_uint<N, B, BI> operator+ (const long_uint<N, B, BI> &a, const long_int<N, B
 /**
  *  @brief Subtraction with unsigned and signed
  */
-template<unsigned int N, class B, class BI>
+template <unsigned int N, class B, class BI>
 long_uint<N, B, BI> operator- (const long_uint<N, B, BI> &a, const long_int<N, B, BI> &b)
 {
   return a.operator- (b);

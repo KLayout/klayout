@@ -64,7 +64,7 @@ namespace lay
 class LibraryTreeWidget
   : public QTreeView
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LibraryTreeWidget (QWidget *parent, const char *name, QWidget *key_event_receiver);
@@ -100,7 +100,7 @@ class LAYUI_PUBLIC LibrariesView
   : public QFrame,
     public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -233,11 +233,11 @@ private:
   db::Layout *mp_layout;
   bool m_enable_cb;
   lay::LayoutViewBase *mp_view;
-  std::vector <QTreeView *> mp_cell_lists;
-  std::vector <QToolButton *> mp_cell_list_headers;
-  std::vector <QFrame *> mp_cell_list_frames;
-  std::vector <bool> m_force_close;
-  std::vector <bool> m_needs_update;
+  std::vector<QTreeView *> mp_cell_lists;
+  std::vector<QToolButton *> mp_cell_list_headers;
+  std::vector<QFrame *> mp_cell_list_frames;
+  std::vector<bool> m_force_close;
+  std::vector<bool> m_needs_update;
   int m_active_index;
   bool m_split_mode;
   QComboBox *mp_selector;
@@ -254,7 +254,7 @@ private:
   tl::DeferredMethod<LibrariesView> m_do_update_content_dm;
   tl::DeferredMethod<LibrariesView> m_do_full_update_content_dm;
   std::unique_ptr<QStyle> mp_tree_style;
-  std::vector<tl::weak_ptr<db::Library> > m_libraries;
+  std::vector<tl::weak_ptr<db::Library>> m_libraries;
 
   //  event listener for changes in the cellview and layout
   void update_required ();
@@ -276,4 +276,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

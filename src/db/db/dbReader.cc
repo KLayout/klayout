@@ -42,8 +42,8 @@ join_layer_names (std::string &s, const std::string &n)
   if (! s.empty ()) {
 
     size_t i = s.find (n);
-    if (i != std::string::npos && (i == 0 || s.c_str ()[i - 1] == ';')) {
-      char after = s.c_str ()[i + n.size ()];
+    if (i != std::string::npos && (i == 0 || s.c_str () [i - 1] == ';')) {
+      char after = s.c_str () [i + n.size ()];
       if (after == 0 || after == ';') {
         //  n is already contained in s
         return;
@@ -51,7 +51,6 @@ join_layer_names (std::string &s, const std::string &n)
     }
 
     s += ";";
-
   }
 
   s += n;
@@ -60,23 +59,21 @@ join_layer_names (std::string &s, const std::string &n)
 // ---------------------------------------------------------------
 //  ReaderBase implementation
 
-ReaderBase::ReaderBase () 
+ReaderBase::ReaderBase ()
   : m_warnings_as_errors (false), m_warn_level (1), m_warn_count_for_same_message (0), m_first_warning (true), m_expected_dbu (0.0)
-{ 
+{
 }
 
-ReaderBase::~ReaderBase () 
-{ 
+ReaderBase::~ReaderBase ()
+{
 }
 
-void
-ReaderBase::set_warnings_as_errors (bool f)
+void ReaderBase::set_warnings_as_errors (bool f)
 {
   m_warnings_as_errors = f;
 }
 
-void
-ReaderBase::init (const db::LoadLayoutOptions &options)
+void ReaderBase::init (const db::LoadLayoutOptions &options)
 {
   m_warn_level = options.warn_level ();
   m_last_warning.clear ();
@@ -84,16 +81,14 @@ ReaderBase::init (const db::LoadLayoutOptions &options)
   m_first_warning = true;
 }
 
-bool
-ReaderBase::first_warning ()
+bool ReaderBase::first_warning ()
 {
   bool f = m_first_warning;
   m_first_warning = false;
   return f;
 }
 
-int
-ReaderBase::compress_warning (const std::string &msg)
+int ReaderBase::compress_warning (const std::string &msg)
 {
   const int max_warnings = 10;
 
@@ -114,14 +109,12 @@ ReaderBase::compress_warning (const std::string &msg)
   }
 }
 
-void
-ReaderBase::set_expected_dbu (double dbu)
+void ReaderBase::set_expected_dbu (double dbu)
 {
   m_expected_dbu = dbu;
 }
 
-void
-ReaderBase::check_dbu (double dbu) const
+void ReaderBase::check_dbu (double dbu) const
 {
   if (m_expected_dbu > db::epsilon && fabs (dbu - m_expected_dbu) > db::epsilon) {
     throw ReaderException (tl::sprintf (tl::to_string (tr ("Former and present database units are not compatible: %.12g (former) vs. %.12g (present)")), m_expected_dbu, dbu));
@@ -153,7 +146,6 @@ Reader::Reader (tl::InputStream &stream)
         mp_actual_reader = rdr->create_reader (m_stream);
       }
     }
-
   }
 
   if (! mp_actual_reader) {
@@ -163,7 +155,6 @@ Reader::Reader (tl::InputStream &stream)
     bool has_more (m_stream.get (1) != 0);
 
     throw db::ReaderUnknownFormatException (tl::to_string (tr ("Stream has unknown format: ")) + stream.source (), head, has_more);
-
   }
 }
 
@@ -192,4 +183,3 @@ Reader::read (db::Layout &layout)
 }
 
 }
-

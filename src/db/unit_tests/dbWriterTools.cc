@@ -24,9 +24,9 @@
 #include "dbWriterTools.h"
 #include "tlUnitTest.h"
 
-TEST(1) 
+TEST (1)
 {
-  db::WriterCellNameMap m(10);
+  db::WriterCellNameMap m (10);
 
   m.allow_standard (true, true, true);
   m.replacement ('~');
@@ -92,5 +92,3 @@ TEST(1)
   m.insert (304, "0BCDEFGHIJX");
   EXPECT_EQ (m.cell_name (304), "0BCDEFGH$1");
 }
-
-

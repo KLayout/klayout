@@ -21,10 +21,10 @@
 */
 
 #if defined(HAVE_QT)
-#  include <QEvent>
-#  include <QPainter>
-#  include <QApplication>
-#  include <QWheelEvent>
+#include <QEvent>
+#include <QPainter>
+#include <QApplication>
+#include <QWheelEvent>
 #endif
 
 #include "tlTimer.h"
@@ -36,7 +36,7 @@
 #include "layEditorOptionsPage.h"
 #include "layMarker.h"
 #if defined(HAVE_QT)
-#  include "gtf.h"
+#include "gtf.h"
 #endif
 
 #include "layBitmapsToImage.h"
@@ -52,9 +52,9 @@ namespace lay
 /**
  *  @brief Returns a value indicating whether the needed entry can make use of the one in the cache
  */
-static bool applies (const lay::RedrawLayerInfo &in_cache, const lay::RedrawLayerInfo &needed) 
+static bool applies (const lay::RedrawLayerInfo &in_cache, const lay::RedrawLayerInfo &needed)
 {
-  if (needed.visible && !in_cache.visible) {
+  if (needed.visible && ! in_cache.visible) {
     return false;
   }
 
@@ -73,7 +73,7 @@ static bool applies (const lay::RedrawLayerInfo &in_cache, const lay::RedrawLaye
   }
 
   for (size_t i = 0; i < needed.trans.size (); ++i) {
-    if (! needed.trans[i].equal (in_cache.trans[i])) {
+    if (! needed.trans [i].equal (in_cache.trans [i])) {
       return false;
     }
   }
@@ -83,13 +83,13 @@ static bool applies (const lay::RedrawLayerInfo &in_cache, const lay::RedrawLaye
 
 ImageCacheEntry::ImageCacheEntry (const lay::Viewport &vp, const std::vector<lay::RedrawLayerInfo> &layers, bool precious)
   : m_opened (true), m_trans (vp.trans ()), m_layers (layers), m_width (vp.width ()), m_height (vp.height ()), m_precious (precious)
-{ 
-  //  .. nothing yet .. 
+{
+  //  .. nothing yet ..
 }
 
 bool ImageCacheEntry::equals (const lay::Viewport &vp, const std::vector<lay::RedrawLayerInfo> &layers) const
 {
-  if (!m_trans.equal (vp.trans ()) || m_width != vp.width () || m_height != vp.height ()) {
+  if (! m_trans.equal (vp.trans ()) || m_width != vp.width () || m_height != vp.height ()) {
     return false;
   }
 
@@ -125,15 +125,14 @@ void ImageCacheEntry::swap (ImageCacheEntry &other)
 
 std::string ImageCacheEntry::to_string () const
 {
-  return std::string (m_opened ? "(" : "") + std::string (m_precious ? "*" : " ") + 
+  return std::string (m_opened ? "(" : "") + std::string (m_precious ? "*" : " ") +
          tl::to_string (m_width) + "x" + tl::to_string (m_height) + " " +
          m_trans.to_string () + std::string (m_opened ? ")" : "");
 }
 
 // ----------------------------------------------------------------------------
 
-void 
-invert (unsigned char *data, unsigned int width, unsigned int height)
+void invert (unsigned char *data, unsigned int width, unsigned int height)
 {
   unsigned int nbytes = (width + 7) / 8;
   unsigned char *psrc = data;
@@ -166,7 +165,7 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
   m_gamma = 2.0;
 
   //  some reasonable initializations for the size
-  m_viewport.set_size (100, 100); 
+  m_viewport.set_size (100, 100);
   m_viewport_l.set_size (m_viewport.width () * m_oversampling, m_viewport.height () * m_oversampling);
 
   mp_redraw_thread = new lay::RedrawThread (this, view);
@@ -215,8 +214,7 @@ LayoutCanvas::font_resolution () const
 }
 
 #if defined(HAVE_QT)
-void
-LayoutCanvas::init_ui (QWidget *parent)
+void LayoutCanvas::init_ui (QWidget *parent)
 {
   lay::ViewObjectUI::init_ui (parent);
 
@@ -231,13 +229,11 @@ LayoutCanvas::init_ui (QWidget *parent)
     set_colors (bg, fg, active);
 
     widget ()->setAttribute (Qt::WA_NoSystemBackground);
-
   }
 }
 #endif
 
-void
-LayoutCanvas::key_event (unsigned int key, unsigned int buttons)
+void LayoutCanvas::key_event (unsigned int key, unsigned int buttons)
 {
   if (int (key) == lay::KeyTab || int (key) == lay::KeyBacktab) {
     auto page = first_toolbox_widget ();
@@ -267,8 +263,7 @@ LayoutCanvas::key_event (unsigned int key, unsigned int buttons)
   }
 }
 
-bool
-LayoutCanvas::shortcut_override_event (unsigned int key, unsigned int /*buttons*/)
+bool LayoutCanvas::shortcut_override_event (unsigned int key, unsigned int /*buttons*/)
 {
   if (int (key) == lay::KeyTab || int (key) == lay::KeyBacktab) {
     return first_toolbox_widget () != 0;
@@ -294,14 +289,12 @@ LayoutCanvas::first_toolbox_widget ()
   return 0;
 }
 
-void
-LayoutCanvas::set_image_cache_size (size_t sz)
+void LayoutCanvas::set_image_cache_size (size_t sz)
 {
   m_image_cache_size = sz;
 }
 
-void
-LayoutCanvas::set_oversampling (unsigned int os)
+void LayoutCanvas::set_oversampling (unsigned int os)
 {
   if (os != m_oversampling) {
     m_image_cache.clear ();
@@ -311,8 +304,7 @@ LayoutCanvas::set_oversampling (unsigned int os)
   }
 }
 
-void
-LayoutCanvas::set_highres_mode (bool hrm)
+void LayoutCanvas::set_highres_mode (bool hrm)
 {
   if (hrm != m_hrm) {
     m_image_cache.clear ();
@@ -321,8 +313,7 @@ LayoutCanvas::set_highres_mode (bool hrm)
   }
 }
 
-void
-LayoutCanvas::set_subres_mode (bool srm)
+void LayoutCanvas::set_subres_mode (bool srm)
 {
   if (srm != m_srm) {
     m_image_cache.clear ();
@@ -341,13 +332,12 @@ LayoutCanvas::dpr () const
 #endif
 }
 
-void 
-LayoutCanvas::set_colors (tl::Color background, tl::Color foreground, tl::Color active)
+void LayoutCanvas::set_colors (tl::Color background, tl::Color foreground, tl::Color active)
 {
   m_background = background.rgb ();
   m_foreground = foreground.rgb ();
   m_active = active.rgb ();
-      
+
   //  force regeneration of background image ..
   if (mp_image_bg) {
     delete mp_image_bg;
@@ -357,8 +347,7 @@ LayoutCanvas::set_colors (tl::Color background, tl::Color foreground, tl::Color 
   update_image ();
 }
 
-void
-LayoutCanvas::set_view_ops (std::vector <lay::ViewOp> &view_ops)
+void LayoutCanvas::set_view_ops (std::vector<lay::ViewOp> &view_ops)
 {
   if (view_ops != m_view_ops) {
     m_view_ops.swap (view_ops);
@@ -367,8 +356,7 @@ LayoutCanvas::set_view_ops (std::vector <lay::ViewOp> &view_ops)
   }
 }
 
-void
-LayoutCanvas::set_dither_pattern (const lay::DitherPattern &p)
+void LayoutCanvas::set_dither_pattern (const lay::DitherPattern &p)
 {
   if (p != m_dither_pattern) {
     m_dither_pattern = p;
@@ -376,8 +364,7 @@ LayoutCanvas::set_dither_pattern (const lay::DitherPattern &p)
   }
 }
 
-void
-LayoutCanvas::set_line_styles (const lay::LineStyles &s)
+void LayoutCanvas::set_line_styles (const lay::LineStyles &s)
 {
   if (s != m_line_styles) {
     m_line_styles = s;
@@ -385,7 +372,7 @@ LayoutCanvas::set_line_styles (const lay::LineStyles &s)
   }
 }
 
-const std::vector <lay::ViewOp> &
+const std::vector<lay::ViewOp> &
 LayoutCanvas::scaled_view_ops (unsigned int lw)
 {
   if (lw <= 1) {
@@ -406,15 +393,14 @@ LayoutCanvas::scaled_view_ops (unsigned int lw)
   return scaled_view_ops;
 }
 
-void
-LayoutCanvas::prepare_drawing ()
+void LayoutCanvas::prepare_drawing ()
 {
   if (m_need_redraw) {
 
     BitmapViewObjectCanvas::set_size (m_viewport_l.width (), m_viewport_l.height (), resolution (), font_resolution ());
 
     if (! mp_image ||
-        (unsigned int) mp_image->width () != m_viewport_l.width () || 
+        (unsigned int) mp_image->width () != m_viewport_l.width () ||
         (unsigned int) mp_image->height () != m_viewport_l.height ()) {
       if (mp_image) {
         delete mp_image;
@@ -429,10 +415,10 @@ LayoutCanvas::prepare_drawing ()
     mp_image->fill (m_background);
 
     //  Cancel any pending "finish" event so there is no race between finish and restart (important for caching)
-    m_do_end_of_drawing_dm.cancel (); 
+    m_do_end_of_drawing_dm.cancel ();
 
     //  look for a cache entry we may reuse
-    std::vector <ImageCacheEntry>::iterator c;
+    std::vector<ImageCacheEntry>::iterator c;
     for (c = m_image_cache.begin (); c != m_image_cache.end (); ++c) {
       if (! c->opened () && c->equals (m_viewport_l, m_layers) && can_restore_data (c->data ())) {
         break;
@@ -456,7 +442,7 @@ LayoutCanvas::prepare_drawing ()
 
     } else {
 
-      bool precious = m_viewport_l.target_box ().equal (m_precious_box); 
+      bool precious = m_viewport_l.target_box ().equal (m_precious_box);
 
       //  discard all open cache entries and reset all previously precious ones
       for (size_t i = 0; i < m_image_cache.size (); ++i) {
@@ -477,7 +463,7 @@ LayoutCanvas::prepare_drawing ()
       } else {
 
         if (m_image_cache_size == 1) {
-          if (precious || (!m_image_cache.empty () && !m_image_cache.front ().precious ())) {
+          if (precious || (! m_image_cache.empty () && ! m_image_cache.front ().precious ())) {
             m_image_cache.clear ();
           }
         } else if (m_image_cache.size () > m_image_cache_size - 1) {
@@ -493,7 +479,6 @@ LayoutCanvas::prepare_drawing ()
         if (m_image_cache.size () < m_image_cache_size) {
           m_image_cache.push_back (ImageCacheEntry (m_viewport_l, m_layers, precious));
         }
-
       }
 
       if (m_redraw_clearing) {
@@ -501,7 +486,6 @@ LayoutCanvas::prepare_drawing ()
       } else {
         mp_redraw_thread->restart (m_need_redraw_layer);
       }
-
     }
 
     //  for short draw jobs, the drawing is already done now. For others display the busy cursor.
@@ -512,12 +496,10 @@ LayoutCanvas::prepare_drawing ()
     m_need_redraw = false;
     m_redraw_force_update = false;
     m_update_image = true;
-
   }
 }
 
-void
-LayoutCanvas::update_image ()
+void LayoutCanvas::update_image ()
 {
   // this will make the image being redone (except for background objects which will
   // only be redrawn on touch_bg)
@@ -526,8 +508,7 @@ LayoutCanvas::update_image ()
   update (); // produces a paintEvent()
 }
 
-void
-LayoutCanvas::free_resources ()
+void LayoutCanvas::free_resources ()
 {
   if (mp_image_fg) {
     delete mp_image_fg;
@@ -536,8 +517,7 @@ LayoutCanvas::free_resources ()
 }
 
 #if defined(HAVE_QT)
-void
-LayoutCanvas::paint_event ()
+void LayoutCanvas::paint_event ()
 {
   //  this is the update image request
   tl::SelfTimer timer_info (tl::verbosity () >= 41, tl::to_string (QObject::tr ("PaintEvent")));
@@ -546,8 +526,8 @@ LayoutCanvas::paint_event ()
   prepare_drawing ();
 
   if (mp_image) {
-    
-    //  check, if the background needs to be updated 
+
+    //  check, if the background needs to be updated
     if (m_update_image || needs_update_bg ()) {
 
       if (needs_update_bg () || ! mp_image_bg) {
@@ -576,7 +556,6 @@ LayoutCanvas::paint_event ()
       }
 
       m_update_image = false;
-
     }
 
     //  create a base pixmap consisting of the layout with background
@@ -588,7 +567,7 @@ LayoutCanvas::paint_event ()
 
       if (mp_image_fg) {
         delete mp_image_fg;
-      } 
+      }
 
       clear_fg_bitmaps ();
       do_render (m_viewport_l, *this, true);
@@ -620,9 +599,7 @@ LayoutCanvas::paint_event ()
         subsampled_image.set_transparent (mp_image->transparent ());
         mp_image->subsample (subsampled_image, m_oversampling, m_gamma);
         *mp_image_fg = subsampled_image;
-
       }
-
     }
 
     //  erase any previous data
@@ -664,18 +641,15 @@ LayoutCanvas::paint_event ()
 #endif
         painter.drawImage (QPoint (0, 0), img);
       }
-
     }
 
-    //  erase dynamic bitmaps 
+    //  erase dynamic bitmaps
     clear_fg_bitmaps ();
 
 #if QT_VERSION < 0x050000
     QApplication::syncX ();
 #endif
-
   }
-
 }
 #endif
 
@@ -800,7 +774,7 @@ private:
 };
 
 tl::PixelBuffer
-LayoutCanvas::image (unsigned int width, unsigned int height) 
+LayoutCanvas::image (unsigned int width, unsigned int height)
 {
   return image_with_options (width, height, -1, -1, -1.0, -1.0, tl::Color (), tl::Color (), tl::Color (), db::DBox ());
 }
@@ -844,7 +818,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
   BitmapRedrawThreadCanvas rd_canvas;
   DetachedViewObjectCanvas vo_canvas (background, foreground, active, width * oversampling, height * oversampling, resolution, font_resolution, &img);
 
-  //  compute the new viewport 
+  //  compute the new viewport
   db::DBox tb (target_box);
   if (tb.empty ()) {
     tb = m_viewport.target_box ();
@@ -915,7 +889,7 @@ LayoutCanvas::image_with_options_mono (unsigned int width, unsigned int height, 
 }
 
 tl::PixelBuffer
-LayoutCanvas::screenshot () 
+LayoutCanvas::screenshot ()
 {
   //  if required, start the redraw thread ..
   prepare_drawing ();
@@ -944,8 +918,7 @@ LayoutCanvas::screenshot ()
   return img;
 }
 
-void
-LayoutCanvas::resize_event (unsigned int width, unsigned int height)
+void LayoutCanvas::resize_event (unsigned int width, unsigned int height)
 {
   unsigned int w = (unsigned int) ceil (width * dpr () - db::epsilon);
   unsigned int h = (unsigned int) ceil (height * dpr () - db::epsilon);
@@ -965,12 +938,10 @@ LayoutCanvas::resize_event (unsigned int width, unsigned int height)
     mouse_event_trans (db::DCplxTrans (1.0 / dpr ()) * m_viewport.trans ());
     do_redraw_all (true);
     viewport_changed_event ();
-
   }
 }
 
-void 
-LayoutCanvas::update_viewport ()
+void LayoutCanvas::update_viewport ()
 {
   mouse_event_trans (db::DCplxTrans (1.0 / dpr ()) * m_viewport.trans ());
   for (service_iterator svc = begin_services (); svc != end_services (); ++svc) {
@@ -986,16 +957,14 @@ LayoutCanvas::global_trans () const
   return m_viewport.global_trans ();
 }
 
-void
-LayoutCanvas::set_global_trans (const db::DCplxTrans &global_trans)
+void LayoutCanvas::set_global_trans (const db::DCplxTrans &global_trans)
 {
   m_viewport.set_global_trans (global_trans);
   m_viewport_l.set_global_trans (global_trans);
   update_viewport ();
 }
 
-void
-LayoutCanvas::zoom_box (const db::DBox &box, bool precious)
+void LayoutCanvas::zoom_box (const db::DBox &box, bool precious)
 {
   if (precious) {
     m_precious_box = box;
@@ -1005,24 +974,21 @@ LayoutCanvas::zoom_box (const db::DBox &box, bool precious)
   update_viewport ();
 }
 
-void
-LayoutCanvas::zoom_trans (const db::DCplxTrans &trans)
+void LayoutCanvas::zoom_trans (const db::DCplxTrans &trans)
 {
   m_viewport.set_trans (trans);
   m_viewport_l.set_trans (db::DCplxTrans (double (m_oversampling)) * trans);
   update_viewport ();
 }
 
-bool
-LayoutCanvas::drawing_finished ()
+bool LayoutCanvas::drawing_finished ()
 {
   bool f = m_drawing_finished;
   m_drawing_finished = false;
   return f;
 }
 
-void 
-LayoutCanvas::do_end_of_drawing ()
+void LayoutCanvas::do_end_of_drawing ()
 {
   //  store the data into the open entries or discard if not compatible
   for (size_t i = 0; i < m_image_cache.size (); ++i) {
@@ -1033,7 +999,7 @@ LayoutCanvas::do_end_of_drawing ()
         m_image_cache.erase (m_image_cache.begin () + i);
         --i;
       }
-    } 
+    }
   }
 
   set_default_cursor (lay::Cursor::none);
@@ -1041,15 +1007,13 @@ LayoutCanvas::do_end_of_drawing ()
   m_drawing_finished = true;
 }
 
-void
-LayoutCanvas::do_update_image ()
+void LayoutCanvas::do_update_image ()
 {
   update_image ();
 }
 
 #if defined(HAVE_QT)
-void
-LayoutCanvas::gtf_probe ()
+void LayoutCanvas::gtf_probe ()
 {
   if (gtf::Recorder::instance () && gtf::Recorder::instance ()->recording ()) {
     gtf::Recorder::instance ()->probe (widget (), gtf::image_to_variant (screenshot ().to_image_copy ()));
@@ -1057,14 +1021,12 @@ LayoutCanvas::gtf_probe ()
 }
 #endif
 
-void
-LayoutCanvas::redraw_all ()
+void LayoutCanvas::redraw_all ()
 {
   do_redraw_all ();
 }
 
-void
-LayoutCanvas::do_redraw_all (bool force_redraw)
+void LayoutCanvas::do_redraw_all (bool force_redraw)
 {
   stop_redraw ();
 
@@ -1084,16 +1046,14 @@ LayoutCanvas::do_redraw_all (bool force_redraw)
   update (); // produces a paintEvent()
 }
 
-void
-LayoutCanvas::redraw_new (std::vector<lay::RedrawLayerInfo> &layers)
+void LayoutCanvas::redraw_new (std::vector<lay::RedrawLayerInfo> &layers)
 {
   m_image_cache.clear ();
   m_layers.swap (layers);
   do_redraw_all (true);
 }
 
-void
-LayoutCanvas::redraw_selected (const std::vector<int> &layers)
+void LayoutCanvas::redraw_selected (const std::vector<int> &layers)
 {
   stop_redraw ();
 
@@ -1113,8 +1073,7 @@ LayoutCanvas::redraw_selected (const std::vector<int> &layers)
   update (); // produces a paintEvent()
 }
 
-void
-LayoutCanvas::change_visibility (const std::vector <bool> &visible)
+void LayoutCanvas::change_visibility (const std::vector<bool> &visible)
 {
   stop_redraw ();
   mp_redraw_thread->change_visibility (visible);
@@ -1132,8 +1091,7 @@ LayoutCanvas::change_visibility (const std::vector <bool> &visible)
   update (); // produces a paintEvent()
 }
 
-void
-LayoutCanvas::stop_redraw ()
+void LayoutCanvas::stop_redraw ()
 {
   //  discard all open cache entries
   for (size_t i = 0; i < m_image_cache.size (); ++i) {
@@ -1146,23 +1104,19 @@ LayoutCanvas::stop_redraw ()
   mp_redraw_thread->stop ();
 }
 
-void
-LayoutCanvas::update_drawings ()
+void LayoutCanvas::update_drawings ()
 {
   update_image ();
 }
 
-void 
-LayoutCanvas::signal_transfer_done () 
+void LayoutCanvas::signal_transfer_done ()
 {
   m_do_update_image_dm ();
 }
 
-void 
-LayoutCanvas::signal_end_of_drawing () 
+void LayoutCanvas::signal_end_of_drawing ()
 {
   m_do_end_of_drawing_dm ();
 }
 
-}  // namespace lay
-
+} // namespace lay

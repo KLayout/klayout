@@ -52,62 +52,52 @@ PythonInterpreter *PythonInterpreter::instance ()
   return sp_pya_interpreter;
 }
 
-void 
-PythonInterpreter::add_path (const std::string &, bool prepend)
+void PythonInterpreter::add_path (const std::string &, bool prepend)
 {
   // .. nothing ..
 }
 
-void
-PythonInterpreter::add_package_location (const std::string &)
+void PythonInterpreter::add_package_location (const std::string &)
 {
   // .. nothing ..
 }
 
-void
-PythonInterpreter::remove_package_location (const std::string &)
+void PythonInterpreter::remove_package_location (const std::string &)
 {
   // .. nothing ..
 }
 
-void
-PythonInterpreter::require (const std::string &)
+void PythonInterpreter::require (const std::string &)
 {
   // .. nothing ..
 }
 
-void 
-PythonInterpreter::set_debugger_scope (const std::string &)
+void PythonInterpreter::set_debugger_scope (const std::string &)
 {
   // .. nothing ..
 }
 
-void 
-PythonInterpreter::remove_debugger_scope ()
+void PythonInterpreter::remove_debugger_scope ()
 {
   // .. nothing ..
 }
 
-void 
-PythonInterpreter::ignore_next_exception ()
+void PythonInterpreter::ignore_next_exception ()
 {
   // .. nothing ..
 }
 
-void
-PythonInterpreter::load_file (const std::string &)
+void PythonInterpreter::load_file (const std::string &)
 {
   // .. nothing ..
 }
 
-void
-PythonInterpreter::eval_string (const char *, const char *file, int line, int)
+void PythonInterpreter::eval_string (const char *, const char *file, int line, int)
 {
   fail (file, line);
 }
 
-void
-PythonInterpreter::eval_string_and_print (const char *, const char *file, int line, int)
+void PythonInterpreter::eval_string_and_print (const char *, const char *file, int line, int)
 {
   fail (file, line);
 }
@@ -118,44 +108,37 @@ PythonInterpreter::inspector (int)
   return 0;
 }
 
-void
-PythonInterpreter::define_variable (const std::string &, const tl::Variant &)
+void PythonInterpreter::define_variable (const std::string &, const tl::Variant &)
 {
   // .. nothing ..
 }
 
-bool
-PythonInterpreter::available () const
+bool PythonInterpreter::available () const
 {
   return false;
 }
 
-void 
-PythonInterpreter::initialize ()
+void PythonInterpreter::initialize ()
 {
   // .. nothing ..
 }
 
-void 
-PythonInterpreter::push_exec_handler (gsi::ExecutionHandler *)
+void PythonInterpreter::push_exec_handler (gsi::ExecutionHandler *)
 {
   // .. nothing ..
 }
 
-void
-PythonInterpreter::remove_exec_handler (gsi::ExecutionHandler *)
+void PythonInterpreter::remove_exec_handler (gsi::ExecutionHandler *)
 {
   // .. nothing ..
 }
 
-void 
-PythonInterpreter::push_console (gsi::Console *)
+void PythonInterpreter::push_console (gsi::Console *)
 {
   // .. nothing ..
 }
 
-void 
-PythonInterpreter::remove_console (gsi::Console *)
+void PythonInterpreter::remove_console (gsi::Console *)
 {
   // .. nothing ..
 }
@@ -174,4 +157,3 @@ PythonInterpreter::eval_expr (const char *, const char *file, int line, int)
 }
 
 }
-

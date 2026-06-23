@@ -46,12 +46,13 @@ class ReaderBase;
  *  @brief Generic base class of reader exceptions
  */
 class DB_PUBLIC ReaderException
-  : public tl::Exception 
+  : public tl::Exception
 {
 public:
   ReaderException (const std::string &msg)
     : tl::Exception (msg)
-  { }
+  {
+  }
 };
 
 /**
@@ -66,7 +67,8 @@ class DB_PUBLIC ReaderUnknownFormatException
 public:
   ReaderUnknownFormatException (const std::string &msg, const std::string &data, bool has_more)
     : ReaderException (msg), m_data (data), m_has_more (has_more)
-  { }
+  {
+  }
 
   const std::string &data () const
   {
@@ -178,18 +180,18 @@ private:
 };
 
 /**
- *  @brief The generic stream reader 
+ *  @brief The generic stream reader
  *
  *  This reader is supposed to fork to one of the specific readers
  *  depending on the format detected.
  */
 class DB_PUBLIC Reader
 {
-public: 
+public:
   /**
    *  @brief Construct a reader object
    *
-   *  If no valid format can be detected, the constructor will throw 
+   *  If no valid format can be detected, the constructor will throw
    *  an exception. The stream must be opened already in order to allow
    *  format detection.
    *
@@ -197,20 +199,20 @@ public:
    */
   Reader (tl::InputStream &s);
 
-  /**  
+  /**
    *  @brief Destructor
    */
   ~Reader ();
 
-  /** 
-   *  @brief The basic read method 
+  /**
+   *  @brief The basic read method
    *
    *  This method will read the stream data and translate this to
    *  insert calls into the layout object. This will not do much
    *  on the layout object beside inserting the objects.
    *  It can be passed options with a layer map which tells which
    *  OASIS layer(s) to read on which logical layers.
-   *  In addition, a flag can be passed that tells whether to create 
+   *  In addition, a flag can be passed that tells whether to create
    *  new layers. The returned map will contain all layers, the passed
    *  ones and the newly created ones.
    *
@@ -219,7 +221,7 @@ public:
    */
   const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions &options);
 
-  /** 
+  /**
    *  @brief The basic read method (without mapping)
    *
    *  This method will read the stream data and translate this to
@@ -283,4 +285,3 @@ private:
 }
 
 #endif
-

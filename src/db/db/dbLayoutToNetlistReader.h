@@ -30,30 +30,32 @@
 #include "tlStream.h"
 #include "tlProgress.h"
 
-namespace db {
+namespace db
+{
 
 class LayoutToNetlistStandardReader;
 
-namespace l2n_std_reader {
+namespace l2n_std_reader
+{
 
-  class Brace
+class Brace
+{
+public:
+  Brace (db::LayoutToNetlistStandardReader *reader);
+
+  operator bool ();
+  void done ();
+
+  bool has_brace () const
   {
-  public:
-    Brace (db::LayoutToNetlistStandardReader *reader);
+    return m_has_brace;
+  }
 
-    operator bool ();
-    void done ();
-
-    bool has_brace () const
-    {
-      return m_has_brace;
-    }
-
-  private:
-    db::LayoutToNetlistStandardReader *mp_reader;
-    bool m_checked;
-    bool m_has_brace;
-  };
+private:
+  db::LayoutToNetlistStandardReader *mp_reader;
+  bool m_checked;
+  bool m_has_brace;
+};
 
 }
 
@@ -71,8 +73,8 @@ class Region;
 class DB_PUBLIC LayoutToNetlistReaderBase
 {
 public:
-  LayoutToNetlistReaderBase () { }
-  virtual ~LayoutToNetlistReaderBase () { }
+  LayoutToNetlistReaderBase () {}
+  virtual ~LayoutToNetlistReaderBase () {}
 
   void read (db::LayoutToNetlist *l2n)
   {
@@ -90,9 +92,7 @@ class DB_PUBLIC LayoutToNetlistStandardReader
   : public LayoutToNetlistReaderBase
 {
 public:
-
-  struct ObjectMap
-  {
+  struct ObjectMap {
     std::map<unsigned int, db::Net *> id2net;
     std::map<unsigned int, db::Device *> id2device;
     std::map<unsigned int, db::SubCircuit *> id2subcircuit;
@@ -122,11 +122,11 @@ protected:
     return m_stream;
   }
 
-  struct Connections
-  {
+  struct Connections {
     Connections (size_t _from_cluster, size_t _to_cluster)
       : from_cluster (_from_cluster), to_cluster (_to_cluster)
-    { }
+    {
+    }
 
     size_t from_cluster, to_cluster;
   };
@@ -153,8 +153,8 @@ private:
 
   void read_net (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map);
   void read_pin (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map);
-  void read_device (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections);
-  void read_subcircuit (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections);
+  void read_device (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections>> &connections);
+  void read_subcircuit (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections>> &connections);
   bool read_trans_part (db::DCplxTrans &tr);
   void read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceAbstract *dm, db::DeviceClass *dc);
   void read_property (db::NetlistObject *obj);
@@ -172,4 +172,3 @@ private:
 }
 
 #endif
-

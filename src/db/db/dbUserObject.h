@@ -39,7 +39,8 @@
 #include <string>
 #include <string.h>
 
-namespace db {
+namespace db
+{
 
 template <class Coord> class generic_repository;
 class ArrayRepository;
@@ -61,14 +62,14 @@ class DB_PUBLIC_TEMPLATE user_object_base
 public:
   typedef C coord_type;
 
-  virtual ~user_object_base () { }
+  virtual ~user_object_base () {}
 
   /**
    *  @brief Compare with another object
    *
    *  The implementation is supposed to return true if the
    *  object is identical to this. The pointer passed should be
-   *  dynamic_cast to the derived class and false should be 
+   *  dynamic_cast to the derived class and false should be
    *  returned if the class is not identical.
    */
   virtual bool equals (const user_object_base<C> *d) const = 0;
@@ -86,8 +87,8 @@ public:
   /**
    *  @brief Return a unique class Id
    *
-   *  This value must be "some" unique class ID. 
-   *  This is either an integer assigned by convention or by calling 
+   *  This value must be "some" unique class ID.
+   *  This is either an integer assigned by convention or by calling
    *  get_unique_user_object_class_id once in the initialisation of a static member
    *  Used for operator< () implementation.
    */
@@ -112,24 +113,24 @@ public:
   /**
    *  @brief Transform this object with a simple_trans
    */
-  virtual void transform (const simple_trans<C> &t) 
-  { 
+  virtual void transform (const simple_trans<C> &t)
+  {
     transform (complex_trans<C, C> (t));
   }
 
   /**
    *  @brief Transform this object with a fixpoint_trans
    */
-  virtual void transform (const fixpoint_trans<C> &t) 
-  { 
+  virtual void transform (const fixpoint_trans<C> &t)
+  {
     transform (complex_trans<C, C> (t));
   }
 
   /**
    *  @brief Transform this object with a complex_trans
    */
-  virtual void transform (const complex_trans<C, C> & /*t*/) 
-  { 
+  virtual void transform (const complex_trans<C, C> & /*t*/)
+  {
     //  .. the default implementation does nothing ..
   }
 
@@ -148,7 +149,7 @@ public:
    *  This method needs to be implemented mainly if the object is to be created from the
    *  generic factory.
    */
-  virtual void from_string (const char * /*str*/, const char * /*base_path*/) { }
+  virtual void from_string (const char * /*str*/, const char * /*base_path*/) {}
 
   /**
    *  @brief Convert to a string
@@ -161,7 +162,7 @@ public:
   /**
    *  @brief Collect memory statistics
    */
-  virtual void mem_stat (db::MemStatistics * /*stat*/, db::MemStatistics::purpose_t /*purpose*/, int /*cat*/, bool /*no_self*/, void * /*parent*/) const { }
+  virtual void mem_stat (db::MemStatistics * /*stat*/, db::MemStatistics::purpose_t /*purpose*/, int /*cat*/, bool /*no_self*/, void * /*parent*/) const {}
 };
 
 template <class C>
@@ -172,11 +173,11 @@ public:
   typedef db::box<C> box_type;
   typedef db::point<C> point_type;
   typedef db::vector<C> vector_type;
-  typedef db::object_tag< user_object<C> > tag;
+  typedef db::object_tag<user_object<C>> tag;
 
   /**
    *  @brief The default constructor.
-   *  
+   *
    *  The default constructor creates an empty object.
    */
   user_object ()
@@ -187,7 +188,7 @@ public:
 
   /**
    *  @brief The constructor taking a pointer to a base object
-   *  
+   *
    *  This constructor takes over the ownership over the object
    *  passed.
    */
@@ -273,7 +274,7 @@ public:
     transform (t);
   }
 
-  /** 
+  /**
    *  @brief Equality test
    */
   bool operator== (const user_object<C> &d) const
@@ -285,12 +286,12 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Inequality test
    */
   bool operator!= (const user_object<C> &b) const
   {
-    return !operator== (b);
+    return ! operator== (b);
   }
 
   /**
@@ -300,7 +301,7 @@ public:
   {
     if (mp_obj == 0 || b.mp_obj == 0) {
       return mp_obj < b.mp_obj;
-    } 
+    }
     if (mp_obj->class_id () != b.mp_obj->class_id ()) {
       return (mp_obj->class_id () < b.mp_obj->class_id ());
     }
@@ -318,7 +319,7 @@ public:
   /**
    *  @brief Get the pointer to the base object (non-const version)
    */
-  user_object_base<C> *ptr () 
+  user_object_base<C> *ptr ()
   {
     return mp_obj;
   }
@@ -343,7 +344,7 @@ public:
   db::box<C> box () const
   {
     if (mp_obj) {
-      return mp_obj->box (); 
+      return mp_obj->box ();
     } else {
       return db::box<C> ();
     }
@@ -446,7 +447,7 @@ private:
 /**
  *  @brief The standard user object base class typedef
  */
-typedef user_object_base<db::Coord>  UserObjectBase;
+typedef user_object_base<db::Coord> UserObjectBase;
 
 /**
  *  @brief The double coordinate user object base class typedef
@@ -456,7 +457,7 @@ typedef user_object_base<db::DCoord> DUserObjectBase;
 /**
  *  @brief The standard user object typedef
  */
-typedef user_object<db::Coord>  UserObject;
+typedef user_object<db::Coord> UserObject;
 
 /**
  *  @brief The double coordinate user object typedef
@@ -470,8 +471,8 @@ template <class C>
 class DB_PUBLIC_TEMPLATE user_object_factory_base
 {
 public:
-  user_object_factory_base () { }
-  virtual ~user_object_factory_base () { }
+  user_object_factory_base () {}
+  virtual ~user_object_factory_base () {}
   virtual const char *class_name () const = 0;
   virtual user_object_base<C> *create () const = 0;
 };
@@ -483,19 +484,20 @@ public:
  */
 template <class X, class C>
 class DB_PUBLIC_TEMPLATE user_object_factory_impl
-  : public user_object_factory_base <C>
+  : public user_object_factory_base<C>
 {
 public:
-  user_object_factory_impl (const char *class_name) 
-    : mp_class_name (class_name) 
-  { }
-
-  virtual const char *class_name () const 
-  { 
-    return mp_class_name; 
+  user_object_factory_impl (const char *class_name)
+    : mp_class_name (class_name)
+  {
   }
 
-  virtual user_object_base<C> *create () const 
+  virtual const char *class_name () const
+  {
+    return mp_class_name;
+  }
+
+  virtual user_object_base<C> *create () const
   {
     return new X ();
   }
@@ -511,19 +513,19 @@ public:
  */
 template <class C>
 class user_object_factory
-  : public tl::Registrar< user_object_factory_base<C> >
+  : public tl::Registrar<user_object_factory_base<C>>
 {
 public:
-  /** 
+  /**
    *  @brief Create a UserObject from a string with the given class and using the provided string to create the object from.
    *
    *  If the class name is not registered, no object is created and 0 is returned.
    */
   static user_object_base<C> *create (const char *class_name, const char *string, const char *base_path)
   {
-    tl::Registrar< user_object_factory_base<C> > *factory = tl::Registrar< user_object_factory_base<C> >::get_instance ();
+    tl::Registrar<user_object_factory_base<C>> *factory = tl::Registrar<user_object_factory_base<C>>::get_instance ();
     if (factory != 0) {
-      for (typename tl::Registrar< user_object_factory_base<C> >::iterator i = factory->begin (); i != factory->end (); ++i) {
+      for (typename tl::Registrar<user_object_factory_base<C>>::iterator i = factory->begin (); i != factory->end (); ++i) {
         if (strcmp (class_name, i->class_name ()) == 0) {
           user_object_base<C> *obj = i->create ();
           obj->from_string (string, base_path);
@@ -552,7 +554,7 @@ typedef user_object_factory<db::Coord> UserObjectFactory;
 /**
  *  @brief typedef for a factory object for integer coordinate user objects
  */
-typedef tl::RegisteredClass<user_object_factory_base<db::Coord> > UserObjectDeclaration;
+typedef tl::RegisteredClass<user_object_factory_base<db::Coord>> UserObjectDeclaration;
 
 /**
  *  @brief typedef for a factory object for double coordinate user objects
@@ -562,19 +564,18 @@ typedef user_object_factory<db::DCoord> DUserObjectFactory;
 /**
  *  @brief typedef for a factory object for double coordinate user objects
  */
-typedef tl::RegisteredClass<user_object_factory_base<db::DCoord> > DUserObjectDeclaration;
+typedef tl::RegisteredClass<user_object_factory_base<db::DCoord>> DUserObjectDeclaration;
 
 } // namespace db
 
 //  inject a swap specialization into the std namespace:
-namespace std 
-{  
-  template <class C>
-  inline void swap (db::user_object<C> &a, db::user_object<C> &b)
-  {
-    a.swap (b);
-  }
+namespace std
+{
+template <class C>
+inline void swap (db::user_object<C> &a, db::user_object<C> &b)
+{
+  a.swap (b);
+}
 }
 
 #endif
-

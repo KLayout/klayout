@@ -57,7 +57,7 @@ class QLabel;
 class QTabBar;
 class QCheckBox;
 
-namespace lay 
+namespace lay
 {
 
 /**
@@ -70,7 +70,7 @@ namespace lay
 
 class LCPTreeWidget : public QTreeView
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   LCPTreeWidget (QWidget *parent, lay::LayerTreeModel *model, const char *name);
@@ -101,24 +101,31 @@ private:
 };
 
 /**
- *  @brief The layer control panel 
+ *  @brief The layer control panel
  *
- *  The layer control panel has a layer list and four panels 
+ *  The layer control panel has a layer list and four panels
  *  for colors, dither pattern and visibility.
  *
  *  The class communicates with a Layout interface for
  *  retrieval and changing of layer properties.
  */
 class LAYUI_PUBLIC LayerControlPanel
-  : public QFrame, 
+  : public QFrame,
     public db::Object,
     public tl::Object
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
-  enum SortOrder { ByName, ByIndexLayerDatatype, ByIndexDatatypeLayer, ByLayerDatatypeIndex, ByDatatypeLayerIndex };
-  enum RegroupMode { RegroupByIndex, RegroupByDatatype, RegroupByLayer, RegroupFlatten };
+  enum SortOrder { ByName,
+                   ByIndexLayerDatatype,
+                   ByIndexDatatypeLayer,
+                   ByLayerDatatypeIndex,
+                   ByDatatypeLayerIndex };
+  enum RegroupMode { RegroupByIndex,
+                     RegroupByDatatype,
+                     RegroupByLayer,
+                     RegroupFlatten };
 
   /**
    *  @brief Constructor
@@ -135,7 +142,7 @@ public:
    */
   ~LayerControlPanel ();
 
-  /** 
+  /**
    *  @brief Return true, if the tree view has the focus
    */
   bool has_focus () const;
@@ -210,7 +217,7 @@ public:
   /**
    *  @brief Get the "test shapes in view" flag
    */
-  bool test_shapes_in_view () 
+  bool test_shapes_in_view ()
   {
     return mp_model->get_test_shapes_in_view ();
   }
@@ -272,7 +279,7 @@ public:
 
   /**
    *  @brief Inform of coming changes
-   *  
+   *
    *  This method may be called before changes are made to the cell list.
    *  "end_updates" resets this state.
    */
@@ -316,12 +323,12 @@ public:
   lay::LayerPropertiesConstIterator current_layer () const;
 
   /**
-   *  @brief Sort the layer list in the given order 
+   *  @brief Sort the layer list in the given order
    */
   void sort_layers (SortOrder order);
 
   /**
-   *  @brief Regroup the layer list in the given way 
+   *  @brief Regroup the layer list in the given way
    */
   void regroup_layers (RegroupMode mode);
 
@@ -378,8 +385,8 @@ public slots:
   void cm_remove_unused ();
   void tab_selected (int index);
   void double_clicked (const QModelIndex &index, Qt::KeyboardModifiers modifiers);
-  void context_menu (const QPoint &pt);  
-  void tab_context_menu (const QPoint &pt);  
+  void context_menu (const QPoint &pt);
+  void tab_context_menu (const QPoint &pt);
   void group_collapsed (const QModelIndex &index);
   void group_expanded (const QModelIndex &index);
   void current_index_changed (const QModelIndex &index);
@@ -449,4 +456,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

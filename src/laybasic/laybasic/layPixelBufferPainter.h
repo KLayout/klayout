@@ -30,10 +30,11 @@
 
 namespace tl
 {
-  class PixelBuffer;
+class PixelBuffer;
 }
 
-namespace lay {
+namespace lay
+{
 
 /**
  *  @brief A very simplistic painter for tl::PixelBuffer
@@ -64,4 +65,3 @@ private:
 }
 
 #endif
-

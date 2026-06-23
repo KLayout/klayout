@@ -29,16 +29,16 @@
 
 namespace Ui
 {
-  class GDS2WriterOptionPage;
+class GDS2WriterOptionPage;
 }
 
 namespace lay
 {
 
-class GDS2WriterOptionPage 
+class GDS2WriterOptionPage
   : public StreamWriterOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   GDS2WriterOptionPage (QWidget *parent);
@@ -57,5 +57,3 @@ private:
 }
 
 #endif
-
-

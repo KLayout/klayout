@@ -26,43 +26,41 @@
 
 namespace tl
 {
-  /**
-   *  @brief A specialization of the XMLConverter that is used to serialize the connection info
-   */
+/**
+ *  @brief A specialization of the XMLConverter that is used to serialize the connection info
+ */
 
-  template <>
-  struct XMLStdConverter<db::NetTracerConnectionInfo>
+template <>
+struct XMLStdConverter<db::NetTracerConnectionInfo> {
+  std::string to_string (const db::NetTracerConnectionInfo &v) const
   {
-    std::string to_string (const db::NetTracerConnectionInfo &v) const
-    {
-      return v.to_string ();
-    }
+    return v.to_string ();
+  }
 
-    void from_string (const std::string &s, db::NetTracerConnectionInfo &v) const
-    {
-      tl::Extractor ex (s.c_str ());
-      v.parse (ex);
-    }
-  };
-
-  /**
-   *  @brief A specialization of the XMLConverter that is used to serialize the symbol info
-   */
-
-  template <>
-  struct XMLStdConverter<db::NetTracerSymbolInfo>
+  void from_string (const std::string &s, db::NetTracerConnectionInfo &v) const
   {
-    std::string to_string (const db::NetTracerSymbolInfo &v) const
-    {
-      return v.to_string ();
-    }
+    tl::Extractor ex (s.c_str ());
+    v.parse (ex);
+  }
+};
 
-    void from_string (const std::string &s, db::NetTracerSymbolInfo &v) const
-    {
-      tl::Extractor ex (s.c_str ());
-      v.parse (ex);
-    }
-  };
+/**
+ *  @brief A specialization of the XMLConverter that is used to serialize the symbol info
+ */
+
+template <>
+struct XMLStdConverter<db::NetTracerSymbolInfo> {
+  std::string to_string (const db::NetTracerSymbolInfo &v) const
+  {
+    return v.to_string ();
+  }
+
+  void from_string (const std::string &s, db::NetTracerSymbolInfo &v) const
+  {
+    tl::Extractor ex (s.c_str ());
+    v.parse (ex);
+  }
+};
 }
 
 namespace
@@ -73,7 +71,7 @@ get_fallback_default (const db::NetTracerTechnologyComponent &tc)
 {
   for (auto d = tc.begin (); d != tc.end (); ++d) {
     if (d->is_fallback_default ()) {
-      return d.operator-> ();
+      return d.operator->();
     }
   }
 
@@ -85,12 +83,12 @@ get_default (const db::NetTracerTechnologyComponent &tc)
 {
   for (auto d = tc.begin (); d != tc.end (); ++d) {
     if (d->name ().empty ()) {
-      return d.operator-> ();
+      return d.operator->();
     }
   }
 
   if (tc.begin () != tc.end ()) {
-    return tc.begin ().operator-> ();
+    return tc.begin ().operator->();
   } else {
     static db::NetTracerConnectivity s_empty;
     return &s_empty;
@@ -98,20 +96,19 @@ get_default (const db::NetTracerTechnologyComponent &tc)
 }
 
 template <class Value>
-struct FallbackXMLWriteAdaptor
-{
+struct FallbackXMLWriteAdaptor {
   FallbackXMLWriteAdaptor (void (db::NetTracerConnectivity::*member) (const Value &))
     : mp_member (member)
   {
     // .. nothing yet ..
   }
 
-  void operator () (db::NetTracerTechnologyComponent &owner, tl::XMLReaderState &reader) const
+  void operator() (db::NetTracerTechnologyComponent &owner, tl::XMLReaderState &reader) const
   {
     db::NetTracerConnectivity *stack = const_cast<db::NetTracerConnectivity *> (get_fallback_default (owner));
     if (! stack && owner.begin () == owner.end ()) {
       owner.push_back (db::NetTracerConnectivity ());
-      stack = (owner.end () - 1).operator-> ();
+      stack = (owner.end () - 1).operator->();
       stack->set_fallback_default (true);
     }
 
@@ -126,8 +123,7 @@ private:
 };
 
 template <class Value, class Iter>
-struct FallbackXMLReadAdaptor
-{
+struct FallbackXMLReadAdaptor {
   typedef tl::pass_by_ref_tag tag;
 
   FallbackXMLReadAdaptor (Iter (db::NetTracerConnectivity::*begin) () const, Iter (db::NetTracerConnectivity::*end) () const)
@@ -136,7 +132,7 @@ struct FallbackXMLReadAdaptor
     // .. nothing yet ..
   }
 
-  Value operator () () const
+  Value operator() () const
   {
     return *m_iter;
   }
@@ -187,21 +183,19 @@ public:
   virtual tl::XMLElementBase *xml_element () const
   {
     return new db::TechnologyComponentXMLElement<NetTracerTechnologyComponent> (net_tracer_component_name (),
-      //  0.28 definitions
-      tl::make_element ((NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::begin, (NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::end, (void (NetTracerTechnologyComponent::*) (const NetTracerConnectivity &)) &NetTracerTechnologyComponent::push_back, "stack",
-        tl::make_member (&NetTracerConnectivity::name, &NetTracerConnectivity::set_name, "name") +
-        tl::make_member (&NetTracerConnectivity::description, &NetTracerConnectivity::set_description, "description") +
-        tl::make_member ((NetTracerConnectivity::const_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::begin, (NetTracerConnectivity::const_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::end, &NetTracerConnectivity::add, "connection") +
-        tl::make_member ((NetTracerConnectivity::const_symbol_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::begin_symbols, (NetTracerConnectivity::const_symbol_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::end_symbols, &NetTracerConnectivity::add_symbol, "symbols")
-      ) +
-      //  Fallback readers for migrating pre-0.28 setups to 0.28 and backward compatibility
-      tl::XMLMember<NetTracerConnectionInfo, NetTracerTechnologyComponent, FallbackXMLReadAdaptor <NetTracerConnectionInfo, NetTracerConnectivity::const_iterator>, FallbackXMLWriteAdaptor <NetTracerConnectionInfo>, tl::XMLStdConverter <NetTracerConnectionInfo> > (
-        FallbackXMLReadAdaptor <NetTracerConnectionInfo, NetTracerConnectivity::const_iterator> (&NetTracerConnectivity::begin, &NetTracerConnectivity::end),
-        FallbackXMLWriteAdaptor <NetTracerConnectionInfo> (&NetTracerConnectivity::add), "connection") +
-      tl::XMLMember<NetTracerSymbolInfo, NetTracerTechnologyComponent, FallbackXMLReadAdaptor <NetTracerSymbolInfo, NetTracerConnectivity::const_symbol_iterator>, FallbackXMLWriteAdaptor <NetTracerSymbolInfo>, tl::XMLStdConverter <NetTracerSymbolInfo> > (
-        FallbackXMLReadAdaptor <NetTracerSymbolInfo, NetTracerConnectivity::const_symbol_iterator> (&NetTracerConnectivity::begin_symbols, &NetTracerConnectivity::end_symbols),
-        FallbackXMLWriteAdaptor <NetTracerSymbolInfo> (&NetTracerConnectivity::add_symbol), "symbols")
-    );
+                                                                                //  0.28 definitions
+                                                                                tl::make_element ((NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) & NetTracerTechnologyComponent::begin, (NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) & NetTracerTechnologyComponent::end, (void (NetTracerTechnologyComponent::*) (const NetTracerConnectivity &)) &NetTracerTechnologyComponent::push_back, "stack",
+                                                                                                  tl::make_member (&NetTracerConnectivity::name, &NetTracerConnectivity::set_name, "name") +
+                                                                                                    tl::make_member (&NetTracerConnectivity::description, &NetTracerConnectivity::set_description, "description") +
+                                                                                                    tl::make_member ((NetTracerConnectivity::const_iterator (NetTracerConnectivity::*) () const) & NetTracerConnectivity::begin, (NetTracerConnectivity::const_iterator (NetTracerConnectivity::*) () const) & NetTracerConnectivity::end, &NetTracerConnectivity::add, "connection") +
+                                                                                                    tl::make_member ((NetTracerConnectivity::const_symbol_iterator (NetTracerConnectivity::*) () const) & NetTracerConnectivity::begin_symbols, (NetTracerConnectivity::const_symbol_iterator (NetTracerConnectivity::*) () const) & NetTracerConnectivity::end_symbols, &NetTracerConnectivity::add_symbol, "symbols")) +
+                                                                                  //  Fallback readers for migrating pre-0.28 setups to 0.28 and backward compatibility
+                                                                                  tl::XMLMember<NetTracerConnectionInfo, NetTracerTechnologyComponent, FallbackXMLReadAdaptor<NetTracerConnectionInfo, NetTracerConnectivity::const_iterator>, FallbackXMLWriteAdaptor<NetTracerConnectionInfo>, tl::XMLStdConverter<NetTracerConnectionInfo>> (
+                                                                                    FallbackXMLReadAdaptor<NetTracerConnectionInfo, NetTracerConnectivity::const_iterator> (&NetTracerConnectivity::begin, &NetTracerConnectivity::end),
+                                                                                    FallbackXMLWriteAdaptor<NetTracerConnectionInfo> (&NetTracerConnectivity::add), "connection") +
+                                                                                  tl::XMLMember<NetTracerSymbolInfo, NetTracerTechnologyComponent, FallbackXMLReadAdaptor<NetTracerSymbolInfo, NetTracerConnectivity::const_symbol_iterator>, FallbackXMLWriteAdaptor<NetTracerSymbolInfo>, tl::XMLStdConverter<NetTracerSymbolInfo>> (
+                                                                                    FallbackXMLReadAdaptor<NetTracerSymbolInfo, NetTracerConnectivity::const_symbol_iterator> (&NetTracerConnectivity::begin_symbols, &NetTracerConnectivity::end_symbols),
+                                                                                    FallbackXMLWriteAdaptor<NetTracerSymbolInfo> (&NetTracerConnectivity::add_symbol), "symbols"));
   }
 };
 

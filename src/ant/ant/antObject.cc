@@ -166,8 +166,7 @@ Object::operator= (const ant::Object &d)
   return *this;
 }
 
-bool 
-Object::operator< (const ant::Object &b) const
+bool Object::operator< (const ant::Object &b) const
 {
   if (m_id != b.m_id) {
     return m_id < b.m_id;
@@ -223,8 +222,7 @@ Object::operator< (const ant::Object &b) const
   return false;
 }
 
-bool 
-Object::equals (const db::DUserObjectBase *d) const
+bool Object::equals (const db::DUserObjectBase *d) const
 {
   const ant::Object *ruler = dynamic_cast<const ant::Object *> (d);
   if (ruler) {
@@ -234,39 +232,34 @@ Object::equals (const db::DUserObjectBase *d) const
   }
 }
 
-bool 
-Object::operator== (const ant::Object &d) const
+bool Object::operator== (const ant::Object &d) const
 {
   return m_points == d.m_points && m_id == d.m_id &&
          m_fmt_x == d.m_fmt_x && m_fmt_y == d.m_fmt_y && m_fmt == d.m_fmt &&
-         m_style == d.m_style && m_outline == d.m_outline && 
+         m_style == d.m_style && m_outline == d.m_outline &&
          m_snap == d.m_snap && m_angle_constraint == d.m_angle_constraint &&
          m_category == d.m_category &&
          m_main_position == d.m_main_position &&
          m_main_xalign == d.m_main_xalign && m_main_yalign == d.m_main_yalign &&
          m_xlabel_xalign == d.m_xlabel_xalign && m_xlabel_yalign == d.m_xlabel_yalign &&
-         m_ylabel_xalign == d.m_ylabel_xalign && m_ylabel_yalign == d.m_ylabel_yalign
-    ;
+         m_ylabel_xalign == d.m_ylabel_xalign && m_ylabel_yalign == d.m_ylabel_yalign;
 }
 
-void
-Object::clean_points ()
+void Object::clean_points ()
 {
   auto new_points = m_points;
   clean_points_impl (new_points);
   set_points_exact (std::move (new_points));
 }
 
-void
-Object::set_points (const point_list &points)
+void Object::set_points (const point_list &points)
 {
   auto new_points = points;
   clean_points_impl (new_points);
   set_points_exact (std::move (new_points));
 }
 
-void
-Object::set_points_exact (const point_list &points)
+void Object::set_points_exact (const point_list &points)
 {
   if (m_points != points) {
     m_points = points;
@@ -274,8 +267,7 @@ Object::set_points_exact (const point_list &points)
   }
 }
 
-void
-Object::set_points_exact (point_list &&points)
+void Object::set_points_exact (point_list &&points)
 {
   if (m_points != points) {
     m_points.swap (points);
@@ -289,7 +281,7 @@ Object::seg_p1 (size_t seg_index) const
   if (seg_index == std::numeric_limits<size_t>::max ()) {
     return p1 ();
   } else if (seg_index < m_points.size ()) {
-    return m_points[seg_index];
+    return m_points [seg_index];
   } else if (m_points.empty ()) {
     return db::DPoint ();
   } else {
@@ -303,7 +295,7 @@ Object::seg_p2 (size_t seg_index) const
   if (seg_index == std::numeric_limits<size_t>::max ()) {
     return p2 ();
   } else if (seg_index + 1 < m_points.size ()) {
-    return m_points[seg_index + 1];
+    return m_points [seg_index + 1];
   } else if (m_points.empty ()) {
     return db::DPoint ();
   } else {
@@ -311,32 +303,29 @@ Object::seg_p2 (size_t seg_index) const
   }
 }
 
-void
-Object::seg_p1 (size_t seg_index, const db::DPoint &p)
+void Object::seg_p1 (size_t seg_index, const db::DPoint &p)
 {
   if (seg_index == std::numeric_limits<size_t>::max ()) {
     p1 (p);
   } else if (seg_index < m_points.size ()) {
-    m_points[seg_index] = p;
+    m_points [seg_index] = p;
   } else if (! m_points.empty ()) {
     m_points.back () = p;
   }
 }
 
-void
-Object::seg_p2 (size_t seg_index, const db::DPoint &p)
+void Object::seg_p2 (size_t seg_index, const db::DPoint &p)
 {
   if (seg_index == std::numeric_limits<size_t>::max ()) {
     p2 (p);
   } else if (seg_index + 1 < m_points.size ()) {
-    m_points[seg_index + 1] = p;
+    m_points [seg_index + 1] = p;
   } else if (! m_points.empty ()) {
     m_points.back () = p;
   }
 }
 
-void
-Object::p1 (const db::DPoint &p)
+void Object::p1 (const db::DPoint &p)
 {
   if (m_points.size () < 1 || ! p1 ().equal (p)) {
     if (m_points.size () < 1) {
@@ -352,8 +341,7 @@ Object::p1 (const db::DPoint &p)
   }
 }
 
-void
-Object::p2 (const db::DPoint &p)
+void Object::p2 (const db::DPoint &p)
 {
   if (m_points.size () < 2 || ! p2 ().equal (p)) {
     if (m_points.size () < 2) {
@@ -372,8 +360,7 @@ Object::p2 (const db::DPoint &p)
   }
 }
 
-bool 
-Object::less (const db::DUserObjectBase *d) const
+bool Object::less (const db::DUserObjectBase *d) const
 {
   const ant::Object *ruler = dynamic_cast<const ant::Object *> (d);
   if (ruler) {
@@ -383,7 +370,7 @@ Object::less (const db::DUserObjectBase *d) const
   }
 }
 
-unsigned int 
+unsigned int
 Object::class_id () const
 {
   static unsigned int cid = db::get_unique_user_object_class_id ();
@@ -396,7 +383,7 @@ Object::clone () const
   return new ant::Object (*this);
 }
 
-db::DBox 
+db::DBox
 Object::box () const
 {
   db::DBox bx;
@@ -412,7 +399,8 @@ class AnnotationEval
 public:
   AnnotationEval (const Object &obj, const db::DFTrans &t)
     : m_obj (obj), m_trans (t)
-  { }
+  {
+  }
 
   const Object &obj () const { return m_obj; }
   const db::DFTrans &trans () const { return m_trans; }
@@ -427,20 +415,20 @@ class AnnotationEvalFunction
 {
 public:
   enum FunctionType {
-    ManhattanLength,                // L
-    ManhattanLengthIncremental,     // LL
-    EuclidianDistance,              // D
-    EuclidianDistanceIncremental,   // DD
-    XDelta,                         // X
-    XDeltaIncremental,              // XX
-    YDelta,                         // Y
-    YDeltaIncremental,              // YY
-    P1X,                            // U
-    P1Y,                            // V
-    P2X,                            // P
-    P2Y,                            // Q
-    Area,                           // A
-    Angle                           // G
+    ManhattanLength,              // L
+    ManhattanLengthIncremental,   // LL
+    EuclidianDistance,            // D
+    EuclidianDistanceIncremental, // DD
+    XDelta,                       // X
+    XDeltaIncremental,            // XX
+    YDelta,                       // Y
+    YDeltaIncremental,            // YY
+    P1X,                          // U
+    P1Y,                          // V
+    P2X,                          // P
+    P2Y,                          // Q
+    Area,                         // A
+    Angle                         // G
   };
 
   AnnotationEvalFunction (FunctionType function, const AnnotationEval *eval, size_t index)
@@ -449,7 +437,7 @@ public:
     // .. nothing yet ..
   }
 
-  void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+  void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &vv, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
     if (vv.size () != 0) {
       throw tl::EvalError (tl::to_string (tr ("Annotation function must not have arguments")), context);
@@ -559,7 +547,7 @@ private:
   size_t m_index;
 };
 
-std::string 
+std::string
 Object::formatted (const std::string &fmt, const db::DFTrans &t, size_t index) const
 {
   AnnotationEval eval (*this, t);
@@ -586,8 +574,7 @@ Object::class_name () const
   return "ant::Object";
 }
 
-void 
-Object::from_string (const char *s, const char * /*base_dir*/)
+void Object::from_string (const char *s, const char * /*base_dir*/)
 {
   m_points.clear ();
   point_list new_points;
@@ -773,7 +760,6 @@ Object::from_string (const char *s, const char * /*base_dir*/)
     }
 
     ex.test (",");
-
   }
 
   if (! new_points.empty ()) {
@@ -781,7 +767,7 @@ Object::from_string (const char *s, const char * /*base_dir*/)
   }
 }
 
-std::string 
+std::string
 Object::to_string () const
 {
   std::string r;
@@ -826,7 +812,7 @@ Object::to_string () const
   r += "fmt_y=";
   r += tl::to_word_or_quoted_string (fmt_y ());
   r += ",";
-  
+
   r += "position=";
   ant::PositionConverter pc;
   r += pc.to_string (main_position ());
@@ -856,12 +842,12 @@ Object::to_string () const
   ant::StyleConverter sc;
   r += sc.to_string (style ());
   r += ",";
-  
+
   r += "outline=";
   ant::OutlineConverter oc;
   r += oc.to_string (outline ());
   r += ",";
-  
+
   r += "snap=";
   r += tl::to_string (snap ());
   r += ",";
@@ -873,8 +859,7 @@ Object::to_string () const
   return r;
 }
 
-bool
-Object::compute_interpolating_circle (double &radius, db::DPoint &center, double &start_angle, double &stop_angle) const
+bool Object::compute_interpolating_circle (double &radius, db::DPoint &center, double &start_angle, double &stop_angle) const
 {
   if (m_points.size () < 2) {
     return false;
@@ -924,7 +909,6 @@ Object::compute_interpolating_circle (double &radius, db::DPoint &center, double
 
     start_angle = a - da;
     stop_angle = a + da;
-
   }
 
   while (stop_angle < start_angle - db::epsilon) {
@@ -934,8 +918,7 @@ Object::compute_interpolating_circle (double &radius, db::DPoint &center, double
   return true;
 }
 
-bool
-Object::compute_angle_parameters (double &radius, db::DPoint &center, double &start_angle, double &stop_angle) const
+bool Object::compute_angle_parameters (double &radius, db::DPoint &center, double &start_angle, double &stop_angle) const
 {
   if (m_points.size () < 3) {
     return false;
@@ -945,7 +928,7 @@ Object::compute_angle_parameters (double &radius, db::DPoint &center, double &st
 
   db::DVector pc;
   for (size_t i = 1; i + 1 < m_points.size (); ++i) {
-    pc += m_points[i] - db::DPoint ();
+    pc += m_points [i] - db::DPoint ();
   }
   center = db::DPoint () + pc * (1.0 / double (m_points.size () - 2));
 
@@ -984,8 +967,7 @@ Object::compute_angle_parameters (double &radius, db::DPoint &center, double &st
   return true;
 }
 
-void
-Object::property_changed ()
+void Object::property_changed ()
 {
   //  .. nothing yet ..
 }
@@ -996,4 +978,3 @@ Object::property_changed ()
 static db::DUserObjectDeclaration class_registrar (new db::user_object_factory_impl<ant::Object, db::DCoord> ("ant::Object"));
 
 } // namespace ant
-

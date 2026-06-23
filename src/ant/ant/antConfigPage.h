@@ -33,19 +33,19 @@ class QListWidgetItem;
 
 namespace Ui
 {
-  class RulerConfigPage;
-  class RulerConfigPage2;
-  class RulerConfigPage3;
-  class RulerConfigPage4;
+class RulerConfigPage;
+class RulerConfigPage2;
+class RulerConfigPage3;
+class RulerConfigPage4;
 }
 
-namespace ant 
+namespace ant
 {
 
 class ConfigPage
   : public lay::ConfigPage
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   ConfigPage (QWidget *parent);
@@ -56,7 +56,7 @@ public:
 
 private:
   Ui::RulerConfigPage *mp_ui;
-  
+
   void show ();
   void commit ();
 };
@@ -64,7 +64,7 @@ private:
 class ConfigPage2
   : public lay::ConfigPage
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   ConfigPage2 (QWidget *parent);
@@ -75,7 +75,7 @@ public:
 
 private:
   Ui::RulerConfigPage2 *mp_ui;
-  
+
   void show ();
   void commit ();
 };
@@ -83,7 +83,7 @@ private:
 class ConfigPage3
   : public lay::ConfigPage
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   ConfigPage3 (QWidget *parent);
@@ -94,7 +94,7 @@ public:
 
 private:
   Ui::RulerConfigPage3 *mp_ui;
-  
+
   void show ();
   void commit ();
 };
@@ -102,7 +102,7 @@ private:
 class ConfigPage4
   : public lay::ConfigPage
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   ConfigPage4 (QWidget *parent);
@@ -118,13 +118,13 @@ public slots:
   void down_clicked ();
   void current_template_changed (int index);
   void double_clicked (QListWidgetItem *);
-  
+
 private:
   Ui::RulerConfigPage4 *mp_ui;
   std::vector<ant::Template> m_ruler_templates;
   int m_current_template;
   bool m_current_changed_enabled;
-  
+
   void show ();
   void commit ();
   void update_list ();
@@ -135,4 +135,3 @@ private:
 #endif
 
 #endif
-

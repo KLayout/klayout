@@ -44,11 +44,12 @@ struct LayoutOrCellContextInfo;
  *  development of PCell code - this proxy replaces the original one. It stores the connection information, so
  *  it can be regenerated when it becomes valid again.
  */
-class DB_PUBLIC ColdProxy 
-  : public Cell, public tl::Object
+class DB_PUBLIC ColdProxy
+  : public Cell,
+    public tl::Object
 {
 public:
-  /** 
+  /**
    *  @brief The constructor
    *
    *  Creates a cold proxy represented by the ProxyContextInfo data.
@@ -61,12 +62,12 @@ public:
   ~ColdProxy ();
 
   /**
-   *  @brief Cloning 
+   *  @brief Cloning
    */
   virtual Cell *clone (Layout &layout) const;
 
   /**
-   *  @brief Get the library id 
+   *  @brief Get the library id
    */
   const LayoutOrCellContextInfo &context_info () const
   {
@@ -76,9 +77,9 @@ public:
   /**
    *  @brief Indicates that this cell is a proxy cell
    */
-  virtual bool is_proxy () const 
-  { 
-    return true; 
+  virtual bool is_proxy () const
+  {
+    return true;
   }
 
   /**
@@ -121,5 +122,3 @@ private:
 }
 
 #endif
-
-

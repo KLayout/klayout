@@ -56,10 +56,10 @@ public:
   virtual void render_progress (QWidget *widget) const;
 
   void configure (double dbu, int nx, int ny, const std::vector<db::Coord> &tol);
-  void merge_results (std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > &results);
+  void merge_results (std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t>>> &results);
 
 private:
-  std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > m_results;
+  std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t>>> m_results;
   std::map<db::LayerProperties, size_t> m_count_per_layer;
   std::vector<db::Coord> m_tolerances;
   bool m_needs_update;

@@ -36,15 +36,15 @@ ZoomService::ZoomService (lay::LayoutViewBase *view)
     mp_view (view),
     mp_box (0),
     m_color (0)
-{ }
+{
+}
 
 ZoomService::~ZoomService ()
 {
   drag_cancel ();
 }
 
-void
-ZoomService::drag_cancel ()
+void ZoomService::drag_cancel ()
 {
   if (mp_box) {
     delete mp_box;
@@ -53,8 +53,7 @@ ZoomService::drag_cancel ()
   ui ()->ungrab_mouse (this);
 }
 
-void 
-ZoomService::set_colors (tl::Color /*background*/, tl::Color color)
+void ZoomService::set_colors (tl::Color /*background*/, tl::Color color)
 {
   m_color = color.rgb ();
   if (mp_box) {
@@ -62,8 +61,7 @@ ZoomService::set_colors (tl::Color /*background*/, tl::Color color)
   }
 }
 
-bool 
-ZoomService::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio) 
+bool ZoomService::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio)
 {
   if (prio) {
 
@@ -77,9 +75,8 @@ ZoomService::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bo
     } else if (mp_view) {
 
       m_vp.move (m_p1 - p);
-      mp_view->pop_state ();  //  we will overwrite the previous state so we don't collect tiny move events
+      mp_view->pop_state (); //  we will overwrite the previous state so we don't collect tiny move events
       mp_view->zoom_box (m_vp);
-
     }
 
     return true;
@@ -89,8 +86,7 @@ ZoomService::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bo
   }
 }
 
-bool 
-ZoomService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool ZoomService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (! prio && (buttons & lay::RightButton) != 0) {
 
@@ -108,15 +104,13 @@ ZoomService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool 
     mp_view->stop_redraw (); // TODO: how to restart if zoom is aborted?
     begin_pan (p);
     return true;
-
   }
 
   return false;
 }
 
-bool 
-ZoomService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio) 
-{ 
+bool ZoomService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+{
   if (! prio && (buttons & lay::RightButton) != 0) {
     db::DBox vp = ui ()->mouse_event_viewport ();
     if (mp_view && vp.contains (p)) {
@@ -127,9 +121,8 @@ ZoomService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool 
   return false;
 }
 
-bool 
-ZoomService::mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool prio) 
-{ 
+bool ZoomService::mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool prio)
+{
   if (prio) {
 
     ui ()->ungrab_mouse (this);
@@ -167,20 +160,15 @@ ZoomService::mouse_release_event (const db::DPoint & /*p*/, unsigned int /*butto
           db::DPoint c = m_p1 + (m_p2 - m_p1) * 0.5;
           db::DBox b (c - d * f, c + d * f);
           mp_view->zoom_box (b);
-
         }
-
       }
-
     }
-
   }
 
   return false;
 }
 
-bool 
-ZoomService::wheel_event (int delta, bool /*horizontal*/, const db::DPoint &p, unsigned int buttons, bool prio)
+bool ZoomService::wheel_event (int delta, bool /*horizontal*/, const db::DPoint &p, unsigned int buttons, bool prio)
 {
   //  Only act without the mouse being grabbed.
   if (! prio) {
@@ -188,7 +176,9 @@ ZoomService::wheel_event (int delta, bool /*horizontal*/, const db::DPoint &p, u
     db::DBox vp = ui ()->mouse_event_viewport ();
     if (mp_view && vp.contains (p) && vp.width () > 0 && vp.height () > 0) {
 
-      enum { horizontal, vertical, zoom } direction = zoom;
+      enum { horizontal,
+             vertical,
+             zoom } direction = zoom;
       if (mp_view->mouse_wheel_mode () == 0) {
 
         if ((buttons & lay::ShiftButton) != 0) {
@@ -208,7 +198,6 @@ ZoomService::wheel_event (int delta, bool /*horizontal*/, const db::DPoint &p, u
         } else {
           direction = vertical;
         }
-
       }
 
       if (direction == vertical) {
@@ -238,22 +227,18 @@ ZoomService::wheel_event (int delta, bool /*horizontal*/, const db::DPoint &p, u
           f = 1.0 + zoom_step * (-delta / 120.0);
         }
 
-        mp_view->zoom_box (db::DBox (p.x () - (p.x () - vp.left ()) * f, 
+        mp_view->zoom_box (db::DBox (p.x () - (p.x () - vp.left ()) * f,
                                      p.y () - (p.y () - vp.bottom ()) * f,
-                                     p.x () - (p.x () - vp.right ()) * f, 
+                                     p.x () - (p.x () - vp.right ()) * f,
                                      p.y () - (p.y () - vp.top ()) * f));
-
       }
-
     }
-
   }
   return false;
 }
 
-void 
-ZoomService::begin_pan (const db::DPoint &pos)
-{ 
+void ZoomService::begin_pan (const db::DPoint &pos)
+{
   if (mp_box) {
     delete mp_box;
   }
@@ -268,9 +253,8 @@ ZoomService::begin_pan (const db::DPoint &pos)
   ui ()->grab_mouse (this, true);
 }
 
-void 
-ZoomService::begin (const db::DPoint &pos)
-{ 
+void ZoomService::begin (const db::DPoint &pos)
+{
   if (mp_box) {
     delete mp_box;
   }

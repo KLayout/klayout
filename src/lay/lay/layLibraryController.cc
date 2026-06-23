@@ -48,16 +48,14 @@ LibraryController::LibraryController ()
 {
 }
 
-void
-LibraryController::initialize (lay::Dispatcher * /*root*/)
+void LibraryController::initialize (lay::Dispatcher * /*root*/)
 {
   //  NOTE: we initialize the libraries in the stage once to have them available for the autorun
   //  macros. We'll do that later again in order to pull in the libraries from the packages.
   sync_files (false);
 }
 
-void
-LibraryController::initialized (lay::Dispatcher * /*root*/)
+void LibraryController::initialized (lay::Dispatcher * /*root*/)
 {
   if (lay::SaltController::instance ()) {
     connect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (sync_with_external_sources ()));
@@ -72,8 +70,7 @@ LibraryController::initialized (lay::Dispatcher * /*root*/)
   sync_files (false);
 }
 
-void
-LibraryController::uninitialize (lay::Dispatcher * /*root*/)
+void LibraryController::uninitialize (lay::Dispatcher * /*root*/)
 {
   if (m_file_watcher) {
     disconnect (m_file_watcher, SIGNAL (fileChanged (const QString &)), this, SLOT (file_watcher_triggered ()));
@@ -87,20 +84,17 @@ LibraryController::uninitialize (lay::Dispatcher * /*root*/)
   }
 }
 
-void
-LibraryController::get_options (std::vector < std::pair<std::string, std::string> > &options) const
+void LibraryController::get_options (std::vector<std::pair<std::string, std::string>> &options) const
 {
   options.push_back (std::pair<std::string, std::string> (cfg_auto_sync_libraries, "false"));
 }
 
-void
-LibraryController::get_menu_entries (std::vector<lay::MenuEntry> & /*menu_entries*/) const
+void LibraryController::get_menu_entries (std::vector<lay::MenuEntry> & /*menu_entries*/) const
 {
   //  .. nothing yet ..
 }
 
-bool
-LibraryController::configure (const std::string &name, const std::string &value)
+bool LibraryController::configure (const std::string &name, const std::string &value)
 {
   if (name == cfg_auto_sync_libraries) {
 
@@ -111,34 +105,29 @@ LibraryController::configure (const std::string &name, const std::string &value)
     if (sync) {
       dm_sync_files ();
     }
-
   }
 
   //  don't consume
   return false;
 }
 
-void
-LibraryController::config_finalize()
+void LibraryController::config_finalize ()
 {
   //  .. nothing yet ..
 }
 
-bool
-LibraryController::can_exit (lay::Dispatcher * /*root*/) const
+bool LibraryController::can_exit (lay::Dispatcher * /*root*/) const
 {
   //  .. nothing yet ..
   return true;
 }
 
-void
-LibraryController::sync_files_maybe ()
+void LibraryController::sync_files_maybe ()
 {
   sync_files (false);
 }
 
-void
-LibraryController::sync_files (bool always)
+void LibraryController::sync_files (bool always)
 {
   if (tl::verbosity () >= 20) {
     if (always) {
@@ -158,7 +147,7 @@ LibraryController::sync_files (bool always)
   std::map<std::string, LibInfo> new_lib_files;
 
   //  build a list of paths vs. technology
-  std::vector<std::pair<std::string, std::string> > paths;
+  std::vector<std::pair<std::string, std::string>> paths;
 
   std::vector<std::string> klayout_path = lay::ApplicationBase::instance ()->klayout_path ();
   for (std::vector<std::string>::const_iterator p = klayout_path.begin (); p != klayout_path.end (); ++p) {
@@ -186,10 +175,10 @@ LibraryController::sync_files (bool always)
 
   std::string lib_file = tl::get_env ("KLAYOUT_LIB");
 
-  std::vector <std::pair<std::string, std::string> > lib_files;
+  std::vector<std::pair<std::string, std::string>> lib_files;
 
   if (lib_file.empty ()) {
-    for (std::vector <std::pair<std::string, std::string> >::const_iterator p = paths.begin (); p != paths.end (); ++p) {
+    for (std::vector<std::pair<std::string, std::string>>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
       std::string lf = tl::combine_path (p->first, "klayout.lib");
       if (tl::is_readable (lf)) {
         lib_files.push_back (std::make_pair (lf, p->second));
@@ -215,15 +204,15 @@ LibraryController::sync_files (bool always)
       }
 
     } catch (tl::Exception &ex) {
-      tl::error << tl::to_string (tr ("Error reading lib file")) << " " << lf->first << ":" << tl::endl << ex.msg ();
+      tl::error << tl::to_string (tr ("Error reading lib file")) << " " << lf->first << ":" << tl::endl
+                << ex.msg ();
     } catch (...) {
     }
-
   }
 
   //  scan for libraries
 
-  for (std::vector <std::pair<std::string, std::string> >::const_iterator p = paths.begin (); p != paths.end (); ++p) {
+  for (std::vector<std::pair<std::string, std::string>>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
 
     QDir lp = QDir (tl::to_qstring (p->first)).filePath (tl::to_qstring ("libraries"));
     if (lp.exists ()) {
@@ -252,9 +241,7 @@ LibraryController::sync_files (bool always)
       }
 
       read_libs (libs, new_lib_files, always);
-
     }
-
   }
 
   if (m_file_watcher) {
@@ -273,7 +260,7 @@ LibraryController::sync_files (bool always)
 
     std::pair<bool, db::lib_id_type> li = db::LibraryManager::instance ().lib_by_name (lf->second.name, lf->second.tech);
     if (! li.first) {
-      continue;  //  should not happen
+      continue; //  should not happen
     }
 
     db::Library *lib = db::LibraryManager::instance ().lib (li.second);
@@ -291,9 +278,7 @@ LibraryController::sync_files (bool always)
         tl::error << ex.msg ();
       } catch (...) {
       }
-
     }
-
   }
 
   //  establish the new libraries
@@ -304,8 +289,7 @@ LibraryController::sync_files (bool always)
 namespace
 {
 
-struct LibFileFunctionContext
-{
+struct LibFileFunctionContext {
   std::string lib_file;
   std::string tech;
   std::vector<LibraryController::LibFileInfo> *lib_files;
@@ -319,7 +303,8 @@ class DefineFunction
 public:
   DefineFunction (LibFileFunctionContext *fc)
     : mp_fc (fc)
-  { }
+  {
+  }
 
   virtual bool supports_keyword_parameters () const { return true; }
 
@@ -331,10 +316,10 @@ public:
 
     std::string lf, name;
     if (args.size () == 1) {
-      lf = args[0].to_string ();
+      lf = args [0].to_string ();
     } else {
-      name = args[0].to_string ();
-      lf = args[1].to_string ();
+      name = args [0].to_string ();
+      lf = args [1].to_string ();
     }
 
     LibraryController::LibFileInfo fi;
@@ -381,15 +366,11 @@ public:
         } else {
 
           throw tl::EvalError (tl::sprintf (tl::to_string (tr ("Unknown keyword argument '%s' for 'define' function - the only allowed keyword arguments are 'replicate', 'technology' and 'technologies")), k->first), context);
-
         }
-
       }
-
     }
 
     mp_fc->lib_files->push_back (fi);
-
   }
 
 private:
@@ -402,7 +383,8 @@ class IncludeFunction
 public:
   IncludeFunction (LibFileFunctionContext *fc)
     : mp_fc (fc)
-  { }
+  {
+  }
 
   virtual void execute (const tl::ExpressionParserContext &context, tl::Variant & /*out*/, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
@@ -410,7 +392,7 @@ public:
       throw tl::EvalError (tl::to_string (tr ("'include' function needs exactly one argument (the include file path)")), context);
     }
 
-    std::string lf = args[0].to_string ();
+    std::string lf = args [0].to_string ();
 
     LibFileFunctionContext fc = *mp_fc;
     fc.lib_file = tl::is_absolute (lf) ? lf : tl::combine_path (tl::absolute_path (mp_fc->lib_file), lf);
@@ -441,8 +423,7 @@ do_read_lib_file (LibFileFunctionContext &fc)
 
 }
 
-void
-LibraryController::read_lib_file (const std::string &lib_file, const std::string &tech, std::vector<LibraryController::LibFileInfo> &file_info)
+void LibraryController::read_lib_file (const std::string &lib_file, const std::string &tech, std::vector<LibraryController::LibFileInfo> &file_info)
 {
   LibFileFunctionContext fc;
   fc.tech = tech;
@@ -452,8 +433,7 @@ LibraryController::read_lib_file (const std::string &lib_file, const std::string
   do_read_lib_file (fc);
 }
 
-void
-LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> &libs, std::map<std::string, LibraryController::LibInfo> &new_lib_files, bool always)
+void LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> &libs, std::map<std::string, LibraryController::LibInfo> &new_lib_files, bool always)
 {
   bool needs_load = always;
 
@@ -468,7 +448,6 @@ LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> 
     } else if (fi.lastModified () > ll->second.time || im->tech != ll->second.tech || im->replicate != ll->second.replicate) {
       needs_load = true;
     }
-
   }
 
   if (! needs_load) {
@@ -482,7 +461,6 @@ LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> 
       if (ll != m_lib_files.end ()) {
         new_lib_files.insert (*ll);
       }
-
     }
 
   } else {
@@ -535,13 +513,11 @@ LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> 
 
           lib->set_name (libname);
           libs_by_name_here.insert (std::make_pair (libname, lib.release ()));
-
         }
 
       } catch (tl::Exception &ex) {
         tl::error << ex.msg ();
       }
-
     }
 
     //  Register the libs (NOTE: this needs to happen after the merge)
@@ -553,20 +529,17 @@ LibraryController::read_libs (const std::vector<LibraryController::LibFileInfo> 
       } catch (...) {
       }
     }
-
   }
 }
 
-void
-LibraryController::sync_with_external_sources ()
+void LibraryController::sync_with_external_sources ()
 {
   tl::log << tl::to_string (tr ("Package updates - updating libraries"));
   m_sync_once = true;
   dm_sync_files ();
 }
 
-void
-LibraryController::file_watcher_triggered ()
+void LibraryController::file_watcher_triggered ()
 {
   if (m_sync) {
     tl::log << tl::to_string (tr ("Detected file system change in libraries - updating"));
@@ -578,7 +551,7 @@ LibraryController *
 LibraryController::instance ()
 {
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    LibraryController *sc = dynamic_cast <LibraryController *> (cls.operator-> ());
+    LibraryController *sc = dynamic_cast<LibraryController *> (cls.operator->());
     if (sc) {
       return sc;
     }
@@ -590,4 +563,3 @@ LibraryController::instance ()
 static tl::RegisteredClass<lay::PluginDeclaration> library_controller_decl (new lay::LibraryController (), 150, "LibraryController");
 
 }
-

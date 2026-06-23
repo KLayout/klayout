@@ -105,7 +105,7 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
   bool any = false;
 
   int n = 0;
-  for ( ; ! equal; ++n) {
+  for (; ! equal; ++n) {
 
     db::Layout layout_au;
 
@@ -160,25 +160,19 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
         }
 
         equal = db::compare_layouts (*subject, top_subject, layout_au, top_au,
-                                       (n > 0 ? db::layout_diff::f_silent : db::layout_diff::f_verbose)
-                                       | ((norm & AsPolygons) != 0 ? db::layout_diff::f_boxes_as_polygons + db::layout_diff::f_paths_as_polygons : 0)
-                                       | ((norm & WithArrays) != 0 ? 0 : db::layout_diff::f_flatten_array_insts)
-                                       | ((norm & WithMeta) == 0 ? 0 : db::layout_diff::f_with_meta
-                                       | db::layout_diff::f_smart_cell_mapping)
+                                     (n > 0 ? db::layout_diff::f_silent : db::layout_diff::f_verbose) | ((norm & AsPolygons) != 0 ? db::layout_diff::f_boxes_as_polygons + db::layout_diff::f_paths_as_polygons : 0) | ((norm & WithArrays) != 0 ? 0 : db::layout_diff::f_flatten_array_insts) | ((norm & WithMeta) == 0 ? 0 : db::layout_diff::f_with_meta | db::layout_diff::f_smart_cell_mapping)
                                      /*| db::layout_diff::f_no_text_details | db::layout_diff::f_no_text_orientation*/
-                                     , tolerance, 100 /*max diff lines*/);
+                                     ,
+                                     tolerance, 100 /*max diff lines*/);
 
 
       } else {
 
         equal = db::compare_layouts (*subject, layout_au,
-                                       (n > 0 ? db::layout_diff::f_silent : db::layout_diff::f_verbose)
-                                       | ((norm & AsPolygons) != 0 ? db::layout_diff::f_boxes_as_polygons + db::layout_diff::f_paths_as_polygons : 0)
-                                       | ((norm & WithArrays) != 0 ? 0 : db::layout_diff::f_flatten_array_insts)
-                                       | ((norm & WithMeta) == 0 ? 0 : db::layout_diff::f_with_meta)
+                                     (n > 0 ? db::layout_diff::f_silent : db::layout_diff::f_verbose) | ((norm & AsPolygons) != 0 ? db::layout_diff::f_boxes_as_polygons + db::layout_diff::f_paths_as_polygons : 0) | ((norm & WithArrays) != 0 ? 0 : db::layout_diff::f_flatten_array_insts) | ((norm & WithMeta) == 0 ? 0 : db::layout_diff::f_with_meta)
                                      /*| db::layout_diff::f_no_text_details | db::layout_diff::f_no_text_orientation*/
-                                     , tolerance, 100 /*max diff lines*/);
-
+                                     ,
+                                     tolerance, 100 /*max diff lines*/);
       }
 
       if (equal && n > 0) {
@@ -191,7 +185,6 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
       }
       break;
     }
-
   }
 
   if (! equal) {
@@ -207,7 +200,7 @@ class CompareLogger
 {
 public:
   CompareLogger ()
-    : m_new_circuit (true) { }
+    : m_new_circuit (true) {}
 
   void out (const std::string &text)
   {
@@ -377,8 +370,7 @@ void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist,
 }
 
 template <class Container, class Shape>
-static
-bool do_compare (const Container &cont, const std::string &string)
+static bool do_compare (const Container &cont, const std::string &string)
 {
   std::set<Shape> a, b;
 
@@ -386,11 +378,11 @@ bool do_compare (const Container &cont, const std::string &string)
   tl::Extractor ex (string.c_str ());
   ex.read (cs);
 
-  for (typename Container::const_iterator i = cont.begin (); !i.at_end (); ++i) {
+  for (typename Container::const_iterator i = cont.begin (); ! i.at_end (); ++i) {
     a.insert (*i);
   }
 
-  for (typename Container::const_iterator i = cs.begin (); !i.at_end (); ++i) {
+  for (typename Container::const_iterator i = cs.begin (); ! i.at_end (); ++i) {
     b.insert (*i);
   }
 

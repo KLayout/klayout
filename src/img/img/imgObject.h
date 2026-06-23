@@ -43,8 +43,9 @@
 class QImage;
 #endif
 
-namespace img {
-  
+namespace img
+{
+
 class DataHeader;
 
 /**
@@ -52,10 +53,9 @@ class DataHeader;
  *
  *  Data mapping is the process of transforming the data into RGB pixel values.
  */
-struct IMG_PUBLIC DataMapping
-{
+struct IMG_PUBLIC DataMapping {
 public:
-  typedef std::vector< std::pair<double, std::pair<tl::Color, tl::Color> > > false_color_nodes_type;
+  typedef std::vector<std::pair<double, std::pair<tl::Color, tl::Color>>> false_color_nodes_type;
 
   /**
    *  @brief The constructor
@@ -83,7 +83,7 @@ public:
   /**
    *  @brief The brightness value
    *
-   *  The brightness is a double value between -1.0 and 1.0. 
+   *  The brightness is a double value between -1.0 and 1.0.
    *  Neutral brightness is 0.0.
    */
   double brightness;
@@ -91,7 +91,7 @@ public:
   /**
    *  @brief The contrast value
    *
-   *  The contrast is a double value between -1.0 and 1.0. 
+   *  The contrast is a double value between -1.0 and 1.0.
    *  Neutral contrast is 0.0.
    */
   double contrast;
@@ -104,7 +104,7 @@ public:
   /**
    *  @brief The red channel gain
    *
-   *  This value is the multiplier by which the red channel is scaled after applying 
+   *  This value is the multiplier by which the red channel is scaled after applying
    *  false color transformation and contrast/brightness/gamma.
    *
    *  1.0 is a neutral value. The gain should be >=0.0.
@@ -114,7 +114,7 @@ public:
   /**
    *  @brief The green channel gain
    *
-   *  This value is the multiplier by which the green channel is scaled after applying 
+   *  This value is the multiplier by which the green channel is scaled after applying
    *  false color transformation and contrast/brightness/gamma.
    *
    *  1.0 is a neutral value. The gain should be >=0.0.
@@ -124,7 +124,7 @@ public:
   /**
    *  @brief The blue channel gain
    *
-   *  This value is the multiplier by which the blue channel is scaled after applying 
+   *  This value is the multiplier by which the blue channel is scaled after applying
    *  false color transformation and contrast/brightness/gamma.
    *
    *  1.0 is a neutral value. The gain should be >=0.0.
@@ -149,17 +149,17 @@ IMG_PUBLIC tl::Color interpolated_color (const DataMapping::false_color_nodes_ty
 
 /**
  *  @brief A image object
- * 
+ *
  *  This class implements the actual image.
  *  Since this class derives from db::UserObjectBase, these objects
  *  can be stored within the database.
- */  
+ */
 class IMG_PUBLIC Object
   : public db::DUserObjectBase
 {
 public:
   typedef db::coord_traits<coord_type> coord_traits;
-  typedef std::vector <db::DPoint> landmarks_type;
+  typedef std::vector<db::DPoint> landmarks_type;
 
   /**
    *  @brief Default constructor
@@ -179,7 +179,7 @@ public:
    *  This constructor creates an image object from a data set describing one monochrome channel
    *  or three color channels.
    *  Each channel consists of an array of x*y values where the first "x" values describe the first (lowest!) row
-   *  and so on. Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  and so on. Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *  The data fields can be accessed with the "data", "set_data", "pixel" or "set_pixel" methods.
    *
@@ -196,7 +196,7 @@ public:
    *
    *  This constructor creates an image from the given pixel values. The values have to be organized
    *  line by line. Each line must consist of "w" values where the first value is the leftmost pixel.
-   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *  The pixel values are given as unsigned char values with a data range of 0 to 255.
    *
@@ -212,7 +212,7 @@ public:
    *
    *  This constructor creates an image from the given pixel values. The values have to be organized
    *  line by line. Each line must consist of "w" values where the first value is the leftmost pixel.
-   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *
    *  @param w The width of the image
@@ -227,7 +227,7 @@ public:
    *
    *  This constructor creates an image from the given pixel values. The values have to be organized
    *  line by line. Each line must consist of "w" values where the first value is the leftmost pixel.
-   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *
    *  @param w The width of the image
@@ -235,14 +235,14 @@ public:
    *  @param trans The transformation from pixel space to micron space
    *  @param d The data set
    */
-  Object (size_t w, size_t h, const db::DCplxTrans &trans, const std::vector <double> &d);
+  Object (size_t w, size_t h, const db::DCplxTrans &trans, const std::vector<double> &d);
 
   /**
    *  @brief Constructor for a color image with the given pixel values
    *
    *  This constructor creates an image from the given pixel values. The values have to be organized
    *  line by line and separated by color channel. Each line must consist of "w" values where the first value is the leftmost pixel.
-   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *  The pixel values are given as unsigned char values with a data range of 0 to 255.
    *
@@ -260,7 +260,7 @@ public:
    *
    *  This constructor creates an image from the given pixel values. The values have to be organized
    *  line by line and separated by color channel. Each line must consist of "w" values where the first value is the leftmost pixel.
-   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *
    *  @param w The width of the image
@@ -277,22 +277,22 @@ public:
    *
    *  This constructor creates an image from the given pixel values. The values have to be organized
    *  line by line and separated by color channel. Each line must consist of "w" values where the first value is the leftmost pixel.
-   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *
    *  @param w The width of the image
    *  @param h The height of the image
    *  @param trans The transformation from pixel space to micron space
-   *  @param red The red channel data set 
+   *  @param red The red channel data set
    *  @param green The green channel data set
    *  @param blue The blue channel data set
    */
-  Object (size_t w, size_t h, const db::DCplxTrans &trans, const std::vector <double> &red, const std::vector <double> &green, const std::vector <double> &blue);
+  Object (size_t w, size_t h, const db::DCplxTrans &trans, const std::vector<double> &red, const std::vector<double> &green, const std::vector<double> &blue);
 
   /**
-   *  @brief Constructor from a image file 
+   *  @brief Constructor from a image file
    *
-   *  This constructor creates an image object from a file (which can have any format supported by Qt) and 
+   *  This constructor creates an image object from a file (which can have any format supported by Qt) and
    *  a transformation. The image will originally be put to position 0, 0 (lower left corner) and each pixel
    *  will have a size of 1. The transformation describes how to transform this image into micron space.
    */
@@ -324,7 +324,7 @@ public:
    *  This constructor creates an image object from a data set describing one monochrome channel
    *  or three color channels.
    *  Each channel consists of an array of x*y values where the first "x" values describe the first (lowest!) row
-   *  and so on. Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  and so on. Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *  The data fields can be accessed with the "data", "set_data", "pixel" or "set_pixel" methods.
    *
@@ -341,7 +341,7 @@ public:
    *
    *  This constructor creates an image from the given pixel values. The values have to be organized
    *  line by line. Each line must consist of "w" values where the first value is the leftmost pixel.
-   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *  The pixel values are given as unsigned char values with a data range of 0 to 255.
    *
@@ -357,7 +357,7 @@ public:
    *
    *  This constructor creates an image from the given pixel values. The values have to be organized
    *  line by line. Each line must consist of "w" values where the first value is the leftmost pixel.
-   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *
    *  @param w The width of the image
@@ -372,7 +372,7 @@ public:
    *
    *  This constructor creates an image from the given pixel values. The values have to be organized
    *  line by line. Each line must consist of "w" values where the first value is the leftmost pixel.
-   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *
    *  @param w The width of the image
@@ -380,14 +380,14 @@ public:
    *  @param matrix The 3d transformation matrix from pixel space to micron space
    *  @param d The data set
    */
-  Object (size_t w, size_t h, const db::Matrix3d &trans, const std::vector <double> &d);
+  Object (size_t w, size_t h, const db::Matrix3d &trans, const std::vector<double> &d);
 
   /**
    *  @brief Constructor for a color image with the given pixel values
    *
    *  This constructor creates an image from the given pixel values. The values have to be organized
    *  line by line and separated by color channel. Each line must consist of "w" values where the first value is the leftmost pixel.
-   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *  The pixel values are given as unsigned char values with a data range of 0 to 255.
    *
@@ -405,7 +405,7 @@ public:
    *
    *  This constructor creates an image from the given pixel values. The values have to be organized
    *  line by line and separated by color channel. Each line must consist of "w" values where the first value is the leftmost pixel.
-   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *
    *  @param w The width of the image
@@ -422,22 +422,22 @@ public:
    *
    *  This constructor creates an image from the given pixel values. The values have to be organized
    *  line by line and separated by color channel. Each line must consist of "w" values where the first value is the leftmost pixel.
-   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to 
+   *  Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to
    *  the common convention for image data.
    *
    *  @param w The width of the image
    *  @param h The height of the image
    *  @param matrix The 3d transformation matrix from pixel space to micron space
-   *  @param red The red channel data set 
+   *  @param red The red channel data set
    *  @param green The green channel data set
    *  @param blue The blue channel data set
    */
-  Object (size_t w, size_t h, const db::Matrix3d &matrix, const std::vector <double> &red, const std::vector <double> &green, const std::vector <double> &blue);
+  Object (size_t w, size_t h, const db::Matrix3d &matrix, const std::vector<double> &red, const std::vector<double> &green, const std::vector<double> &blue);
 
   /**
-   *  @brief Constructor from a image file 
+   *  @brief Constructor from a image file
    *
-   *  This constructor creates an image object from a file (which can have any format supported by Qt) and 
+   *  This constructor creates an image object from a file (which can have any format supported by Qt) and
    *  a transformation. The image will originally be put to position 0, 0 (lower left corner) and each pixel
    *  will have a size of 1. The transformation describes how to transform this image into micron space.
    */
@@ -506,8 +506,8 @@ public:
    *
    *  This method reimplements the db::DUserObjectBase interface.
    *
-   *  The bounding box can be a world bbox since under certain perspective transformations the 
-   *  image may extend into the forbidden z space. For a more exact representation use 
+   *  The bounding box can be a world bbox since under certain perspective transformations the
+   *  image may extend into the forbidden z space. For a more exact representation use
    *  the image_box_polygon method which delivers the box clipped to a certain viewport.
    */
   virtual db::DBox box () const;
@@ -519,8 +519,8 @@ public:
    *  box. This happens if corner points of the image are located in the invalid z space (z <= 0). In this
    *  case this method can be used which delivers a polygon which is the transformed image box clipped
    *  by the given viewport box which and viewport transformation. More precisely, the viewport box vp
-   *  is transformed with vpt.inverted() and the resulting polygon is used as the clip polygon to determine the 
-   *  outer contour of the image in viewport space (micron space plus vpt). 
+   *  is transformed with vpt.inverted() and the resulting polygon is used as the clip polygon to determine the
+   *  outer contour of the image in viewport space (micron space plus vpt).
    *  This method may deliver an empty polygon if the image is outside the viewport area.
    */
   db::DPolygon image_box_poly (const db::DBox vp, const db::DCplxTrans &vpt) const;
@@ -572,7 +572,7 @@ public:
   }
 
   /**
-   *  @brief Return the moved object 
+   *  @brief Return the moved object
    */
   Object moved (const db::DVector &p) const
   {
@@ -694,7 +694,7 @@ public:
    *  @param x The x coordinate of the pixel (0..width()-1)
    *  @param y The y coordinate of the pixel (mathematical order: 0 is the lowest, 0..height()-1)
    *
-   *  If the x or y value exceeds the image bounds or the image is not a monochrome image, this method 
+   *  If the x or y value exceeds the image bounds or the image is not a monochrome image, this method
    *  returns 0.0.
    */
   double pixel (size_t x, size_t y) const;
@@ -706,7 +706,7 @@ public:
    *  @param y The y coordinate of the pixel (mathematical order: 0 is the lowest, 0..height()-1)
    *  @param component 0 for red, 1 for green, 2 for blue.
    *
-   *  If the component index, x or y value exceeds the image bounds, this method 
+   *  If the component index, x or y value exceeds the image bounds, this method
    *  returns 0.0. For monochrome images, the component index is ignored.
    */
   double pixel (size_t x, size_t y, unsigned int component) const;
@@ -838,7 +838,7 @@ public:
     return m_min_value;
   }
 
-  /** 
+  /**
    *  @brief Set the minimum value
    *
    *  See the \min_value method for the description of the minimum value property.
@@ -857,17 +857,17 @@ public:
     return m_max_value;
   }
 
-  /** 
+  /**
    *  @brief Set the maximum value
    *
    *  See the \max_value method for the description of the maximum value property.
    */
   void set_max_value (double h);
 
-  /**  
-   *  @brief Get the Id 
-   *  
-   *  Upon initialization, an unique Id is given to the object. The Id is used to 
+  /**
+   *  @brief Get the Id
+   *
+   *  Upon initialization, an unique Id is given to the object. The Id is used to
    *  identify the object in the context of the service.
    */
   size_t id () const
@@ -910,7 +910,7 @@ public:
   /**
    *  @brief Set the visibility
    */
-  void set_visible (bool v) 
+  void set_visible (bool v)
   {
     if (m_visible != v) {
       m_visible = v;
@@ -982,7 +982,7 @@ public:
   void load_data (const std::string &filename, bool adjust_min_max = true);
 
   /**
-   *  @brief Get the landmarks 
+   *  @brief Get the landmarks
    *
    *  The landmark coordinates are given relative to the center of the image.
    */
@@ -1010,11 +1010,11 @@ public:
    */
   bool operator!= (const img::Object &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
-   *  @brief The class name for the generic user object factory 
+   *  @brief The class name for the generic user object factory
    */
   virtual const char *class_name () const;
 
@@ -1061,7 +1061,7 @@ private:
   DataMapping m_data_mapping;
   bool m_visible;
   mutable const tl::color_t *mp_pixel_data;
-  std::vector <db::DPoint> m_landmarks;
+  std::vector<db::DPoint> m_landmarks;
   int m_z_position;
   db::LayerProperties m_layer_binding;
   bool m_updates_enabled;
@@ -1080,4 +1080,3 @@ private:
 }
 
 #endif
-

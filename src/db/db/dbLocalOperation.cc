@@ -30,7 +30,7 @@ namespace db
 //  local_operations implementation
 
 template <class TS, class TI, class TR>
-void local_operation<TS, TI, TR>::compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const
+void local_operation<TS, TI, TR>::compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase *proc) const
 {
   if (interactions.num_subjects () <= 1 || ! requests_single_subjects ()) {
 
@@ -67,9 +67,7 @@ void local_operation<TS, TI, TR>::compute_local (db::Layout *layout, db::Cell *s
       if (progress.get ()) {
         ++*progress;
       }
-
     }
-
   }
 }
 
@@ -116,4 +114,3 @@ template class DB_PUBLIC local_operation<db::EdgePair, db::PolygonRef, db::Polyg
 template class DB_PUBLIC local_operation<db::EdgePair, db::Edge, db::Edge>;
 
 }
-

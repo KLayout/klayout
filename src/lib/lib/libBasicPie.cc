@@ -50,7 +50,7 @@ BasicPie::BasicPie ()
   //  .. nothing yet ..
 }
 
-std::vector<db::PCellLayerDeclaration> 
+std::vector<db::PCellLayerDeclaration>
 BasicPie::get_layer_declarations (const db::pcell_parameters_type &parameters) const
 {
   std::vector<db::PCellLayerDeclaration> layers;
@@ -63,8 +63,7 @@ BasicPie::get_layer_declarations (const db::pcell_parameters_type &parameters) c
   return layers;
 }
 
-void 
-BasicPie::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters_type &parameters) const
+void BasicPie::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters_type &parameters) const
 {
   if (parameters.size () < p_total) {
     return;
@@ -73,14 +72,14 @@ BasicPie::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters
   double ru = parameters [p_radius].to_double ();
   double r = parameters [p_actual_radius].to_double ();
   double rs = ru;
-  if (parameters [p_actual_handle1].is_user <db::DPoint> ()) {
-    rs = parameters [p_actual_handle1].to_user <db::DPoint> ().distance ();
-    if (parameters [p_actual_handle2].is_user <db::DPoint> ()) {
-      rs = std::max (rs, parameters [p_actual_handle2].to_user <db::DPoint> ().distance ());
+  if (parameters [p_actual_handle1].is_user<db::DPoint> ()) {
+    rs = parameters [p_actual_handle1].to_user<db::DPoint> ().distance ();
+    if (parameters [p_actual_handle2].is_user<db::DPoint> ()) {
+      rs = std::max (rs, parameters [p_actual_handle2].to_user<db::DPoint> ().distance ());
     }
-  } else if (parameters [p_actual_handle2].is_user <db::DPoint> ()) {
-    rs = parameters [p_actual_handle2].to_user <db::DPoint> ().distance ();
-  } 
+  } else if (parameters [p_actual_handle2].is_user<db::DPoint> ()) {
+    rs = parameters [p_actual_handle2].to_user<db::DPoint> ().distance ();
+  }
 
   double a1u = parameters [p_start_angle].to_double ();
   double a1 = parameters [p_actual_start_angle].to_double ();
@@ -119,7 +118,7 @@ BasicPie::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters
   } else if (h1u.distance (h1) > 1e-6 || h2u.distance (h2) > 1e-6) {
 
     //  the handle has changed: use this
-    
+
     double a1s = 180.0 * atan2 (h1.y (), h1.x ()) / M_PI;
     double a2s = 180.0 * atan2 (h2.y (), h2.x ()) / M_PI;
 
@@ -132,7 +131,6 @@ BasicPie::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters
     parameters [p_actual_radius] = ru;
     parameters [p_actual_start_angle] = a1u;
     parameters [p_actual_end_angle] = a2u;
-
   }
 
   //  set the hidden used radius parameter
@@ -143,8 +141,7 @@ BasicPie::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters
   parameters [p_handle2] = h2u;
 }
 
-void 
-BasicPie::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
+void BasicPie::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
 {
   if (parameters.size () < p_total || layer_ids.size () < 1) {
     return;
@@ -161,11 +158,11 @@ BasicPie::produce (const db::Layout &layout, const std::vector<unsigned int> &la
   }
   int n = std::max (2, int (floor (0.5 + std::max (8, parameters [p_npoints].to_int ()) * (a2 - a1) / 360.0)));
 
-  std::vector <db::Point> points;
+  std::vector<db::Point> points;
   points.reserve (n + 3);
 
-  //  Produce an outer circle approximation. This 
-  //  one looks slightly better in the case of few points. 
+  //  Produce an outer circle approximation. This
+  //  one looks slightly better in the case of few points.
   double rr = r / cos (M_PI * (a2 - a1) / (360.0 * n));
   double da = M_PI * (a2 - a1) / (180.0 * n);
   for (int i = 0; i < n; ++i) {
@@ -183,29 +180,29 @@ BasicPie::produce (const db::Layout &layout, const std::vector<unsigned int> &la
   cell.shapes (layer_ids [p_layer]).insert (poly);
 }
 
-std::string 
+std::string
 BasicPie::get_display_name (const db::pcell_parameters_type &parameters) const
 {
   return "PIE(l=" + std::string (parameters [p_layer].to_string ()) +
-            ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
-            ",a=" + tl::to_string (parameters [p_start_angle].to_double (), 6) +
-             ".." + tl::to_string (parameters [p_end_angle].to_double (), 6) +
-            ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
-              ")";
+         ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
+         ",a=" + tl::to_string (parameters [p_start_angle].to_double (), 6) +
+         ".." + tl::to_string (parameters [p_end_angle].to_double (), 6) +
+         ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
+         ")";
 }
 
-std::vector<db::PCellParameterDeclaration> 
+std::vector<db::PCellParameterDeclaration>
 BasicPie::get_parameter_declarations () const
 {
   std::vector<db::PCellParameterDeclaration> parameters;
 
-  //  parameter #0: layer 
+  //  parameter #0: layer
   tl_assert (parameters.size () == p_layer);
   parameters.push_back (db::PCellParameterDeclaration ("layer"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_layer);
   parameters.back ().set_description (tl::to_string (tr ("Layer")));
 
-  //  parameter #1: radius 
+  //  parameter #1: radius
   //  This parameter is updated by "coerce_parameters" from "actual_radius" or the handles,
   //  whichever changed.
   tl_assert (parameters.size () == p_radius);
@@ -213,14 +210,14 @@ BasicPie::get_parameter_declarations () const
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
   parameters.back ().set_hidden (true);
 
-  //  parameter #2: start angle 
+  //  parameter #2: start angle
   //  This is a shadow parameter to keep the final start angle
   tl_assert (parameters.size () == p_start_angle);
   parameters.push_back (db::PCellParameterDeclaration ("a1"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
   parameters.back ().set_hidden (true);
 
-  //  parameter #3: end angle 
+  //  parameter #3: end angle
   //  This is a shadow parameter to keep the final end angle
   tl_assert (parameters.size () == p_end_angle);
   parameters.push_back (db::PCellParameterDeclaration ("a2"));
@@ -243,7 +240,7 @@ BasicPie::get_parameter_declarations () const
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
   parameters.back ().set_hidden (true);
 
-  //  parameter #6: number of points 
+  //  parameter #6: number of points
   tl_assert (parameters.size () == p_npoints);
   parameters.push_back (db::PCellParameterDeclaration ("npoints"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_int);
@@ -293,5 +290,3 @@ BasicPie::get_parameter_declarations () const
 }
 
 }
-
-

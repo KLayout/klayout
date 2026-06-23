@@ -75,7 +75,7 @@ bool EdgePairFilterByDistance::selected (const db::EdgePair &edge_pair, db::prop
 {
   distance_type dist = edge_pair.distance ();
   bool sel = (dist >= m_min_distance && dist < m_max_distance);
-  return m_inverted ? !sel : sel;
+  return m_inverted ? ! sel : sel;
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ bool EdgePairFilterByArea::selected (const db::EdgePair &edge_pair, db::properti
 {
   area_type dist = edge_pair.to_simple_polygon (0).area ();
   bool sel = (dist >= m_min_area && dist < m_max_area);
-  return m_inverted ? !sel : sel;
+  return m_inverted ? ! sel : sel;
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -109,8 +109,7 @@ InternalAngleEdgePairFilter::InternalAngleEdgePairFilter (double amin, bool incl
   //  .. nothing yet ..
 }
 
-bool
-InternalAngleEdgePairFilter::selected (const db::EdgePair &edge_pair, db::properties_id_type) const
+bool InternalAngleEdgePairFilter::selected (const db::EdgePair &edge_pair, db::properties_id_type) const
 {
   db::Vector d1 = edge_pair.first ().d ();
   db::Vector d2 = edge_pair.second ().d ();

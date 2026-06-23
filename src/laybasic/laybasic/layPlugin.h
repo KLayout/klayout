@@ -38,7 +38,7 @@
 
 namespace db
 {
-  class Manager;
+class Manager;
 }
 
 namespace lay
@@ -61,9 +61,8 @@ class ConfigPage;
  *  @brief A menu entry declaration
  *  See separator, menu_item, submenu and config_menu_item below.
  */
-struct LAYBASIC_PUBLIC MenuEntry
-{
-  MenuEntry () : sub_menu (false), checkable (false), separator (false) { }
+struct LAYBASIC_PUBLIC MenuEntry {
+  MenuEntry () : sub_menu (false), checkable (false), separator (false) {}
 
   std::string menu_name;
   std::string symbol;
@@ -146,20 +145,20 @@ LAYBASIC_PUBLIC MenuEntry config_menu_item (const std::string &menu_name, const 
  */
 class LAYBASIC_PUBLIC PluginDeclaration :
 #if defined(HAVE_QT)
-    public QObject,
+  public QObject,
 #endif
-    public gsi::ObjectBase
+  public gsi::ObjectBase
 {
 #if defined(HAVE_QT)
-Q_OBJECT
+  Q_OBJECT
 #endif
 
 public:
-  /** 
+  /**
    *  @brief Constructor
    */
   PluginDeclaration ();
-  
+
   /**
    *  @brief Constructor with a fixed ID
    */
@@ -180,10 +179,10 @@ public:
 
   /**
    *  @brief This method is supposed to deliver the option names available
-   *  
+   *
    *  @param options A vector of names and default value strings.
    */
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > & /*options*/) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> & /*options*/) const
   {
     //  the default implementation does not add any options
   }
@@ -207,16 +206,16 @@ public:
    *  @return A list of titles and ConfigPage instances
    *
    *  This method can be reimplemented alternatively to "config_page" when multiple pages shall be
-   *  used. The pages are inserted in the order they are defined. 
+   *  used. The pages are inserted in the order they are defined.
    */
-  virtual std::vector<std::pair <std::string, ConfigPage *> > config_pages (QWidget * /*parent*/) const
+  virtual std::vector<std::pair<std::string, ConfigPage *>> config_pages (QWidget * /*parent*/) const
   {
-    return std::vector<std::pair <std::string, ConfigPage *> > ();
+    return std::vector<std::pair<std::string, ConfigPage *>> ();
   }
 #endif
 
   /**
-   *  @brief The global configuration 
+   *  @brief The global configuration
    *
    *  By implementing this method, a configuration can be treated globally.
    *  Otherwise the individual plugin object (associated with a view) must handle
@@ -231,7 +230,7 @@ public:
   /**
    *  @brief Global menu handler
    *
-   *  This menu handler is called before the view specific handler is 
+   *  This menu handler is called before the view specific handler is
    *  called (lay::Plugin::menu_activated).
    *  The implementation is supposed to return true if it handles the menu entry.
    */
@@ -256,7 +255,7 @@ public:
   /**
    *  @brief Basic initialization
    *
-   *  Reimplementation of this method offers a chance to initialize static resources such as 
+   *  Reimplementation of this method offers a chance to initialize static resources such as
    *  dialogs etc.
    */
   virtual void initialize (lay::Dispatcher * /*dispatcher*/)
@@ -267,7 +266,7 @@ public:
   /**
    *  @brief Basic initialization
    *
-   *  Reimplementation of this method offers a chance to initialize static resources such as 
+   *  Reimplementation of this method offers a chance to initialize static resources such as
    *  dialogs etc.
    *  While initialize is called before any configuration is loaded, "initialized" will be
    *  called after the plugin system has been initially configured.
@@ -321,7 +320,7 @@ public:
   /**
    *  @brief Tells if the plugin implements the "lay::Editable" interface
    *
-   *  This method is supposed to return true if the plugin implements the 
+   *  This method is supposed to return true if the plugin implements the
    *  lay::Editable interface and wants to be listed as an "edit" mode in the
    *  "Edit" menu. The string returned in "title" is displayed in the "Edit" menu's
    *  corresponding mode entry.
@@ -346,7 +345,7 @@ public:
   /**
    *  @brief Gets pages created from registered factories by name
    */
-  static void get_additional_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher, const std::map<std::string, std::vector<const lay::PluginDeclaration *> > &names);
+  static void get_additional_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher, const std::map<std::string, std::vector<const lay::PluginDeclaration *>> &names);
 
   /**
    *  @brief Returns a list of editor options pages that the plugin wants to inherit
@@ -362,7 +361,7 @@ public:
   /**
    *  @brief Tells if the plugin implements a "lay::ViewService" active mouse mode
    *
-   *  This method is supposed to return true if the plugin implements the 
+   *  This method is supposed to return true if the plugin implements the
    *  lay::ViewService interface and wants to be listed as an mouse mode in the
    *  "Edit" menu. The string returned in "title" is displayed in the "Edit" menu's
    *  corresponding mode entry.
@@ -378,21 +377,21 @@ public:
    *  These are built-in modes from the LayoutViewBase. This method is intended for
    *  the LayoutViewBase's standard modes only.
    */
-  virtual void implements_primary_mouse_modes (std::vector<std::pair<std::string, std::pair<std::string, int> > > & /*modes*/)
+  virtual void implements_primary_mouse_modes (std::vector<std::pair<std::string, std::pair<std::string, int>>> & /*modes*/)
   {
     //  .. nothing yet ..
   }
-  
+
   /**
    *  @brief Returns the technology component provider
    *
-   *  If this plugin wants to register a technology component, it's declaration must 
-   *  include a technology component provider. This is responsible for creating 
+   *  If this plugin wants to register a technology component, it's declaration must
+   *  include a technology component provider. This is responsible for creating
    *  a technology component and an associated editor.
    *
    *  @return The provide object (no ownership is taken) or 0 if no technology component is created.
    */
-  virtual const TechnologyComponentProvider *technology_component_provider () const 
+  virtual const TechnologyComponentProvider *technology_component_provider () const
   {
     return 0;
   }
@@ -402,7 +401,7 @@ public:
    *
    *  This ID can be used to connect plugins to menus for example.
    *  Currently the ID is just the address of the declaration object.
-   *  The ID is guaranteed to be larger than 0, so negative ID's can be 
+   *  The ID is guaranteed to be larger than 0, so negative ID's can be
    *  used for different purposed.
    */
   int id () const
@@ -420,7 +419,7 @@ public:
   /**
    *  @brief Creates the menu resources for this plugin
    *
-   *  This method will create the menu resources for the plugin and perform the 
+   *  This method will create the menu resources for the plugin and perform the
    *  required connect operations. The dispatcher provides the menu and the
    *  event endpoints.
    */
@@ -468,7 +467,7 @@ public:
    *  @brief Notifies that dispatcher that a new plugin was registered
    *
    *  This method must be called when a plugin is dynamically created. It is important
-   *  that when this method is called, the menu items and other properties are set already. 
+   *  that when this method is called, the menu items and other properties are set already.
    */
   void register_plugin ();
 
@@ -521,11 +520,11 @@ class LAYBASIC_PUBLIC Plugin
     virtual public tl::Object
 {
 public:
-  typedef std::map <std::string, std::string>::const_iterator iterator;
+  typedef std::map<std::string, std::string>::const_iterator iterator;
 
   /**
    *  @brief The constructor
-   *  
+   *
    *  See above for a explanation of the parent-child relationship.
    */
   Plugin (Plugin *parent, bool standalone = false);
@@ -562,11 +561,11 @@ public:
    *  @brief Setup
    *
    *  Calling this method will make the root configurable object dump
-   *  it's current configuration to this object. The setup method can 
+   *  it's current configuration to this object. The setup method can
    *  be called in the derived object's constructor for example.
    */
   void config_setup ();
-  
+
   /**
    *  @brief Clear (reset to default) the configuration
    *
@@ -601,7 +600,7 @@ public:
    *  root element. It will use tl::to_string to convert the type into
    *  a string.
    */
-  template <class T> 
+  template <class T>
   void config_set (const std::string &name, const T &value)
   {
     config_set (name, tl::to_string (value));
@@ -615,7 +614,7 @@ public:
    *  root element. It will use conv.to_string to convert the type into
    *  a string.
    */
-  template <class T, class C> 
+  template <class T, class C>
   void config_set (const std::string &name, const T &value, C conv)
   {
     config_set (name, conv.to_string (value));
@@ -625,7 +624,7 @@ public:
    *  @brief Terminate a sequence of configuration setups
    *
    *  In order to make configuration changes effective, this method
-   *  must be called. It calls config_finalize recursively on the 
+   *  must be called. It calls config_finalize recursively on the
    *  children. In GUI-enabled applications this step is optional
    *  and is performed automatically through a timer.
    */
@@ -636,7 +635,7 @@ public:
    *
    *  This method will fetch the parameter from the repository.
    *  It can only be called on the root element.
-   *  If no parameter with the given name is known, this method will 
+   *  If no parameter with the given name is known, this method will
    *  return false and set "value" to empty.
    */
   bool config_get (const std::string &name, std::string &value) const;
@@ -646,7 +645,7 @@ public:
    *
    *  This is a convenience method which behaves similar. It will return the
    *  configuration value for the given configuration option name. However, if the
-   *  configuration option with the given name does not exist, simply an 
+   *  configuration option with the given name does not exist, simply an
    *  empty string is returned.
    */
   std::string config_get (const std::string &name) const
@@ -744,11 +743,11 @@ public:
   /**
    *  @brief Menu command handler
    *
-   *  This method is called if a menu entry registered in the 
-   *  plugin declaration is activated. The string passed is the 
+   *  This method is called if a menu entry registered in the
+   *  plugin declaration is activated. The string passed is the
    *  symbol of the menu entry.
    */
-  virtual void menu_activated (const std::string & /*symbol*/) 
+  virtual void menu_activated (const std::string & /*symbol*/)
   {
     // .. this implementation does nothing ..
   }
@@ -843,7 +842,7 @@ public:
    *
    *  The association is done when the plugin is created. It should not be changed.
    */
-  void set_plugin_declaration (const PluginDeclaration *pd) 
+  void set_plugin_declaration (const PluginDeclaration *pd)
   {
     mp_plugin_declaration = pd;
   }
@@ -896,7 +895,7 @@ private:
   void do_config_setup (Plugin *target);
 
   /**
-   *  @brief Do the actual set or pass to the children if not taken 
+   *  @brief Do the actual set or pass to the children if not taken
    */
   bool do_config_set (const std::string &name, const std::string &value, bool for_child);
 
@@ -908,7 +907,7 @@ private:
   Plugin *mp_parent;
   const PluginDeclaration *mp_plugin_declaration;
   tl::weak_collection<Plugin> m_children;
-  std::map <std::string, std::string> m_repository;
+  std::map<std::string, std::string> m_repository;
   tl::DeferredMethod<lay::Plugin> dm_finalize_config;
   bool m_standalone;
 };
@@ -917,7 +916,7 @@ private:
  *  @brief A handy function for implementing the configure method
  *
  *  This template compares two values and overwrites the target
- *  with the source if both are different. It returns true, if 
+ *  with the source if both are different. It returns true, if
  *  the target was updated indicating that something needs to be
  *  updated.
  */
@@ -935,5 +934,3 @@ inline bool test_and_set (T &target, const T &source)
 }
 
 #endif
-
-

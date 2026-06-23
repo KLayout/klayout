@@ -30,13 +30,15 @@
 #include "dbDeepShapeStore.h"
 #include "dbTexts.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief Provides hierarchical edges implementation
  */
 class DB_PUBLIC DeepTexts
-  : public db::MutableTexts, public db::DeepShapeCollectionDelegateBase
+  : public db::MutableTexts,
+    public db::DeepShapeCollectionDelegateBase
 {
 public:
   DeepTexts ();
@@ -116,4 +118,3 @@ private:
 }
 
 #endif
-

@@ -25,7 +25,7 @@
 
 #include <string>
 
-namespace lay 
+namespace lay
 {
 
 static std::string s_exe_name;
@@ -64,35 +64,29 @@ Version::about_text ()
   return s_about_text.c_str ();
 }
 
-void
-Version::set_exe_name (const char *s)
+void Version::set_exe_name (const char *s)
 {
   s_exe_name = s;
 }
 
-void
-Version::set_name (const char *s)
+void Version::set_name (const char *s)
 {
   s_name = s;
 }
 
-void
-Version::set_version (const char *s)
+void Version::set_version (const char *s)
 {
   s_version = s;
 }
 
-void
-Version::set_subversion (const char *s)
+void Version::set_subversion (const char *s)
 {
   s_subversion = s;
 }
 
-void
-Version::set_about_text (const char *s)
+void Version::set_about_text (const char *s)
 {
   s_about_text = s;
 }
 
 }
-

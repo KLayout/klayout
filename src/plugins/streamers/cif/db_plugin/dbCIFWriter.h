@@ -37,7 +37,7 @@
 
 namespace tl
 {
-  class OutputStream;
+class OutputStream;
 }
 
 namespace db
@@ -83,7 +83,8 @@ public:
   void write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options);
 
 private:
-  struct endl_tag { };
+  struct endl_tag {
+  };
 
   tl::OutputStream *mp_stream;
   CIFWriterOptions m_options;
@@ -94,13 +95,13 @@ private:
   CIFValidNameGenerator<unsigned int> m_layer_names;
   CIFValidNameGenerator<db::cell_index_type> m_cell_names;
 
-  CIFWriter &operator<<(const char *s);
-  CIFWriter &operator<<(const std::string &s);
-  CIFWriter &operator<<(endl_tag); 
+  CIFWriter &operator<< (const char *s);
+  CIFWriter &operator<< (const std::string &s);
+  CIFWriter &operator<< (endl_tag);
 
-  template<class X> CIFWriter &operator<<(const X &x) 
+  template <class X> CIFWriter &operator<< (const X &x)
   {
-    return (*this << tl::to_string(x));
+    return (*this << tl::to_string (x));
   }
 
   void write_texts (const db::Layout &layout, const db::Cell &cell, unsigned int layer, double tl_scale);
@@ -111,10 +112,9 @@ private:
   void write_edges (const db::Layout &layout, const db::Cell &cell, unsigned int layer, double tl_scale);
   const char *xy_sep () const;
 
-  void emit_layer();
+  void emit_layer ();
 };
 
 } // namespace db
 
 #endif
-

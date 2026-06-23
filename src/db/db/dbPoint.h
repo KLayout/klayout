@@ -35,7 +35,8 @@
 
 #include <string>
 
-namespace db {
+namespace db
+{
 
 template <class C> class vector;
 template <class C, class R = C> struct box;
@@ -53,18 +54,18 @@ public:
   typedef C coord_type;
   typedef db::coord_traits<C> coord_traits;
   typedef db::vector<C> vector_type;
-  typedef typename coord_traits::distance_type distance_type; 
-  typedef typename coord_traits::area_type area_type; 
-  typedef db::object_tag< point<C> > tag;
+  typedef typename coord_traits::distance_type distance_type;
+  typedef typename coord_traits::area_type area_type;
+  typedef db::object_tag<point<C>> tag;
   typedef db::box<C> box_type;
   typedef db::point<C> point_type;
 
-  /** 
+  /**
    *  @brief Default constructor
    *
    *  Creates a point at 0,0
    */
-  point () : m_x (0), m_y (0) { }
+  point () : m_x (0), m_y (0) {}
 
   /**
    *  @brief Standard constructor
@@ -72,7 +73,7 @@ public:
    *  @param x The x coordinate
    *  @param y The y coordinate
    */
-  point (C x, C y) : m_x (x), m_y (y) { }
+  point (C x, C y) : m_x (x), m_y (y) {}
 
   /**
    *  @brief Standard constructor from a different type
@@ -81,21 +82,21 @@ public:
    *  @param y The y coordinate
    */
   template <class D>
-  point (D x, D y) : m_x (coord_traits::rounded (x)), m_y (coord_traits::rounded (y)) { }
+  point (D x, D y) : m_x (coord_traits::rounded (x)), m_y (coord_traits::rounded (y)) {}
 
   /**
-   *  @brief The copy constructor 
+   *  @brief The copy constructor
    *
    *  @param d The source from which to copy
    */
-  point (const point<C> &d) : m_x (d.x ()), m_y (d.y ()) { }
+  point (const point<C> &d) : m_x (d.x ()), m_y (d.y ()) {}
 
   /**
    *  @brief Assignment
    *
    *  @param d The source from which to take the data
    */
-  point &operator= (const point<C> &d) 
+  point &operator= (const point<C> &d)
   {
     m_x = d.x ();
     m_y = d.y ();
@@ -111,7 +112,7 @@ public:
    *  @param d The source from which to copy
    */
   template <class D>
-  explicit point (const point<D> &d) : m_x (coord_traits::rounded (d.x ())), m_y (coord_traits::rounded (d.y ())) { }
+  explicit point (const point<D> &d) : m_x (coord_traits::rounded (d.x ())), m_y (coord_traits::rounded (d.y ())) {}
 
   /**
    *  @brief Assignment which also converts
@@ -121,7 +122,7 @@ public:
    *  @param d The source from which to take the data
    */
   template <class D>
-  point &operator= (const point<C> &d) 
+  point &operator= (const point<C> &d)
   {
     m_x = coord_traits::rounded (d.x ());
     m_y = coord_traits::rounded (d.y ());
@@ -187,7 +188,7 @@ public:
     m_y -= v.y ();
     return *this;
   }
-  
+
   /**
    *  @brief method version of operator- (mainly for automation purposes)
    */
@@ -228,7 +229,7 @@ public:
    */
   bool operator!= (const point<C> &p) const
   {
-    return !operator== (p);
+    return ! operator== (p);
   }
 
   /**
@@ -326,7 +327,7 @@ public:
 
   point<C> &operator/= (double s)
   {
-    double mult = 1.0 / static_cast<double>(s);
+    double mult = 1.0 / static_cast<double> (s);
     *this *= mult;
     return *this;
   }
@@ -336,7 +337,7 @@ public:
    */
   point<C> &operator/= (long s)
   {
-    double mult = 1.0 / static_cast<double>(s);
+    double mult = 1.0 / static_cast<double> (s);
     *this *= mult;
     return *this;
   }
@@ -504,36 +505,36 @@ private:
 };
 
 template <class C>
-inline point<double> 
-operator* (const db::point<C> &p, double s) 
+inline point<double>
+operator* (const db::point<C> &p, double s)
 {
   return point<double> (p.x () * s, p.y () * s);
 }
 
 template <class C>
-inline point<C> 
-operator* (const db::point<C> &p, long s) 
+inline point<C>
+operator* (const db::point<C> &p, long s)
 {
   return point<C> (p.x () * s, p.y () * s);
 }
 
 template <class C>
-inline point<C> 
-operator* (const db::point<C> &p, unsigned long s) 
+inline point<C>
+operator* (const db::point<C> &p, unsigned long s)
 {
   return point<C> (p.x () * s, p.y () * s);
 }
 
 template <class C>
-inline point<C> 
-operator* (const db::point<C> &p, int s) 
+inline point<C>
+operator* (const db::point<C> &p, int s)
 {
   return point<C> (p.x () * s, p.y () * s);
 }
 
 template <class C>
-inline point<C> 
-operator* (const db::point<C> &p, unsigned int s) 
+inline point<C>
+operator* (const db::point<C> &p, unsigned int s)
 {
   return point<C> (p.x () * s, p.y () * s);
 }
@@ -542,7 +543,7 @@ template <class C, typename Number>
 inline point<C>
 operator/ (const db::point<C> &p, Number s)
 {
-  double mult = 1.0 / static_cast<double>(s);
+  double mult = 1.0 / static_cast<double> (s);
   return point<C> (p.x () * mult, p.y () * mult);
 }
 
@@ -590,13 +591,13 @@ operator- (const point<C> &p1, const point<C> &p2)
 }
 
 /**
- *  @brief The unary - operator 
+ *  @brief The unary - operator
  *
- *  @param p The point 
+ *  @param p The point
  *  @return -p = (-p.x, -p.y)
  */
 template <class C>
-inline point<C> 
+inline point<C>
 operator- (const point<C> &p)
 {
   return point<C> (-p.x (), -p.y ());
@@ -615,24 +616,23 @@ operator<< (std::ostream &os, const point<C> &p)
 /**
  *  @brief The short integer point
  */
-typedef point <short> ShortPoint;
+typedef point<short> ShortPoint;
 
 /**
  *  @brief The standard point
  */
-typedef point <db::Coord> Point;
+typedef point<db::Coord> Point;
 
 /**
  *  @brief The standard double coordinate point
  */
-typedef point <db::DCoord> DPoint;
+typedef point<db::DCoord> DPoint;
 
 /**
  *  @brief A generic conversion operator from double point to any type
  */
 template <class D, class C>
-struct point_coord_converter
-{
+struct point_coord_converter {
   db::point<D> operator() (const db::point<C> &dp) const
   {
     return db::point<D> (dp);
@@ -643,13 +643,13 @@ struct point_coord_converter
  *  A fuzzy "less" operator for point lists
  */
 template <class C>
-inline bool less (const tl::vector<point<C> > &a, const tl::vector<point<C> > &b)
+inline bool less (const tl::vector<point<C>> &a, const tl::vector<point<C>> &b)
 {
   if (a.size () != b.size ()) {
     return a.size () < b.size ();
   }
 
-  for (typename tl::vector<point<C> >::const_iterator i = a.begin (), j = b.begin (); i != a.end (); ++i, ++j) {
+  for (typename tl::vector<point<C>>::const_iterator i = a.begin (), j = b.begin (); i != a.end (); ++i, ++j) {
     if (! i->equal (*j)) {
       return i->less (*j);
     }
@@ -662,13 +662,13 @@ inline bool less (const tl::vector<point<C> > &a, const tl::vector<point<C> > &b
  *  A fuzzy "equal" operator for point lists
  */
 template <class C>
-inline bool equal (const tl::vector<point<C> > &a, const tl::vector<point<C> > &b)
+inline bool equal (const tl::vector<point<C>> &a, const tl::vector<point<C>> &b)
 {
   if (a.size () != b.size ()) {
     return false;
   }
 
-  for (typename tl::vector<point<C> >::const_iterator i = a.begin (), j = b.begin (); i != a.end (); ++i, ++j) {
+  for (typename tl::vector<point<C>>::const_iterator i = a.begin (), j = b.begin (); i != a.end (); ++i, ++j) {
     if (! i->equal (*j)) {
       return false;
     }
@@ -683,15 +683,14 @@ inline bool equal (const tl::vector<point<C> > &a, const tl::vector<point<C> > &
  *  @brief Special extractors for the points
  */
 
-namespace tl 
+namespace tl
 {
-  template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Point &p);
-  template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPoint &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Point &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPoint &p);
 
-  template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Point &p);
-  template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DPoint &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Point &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DPoint &p);
 
 } // namespace tl
 
 #endif
-

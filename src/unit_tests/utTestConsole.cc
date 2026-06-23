@@ -23,16 +23,16 @@
 #include "utTestConsole.h"
 #include "tlUnitTest.h"
 
-#if !defined(_MSC_VER)
-#  include <unistd.h>
+#if ! defined(_MSC_VER)
+#include <unistd.h>
 #endif
 
-#if !defined(_WIN32)
-#  include <sys/ioctl.h>
-#  include <dlfcn.h>
+#if ! defined(_WIN32)
+#include <sys/ioctl.h>
+#include <dlfcn.h>
 #endif
 #if defined(_WIN32)
-#  include <Windows.h>
+#include <Windows.h>
 #endif
 
 namespace ut
@@ -75,7 +75,7 @@ protected:
     //  .. nothing yet ..
   }
 
-  virtual void yield () { }
+  virtual void yield () {}
 
 private:
   int m_verbosity;
@@ -111,7 +111,7 @@ protected:
     TestConsole::instance ()->begin_warn ();
   }
 
-  virtual void yield () { }
+  virtual void yield () {}
 };
 
 class ErrorChannel : public tl::Channel
@@ -144,7 +144,7 @@ protected:
     TestConsole::instance ()->begin_error ();
   }
 
-  virtual void yield () { }
+  virtual void yield () {}
 };
 
 class CtrlChannel : public tl::Channel
@@ -186,7 +186,7 @@ protected:
     }
   }
 
-  virtual void yield () { }
+  virtual void yield () {}
 
 private:
   bool m_with_xml;
@@ -226,7 +226,7 @@ void TestConsole::prepare_file ()
   m_file_is_tty = isatty (fileno (m_file));
 #endif
 
-#if !defined(_WIN32)
+#if ! defined(_WIN32)
   if (m_file_is_tty) {
     struct winsize ws;
     ioctl (fileno (stdout), TIOCGWINSZ, &ws);
@@ -236,8 +236,7 @@ void TestConsole::prepare_file ()
 #endif
 }
 
-void
-TestConsole::send_to (FILE *file)
+void TestConsole::send_to (FILE *file)
 {
   if (file != m_file) {
     flush ();
@@ -246,15 +245,13 @@ TestConsole::send_to (FILE *file)
   }
 }
 
-int
-TestConsole::columns ()
+int TestConsole::columns ()
 {
   int c = m_columns - tl::indent ();
   return c > 0 ? c : 0;
 }
 
-void
-TestConsole::write_str (const char *text, output_stream os)
+void TestConsole::write_str (const char *text, output_stream os)
 {
   if (os == OS_stderr) {
     begin_error ();
@@ -265,59 +262,51 @@ TestConsole::write_str (const char *text, output_stream os)
   }
 }
 
-void
-TestConsole::raw_write (const char *text)
+void TestConsole::raw_write (const char *text)
 {
   fputs (text, m_file);
 }
 
-void
-TestConsole::flush ()
+void TestConsole::flush ()
 {
   fflush (m_file);
 }
 
-bool
-TestConsole::is_tty ()
+bool TestConsole::is_tty ()
 {
   //  NOTE: this assumes we are delivering to stdout
   return m_file_is_tty && ! tl::xml_format ();
 }
 
-void
-TestConsole::begin_error ()
+void TestConsole::begin_error ()
 {
   if (is_tty ()) {
     fputs (ANSI_RED, m_file);
   }
 }
 
-void
-TestConsole::begin_info ()
+void TestConsole::begin_info ()
 {
   if (is_tty ()) {
     fputs (ANSI_GREEN, m_file);
   }
 }
 
-void
-TestConsole::begin_warn ()
+void TestConsole::begin_warn ()
 {
   if (is_tty ()) {
     fputs (ANSI_BLUE, m_file);
   }
 }
 
-void
-TestConsole::end ()
+void TestConsole::end ()
 {
   if (is_tty ()) {
     fputs (ANSI_RESET, m_file);
   }
 }
 
-void
-TestConsole::basic_write (const char *s)
+void TestConsole::basic_write (const char *s)
 {
   if (tl::xml_format ()) {
 
@@ -376,12 +365,10 @@ TestConsole::basic_write (const char *s)
         }
       }
     }
-
   }
 }
 
-void
-TestConsole::redirect ()
+void TestConsole::redirect ()
 {
   //  redirect the log channels
   tl::warn.clear ();
@@ -394,8 +381,7 @@ TestConsole::redirect ()
   tl::error.add (new ut::ErrorChannel (), true);
 }
 
-void
-TestConsole::restore ()
+void TestConsole::restore ()
 {
   //  TODO: we should basically restore the original channels
   tl::warn.clear ();

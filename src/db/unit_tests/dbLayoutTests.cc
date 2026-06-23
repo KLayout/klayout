@@ -45,7 +45,7 @@ std::string set2string (const std::set<db::cell_index_type> &set)
 }
 
 
-TEST(1) 
+TEST (1)
 {
   db::Layout g;
   EXPECT_EQ (g.end_top_cells () - g.begin_top_down (), 0);
@@ -64,25 +64,25 @@ TEST(1)
   db::Trans tt (0, pp);
 
   //  c4->c1
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
   //  c5->c1
-  c5.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c5.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
   //  c3->c5
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
   //  c4->c3
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   //  c4->c1
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
   //  c2->c1
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
   //  c2->c4
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
   //  c2->c5
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
   EXPECT_EQ (g.end_top_down () - g.begin_top_down (), 5);
   EXPECT_EQ (g.end_top_cells () - g.begin_top_down (), 1);
 
@@ -196,11 +196,11 @@ TEST(1)
   EXPECT_EQ (set2string (cc), "0,2,3,4");
   c5.collect_called_cells (cc);
   EXPECT_EQ (set2string (cc), "0,2,3,4");
-  
+
   //  detect recursive graphs ..
   bool ex = false;
   try {
-    c5.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c2.cell_index ()), t));
+    c5.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c2.cell_index ()), t));
     g.update ();
   } catch (tl::InternalException &) {
     ex = true;
@@ -212,8 +212,7 @@ namespace
 {
 
 struct EventListener
-  : public tl::Object
-{
+  : public tl::Object {
   EventListener ()
     : flags (0),
       bboxes_dirty (false),
@@ -223,7 +222,8 @@ struct EventListener
       cell_name_dirty (false),
       property_ids_dirty (false),
       layer_properties_dirty (false)
-  { }
+  {
+  }
 
   void reset () { *this = EventListener (); }
 
@@ -250,7 +250,7 @@ struct EventListener
 
 }
 
-TEST(2)
+TEST (2)
 {
   //  LayoutStateModel hierarchy events
 
@@ -281,7 +281,7 @@ TEST(2)
   EXPECT_EQ (el.flags, (unsigned int) 0);
   EXPECT_EQ (el.bboxes_dirty, false);
   EXPECT_EQ (el.bboxes_all_dirty, false);
-  EXPECT_EQ (el.hier_dirty, false);  //  needs g.update() before being issues again
+  EXPECT_EQ (el.hier_dirty, false); //  needs g.update() before being issues again
   EXPECT_EQ (g.hier_generation_id (), size_t (2));
 
   el.reset ();
@@ -290,7 +290,7 @@ TEST(2)
   EXPECT_EQ (el.flags, (unsigned int) 0);
   EXPECT_EQ (el.bboxes_dirty, true);
   EXPECT_EQ (el.bboxes_all_dirty, true);
-  EXPECT_EQ (el.hier_dirty, false);  //  needs g.update() before being issues again
+  EXPECT_EQ (el.hier_dirty, false); //  needs g.update() before being issues again
   EXPECT_EQ (g.hier_generation_id (), size_t (3));
 
   g.clear ();
@@ -316,7 +316,7 @@ TEST(2)
   EXPECT_EQ (el.flags, (unsigned int) 0);
   EXPECT_EQ (el.bboxes_dirty, false);
   EXPECT_EQ (el.bboxes_all_dirty, false);
-  EXPECT_EQ (el.hier_dirty, true);  //  OK - see above
+  EXPECT_EQ (el.hier_dirty, true); //  OK - see above
   EXPECT_EQ (g.hier_generation_id (), size_t (6));
 
   el.reset ();
@@ -326,7 +326,7 @@ TEST(2)
   EXPECT_EQ (el.flags, (unsigned int) 0);
   EXPECT_EQ (el.bboxes_dirty, true);
   EXPECT_EQ (el.bboxes_all_dirty, true);
-  EXPECT_EQ (el.hier_dirty, true);  //  OK - see above
+  EXPECT_EQ (el.hier_dirty, true); //  OK - see above
   EXPECT_EQ (g.hier_generation_id (), size_t (7));
 
   //  busy mode will make events issued always
@@ -349,7 +349,7 @@ TEST(2)
   EXPECT_EQ (el.flags, (unsigned int) 0);
   EXPECT_EQ (el.bboxes_dirty, false);
   EXPECT_EQ (el.bboxes_all_dirty, false);
-  EXPECT_EQ (el.hier_dirty, true);  //  OK - see above
+  EXPECT_EQ (el.hier_dirty, true); //  OK - see above
   EXPECT_EQ (g.hier_generation_id (), size_t (10));
 
   el.reset ();
@@ -358,12 +358,11 @@ TEST(2)
   EXPECT_EQ (el.flags, (unsigned int) 0);
   EXPECT_EQ (el.bboxes_dirty, true);
   EXPECT_EQ (el.bboxes_all_dirty, true);
-  EXPECT_EQ (el.hier_dirty, true);  //  OK - see above
+  EXPECT_EQ (el.hier_dirty, true); //  OK - see above
   EXPECT_EQ (g.hier_generation_id (), size_t (11));
-
 }
 
-TEST(3)
+TEST (3)
 {
   //  LayoutStateModel bbox events
 
@@ -405,8 +404,8 @@ TEST(3)
 
   top->shapes (0).insert (db::Box (0, 0, 10, 20));
 
-  EXPECT_EQ (el.flags, (unsigned int) 0);  //  g.update () is missing -> no new events
-  EXPECT_EQ (el.bboxes_dirty, false);   //  g.update () is missing -> no new events
+  EXPECT_EQ (el.flags, (unsigned int) 0); //  g.update () is missing -> no new events
+  EXPECT_EQ (el.bboxes_dirty, false);     //  g.update () is missing -> no new events
   EXPECT_EQ (el.bboxes_all_dirty, false);
   EXPECT_EQ (el.hier_dirty, false);
 
@@ -415,20 +414,20 @@ TEST(3)
 
   top->shapes (0).insert (db::Box (0, 0, 10, 20));
 
-  EXPECT_EQ (el.flags, (unsigned int) 1);  //  voila
-  EXPECT_EQ (el.bboxes_dirty, true);   //  :-)
+  EXPECT_EQ (el.flags, (unsigned int) 1); //  voila
+  EXPECT_EQ (el.bboxes_dirty, true);      //  :-)
   EXPECT_EQ (el.bboxes_all_dirty, false);
   EXPECT_EQ (el.hier_dirty, false);
 
   top->shapes (1).insert (db::Box (0, 0, 10, 20));
 
-  EXPECT_EQ (el.flags, (unsigned int) 3);  //  and yet another one
+  EXPECT_EQ (el.flags, (unsigned int) 3); //  and yet another one
   EXPECT_EQ (el.bboxes_dirty, true);
   EXPECT_EQ (el.bboxes_all_dirty, false);
   EXPECT_EQ (el.hier_dirty, false);
 }
 
-TEST(4)
+TEST (4)
 {
   //  Other events
 
@@ -453,25 +452,25 @@ TEST(4)
   EXPECT_EQ (el.layer_properties_dirty, true);
   el.reset ();
   g.set_properties (0, db::LayerProperties (1, 0));
-  EXPECT_EQ (el.layer_properties_dirty, false);  //  no change
+  EXPECT_EQ (el.layer_properties_dirty, false); //  no change
   g.set_properties (0, db::LayerProperties (1, 1));
-  EXPECT_EQ (el.layer_properties_dirty, true);  //  but this is
+  EXPECT_EQ (el.layer_properties_dirty, true); //  but this is
 
   g.dbu (1.0);
   EXPECT_EQ (el.dbu_dirty, true);
   el.reset ();
   g.dbu (1.0);
-  EXPECT_EQ (el.dbu_dirty, false);  //  no change
+  EXPECT_EQ (el.dbu_dirty, false); //  no change
   g.dbu (0.5);
-  EXPECT_EQ (el.dbu_dirty, true);  //  but this is
+  EXPECT_EQ (el.dbu_dirty, true); //  but this is
 
   g.rename_cell (top, "TIP");
   EXPECT_EQ (el.cell_name_dirty, true);
   el.reset ();
   g.rename_cell (top, "TIP");
-  EXPECT_EQ (el.cell_name_dirty, false);  //  no change
+  EXPECT_EQ (el.cell_name_dirty, false); //  no change
   g.rename_cell (top, "TAP");
-  EXPECT_EQ (el.cell_name_dirty, true);  //  but this is
+  EXPECT_EQ (el.cell_name_dirty, true); //  but this is
 
   db::PropertiesSet ps;
   ps.insert (tl::Variant (1), tl::Variant ("XYZ"));
@@ -481,7 +480,7 @@ TEST(4)
 
   EXPECT_EQ (el.property_ids_dirty, true);
   el.reset ();
-  g.update ();  //  needed to enable new events from the layout
+  g.update (); //  needed to enable new events from the layout
 
   ps.clear ();
   ps.insert (tl::Variant (1), tl::Variant ("XXX"));
@@ -495,21 +494,21 @@ TEST(4)
   db::cell_index_type child = g.add_cell ("CHILD");
   db::Instance inst = g.cell (top).insert (db::CellInstArray (db::CellInst (child), db::Trans ()));
   el.reset ();
-  g.update ();  //  needed to enable new events from the layout
+  g.update (); //  needed to enable new events from the layout
 
   EXPECT_EQ (el.property_ids_dirty, false);
   inst.instances ()->replace_prop_id (inst, pid2);
   EXPECT_EQ (el.property_ids_dirty, true);
 
   el.reset ();
-  g.update ();  //  needed to enable new events from the layout
+  g.update (); //  needed to enable new events from the layout
 
   EXPECT_EQ (el.property_ids_dirty, false);
   g.cell (child).prop_id (pid1);
   EXPECT_EQ (el.property_ids_dirty, true);
 
   el.reset ();
-  g.update ();  //  needed to enable new events from the layout
+  g.update (); //  needed to enable new events from the layout
 
   EXPECT_EQ (el.property_ids_dirty, false);
   g.prop_id (pid2);
@@ -519,8 +518,7 @@ TEST(4)
   EXPECT_EQ (g.get_layer_maybe (db::LayerProperties (42, 17)), -1);
   EXPECT_EQ (el.layer_properties_dirty, false);
   g.get_layer (db::LayerProperties (42, 17));
-  EXPECT_EQ (el.layer_properties_dirty, true);  //  new layer got inserted
-
+  EXPECT_EQ (el.layer_properties_dirty, true); //  new layer got inserted
 }
 
 static std::string l2s (const db::Layout &layout)
@@ -532,7 +530,7 @@ static std::string l2s (const db::Layout &layout)
   return os.string ();
 }
 
-TEST(5)
+TEST (5)
 {
   //  Technology management and library substitution
 
@@ -643,7 +641,6 @@ TEST(5)
     cell = &l.cell (l.cell_by_name ("LIBCELL").second);
     EXPECT_EQ (dynamic_cast<db::LibraryProxy *> (cell) != 0, true);
     EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 2 0 {0 0} {200 100}\nend_cell\nend_lib\n");
-
   }
 
   db::LibraryManager::instance ().delete_lib (lib_a);
@@ -651,7 +648,7 @@ TEST(5)
   db::LibraryManager::instance ().delete_lib (lib_c);
 }
 
-TEST(6)
+TEST (6)
 {
   //  Cold proxies and context serialization
   db::Cell *cell;
@@ -708,7 +705,7 @@ TEST(6)
   }
 }
 
-TEST(7_LayerProperties)
+TEST (7_LayerProperties)
 {
   db::Manager m;
   db::Layout l (&m);
@@ -775,7 +772,7 @@ TEST(7_LayerProperties)
   EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (2, 0)), -1);
 }
 
-TEST(8_MetaInfo)
+TEST (8_MetaInfo)
 {
   db::Layout ly;
 
@@ -833,7 +830,7 @@ TEST(8_MetaInfo)
   EXPECT_EQ (ly.meta_info (ci, "a").value.to_string (), "nil");
 }
 
-TEST(9_ErrorLayer)
+TEST (9_ErrorLayer)
 {
   db::Manager m;
   db::Layout l (&m);
@@ -846,7 +843,7 @@ TEST(9_ErrorLayer)
   EXPECT_EQ (int (l.layers ()), 2);
 }
 
-TEST(10_TranslateStringRefs)
+TEST (10_TranslateStringRefs)
 {
   db::Manager m;
   db::Layout l (&m);
@@ -882,7 +879,7 @@ TEST(10_TranslateStringRefs)
   EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {TOP}\ntext 1 0 0 0 {0 0} {TEXT_NEW}\ntext 1 0 0 0 {0 0} {TEXT_NEW}\nend_cell\nend_lib\n");
 }
 
-TEST(11_FindPath)
+TEST (11_FindPath)
 {
   db::Manager m;
   db::Layout l (&m);
@@ -910,7 +907,7 @@ TEST(11_FindPath)
 }
 
 //  Shapes can be flat-iterated even in locked layout
-TEST(12_ShapesInLockedLayout)
+TEST (12_ShapesInLockedLayout)
 {
   db::Layout l;
   db::Cell &top = l.cell (l.add_cell ("TOP"));
@@ -941,7 +938,7 @@ TEST(12_ShapesInLockedLayout)
 }
 
 //  Instances can be flat-iterated even in locked layout
-TEST(13_InstancesInLockedLayout)
+TEST (13_InstancesInLockedLayout)
 {
   db::Layout l;
   db::Cell &top = l.cell (l.add_cell ("TOP"));
@@ -972,7 +969,7 @@ TEST(13_InstancesInLockedLayout)
 }
 
 //  issue #1860
-TEST(100_UndoOfDeleteLayer)
+TEST (100_UndoOfDeleteLayer)
 {
   db::Manager m;
   db::Layout l (&m);
@@ -1011,7 +1008,7 @@ TEST(100_UndoOfDeleteLayer)
 }
 
 //  issue #2343
-TEST(101_CopyTreeDoesNotModifyPolygons)
+TEST (101_CopyTreeDoesNotModifyPolygons)
 {
   db::Manager m;
   db::Layout l (&m);
@@ -1023,8 +1020,7 @@ TEST(101_CopyTreeDoesNotModifyPolygons)
   unsigned int tl1 = t->insert_layer (db::LayerProperties (1, 0));
 
   std::vector<db::Point> pts = {
-    { 0, 0 }, { 0, 1000 }, { 500, 1000 }, { 1500, 1000 }, { 1000, 1000 }, { 1000, 0 }
-  };
+    {0, 0}, {0, 1000}, {500, 1000}, {1500, 1000}, {1000, 1000}, {1000, 0}};
 
   db::Polygon poly;
   poly.assign_hull (pts.begin (), pts.end (), false /*don't compress*/, false /*don't remove reflected*/);
@@ -1050,8 +1046,8 @@ public:
   LIBT_L (tl::TestBase *_this)
     : Library ()
   {
-    set_name("L");
-    set_description("A test library.");
+    set_name ("L");
+    set_description ("A test library.");
 
     layout ().dbu (0.001);
 
@@ -1066,14 +1062,14 @@ public:
     unsigned int l_gate = layout ().insert_layer (p);
 
     db::Cell &cell_a = layout ().cell (layout ().add_cell ("A"));
-    cell_a.shapes(l_cont).insert(db::Box (50, 50, 150, 150));
-    cell_a.shapes(l_gate).insert(db::Box (0, 0, 200, 1000));
+    cell_a.shapes (l_cont).insert (db::Box (50, 50, 150, 150));
+    cell_a.shapes (l_gate).insert (db::Box (0, 0, 200, 1000));
 
     db::Cell &top = layout ().cell (layout ().add_cell ("TOP"));
     top.insert (db::CellInstArray (db::CellInst (cell_a.cell_index ()), db::Trans (db::Vector (0, 0))));
   }
 
-  ~LIBT_L()
+  ~LIBT_L ()
   {
     // .. nothing yet ..
   }
@@ -1098,7 +1094,7 @@ static std::string cells2string (const db::Layout &layout, bool top = true)
 }
 
 //  issue #2350
-TEST(101_CleanupBehavior)
+TEST (101_CleanupBehavior)
 {
   std::unique_ptr<LIBT_L> lib (new LIBT_L (_this));
   db::LibraryManager::instance ().register_lib (lib.get ());
@@ -1159,7 +1155,7 @@ TEST(101_CleanupBehavior)
   EXPECT_EQ (cells2string (layout2), "TOPTOP");
 
   layout2 = layout;
-  layout2.delete_cell (top.cell_index ());  //  layout and layout2 use the same cell indexes
+  layout2.delete_cell (top.cell_index ()); //  layout and layout2 use the same cell indexes
   layout2.do_cleanup (true);
 
   EXPECT_EQ (cells2string (layout2, false), "*TOP,*A");

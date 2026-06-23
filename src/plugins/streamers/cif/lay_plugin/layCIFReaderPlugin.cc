@@ -48,12 +48,11 @@ CIFReaderOptionPage::~CIFReaderOptionPage ()
   mp_ui = 0;
 }
 
-void 
-CIFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
+void CIFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   static const db::CIFReaderOptions default_options;
   const db::CIFReaderOptions *options = dynamic_cast<const db::CIFReaderOptions *> (o);
-  if (!options) {
+  if (! options) {
     options = &default_options;
   }
 
@@ -64,8 +63,7 @@ CIFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::
   mp_ui->wire_mode_cb->setCurrentIndex (options->wire_mode);
 }
 
-void 
-CIFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
+void CIFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   db::CIFReaderOptions *options = dynamic_cast<db::CIFReaderOptions *> (o);
   if (options) {
@@ -87,7 +85,7 @@ class CIFReaderPluginDeclaration
   : public StreamReaderPluginDeclaration
 {
 public:
-  CIFReaderPluginDeclaration () 
+  CIFReaderPluginDeclaration ()
     : StreamReaderPluginDeclaration (db::CIFReaderOptions ().format_name ())
   {
     // .. nothing yet ..
@@ -107,8 +105,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::CIFReaderPluginDeclaration (), 10000, "CIFReader");
 
 }
-
-
-
-
-

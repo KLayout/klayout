@@ -24,14 +24,14 @@
 #include "tlUnitTest.h"
 
 //  This namespace separates the test structs from other objects
-namespace class_registry_test 
+namespace class_registry_test
 {
 
-class X 
+class X
 {
 public:
-  X () { }
-  virtual ~X () { }
+  X () {}
+  virtual ~X () {}
   virtual const char *name () const = 0;
 };
 
@@ -48,11 +48,11 @@ public:
 };
 
 
-class A 
+class A
 {
 public:
-  A () { }
-  virtual ~A () { }
+  A () {}
+  virtual ~A () {}
   virtual const char *name () const = 0;
 };
 
@@ -68,41 +68,53 @@ class C : public A
 
 
 
-TEST(1) 
+TEST (1)
 {
   tl::RegisteredClass<X> y (new Y ());
   tl::RegisteredClass<X> z (new Z ());
 
   int count = 0;
   for (tl::Registrar<X>::iterator cls = tl::Registrar<X>::begin (); cls != tl::Registrar<X>::end (); ++cls) {
-    if (count == 0) { EXPECT_EQ (std::string (cls->name ()), "Z"); }
-    if (count == 1) { EXPECT_EQ (std::string (cls->name ()), "Y"); }
+    if (count == 0) {
+      EXPECT_EQ (std::string (cls->name ()), "Z");
+    }
+    if (count == 1) {
+      EXPECT_EQ (std::string (cls->name ()), "Y");
+    }
     ++count;
   }
   EXPECT_EQ (count, 2);
 }
 
-TEST(2) 
+TEST (2)
 {
-  tl::RegisteredClass<A> b (new B(), 1);
-  tl::RegisteredClass<A> c1 (new C(), 0);
-  tl::RegisteredClass<A> c2 (new C(), 2);
-  tl::RegisteredClass<A> c3 (new C(), 1);
-  tl::RegisteredClass<X> y (new Y());
-  tl::RegisteredClass<X> z (new Z());
+  tl::RegisteredClass<A> b (new B (), 1);
+  tl::RegisteredClass<A> c1 (new C (), 0);
+  tl::RegisteredClass<A> c2 (new C (), 2);
+  tl::RegisteredClass<A> c3 (new C (), 1);
+  tl::RegisteredClass<X> y (new Y ());
+  tl::RegisteredClass<X> z (new Z ());
 
   int count = 0;
   for (tl::Registrar<A>::iterator cls = tl::Registrar<A>::begin (); cls != tl::Registrar<A>::end (); ++cls) {
-    if (count == 0) { EXPECT_EQ (std::string (cls->name ()), "C"); }
-    if (count == 1) { EXPECT_EQ (std::string (cls->name ()), "C"); }
-    if (count == 2) { EXPECT_EQ (std::string (cls->name ()), "B"); }
-    if (count == 3) { EXPECT_EQ (std::string (cls->name ()), "C"); }
+    if (count == 0) {
+      EXPECT_EQ (std::string (cls->name ()), "C");
+    }
+    if (count == 1) {
+      EXPECT_EQ (std::string (cls->name ()), "C");
+    }
+    if (count == 2) {
+      EXPECT_EQ (std::string (cls->name ()), "B");
+    }
+    if (count == 3) {
+      EXPECT_EQ (std::string (cls->name ()), "C");
+    }
     ++count;
   }
   EXPECT_EQ (count, 4);
 }
 
-TEST(3) 
+TEST (3)
 {
   EXPECT_EQ (tl::Registrar<A>::get_instance () == 0, true);
   EXPECT_EQ (tl::Registrar<X>::get_instance () == 0, true);

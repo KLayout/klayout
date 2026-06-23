@@ -25,7 +25,8 @@
 
 KJ_BEGIN_HEADER
 
-namespace kj {
+namespace kj
+{
 
 template <typename T>
 class ListLink;
@@ -33,17 +34,19 @@ class ListLink;
 template <typename T, typename MaybeConstT, ListLink<T> T::*link>
 class ListIterator;
 
-namespace _ {  // (private)
+namespace _
+{ // (private)
 
-KJ_NORETURN(void throwDoubleAdd());
-KJ_NORETURN(void throwRemovedNotPresent());
-KJ_NORETURN(void throwRemovedWrongList());
-KJ_NORETURN(void throwDestroyedWhileInList());
+KJ_NORETURN (void throwDoubleAdd ());
+KJ_NORETURN (void throwRemovedNotPresent ());
+KJ_NORETURN (void throwRemovedWrongList ());
+KJ_NORETURN (void throwDestroyedWhileInList ());
 
-}  // namespace _ (private)
+} // namespace _ (private)
 
 template <typename T, ListLink<T> T::*link>
-class List {
+class List
+{
   // A linked list that does no memory allocation.
   //
   // The list contains elements of type T that are allocated elsewhere. An existing object of type
@@ -83,30 +86,36 @@ class List {
   // invalidate the iterator.
 
 public:
-  List() = default;
-  KJ_DISALLOW_COPY_AND_MOVE(List);
+  List () = default;
+  KJ_DISALLOW_COPY_AND_MOVE (List);
 
-  bool empty() const {
+  bool empty () const
+  {
     return head == nullptr;
   }
 
-  size_t size() const {
+  size_t size () const
+  {
     return listSize;
   }
 
-  void add(T& element) {
-    if ((element.*link).prev != nullptr) _::throwDoubleAdd();
+  void add (T &element)
+  {
+    if ((element.*link).prev != nullptr)
+      _::throwDoubleAdd ();
     *tail = element;
     (element.*link).prev = tail;
     tail = &((element.*link).next);
     ++listSize;
   }
 
-  void addFront(T& element) {
-    if ((element.*link).prev != nullptr) _::throwDoubleAdd();
+  void addFront (T &element)
+  {
+    if ((element.*link).prev != nullptr)
+      _::throwDoubleAdd ();
     (element.*link).next = head;
     (element.*link).prev = &head;
-    KJ_IF_MAYBE(oldHead, head) {
+    KJ_IF_MAYBE (oldHead, head) {
       (oldHead->*link).prev = &(element.*link).next;
     } else {
       tail = &(element.*link).next;
@@ -115,13 +124,16 @@ public:
     ++listSize;
   }
 
-  void remove(T& element) {
-    if ((element.*link).prev == nullptr) _::throwRemovedNotPresent();
+  void remove (T &element)
+  {
+    if ((element.*link).prev == nullptr)
+      _::throwRemovedNotPresent ();
     *((element.*link).prev) = (element.*link).next;
-    KJ_IF_MAYBE(n, (element.*link).next) {
+    KJ_IF_MAYBE (n, (element.*link).next) {
       (n->*link).prev = (element.*link).prev;
     } else {
-      if (tail != &((element.*link).next)) _::throwRemovedWrongList();
+      if (tail != &((element.*link).next))
+        _::throwRemovedWrongList ();
       tail = (element.*link).prev;
     }
     (element.*link).next = nullptr;
@@ -132,35 +144,38 @@ public:
   typedef ListIterator<T, T, link> Iterator;
   typedef ListIterator<T, const T, link> ConstIterator;
 
-  Iterator begin() { return Iterator(head); }
-  Iterator end() { return Iterator(nullptr); }
-  ConstIterator begin() const { return ConstIterator(head); }
-  ConstIterator end() const { return ConstIterator(nullptr); }
+  Iterator begin () { return Iterator (head); }
+  Iterator end () { return Iterator (nullptr); }
+  ConstIterator begin () const { return ConstIterator (head); }
+  ConstIterator end () const { return ConstIterator (nullptr); }
 
-  T& front() { return *begin(); }
-  const T& front() const { return *begin(); }
+  T &front () { return *begin (); }
+  const T &front () const { return *begin (); }
 
 private:
-  Maybe<T&> head;
-  Maybe<T&>* tail = &head;
+  Maybe<T &> head;
+  Maybe<T &> *tail = &head;
   size_t listSize = 0;
 };
 
 template <typename T>
-class ListLink {
+class ListLink
+{
 public:
-  ListLink(): next(nullptr), prev(nullptr) {}
-  ~ListLink() noexcept {
+  ListLink () : next (nullptr), prev (nullptr) {}
+  ~ListLink () noexcept
+  {
     // Intentionally `noexcept` because we want to crash if a dangling pointer was left in a list.
-    if (prev != nullptr) _::throwDestroyedWhileInList();
+    if (prev != nullptr)
+      _::throwDestroyedWhileInList ();
   }
-  KJ_DISALLOW_COPY_AND_MOVE(ListLink);
+  KJ_DISALLOW_COPY_AND_MOVE (ListLink);
 
-  bool isLinked() const { return prev != nullptr; }
+  bool isLinked () const { return prev != nullptr; }
 
 private:
-  Maybe<T&> next;
-  Maybe<T&>* prev;
+  Maybe<T &> next;
+  Maybe<T &> *prev;
 
   template <typename U, ListLink<U> U::*link>
   friend class List;
@@ -169,56 +184,65 @@ private:
 };
 
 template <typename T, typename MaybeConstT, ListLink<T> T::*link>
-class ListIterator {
+class ListIterator
+{
 public:
-  ListIterator() = default;
+  ListIterator () = default;
 
-  MaybeConstT& operator*() {
-    KJ_IREQUIRE(current != nullptr, "tried to dereference end of list");
-    return *_::readMaybe(current);
+  MaybeConstT &operator* ()
+  {
+    KJ_IREQUIRE (current != nullptr, "tried to dereference end of list");
+    return *_::readMaybe (current);
   }
-  const T& operator*() const {
-    KJ_IREQUIRE(current != nullptr, "tried to dereference end of list");
-    return *_::readMaybe(current);
+  const T &operator* () const
+  {
+    KJ_IREQUIRE (current != nullptr, "tried to dereference end of list");
+    return *_::readMaybe (current);
   }
-  MaybeConstT* operator->() {
-    KJ_IREQUIRE(current != nullptr, "tried to dereference end of list");
-    return _::readMaybe(current);
+  MaybeConstT *operator->()
+  {
+    KJ_IREQUIRE (current != nullptr, "tried to dereference end of list");
+    return _::readMaybe (current);
   }
-  const T* operator->() const {
-    KJ_IREQUIRE(current != nullptr, "tried to dereference end of list");
-    return _::readMaybe(current);
+  const T *operator->() const
+  {
+    KJ_IREQUIRE (current != nullptr, "tried to dereference end of list");
+    return _::readMaybe (current);
   }
 
-  inline ListIterator& operator++() {
+  inline ListIterator &operator++ ()
+  {
     current = next;
-    next = current.map([](MaybeConstT& obj) -> kj::Maybe<MaybeConstT&> { return (obj.*link).next; })
-        .orDefault(nullptr);
+    next = current.map ([] (MaybeConstT &obj) -> kj::Maybe<MaybeConstT &> { return (obj.*link).next; })
+             .orDefault (nullptr);
     return *this;
   }
-  inline ListIterator operator++(int) {
+  inline ListIterator operator++ (int)
+  {
     ListIterator result = *this;
     ++*this;
     return result;
   }
 
-  inline bool operator==(const ListIterator& other) const {
-    return _::readMaybe(current) == _::readMaybe(other.current);
+  inline bool operator== (const ListIterator &other) const
+  {
+    return _::readMaybe (current) == _::readMaybe (other.current);
   }
-  inline bool operator!=(const ListIterator& other) const {
-    return _::readMaybe(current) != _::readMaybe(other.current);
+  inline bool operator!= (const ListIterator &other) const
+  {
+    return _::readMaybe (current) != _::readMaybe (other.current);
   }
 
 private:
-  Maybe<MaybeConstT&> current;
+  Maybe<MaybeConstT &> current;
 
-  Maybe<MaybeConstT&> next;
+  Maybe<MaybeConstT &> next;
   // so that the current item can be removed from the list without invalidating the iterator
 
-  explicit ListIterator(Maybe<MaybeConstT&> start)
-      : current(start),
-        next(start.map([](MaybeConstT& obj) -> kj::Maybe<MaybeConstT&> { return (obj.*link).next; })
-            .orDefault(nullptr)) {}
+  explicit ListIterator (Maybe<MaybeConstT &> start)
+    : current (start),
+      next (start.map ([] (MaybeConstT &obj) -> kj::Maybe<MaybeConstT &> { return (obj.*link).next; })
+              .orDefault (nullptr)) {}
   friend class List<T, link>;
 };
 

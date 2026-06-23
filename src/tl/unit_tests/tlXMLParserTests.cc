@@ -30,17 +30,25 @@
 
 
 struct Child {
-  Child () : txt (""), d(-1), live(true) { }
-  ~Child () { tl_assert (live); live = false; }
+  Child () : txt (""), d (-1), live (true) {}
+  ~Child ()
+  {
+    tl_assert (live);
+    live = false;
+  }
   std::string txt;
   double d;
   bool live;
   bool operator== (const Child &x) const { return txt == x.txt && fabs (d - x.d) < 1e-9 && children == x.children; }
   std::vector<Child> children;
-  std::vector<Child>::const_iterator begin_children() const { return children.begin (); }
-  std::vector<Child>::const_iterator end_children() const { return children.end (); }
+  std::vector<Child>::const_iterator begin_children () const { return children.begin (); }
+  std::vector<Child>::const_iterator end_children () const { return children.end (); }
   void add_child (const Child &c) { children.push_back (c); }
-  void add_child_ptr (Child *c) { children.push_back (*c); delete c; }
+  void add_child_ptr (Child *c)
+  {
+    children.push_back (*c);
+    delete c;
+  }
 };
 
 struct Root {
@@ -51,44 +59,53 @@ struct Root {
   std::vector<Child> m_children;
   Child m_child;
 
-  Root () : m(0), mi(0) { }
+  Root () : m (0), mi (0) {}
 
-  bool operator== (const Root &x) const { return m == x.m && 
-                                          mi == x.mi && m_subs == x.m_subs && 
-                                          m_isubs == x.m_isubs && m_children == x.m_children 
-                                          && m_child == x.m_child; }
+  bool operator== (const Root &x) const { return m == x.m &&
+                                                 mi == x.mi && m_subs == x.m_subs &&
+                                                 m_isubs == x.m_isubs && m_children == x.m_children && m_child == x.m_child; }
 
   int get_mi () const { return mi; }
   void set_mi (int i) { mi = i; }
-  void add_sub (const double &s) {
+  void add_sub (const double &s)
+  {
     m_subs.push_back (s);
   }
-  void add_isub (const int &s) {
+  void add_isub (const int &s)
+  {
     m_isubs.push_back (s);
   }
-  std::vector<double>::const_iterator begin_subs () const {
+  std::vector<double>::const_iterator begin_subs () const
+  {
     return m_subs.begin ();
   }
-  std::vector<double>::const_iterator end_subs () const {
+  std::vector<double>::const_iterator end_subs () const
+  {
     return m_subs.end ();
   }
-  std::vector<int>::const_iterator begin_isubs () const {
+  std::vector<int>::const_iterator begin_isubs () const
+  {
     return m_isubs.begin ();
   }
-  std::vector<int>::const_iterator end_isubs () const {
+  std::vector<int>::const_iterator end_isubs () const
+  {
     return m_isubs.end ();
   }
-  void add_child_ptr (Child *c) {
+  void add_child_ptr (Child *c)
+  {
     m_children.push_back (*c);
     delete c;
   }
-  void add_child (const Child &c) {
+  void add_child (const Child &c)
+  {
     m_children.push_back (c);
   }
-  std::vector<Child>::const_iterator begin_children () const {
+  std::vector<Child>::const_iterator begin_children () const
+  {
     return m_children.begin ();
   }
-  std::vector<Child>::const_iterator end_children () const {
+  std::vector<Child>::const_iterator end_children () const
+  {
     return m_children.end ();
   }
   void set_child (const Child &child) { m_child = child; }
@@ -114,19 +131,16 @@ TEST (1)
   Root root;
 
   tl::XMLStruct<Root> structure ("root",
-    tl::make_member (&Root::begin_subs, &Root::end_subs, &Root::add_sub, "sub") +
-    tl::make_member (&Root::begin_isubs, &Root::end_isubs, &Root::add_isub, "isub") +
-    tl::make_element (&Root::begin_children, &Root::end_children, &Root::add_child, "child", 
-      tl::make_member (&Child::txt, "t") +
-      tl::make_member (&Child::d, "d")
-    ) +
-    tl::make_element (&Root::get_child, &Root::set_child, "c",
-      tl::make_member (&Child::txt, "t") +
-      tl::make_member (&Child::d, "d")
-    ) +
-    tl::make_member (&Root::m, "member") +
-    tl::make_member (&Root::get_mi, &Root::set_mi, "imember")
-  );
+                                 tl::make_member (&Root::begin_subs, &Root::end_subs, &Root::add_sub, "sub") +
+                                   tl::make_member (&Root::begin_isubs, &Root::end_isubs, &Root::add_isub, "isub") +
+                                   tl::make_element (&Root::begin_children, &Root::end_children, &Root::add_child, "child",
+                                                     tl::make_member (&Child::txt, "t") +
+                                                       tl::make_member (&Child::d, "d")) +
+                                   tl::make_element (&Root::get_child, &Root::set_child, "c",
+                                                     tl::make_member (&Child::txt, "t") +
+                                                       tl::make_member (&Child::d, "d")) +
+                                   tl::make_member (&Root::m, "member") +
+                                   tl::make_member (&Root::get_mi, &Root::set_mi, "imember"));
 
   std::string error;
   try {
@@ -182,8 +196,7 @@ TEST (5)
   Root root;
 
   tl::XMLStruct<Root> structure ("root",
-    tl::make_member (&Root::m, "member")
-  );
+                                 tl::make_member (&Root::m, "member"));
 
   std::string error;
   try {
@@ -192,7 +205,7 @@ TEST (5)
     error = ex.msg ();
   }
 
-#if !defined (HAVE_EXPAT)
+#if ! defined(HAVE_EXPAT)
   EXPECT_EQ (error, "XML parser error: tag mismatch in line 2, column 33");
 #else
   EXPECT_EQ (error, "XML parser error: mismatched tag in line 2, column 28");
@@ -209,8 +222,7 @@ TEST (6)
   Root root;
 
   tl::XMLStruct<Root> structure ("root",
-    tl::make_member (&Root::m, "member")
-  );
+                                 tl::make_member (&Root::m, "member"));
 
   std::string error;
   try {
@@ -219,7 +231,7 @@ TEST (6)
     error = ex.msg ();
   }
 
-#if !defined (HAVE_EXPAT)
+#if ! defined(HAVE_EXPAT)
   EXPECT_EQ (error, "XML parser error: Unexpected text after numeric value: '...a' in line 2, column 27");
 #else
   //  expat delivers cdata at beginning of closing tag
@@ -234,18 +246,18 @@ TEST (7)
   FILE *f = fopen (tmp_file.c_str (), "w");
   tl_assert (f != NULL);
 
-  fprintf (f, 
-    "<?xml version=\"1.0\"?>\n"
-    "<root>\n"
-    "  <member>\n"
-    "    10\n"
-    "  </member>\n"
-    "  <sub>1.0</sub>\n"
-    "  <isub>-100</isub>\n"
-    "  <sub>-2.5</sub>\n"
-    "  <child><t> Text </t><d>2.5</d><d>1e-3</d></child>\n"
-    "  <child><t>T2</t></child>\n"
-    "</root>\n");
+  fprintf (f,
+           "<?xml version=\"1.0\"?>\n"
+           "<root>\n"
+           "  <member>\n"
+           "    10\n"
+           "  </member>\n"
+           "  <sub>1.0</sub>\n"
+           "  <isub>-100</isub>\n"
+           "  <sub>-2.5</sub>\n"
+           "  <child><t> Text </t><d>2.5</d><d>1e-3</d></child>\n"
+           "  <child><t>T2</t></child>\n"
+           "</root>\n");
   fclose (f);
 
   tl::XMLFileSource s (tmp_file.c_str ());
@@ -253,14 +265,12 @@ TEST (7)
   Root root;
 
   tl::XMLStruct<Root> structure ("root",
-    tl::make_member (&Root::add_sub, "sub") +
-    tl::make_member (&Root::add_isub, "isub") +
-    tl::make_element (&Root::add_child, "child", 
-      tl::make_member (&Child::txt, "t") +
-      tl::make_member (&Child::d, "d")
-    ) +
-    tl::make_member (&Root::m, "member")
-  );
+                                 tl::make_member (&Root::add_sub, "sub") +
+                                   tl::make_member (&Root::add_isub, "isub") +
+                                   tl::make_element (&Root::add_child, "child",
+                                                     tl::make_member (&Child::txt, "t") +
+                                                       tl::make_member (&Child::d, "d")) +
+                                   tl::make_member (&Root::m, "member"));
 
   std::string error;
   try {
@@ -290,18 +300,18 @@ TEST (7a)
   FILE *f = fopen (tmp_file.c_str (), "w");
   tl_assert (f != NULL);
 
-  fprintf (f, 
-    "<?xml version=\"1.0\"?>\n"
-    "<root>\n"
-    "  <member>\n"
-    "    10\n"
-    "  </member>\n"
-    "  <sub>1.0</sub>\n"
-    "  <isub>-100</isub>\n"
-    "  <sub>-2.5</sub>\n"
-    "  <child><t> Text </t><d>2.5</d><d>1e-3</d></child>\n"
-    "  <child><t>T2</t></child>\n"
-    "</root>\n");
+  fprintf (f,
+           "<?xml version=\"1.0\"?>\n"
+           "<root>\n"
+           "  <member>\n"
+           "    10\n"
+           "  </member>\n"
+           "  <sub>1.0</sub>\n"
+           "  <isub>-100</isub>\n"
+           "  <sub>-2.5</sub>\n"
+           "  <child><t> Text </t><d>2.5</d><d>1e-3</d></child>\n"
+           "  <child><t>T2</t></child>\n"
+           "</root>\n");
   fclose (f);
 
   tl::XMLFileSource s (tmp_file.c_str ());
@@ -309,14 +319,12 @@ TEST (7a)
   Root root;
 
   tl::XMLStruct<Root> structure ("root",
-    tl::make_member (&Root::add_sub, "sub") +
-    tl::make_member (&Root::add_isub, "isub") +
-    tl::make_element (&Root::add_child_ptr, "child", 
-      tl::make_member (&Child::txt, "t") +
-      tl::make_member (&Child::d, "d")
-    ) +
-    tl::make_member (&Root::m, "member")
-  );
+                                 tl::make_member (&Root::add_sub, "sub") +
+                                   tl::make_member (&Root::add_isub, "isub") +
+                                   tl::make_element (&Root::add_child_ptr, "child",
+                                                     tl::make_member (&Child::txt, "t") +
+                                                       tl::make_member (&Child::d, "d")) +
+                                   tl::make_member (&Root::m, "member"));
 
   std::string error;
   try {
@@ -346,33 +354,32 @@ TEST (8)
   FILE *f = fopen (tmp_file.c_str (), "w");
   tl_assert (f != NULL);
 
-  fprintf (f, 
-    "<?xml version=\"1.0\"?>\n"
-    "<root>\n"
-    "  <member>\n"
-    "    10\n"
-    "  </member>\n"
-    "  <child><t> Text </t>\n"
-    "    <child><t>C1</t></child>\n"
-    "    <child><t>c2</t><child><t>d2</t><d>-1.25</d></child></child>\n"
-    "    <d>2.5</d><d>125e-3</d></child>\n"
-    "  <child><t>T2</t></child>\n"
-    "</root>\n");
+  fprintf (f,
+           "<?xml version=\"1.0\"?>\n"
+           "<root>\n"
+           "  <member>\n"
+           "    10\n"
+           "  </member>\n"
+           "  <child><t> Text </t>\n"
+           "    <child><t>C1</t></child>\n"
+           "    <child><t>c2</t><child><t>d2</t><d>-1.25</d></child></child>\n"
+           "    <d>2.5</d><d>125e-3</d></child>\n"
+           "  <child><t>T2</t></child>\n"
+           "</root>\n");
   fclose (f);
 
   tl::XMLFileSource s (tmp_file.c_str ());
 
   Root root;
 
-  tl::XMLElementList child_struct = 
-      tl::make_member (&Child::txt, "t") +
-      tl::make_member (&Child::d, "d") +
-      tl::make_element (&Child::begin_children, &Child::end_children, &Child::add_child, "child", &child_struct);
+  tl::XMLElementList child_struct =
+    tl::make_member (&Child::txt, "t") +
+    tl::make_member (&Child::d, "d") +
+    tl::make_element (&Child::begin_children, &Child::end_children, &Child::add_child, "child", &child_struct);
 
   tl::XMLStruct<Root> structure ("root",
-    tl::make_element (&Root::begin_children, &Root::end_children, &Root::add_child, "child", &child_struct) +
-    tl::make_member (&Root::m, "member")
-  );
+                                 tl::make_element (&Root::begin_children, &Root::end_children, &Root::add_child, "child", &child_struct) +
+                                   tl::make_member (&Root::m, "member"));
 
   std::string error;
   try {
@@ -410,7 +417,6 @@ TEST (8)
 
   EXPECT_EQ (error, "");
   EXPECT_EQ (root == root2, true);
-
 }
 
 TEST (8a)
@@ -420,33 +426,32 @@ TEST (8a)
   FILE *f = fopen (tmp_file.c_str (), "w");
   tl_assert (f != NULL);
 
-  fprintf (f, 
-    "<?xml version=\"1.0\"?>\n"
-    "<root>\n"
-    "  <member>\n"
-    "    10\n"
-    "  </member>\n"
-    "  <child><t> Text </t>\n"
-    "    <child><t>C1</t></child>\n"
-    "    <child><t>c2</t><child><t>d2</t><d>-1.25</d></child></child>\n"
-    "    <d>2.5</d><d>125e-3</d></child>\n"
-    "  <child><t>T2</t></child>\n"
-    "</root>\n");
+  fprintf (f,
+           "<?xml version=\"1.0\"?>\n"
+           "<root>\n"
+           "  <member>\n"
+           "    10\n"
+           "  </member>\n"
+           "  <child><t> Text </t>\n"
+           "    <child><t>C1</t></child>\n"
+           "    <child><t>c2</t><child><t>d2</t><d>-1.25</d></child></child>\n"
+           "    <d>2.5</d><d>125e-3</d></child>\n"
+           "  <child><t>T2</t></child>\n"
+           "</root>\n");
   fclose (f);
 
   tl::XMLFileSource s (tmp_file.c_str ());
 
   Root root;
 
-  tl::XMLElementList child_struct = 
-      tl::make_member (&Child::txt, "t") +
-      tl::make_member (&Child::d, "d") +
-      tl::make_element (&Child::begin_children, &Child::end_children, &Child::add_child_ptr, "child", &child_struct);
+  tl::XMLElementList child_struct =
+    tl::make_member (&Child::txt, "t") +
+    tl::make_member (&Child::d, "d") +
+    tl::make_element (&Child::begin_children, &Child::end_children, &Child::add_child_ptr, "child", &child_struct);
 
   tl::XMLStruct<Root> structure ("root",
-    tl::make_element (&Root::begin_children, &Root::end_children, &Root::add_child_ptr, "child", &child_struct) +
-    tl::make_member (&Root::m, "member")
-  );
+                                 tl::make_element (&Root::begin_children, &Root::end_children, &Root::add_child_ptr, "child", &child_struct) +
+                                   tl::make_member (&Root::m, "member"));
 
   std::string error;
   try {
@@ -484,7 +489,6 @@ TEST (8a)
 
   EXPECT_EQ (error, "");
   EXPECT_EQ (root == root2, true);
-
 }
 
 TEST (9)
@@ -517,15 +521,14 @@ TEST (9)
 
   Root root;
 
-  tl::XMLElementList child_struct = 
-      tl::make_member (&Child::txt, "t") +
-      tl::make_member (&Child::d, "d") +
-      tl::make_element (&Child::begin_children, &Child::end_children, &Child::add_child_ptr, "child", &child_struct);
+  tl::XMLElementList child_struct =
+    tl::make_member (&Child::txt, "t") +
+    tl::make_member (&Child::d, "d") +
+    tl::make_element (&Child::begin_children, &Child::end_children, &Child::add_child_ptr, "child", &child_struct);
 
   tl::XMLStruct<Root> structure ("root",
-    tl::make_element (&Root::begin_children, &Root::end_children, &Root::add_child_ptr, "child", &child_struct) +
-    tl::make_member (&Root::m, "member")
-  );
+                                 tl::make_element (&Root::begin_children, &Root::end_children, &Root::add_child_ptr, "child", &child_struct) +
+                                   tl::make_member (&Root::m, "member"));
 
   std::string error;
   try {
@@ -573,7 +576,7 @@ TEST (10)
   EXPECT_EQ (child.txt, "H\xc3\xa4llo");
 }
 
-#if defined(HAVE_EXPAT) || QT_VERSION < 0x60000   // #QTBUG-98656 (XML reader does not read encoding properly)
+#if defined(HAVE_EXPAT) || QT_VERSION < 0x60000 // #QTBUG-98656 (XML reader does not read encoding properly)
 TEST (11)
 {
   //  iso8859-1 encoding
@@ -627,7 +630,7 @@ TEST (12)
   EXPECT_EQ (child.txt, "H\xc3\xa4llo");
 }
 
-#if defined(HAVE_EXPAT) || QT_VERSION < 0x60000   // #QTBUG-98656 (XML reader does not read encoding properly)
+#if defined(HAVE_EXPAT) || QT_VERSION < 0x60000 // #QTBUG-98656 (XML reader does not read encoding properly)
 TEST (13)
 {
   //  iso8859 encoding

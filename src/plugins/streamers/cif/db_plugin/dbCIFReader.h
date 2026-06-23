@@ -54,7 +54,8 @@ class DB_PLUGIN_PUBLIC CIFReaderException
 public:
   CIFReaderException (const std::string &msg, size_t l, const std::string &cell, const std::string &source)
     : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%ld, cell=%s), in file: %s")), msg, l, cell, source))
-  { }
+  {
+  }
 };
 
 /**
@@ -64,7 +65,7 @@ class DB_PLUGIN_PUBLIC CIFReader
   : public NamedLayerReader,
     public CIFDiagnostics
 {
-public: 
+public:
   typedef std::vector<tl::Variant> property_value_list;
 
   /**
@@ -74,13 +75,13 @@ public:
    */
   CIFReader (tl::InputStream &s);
 
-  /**  
+  /**
    *  @brief Destructor
    */
   ~CIFReader ();
 
-  /** 
-   *  @brief The basic read method 
+  /**
+   *  @brief The basic read method
    *
    *  This method will read the stream data and translate this to
    *  insert calls into the layout object. This will not do much
@@ -97,7 +98,7 @@ public:
    */
   virtual const LayerMap &read (db::Layout &layout, const LoadLayoutOptions &options);
 
-  /** 
+  /**
    *  @brief The basic read method (without mapping)
    *
    *  This method will read the stream data and translate this to
@@ -138,13 +139,13 @@ private:
   unsigned int m_wire_mode;
   std::string m_cellname;
   std::string m_cmd_buffer;
-  std::map <unsigned int, db::cell_index_type> m_cells_by_id;
+  std::map<unsigned int, db::cell_index_type> m_cells_by_id;
 
   void do_read (db::Layout &layout);
 
   const char *fetch_command ();
   bool read_cell (db::Layout &layout, db::Cell &cell, double sf, int level);
-  void skip_blanks();
+  void skip_blanks ();
   void skip_sep ();
   void skip_comment ();
   char get_char ();
@@ -162,4 +163,3 @@ private:
 }
 
 #endif
-

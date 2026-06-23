@@ -37,7 +37,7 @@ class QSignalBlocker;
 
 namespace tl
 {
-  class Exception;
+class Exception;
 }
 
 namespace lay
@@ -115,4 +115,4 @@ typedef QSignalBlocker SignalBlocker;
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

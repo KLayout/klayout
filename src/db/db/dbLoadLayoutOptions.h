@@ -46,8 +46,8 @@ class DB_PUBLIC FormatSpecificReaderOptions
   : public gsi::ObjectBase
 {
 public:
-  FormatSpecificReaderOptions () { }  
-  virtual ~FormatSpecificReaderOptions () { }  //  to enable RTTI
+  FormatSpecificReaderOptions () {}
+  virtual ~FormatSpecificReaderOptions () {} //  to enable RTTI
 
   virtual FormatSpecificReaderOptions *clone () const = 0;
   virtual const std::string &format_name () const = 0;
@@ -70,7 +70,7 @@ public:
   LoadLayoutOptions (const LoadLayoutOptions &d);
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   LoadLayoutOptions &operator= (const LoadLayoutOptions &d);
 
@@ -144,7 +144,7 @@ public:
   const T &get_options () const
   {
     static const T default_format;
-    std::map <std::string, FormatSpecificReaderOptions *>::const_iterator o = m_options.find (default_format.format_name ());
+    std::map<std::string, FormatSpecificReaderOptions *>::const_iterator o = m_options.find (default_format.format_name ());
     if (o != m_options.end () && dynamic_cast<const T *> (o->second)) {
       return *(dynamic_cast<const T *> (o->second));
     } else {
@@ -161,7 +161,7 @@ public:
   T &get_options ()
   {
     static const T default_format;
-    std::map <std::string, FormatSpecificReaderOptions *>::iterator o = m_options.find (default_format.format_name ());
+    std::map<std::string, FormatSpecificReaderOptions *>::iterator o = m_options.find (default_format.format_name ());
     if (o != m_options.end () && dynamic_cast<T *> (o->second)) {
       return *(dynamic_cast<T *> (o->second));
     } else {
@@ -236,7 +236,7 @@ public:
   tl::Variant get_option_by_method (const std::string &name);
 
 private:
-  std::map <std::string, FormatSpecificReaderOptions *> m_options;
+  std::map<std::string, FormatSpecificReaderOptions *> m_options;
   int m_warn_level;
 
   void release ();
@@ -245,5 +245,3 @@ private:
 }
 
 #endif
-
-

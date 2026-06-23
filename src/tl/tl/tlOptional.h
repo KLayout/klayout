@@ -32,36 +32,37 @@
 namespace tl
 {
 
-struct nullopt_t {};
+struct nullopt_t {
+};
 
 extern TL_PUBLIC const nullopt_t nullopt;
 
 /**
  *  @brief Poor man's partial implementation of C++17's std::optional
  */
-template<typename T>
+template <typename T>
 class TL_PUBLIC_TEMPLATE optional
 {
 public:
-  optional () :
-    m_value (),
-    m_is_valid (false)
-  {}
+  optional () : m_value (),
+                m_is_valid (false)
+  {
+  }
 
-  optional (const nullopt_t &) :
-    m_value (),
-    m_is_valid (false)
-  {}
+  optional (const nullopt_t &) : m_value (),
+                                 m_is_valid (false)
+  {
+  }
 
-  explicit optional (const T &value) :
-    m_value (value),
-    m_is_valid (true)
-  {}
+  explicit optional (const T &value) : m_value (value),
+                                       m_is_valid (true)
+  {
+  }
 
-  explicit optional (T &&value) :
-    m_value (value),
-    m_is_valid (true)
-  {}
+  explicit optional (T &&value) : m_value (value),
+                                  m_is_valid (true)
+  {
+  }
 
   optional &operator= (const T &value)
   {
@@ -82,7 +83,7 @@ public:
     m_is_valid = false;
   }
 
-  bool has_value() const { return m_is_valid; }
+  bool has_value () const { return m_is_valid; }
 
   T &value ()
   {
@@ -98,22 +99,22 @@ public:
     return m_value;
   }
 
-  T& operator* ()
+  T &operator* ()
   {
     return value ();
   }
 
-  const T& operator* () const
+  const T &operator* () const
   {
     return value ();
   }
 
-  T* operator-> ()
+  T *operator->()
   {
     return m_is_valid ? &m_value : 0;
   }
 
-  const T* operator-> () const
+  const T *operator->() const
   {
     return m_is_valid ? &m_value : 0;
   }
@@ -123,36 +124,36 @@ private:
   bool m_is_valid;
 };
 
-template<typename T>
+template <typename T>
 optional<T> make_optional (const T &value)
 {
   return optional<T> (value);
 }
 
-template<typename T>
+template <typename T>
 bool operator== (const optional<T> &lhs, const optional<T> &rhs)
 {
   if (lhs.has_value () != rhs.has_value ()) {
     return false;
   }
-  if (!lhs.has_value ()) {
+  if (! lhs.has_value ()) {
     return true;
   }
 
-  return lhs.value() == rhs.value();
+  return lhs.value () == rhs.value ();
 }
 
-template<typename T>
+template <typename T>
 bool operator!= (const optional<T> &lhs, const optional<T> &rhs)
 {
-  return !(lhs == rhs);
+  return ! (lhs == rhs);
 }
 
-template<typename T>
+template <typename T>
 std::ostream &operator<< (std::ostream &ostr, const optional<T> &rhs)
 {
-  if (rhs.has_value()) {
-    ostr << rhs.value();
+  if (rhs.has_value ()) {
+    ostr << rhs.value ();
   } else {
     ostr << "<invalid>";
   }

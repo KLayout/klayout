@@ -26,15 +26,14 @@ namespace db
 {
 
 template <class C>
-void
-variable_width_path<C>::init ()
+void variable_width_path<C>::init ()
 {
   //  compress the points
 
-  typename std::vector<db::point<C> >::iterator pw = m_points.begin ();
-  typename std::vector<db::point<C> >::const_iterator pr = m_points.begin ();
+  typename std::vector<db::point<C>>::iterator pw = m_points.begin ();
+  typename std::vector<db::point<C>>::const_iterator pr = m_points.begin ();
 
-  typename std::vector<std::pair<size_t, C> >::iterator ow = m_org_widths.begin ();
+  typename std::vector<std::pair<size_t, C>>::iterator ow = m_org_widths.begin ();
 
   while (pr != m_points.end ()) {
 
@@ -55,7 +54,6 @@ variable_width_path<C>::init ()
     if (ow != m_org_widths.end ()) {
       tl_assert (ow->first >= irr);
     }
-
   }
 
   m_points.erase (pw, m_points.end ());
@@ -66,7 +64,7 @@ variable_width_path<C>::init ()
   size_t i = 0;
   bool last_set = false;
 
-  for (typename std::vector<std::pair<size_t, C> >::const_iterator j = m_org_widths.begin (); j != m_org_widths.end (); ++j) {
+  for (typename std::vector<std::pair<size_t, C>>::const_iterator j = m_org_widths.begin (); j != m_org_widths.end (); ++j) {
 
     width_type w0 = w;
     w = j->second;
@@ -107,11 +105,9 @@ variable_width_path<C>::init ()
       }
 
       i = j->first;
-
     }
 
     last_set = true;
-
   }
 
   //  fill up the remaining widths (should not happen if the last width_spec is for
@@ -125,8 +121,7 @@ variable_width_path<C>::init ()
 }
 
 template <class C, class Iter, class WIter, class Inserter>
-static
-void create_shifted_points (C /*c*/, bool forward, Iter from, Iter to, WIter wfrom, WIter wto, Inserter pts)
+static void create_shifted_points (C /*c*/, bool forward, Iter from, Iter to, WIter wfrom, WIter wto, Inserter pts)
 {
   //  for safety reasons
   if (from == to) {
@@ -164,7 +159,6 @@ void create_shifted_points (C /*c*/, bool forward, Iter from, Iter to, WIter wfr
       nd *= (forward ? w->second : w->first) * 0.5;
 
       *pts++ = (*p + vector<C> (nd));
-
     }
 
     if (ppp == to) {
@@ -223,7 +217,6 @@ void create_shifted_points (C /*c*/, bool forward, Iter from, Iter to, WIter wfr
         double u2 = db::vprod (nd2 - nnd1, ed) / du;
 
         is_folded = ((u1 < -db::epsilon) != (u2 < -db::epsilon));
-
       }
 
       if (is_folded) {
@@ -275,7 +268,6 @@ void create_shifted_points (C /*c*/, bool forward, Iter from, Iter to, WIter wfr
             //  cut-off corner: produce two points connecting the edges
             *pts++ = *pp + vector<C> (nd2 + g * std::min (l1max, l1));
             *pts++ = *pp + vector<C> (nnd1 - gg * std::min (l2max, l2));
-
           }
 
         } else if (db::sprod (g, gg) < -db::epsilon) {
@@ -283,26 +275,22 @@ void create_shifted_points (C /*c*/, bool forward, Iter from, Iter to, WIter wfr
           //  reflecting segment
           *pts++ = *pp + vector<C> (nd2 + g * wi);
           *pts++ = *pp + vector<C> (nnd1 - gg * wi);
-
         }
-
       }
-
     }
 
     p = pp;
     pp = ppp;
     w = ww;
     ww = www;
-
   }
 }
 
 template <class C>
 typename variable_width_path<C>::simple_polygon_type variable_width_path<C>::to_poly () const
 {
-  std::vector<point<C> > pts;
-  pts.reserve (m_points.size () * 2);  //  minimum number of points required
+  std::vector<point<C>> pts;
+  pts.reserve (m_points.size () * 2); //  minimum number of points required
 
   C c = 0;
   create_shifted_points (c, true, m_points.begin (), m_points.end (), m_widths.begin (), m_widths.end (), std::back_inserter (pts));

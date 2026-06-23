@@ -39,8 +39,7 @@ SaltGrains::SaltGrains ()
   //  .. nothing yet ..
 }
 
-bool
-SaltGrains::operator== (const SaltGrains &other) const
+bool SaltGrains::operator== (const SaltGrains &other) const
 {
   return m_name == other.m_name &&
          m_path == other.m_path &&
@@ -49,43 +48,37 @@ SaltGrains::operator== (const SaltGrains &other) const
          m_grains == other.m_grains;
 }
 
-void
-SaltGrains::set_name (const std::string &n)
+void SaltGrains::set_name (const std::string &n)
 {
   m_name = n;
 }
 
-void
-SaltGrains::set_sparse (const bool &f)
+void SaltGrains::set_sparse (const bool &f)
 {
   m_sparse = f;
 }
 
-void
-SaltGrains::set_title (const std::string &t)
+void SaltGrains::set_title (const std::string &t)
 {
   m_title = t;
 }
 
-void
-SaltGrains::set_path (const std::string &p)
+void SaltGrains::set_path (const std::string &p)
 {
   m_path = p;
 }
 
-void
-SaltGrains::add_collection (const SaltGrains &collection)
+void SaltGrains::add_collection (const SaltGrains &collection)
 {
   m_collections.push_back (collection);
 }
 
-bool
-SaltGrains::remove_collection (collection_iterator iter, bool with_files)
+bool SaltGrains::remove_collection (collection_iterator iter, bool with_files)
 {
   //  NOTE: this is kind of inefficient, but in order to maintain the const iterator semantics this approach is required
   for (collections_type::iterator i = m_collections.begin (); i != m_collections.end (); ++i) {
     if (i == iter) {
-      if (with_files && !tl::rm_dir_recursive (i->path ())) {
+      if (with_files && ! tl::rm_dir_recursive (i->path ())) {
         return false;
       }
       m_collections.erase (i);
@@ -96,19 +89,17 @@ SaltGrains::remove_collection (collection_iterator iter, bool with_files)
   return false;
 }
 
-void
-SaltGrains::add_grain (const SaltGrain &grain)
+void SaltGrains::add_grain (const SaltGrain &grain)
 {
   m_grains.push_back (grain);
 }
 
-bool
-SaltGrains::remove_grain (grain_iterator iter, bool with_files)
+bool SaltGrains::remove_grain (grain_iterator iter, bool with_files)
 {
   //  NOTE: this is kind of inefficient, but in order to maintain the const iterator semantics this approach is required
   for (grains_type::iterator i = m_grains.begin (); i != m_grains.end (); ++i) {
     if (i == iter) {
-      if (with_files && !tl::rm_dir_recursive (i->path ())) {
+      if (with_files && ! tl::rm_dir_recursive (i->path ())) {
         return false;
       }
       m_grains.erase (i);
@@ -119,22 +110,20 @@ SaltGrains::remove_grain (grain_iterator iter, bool with_files)
   return false;
 }
 
-bool
-SaltGrains::is_empty () const
+bool SaltGrains::is_empty () const
 {
   if (! m_grains.empty ()) {
     return false;
   }
   for (collections_type::const_iterator i = m_collections.begin (); i != m_collections.end (); ++i) {
-    if (!i->is_empty ()) {
+    if (! i->is_empty ()) {
       return false;
     }
   }
   return true;
 }
 
-bool
-SaltGrains::is_readonly () const
+bool SaltGrains::is_readonly () const
 {
   return QFileInfo (tl::to_qstring (path ())).isWritable ();
 }
@@ -149,9 +138,9 @@ class OpenResource
   : public QResource
 {
 public:
+  using QResource::children;
   using QResource::isDir;
   using QResource::isFile;
-  using QResource::children;
 
   OpenResource (const QString &path)
     : QResource (path)
@@ -170,7 +159,7 @@ SaltGrains::from_path (const std::string &path, const std::string &prefix)
   SaltGrains grains;
   grains.set_path (path);
 
-  if (path[0] != ':') {
+  if (path [0] != ':') {
 
     QDir dir (tl::to_qstring (path));
     QStringList entries = dir.entryList (QDir::NoDotAndDotDot | QDir::Dirs, QDir::Name);
@@ -198,7 +187,6 @@ SaltGrains::from_path (const std::string &path, const std::string &prefix)
           grains.add_collection (c);
         }
       }
-
     }
 
   } else {
@@ -232,18 +220,14 @@ SaltGrains::from_path (const std::string &path, const std::string &prefix)
             grains.add_collection (c);
           }
         }
-
       }
-
     }
-
   }
 
   return grains;
 }
 
-void
-SaltGrains::merge_with (const lay::SaltGrains &other)
+void SaltGrains::merge_with (const lay::SaltGrains &other)
 {
   for (lay::SaltGrains::collection_iterator c = other.begin_collections (); c != other.end_collections (); ++c) {
     add_collection (*c);
@@ -254,8 +238,7 @@ SaltGrains::merge_with (const lay::SaltGrains &other)
   consolidate ();
 }
 
-void
-SaltGrains::consolidate ()
+void SaltGrains::consolidate ()
 {
   std::vector<collections_type::iterator> collection_to_delete;
 
@@ -270,7 +253,6 @@ SaltGrains::consolidate ()
       c->consolidate ();
       collection_by_name.insert (std::make_pair (c->name (), c));
     }
-
   }
 
   //  actually delete the additional collections
@@ -298,7 +280,6 @@ SaltGrains::consolidate ()
     } else {
       grain_by_name.insert (std::make_pair (g->name (), g));
     }
-
   }
 
   //  actually delete the additional elements
@@ -316,8 +297,7 @@ static tl::XMLElementList s_group_struct =
 
 static tl::XMLStruct<lay::SaltGrains> s_xml_struct ("salt-mine", s_group_struct);
 
-void
-SaltGrains::load (const std::string &p)
+void SaltGrains::load (const std::string &p)
 {
   m_url = p;
 
@@ -325,8 +305,7 @@ SaltGrains::load (const std::string &p)
   s_xml_struct.parse (source, *this);
 }
 
-void
-SaltGrains::load (const std::string &p, tl::InputStream &s)
+void SaltGrains::load (const std::string &p, tl::InputStream &s)
 {
   m_url = p;
 
@@ -334,26 +313,24 @@ SaltGrains::load (const std::string &p, tl::InputStream &s)
   s_xml_struct.parse (source, *this);
 }
 
-void
-SaltGrains::include (const std::string &src_in)
+void SaltGrains::include (const std::string &src_in)
 {
   if (! src_in.empty ()) {
 
     std::string src = src_in;
 
     //  base relative URL's on the parent URL
-    if (!m_url.empty () && src.find ("http:") != 0 && src.find ("https:") != 0 && src.find ("file:") != 0 && !src.empty() && src[0] != '/' && src[0] != '\\') {
+    if (! m_url.empty () && src.find ("http:") != 0 && src.find ("https:") != 0 && src.find ("file:") != 0 && ! src.empty () && src [0] != '/' && src [0] != '\\') {
 
       //  replace the last component ("repository.xml") by the given path
       QUrl url (tl::to_qstring (m_url));
       QStringList path_comp = url.path ().split (QString::fromUtf8 ("/"));
-      if (!path_comp.isEmpty ()) {
+      if (! path_comp.isEmpty ()) {
         path_comp.back () = tl::to_qstring (src);
       }
       url.setPath (path_comp.join (QString::fromUtf8 ("/")));
 
       src = tl::to_string (url.toString ());
-
     }
 
     if (tl::verbosity () >= 20) {
@@ -367,12 +344,10 @@ SaltGrains::include (const std::string &src_in)
     }
     m_collections.splice (m_collections.end (), g.m_collections);
     m_grains.splice (m_grains.end (), g.m_grains);
-
   }
 }
 
-void
-SaltGrains::save (const std::string &p) const
+void SaltGrains::save (const std::string &p) const
 {
   tl::OutputStream os (p, tl::OutputStream::OM_Plain);
   s_xml_struct.write (os, *this);

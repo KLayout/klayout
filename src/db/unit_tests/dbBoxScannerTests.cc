@@ -29,9 +29,9 @@
 #include "tlTimer.h"
 #include "tlLog.h"
 
-struct BoxScannerTestRecorder
-{
-  void finish (const db::Box * /*box*/, size_t p) {
+struct BoxScannerTestRecorder {
+  void finish (const db::Box * /*box*/, size_t p)
+  {
     str += "<" + tl::to_string (p) + ">";
   }
 
@@ -47,11 +47,11 @@ struct BoxScannerTestRecorder
   std::string str;
 };
 
-struct BoxScannerTestRecorderStopping
-{
-  BoxScannerTestRecorderStopping () : do_stop (false) { }
+struct BoxScannerTestRecorderStopping {
+  BoxScannerTestRecorderStopping () : do_stop (false) {}
 
-  void finish (const db::Box * /*box*/, size_t p) {
+  void finish (const db::Box * /*box*/, size_t p)
+  {
     str += "<" + tl::to_string (p) + ">";
   }
 
@@ -69,13 +69,12 @@ struct BoxScannerTestRecorderStopping
   bool do_stop;
 };
 
-struct BoxScannerTestRecorder2
-{
-  void finish (const db::Box *, size_t) { }
+struct BoxScannerTestRecorder2 {
+  void finish (const db::Box *, size_t) {}
 
   bool stop () const { return false; }
-  void initialize () { }
-  void finalize (bool) { }
+  void initialize () {}
+  void finalize (bool) {}
 
   void add (const db::Box * /*b1*/, size_t p1, const db::Box * /*b2*/, size_t p2)
   {
@@ -83,16 +82,17 @@ struct BoxScannerTestRecorder2
     interactions.insert (std::make_pair (p2, p1));
   }
 
-  std::set<std::pair<size_t, size_t> > interactions;
+  std::set<std::pair<size_t, size_t>> interactions;
 };
 
-struct BoxScannerTestRecorderTwo
-{
-  void finish1 (const db::Box * /*box*/, size_t p) {
+struct BoxScannerTestRecorderTwo {
+  void finish1 (const db::Box * /*box*/, size_t p)
+  {
     str += "<" + tl::to_string (p) + ">";
   }
 
-  void finish2 (const db::SimplePolygon * /*poly*/, int p) {
+  void finish2 (const db::SimplePolygon * /*poly*/, int p)
+  {
     str += "<" + tl::to_string (p) + ">";
   }
 
@@ -108,15 +108,16 @@ struct BoxScannerTestRecorderTwo
   std::string str;
 };
 
-struct BoxScannerTestRecorderTwoStopping
-{
-  BoxScannerTestRecorderTwoStopping () : do_stop (false) { }
+struct BoxScannerTestRecorderTwoStopping {
+  BoxScannerTestRecorderTwoStopping () : do_stop (false) {}
 
-  void finish1 (const db::Box * /*box*/, size_t p) {
+  void finish1 (const db::Box * /*box*/, size_t p)
+  {
     str += "<" + tl::to_string (p) + ">";
   }
 
-  void finish2 (const db::SimplePolygon * /*poly*/, int p) {
+  void finish2 (const db::SimplePolygon * /*poly*/, int p)
+  {
     str += "<" + tl::to_string (p) + ">";
   }
 
@@ -134,24 +135,23 @@ struct BoxScannerTestRecorderTwoStopping
   bool do_stop;
 };
 
-struct BoxScannerTestRecorder2Two
-{
-  void finish1 (const db::Box *, size_t) { }
-  void finish2 (const db::SimplePolygon *, int) { }
+struct BoxScannerTestRecorder2Two {
+  void finish1 (const db::Box *, size_t) {}
+  void finish2 (const db::SimplePolygon *, int) {}
 
   bool stop () const { return false; }
-  void initialize () { }
-  void finalize (bool) { }
+  void initialize () {}
+  void finalize (bool) {}
 
   void add (const db::Box * /*b1*/, size_t p1, const db::SimplePolygon * /*b2*/, int p2)
   {
     interactions.insert (std::make_pair (p1, p2));
   }
 
-  std::set<std::pair<size_t, int> > interactions;
+  std::set<std::pair<size_t, int>> interactions;
 };
 
-TEST(1)
+TEST (1)
 {
   db::box_scanner<db::Box, size_t> bs;
 
@@ -178,7 +178,7 @@ TEST(1)
   EXPECT_EQ (trstop.str, "[i](4-2)[f-]");
 }
 
-TEST(1a)
+TEST (1a)
 {
   db::box_scanner<db::Box, size_t> bs;
 
@@ -197,7 +197,7 @@ TEST(1a)
   EXPECT_EQ (tr.str, "[i](1-0)<0><1>[f]");
 }
 
-TEST(1b)
+TEST (1b)
 {
   db::box_scanner<db::Box, size_t> bs;
 
@@ -219,7 +219,7 @@ TEST(1b)
   EXPECT_EQ (tr.str, "[i](3-0)(1-3)(4-1)(2-4)<0><3><1><4><2>[f]");
 }
 
-TEST(1c)
+TEST (1c)
 {
   db::box_scanner<db::Box, size_t> bs;
 
@@ -241,7 +241,7 @@ TEST(1c)
   EXPECT_EQ (tr.str, "[i](3-0)(1-3)<0>(4-1)<3>(2-4)<1><4><2>[f]");
 }
 
-TEST(1d)
+TEST (1d)
 {
   db::box_scanner<db::Box, size_t> bs;
 
@@ -263,7 +263,7 @@ TEST(1d)
   EXPECT_EQ (tr.str, "[i](3-0)<0><3><1><4><2>[f]");
 }
 
-TEST(1e)
+TEST (1e)
 {
   db::box_scanner<db::Box, size_t> bs;
 
@@ -284,7 +284,7 @@ TEST(1e)
   EXPECT_EQ (tr.str, "[i](0-3)<0><1><2><3><4>[f]");
 }
 
-TEST(1f)
+TEST (1f)
 {
   //  trivial case
   db::box_scanner<db::Box, size_t> bs;
@@ -295,7 +295,7 @@ TEST(1f)
   EXPECT_EQ (tr.str, "[i][f]");
 }
 
-TEST(1g)
+TEST (1g)
 {
   //  empty elements
   db::box_scanner<db::Box, size_t> bs;
@@ -340,12 +340,12 @@ void run_test2 (tl::TestBase *_this, size_t n, double ff, db::Coord spread, bool
     bs.process (tr, touch ? 1 : 0, bc);
   }
 
-  std::set<std::pair<size_t, size_t> > interactions;
+  std::set<std::pair<size_t, size_t>> interactions;
   {
     tl::SelfTimer timer ("brute-force");
     for (size_t i = 0; i < bb.size (); ++i) {
       for (size_t j = i + 1; j < bb.size (); ++j) {
-        if ((touch && bb[i].touches (bb[j])) || (!touch && bb[i].overlaps (bb[j]))) {
+        if ((touch && bb [i].touches (bb [j])) || (! touch && bb [i].overlaps (bb [j]))) {
           interactions.insert (std::make_pair (i, j));
           interactions.insert (std::make_pair (j, i));
         }
@@ -355,41 +355,40 @@ void run_test2 (tl::TestBase *_this, size_t n, double ff, db::Coord spread, bool
 
   if (interactions != tr.interactions) {
     tl::info << "Interactions in 'brute force' but not in 'box-scanner':";
-    for (std::set<std::pair<size_t, size_t> >::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (std::set<std::pair<size_t, size_t>>::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
       if (tr.interactions.find (*i) == tr.interactions.end ()) {
         tl::info << "   " << i->first << "-" << i->second;
       }
     }
     tl::info << "Interactions in 'box-scanner' but not in 'brute force':";
-    for (std::set<std::pair<size_t, size_t> >::const_iterator i = tr.interactions.begin (); i != tr.interactions.end (); ++i) {
+    for (std::set<std::pair<size_t, size_t>>::const_iterator i = tr.interactions.begin (); i != tr.interactions.end (); ++i) {
       if (interactions.find (*i) == interactions.end ()) {
         tl::info << "   " << i->first << "-" << i->second;
       }
     }
   }
   EXPECT_EQ (interactions == tr.interactions, true);
-
 }
 
-TEST(2)
+TEST (2)
 {
-  run_test2(_this, 1000, 0.0, 1000);
-  run_test2(_this, 1000, 2, 1000);
-  run_test2(_this, 1000, 2, 1000, false);
-  run_test2(_this, 1000, 2, 500);
-  run_test2(_this, 1000, 2, 100);
-  run_test2(_this, 10000, 2, 10000);
+  run_test2 (_this, 1000, 0.0, 1000);
+  run_test2 (_this, 1000, 2, 1000);
+  run_test2 (_this, 1000, 2, 1000, false);
+  run_test2 (_this, 1000, 2, 500);
+  run_test2 (_this, 1000, 2, 100);
+  run_test2 (_this, 10000, 2, 10000);
 }
 
 
 struct TestCluster
-  : public db::cluster<db::Box, size_t>
-{
+  : public db::cluster<db::Box, size_t> {
   typedef db::cluster<db::Box, size_t> base_class;
 
-  TestCluster (std::set<std::set<size_t> > *cl)
+  TestCluster (std::set<std::set<size_t>> *cl)
     : clusters (cl)
-  { }
+  {
+  }
 
   void add (const db::Box *box, size_t p)
   {
@@ -397,7 +396,7 @@ struct TestCluster
     base_class::add (box, p);
   }
 
-  void join (const TestCluster &other) 
+  void join (const TestCluster &other)
   {
     props.insert (other.props.begin (), other.props.end ());
     base_class::join (other);
@@ -405,14 +404,14 @@ struct TestCluster
 
   void finish ()
   {
-    clusters->insert(props);
+    clusters->insert (props);
   }
 
   std::set<size_t> props;
-  std::set<std::set<size_t> > *clusters;
+  std::set<std::set<size_t>> *clusters;
 };
 
-std::string c2s (const std::set<size_t> &cl) 
+std::string c2s (const std::set<size_t> &cl)
 {
   std::string r;
   r += "(";
@@ -426,11 +425,11 @@ std::string c2s (const std::set<size_t> &cl)
   return r;
 }
 
-std::string cl2s (const std::set<std::set<size_t> > &clusters)
+std::string cl2s (const std::set<std::set<size_t>> &clusters)
 {
   std::string r;
-  for (std::set<std::set<size_t> >::const_iterator c = clusters.begin (); c != clusters.end (); ++c) {
-    if (!r.empty ()) {
+  for (std::set<std::set<size_t>>::const_iterator c = clusters.begin (); c != clusters.end (); ++c) {
+    if (! r.empty ()) {
       r += ",";
     }
     r += c2s (*c);
@@ -438,10 +437,10 @@ std::string cl2s (const std::set<std::set<size_t> > &clusters)
   return r;
 }
 
-TEST(10)
+TEST (10)
 {
   db::box_scanner<db::Box, size_t> bs;
-  std::set<std::set<size_t> > clusters;
+  std::set<std::set<size_t>> clusters;
 
   std::vector<db::Box> bb;
   bb.push_back (db::Box (0, 210, 200, 310));
@@ -464,10 +463,10 @@ TEST(10)
   EXPECT_EQ (cl2s (clusters), "(0,1),(2,3,4,5)");
 }
 
-TEST(10a)
+TEST (10a)
 {
   db::box_scanner<db::Box, size_t> bs;
-  std::set<std::set<size_t> > clusters;
+  std::set<std::set<size_t>> clusters;
 
   std::vector<db::Box> bb;
   bb.push_back (db::Box (0, 210, 200, 310));
@@ -489,10 +488,10 @@ TEST(10a)
   EXPECT_EQ (cl2s (clusters), "(0,1),(2,3,4,5)");
 }
 
-TEST(10b)
+TEST (10b)
 {
   db::box_scanner<db::Box, size_t> bs;
-  std::set<std::set<size_t> > clusters;
+  std::set<std::set<size_t>> clusters;
 
   std::vector<db::Box> bb;
   bb.push_back (db::Box (0, 210, 100, 310));
@@ -520,16 +519,16 @@ TEST(10b)
   clusters.clear ();
   bs.process (coll, 60, bc);
   EXPECT_EQ (cl2s (clusters), "(0,1),(2,3,4,5)");
- 
+
   clusters.clear ();
   bs.process (coll, 61, bc);
   EXPECT_EQ (cl2s (clusters), "(0,1,2,3,4,5)");
 }
 
-TEST(10c)
+TEST (10c)
 {
   db::box_scanner<db::Box, size_t> bs;
-  std::set<std::set<size_t> > clusters;
+  std::set<std::set<size_t>> clusters;
 
   std::vector<db::Box> bb;
   bb.push_back (db::Box (0, 210, 200, 310));
@@ -548,10 +547,10 @@ TEST(10c)
   EXPECT_EQ (cl2s (clusters), "(0),(1)");
 }
 
-TEST(10d)
+TEST (10d)
 {
   db::box_scanner<db::Box, size_t> bs;
-  std::set<std::set<size_t> > clusters;
+  std::set<std::set<size_t>> clusters;
 
   std::vector<db::Box> bb;
   for (std::vector<db::Box>::const_iterator b = bb.begin (); b != bb.end (); ++b) {
@@ -568,10 +567,10 @@ TEST(10d)
   EXPECT_EQ (cl2s (clusters), "");
 }
 
-TEST(10e)
+TEST (10e)
 {
   db::box_scanner<db::Box, size_t> bs;
-  std::set<std::set<size_t> > clusters;
+  std::set<std::set<size_t>> clusters;
 
   std::vector<db::Box> bb;
   bb.push_back (db::Box (0, 210, 200, 310));
@@ -604,7 +603,7 @@ void run_test11 (tl::TestBase *_this, size_t n, double ff, db::Coord spread, boo
     bs.insert (&*b, b - bb.begin ());
   }
 
-  std::set<std::set<size_t> > clusters;
+  std::set<std::set<size_t>> clusters;
 
   bs.set_fill_factor (ff);
   db::box_convert<db::Box> bc;
@@ -616,7 +615,7 @@ void run_test11 (tl::TestBase *_this, size_t n, double ff, db::Coord spread, boo
     bs.process (coll, touch ? 1 : 0, bc);
   }
 
-  std::set<std::set<size_t > > bf_clusters;
+  std::set<std::set<size_t>> bf_clusters;
   {
     tl::SelfTimer timer ("brute-force");
     std::set<size_t> seen;
@@ -635,7 +634,7 @@ void run_test11 (tl::TestBase *_this, size_t n, double ff, db::Coord spread, boo
             continue;
           }
           for (std::set<size_t>::const_iterator k = cl.begin (); k != cl.end (); ++k) {
-            if ((touch && bb[*k].touches (bb[j])) || (!touch && bb[*k].overlaps (bb[j]))) {
+            if ((touch && bb [*k].touches (bb [j])) || (! touch && bb [*k].overlaps (bb [j]))) {
               cl.insert (j);
               seen.insert (j);
               any = true;
@@ -650,13 +649,13 @@ void run_test11 (tl::TestBase *_this, size_t n, double ff, db::Coord spread, boo
 
   if (clusters != bf_clusters) {
     tl::info << "Clusters in 'brute force' but not in 'box-scanner':";
-    for (std::set<std::set<size_t > >::const_iterator i = bf_clusters.begin (); i != bf_clusters.end (); ++i) {
+    for (std::set<std::set<size_t>>::const_iterator i = bf_clusters.begin (); i != bf_clusters.end (); ++i) {
       if (clusters.find (*i) == clusters.end ()) {
         tl::info << "   " << c2s (*i);
       }
     }
     tl::info << "Clusters in 'box-scanner' but not in 'brute force':";
-    for (std::set<std::set<size_t > >::const_iterator i = clusters.begin (); i != clusters.end (); ++i) {
+    for (std::set<std::set<size_t>>::const_iterator i = clusters.begin (); i != clusters.end (); ++i) {
       if (bf_clusters.find (*i) == bf_clusters.end ()) {
         tl::info << "   " << c2s (*i);
       }
@@ -665,13 +664,13 @@ void run_test11 (tl::TestBase *_this, size_t n, double ff, db::Coord spread, boo
   EXPECT_EQ (clusters == bf_clusters, true);
 }
 
-TEST(11)
+TEST (11)
 {
-  run_test11(_this, 1000, 0.0, 1000);
-  run_test11(_this, 1000, 2, 1000);
-  run_test11(_this, 1000, 2, 1000, false);
-  run_test11(_this, 1000, 2, 500);
-  run_test11(_this, 1000, 2, 100);
+  run_test11 (_this, 1000, 0.0, 1000);
+  run_test11 (_this, 1000, 2, 1000);
+  run_test11 (_this, 1000, 2, 1000, false);
+  run_test11 (_this, 1000, 2, 500);
+  run_test11 (_this, 1000, 2, 100);
   // brute-force is taking too long: (scanner vs brute-force: 0.07 vs 28s!)
   // run_test11(_this, 10000, 2, 10000);
 }
@@ -682,14 +681,13 @@ TEST(11)
 #include "dbWriter.h"
 
 struct BooleanAndOp
-  : public db::box_scanner_receiver<db::Polygon, size_t>
-{
+  : public db::box_scanner_receiver<db::Polygon, size_t> {
   BooleanAndOp (db::EdgeProcessor *ep, db::Shapes *out)
     : mp_ep (ep), mp_out (out)
   {
   }
 
-  void add (const db::Polygon *o1, size_t p1, const db::Polygon *o2, size_t p2) 
+  void add (const db::Polygon *o1, size_t p1, const db::Polygon *o2, size_t p2)
   {
     if (p1 == p2) {
       return;
@@ -711,7 +709,6 @@ struct BooleanAndOp
       db::PolygonGenerator pg (sg, false);
       db::BooleanOp op (db::BooleanOp::And);
       mp_ep->process (pg, op);
-
     }
   }
 
@@ -721,8 +718,7 @@ public:
 };
 
 struct BooleanAndCluster
-  : public db::cluster<db::Polygon, size_t>
-{
+  : public db::cluster<db::Polygon, size_t> {
   typedef db::cluster<db::Polygon, size_t> base_class;
 
   BooleanAndCluster (db::EdgeProcessor *ep, db::Shapes *out)
@@ -736,7 +732,7 @@ struct BooleanAndCluster
     base_class::add (polygon, p);
   }
 
-  void join (const BooleanAndCluster &other) 
+  void join (const BooleanAndCluster &other)
   {
     m_props.insert (m_props.end (), other.begin_props (), other.end_props ());
     base_class::join (other);
@@ -779,8 +775,7 @@ public:
 };
 
 struct BooleanAndInteractionClusterCollector
-  : public db::cluster_collector<db::Polygon, size_t, BooleanAndCluster> 
-{
+  : public db::cluster_collector<db::Polygon, size_t, BooleanAndCluster> {
   typedef db::cluster_collector<db::Polygon, size_t, BooleanAndCluster> base_class;
 
   BooleanAndInteractionClusterCollector (const BooleanAndCluster &cl)
@@ -797,7 +792,7 @@ struct BooleanAndInteractionClusterCollector
   }
 };
 
-TEST(100)
+TEST (100)
 {
   std::string fn (tl::testdata_private ());
   fn += "/other/";
@@ -808,8 +803,8 @@ TEST(100)
   db::Reader reader (in);
   reader.read (layout, db::LoadLayoutOptions ());
 
-  unsigned int l3 = std::numeric_limits <unsigned int>::max ();
-  unsigned int l6 = std::numeric_limits <unsigned int>::max ();
+  unsigned int l3 = std::numeric_limits<unsigned int>::max ();
+  unsigned int l6 = std::numeric_limits<unsigned int>::max ();
   for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
     if ((*l).second->layer == 3 && (*l).second->datatype == 0) {
       l3 = (*l).first;
@@ -817,8 +812,8 @@ TEST(100)
       l6 = (*l).first;
     }
   }
-  tl_assert (l3 != std::numeric_limits <unsigned int>::max ());
-  tl_assert (l6 != std::numeric_limits <unsigned int>::max ());
+  tl_assert (l3 != std::numeric_limits<unsigned int>::max ());
+  tl_assert (l6 != std::numeric_limits<unsigned int>::max ());
 
   db::cell_index_type top = *layout.begin_top_down ();
   tl_assert (layout.is_valid_cell_index (top));
@@ -844,7 +839,7 @@ TEST(100)
   {
     db::box_scanner<db::Polygon, size_t> bs;
     std::vector<db::Polygon> polygons [2];
-    unsigned int layers [2] = { l3, l6 };
+    unsigned int layers [2] = {l3, l6};
 
     {
       tl::SelfTimer timer ("Box-scanner implementation - prep");
@@ -887,29 +882,26 @@ TEST(100)
       sp.boolean (layout, top_cell, lclass, layout, top_cell, llocal, top_cell.shapes (ltmp1), db::BooleanOp::Xor, true, false);
       sp.boolean (layout, top_cell, lclass, layout, top_cell, lcluster, top_cell.shapes (ltmp2), db::BooleanOp::Xor, true, false);
     }
-    
+
     if (top_cell.shapes (ltmp1).size () != 0 || top_cell.shapes (ltmp2).size () != 0) {
 
       const char *file_out = "BoxScanner_100_out.gds";
       if (file_out) {
-        tl::OutputStream fo (file_out); 
+        tl::OutputStream fo (file_out);
         db::SaveLayoutOptions opt;
         db::Writer writer (opt);
         writer.write (layout, fo);
         tl::info << file_out << " written.";
       }
-
     }
 
     EXPECT_EQ (top_cell.shapes (ltmp1).size (), size_t (0));
     EXPECT_EQ (top_cell.shapes (ltmp2).size (), size_t (0));
-
   }
-
 }
 
 
-TEST(two_1)
+TEST (two_1)
 {
   db::box_scanner2<db::Box, size_t, db::SimplePolygon, int> bs;
 
@@ -943,24 +935,24 @@ TEST(two_1)
   EXPECT_EQ (tr.str, "[i](2-12)(2-14)(4-12)(4-14)(2-15)(4-15)(5-12)(5-14)(5-15)(2-13)(4-13)(3-12)(3-14)(3-13)(3-15)(5-13)(0-10)<2><5><4><3><12><15><14><13>(0-11)(1-10)(1-11)<0><1><10><11>[f]");
 }
 
-TEST(two_1a)
+TEST (two_1a)
 {
   db::box_scanner2<db::Box, size_t, db::SimplePolygon, int> bs;
 
   std::vector<db::Box> bb;
   bb.push_back (db::Box (0, 210, 200, 310));
-  //bb.push_back (db::Box (10, 220, 210, 320));
-  //bb.push_back (db::Box (0, 0, 100, 100));
+  // bb.push_back (db::Box (10, 220, 210, 320));
+  // bb.push_back (db::Box (0, 0, 100, 100));
   bb.push_back (db::Box (50, 50, 150, 150));
   bb.push_back (db::Box (10, 10, 110, 110));
-  //bb.push_back (db::Box (100, 10, 200, 110));
+  // bb.push_back (db::Box (100, 10, 200, 110));
 
   std::vector<db::SimplePolygon> bb2;
-  //bb2.push_back (db::SimplePolygon (db::Box (0, 210, 200, 310)));
+  // bb2.push_back (db::SimplePolygon (db::Box (0, 210, 200, 310)));
   bb2.push_back (db::SimplePolygon (db::Box (10, 220, 210, 320)));
   bb2.push_back (db::SimplePolygon (db::Box (0, 0, 100, 100)));
-  //bb2.push_back (db::SimplePolygon (db::Box (50, 50, 150, 150)));
-  //bb2.push_back (db::SimplePolygon (db::Box (10, 10, 110, 110)));
+  // bb2.push_back (db::SimplePolygon (db::Box (50, 50, 150, 150)));
+  // bb2.push_back (db::SimplePolygon (db::Box (10, 10, 110, 110)));
   bb2.push_back (db::SimplePolygon (db::Box (100, 10, 200, 110)));
 
   for (std::vector<db::Box>::const_iterator b = bb.begin (); b != bb.end (); ++b) {
@@ -980,25 +972,25 @@ TEST(two_1a)
   EXPECT_EQ (tr.str, "[i](2-11)(2-12)(1-11)(1-12)<1><2><11><12>(0-10)<0><10>[f]");
 }
 
-TEST(two_1b)
+TEST (two_1b)
 {
   db::box_scanner2<db::Box, size_t, db::SimplePolygon, int> bs;
 
   std::vector<db::Box> bb;
-  //bb.push_back (db::Box (0, 210, 200, 310));
+  // bb.push_back (db::Box (0, 210, 200, 310));
   bb.push_back (db::Box (10, 220, 210, 320));
   bb.push_back (db::Box (0, 0, 100, 100));
-  //bb.push_back (db::Box (50, 50, 150, 150));
-  //bb.push_back (db::Box (10, 10, 110, 110));
+  // bb.push_back (db::Box (50, 50, 150, 150));
+  // bb.push_back (db::Box (10, 10, 110, 110));
   bb.push_back (db::Box (100, 10, 200, 110));
 
   std::vector<db::SimplePolygon> bb2;
   bb2.push_back (db::SimplePolygon (db::Box (0, 210, 200, 310)));
-  //bb2.push_back (db::SimplePolygon (db::Box (10, 220, 210, 320)));
-  //bb2.push_back (db::SimplePolygon (db::Box (0, 0, 100, 100)));
+  // bb2.push_back (db::SimplePolygon (db::Box (10, 220, 210, 320)));
+  // bb2.push_back (db::SimplePolygon (db::Box (0, 0, 100, 100)));
   bb2.push_back (db::SimplePolygon (db::Box (50, 50, 150, 150)));
   bb2.push_back (db::SimplePolygon (db::Box (10, 10, 110, 110)));
-  //bb2.push_back (db::SimplePolygon (db::Box (100, 10, 200, 110)));
+  // bb2.push_back (db::SimplePolygon (db::Box (100, 10, 200, 110)));
 
   for (std::vector<db::Box>::const_iterator b = bb.begin (); b != bb.end (); ++b) {
     bs.insert1 (&*b, b - bb.begin ());
@@ -1022,7 +1014,7 @@ TEST(two_1b)
   EXPECT_EQ (trstop.str, "[i](1-12)[f-]");
 }
 
-TEST(two_1c)
+TEST (two_1c)
 {
   //  some empty elements
   db::box_scanner2<db::Box, size_t, db::SimplePolygon, int> bs;
@@ -1093,12 +1085,12 @@ void run_test2_two (tl::TestBase *_this, size_t n1, size_t n2, double ff, db::Co
     bs.process (tr, touch ? 1 : 0, bc1, bc2);
   }
 
-  std::set<std::pair<size_t, int> > interactions;
+  std::set<std::pair<size_t, int>> interactions;
   {
     tl::SelfTimer timer ("brute-force");
     for (size_t i = 0; i < bb.size (); ++i) {
       for (size_t j = 0; j < bb2.size (); ++j) {
-        if ((touch && bb[i].touches (bb2[j].box ())) || (!touch && bb[i].overlaps (bb2[j].box ()))) {
+        if ((touch && bb [i].touches (bb2 [j].box ())) || (! touch && bb [i].overlaps (bb2 [j].box ()))) {
           interactions.insert (std::make_pair (i, int (j)));
         }
       }
@@ -1107,78 +1099,77 @@ void run_test2_two (tl::TestBase *_this, size_t n1, size_t n2, double ff, db::Co
 
   if (interactions != tr.interactions) {
     tl::info << "Interactions 1-2 in 'brute force' but not in 'box-scanner':";
-    for (std::set<std::pair<size_t, int> >::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (std::set<std::pair<size_t, int>>::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
       if (tr.interactions.find (*i) == tr.interactions.end ()) {
         tl::info << "   " << i->first << "-" << i->second;
       }
     }
     tl::info << "Interactions 1-2 in 'box-scanner' but not in 'brute force':";
-    for (std::set<std::pair<size_t, int> >::const_iterator i = tr.interactions.begin (); i != tr.interactions.end (); ++i) {
+    for (std::set<std::pair<size_t, int>>::const_iterator i = tr.interactions.begin (); i != tr.interactions.end (); ++i) {
       if (interactions.find (*i) == interactions.end ()) {
         tl::info << "   " << i->first << "-" << i->second;
       }
     }
   }
   EXPECT_EQ (interactions == tr.interactions, true);
-
 }
 
-TEST(two_2a)
+TEST (two_2a)
 {
-  run_test2_two(_this, 10, 10, 0.0, 1000);
-  run_test2_two(_this, 10, 10, 0.0, 1000, true, false /*sub-threshold*/);
+  run_test2_two (_this, 10, 10, 0.0, 1000);
+  run_test2_two (_this, 10, 10, 0.0, 1000, true, false /*sub-threshold*/);
 }
 
-TEST(two_2b)
+TEST (two_2b)
 {
-  run_test2_two(_this, 10, 10, 0.0, 100);
-  run_test2_two(_this, 10, 10, 0.0, 100, true, false /*sub-threshold*/);
+  run_test2_two (_this, 10, 10, 0.0, 100);
+  run_test2_two (_this, 10, 10, 0.0, 100, true, false /*sub-threshold*/);
 }
 
-TEST(two_2c)
+TEST (two_2c)
 {
-  run_test2_two(_this, 10, 10, 0.0, 10);
-  run_test2_two(_this, 10, 10, 0.0, 10, true, false /*sub-threshold*/);
+  run_test2_two (_this, 10, 10, 0.0, 10);
+  run_test2_two (_this, 10, 10, 0.0, 10, true, false /*sub-threshold*/);
 }
 
-TEST(two_2d)
+TEST (two_2d)
 {
-  run_test2_two(_this, 1000, 1000, 0.0, 1000);
+  run_test2_two (_this, 1000, 1000, 0.0, 1000);
 }
 
-TEST(two_2e)
+TEST (two_2e)
 {
-  run_test2_two(_this, 1000, 1000, 2, 1000);
+  run_test2_two (_this, 1000, 1000, 2, 1000);
 }
 
-TEST(two_2f)
+TEST (two_2f)
 {
-  run_test2_two(_this, 1000, 1000, 2, 1000, false);
+  run_test2_two (_this, 1000, 1000, 2, 1000, false);
 }
 
-TEST(two_2g)
+TEST (two_2g)
 {
-  run_test2_two(_this, 1000, 1000, 2, 500);
+  run_test2_two (_this, 1000, 1000, 2, 500);
 }
 
-TEST(two_2h)
+TEST (two_2h)
 {
-  run_test2_two(_this, 1000, 1000, 2, 100);
+  run_test2_two (_this, 1000, 1000, 2, 100);
 }
 
-TEST(two_2i)
+TEST (two_2i)
 {
-  run_test2_two(_this, 10000, 1000, 2, 10000);
+  run_test2_two (_this, 10000, 1000, 2, 10000);
 }
 
-TEST(two_2j)
+TEST (two_2j)
 {
-  run_test2_two(_this, 3, 1000, 0.0, 1000);
-  run_test2_two(_this, 3, 1000, 0.0, 1000, true, false /*sub-threshold*/);
+  run_test2_two (_this, 3, 1000, 0.0, 1000);
+  run_test2_two (_this, 3, 1000, 0.0, 1000, true, false /*sub-threshold*/);
 }
 
-TEST(two_2k)
+TEST (two_2k)
 {
-  run_test2_two(_this, 1000, 3, 0.0, 1000);
-  run_test2_two(_this, 1000, 3, 0.0, 1000, true, false /*sub-threshold*/);
+  run_test2_two (_this, 1000, 3, 0.0, 1000);
+  run_test2_two (_this, 1000, 3, 0.0, 1000, true, false /*sub-threshold*/);
 }

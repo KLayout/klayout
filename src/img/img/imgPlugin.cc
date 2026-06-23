@@ -30,8 +30,7 @@ namespace img
 
 const std::string cfg_images_visible ("images-visible");
 
-void 
-PluginDeclaration::get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
+void PluginDeclaration::get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
 {
   lay::PluginDeclaration::get_menu_entries (menu_entries);
   menu_entries.push_back (lay::separator ("image_group", "edit_menu.end"));
@@ -49,15 +48,13 @@ PluginDeclaration::create_plugin (db::Manager *manager, lay::Dispatcher *, lay::
   return new img::Service (manager, view);
 }
 
-bool 
-PluginDeclaration::implements_editable (std::string &title) const
+bool PluginDeclaration::implements_editable (std::string &title) const
 {
   title = tl::to_string (tr ("Images"));
   return true;
 }
 
-void
-PluginDeclaration::get_options (std::vector < std::pair<std::string, std::string> > &options) const
+void PluginDeclaration::get_options (std::vector<std::pair<std::string, std::string>> &options) const
 {
   options.push_back (std::pair<std::string, std::string> (cfg_images_visible, "true"));
 }
@@ -65,4 +62,3 @@ PluginDeclaration::get_options (std::vector < std::pair<std::string, std::string
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new img::PluginDeclaration (), 4000, "img::Plugin");
 
 }
-

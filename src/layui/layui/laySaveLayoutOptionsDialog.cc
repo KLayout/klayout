@@ -45,7 +45,7 @@ namespace lay
 static const StreamWriterPluginDeclaration *plugin_for_format (const std::string &format_name)
 {
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    const StreamWriterPluginDeclaration *decl = dynamic_cast <const StreamWriterPluginDeclaration *> (&*cls);
+    const StreamWriterPluginDeclaration *decl = dynamic_cast<const StreamWriterPluginDeclaration *> (&*cls);
     if (decl && decl->format_name () == format_name) {
       return decl;
     }
@@ -58,7 +58,7 @@ static unsigned int om_to_index (tl::OutputStream::OutputStreamMode om)
   if (om == tl::OutputStream::OM_Plain) {
     return 1;
   } else if (om == tl::OutputStream::OM_Zlib) {
-    return 2; 
+    return 2;
   } else {
     return 0;
   }
@@ -129,7 +129,6 @@ SaveLayoutOptionsDialog::SaveLayoutOptionsDialog (QWidget *parent, const std::st
       m_pages.push_back (std::make_pair (page, fmt->format_name ()));
       any_option = true;
     }
-
   }
 
   if (! any_option) {
@@ -147,16 +146,14 @@ SaveLayoutOptionsDialog::~SaveLayoutOptionsDialog ()
   mp_ui = 0;
 }
 
-void
-SaveLayoutOptionsDialog::button_pressed (QAbstractButton *button)
+void SaveLayoutOptionsDialog::button_pressed (QAbstractButton *button)
 {
   if (button == mp_ui->buttonBox->button (QDialogButtonBox::Reset)) {
     reset_button_pressed ();
   }
 }
 
-void
-SaveLayoutOptionsDialog::current_tech_changed (int index)
+void SaveLayoutOptionsDialog::current_tech_changed (int index)
 {
   if (index != m_technology_index) {
     commit ();
@@ -165,21 +162,19 @@ SaveLayoutOptionsDialog::current_tech_changed (int index)
   }
 }
 
-void
-SaveLayoutOptionsDialog::reset_button_pressed ()
+void SaveLayoutOptionsDialog::reset_button_pressed ()
 {
   BEGIN_PROTECTED
 
   if (m_technology_index >= 0) {
-    m_opt_array[m_technology_index] = db::SaveLayoutOptions ();
+    m_opt_array [m_technology_index] = db::SaveLayoutOptions ();
   }
   update ();
 
   END_PROTECTED
 }
 
-void
-SaveLayoutOptionsDialog::ok_button_pressed ()
+void SaveLayoutOptionsDialog::ok_button_pressed ()
 {
   BEGIN_PROTECTED
 
@@ -189,15 +184,14 @@ SaveLayoutOptionsDialog::ok_button_pressed ()
   END_PROTECTED
 }
 
-void
-SaveLayoutOptionsDialog::commit ()
+void SaveLayoutOptionsDialog::commit ()
 {
   if (m_technology_index < 0) {
     return;
   }
 
   //  create the particular options for all formats
-  for (std::vector< std::pair<StreamWriterOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
+  for (std::vector<std::pair<StreamWriterOptionsPage *, std::string>>::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
 
     if (page->first) {
 
@@ -209,20 +203,17 @@ SaveLayoutOptionsDialog::commit ()
       }
 
       page->first->commit (specific_options, m_tech_array [m_technology_index], false);
-
     }
-
   }
 }
 
-void
-SaveLayoutOptionsDialog::update ()
+void SaveLayoutOptionsDialog::update ()
 {
   if (m_technology_index < 0) {
     return;
   }
 
-  for (std::vector< std::pair<StreamWriterOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
+  for (std::vector<std::pair<StreamWriterOptionsPage *, std::string>>::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
     if (page->first) {
       db::FormatSpecificWriterOptions *specific_options = m_opt_array [m_technology_index].get_options (page->second);
       if (! specific_options) {
@@ -236,8 +227,7 @@ SaveLayoutOptionsDialog::update ()
   }
 }
 
-bool
-SaveLayoutOptionsDialog::edit_global_options (lay::Dispatcher *config_root, db::Technologies *technologies)
+bool SaveLayoutOptionsDialog::edit_global_options (lay::Dispatcher *config_root, db::Technologies *technologies)
 {
   m_opt_array.clear ();
   m_tech_array.clear ();
@@ -260,14 +250,13 @@ SaveLayoutOptionsDialog::edit_global_options (lay::Dispatcher *config_root, db::
     d += t->description ();
 
     m_opt_array.push_back (t->save_layout_options ());
-    m_tech_array.push_back (t.operator-> ());
+    m_tech_array.push_back (t.operator->());
 
     mp_ui->tech_cbx->addItem (tl::to_qstring (d));
     if (t->name () == technology) {
       mp_ui->tech_cbx->setCurrentIndex (i);
       m_technology_index = i;
     }
-
   }
 
   mp_ui->tech_cbx->blockSignals (false);
@@ -278,7 +267,7 @@ SaveLayoutOptionsDialog::edit_global_options (lay::Dispatcher *config_root, db::
     //  get the selected technology name and store in the config
     unsigned int i = 0;
     for (db::Technologies::iterator t = technologies->begin (); t != technologies->end () && i < m_opt_array.size (); ++t, ++i) {
-      technologies->begin ()[i].set_save_layout_options (m_opt_array [i]);
+      technologies->begin () [i].set_save_layout_options (m_opt_array [i]);
     }
 
     //  TODO: this call is required currently because otherwise the technology
@@ -292,8 +281,7 @@ SaveLayoutOptionsDialog::edit_global_options (lay::Dispatcher *config_root, db::
   }
 }
 
-bool
-SaveLayoutOptionsDialog::get_options (db::SaveLayoutOptions &options)
+bool SaveLayoutOptionsDialog::get_options (db::SaveLayoutOptions &options)
 {
   mp_ui->tech_cbx->hide ();
 
@@ -311,8 +299,7 @@ SaveLayoutOptionsDialog::get_options (db::SaveLayoutOptions &options)
   }
 }
 
-bool
-SaveLayoutOptionsDialog::get_options_internal ()
+bool SaveLayoutOptionsDialog::get_options_internal ()
 {
   update ();
   if (exec ()) {
@@ -367,7 +354,7 @@ SaveLayoutAsOptionsDialog::SaveLayoutAsOptionsDialog (QWidget *parent, const std
 
           if (index >= 0 && index < int (m_tab_positions.size ())) {
             m_pages.push_back (std::make_pair (m_pages [index].first, fmt->format_name ()));
-            m_tab_positions.push_back (m_tab_positions[index]);
+            m_tab_positions.push_back (m_tab_positions [index]);
           } else {
             m_pages.push_back (std::make_pair ((StreamWriterOptionsPage *) 0, fmt->format_name ()));
             m_tab_positions.push_back (empty_widget_index);
@@ -379,18 +366,14 @@ SaveLayoutAsOptionsDialog::SaveLayoutAsOptionsDialog (QWidget *parent, const std
 
           m_pages.push_back (std::make_pair (page, fmt->format_name ()));
           m_tab_positions.push_back (page ? mp_ui->options_stack->addWidget (page) : empty_widget_index);
-
         }
 
       } else {
 
         m_pages.push_back (std::make_pair ((StreamWriterOptionsPage *) 0, fmt->format_name ()));
         m_tab_positions.push_back (empty_widget_index);
-
       }
-
     }
-
   }
 
   connect (mp_ui->buttonBox, SIGNAL (accepted ()), this, SLOT (ok_button_pressed ()));
@@ -403,12 +386,11 @@ SaveLayoutAsOptionsDialog::~SaveLayoutAsOptionsDialog ()
   mp_ui = 0;
 }
 
-void
-SaveLayoutAsOptionsDialog::ok_button_pressed ()
+void SaveLayoutAsOptionsDialog::ok_button_pressed ()
 {
   BEGIN_PROTECTED
 
-  //  get the name of the currently selected format 
+  //  get the name of the currently selected format
   int index = mp_ui->fmt_cbx->currentIndex ();
   std::string fmt_name;
   for (tl::Registrar<db::StreamFormatDeclaration>::iterator fmt = tl::Registrar<db::StreamFormatDeclaration>::begin (); fmt != tl::Registrar<db::StreamFormatDeclaration>::end () && index >= 0; ++fmt) {
@@ -423,7 +405,7 @@ SaveLayoutAsOptionsDialog::ok_button_pressed ()
   //  test-commit the page for the current format
   const StreamWriterPluginDeclaration *decl = plugin_for_format (fmt_name);
   if (decl) {
-    for (std::vector< std::pair<StreamWriterOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
+    for (std::vector<std::pair<StreamWriterOptionsPage *, std::string>>::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
       if (page->second == fmt_name) {
         if (page->first) {
           std::unique_ptr<db::FormatSpecificWriterOptions> options (decl->create_specific_options ());
@@ -445,8 +427,7 @@ SaveLayoutAsOptionsDialog::ok_button_pressed ()
   END_PROTECTED
 }
 
-bool 
-SaveLayoutAsOptionsDialog::get_options (lay::LayoutViewBase *view, unsigned int cv_index, const std::string &fn, tl::OutputStream::OutputStreamMode &om, db::SaveLayoutOptions &options)
+bool SaveLayoutAsOptionsDialog::get_options (lay::LayoutViewBase *view, unsigned int cv_index, const std::string &fn, tl::OutputStream::OutputStreamMode &om, db::SaveLayoutOptions &options)
 {
   const lay::CellView &cv = view->cellview (cv_index);
   if (! cv.is_valid ()) {
@@ -479,7 +460,7 @@ SaveLayoutAsOptionsDialog::get_options (lay::LayoutViewBase *view, unsigned int 
     }
   }
 
-  for (std::vector< std::pair<StreamWriterOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
+  for (std::vector<std::pair<StreamWriterOptionsPage *, std::string>>::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
 
     const StreamWriterPluginDeclaration *decl = plugin_for_format (page->second);
     if (decl && ! decl->options_alias ()) {
@@ -494,9 +475,7 @@ SaveLayoutAsOptionsDialog::get_options (lay::LayoutViewBase *view, unsigned int 
       if (page->first) {
         page->first->setup (specific_options.get (), mp_tech);
       }
-
     }
-
   }
 
   bool ret = false;
@@ -560,7 +539,7 @@ SaveLayoutAsOptionsDialog::get_options (lay::LayoutViewBase *view, unsigned int 
     //  identify the plugin in charge of creating the particular options and commit only those options
     const StreamWriterPluginDeclaration *decl = plugin_for_format (options.format ());
     if (decl) {
-      for (std::vector< std::pair<StreamWriterOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
+      for (std::vector<std::pair<StreamWriterOptionsPage *, std::string>>::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
         if (page->second == options.format ()) {
 
           std::unique_ptr<db::FormatSpecificWriterOptions> specific_options;
@@ -572,23 +551,20 @@ SaveLayoutAsOptionsDialog::get_options (lay::LayoutViewBase *view, unsigned int 
             }
             options.set_options (specific_options.release ());
           }
-
         }
       }
     }
 
     ret = true;
-
   }
 
   return ret;
 }
 
-void 
-SaveLayoutAsOptionsDialog::fmt_cbx_changed (int index)
+void SaveLayoutAsOptionsDialog::fmt_cbx_changed (int index)
 {
   if (index >= 0 && index < int (m_tab_positions.size ())) {
-    mp_ui->options_stack->setCurrentIndex (m_tab_positions[index]);
+    mp_ui->options_stack->setCurrentIndex (m_tab_positions [index]);
   }
 }
 

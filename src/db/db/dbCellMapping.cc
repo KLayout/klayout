@@ -41,8 +41,7 @@ namespace db
 // -------------------------------------------------------------------------------------
 //  Some utility class: an iterator for cell instances delivered sorted by cell index
 
-struct SortedCellIndexIterator
-{
+struct SortedCellIndexIterator {
   typedef db::cell_index_type value_type;
   typedef size_t difference_type;
   typedef size_t pointer;
@@ -51,66 +50,66 @@ struct SortedCellIndexIterator
 
   SortedCellIndexIterator ()
     : mp_cell (0), m_n (0)
-  { 
+  {
     // .. nothing yet ..
   }
 
   SortedCellIndexIterator (const db::Cell &cell, size_t n)
     : mp_cell (&cell), m_n (n)
-  { 
+  {
     // .. nothing yet ..
   }
 
-  db::cell_index_type operator*() const
+  db::cell_index_type operator* () const
   {
     return mp_cell->sorted_inst_ptr (m_n).cell_index ();
   }
 
-  size_t operator-(const SortedCellIndexIterator &d) const
+  size_t operator- (const SortedCellIndexIterator &d) const
   {
     return m_n - d.m_n;
   }
 
-  SortedCellIndexIterator &operator++() 
+  SortedCellIndexIterator &operator++ ()
   {
     ++m_n;
     return *this;
   }
 
-  SortedCellIndexIterator &operator+=(size_t n) 
+  SortedCellIndexIterator &operator+= (size_t n)
   {
     m_n += n;
     return *this;
   }
 
-  SortedCellIndexIterator &operator--()
+  SortedCellIndexIterator &operator-- ()
   {
     --m_n;
     return *this;
   }
 
-  SortedCellIndexIterator &operator-=(size_t n)
+  SortedCellIndexIterator &operator-= (size_t n)
   {
     m_n -= n;
     return *this;
   }
 
-  bool operator==(const SortedCellIndexIterator &d) const
+  bool operator== (const SortedCellIndexIterator &d) const
   {
     return m_n == d.m_n;
   }
 
-  bool operator!=(const SortedCellIndexIterator &d) const
+  bool operator!= (const SortedCellIndexIterator &d) const
   {
     return m_n != d.m_n;
   }
 
-  bool operator<(const SortedCellIndexIterator &d) const
+  bool operator< (const SortedCellIndexIterator &d) const
   {
     return m_n < d.m_n;
   }
 
-  db::Instance instance () const 
+  db::Instance instance () const
   {
     return mp_cell->sorted_inst_ptr (m_n);
   }
@@ -152,7 +151,6 @@ public:
 
       m_trans.clear ();
       insert (m_layout_a, m_initial_cell_a, m_cell_a, m_callers_a, m_trans, db::ICplxTrans ());
-
     }
 
     m_repr_set = false;
@@ -179,7 +177,7 @@ public:
     return trans.empty ();
   }
 
-  void make_endpoint (db::cell_index_type /*cell_a*/, db::cell_index_type /*cell_b*/) 
+  void make_endpoint (db::cell_index_type /*cell_a*/, db::cell_index_type /*cell_b*/)
   {
     //  not supported by this version
   }
@@ -218,7 +216,6 @@ private:
           }
         }
       }
-
     }
   }
 
@@ -262,7 +259,6 @@ private:
       }
 
       return true;
-
     }
   }
 };
@@ -280,11 +276,11 @@ private:
  *  in general it requires somewhat more memory and is not fully optimized yet.
  */
 
-namespace {
-
-struct InstanceSetCompareFunctionHash
+namespace
 {
-  std::size_t operator () (const std::pair<unsigned int, db::ICplxTrans> &p) const
+
+struct InstanceSetCompareFunctionHash {
+  std::size_t operator() (const std::pair<unsigned int, db::ICplxTrans> &p) const
   {
     return tl::hcombine (p.first, tl::hfunc (p.second));
   }
@@ -372,7 +368,6 @@ private:
           return true;
         }
       }
-
     }
 
     const db::Cell &fc = layout.cell (for_cell);
@@ -396,9 +391,7 @@ private:
             return false;
           }
         }
-
       }
-
     }
 
     return true;
@@ -445,15 +438,13 @@ std::vector<db::cell_index_type> CellMapping::target_cells () const
   return s;
 }
 
-void
-CellMapping::create_single_mapping (const db::Layout & /*layout_a*/, db::cell_index_type cell_index_a, const db::Layout & /*layout_b*/, db::cell_index_type cell_index_b)
+void CellMapping::create_single_mapping (const db::Layout & /*layout_a*/, db::cell_index_type cell_index_a, const db::Layout & /*layout_b*/, db::cell_index_type cell_index_b)
 {
   clear ();
   map (cell_index_b, cell_index_a);
 }
 
-void
-CellMapping::create_multi_mapping (const db::Layout & /*layout_a*/, const std::vector<db::cell_index_type> &cell_index_a, const db::Layout & /*layout_b*/, const std::vector<db::cell_index_type> &cell_index_b)
+void CellMapping::create_multi_mapping (const db::Layout & /*layout_a*/, const std::vector<db::cell_index_type> &cell_index_a, const db::Layout & /*layout_b*/, const std::vector<db::cell_index_type> &cell_index_b)
 {
   clear ();
   if (cell_index_a.size () != cell_index_b.size ()) {
@@ -464,8 +455,7 @@ CellMapping::create_multi_mapping (const db::Layout & /*layout_a*/, const std::v
   }
 }
 
-void
-CellMapping::create_from_names (const db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
+void CellMapping::create_from_names (const db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
 {
   clear ();
 
@@ -482,7 +472,7 @@ CellMapping::create_from_names (const db::Layout &layout_a, db::cell_index_type 
   }
 }
 
-std::vector<db::cell_index_type> 
+std::vector<db::cell_index_type>
 CellMapping::create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells)
 {
   std::vector<db::cell_index_type> new_cells;
@@ -490,22 +480,21 @@ CellMapping::create_missing_mapping (db::Layout &layout_a, const db::Layout &lay
   return new_cells;
 }
 
-std::vector<std::pair<db::cell_index_type, db::cell_index_type> >
+std::vector<std::pair<db::cell_index_type, db::cell_index_type>>
 CellMapping::create_missing_mapping2 (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells)
 {
-  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > cell_pairs;
+  std::vector<std::pair<db::cell_index_type, db::cell_index_type>> cell_pairs;
   do_create_missing_mapping (layout_a, layout_b, cell_index_b, exclude_cells, include_cells, 0, &cell_pairs);
   return cell_pairs;
 }
 
-void
-CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells_ptr, std::vector<std::pair<db::cell_index_type, db::cell_index_type> > *mapped_pairs)
+void CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells_ptr, std::vector<std::pair<db::cell_index_type, db::cell_index_type>> *mapped_pairs)
 {
   std::vector<db::cell_index_type> new_cells_int;
   std::vector<db::cell_index_type> &new_cells = *(new_cells_ptr ? new_cells_ptr : &new_cells_int);
   std::vector<db::cell_index_type> new_cells_b;
 
-  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > all_a2b;
+  std::vector<std::pair<db::cell_index_type, db::cell_index_type>> all_a2b;
   for (std::vector<db::cell_index_type>::const_iterator b = cell_index_b.begin (); b != cell_index_b.end (); ++b) {
     auto m = m_b2a_mapping.find (*b);
     tl_assert (m != m_b2a_mapping.end ());
@@ -519,9 +508,7 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
   }
 
   for (std::set<db::cell_index_type>::const_iterator b = called_b.begin (); b != called_b.end (); ++b) {
-    if (m_b2a_mapping.find (*b) == m_b2a_mapping.end ()
-        && (! exclude_cells || exclude_cells->find (*b) == exclude_cells->end ())
-        && (! include_cells || include_cells->find (*b) != include_cells->end ())) {
+    if (m_b2a_mapping.find (*b) == m_b2a_mapping.end () && (! exclude_cells || exclude_cells->find (*b) == exclude_cells->end ()) && (! include_cells || include_cells->find (*b) != include_cells->end ())) {
 
       db::cell_index_type new_cell = layout_a.add_cell (layout_b, *b);
       new_cells.push_back (new_cell);
@@ -533,7 +520,6 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
       }
 
       map (*b, new_cell);
-
     }
   }
 
@@ -566,16 +552,12 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
         } else {
           pa.insert (bci);
         }
-
       }
-
     }
-
   }
 }
 
-void 
-CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
+void CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
 {
   tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Cell mapping")));
 
@@ -598,7 +580,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
     cm_a.insert (std::make_pair (*c == cell_index_a ? 0 : cc_a.weight (*c), *c));
   }
 
-  std::map <db::cell_index_type, std::vector<db::cell_index_type> > candidates; // key = index(a), value = indices(b)
+  std::map<db::cell_index_type, std::vector<db::cell_index_type>> candidates; // key = index(a), value = indices(b)
 
   InstanceSetCompareFunction cmp (layout_a, cell_index_a, &cc_a.selection (), layout_b, cell_index_b, &cc_b.selection ());
 
@@ -629,20 +611,20 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
       }
 
       unsigned int g = 0;
-      std::map <unsigned int, std::vector <db::cell_index_type> > b_group;
-      std::map <db::cell_index_type, unsigned int> b_group_of_cell;
-      std::map <db::cell_index_type, std::vector<db::cell_index_type> > new_candidates;
+      std::map<unsigned int, std::vector<db::cell_index_type>> b_group;
+      std::map<db::cell_index_type, unsigned int> b_group_of_cell;
+      std::map<db::cell_index_type, std::vector<db::cell_index_type>> new_candidates;
 
       while (a != cm_a.end () && a->first == w) {
 
-        new_candidates.insert (std::make_pair (a->second, std::vector <db::cell_index_type> ()));
+        new_candidates.insert (std::make_pair (a->second, std::vector<db::cell_index_type> ()));
 
-        std::set <unsigned int> groups_taken;
+        std::set<unsigned int> groups_taken;
 
         std::multimap<size_t, db::cell_index_type>::const_iterator bb = b;
         while (bb != cm_b.end () && bb->first == w) {
 
-          std::map <db::cell_index_type, unsigned int>::const_iterator bg = b_group_of_cell.find (bb->second);
+          std::map<db::cell_index_type, unsigned int>::const_iterator bg = b_group_of_cell.find (bb->second);
           if (bg != b_group_of_cell.end ()) {
 
             if (groups_taken.find (bg->second) == groups_taken.end ()) {
@@ -657,22 +639,19 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
             if (cmp.compare (a->second, bb->second)) {
               new_candidates [a->second].push_back (bb->second);
               b_group_of_cell.insert (std::make_pair (bb->second, g));
-              b_group.insert (std::make_pair (g, std::vector <db::cell_index_type> ())).first->second.push_back (bb->second);
+              b_group.insert (std::make_pair (g, std::vector<db::cell_index_type> ())).first->second.push_back (bb->second);
             }
-
           }
 
           ++bb;
-
         }
 
         if (tl::verbosity () >= 60) {
           tl::info << "Checked cell " << layout_a.cell_name (a->second) << ": " << candidates [a->second].size () << " candidates remaining.";
         }
-          
+
         ++a;
         ++g;
-
       }
 
       while (b != cm_b.end () && b->second == w) {
@@ -687,9 +666,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
       }
 
       candidates.insert (new_candidates.begin (), new_candidates.end ());
-
     }
-
   }
 
   while (a != cm_a.end ()) {
@@ -701,8 +678,8 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
     tl::info << "Mapping candidates:";
     dump_mapping (candidates, layout_a, layout_b);
   }
-    
-  for (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::const_iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
+
+  for (std::map<db::cell_index_type, std::vector<db::cell_index_type>>::const_iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
     extract_unique (cand, m_b2a_mapping, layout_a, layout_b);
   }
 
@@ -718,13 +695,13 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
       tl::info << "Cell mapping - iteration " << iteration << ": cross-instance cone reduction";
     }
 
-    // This map stores that layout_b cells with the corresponding layout_a cell for such cells which 
-    // have their mapping reduced to a unique one 
-    std::map <db::cell_index_type, std::pair<db::cell_index_type, int> > unique_candidates;
+    // This map stores that layout_b cells with the corresponding layout_a cell for such cells which
+    // have their mapping reduced to a unique one
+    std::map<db::cell_index_type, std::pair<db::cell_index_type, int>> unique_candidates;
 
     std::vector<db::cell_index_type> refined_cand;
 
-    for (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
+    for (std::map<db::cell_index_type, std::vector<db::cell_index_type>>::iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
 
       if (cand->second.size () > 1) {
 
@@ -733,10 +710,10 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
 
         if (tl::verbosity () >= 70) {
           tl::info << "--- Cell: " << layout_a.cell_name (cand->first);
-          tl::info << "Before reduction: " << tl::noendl; 
-          for (size_t i = 0; i < refined_cand.size (); ++i) { 
-            tl::info << " " << layout_b.cell_name(refined_cand[i]) << tl::noendl; 
-          } 
+          tl::info << "Before reduction: " << tl::noendl;
+          for (size_t i = 0; i < refined_cand.size (); ++i) {
+            tl::info << " " << layout_b.cell_name (refined_cand [i]) << tl::noendl;
+          }
           tl::info << "";
         }
 
@@ -761,20 +738,17 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
               }
 
               if (tl::verbosity () >= 70 && cout != refined_cand.end ()) {
-                tl::info << "Reduction because of caller mapping: " << layout_a.cell_name (*c) << " <-> " << layout_b.cell_name (others[0]);
-                tl::info << "  -> " << tl::noendl; 
-                for (size_t i = 0; i < size_t (cout - refined_cand.begin ()); ++i) { 
-                  tl::info << " " << layout_b.cell_name(refined_cand[i]) << tl::noendl; 
-                } 
+                tl::info << "Reduction because of caller mapping: " << layout_a.cell_name (*c) << " <-> " << layout_b.cell_name (others [0]);
+                tl::info << "  -> " << tl::noendl;
+                for (size_t i = 0; i < size_t (cout - refined_cand.begin ()); ++i) {
+                  tl::info << " " << layout_b.cell_name (refined_cand [i]) << tl::noendl;
+                }
                 tl::info << "";
               }
 
               refined_cand.erase (cout, refined_cand.end ());
-
             }
-
           }
-
         }
 
         if (refined_cand.size () > 0) {
@@ -798,27 +772,25 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
               }
 
               if (tl::verbosity () >= 70 && cout != refined_cand.end ()) {
-                tl::info << "Reduction because of callee mapping: " << layout_a.cell_name (*c) << " <-> " << layout_b.cell_name (others[0]);
-                tl::info << "  -> " << tl::noendl; 
-                for (size_t i = 0; i < size_t (cout - refined_cand.begin ()); ++i) { 
-                  tl::info << " " << layout_b.cell_name(refined_cand[i]) << tl::noendl; 
-                } 
+                tl::info << "Reduction because of callee mapping: " << layout_a.cell_name (*c) << " <-> " << layout_b.cell_name (others [0]);
+                tl::info << "  -> " << tl::noendl;
+                for (size_t i = 0; i < size_t (cout - refined_cand.begin ()); ++i) {
+                  tl::info << " " << layout_b.cell_name (refined_cand [i]) << tl::noendl;
+                }
                 tl::info << "";
               }
 
               refined_cand.erase (cout, refined_cand.end ());
-
             }
-
           }
 
           if (refined_cand.size () == 1) {
 
             //  The remaining cell is a candidate for layout_b to layout_a mapping
-            db::cell_index_type cb = refined_cand[0];
+            db::cell_index_type cb = refined_cand [0];
             db::cell_index_type ca = cand->first;
 
-            std::map <db::cell_index_type, std::pair<db::cell_index_type, int> >::iterator uc = unique_candidates.find (cb);
+            std::map<db::cell_index_type, std::pair<db::cell_index_type, int>>::iterator uc = unique_candidates.find (cb);
             if (uc != unique_candidates.end ()) {
               if (uc->second.first != ca) {
                 int ed = tl::edit_distance (layout_a.cell_name (ca), layout_b.cell_name (cb));
@@ -836,37 +808,32 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
                 tl::info << "Choosing " << layout_b.cell_name (cb) << " (layout_b) as unique mapping for " << layout_a.cell_name (ca) << " (layout_a)";
               }
             }
-
           }
-
         }
-
       }
-
     }
 
     //  realize the proposed unique mapping
-    for (std::map <db::cell_index_type, std::pair<db::cell_index_type, int> >::const_iterator uc = unique_candidates.begin (); uc != unique_candidates.end (); ++uc) {
+    for (std::map<db::cell_index_type, std::pair<db::cell_index_type, int>>::const_iterator uc = unique_candidates.begin (); uc != unique_candidates.end (); ++uc) {
 
-      std::map <db::cell_index_type, std::vector<db::cell_index_type> >::iterator cand = candidates.find (uc->second.first);
+      std::map<db::cell_index_type, std::vector<db::cell_index_type>>::iterator cand = candidates.find (uc->second.first);
       tl_assert (cand != candidates.end ());
       cand->second.clear ();
       cand->second.push_back (uc->first);
       reduction = true;
       extract_unique (cand, m_b2a_mapping, layout_a, layout_b);
-
     }
 
     if (tl::verbosity () >= 60) {
       tl::info << "Further refined candidates:";
       dump_mapping (candidates, layout_a, layout_b);
     }
-    
+
     if (tl::verbosity () >= 40) {
       tl::info << "Cell mapping - iteration " << iteration << ": removal of uniquely mapped cells on B side";
     }
 
-    for (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
+    for (std::map<db::cell_index_type, std::vector<db::cell_index_type>>::iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
 
       if (cand->second.size () > 1) {
 
@@ -883,16 +850,13 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
           cand->second.swap (refined_cand);
           extract_unique (cand, m_b2a_mapping, layout_a, layout_b);
         }
-
       }
-
     }
 
     if (tl::verbosity () >= 60) {
       tl::info << "After reduction of mapped cells on b side:";
       dump_mapping (candidates, layout_a, layout_b);
     }
-    
   }
 
   if (tl::verbosity () >= 40) {
@@ -903,7 +867,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
     int non_unique = 0;
     int alternatives = 0;
 
-    for (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
+    for (std::map<db::cell_index_type, std::vector<db::cell_index_type>>::iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
       ++total;
       if (cand->second.size () == 0) {
         ++not_mapped;
@@ -920,7 +884,6 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
     tl::info << "  Not mapped = " << not_mapped;
     tl::info << "  Unique = " << unique;
     tl::info << "  Non unique = " << non_unique << " (total " << alternatives << " of alternatives)";
-
   }
 
   //  Resolve mapping according to string match
@@ -929,7 +892,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
     tl::info << "Cell mapping - string mapping as last resort";
   }
 
-  for (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
+  for (std::map<db::cell_index_type, std::vector<db::cell_index_type>>::iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
 
     if (cand->second.size () > 1) {
 
@@ -947,9 +910,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
             min_ed = ed;
             min_ed_ci = *c;
           }
-
         }
-
       }
 
       cand->second.clear ();
@@ -957,9 +918,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
         cand->second.push_back (min_ed_ci);
         extract_unique (cand, m_b2a_mapping, layout_a, layout_b);
       }
-
     }
-
   }
 
   if (tl::verbosity () >= 40) {
@@ -970,7 +929,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
     int non_unique = 0;
     int alternatives = 0;
 
-    for (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
+    for (std::map<db::cell_index_type, std::vector<db::cell_index_type>>::iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
       ++total;
       if (cand->second.size () == 0) {
         if (tl::verbosity () >= 50) {
@@ -990,14 +949,12 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
     tl::info << "  Not mapped = " << not_mapped;
     tl::info << "  Unique = " << unique;
     tl::info << "  Non unique = " << non_unique << " (total " << alternatives << " of alternatives)";
-
   }
 }
 
-void 
-CellMapping::extract_unique (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::const_iterator cand, 
-                             std::map<db::cell_index_type, db::cell_index_type> &unique_mapping,
-                             const db::Layout &layout_a, const db::Layout &layout_b)
+void CellMapping::extract_unique (std::map<db::cell_index_type, std::vector<db::cell_index_type>>::const_iterator cand,
+                                  std::map<db::cell_index_type, db::cell_index_type> &unique_mapping,
+                                  const db::Layout &layout_a, const db::Layout &layout_b)
 {
   if (cand->second.size () == 1) {
 
@@ -1018,15 +975,13 @@ CellMapping::extract_unique (std::map <db::cell_index_type, std::vector<db::cell
     } else {
       tl::info << "";
     }
-
   }
 }
 
-void 
-CellMapping::dump_mapping (const std::map <db::cell_index_type, std::vector<db::cell_index_type> > &candidates, 
-                           const db::Layout &layout_a, const db::Layout &layout_b)
+void CellMapping::dump_mapping (const std::map<db::cell_index_type, std::vector<db::cell_index_type>> &candidates,
+                                const db::Layout &layout_a, const db::Layout &layout_b)
 {
-  for (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::const_iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
+  for (std::map<db::cell_index_type, std::vector<db::cell_index_type>>::const_iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
     tl::info << "  " << layout_a.cell_name (cand->first) << " ->" << tl::noendl;
     int n = 5;
     for (std::vector<db::cell_index_type>::const_iterator c = cand->second.begin (); c != cand->second.end () && --n > 0; ++c) {
@@ -1040,10 +995,10 @@ CellMapping::dump_mapping (const std::map <db::cell_index_type, std::vector<db::
   }
 }
 
-std::pair<bool, db::cell_index_type> 
+std::pair<bool, db::cell_index_type>
 CellMapping::cell_mapping_pair (db::cell_index_type cell_index_b) const
 {
-  std::map <db::cell_index_type, db::cell_index_type>::const_iterator m = m_b2a_mapping.find (cell_index_b);
+  std::map<db::cell_index_type, db::cell_index_type>::const_iterator m = m_b2a_mapping.find (cell_index_b);
   if (m == m_b2a_mapping.end ()) {
     return std::make_pair (false, 0);
   } else {
@@ -1051,20 +1006,18 @@ CellMapping::cell_mapping_pair (db::cell_index_type cell_index_b) const
   }
 }
 
-bool 
-CellMapping::has_mapping (db::cell_index_type cell_index_b) const
+bool CellMapping::has_mapping (db::cell_index_type cell_index_b) const
 {
-  std::map <db::cell_index_type, db::cell_index_type>::const_iterator m = m_b2a_mapping.find (cell_index_b);
+  std::map<db::cell_index_type, db::cell_index_type>::const_iterator m = m_b2a_mapping.find (cell_index_b);
   return (m != m_b2a_mapping.end ());
 }
 
-db::cell_index_type 
+db::cell_index_type
 CellMapping::cell_mapping (db::cell_index_type cell_index_b) const
 {
-  std::map <db::cell_index_type, db::cell_index_type>::const_iterator m = m_b2a_mapping.find (cell_index_b);
+  std::map<db::cell_index_type, db::cell_index_type>::const_iterator m = m_b2a_mapping.find (cell_index_b);
   tl_assert (m != m_b2a_mapping.end ());
   return m->second;
 }
 
 }
-

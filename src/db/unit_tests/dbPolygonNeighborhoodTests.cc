@@ -129,32 +129,32 @@ static void run_test (tl::TestBase *_this, db::PolygonNeighborhoodVisitor &visit
   db::compare_layouts (_this, ly, tl::testdata () + au_name);
 }
 
-TEST(1)
+TEST (1)
 {
   PNPrimaryCopyVisitor visitor;
   run_test (_this, visitor, "/algo/polygon_neighborhood_au1.gds");
 }
 
 
-TEST(2)
+TEST (2)
 {
   PNPrimaryCopyIntruderVisitor visitor (0);
   run_test (_this, visitor, "/algo/polygon_neighborhood_au2.gds", true, 2000);
 }
 
-TEST(3)
+TEST (3)
 {
   PNPrimaryCopyIntruderVisitor visitor (1);
   run_test (_this, visitor, "/algo/polygon_neighborhood_au3.gds", true, 2000);
 }
 
-TEST(4)
+TEST (4)
 {
   PNPrimaryCopyIntruderVisitor visitor (2);
   run_test (_this, visitor, "/algo/polygon_neighborhood_au4.gds", true, 2000);
 }
 
-TEST(5)
+TEST (5)
 {
   PNPrimaryCopyIntruderVisitor visitor (3);
   run_test (_this, visitor, "/algo/polygon_neighborhood_au5.gds", true, 2000);

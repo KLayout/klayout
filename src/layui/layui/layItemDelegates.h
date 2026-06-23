@@ -40,7 +40,7 @@ namespace lay
 class LAYUI_PUBLIC HTMLItemDelegate
   : public QStyledItemDelegate
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   HTMLItemDelegate (QObject *parent);
@@ -106,4 +106,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

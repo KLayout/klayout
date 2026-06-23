@@ -40,10 +40,9 @@
 namespace db
 {
 
-struct GDS2XY
-{
-  unsigned char x[4];
-  unsigned char y[4];
+struct GDS2XY {
+  unsigned char x [4];
+  unsigned char y [4];
 };
 
 /**
@@ -52,13 +51,13 @@ struct GDS2XY
 class DB_PLUGIN_PUBLIC GDS2ReaderBase
   : public CommonReader
 {
-public: 
+public:
   /**
    *  @brief Constructor
    */
   GDS2ReaderBase ();
 
-  /**  
+  /**
    *  @brief Destructor
    */
   ~GDS2ReaderBase ();
@@ -87,8 +86,8 @@ private:
   bool m_read_properties;
   bool m_allow_multi_xy_records;
   unsigned int m_box_mode;
-  std::map <tl::string, std::vector<std::string> > m_context_info;
-  std::vector <db::Point> m_all_points;
+  std::map<tl::string, std::vector<std::string>> m_context_info;
+  std::vector<db::Point> m_all_points;
 
   void read_context_info_cell ();
   void read_boundary (db::Layout &layout, db::Cell &cell, bool from_box_record);
@@ -97,7 +96,7 @@ private:
   void read_box (db::Layout &layout, db::Cell &cell);
   void read_ref (db::Layout &layout, db::Cell &cell, bool array, tl::vector<db::CellInstArray> &instances, tl::vector<db::CellInstArrayWithProperties> &insts_wp);
 
-  std::pair <bool, db::properties_id_type> finish_element_with_props ();
+  std::pair<bool, db::properties_id_type> finish_element_with_props ();
   void finish_element ();
 
   virtual void common_reader_error (const std::string &msg) { error (msg); }
@@ -123,4 +122,3 @@ private:
 }
 
 #endif
-

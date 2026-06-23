@@ -49,7 +49,7 @@ namespace gsi
 /**
  *  @brief A base class for client-specific data per class
  *
- *  Objects of this type are used inside the ClassBase object to store 
+ *  Objects of this type are used inside the ClassBase object to store
  *  information specific for certain clients.
  */
 class PerClassClientSpecificData
@@ -60,7 +60,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual ~PerClassClientSpecificData()
+  virtual ~PerClassClientSpecificData ()
   {
     //  .. nothing yet ..
   }
@@ -80,7 +80,7 @@ public:
   typedef tl::weak_collection<ClassBase> class_collection;
   typedef class_collection::const_iterator class_iterator;
   typedef Methods::iterator method_iterator;
-  
+
   /**
    *  @brief Constructor
    *
@@ -105,22 +105,22 @@ public:
    *  @brief Returns a pointer to the type_info object if the class is an adaptor
    *
    *  If the class adapts another type (specifically enums), this method will
-   *  return a pointer to the adapted type's type_info. 
+   *  return a pointer to the adapted type's type_info.
    *  In other cases, the return value is 0.
    */
-  virtual const std::type_info *adapted_type_info () const 
+  virtual const std::type_info *adapted_type_info () const
   {
     return 0;
   }
 
   /**
    *  @brief Returns the "real" (consolidated) declaration object
-   *  
+   *
    *  The actual declaration object may be different from this declaration because of the class extension
    *  mechanism. Using that mechanism, class declarations can extend over multiple ClassBase objects. The
    *  individual declarations are merged and a consolidated class declaration object is provided.
    */
-  virtual const ClassBase *declaration () const 
+  virtual const ClassBase *declaration () const
   {
     return 0;
   }
@@ -173,7 +173,7 @@ public:
    *  @brief Gets the parent declaration object
    *  This returns the parent class if this class is a child class.
    */
-  const ClassBase *parent () const 
+  const ClassBase *parent () const
   {
     return mp_parent;
   }
@@ -201,7 +201,7 @@ public:
   {
     return m_child_classes.begin ();
   }
- 
+
   /**
    *  @brief Iterates all child classes (end)
    */
@@ -209,7 +209,7 @@ public:
   {
     return m_child_classes.end ();
   }
- 
+
   /**
    *  @brief Iterates all subclasses (begin)
    */
@@ -233,15 +233,15 @@ public:
   {
     return collection ().begin ();
   }
- 
+
   /**
    *  @brief Iterates all classes present (end)
    */
-  static class_iterator end_classes () 
+  static class_iterator end_classes ()
   {
     return collection ().end ();
   }
- 
+
   /**
    *  @brief Iterates all freshly registered classes (begin)
    *  This collection is emptied on "merge_declarations".
@@ -345,7 +345,7 @@ public:
    *
    *  This method may not be available if "can_destroy" is false.
    */
-  virtual void destroy (void * /*obj*/) const 
+  virtual void destroy (void * /*obj*/) const
   {
     tl_assert (false);
   }
@@ -354,17 +354,17 @@ public:
    *  @brief Class implementation: creates an object (default constructor)
    *
    *  Creates and default-initializes the given object. This method may not be
-   *  available if there is no default constructor (can_default_create is false). 
+   *  available if there is no default constructor (can_default_create is false).
    *  In that case, some static factory method must be provided.
    */
-  virtual void *create () const 
+  virtual void *create () const
   {
     tl_assert (false);
     return 0;
   }
 
   /**
-   *  @brief Creates a class representing an adapted object 
+   *  @brief Creates a class representing an adapted object
    *
    *  This method will create a new object representing the adapted object x.
    */
@@ -375,7 +375,7 @@ public:
   }
 
   /**
-   *  @brief Creates a class representing an adapted object 
+   *  @brief Creates a class representing an adapted object
    *
    *  This method will create a new object representing the adapted object x.
    *  It will consume the object given by x.
@@ -410,7 +410,7 @@ public:
    *  The implementation is supposed to create a deep copy of the source object.
    *  This method may not be available if can_copy is false.
    */
-  virtual void *clone (const void * /*src*/) const 
+  virtual void *clone (const void * /*src*/) const
   {
     tl_assert (false);
     return 0;
@@ -423,7 +423,7 @@ public:
    *  of the source. This is a deep copy.
    *  This method may not be available if can_copy is false.
    */
-  virtual void assign (void * /*target*/, const void * /*src*/) const 
+  virtual void assign (void * /*target*/, const void * /*src*/) const
   {
     tl_assert (false);
   }
@@ -433,7 +433,7 @@ public:
    *
    *  This flag is true, if the class supports destruction of objects of this kind.
    */
-  virtual bool can_destroy () const 
+  virtual bool can_destroy () const
   {
     tl_assert (false);
     return false;
@@ -444,7 +444,7 @@ public:
    *
    *  This flag is true, if the class supports copying of objects of this kind.
    */
-  virtual bool can_copy () const 
+  virtual bool can_copy () const
   {
     tl_assert (false);
     return false;
@@ -455,7 +455,7 @@ public:
    *
    *  This flag is true, if the class supports default construction of objects of this kind.
    */
-  virtual bool can_default_create () const 
+  virtual bool can_default_create () const
   {
     tl_assert (false);
     return false;
@@ -473,7 +473,7 @@ public:
   /**
    *  @brief Returns true, if the given object can be cast to this class
    *
-   *  When this method is called, it is guaranteed that the object is at least of 
+   *  When this method is called, it is guaranteed that the object is at least of
    *  the base class type. This implies that there is a base class when this method
    *  is called.
    */
@@ -488,7 +488,7 @@ public:
    *
    *  This method delivers the C++ type_info object of this class.
    */
-  virtual const std::type_info &type () const 
+  virtual const std::type_info &type () const
   {
     tl_assert (false);
     return typeid (void);
@@ -497,11 +497,11 @@ public:
   /**
    *  @brief Class implementation: gets C++ type of object
    *
-   *  This method delivers the class declaration for an subclassed object p. p must be of a 
-   *  subclass (derived class) of this class. This method will the declaration object 
-   *  of object p. 
+   *  This method delivers the class declaration for an subclassed object p. p must be of a
+   *  subclass (derived class) of this class. This method will the declaration object
+   *  of object p.
    */
-  virtual const ClassBase *subclass_decl (const void * /*p*/) const 
+  virtual const ClassBase *subclass_decl (const void * /*p*/) const
   {
     tl_assert (false);
     return 0;
@@ -561,7 +561,7 @@ public:
   /**
    *  @brief Post-construction initialization
    *
-   *  This method will be called by the GSI system to provide initialization after 
+   *  This method will be called by the GSI system to provide initialization after
    *  the static initialization. Some schemes cannot be implementation statically, plus
    *  the initialization order is undetermined for static initialization.
    *  In that case, this initialization step is useful. It will call the initialize
@@ -571,7 +571,7 @@ public:
 
   /**
    *  @brief Adds a method to the class
-   *  The class becomes owner of the method object. 
+   *  The class becomes owner of the method object.
    *  This method is public to allow dynamic extension of the documentation
    *  through scripts.
    *  Don't use it for other purposes.
@@ -579,13 +579,13 @@ public:
   void add_method (MethodBase *method, bool base_class = false);
 
   /**
-   *  @brief Sets the per-client data for the given client index 
-   *  This method is const to preserve the general const semantics of the class 
+   *  @brief Sets the per-client data for the given client index
+   *  This method is const to preserve the general const semantics of the class
    *  while allowing clients to register information.
    */
   void set_data (int ch, PerClassClientSpecificData *data) const
   {
-    mp_data[ch].reset (data);
+    mp_data [ch].reset (data);
   }
 
   /**
@@ -593,7 +593,7 @@ public:
    */
   PerClassClientSpecificData *data (int ch) const
   {
-    return mp_data[ch].get ();
+    return mp_data [ch].get ();
   }
 
   /**
@@ -622,7 +622,7 @@ protected:
     return m_subclasses;
   }
 
-  void set_name (const std::string &n) 
+  void set_name (const std::string &n)
   {
     m_name = n;
   }
@@ -644,7 +644,7 @@ private:
   std::string m_name;
   std::string m_module;
   tl::weak_collection<ClassBase> m_child_classes, m_subclasses;
-  mutable std::unique_ptr<PerClassClientSpecificData> mp_data[ClientIndex::MaxClientIndex];
+  mutable std::unique_ptr<PerClassClientSpecificData> mp_data [ClientIndex::MaxClientIndex];
 
   static class_collection *mp_class_collection;
   static class_collection *mp_new_class_collection;
@@ -673,7 +673,7 @@ GSI_PUBLIC const ClassBase *class_by_name_no_assert (const std::string &name);
 GSI_PUBLIC bool has_class (const std::string &name);
 
 /**
- *  @brief Find a class declaration through the type info 
+ *  @brief Find a class declaration through the type info
  */
 GSI_PUBLIC const ClassBase *class_by_typeinfo (const std::type_info &ti);
 
@@ -693,5 +693,3 @@ GSI_PUBLIC bool has_class (const std::type_info &ti);
 }
 
 #endif
-
-

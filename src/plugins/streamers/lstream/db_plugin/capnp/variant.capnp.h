@@ -15,36 +15,40 @@
 
 CAPNP_BEGIN_HEADER
 
-namespace capnp {
-namespace schemas {
+namespace capnp
+{
+namespace schemas
+{
 
-CAPNP_DECLARE_SCHEMA(dcf203025f9c6db8);
-CAPNP_DECLARE_SCHEMA(f96a70ebaebd19c6);
-CAPNP_DECLARE_SCHEMA(870412781f8c67a0);
+CAPNP_DECLARE_SCHEMA (dcf203025f9c6db8);
+CAPNP_DECLARE_SCHEMA (f96a70ebaebd19c6);
+CAPNP_DECLARE_SCHEMA (870412781f8c67a0);
 
-}  // namespace schemas
-}  // namespace capnp
+} // namespace schemas
+} // namespace capnp
 
-namespace stream {
-namespace variant {
+namespace stream
+{
+namespace variant
+{
 
 struct ArrayEntry {
-  ArrayEntry() = delete;
+  ArrayEntry () = delete;
 
   class Reader;
   class Builder;
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(dcf203025f9c6db8, 0, 2)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
+    CAPNP_DECLARE_STRUCT_HEADER (dcf203025f9c6db8, 0, 2)
+#if ! CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const *brand () { return &schema->defaultBrand; }
+#endif // !CAPNP_LITE
   };
 };
 
 struct Variant {
-  Variant() = delete;
+  Variant () = delete;
 
   class Reader;
   class Builder;
@@ -52,20 +56,20 @@ struct Variant {
   struct Value;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(f96a70ebaebd19c6, 2, 1)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
+    CAPNP_DECLARE_STRUCT_HEADER (f96a70ebaebd19c6, 2, 1)
+#if ! CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const *brand () { return &schema->defaultBrand; }
+#endif // !CAPNP_LITE
   };
 };
 
 struct Variant::Value {
-  Value() = delete;
+  Value () = delete;
 
   class Reader;
   class Builder;
   class Pipeline;
-  enum Which: uint16_t {
+  enum Which : uint16_t {
     NIL,
     BOOL,
     UINT64,
@@ -78,37 +82,40 @@ struct Variant::Value {
   };
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(870412781f8c67a0, 2, 1)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
+    CAPNP_DECLARE_STRUCT_HEADER (870412781f8c67a0, 2, 1)
+#if ! CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const *brand () { return &schema->defaultBrand; }
+#endif // !CAPNP_LITE
   };
 };
 
 // =======================================================================================
 
-class ArrayEntry::Reader {
+class ArrayEntry::Reader
+{
 public:
   typedef ArrayEntry Reads;
 
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+  Reader () = default;
+  inline explicit Reader (::capnp::_::StructReader base) : _reader (base) {}
 
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
+  inline ::capnp::MessageSize totalSize () const
+  {
+    return _reader.totalSize ().asPublic ();
   }
 
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+#if ! CAPNP_LITE
+  inline ::kj::StringTree toString () const
+  {
+    return ::capnp::_::structString (_reader, *_capnpPrivate::brand ());
   }
-#endif  // !CAPNP_LITE
+#endif // !CAPNP_LITE
 
-  inline bool hasKey() const;
-  inline  ::stream::variant::Variant::Reader getKey() const;
+  inline bool hasKey () const;
+  inline ::stream::variant::Variant::Reader getKey () const;
 
-  inline bool hasValue() const;
-  inline  ::stream::variant::Variant::Reader getValue() const;
+  inline bool hasValue () const;
+  inline ::stream::variant::Variant::Reader getValue () const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -122,35 +129,36 @@ private:
   friend class ::capnp::Orphanage;
 };
 
-class ArrayEntry::Builder {
+class ArrayEntry::Builder
+{
 public:
   typedef ArrayEntry Builds;
 
-  Builder() = delete;  // Deleted to discourage incorrect usage.
+  Builder () = delete; // Deleted to discourage incorrect usage.
                        // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
+  inline Builder (decltype (nullptr)) {}
+  inline explicit Builder (::capnp::_::StructBuilder base) : _builder (base) {}
+  inline operator Reader () const { return Reader (_builder.asReader ()); }
+  inline Reader asReader () const { return *this; }
 
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
+  inline ::capnp::MessageSize totalSize () const { return asReader ().totalSize (); }
+#if ! CAPNP_LITE
+  inline ::kj::StringTree toString () const { return asReader ().toString (); }
+#endif // !CAPNP_LITE
 
-  inline bool hasKey();
-  inline  ::stream::variant::Variant::Builder getKey();
-  inline void setKey( ::stream::variant::Variant::Reader value);
-  inline  ::stream::variant::Variant::Builder initKey();
-  inline void adoptKey(::capnp::Orphan< ::stream::variant::Variant>&& value);
-  inline ::capnp::Orphan< ::stream::variant::Variant> disownKey();
+  inline bool hasKey ();
+  inline ::stream::variant::Variant::Builder getKey ();
+  inline void setKey (::stream::variant::Variant::Reader value);
+  inline ::stream::variant::Variant::Builder initKey ();
+  inline void adoptKey (::capnp::Orphan<::stream::variant::Variant> &&value);
+  inline ::capnp::Orphan<::stream::variant::Variant> disownKey ();
 
-  inline bool hasValue();
-  inline  ::stream::variant::Variant::Builder getValue();
-  inline void setValue( ::stream::variant::Variant::Reader value);
-  inline  ::stream::variant::Variant::Builder initValue();
-  inline void adoptValue(::capnp::Orphan< ::stream::variant::Variant>&& value);
-  inline ::capnp::Orphan< ::stream::variant::Variant> disownValue();
+  inline bool hasValue ();
+  inline ::stream::variant::Variant::Builder getValue ();
+  inline void setValue (::stream::variant::Variant::Reader value);
+  inline ::stream::variant::Variant::Builder initValue ();
+  inline void adoptValue (::capnp::Orphan<::stream::variant::Variant> &&value);
+  inline ::capnp::Orphan<::stream::variant::Variant> disownValue ();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -161,43 +169,48 @@ private:
   friend struct ::capnp::_::PointerHelpers;
 };
 
-#if !CAPNP_LITE
-class ArrayEntry::Pipeline {
+#if ! CAPNP_LITE
+class ArrayEntry::Pipeline
+{
 public:
   typedef ArrayEntry Pipelines;
 
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
+  inline Pipeline (decltype (nullptr)) : _typeless (nullptr) {}
+  inline explicit Pipeline (::capnp::AnyPointer::Pipeline &&typeless)
+    : _typeless (kj::mv (typeless)) {}
 
-  inline  ::stream::variant::Variant::Pipeline getKey();
-  inline  ::stream::variant::Variant::Pipeline getValue();
+  inline ::stream::variant::Variant::Pipeline getKey ();
+  inline ::stream::variant::Variant::Pipeline getValue ();
+
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
   template <typename, ::capnp::Kind>
   friend struct ::capnp::ToDynamic_;
 };
-#endif  // !CAPNP_LITE
+#endif // !CAPNP_LITE
 
-class Variant::Reader {
+class Variant::Reader
+{
 public:
   typedef Variant Reads;
 
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+  Reader () = default;
+  inline explicit Reader (::capnp::_::StructReader base) : _reader (base) {}
 
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
+  inline ::capnp::MessageSize totalSize () const
+  {
+    return _reader.totalSize ().asPublic ();
   }
 
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+#if ! CAPNP_LITE
+  inline ::kj::StringTree toString () const
+  {
+    return ::capnp::_::structString (_reader, *_capnpPrivate::brand ());
   }
-#endif  // !CAPNP_LITE
+#endif // !CAPNP_LITE
 
-  inline typename Value::Reader getValue() const;
+  inline typename Value::Reader getValue () const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -211,24 +224,25 @@ private:
   friend class ::capnp::Orphanage;
 };
 
-class Variant::Builder {
+class Variant::Builder
+{
 public:
   typedef Variant Builds;
 
-  Builder() = delete;  // Deleted to discourage incorrect usage.
+  Builder () = delete; // Deleted to discourage incorrect usage.
                        // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
+  inline Builder (decltype (nullptr)) {}
+  inline explicit Builder (::capnp::_::StructBuilder base) : _builder (base) {}
+  inline operator Reader () const { return Reader (_builder.asReader ()); }
+  inline Reader asReader () const { return *this; }
 
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
+  inline ::capnp::MessageSize totalSize () const { return asReader ().totalSize (); }
+#if ! CAPNP_LITE
+  inline ::kj::StringTree toString () const { return asReader ().toString (); }
+#endif // !CAPNP_LITE
 
-  inline typename Value::Builder getValue();
-  inline typename Value::Builder initValue();
+  inline typename Value::Builder getValue ();
+  inline typename Value::Builder initValue ();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -239,72 +253,77 @@ private:
   friend struct ::capnp::_::PointerHelpers;
 };
 
-#if !CAPNP_LITE
-class Variant::Pipeline {
+#if ! CAPNP_LITE
+class Variant::Pipeline
+{
 public:
   typedef Variant Pipelines;
 
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
+  inline Pipeline (decltype (nullptr)) : _typeless (nullptr) {}
+  inline explicit Pipeline (::capnp::AnyPointer::Pipeline &&typeless)
+    : _typeless (kj::mv (typeless)) {}
 
-  inline typename Value::Pipeline getValue();
+  inline typename Value::Pipeline getValue ();
+
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
   template <typename, ::capnp::Kind>
   friend struct ::capnp::ToDynamic_;
 };
-#endif  // !CAPNP_LITE
+#endif // !CAPNP_LITE
 
-class Variant::Value::Reader {
+class Variant::Value::Reader
+{
 public:
   typedef Value Reads;
 
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+  Reader () = default;
+  inline explicit Reader (::capnp::_::StructReader base) : _reader (base) {}
 
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
+  inline ::capnp::MessageSize totalSize () const
+  {
+    return _reader.totalSize ().asPublic ();
   }
 
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+#if ! CAPNP_LITE
+  inline ::kj::StringTree toString () const
+  {
+    return ::capnp::_::structString (_reader, *_capnpPrivate::brand ());
   }
-#endif  // !CAPNP_LITE
+#endif // !CAPNP_LITE
 
-  inline Which which() const;
-  inline bool isNil() const;
-  inline  ::capnp::Void getNil() const;
+  inline Which which () const;
+  inline bool isNil () const;
+  inline ::capnp::Void getNil () const;
 
-  inline bool isBool() const;
-  inline bool getBool() const;
+  inline bool isBool () const;
+  inline bool getBool () const;
 
-  inline bool isUint64() const;
-  inline  ::uint64_t getUint64() const;
+  inline bool isUint64 () const;
+  inline ::uint64_t getUint64 () const;
 
-  inline bool isInt64() const;
-  inline  ::int64_t getInt64() const;
+  inline bool isInt64 () const;
+  inline ::int64_t getInt64 () const;
 
-  inline bool isDouble() const;
-  inline double getDouble() const;
+  inline bool isDouble () const;
+  inline double getDouble () const;
 
-  inline bool isText() const;
-  inline bool hasText() const;
-  inline  ::capnp::Text::Reader getText() const;
+  inline bool isText () const;
+  inline bool hasText () const;
+  inline ::capnp::Text::Reader getText () const;
 
-  inline bool isList() const;
-  inline bool hasList() const;
-  inline  ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>::Reader getList() const;
+  inline bool isList () const;
+  inline bool hasList () const;
+  inline ::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>::Reader getList () const;
 
-  inline bool isArray() const;
-  inline bool hasArray() const;
-  inline  ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>::Reader getArray() const;
+  inline bool isArray () const;
+  inline bool hasArray () const;
+  inline ::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>::Reader getArray () const;
 
-  inline bool isObject() const;
-  inline bool hasObject() const;
-  inline  ::capnp::Text::Reader getObject() const;
+  inline bool isObject () const;
+  inline bool hasObject () const;
+  inline ::capnp::Text::Reader getObject () const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -318,74 +337,75 @@ private:
   friend class ::capnp::Orphanage;
 };
 
-class Variant::Value::Builder {
+class Variant::Value::Builder
+{
 public:
   typedef Value Builds;
 
-  Builder() = delete;  // Deleted to discourage incorrect usage.
+  Builder () = delete; // Deleted to discourage incorrect usage.
                        // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
+  inline Builder (decltype (nullptr)) {}
+  inline explicit Builder (::capnp::_::StructBuilder base) : _builder (base) {}
+  inline operator Reader () const { return Reader (_builder.asReader ()); }
+  inline Reader asReader () const { return *this; }
 
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
+  inline ::capnp::MessageSize totalSize () const { return asReader ().totalSize (); }
+#if ! CAPNP_LITE
+  inline ::kj::StringTree toString () const { return asReader ().toString (); }
+#endif // !CAPNP_LITE
 
-  inline Which which();
-  inline bool isNil();
-  inline  ::capnp::Void getNil();
-  inline void setNil( ::capnp::Void value = ::capnp::VOID);
+  inline Which which ();
+  inline bool isNil ();
+  inline ::capnp::Void getNil ();
+  inline void setNil (::capnp::Void value = ::capnp::VOID);
 
-  inline bool isBool();
-  inline bool getBool();
-  inline void setBool(bool value);
+  inline bool isBool ();
+  inline bool getBool ();
+  inline void setBool (bool value);
 
-  inline bool isUint64();
-  inline  ::uint64_t getUint64();
-  inline void setUint64( ::uint64_t value);
+  inline bool isUint64 ();
+  inline ::uint64_t getUint64 ();
+  inline void setUint64 (::uint64_t value);
 
-  inline bool isInt64();
-  inline  ::int64_t getInt64();
-  inline void setInt64( ::int64_t value);
+  inline bool isInt64 ();
+  inline ::int64_t getInt64 ();
+  inline void setInt64 (::int64_t value);
 
-  inline bool isDouble();
-  inline double getDouble();
-  inline void setDouble(double value);
+  inline bool isDouble ();
+  inline double getDouble ();
+  inline void setDouble (double value);
 
-  inline bool isText();
-  inline bool hasText();
-  inline  ::capnp::Text::Builder getText();
-  inline void setText( ::capnp::Text::Reader value);
-  inline  ::capnp::Text::Builder initText(unsigned int size);
-  inline void adoptText(::capnp::Orphan< ::capnp::Text>&& value);
-  inline ::capnp::Orphan< ::capnp::Text> disownText();
+  inline bool isText ();
+  inline bool hasText ();
+  inline ::capnp::Text::Builder getText ();
+  inline void setText (::capnp::Text::Reader value);
+  inline ::capnp::Text::Builder initText (unsigned int size);
+  inline void adoptText (::capnp::Orphan<::capnp::Text> &&value);
+  inline ::capnp::Orphan<::capnp::Text> disownText ();
 
-  inline bool isList();
-  inline bool hasList();
-  inline  ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>::Builder getList();
-  inline void setList( ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>::Reader value);
-  inline  ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>::Builder initList(unsigned int size);
-  inline void adoptList(::capnp::Orphan< ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>> disownList();
+  inline bool isList ();
+  inline bool hasList ();
+  inline ::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>::Builder getList ();
+  inline void setList (::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>::Reader value);
+  inline ::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>::Builder initList (unsigned int size);
+  inline void adoptList (::capnp::Orphan<::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>> &&value);
+  inline ::capnp::Orphan<::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>> disownList ();
 
-  inline bool isArray();
-  inline bool hasArray();
-  inline  ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>::Builder getArray();
-  inline void setArray( ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>::Reader value);
-  inline  ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>::Builder initArray(unsigned int size);
-  inline void adoptArray(::capnp::Orphan< ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>> disownArray();
+  inline bool isArray ();
+  inline bool hasArray ();
+  inline ::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>::Builder getArray ();
+  inline void setArray (::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>::Reader value);
+  inline ::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>::Builder initArray (unsigned int size);
+  inline void adoptArray (::capnp::Orphan<::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>> &&value);
+  inline ::capnp::Orphan<::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>> disownArray ();
 
-  inline bool isObject();
-  inline bool hasObject();
-  inline  ::capnp::Text::Builder getObject();
-  inline void setObject( ::capnp::Text::Reader value);
-  inline  ::capnp::Text::Builder initObject(unsigned int size);
-  inline void adoptObject(::capnp::Orphan< ::capnp::Text>&& value);
-  inline ::capnp::Orphan< ::capnp::Text> disownObject();
+  inline bool isObject ();
+  inline bool hasObject ();
+  inline ::capnp::Text::Builder getObject ();
+  inline void setObject (::capnp::Text::Reader value);
+  inline ::capnp::Text::Builder initObject (unsigned int size);
+  inline void adoptObject (::capnp::Orphan<::capnp::Text> &&value);
+  inline ::capnp::Orphan<::capnp::Text> disownObject ();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -396,14 +416,15 @@ private:
   friend struct ::capnp::_::PointerHelpers;
 };
 
-#if !CAPNP_LITE
-class Variant::Value::Pipeline {
+#if ! CAPNP_LITE
+class Variant::Value::Pipeline
+{
 public:
   typedef Value Pipelines;
 
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
+  inline Pipeline (decltype (nullptr)) : _typeless (nullptr) {}
+  inline explicit Pipeline (::capnp::AnyPointer::Pipeline &&typeless)
+    : _typeless (kj::mv (typeless)) {}
 
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
@@ -411,463 +432,587 @@ private:
   template <typename, ::capnp::Kind>
   friend struct ::capnp::ToDynamic_;
 };
-#endif  // !CAPNP_LITE
+#endif // !CAPNP_LITE
 
 // =======================================================================================
 
-inline bool ArrayEntry::Reader::hasKey() const {
-  return !_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+inline bool ArrayEntry::Reader::hasKey () const
+{
+  return ! _reader.getPointerField (
+                    ::capnp::bounded<0> () * ::capnp::POINTERS)
+             .isNull ();
 }
-inline bool ArrayEntry::Builder::hasKey() {
-  return !_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+inline bool ArrayEntry::Builder::hasKey ()
+{
+  return ! _builder.getPointerField (
+                     ::capnp::bounded<0> () * ::capnp::POINTERS)
+             .isNull ();
 }
-inline  ::stream::variant::Variant::Reader ArrayEntry::Reader::getKey() const {
-  return ::capnp::_::PointerHelpers< ::stream::variant::Variant>::get(_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
+inline ::stream::variant::Variant::Reader ArrayEntry::Reader::getKey () const
+{
+  return ::capnp::_::PointerHelpers<::stream::variant::Variant>::get (_reader.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
 }
-inline  ::stream::variant::Variant::Builder ArrayEntry::Builder::getKey() {
-  return ::capnp::_::PointerHelpers< ::stream::variant::Variant>::get(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
+inline ::stream::variant::Variant::Builder ArrayEntry::Builder::getKey ()
+{
+  return ::capnp::_::PointerHelpers<::stream::variant::Variant>::get (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
 }
-#if !CAPNP_LITE
-inline  ::stream::variant::Variant::Pipeline ArrayEntry::Pipeline::getKey() {
-  return  ::stream::variant::Variant::Pipeline(_typeless.getPointerField(0));
+#if ! CAPNP_LITE
+inline ::stream::variant::Variant::Pipeline ArrayEntry::Pipeline::getKey ()
+{
+  return ::stream::variant::Variant::Pipeline (_typeless.getPointerField (0));
 }
-#endif  // !CAPNP_LITE
-inline void ArrayEntry::Builder::setKey( ::stream::variant::Variant::Reader value) {
-  ::capnp::_::PointerHelpers< ::stream::variant::Variant>::set(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+#endif // !CAPNP_LITE
+inline void ArrayEntry::Builder::setKey (::stream::variant::Variant::Reader value)
+{
+  ::capnp::_::PointerHelpers<::stream::variant::Variant>::set (_builder.getPointerField (
+                                                                 ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                               value);
 }
-inline  ::stream::variant::Variant::Builder ArrayEntry::Builder::initKey() {
-  return ::capnp::_::PointerHelpers< ::stream::variant::Variant>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
+inline ::stream::variant::Variant::Builder ArrayEntry::Builder::initKey ()
+{
+  return ::capnp::_::PointerHelpers<::stream::variant::Variant>::init (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
 }
-inline void ArrayEntry::Builder::adoptKey(
-    ::capnp::Orphan< ::stream::variant::Variant>&& value) {
-  ::capnp::_::PointerHelpers< ::stream::variant::Variant>::adopt(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+inline void ArrayEntry::Builder::adoptKey (
+  ::capnp::Orphan<::stream::variant::Variant> &&value)
+{
+  ::capnp::_::PointerHelpers<::stream::variant::Variant>::adopt (_builder.getPointerField (
+                                                                   ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                                 kj::mv (value));
 }
-inline ::capnp::Orphan< ::stream::variant::Variant> ArrayEntry::Builder::disownKey() {
-  return ::capnp::_::PointerHelpers< ::stream::variant::Variant>::disown(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-
-inline bool ArrayEntry::Reader::hasValue() const {
-  return !_reader.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
-}
-inline bool ArrayEntry::Builder::hasValue() {
-  return !_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
-}
-inline  ::stream::variant::Variant::Reader ArrayEntry::Reader::getValue() const {
-  return ::capnp::_::PointerHelpers< ::stream::variant::Variant>::get(_reader.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
-}
-inline  ::stream::variant::Variant::Builder ArrayEntry::Builder::getValue() {
-  return ::capnp::_::PointerHelpers< ::stream::variant::Variant>::get(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
-}
-#if !CAPNP_LITE
-inline  ::stream::variant::Variant::Pipeline ArrayEntry::Pipeline::getValue() {
-  return  ::stream::variant::Variant::Pipeline(_typeless.getPointerField(1));
-}
-#endif  // !CAPNP_LITE
-inline void ArrayEntry::Builder::setValue( ::stream::variant::Variant::Reader value) {
-  ::capnp::_::PointerHelpers< ::stream::variant::Variant>::set(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
-}
-inline  ::stream::variant::Variant::Builder ArrayEntry::Builder::initValue() {
-  return ::capnp::_::PointerHelpers< ::stream::variant::Variant>::init(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
-}
-inline void ArrayEntry::Builder::adoptValue(
-    ::capnp::Orphan< ::stream::variant::Variant>&& value) {
-  ::capnp::_::PointerHelpers< ::stream::variant::Variant>::adopt(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::stream::variant::Variant> ArrayEntry::Builder::disownValue() {
-  return ::capnp::_::PointerHelpers< ::stream::variant::Variant>::disown(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
+inline ::capnp::Orphan<::stream::variant::Variant> ArrayEntry::Builder::disownKey ()
+{
+  return ::capnp::_::PointerHelpers<::stream::variant::Variant>::disown (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
 }
 
-inline typename Variant::Value::Reader Variant::Reader::getValue() const {
-  return typename Variant::Value::Reader(_reader);
+inline bool ArrayEntry::Reader::hasValue () const
+{
+  return ! _reader.getPointerField (
+                    ::capnp::bounded<1> () * ::capnp::POINTERS)
+             .isNull ();
 }
-inline typename Variant::Value::Builder Variant::Builder::getValue() {
-  return typename Variant::Value::Builder(_builder);
+inline bool ArrayEntry::Builder::hasValue ()
+{
+  return ! _builder.getPointerField (
+                     ::capnp::bounded<1> () * ::capnp::POINTERS)
+             .isNull ();
 }
-#if !CAPNP_LITE
-inline typename Variant::Value::Pipeline Variant::Pipeline::getValue() {
-  return typename Variant::Value::Pipeline(_typeless.noop());
+inline ::stream::variant::Variant::Reader ArrayEntry::Reader::getValue () const
+{
+  return ::capnp::_::PointerHelpers<::stream::variant::Variant>::get (_reader.getPointerField (
+    ::capnp::bounded<1> () * ::capnp::POINTERS));
 }
-#endif  // !CAPNP_LITE
-inline typename Variant::Value::Builder Variant::Builder::initValue() {
-  _builder.setDataField< ::uint16_t>(::capnp::bounded<0>() * ::capnp::ELEMENTS, 0);
-  _builder.setDataField<bool>(::capnp::bounded<16>() * ::capnp::ELEMENTS, 0);
-  _builder.setDataField< ::uint64_t>(::capnp::bounded<1>() * ::capnp::ELEMENTS, 0);
-  _builder.getPointerField(::capnp::bounded<0>() * ::capnp::POINTERS).clear();
-  return typename Variant::Value::Builder(_builder);
+inline ::stream::variant::Variant::Builder ArrayEntry::Builder::getValue ()
+{
+  return ::capnp::_::PointerHelpers<::stream::variant::Variant>::get (_builder.getPointerField (
+    ::capnp::bounded<1> () * ::capnp::POINTERS));
 }
-inline  ::stream::variant::Variant::Value::Which Variant::Value::Reader::which() const {
-  return _reader.getDataField<Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+#if ! CAPNP_LITE
+inline ::stream::variant::Variant::Pipeline ArrayEntry::Pipeline::getValue ()
+{
+  return ::stream::variant::Variant::Pipeline (_typeless.getPointerField (1));
 }
-inline  ::stream::variant::Variant::Value::Which Variant::Value::Builder::which() {
-  return _builder.getDataField<Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+#endif // !CAPNP_LITE
+inline void ArrayEntry::Builder::setValue (::stream::variant::Variant::Reader value)
+{
+  ::capnp::_::PointerHelpers<::stream::variant::Variant>::set (_builder.getPointerField (
+                                                                 ::capnp::bounded<1> () * ::capnp::POINTERS),
+                                                               value);
 }
-
-inline bool Variant::Value::Reader::isNil() const {
-  return which() == Variant::Value::NIL;
+inline ::stream::variant::Variant::Builder ArrayEntry::Builder::initValue ()
+{
+  return ::capnp::_::PointerHelpers<::stream::variant::Variant>::init (_builder.getPointerField (
+    ::capnp::bounded<1> () * ::capnp::POINTERS));
 }
-inline bool Variant::Value::Builder::isNil() {
-  return which() == Variant::Value::NIL;
+inline void ArrayEntry::Builder::adoptValue (
+  ::capnp::Orphan<::stream::variant::Variant> &&value)
+{
+  ::capnp::_::PointerHelpers<::stream::variant::Variant>::adopt (_builder.getPointerField (
+                                                                   ::capnp::bounded<1> () * ::capnp::POINTERS),
+                                                                 kj::mv (value));
 }
-inline  ::capnp::Void Variant::Value::Reader::getNil() const {
-  KJ_IREQUIRE((which() == Variant::Value::NIL),
-              "Must check which() before get()ing a union member.");
-  return _reader.getDataField< ::capnp::Void>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-
-inline  ::capnp::Void Variant::Value::Builder::getNil() {
-  KJ_IREQUIRE((which() == Variant::Value::NIL),
-              "Must check which() before get()ing a union member.");
-  return _builder.getDataField< ::capnp::Void>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-inline void Variant::Value::Builder::setNil( ::capnp::Void value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::NIL);
-  _builder.setDataField< ::capnp::Void>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool Variant::Value::Reader::isBool() const {
-  return which() == Variant::Value::BOOL;
-}
-inline bool Variant::Value::Builder::isBool() {
-  return which() == Variant::Value::BOOL;
-}
-inline bool Variant::Value::Reader::getBool() const {
-  KJ_IREQUIRE((which() == Variant::Value::BOOL),
-              "Must check which() before get()ing a union member.");
-  return _reader.getDataField<bool>(
-      ::capnp::bounded<16>() * ::capnp::ELEMENTS);
+inline ::capnp::Orphan<::stream::variant::Variant> ArrayEntry::Builder::disownValue ()
+{
+  return ::capnp::_::PointerHelpers<::stream::variant::Variant>::disown (_builder.getPointerField (
+    ::capnp::bounded<1> () * ::capnp::POINTERS));
 }
 
-inline bool Variant::Value::Builder::getBool() {
-  KJ_IREQUIRE((which() == Variant::Value::BOOL),
-              "Must check which() before get()ing a union member.");
-  return _builder.getDataField<bool>(
-      ::capnp::bounded<16>() * ::capnp::ELEMENTS);
+inline typename Variant::Value::Reader Variant::Reader::getValue () const
+{
+  return typename Variant::Value::Reader (_reader);
 }
-inline void Variant::Value::Builder::setBool(bool value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::BOOL);
-  _builder.setDataField<bool>(
-      ::capnp::bounded<16>() * ::capnp::ELEMENTS, value);
+inline typename Variant::Value::Builder Variant::Builder::getValue ()
+{
+  return typename Variant::Value::Builder (_builder);
 }
-
-inline bool Variant::Value::Reader::isUint64() const {
-  return which() == Variant::Value::UINT64;
+#if ! CAPNP_LITE
+inline typename Variant::Value::Pipeline Variant::Pipeline::getValue ()
+{
+  return typename Variant::Value::Pipeline (_typeless.noop ());
 }
-inline bool Variant::Value::Builder::isUint64() {
-  return which() == Variant::Value::UINT64;
+#endif // !CAPNP_LITE
+inline typename Variant::Value::Builder Variant::Builder::initValue ()
+{
+  _builder.setDataField<::uint16_t> (::capnp::bounded<0> () * ::capnp::ELEMENTS, 0);
+  _builder.setDataField<bool> (::capnp::bounded<16> () * ::capnp::ELEMENTS, 0);
+  _builder.setDataField<::uint64_t> (::capnp::bounded<1> () * ::capnp::ELEMENTS, 0);
+  _builder.getPointerField (::capnp::bounded<0> () * ::capnp::POINTERS).clear ();
+  return typename Variant::Value::Builder (_builder);
 }
-inline  ::uint64_t Variant::Value::Reader::getUint64() const {
-  KJ_IREQUIRE((which() == Variant::Value::UINT64),
-              "Must check which() before get()ing a union member.");
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+inline ::stream::variant::Variant::Value::Which Variant::Value::Reader::which () const
+{
+  return _reader.getDataField<Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS);
 }
-
-inline  ::uint64_t Variant::Value::Builder::getUint64() {
-  KJ_IREQUIRE((which() == Variant::Value::UINT64),
-              "Must check which() before get()ing a union member.");
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void Variant::Value::Builder::setUint64( ::uint64_t value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::UINT64);
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+inline ::stream::variant::Variant::Value::Which Variant::Value::Builder::which ()
+{
+  return _builder.getDataField<Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS);
 }
 
-inline bool Variant::Value::Reader::isInt64() const {
-  return which() == Variant::Value::INT64;
+inline bool Variant::Value::Reader::isNil () const
+{
+  return which () == Variant::Value::NIL;
 }
-inline bool Variant::Value::Builder::isInt64() {
-  return which() == Variant::Value::INT64;
+inline bool Variant::Value::Builder::isNil ()
+{
+  return which () == Variant::Value::NIL;
 }
-inline  ::int64_t Variant::Value::Reader::getInt64() const {
-  KJ_IREQUIRE((which() == Variant::Value::INT64),
-              "Must check which() before get()ing a union member.");
-  return _reader.getDataField< ::int64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int64_t Variant::Value::Builder::getInt64() {
-  KJ_IREQUIRE((which() == Variant::Value::INT64),
-              "Must check which() before get()ing a union member.");
-  return _builder.getDataField< ::int64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void Variant::Value::Builder::setInt64( ::int64_t value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::INT64);
-  _builder.setDataField< ::int64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+inline ::capnp::Void Variant::Value::Reader::getNil () const
+{
+  KJ_IREQUIRE ((which () == Variant::Value::NIL),
+               "Must check which() before get()ing a union member.");
+  return _reader.getDataField<::capnp::Void> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS);
 }
 
-inline bool Variant::Value::Reader::isDouble() const {
-  return which() == Variant::Value::DOUBLE;
+inline ::capnp::Void Variant::Value::Builder::getNil ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::NIL),
+               "Must check which() before get()ing a union member.");
+  return _builder.getDataField<::capnp::Void> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS);
 }
-inline bool Variant::Value::Builder::isDouble() {
-  return which() == Variant::Value::DOUBLE;
-}
-inline double Variant::Value::Reader::getDouble() const {
-  KJ_IREQUIRE((which() == Variant::Value::DOUBLE),
-              "Must check which() before get()ing a union member.");
-  return _reader.getDataField<double>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline double Variant::Value::Builder::getDouble() {
-  KJ_IREQUIRE((which() == Variant::Value::DOUBLE),
-              "Must check which() before get()ing a union member.");
-  return _builder.getDataField<double>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void Variant::Value::Builder::setDouble(double value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::DOUBLE);
-  _builder.setDataField<double>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+inline void Variant::Value::Builder::setNil (::capnp::Void value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::NIL);
+  _builder.setDataField<::capnp::Void> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, value);
 }
 
-inline bool Variant::Value::Reader::isText() const {
-  return which() == Variant::Value::TEXT;
+inline bool Variant::Value::Reader::isBool () const
+{
+  return which () == Variant::Value::BOOL;
 }
-inline bool Variant::Value::Builder::isText() {
-  return which() == Variant::Value::TEXT;
+inline bool Variant::Value::Builder::isBool ()
+{
+  return which () == Variant::Value::BOOL;
 }
-inline bool Variant::Value::Reader::hasText() const {
-  if (which() != Variant::Value::TEXT) return false;
-  return !_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline bool Variant::Value::Builder::hasText() {
-  if (which() != Variant::Value::TEXT) return false;
-  return !_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::Text::Reader Variant::Value::Reader::getText() const {
-  KJ_IREQUIRE((which() == Variant::Value::TEXT),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline  ::capnp::Text::Builder Variant::Value::Builder::getText() {
-  KJ_IREQUIRE((which() == Variant::Value::TEXT),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline void Variant::Value::Builder::setText( ::capnp::Text::Reader value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::TEXT);
-  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
-}
-inline  ::capnp::Text::Builder Variant::Value::Builder::initText(unsigned int size) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::TEXT);
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
-}
-inline void Variant::Value::Builder::adoptText(
-    ::capnp::Orphan< ::capnp::Text>&& value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::TEXT);
-  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::Text> Variant::Value::Builder::disownText() {
-  KJ_IREQUIRE((which() == Variant::Value::TEXT),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
+inline bool Variant::Value::Reader::getBool () const
+{
+  KJ_IREQUIRE ((which () == Variant::Value::BOOL),
+               "Must check which() before get()ing a union member.");
+  return _reader.getDataField<bool> (
+    ::capnp::bounded<16> () * ::capnp::ELEMENTS);
 }
 
-inline bool Variant::Value::Reader::isList() const {
-  return which() == Variant::Value::LIST;
+inline bool Variant::Value::Builder::getBool ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::BOOL),
+               "Must check which() before get()ing a union member.");
+  return _builder.getDataField<bool> (
+    ::capnp::bounded<16> () * ::capnp::ELEMENTS);
 }
-inline bool Variant::Value::Builder::isList() {
-  return which() == Variant::Value::LIST;
-}
-inline bool Variant::Value::Reader::hasList() const {
-  if (which() != Variant::Value::LIST) return false;
-  return !_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline bool Variant::Value::Builder::hasList() {
-  if (which() != Variant::Value::LIST) return false;
-  return !_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>::Reader Variant::Value::Reader::getList() const {
-  KJ_IREQUIRE((which() == Variant::Value::LIST),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline  ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>::Builder Variant::Value::Builder::getList() {
-  KJ_IREQUIRE((which() == Variant::Value::LIST),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline void Variant::Value::Builder::setList( ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>::Reader value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::LIST);
-  ::capnp::_::PointerHelpers< ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
-}
-inline  ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>::Builder Variant::Value::Builder::initList(unsigned int size) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::LIST);
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
-}
-inline void Variant::Value::Builder::adoptList(
-    ::capnp::Orphan< ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>>&& value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::LIST);
-  ::capnp::_::PointerHelpers< ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>> Variant::Value::Builder::disownList() {
-  KJ_IREQUIRE((which() == Variant::Value::LIST),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::stream::variant::Variant,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
+inline void Variant::Value::Builder::setBool (bool value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::BOOL);
+  _builder.setDataField<bool> (
+    ::capnp::bounded<16> () * ::capnp::ELEMENTS, value);
 }
 
-inline bool Variant::Value::Reader::isArray() const {
-  return which() == Variant::Value::ARRAY;
+inline bool Variant::Value::Reader::isUint64 () const
+{
+  return which () == Variant::Value::UINT64;
 }
-inline bool Variant::Value::Builder::isArray() {
-  return which() == Variant::Value::ARRAY;
+inline bool Variant::Value::Builder::isUint64 ()
+{
+  return which () == Variant::Value::UINT64;
 }
-inline bool Variant::Value::Reader::hasArray() const {
-  if (which() != Variant::Value::ARRAY) return false;
-  return !_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline bool Variant::Value::Builder::hasArray() {
-  if (which() != Variant::Value::ARRAY) return false;
-  return !_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>::Reader Variant::Value::Reader::getArray() const {
-  KJ_IREQUIRE((which() == Variant::Value::ARRAY),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline  ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>::Builder Variant::Value::Builder::getArray() {
-  KJ_IREQUIRE((which() == Variant::Value::ARRAY),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline void Variant::Value::Builder::setArray( ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>::Reader value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::ARRAY);
-  ::capnp::_::PointerHelpers< ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
-}
-inline  ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>::Builder Variant::Value::Builder::initArray(unsigned int size) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::ARRAY);
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
-}
-inline void Variant::Value::Builder::adoptArray(
-    ::capnp::Orphan< ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>>&& value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::ARRAY);
-  ::capnp::_::PointerHelpers< ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>> Variant::Value::Builder::disownArray() {
-  KJ_IREQUIRE((which() == Variant::Value::ARRAY),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::stream::variant::ArrayEntry,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
+inline ::uint64_t Variant::Value::Reader::getUint64 () const
+{
+  KJ_IREQUIRE ((which () == Variant::Value::UINT64),
+               "Must check which() before get()ing a union member.");
+  return _reader.getDataField<::uint64_t> (
+    ::capnp::bounded<1> () * ::capnp::ELEMENTS);
 }
 
-inline bool Variant::Value::Reader::isObject() const {
-  return which() == Variant::Value::OBJECT;
+inline ::uint64_t Variant::Value::Builder::getUint64 ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::UINT64),
+               "Must check which() before get()ing a union member.");
+  return _builder.getDataField<::uint64_t> (
+    ::capnp::bounded<1> () * ::capnp::ELEMENTS);
 }
-inline bool Variant::Value::Builder::isObject() {
-  return which() == Variant::Value::OBJECT;
-}
-inline bool Variant::Value::Reader::hasObject() const {
-  if (which() != Variant::Value::OBJECT) return false;
-  return !_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline bool Variant::Value::Builder::hasObject() {
-  if (which() != Variant::Value::OBJECT) return false;
-  return !_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::Text::Reader Variant::Value::Reader::getObject() const {
-  KJ_IREQUIRE((which() == Variant::Value::OBJECT),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline  ::capnp::Text::Builder Variant::Value::Builder::getObject() {
-  KJ_IREQUIRE((which() == Variant::Value::OBJECT),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline void Variant::Value::Builder::setObject( ::capnp::Text::Reader value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::OBJECT);
-  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
-}
-inline  ::capnp::Text::Builder Variant::Value::Builder::initObject(unsigned int size) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::OBJECT);
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
-}
-inline void Variant::Value::Builder::adoptObject(
-    ::capnp::Orphan< ::capnp::Text>&& value) {
-  _builder.setDataField<Variant::Value::Which>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, Variant::Value::OBJECT);
-  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::Text> Variant::Value::Builder::disownObject() {
-  KJ_IREQUIRE((which() == Variant::Value::OBJECT),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
+inline void Variant::Value::Builder::setUint64 (::uint64_t value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::UINT64);
+  _builder.setDataField<::uint64_t> (
+    ::capnp::bounded<1> () * ::capnp::ELEMENTS, value);
 }
 
-}  // namespace
-}  // namespace
+inline bool Variant::Value::Reader::isInt64 () const
+{
+  return which () == Variant::Value::INT64;
+}
+inline bool Variant::Value::Builder::isInt64 ()
+{
+  return which () == Variant::Value::INT64;
+}
+inline ::int64_t Variant::Value::Reader::getInt64 () const
+{
+  KJ_IREQUIRE ((which () == Variant::Value::INT64),
+               "Must check which() before get()ing a union member.");
+  return _reader.getDataField<::int64_t> (
+    ::capnp::bounded<1> () * ::capnp::ELEMENTS);
+}
+
+inline ::int64_t Variant::Value::Builder::getInt64 ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::INT64),
+               "Must check which() before get()ing a union member.");
+  return _builder.getDataField<::int64_t> (
+    ::capnp::bounded<1> () * ::capnp::ELEMENTS);
+}
+inline void Variant::Value::Builder::setInt64 (::int64_t value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::INT64);
+  _builder.setDataField<::int64_t> (
+    ::capnp::bounded<1> () * ::capnp::ELEMENTS, value);
+}
+
+inline bool Variant::Value::Reader::isDouble () const
+{
+  return which () == Variant::Value::DOUBLE;
+}
+inline bool Variant::Value::Builder::isDouble ()
+{
+  return which () == Variant::Value::DOUBLE;
+}
+inline double Variant::Value::Reader::getDouble () const
+{
+  KJ_IREQUIRE ((which () == Variant::Value::DOUBLE),
+               "Must check which() before get()ing a union member.");
+  return _reader.getDataField<double> (
+    ::capnp::bounded<1> () * ::capnp::ELEMENTS);
+}
+
+inline double Variant::Value::Builder::getDouble ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::DOUBLE),
+               "Must check which() before get()ing a union member.");
+  return _builder.getDataField<double> (
+    ::capnp::bounded<1> () * ::capnp::ELEMENTS);
+}
+inline void Variant::Value::Builder::setDouble (double value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::DOUBLE);
+  _builder.setDataField<double> (
+    ::capnp::bounded<1> () * ::capnp::ELEMENTS, value);
+}
+
+inline bool Variant::Value::Reader::isText () const
+{
+  return which () == Variant::Value::TEXT;
+}
+inline bool Variant::Value::Builder::isText ()
+{
+  return which () == Variant::Value::TEXT;
+}
+inline bool Variant::Value::Reader::hasText () const
+{
+  if (which () != Variant::Value::TEXT)
+    return false;
+  return ! _reader.getPointerField (
+                    ::capnp::bounded<0> () * ::capnp::POINTERS)
+             .isNull ();
+}
+inline bool Variant::Value::Builder::hasText ()
+{
+  if (which () != Variant::Value::TEXT)
+    return false;
+  return ! _builder.getPointerField (
+                     ::capnp::bounded<0> () * ::capnp::POINTERS)
+             .isNull ();
+}
+inline ::capnp::Text::Reader Variant::Value::Reader::getText () const
+{
+  KJ_IREQUIRE ((which () == Variant::Value::TEXT),
+               "Must check which() before get()ing a union member.");
+  return ::capnp::_::PointerHelpers<::capnp::Text>::get (_reader.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
+}
+inline ::capnp::Text::Builder Variant::Value::Builder::getText ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::TEXT),
+               "Must check which() before get()ing a union member.");
+  return ::capnp::_::PointerHelpers<::capnp::Text>::get (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
+}
+inline void Variant::Value::Builder::setText (::capnp::Text::Reader value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::TEXT);
+  ::capnp::_::PointerHelpers<::capnp::Text>::set (_builder.getPointerField (
+                                                    ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                  value);
+}
+inline ::capnp::Text::Builder Variant::Value::Builder::initText (unsigned int size)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::TEXT);
+  return ::capnp::_::PointerHelpers<::capnp::Text>::init (_builder.getPointerField (
+                                                            ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                          size);
+}
+inline void Variant::Value::Builder::adoptText (
+  ::capnp::Orphan<::capnp::Text> &&value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::TEXT);
+  ::capnp::_::PointerHelpers<::capnp::Text>::adopt (_builder.getPointerField (
+                                                      ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                    kj::mv (value));
+}
+inline ::capnp::Orphan<::capnp::Text> Variant::Value::Builder::disownText ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::TEXT),
+               "Must check which() before get()ing a union member.");
+  return ::capnp::_::PointerHelpers<::capnp::Text>::disown (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
+}
+
+inline bool Variant::Value::Reader::isList () const
+{
+  return which () == Variant::Value::LIST;
+}
+inline bool Variant::Value::Builder::isList ()
+{
+  return which () == Variant::Value::LIST;
+}
+inline bool Variant::Value::Reader::hasList () const
+{
+  if (which () != Variant::Value::LIST)
+    return false;
+  return ! _reader.getPointerField (
+                    ::capnp::bounded<0> () * ::capnp::POINTERS)
+             .isNull ();
+}
+inline bool Variant::Value::Builder::hasList ()
+{
+  if (which () != Variant::Value::LIST)
+    return false;
+  return ! _builder.getPointerField (
+                     ::capnp::bounded<0> () * ::capnp::POINTERS)
+             .isNull ();
+}
+inline ::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>::Reader Variant::Value::Reader::getList () const
+{
+  KJ_IREQUIRE ((which () == Variant::Value::LIST),
+               "Must check which() before get()ing a union member.");
+  return ::capnp::_::PointerHelpers<::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>>::get (_reader.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
+}
+inline ::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>::Builder Variant::Value::Builder::getList ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::LIST),
+               "Must check which() before get()ing a union member.");
+  return ::capnp::_::PointerHelpers<::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>>::get (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
+}
+inline void Variant::Value::Builder::setList (::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>::Reader value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::LIST);
+  ::capnp::_::PointerHelpers<::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>>::set (_builder.getPointerField (
+                                                                                                       ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                                                                     value);
+}
+inline ::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>::Builder Variant::Value::Builder::initList (unsigned int size)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::LIST);
+  return ::capnp::_::PointerHelpers<::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>>::init (_builder.getPointerField (
+                                                                                                               ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                                                                             size);
+}
+inline void Variant::Value::Builder::adoptList (
+  ::capnp::Orphan<::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>> &&value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::LIST);
+  ::capnp::_::PointerHelpers<::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>>::adopt (_builder.getPointerField (
+                                                                                                         ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                                                                       kj::mv (value));
+}
+inline ::capnp::Orphan<::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>> Variant::Value::Builder::disownList ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::LIST),
+               "Must check which() before get()ing a union member.");
+  return ::capnp::_::PointerHelpers<::capnp::List<::stream::variant::Variant, ::capnp::Kind::STRUCT>>::disown (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
+}
+
+inline bool Variant::Value::Reader::isArray () const
+{
+  return which () == Variant::Value::ARRAY;
+}
+inline bool Variant::Value::Builder::isArray ()
+{
+  return which () == Variant::Value::ARRAY;
+}
+inline bool Variant::Value::Reader::hasArray () const
+{
+  if (which () != Variant::Value::ARRAY)
+    return false;
+  return ! _reader.getPointerField (
+                    ::capnp::bounded<0> () * ::capnp::POINTERS)
+             .isNull ();
+}
+inline bool Variant::Value::Builder::hasArray ()
+{
+  if (which () != Variant::Value::ARRAY)
+    return false;
+  return ! _builder.getPointerField (
+                     ::capnp::bounded<0> () * ::capnp::POINTERS)
+             .isNull ();
+}
+inline ::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>::Reader Variant::Value::Reader::getArray () const
+{
+  KJ_IREQUIRE ((which () == Variant::Value::ARRAY),
+               "Must check which() before get()ing a union member.");
+  return ::capnp::_::PointerHelpers<::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>>::get (_reader.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
+}
+inline ::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>::Builder Variant::Value::Builder::getArray ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::ARRAY),
+               "Must check which() before get()ing a union member.");
+  return ::capnp::_::PointerHelpers<::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>>::get (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
+}
+inline void Variant::Value::Builder::setArray (::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>::Reader value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::ARRAY);
+  ::capnp::_::PointerHelpers<::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>>::set (_builder.getPointerField (
+                                                                                                          ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                                                                        value);
+}
+inline ::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>::Builder Variant::Value::Builder::initArray (unsigned int size)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::ARRAY);
+  return ::capnp::_::PointerHelpers<::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>>::init (_builder.getPointerField (
+                                                                                                                  ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                                                                                size);
+}
+inline void Variant::Value::Builder::adoptArray (
+  ::capnp::Orphan<::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>> &&value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::ARRAY);
+  ::capnp::_::PointerHelpers<::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>>::adopt (_builder.getPointerField (
+                                                                                                            ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                                                                          kj::mv (value));
+}
+inline ::capnp::Orphan<::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>> Variant::Value::Builder::disownArray ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::ARRAY),
+               "Must check which() before get()ing a union member.");
+  return ::capnp::_::PointerHelpers<::capnp::List<::stream::variant::ArrayEntry, ::capnp::Kind::STRUCT>>::disown (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
+}
+
+inline bool Variant::Value::Reader::isObject () const
+{
+  return which () == Variant::Value::OBJECT;
+}
+inline bool Variant::Value::Builder::isObject ()
+{
+  return which () == Variant::Value::OBJECT;
+}
+inline bool Variant::Value::Reader::hasObject () const
+{
+  if (which () != Variant::Value::OBJECT)
+    return false;
+  return ! _reader.getPointerField (
+                    ::capnp::bounded<0> () * ::capnp::POINTERS)
+             .isNull ();
+}
+inline bool Variant::Value::Builder::hasObject ()
+{
+  if (which () != Variant::Value::OBJECT)
+    return false;
+  return ! _builder.getPointerField (
+                     ::capnp::bounded<0> () * ::capnp::POINTERS)
+             .isNull ();
+}
+inline ::capnp::Text::Reader Variant::Value::Reader::getObject () const
+{
+  KJ_IREQUIRE ((which () == Variant::Value::OBJECT),
+               "Must check which() before get()ing a union member.");
+  return ::capnp::_::PointerHelpers<::capnp::Text>::get (_reader.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
+}
+inline ::capnp::Text::Builder Variant::Value::Builder::getObject ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::OBJECT),
+               "Must check which() before get()ing a union member.");
+  return ::capnp::_::PointerHelpers<::capnp::Text>::get (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
+}
+inline void Variant::Value::Builder::setObject (::capnp::Text::Reader value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::OBJECT);
+  ::capnp::_::PointerHelpers<::capnp::Text>::set (_builder.getPointerField (
+                                                    ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                  value);
+}
+inline ::capnp::Text::Builder Variant::Value::Builder::initObject (unsigned int size)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::OBJECT);
+  return ::capnp::_::PointerHelpers<::capnp::Text>::init (_builder.getPointerField (
+                                                            ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                          size);
+}
+inline void Variant::Value::Builder::adoptObject (
+  ::capnp::Orphan<::capnp::Text> &&value)
+{
+  _builder.setDataField<Variant::Value::Which> (
+    ::capnp::bounded<0> () * ::capnp::ELEMENTS, Variant::Value::OBJECT);
+  ::capnp::_::PointerHelpers<::capnp::Text>::adopt (_builder.getPointerField (
+                                                      ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                    kj::mv (value));
+}
+inline ::capnp::Orphan<::capnp::Text> Variant::Value::Builder::disownObject ()
+{
+  KJ_IREQUIRE ((which () == Variant::Value::OBJECT),
+               "Must check which() before get()ing a union member.");
+  return ::capnp::_::PointerHelpers<::capnp::Text>::disown (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
+}
+
+} // namespace
+} // namespace
 
 CAPNP_END_HEADER
-

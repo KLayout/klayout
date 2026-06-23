@@ -109,4 +109,3 @@ void RegionDelegate::set_strict_handling (bool f)
 }
 
 }
-

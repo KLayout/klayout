@@ -26,7 +26,8 @@
 #include "layFixedFont.h"
 #include "tlAlgorithm.h"
 
-namespace lay {
+namespace lay
+{
 
 Bitmap::Bitmap ()
   : m_empty_scanline (0)
@@ -76,10 +77,9 @@ Bitmap::operator= (const Bitmap &d)
         m_scanlines [i] = 0;
       }
     }
-    
+
     m_last_sl = d.m_last_sl;
     m_first_sl = d.m_first_sl;
-
   }
   return *this;
 }
@@ -114,12 +114,11 @@ Bitmap::scanline (unsigned int n)
     if (m_last_sl <= n) {
       m_last_sl = n + 1;
     }
-  } 
+  }
   return sl;
 }
 
-void
-Bitmap::clear ()
+void Bitmap::clear ()
 {
   for (std::vector<uint32_t *>::iterator i = m_scanlines.begin (); i != m_scanlines.end (); ++i) {
     if (*i) {
@@ -132,8 +131,7 @@ Bitmap::clear ()
   m_last_sl = m_first_sl = 0;
 }
 
-void 
-Bitmap::cleanup ()
+void Bitmap::cleanup ()
 {
   m_last_sl = m_first_sl = 0;
 
@@ -156,8 +154,7 @@ Bitmap::cleanup ()
   m_last_sl = m_first_sl = 0;
 }
 
-void 
-Bitmap::init (unsigned int w, unsigned int h)
+void Bitmap::init (unsigned int w, unsigned int h)
 {
   m_width = w;
   m_height = h;
@@ -173,8 +170,7 @@ Bitmap::init (unsigned int w, unsigned int h)
   m_last_sl = m_first_sl = 0;
 }
 
-void 
-Bitmap::merge (const lay::Bitmap *from, int dx, int dy)
+void Bitmap::merge (const lay::Bitmap *from, int dx, int dy)
 {
   if (! from) {
     return;
@@ -229,14 +225,13 @@ Bitmap::merge (const lay::Bitmap *from, int dx, int dy)
         }
       } else if (m) {
         for (unsigned int i = 1; i < m; ++i) {
-          *sl_to++ |= (sl_from[1] << s2) | (sl_from[0] >> s1);
+          *sl_to++ |= (sl_from [1] << s2) | (sl_from [0] >> s1);
           ++sl_from;
         }
         if (mm > m - 1) {
-          *sl_to++ |= (sl_from[0] >> s1);
+          *sl_to++ |= (sl_from [0] >> s1);
         }
       }
-
     }
 
   } else {
@@ -262,23 +257,20 @@ Bitmap::merge (const lay::Bitmap *from, int dx, int dy)
           *sl_to++ |= *sl_from++;
         }
       } else if (m) {
-        *sl_to++ |= (sl_from[0] << s1);
+        *sl_to++ |= (sl_from [0] << s1);
         for (unsigned int i = 1; i < m; ++i) {
-          *sl_to++ |= (sl_from[0] >> s2) | (sl_from[1] << s1);
+          *sl_to++ |= (sl_from [0] >> s2) | (sl_from [1] << s1);
           ++sl_from;
         }
         if (mm > m) {
-          *sl_to++ |= (sl_from[0] >> s2);
+          *sl_to++ |= (sl_from [0] >> s2);
         }
       }
-
     }
-
   }
 }
 
-void 
-Bitmap::fill_pattern (int y, int x, const uint32_t *pp, unsigned int stride, unsigned int n)
+void Bitmap::fill_pattern (int y, int x, const uint32_t *pp, unsigned int stride, unsigned int n)
 {
   if (x < int (m_width)) {
 
@@ -298,10 +290,10 @@ Bitmap::fill_pattern (int y, int x, const uint32_t *pp, unsigned int stride, uns
         uint32_t p = *pp;
 
         int x1 = x + s * 32;
-        if (x1 <= -32 || x1 >= (int)m_width) {
+        if (x1 <= -32 || x1 >= (int) m_width) {
           continue;
         } else if (x1 < 0) {
-          p >>= (unsigned int)-x1;
+          p >>= (unsigned int) -x1;
           x1 = 0;
         }
 
@@ -312,31 +304,26 @@ Bitmap::fill_pattern (int y, int x, const uint32_t *pp, unsigned int stride, uns
           uint32_t *sl = scanline (y);
           sl += bx / 32;
 
-          *sl |= (p << ((unsigned int)x1 - bx));
+          *sl |= (p << ((unsigned int) x1 - bx));
 
-          if ((unsigned int)x1 > bx) {
+          if ((unsigned int) x1 > bx) {
 
             bx += 32;
             ++sl;
 
             if (bx < m_width) {
-              *sl |= (p >> (bx - (unsigned int)x1));
+              *sl |= (p >> (bx - (unsigned int) x1));
             }
-
           }
-
         }
-
       }
 
       --n;
       --y;
-
     }
-
   }
 }
- 
+
 static const uint32_t masks [32] = {
   0x00000000, 0x00000001, 0x00000003, 0x00000007,
   0x0000000f, 0x0000001f, 0x0000003f, 0x0000007f,
@@ -345,13 +332,11 @@ static const uint32_t masks [32] = {
   0x0000ffff, 0x0001ffff, 0x0003ffff, 0x0007ffff,
   0x000fffff, 0x001fffff, 0x003fffff, 0x007fffff,
   0x00ffffff, 0x01ffffff, 0x03ffffff, 0x07ffffff,
-  0x0fffffff, 0x1fffffff, 0x3fffffff, 0x7fffffff
-};
+  0x0fffffff, 0x1fffffff, 0x3fffffff, 0x7fffffff};
 
 static const uint32_t all_ones = 0xffffffff;
 
-void 
-Bitmap::fill (unsigned int y, unsigned int x1, unsigned int x2)
+void Bitmap::fill (unsigned int y, unsigned int x1, unsigned int x2)
 {
   unsigned int b1 = x1 / 32;
 
@@ -377,12 +362,10 @@ Bitmap::fill (unsigned int y, unsigned int x1, unsigned int x2)
     if (m) {
       *sl |= m;
     }
-
   }
 }
 
-void
-Bitmap::clear (unsigned int y, unsigned int x1, unsigned int x2)
+void Bitmap::clear (unsigned int y, unsigned int x1, unsigned int x2)
 {
   unsigned int b1 = x1 / 32;
 
@@ -408,28 +391,24 @@ Bitmap::clear (unsigned int y, unsigned int x1, unsigned int x2)
     if (m) {
       *sl &= ~m;
     }
-
   }
 }
 
-struct PosCompareF
-{
+struct PosCompareF {
   bool operator() (const RenderEdge &a, const RenderEdge &b) const
   {
     return a.pos () < b.pos ();
   }
 };
 
-struct X1CompareF 
-{
+struct X1CompareF {
   bool operator() (const RenderEdge &a, const RenderEdge &b) const
   {
     return a.x1 () < b.x1 ();
   }
 };
 
-void
-Bitmap::render_fill (std::vector<lay::RenderEdge> &edges)
+void Bitmap::render_fill (std::vector<lay::RenderEdge> &edges)
 {
   //  sort the edges so we can operate on the sorted list
   tl::sort (edges.begin (), edges.end ());
@@ -440,7 +419,7 @@ Bitmap::render_fill (std::vector<lay::RenderEdge> &edges)
   //  this is generic case
   while (done != edges.end () && y < height ()) {
 
-    for ( ; done != edges.end (); ++done) {
+    for (; done != edges.end (); ++done) {
       if (! done->done (y)) {
         break;
       }
@@ -448,14 +427,14 @@ Bitmap::render_fill (std::vector<lay::RenderEdge> &edges)
 
     std::vector<lay::RenderEdge>::iterator todo = done;
 
-    for ( ; todo != edges.end (); ++todo) {
+    for (; todo != edges.end (); ++todo) {
       if (todo->done (y)) {
         std::swap (*done, *todo);
         ++done;
       }
       if (todo->todo (y)) {
         break;
-      } 
+      }
     }
 
     std::vector<lay::RenderEdge>::iterator e;
@@ -474,19 +453,19 @@ Bitmap::render_fill (std::vector<lay::RenderEdge> &edges)
     for (e = done; e != todo; ++e) {
       if (! e->is_horizontal ()) {
         c += e->delta ();
-        if (c == 0) {  //  this is implementing the != 0 rule
+        if (c == 0) { //  this is implementing the != 0 rule
           if (e->pos () > 0) {
             unsigned int x1int = 0;
             if (x1 > 0.0) {
               x1int = (unsigned int) x1;
               if (double (x1int) != x1) {
-                ++x1int; 
+                ++x1int;
               }
             }
             fill (yint, x1int, (unsigned int) std::min (double (width () - 1), e->pos ()) + 1);
           }
           x1set = false;
-        } else if (!x1set) {
+        } else if (! x1set) {
           x1 = e->pos ();
           x1set = true;
           if (x1 >= double (width ())) {
@@ -495,14 +474,12 @@ Bitmap::render_fill (std::vector<lay::RenderEdge> &edges)
         }
       }
     }
-    
-    y += 1.0;
 
+    y += 1.0;
   }
 }
 
-void
-Bitmap::render_fill_ortho (std::vector<lay::RenderEdge> &edges)
+void Bitmap::render_fill_ortho (std::vector<lay::RenderEdge> &edges)
 {
   //  sort the edges so we can operate on the sorted list
   tl::sort (edges.begin (), edges.end ());
@@ -514,21 +491,21 @@ Bitmap::render_fill_ortho (std::vector<lay::RenderEdge> &edges)
   //  TODO: the manhattan optimization is not really effective ..
   while (done != edges.end () && y < height ()) {
 
-    for ( ; done != edges.end (); ++done) {
+    for (; done != edges.end (); ++done) {
       if (! done->done (y)) {
         break;
       }
     }
 
     std::vector<lay::RenderEdge>::iterator todo = done;
-    for ( ; todo != edges.end (); ++todo) {
+    for (; todo != edges.end (); ++todo) {
       if (todo->done (y)) {
         std::swap (*done, *todo);
         ++done;
       }
       if (todo->todo (y)) {
         break;
-      } 
+      }
     }
 
     std::vector<lay::RenderEdge>::iterator e;
@@ -544,19 +521,19 @@ Bitmap::render_fill_ortho (std::vector<lay::RenderEdge> &edges)
     for (e = done; e != todo; ++e) {
       if (! e->is_horizontal ()) {
         c += e->delta ();
-        if (c == 0) {  //  this is implementing the != 0 rule
+        if (c == 0) { //  this is implementing the != 0 rule
           if (e->x1 () > 0) {
             unsigned int x1int = 0;
             if (x1 > 0.0) {
               x1int = (unsigned int) x1;
               if (double (x1int) != x1) {
-                ++x1int; 
+                ++x1int;
               }
             }
             fill (yint, x1int, (unsigned int) std::min (double (width () - 1), e->x1 ()) + 1);
           }
           x1set = false;
-        } else if (!x1set) {
+        } else if (! x1set) {
           x1 = e->x1 ();
           x1set = true;
           if (x1 >= double (width ())) {
@@ -565,14 +542,12 @@ Bitmap::render_fill_ortho (std::vector<lay::RenderEdge> &edges)
         }
       }
     }
-    
-    y += 1.0;
 
+    y += 1.0;
   }
 }
 
-void
-Bitmap::render_vertices (std::vector<lay::RenderEdge> &edges, int mode)
+void Bitmap::render_vertices (std::vector<lay::RenderEdge> &edges, int mode)
 {
   double xmax = width ();
   double ymax = height ();
@@ -580,44 +555,42 @@ Bitmap::render_vertices (std::vector<lay::RenderEdge> &edges, int mode)
   for (std::vector<lay::RenderEdge>::iterator e = edges.begin (); e != edges.end (); ++e) {
 
     double x, y;
-    
+
     if (mode == 0 || e->delta () > 0) {
       x = e->x1 () + 0.5;
       y = e->y1 () + 0.5;
       if (x >= 0.0 && x < xmax && y >= 0.0 && y < ymax) {
-        unsigned int xint = (unsigned int)x;
-        fill ((unsigned int)y, xint, xint + 1);
+        unsigned int xint = (unsigned int) x;
+        fill ((unsigned int) y, xint, xint + 1);
       }
     }
-     
+
     if (mode == 0 || e->delta () < 0) {
       x = e->x2 () + 0.5;
       y = e->y2 () + 0.5;
       if (x >= 0.0 && x < xmax && y >= 0.0 && y < ymax) {
-        unsigned int xint = (unsigned int)x;
-        fill ((unsigned int)y, xint, xint + 1);
+        unsigned int xint = (unsigned int) x;
+        fill ((unsigned int) y, xint, xint + 1);
       }
     }
 
     if (mode == 2 && e != edges.end ()) {
       ++e;
     }
-     
   }
 }
 
-void
-Bitmap::render_contour_ortho (std::vector<lay::RenderEdge> &edges)
+void Bitmap::render_contour_ortho (std::vector<lay::RenderEdge> &edges)
 {
   //  this is the purely manhattan case
   for (std::vector<lay::RenderEdge>::iterator e = edges.begin (); e != edges.end (); ++e) {
 
-    //  This is the line render algorithm 
+    //  This is the line render algorithm
     //  The basic idea is to decompose the line into stripes
     //  associated with a integer y value. The stripe extends
-    //  from x1 to x2 then. The algorithm tries to find a 
+    //  from x1 to x2 then. The algorithm tries to find a
     //  set of pixels on the y line that covers the range x1
-    //  to x2 as good as possible and advances to the next y 
+    //  to x2 as good as possible and advances to the next y
     //  value then.
 
     //  TODO: the rendering would be somewhat more efficient if
@@ -628,20 +601,16 @@ Bitmap::render_contour_ortho (std::vector<lay::RenderEdge> &edges)
 
       //  vertical
       double x = e->x1 ();
-      if (e->y1 () < double (height ()) - 0.5  
-          && e->y2 () >= -0.5
-          && x < (double) width () - 0.5 
-          && x >= -0.5) {
+      if (e->y1 () < double (height ()) - 0.5 && e->y2 () >= -0.5 && x < (double) width () - 0.5 && x >= -0.5) {
 
-        unsigned int xint  = (unsigned int) (std::max (0.0, std::min (double (width () - 1), x) + 0.5));
-        unsigned int yint  = (unsigned int) std::max (floor (e->y1 () + 0.5), 0.0);
+        unsigned int xint = (unsigned int) (std::max (0.0, std::min (double (width () - 1), x) + 0.5));
+        unsigned int yint = (unsigned int) std::max (floor (e->y1 () + 0.5), 0.0);
         unsigned int yeint = (unsigned int) std::min (double (height () - 1), std::max (floor (e->y2 () + 0.5), 0.0));
 
         while (yint <= yeint) {
           fill (yint, xint, xint + 1);
           ++yint;
         }
-
       }
 
     } else {
@@ -654,35 +623,28 @@ Bitmap::render_contour_ortho (std::vector<lay::RenderEdge> &edges)
       }
 
       double y = e->y1 ();
-      if (y < (double) height () - 0.5 
-          && y >= -0.5 
-          && x1 < (double) width () - 0.5 
-          && x2 >= -0.5) {
-      
+      if (y < (double) height () - 0.5 && y >= -0.5 && x1 < (double) width () - 0.5 && x2 >= -0.5) {
+
         unsigned int x1int = (unsigned int) (std::max (0.0, std::min (double (width () - 1), x1) + 0.5));
         unsigned int x2int = (unsigned int) (std::max (0.0, std::min (double (width () - 1), x2) + 0.5));
-        unsigned int yint  = (unsigned int) std::max (floor (y + 0.5), 0.0);
+        unsigned int yint = (unsigned int) std::max (floor (y + 0.5), 0.0);
         fill (yint, x1int, x2int + 1);
-
       }
-
     }
-
   }
 }
 
-void
-Bitmap::render_contour (std::vector<lay::RenderEdge> &edges)
+void Bitmap::render_contour (std::vector<lay::RenderEdge> &edges)
 {
   //  this is the generic case
   for (std::vector<lay::RenderEdge>::iterator e = edges.begin (); e != edges.end (); ++e) {
 
-    //  This is the line render algorithm 
+    //  This is the line render algorithm
     //  The basic idea is to decompose the line into stripes
     //  associated with a integer y value. The stripe extends
-    //  from x1 to x2 then. The algorithm tries to find a 
+    //  from x1 to x2 then. The algorithm tries to find a
     //  set of pixels on the y line that covers the range x1
-    //  to x2 as good as possible and advances to the next y 
+    //  to x2 as good as possible and advances to the next y
     //  value then.
 
     //  TODO: the rendering would be somewhat more efficient if
@@ -713,7 +675,7 @@ Bitmap::render_contour (std::vector<lay::RenderEdge> &edges)
         while (yint <= yeint) {
 
           double xx;
-          if (double (yint) > y2m) { 
+          if (double (yint) > y2m) {
             xx = e->x2 () + 0.5;
           } else {
             xx = x + dx;
@@ -742,7 +704,6 @@ Bitmap::render_contour (std::vector<lay::RenderEdge> &edges)
 
           x = xx;
           ++yint;
-
         }
 
       } else {
@@ -750,7 +711,7 @@ Bitmap::render_contour (std::vector<lay::RenderEdge> &edges)
         while (yint <= yeint) {
 
           double xx;
-          if (double (yint) > y2m) { 
+          if (double (yint) > y2m) {
             xx = e->x2 () - 0.5;
           } else {
             xx = x + dx;
@@ -766,7 +727,7 @@ Bitmap::render_contour (std::vector<lay::RenderEdge> &edges)
               xe = 0;
             } else {
               xe = (unsigned int) (xx);
-              if (double (xe) != xx) { 
+              if (double (xe) != xx) {
                 ++xe;
               }
             }
@@ -782,18 +743,13 @@ Bitmap::render_contour (std::vector<lay::RenderEdge> &edges)
 
           x = xx;
           ++yint;
-
         }
-
       }
-
     }
-
   }
 }
 
-void
-Bitmap::render_text (const lay::RenderText &text)
+void Bitmap::render_text (const lay::RenderText &text)
 {
   if (text.font == db::DefaultFont) {
 
@@ -802,7 +758,7 @@ Bitmap::render_text (const lay::RenderText &text)
     //  count the lines and max. characters per line
 
     unsigned int lines = 1;
-    for (const char *cp = text.text.c_str (); *cp; ) {
+    for (const char *cp = text.text.c_str (); *cp;) {
       if (tl::skip_newline (cp)) {
         ++lines;
       } else {
@@ -828,8 +784,8 @@ Bitmap::render_text (const lay::RenderText &text)
     while (*cp1) {
 
       unsigned int length = 0;
-      const char *cp = cp1; 
-      while (*cp && !tl::is_newline (*cp)) {
+      const char *cp = cp1;
+      while (*cp && ! tl::is_newline (*cp)) {
         tl::utf32_from_utf8 (cp);
         ++length;
       }
@@ -861,7 +817,6 @@ Bitmap::render_text (const lay::RenderText &text)
           }
 
           xx += double (ff.width ());
-
         }
 
       } else {
@@ -872,11 +827,10 @@ Bitmap::render_text (const lay::RenderText &text)
       if (tl::skip_newline (cp1)) {
         y -= double (ff.line_height ());
       }
-
     }
 
   } else {
-   
+
     //  Create a sub-renderer so we do not need to clear *this
     lay::BitmapRenderer hr (m_width, m_height, m_resolution, m_font_resolution);
 
@@ -892,16 +846,11 @@ Bitmap::render_text (const lay::RenderText &text)
         hr.insert ((*e).transformed (text.trans));
         ++e;
       }
-
     }
 
     hr.render_contour (*this);
-
   }
-
 }
 
- 
+
 } // namespace lay
-
-

@@ -136,138 +136,116 @@ static double get_gds2_user_units (const db::SaveLayoutOptions *options)
   return options->get_options<db::GDS2WriterOptions> ().user_units;
 }
 
-//  extend lay::SaveLayoutOptions with the GDS2 options 
-static
-gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
+//  extend lay::SaveLayoutOptions with the GDS2 options
+static gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
   gsi::method_ext ("gds2_max_vertex_count=", &set_gds2_max_vertex_count, gsi::arg ("count"),
-    "@brief Sets the maximum number of vertices for polygons to write\n"
-    "This property describes the maximum number of point for polygons in GDS2 files.\n"
-    "Polygons with more points will be split.\n"
-    "The minimum value for this property is 4. The maximum allowed value is about 4000 or 8000, depending on the\n"
-    "GDS2 interpretation. If \\gds2_multi_xy_records is true, this\n"
-    "property is not used. Instead, the number of points is unlimited.\n"
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_max_vertex_count", &get_gds2_max_vertex_count,
-    "@brief Gets the maximum number of vertices for polygons to write\n"
-    "See \\gds2_max_vertex_count= method for a description of the maximum vertex count."
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_multi_xy_records=", &set_gds2_multi_xy_records, gsi::arg ("flag"),
-    "@brief Uses multiple XY records in BOUNDARY elements for unlimited large polygons\n"
-    "\n"
-    "Setting this property to true allows producing polygons with an unlimited number of points \n"
-    "at the cost of incompatible formats. Setting it to true disables the \\gds2_max_vertex_count setting.\n"
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_multi_xy_records?", &get_gds2_multi_xy_records,
-    "@brief Gets the property enabling multiple XY records for BOUNDARY elements\n"
-    "See \\gds2_multi_xy_records= method for a description of this property."
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_resolve_skew_arrays=", &set_gds2_resolve_skew_arrays, gsi::arg ("flag"),
-    "@brief Resolves skew arrays into single instances\n"
-    "\n"
-    "Setting this property to true will make skew (non-orthogonal) arrays being resolved into single instances.\n"
-    "Skew arrays happen if either the row or column vector isn't parallel to x or y axis. Such arrays can cause problems with "
-    "some legacy software and can be disabled with this option.\n"
-    "\nThis property has been added in version 0.27.1.\n"
-  ) +
-  gsi::method_ext ("gds2_resolve_skew_arrays?", &get_gds2_resolve_skew_arrays,
-    "@brief Gets a value indicating whether to resolve skew arrays into single instances\n"
-    "See \\gds2_resolve_skew_arrays= method for a description of this property."
-    "\nThis property has been added in version 0.27.1.\n"
-  ) +
-  gsi::method_ext ("gds2_write_timestamps=", &set_gds2_write_timestamps, gsi::arg ("flag"),
-    "@brief Writes the current time into the GDS2 timestamps if set to true\n"
-    "\n"
-    "If this property is set to false, the time fields will all be zero. This somewhat simplifies compare and diff "
-    "applications.\n"
-    "\n"
-    "\nThis property has been added in version 0.21.16.\n"
-  ) +
-  gsi::method_ext ("gds2_write_timestamps?", &get_gds2_write_timestamps,
-    "@brief Gets a value indicating whether the current time is written into the GDS2 timestamp fields\n"
-    "\nThis property has been added in version 0.21.16.\n"
-  ) +
-  gsi::method_ext ("gds2_default_text_size=", &set_gds2_default_text_size, gsi::arg ("size"),
-    "@brief Specifies the default text size to use when a text does not have a size\n"
-    "\n"
-    "Text object can have no size, e.g. when they are read from OASIS files. Technically such texts\n"
-    "are represented by text object with a zero size. You can configure the GDS writer to use a specific\n"
-    "text size in this case. This property specifies the default text size in micrometer units. This\n"
-    "size can be set to 0 to preserve a zero size in GDS files read.\n"
-    "\n"
-    "Set this attribute to nil to disable writing of a text size if none is specified.\n"
-    "\n"
-    "\nThis property has been added in version 0.30.4.\n"
-  ) +
-  gsi::method_ext ("gds2_default_text_size", &get_gds2_default_text_size,
-    "@brief Gets the default text size to use when a text does not have a size\n"
-    "\nThis property has been added in version 0.30.4.\n"
-  ) +
-  gsi::method_ext ("gds2_no_zero_length_paths=", &set_gds2_no_zero_length_paths, gsi::arg ("flag"),
-    "@brief Eliminates zero-length paths if true\n"
-    "\n"
-    "If this property is set to true, paths with zero length will be converted to BOUNDARY objects.\n"
-    "\n"
-    "\nThis property has been added in version 0.23.\n"
-  ) +
-  gsi::method_ext ("gds2_no_zero_length_paths?|#gds2_no_zero_length_paths", &get_gds2_no_zero_length_paths,
-    "@brief Gets a value indicating whether zero-length paths are eliminated\n"
-    "\nThis property has been added in version 0.23.\n"
-  ) +
-  gsi::method_ext ("gds2_write_cell_properties=", &set_gds2_write_cell_properties, gsi::arg ("flag"),
-    "@brief Enables writing of cell properties if set to true\n"
-    "\n"
-    "If this property is set to true, cell properties will be written as PROPATTR/PROPVALUE records immediately "
-    "following the BGNSTR records. This is a non-standard extension and is therefore disabled by default.\n"
-    "\n"
-    "\nThis property has been added in version 0.23.\n"
-  ) +
-  gsi::method_ext ("gds2_write_cell_properties?|#gds2_write_cell_properties", &get_gds2_write_cell_properties,
-    "@brief Gets a value indicating whether cell properties are written\n"
-    "\nThis property has been added in version 0.23.\n"
-  ) +
-  gsi::method_ext ("gds2_write_file_properties=", &set_gds2_write_file_properties, gsi::arg ("flag"),
-    "@brief Enables writing of file properties if set to true\n"
-    "\n"
-    "If this property is set to true, layout properties will be written as PROPATTR/PROPVALUE records immediately "
-    "following the BGNLIB records. This is a non-standard extension and is therefore disabled by default.\n"
-    "\n"
-    "\nThis property has been added in version 0.24.\n"
-  ) +
-  gsi::method_ext ("gds2_write_file_properties?|#gds2_write_file_properties", &get_gds2_write_file_properties,
-    "@brief Gets a value indicating whether layout properties are written\n"
-    "\nThis property has been added in version 0.24.\n"
-  ) +
-  gsi::method_ext ("gds2_max_cellname_length=", &set_gds2_max_cellname_length, gsi::arg ("length"),
-    "@brief Maximum length of cell names\n"
-    "\n"
-    "This property describes the maximum number of characters for cell names. \n"
-    "Longer cell names will be shortened.\n"
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_max_cellname_length", &get_gds2_max_cellname_length,
-    "@brief Get the maximum length of cell names\n"
-    "See \\gds2_max_cellname_length= method for a description of the maximum cell name length."
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_user_units=", &set_gds2_user_units, gsi::arg ("uu"),
-    "@brief Set the users units to write into the GDS file\n"
-    "\n"
-    "The user units of a GDS file are rarely used and usually are set to 1 (micron).\n"
-    "The intention of the user units is to specify the display units. KLayout ignores the user unit and uses microns as the display unit.\n"
-    "The user unit must be larger than zero.\n"
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_user_units", &get_gds2_user_units,
-    "@brief Get the user units\n"
-    "See \\gds2_user_units= method for a description of the user units."
-    "\nThis property has been added in version 0.18.\n"
-  ),
-  ""
-);
+                   "@brief Sets the maximum number of vertices for polygons to write\n"
+                   "This property describes the maximum number of point for polygons in GDS2 files.\n"
+                   "Polygons with more points will be split.\n"
+                   "The minimum value for this property is 4. The maximum allowed value is about 4000 or 8000, depending on the\n"
+                   "GDS2 interpretation. If \\gds2_multi_xy_records is true, this\n"
+                   "property is not used. Instead, the number of points is unlimited.\n"
+                   "\nThis property has been added in version 0.18.\n") +
+    gsi::method_ext ("gds2_max_vertex_count", &get_gds2_max_vertex_count,
+                     "@brief Gets the maximum number of vertices for polygons to write\n"
+                     "See \\gds2_max_vertex_count= method for a description of the maximum vertex count."
+                     "\nThis property has been added in version 0.18.\n") +
+    gsi::method_ext ("gds2_multi_xy_records=", &set_gds2_multi_xy_records, gsi::arg ("flag"),
+                     "@brief Uses multiple XY records in BOUNDARY elements for unlimited large polygons\n"
+                     "\n"
+                     "Setting this property to true allows producing polygons with an unlimited number of points \n"
+                     "at the cost of incompatible formats. Setting it to true disables the \\gds2_max_vertex_count setting.\n"
+                     "\nThis property has been added in version 0.18.\n") +
+    gsi::method_ext ("gds2_multi_xy_records?", &get_gds2_multi_xy_records,
+                     "@brief Gets the property enabling multiple XY records for BOUNDARY elements\n"
+                     "See \\gds2_multi_xy_records= method for a description of this property."
+                     "\nThis property has been added in version 0.18.\n") +
+    gsi::method_ext ("gds2_resolve_skew_arrays=", &set_gds2_resolve_skew_arrays, gsi::arg ("flag"),
+                     "@brief Resolves skew arrays into single instances\n"
+                     "\n"
+                     "Setting this property to true will make skew (non-orthogonal) arrays being resolved into single instances.\n"
+                     "Skew arrays happen if either the row or column vector isn't parallel to x or y axis. Such arrays can cause problems with "
+                     "some legacy software and can be disabled with this option.\n"
+                     "\nThis property has been added in version 0.27.1.\n") +
+    gsi::method_ext ("gds2_resolve_skew_arrays?", &get_gds2_resolve_skew_arrays,
+                     "@brief Gets a value indicating whether to resolve skew arrays into single instances\n"
+                     "See \\gds2_resolve_skew_arrays= method for a description of this property."
+                     "\nThis property has been added in version 0.27.1.\n") +
+    gsi::method_ext ("gds2_write_timestamps=", &set_gds2_write_timestamps, gsi::arg ("flag"),
+                     "@brief Writes the current time into the GDS2 timestamps if set to true\n"
+                     "\n"
+                     "If this property is set to false, the time fields will all be zero. This somewhat simplifies compare and diff "
+                     "applications.\n"
+                     "\n"
+                     "\nThis property has been added in version 0.21.16.\n") +
+    gsi::method_ext ("gds2_write_timestamps?", &get_gds2_write_timestamps,
+                     "@brief Gets a value indicating whether the current time is written into the GDS2 timestamp fields\n"
+                     "\nThis property has been added in version 0.21.16.\n") +
+    gsi::method_ext ("gds2_default_text_size=", &set_gds2_default_text_size, gsi::arg ("size"),
+                     "@brief Specifies the default text size to use when a text does not have a size\n"
+                     "\n"
+                     "Text object can have no size, e.g. when they are read from OASIS files. Technically such texts\n"
+                     "are represented by text object with a zero size. You can configure the GDS writer to use a specific\n"
+                     "text size in this case. This property specifies the default text size in micrometer units. This\n"
+                     "size can be set to 0 to preserve a zero size in GDS files read.\n"
+                     "\n"
+                     "Set this attribute to nil to disable writing of a text size if none is specified.\n"
+                     "\n"
+                     "\nThis property has been added in version 0.30.4.\n") +
+    gsi::method_ext ("gds2_default_text_size", &get_gds2_default_text_size,
+                     "@brief Gets the default text size to use when a text does not have a size\n"
+                     "\nThis property has been added in version 0.30.4.\n") +
+    gsi::method_ext ("gds2_no_zero_length_paths=", &set_gds2_no_zero_length_paths, gsi::arg ("flag"),
+                     "@brief Eliminates zero-length paths if true\n"
+                     "\n"
+                     "If this property is set to true, paths with zero length will be converted to BOUNDARY objects.\n"
+                     "\n"
+                     "\nThis property has been added in version 0.23.\n") +
+    gsi::method_ext ("gds2_no_zero_length_paths?|#gds2_no_zero_length_paths", &get_gds2_no_zero_length_paths,
+                     "@brief Gets a value indicating whether zero-length paths are eliminated\n"
+                     "\nThis property has been added in version 0.23.\n") +
+    gsi::method_ext ("gds2_write_cell_properties=", &set_gds2_write_cell_properties, gsi::arg ("flag"),
+                     "@brief Enables writing of cell properties if set to true\n"
+                     "\n"
+                     "If this property is set to true, cell properties will be written as PROPATTR/PROPVALUE records immediately "
+                     "following the BGNSTR records. This is a non-standard extension and is therefore disabled by default.\n"
+                     "\n"
+                     "\nThis property has been added in version 0.23.\n") +
+    gsi::method_ext ("gds2_write_cell_properties?|#gds2_write_cell_properties", &get_gds2_write_cell_properties,
+                     "@brief Gets a value indicating whether cell properties are written\n"
+                     "\nThis property has been added in version 0.23.\n") +
+    gsi::method_ext ("gds2_write_file_properties=", &set_gds2_write_file_properties, gsi::arg ("flag"),
+                     "@brief Enables writing of file properties if set to true\n"
+                     "\n"
+                     "If this property is set to true, layout properties will be written as PROPATTR/PROPVALUE records immediately "
+                     "following the BGNLIB records. This is a non-standard extension and is therefore disabled by default.\n"
+                     "\n"
+                     "\nThis property has been added in version 0.24.\n") +
+    gsi::method_ext ("gds2_write_file_properties?|#gds2_write_file_properties", &get_gds2_write_file_properties,
+                     "@brief Gets a value indicating whether layout properties are written\n"
+                     "\nThis property has been added in version 0.24.\n") +
+    gsi::method_ext ("gds2_max_cellname_length=", &set_gds2_max_cellname_length, gsi::arg ("length"),
+                     "@brief Maximum length of cell names\n"
+                     "\n"
+                     "This property describes the maximum number of characters for cell names. \n"
+                     "Longer cell names will be shortened.\n"
+                     "\nThis property has been added in version 0.18.\n") +
+    gsi::method_ext ("gds2_max_cellname_length", &get_gds2_max_cellname_length,
+                     "@brief Get the maximum length of cell names\n"
+                     "See \\gds2_max_cellname_length= method for a description of the maximum cell name length."
+                     "\nThis property has been added in version 0.18.\n") +
+    gsi::method_ext ("gds2_user_units=", &set_gds2_user_units, gsi::arg ("uu"),
+                     "@brief Set the users units to write into the GDS file\n"
+                     "\n"
+                     "The user units of a GDS file are rarely used and usually are set to 1 (micron).\n"
+                     "The intention of the user units is to specify the display units. KLayout ignores the user unit and uses microns as the display unit.\n"
+                     "The user unit must be larger than zero.\n"
+                     "\nThis property has been added in version 0.18.\n") +
+    gsi::method_ext ("gds2_user_units", &get_gds2_user_units,
+                     "@brief Get the user units\n"
+                     "See \\gds2_user_units= method for a description of the user units."
+                     "\nThis property has been added in version 0.18.\n"),
+  "");
 
 // ---------------------------------------------------------------
 //  gsi Implementation of specific methods
@@ -302,46 +280,38 @@ static bool get_gds2_allow_big_records (const db::LoadLayoutOptions *options)
   return options->get_options<db::GDS2ReaderOptions> ().allow_big_records;
 }
 
-//  extend lay::LoadLayoutOptions with the GDS2 options 
-static
-gsi::ClassExt<db::LoadLayoutOptions> gds2_reader_options (
+//  extend lay::LoadLayoutOptions with the GDS2 options
+static gsi::ClassExt<db::LoadLayoutOptions> gds2_reader_options (
   gsi::method_ext ("gds2_box_mode=", &set_gds2_box_mode, gsi::arg ("mode"),
-    "@brief Sets a value specifying how to treat BOX records\n"
-    "This property specifies how BOX records are treated.\n"
-    "Allowed values are 0 (ignore), 1 (treat as rectangles), 2 (treat as boundaries) or 3 (treat as errors). The default is 1.\n"
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_box_mode", &get_gds2_box_mode,
-    "@brief Gets a value specifying how to treat BOX records\n"
-    "See \\gds2_box_mode= method for a description of this mode."
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_allow_multi_xy_records=", &set_gds2_allow_multi_xy_records, gsi::arg ("flag"),
-    "@brief Allows the use of multiple XY records in BOUNDARY elements for unlimited large polygons\n"
-    "\n"
-    "Setting this property to true allows big polygons that span over multiple XY records.\n"
-    "For strict compatibility with the standard, this property should be set to false. The default is true.\n"
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_allow_multi_xy_records?|#gds2_allow_multi_xy_records", &get_gds2_allow_multi_xy_records,
-    "@brief Gets a value specifying whether to allow big polygons with multiple XY records.\n"
-    "See \\gds2_allow_multi_xy_records= method for a description of this property."
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_allow_big_records=", &set_gds2_allow_big_records, gsi::arg ("flag"),
-    "@brief Allows big records with more than 32767 bytes\n"
-    "\n"
-    "Setting this property to true allows larger records by treating the record length as unsigned short, which for example "
-    "allows larger polygons (~8000 points rather than ~4000 points) without using multiple XY records.\n"
-    "For strict compatibility with the standard, this property should be set to false. The default is true.\n"
-    "\nThis property has been added in version 0.18.\n"
-  ) +
-  gsi::method_ext ("gds2_allow_big_records?|#gds2_allow_big_records", &get_gds2_allow_big_records,
-    "@brief Gets a value specifying whether to allow big records with a length of 32768 to 65535 bytes.\n"
-    "See \\gds2_allow_big_records= method for a description of this property."
-    "\nThis property has been added in version 0.18.\n"
-  ),
-  ""
-);
+                   "@brief Sets a value specifying how to treat BOX records\n"
+                   "This property specifies how BOX records are treated.\n"
+                   "Allowed values are 0 (ignore), 1 (treat as rectangles), 2 (treat as boundaries) or 3 (treat as errors). The default is 1.\n"
+                   "\nThis property has been added in version 0.18.\n") +
+    gsi::method_ext ("gds2_box_mode", &get_gds2_box_mode,
+                     "@brief Gets a value specifying how to treat BOX records\n"
+                     "See \\gds2_box_mode= method for a description of this mode."
+                     "\nThis property has been added in version 0.18.\n") +
+    gsi::method_ext ("gds2_allow_multi_xy_records=", &set_gds2_allow_multi_xy_records, gsi::arg ("flag"),
+                     "@brief Allows the use of multiple XY records in BOUNDARY elements for unlimited large polygons\n"
+                     "\n"
+                     "Setting this property to true allows big polygons that span over multiple XY records.\n"
+                     "For strict compatibility with the standard, this property should be set to false. The default is true.\n"
+                     "\nThis property has been added in version 0.18.\n") +
+    gsi::method_ext ("gds2_allow_multi_xy_records?|#gds2_allow_multi_xy_records", &get_gds2_allow_multi_xy_records,
+                     "@brief Gets a value specifying whether to allow big polygons with multiple XY records.\n"
+                     "See \\gds2_allow_multi_xy_records= method for a description of this property."
+                     "\nThis property has been added in version 0.18.\n") +
+    gsi::method_ext ("gds2_allow_big_records=", &set_gds2_allow_big_records, gsi::arg ("flag"),
+                     "@brief Allows big records with more than 32767 bytes\n"
+                     "\n"
+                     "Setting this property to true allows larger records by treating the record length as unsigned short, which for example "
+                     "allows larger polygons (~8000 points rather than ~4000 points) without using multiple XY records.\n"
+                     "For strict compatibility with the standard, this property should be set to false. The default is true.\n"
+                     "\nThis property has been added in version 0.18.\n") +
+    gsi::method_ext ("gds2_allow_big_records?|#gds2_allow_big_records", &get_gds2_allow_big_records,
+                     "@brief Gets a value specifying whether to allow big records with a length of 32768 to 65535 bytes.\n"
+                     "See \\gds2_allow_big_records= method for a description of this property."
+                     "\nThis property has been added in version 0.18.\n"),
+  "");
 
 }

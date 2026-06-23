@@ -25,7 +25,7 @@
 #include "tlUnitTest.h"
 
 
-TEST(1) 
+TEST (1)
 {
   db::Box b (0, 0, 100, 200);
   db::Box empty;
@@ -34,7 +34,7 @@ TEST(1)
   EXPECT_EQ (b.empty (), false);
 }
 
-TEST(2) 
+TEST (2)
 {
   db::Box b (0, 0, 100, 200);
   db::Box empty;
@@ -67,7 +67,7 @@ TEST(2)
   EXPECT_EQ (empty == db::Box (), true);
 }
 
-TEST(3) 
+TEST (3)
 {
   db::Box b (0, 0, 100, 200);
   db::Box empty;
@@ -77,7 +77,7 @@ TEST(3)
   EXPECT_EQ (t * empty, empty);
 }
 
-TEST(4) 
+TEST (4)
 {
   db::Box b (0, 0, 100, 200);
   db::Box empty;
@@ -95,7 +95,7 @@ TEST(4)
   EXPECT_EQ (b.touches (b.moved (db::Vector (10, 10))), true);
 }
 
-TEST(5)
+TEST (5)
 {
   db::Box b (10, 10, 110, 210);
   db::Box empty;
@@ -113,7 +113,7 @@ TEST(5)
   EXPECT_EQ (db::Box (db::Point (110, 210), db::Point (10, 10)).p2 (), db::Point (110, 210));
 }
 
-TEST(6)
+TEST (6)
 {
   db::Box b (10, 10, 110, 210);
   EXPECT_EQ (b.contains (db::Point (50, 50)), true);
@@ -125,7 +125,7 @@ TEST(6)
   EXPECT_EQ (b.contains (db::Point (5, 5)), false);
 }
 
-TEST(7)
+TEST (7)
 {
   db::Box b;
   db::Box bc (0, 1, 2, 3);
@@ -138,7 +138,7 @@ TEST(7)
   EXPECT_EQ (bc.to_string (), s);
 }
 
-TEST(8)
+TEST (8)
 {
   db::Box b (10, 20, 45, 60);
   db::Box bc (0, 1, 2, 3);
@@ -151,7 +151,7 @@ TEST(8)
   EXPECT_EQ (bc.to_string (), s);
 }
 
-TEST(9)
+TEST (9)
 {
   db::DBox b;
   db::DBox bc (0, 1, 2, 3);
@@ -164,7 +164,7 @@ TEST(9)
   EXPECT_EQ (bc.to_string (), s);
 }
 
-TEST(10)
+TEST (10)
 {
   db::Box b (10, 20, 45, 60);
   db::Box bc (0, 1, 2, 3);
@@ -177,7 +177,7 @@ TEST(10)
   EXPECT_EQ (bc.to_string (), s);
 }
 
-TEST(11)
+TEST (11)
 {
   db::Box b;
 
@@ -213,7 +213,7 @@ TEST(11)
   EXPECT_EQ (b.to_string (), "(0,5;0,5)");
 }
 
-TEST(12)
+TEST (12)
 {
   db::DBox b;
 
@@ -249,14 +249,14 @@ TEST(12)
   EXPECT_EQ (b.to_string (), "(0,5;0,5)");
 }
 
-TEST(13)
+TEST (13)
 {
   //  32bit overflow for perimeter
   db::Box b (-1000000000, -1000000000, 1000000000, 1000000000);
   EXPECT_EQ (b.perimeter (), 8000000000.0);
 }
 
-TEST(14)
+TEST (14)
 {
   //  world, specifically with 64bit coordinates and
   //  transfer via double coordinates

@@ -38,8 +38,7 @@ InfoWidget::InfoWidget (QWidget *parent)
 #endif
 }
 
-void 
-InfoWidget::set_image (const QImage &image)
+void InfoWidget::set_image (const QImage &image)
 {
   m_image = image;
 
@@ -51,7 +50,7 @@ InfoWidget::set_image (const QImage &image)
   m_overview_image = image.scaled (QSize (w, h), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 }
 
-QVariant 
+QVariant
 InfoWidget::loadResource (int type, const QUrl &name)
 {
   if (type == QTextDocument::ImageResource && name.isRelative () && name.path () == QString::fromUtf8 ("item.image")) {

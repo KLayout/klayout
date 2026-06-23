@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "QtXmlPatternsMain.h"
-DEFINE_PYMOD(QtXmlPatterns, "QtXmlPatterns", "KLayout/Qt module 'QtXmlPatterns'")
+DEFINE_PYMOD (QtXmlPatterns, "QtXmlPatterns", "KLayout/Qt module 'QtXmlPatterns'")

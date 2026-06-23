@@ -37,7 +37,7 @@ class RNetwork;
  *
  *  The R extractor takes a polyon, a technology definition
  *  and port definitions and extracts a resistor network.
- *  
+ *
  *  Ports are points or polygons that define the connection
  *  points to the network.
  */
@@ -68,4 +68,3 @@ public:
 }
 
 #endif
-

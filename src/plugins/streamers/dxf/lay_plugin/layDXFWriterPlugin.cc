@@ -47,8 +47,7 @@ DXFWriterOptionPage::~DXFWriterOptionPage ()
   mp_ui = 0;
 }
 
-void 
-DXFWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
+void DXFWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
 {
   const db::DXFWriterOptions *options = dynamic_cast<const db::DXFWriterOptions *> (o);
   if (options) {
@@ -56,8 +55,7 @@ DXFWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::
   }
 }
 
-void 
-DXFWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool /*gzip*/)
+void DXFWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool /*gzip*/)
 {
   db::DXFWriterOptions *options = dynamic_cast<db::DXFWriterOptions *> (o);
   if (options) {
@@ -92,4 +90,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::DXFWriterPluginDeclaration (), 10000, "DXFWriter");
 
 }
-

@@ -48,14 +48,14 @@ EnhancedTabBar::EnhancedTabBar (QWidget *parent)
   mp_list_tool_button->setToolButtonStyle (Qt::ToolButtonIconOnly);
   mp_list_tool_button->setToolTip (tr ("List of all opened views"));
 
-  connect (mp_list_tool_button->menu (), SIGNAL (aboutToShow()),
-           this, SLOT (list_tool_button_menu_about_to_show()));
+  connect (mp_list_tool_button->menu (), SIGNAL (aboutToShow ()),
+           this, SLOT (list_tool_button_menu_about_to_show ()));
 
   mp_list_action_group = new QActionGroup (this);
   mp_list_action_group->setExclusive (true);
 
-  connect (mp_list_action_group, SIGNAL (triggered(QAction *)),
-           this, SLOT (list_action_group_triggered(QAction *)));
+  connect (mp_list_action_group, SIGNAL (triggered (QAction *)),
+           this, SLOT (list_action_group_triggered (QAction *)));
 }
 
 EnhancedTabBar::~EnhancedTabBar ()
@@ -94,10 +94,9 @@ void EnhancedTabBar::list_tool_button_menu_about_to_show ()
   }
 }
 
-void EnhancedTabBar::update_list_button_visibility()
+void EnhancedTabBar::update_list_button_visibility ()
 {
   mp_list_tool_button->setVisible (count () > 1);
 }
 
 }
-

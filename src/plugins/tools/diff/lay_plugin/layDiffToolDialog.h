@@ -22,7 +22,6 @@
 
 
 
-
 #ifndef HDR_layDiffToolDialog
 #define HDR_layDiffToolDialog
 
@@ -31,12 +30,12 @@
 
 namespace Ui
 {
-  class DiffToolDialog;
+class DiffToolDialog;
 }
 
 namespace lay
 {
-  class LayoutViewBase;
+class LayoutViewBase;
 }
 
 namespace lay
@@ -51,7 +50,7 @@ extern std::string cfg_diff_exact;
 class DiffToolDialog
   : public QDialog
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   DiffToolDialog (QWidget *parent);
@@ -75,4 +74,3 @@ private:
 }
 
 #endif
-

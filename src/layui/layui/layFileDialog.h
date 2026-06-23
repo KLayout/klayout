@@ -37,24 +37,24 @@ namespace lay
 {
 
 /**
- *  @brief Generic file dialog 
+ *  @brief Generic file dialog
  *
  *  This dialog is provided to encapsulate the Qt file dialog.
  *  This implementation allows staying within a directory even
  *  if the static convenience functions are used. Under Windows,
- *  we need to use the static functions since these use the 
+ *  we need to use the static functions since these use the
  *  system dialogs.
  */
-class LAYUI_PUBLIC FileDialog 
-  : public QObject 
+class LAYUI_PUBLIC FileDialog
+  : public QObject
 {
 public:
   /**
-   *  @brief Instantiate the file dialog 
+   *  @brief Instantiate the file dialog
    *
    *  @param parent The parent object that owns the dialog
    *  @param title The title string
-   *  @param filters The filters as provided for QFileDialog::getOpenFileName 
+   *  @param filters The filters as provided for QFileDialog::getOpenFileName
    *  @param def_suffix The default suffix
    */
   FileDialog (QWidget *parent, const std::string &title, const std::string &filters, const std::string &def_suffix = std::string ());
@@ -87,9 +87,9 @@ public:
   int selected_filter () const;
 
   /**
-   *  @brief Make the file names use UTF8 encoding 
+   *  @brief Make the file names use UTF8 encoding
    *
-   *  TODO: this is a quick hack - basically all 8bit strings should be UTF8 and 
+   *  TODO: this is a quick hack - basically all 8bit strings should be UTF8 and
    *  file names should be handled properly by QString and tl::Stream.
    */
   static void set_utf8 (bool utf);
@@ -116,4 +116,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

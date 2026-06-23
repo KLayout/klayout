@@ -38,12 +38,12 @@
 
 namespace db
 {
-  class Layout;
+class Layout;
 }
 
 namespace tl
 {
-  class GlobPattern;
+class GlobPattern;
 }
 
 namespace lay
@@ -60,18 +60,18 @@ class LayerPropertiesIterator;
 class EmptyWithinViewCache
 {
 public:
-  EmptyWithinViewCache();
+  EmptyWithinViewCache ();
 
-  void clear();
-  bool is_empty_within_view(const db::Layout *layout, unsigned int cell_index, const db::Box &box, unsigned int layer);
+  void clear ();
+  bool is_empty_within_view (const db::Layout *layout, unsigned int cell_index, const db::Box &box, unsigned int layer);
 
 private:
   typedef std::pair<std::pair<const db::Layout *, unsigned int>, db::Box> cache_key_t;
-  typedef std::map<cache_key_t, std::set<unsigned int> > cache_t;
+  typedef std::map<cache_key_t, std::set<unsigned int>> cache_t;
   cache_t m_cache;
   std::vector<bool> m_cells_done;
 
-  void determine_empty_layers(const db::Layout *layout, unsigned int cell_index, const db::Box &box, std::vector<unsigned int> &layers);
+  void determine_empty_layers (const db::Layout *layout, unsigned int cell_index, const db::Box &box, std::vector<unsigned int> &layers);
 };
 
 /**
@@ -84,7 +84,7 @@ private:
 class LAYUI_PUBLIC LayerTreeModel
   : public QAbstractItemModel
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -99,7 +99,7 @@ public:
    */
   ~LayerTreeModel ();
 
-  //  Implementation of the QAbstractItemModel interface 
+  //  Implementation of the QAbstractItemModel interface
   virtual Qt::ItemFlags flags (const QModelIndex &index) const;
   virtual int columnCount (const QModelIndex &) const;
   virtual QVariant data (const QModelIndex &index, int role) const;
@@ -267,7 +267,7 @@ signals:
    */
   void hidden_flags_need_update ();
 
-private: 
+private:
   QWidget *mp_parent;
   lay::LayoutViewBase *mp_view;
   bool m_filter_mode;
@@ -278,9 +278,9 @@ private:
   QFont m_font;
   QColor m_text_color, m_background_color;
   mutable EmptyWithinViewCache m_test_shapes_cache;
-  std::set <size_t> m_selected_ids;
-  std::vector <QModelIndex> m_selected_indexes;
-  std::vector <QModelIndex>::const_iterator m_current_index;
+  std::set<size_t> m_selected_ids;
+  std::vector<QModelIndex> m_selected_indexes;
+  std::vector<QModelIndex>::const_iterator m_current_index;
 
   /**
    *  @brief Get a flag indicating that a layer is empty
@@ -300,4 +300,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

@@ -87,15 +87,15 @@ public:
    *  This level describes how hard the OASIS writer will try to compress the shapes
    *  using shape arrays. Building shape arrays may take some time and requires some memory.
    *    0 - no shape array building
-   *    1 - nearest neighbor shape array formation 
+   *    1 - nearest neighbor shape array formation
    *    2++ - enhanced shape array search algorithm using 2nd and further neighbor distances as well
    */
-  int compression_level; 
+  int compression_level;
 
   /**
    *  @brief Recompressions
    *
-   *  If the recompression flag is true, existing shape arrays will be resolved and 
+   *  If the recompression flag is true, existing shape arrays will be resolved and
    *  put into the compressor again (may take longer).
    */
   bool recompress;
@@ -108,7 +108,7 @@ public:
    */
   bool permissive;
 
-  /** 
+  /**
    *  @brief Implementation of FormatSpecificWriterOptions
    */
   virtual db::FormatSpecificWriterOptions *clone () const

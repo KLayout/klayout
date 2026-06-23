@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "layMain.h"
-DEFINE_PYMOD(laycore, "lay", "KLayout core module 'lay'")
+DEFINE_PYMOD (laycore, "lay", "KLayout core module 'lay'")

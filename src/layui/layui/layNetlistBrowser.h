@@ -35,16 +35,18 @@
 
 namespace Ui
 {
-  class NetlistBrowserConfigPage;
-  class NetlistBrowserConfigPage2;
+class NetlistBrowserConfigPage;
+class NetlistBrowserConfigPage2;
 }
 
 namespace lay
 {
 
-struct NetlistBrowserConfig
-{
-  enum net_window_type { DontChange = 0, FitNet, Center, CenterSize };
+struct NetlistBrowserConfig {
+  enum net_window_type { DontChange = 0,
+                         FitNet,
+                         Center,
+                         CenterSize };
 };
 
 class NetlistBrowserConfigPage
@@ -99,4 +101,4 @@ public:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

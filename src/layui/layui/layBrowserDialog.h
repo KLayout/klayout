@@ -38,15 +38,15 @@ namespace lay
  *  @brief The HTML browser dialog
  *
  *  The HTML browser displays HTML code in a browser panel. It receives the code
- *  by retrieving it from a given URL. 
+ *  by retrieving it from a given URL.
  *  URL's with the special scheme "int" are retrieved from a BrowserSource object.
  *  This will act as a kind of "server" for these URL's.
  */
 class LAYUI_PUBLIC BrowserDialog
-  : public QDialog, 
+  : public QDialog,
     private Ui::BrowserDialog
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   /**
@@ -133,4 +133,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

@@ -45,11 +45,12 @@
 
 KJ_BEGIN_HEADER
 
-namespace kj {
+namespace kj
+{
 
 #if __GNUC__
 
-#define KJ_THREADLOCAL_PTR(type) static __thread type*
+#define KJ_THREADLOCAL_PTR(type) static __thread type *
 // GCC's __thread is lighter-weight than thread_local and is good enough for our purposes.
 //
 // TODO(cleanup): The above comment was written many years ago. Is it still true? Shouldn't the
@@ -57,10 +58,10 @@ namespace kj {
 
 #else
 
-#define KJ_THREADLOCAL_PTR(type) static thread_local type*
+#define KJ_THREADLOCAL_PTR(type) static thread_local type *
 
 #endif // KJ_USE_PTHREAD_TLS
 
-}  // namespace kj
+} // namespace kj
 
 KJ_END_HEADER

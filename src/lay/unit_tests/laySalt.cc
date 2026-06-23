@@ -44,7 +44,7 @@ static std::string grains_to_string (const lay::SaltGrains &gg, bool with_versio
     if (with_version) {
       res += "(";
       res += g->version ();
-      if (!g->url ().empty ()) {
+      if (! g->url ().empty ()) {
         res += ":";
         res += g->url ();
       }
@@ -152,7 +152,7 @@ TEST (1)
 
   gg = lay::SaltGrain ();
   gg.load (tmp);
-  gg.set_path (g.path ());  //  path is not set by load(file)
+  gg.set_path (g.path ()); //  path is not set by load(file)
   EXPECT_EQ (int (gg.dependencies ().size ()), 1);
   EXPECT_EQ (g == gg, true);
 

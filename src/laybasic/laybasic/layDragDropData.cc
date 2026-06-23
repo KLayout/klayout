@@ -41,7 +41,7 @@ const char *drag_drop_mime_type ()
 QMimeData *
 DragDropDataBase::to_mime_data () const
 {
-  QMimeData *mimeData = new QMimeData();
+  QMimeData *mimeData = new QMimeData ();
   mimeData->setData (QString::fromUtf8 (drag_drop_mime_type ()), serialized ());
   return mimeData;
 }
@@ -68,8 +68,7 @@ CellDragDropData::serialized () const
   return data;
 }
 
-bool
-CellDragDropData::deserialize (const QByteArray &ba)
+bool CellDragDropData::deserialize (const QByteArray &ba)
 {
   QDataStream stream (const_cast<QByteArray *> (&ba), QIODevice::ReadOnly);
 
@@ -80,9 +79,9 @@ CellDragDropData::deserialize (const QByteArray &ba)
 
     quintptr p = 0;
     stream >> p;
-    mp_layout = reinterpret_cast <const db::Layout *> (p);
+    mp_layout = reinterpret_cast<const db::Layout *> (p);
     stream >> p;
-    mp_library = reinterpret_cast <const db::Library *> (p);
+    mp_library = reinterpret_cast<const db::Library *> (p);
     stream >> m_cell_index;
     stream >> m_is_pcell;
 
@@ -103,7 +102,6 @@ CellDragDropData::deserialize (const QByteArray &ba)
   } else {
 
     return false;
-
   }
 }
 

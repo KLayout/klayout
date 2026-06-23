@@ -66,7 +66,8 @@ private:
 
 template <class PolygonFilter>
 class polygon_properties_filter
-  : public PolygonFilter, public PropertiesFilter
+  : public PolygonFilter,
+    public PropertiesFilter
 {
 public:
   polygon_properties_filter (const tl::Variant &name, const tl::GlobPattern &pattern, bool inverse)
@@ -75,7 +76,7 @@ public:
     //  .. nothing yet ..
   }
 
-  polygon_properties_filter(const tl::Variant &name, const tl::Variant &value, bool inverse)
+  polygon_properties_filter (const tl::Variant &name, const tl::Variant &value, bool inverse)
     : PropertiesFilter (name, value, inverse)
   {
     //  .. nothing yet ..
@@ -100,7 +101,8 @@ public:
 
 template <class BasicFilter, class ShapeType>
 class generic_properties_filter
-  : public BasicFilter, public PropertiesFilter
+  : public BasicFilter,
+    public PropertiesFilter
 {
 public:
   generic_properties_filter (const tl::Variant &name, const tl::GlobPattern &pattern, bool inverse)

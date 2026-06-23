@@ -46,7 +46,7 @@ CommonReaderBase::make_cell (db::Layout &layout, const std::string &cn)
 {
   tl_assert (! cn.empty ());
 
-  std::map<std::string, std::pair<size_t, db::cell_index_type> >::iterator iname = m_name_map.find (cn);
+  std::map<std::string, std::pair<size_t, db::cell_index_type>>::iterator iname = m_name_map.find (cn);
   if (iname != m_name_map.end ()) {
 
     db::Cell &cell = layout.cell (iname->second.second);
@@ -65,12 +65,10 @@ CommonReaderBase::make_cell (db::Layout &layout, const std::string &cn)
 
     m_name_map [cn] = std::make_pair (null_id, ci);
     return ci;
-
   }
 }
 
-bool
-CommonReaderBase::has_cell (const std::string &cn) const
+bool CommonReaderBase::has_cell (const std::string &cn) const
 {
   return m_name_map.find (cn) != m_name_map.end ();
 }
@@ -78,7 +76,7 @@ CommonReaderBase::has_cell (const std::string &cn) const
 std::pair<bool, db::cell_index_type>
 CommonReaderBase::cell_by_name (const std::string &cn) const
 {
-  std::map<std::string, std::pair<size_t, db::cell_index_type> >::const_iterator iname = m_name_map.find (cn);
+  std::map<std::string, std::pair<size_t, db::cell_index_type>>::const_iterator iname = m_name_map.find (cn);
   if (iname != m_name_map.end ()) {
     return std::make_pair (true, iname->second.second);
   } else {
@@ -91,7 +89,7 @@ CommonReaderBase::make_cell (db::Layout &layout, size_t id)
 {
   tl_assert (id != null_id);
 
-  std::map<size_t, std::pair<std::string, db::cell_index_type> >::iterator iid = m_id_map.find (id);
+  std::map<size_t, std::pair<std::string, db::cell_index_type>>::iterator iid = m_id_map.find (id);
   if (iid != m_id_map.end ()) {
 
     db::Cell &cell = layout.cell (iid->second.second);
@@ -110,12 +108,10 @@ CommonReaderBase::make_cell (db::Layout &layout, size_t id)
 
     m_id_map [id] = std::make_pair (std::string (), ci);
     return ci;
-
   }
 }
 
-bool
-CommonReaderBase::has_cell (size_t id) const
+bool CommonReaderBase::has_cell (size_t id) const
 {
   return m_id_map.find (id) != m_id_map.end ();
 }
@@ -123,7 +119,7 @@ CommonReaderBase::has_cell (size_t id) const
 std::pair<bool, db::cell_index_type>
 CommonReaderBase::cell_by_id (size_t id) const
 {
-  std::map<size_t, std::pair<std::string, db::cell_index_type> >::const_iterator iid = m_id_map.find (id);
+  std::map<size_t, std::pair<std::string, db::cell_index_type>>::const_iterator iid = m_id_map.find (id);
   if (iid != m_id_map.end ()) {
     return std::make_pair (true, iid->second.second);
   } else {
@@ -143,11 +139,10 @@ CommonReaderBase::name_for_id (size_t id) const
   }
 }
 
-void
-CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string &cn)
+void CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string &cn)
 {
-  std::map<size_t, std::pair<std::string, db::cell_index_type> >::iterator iid = m_id_map.find (id);
-  std::map<std::string, std::pair<size_t, db::cell_index_type> >::iterator iname = m_name_map.find (cn);
+  std::map<size_t, std::pair<std::string, db::cell_index_type>>::iterator iid = m_id_map.find (id);
+  std::map<std::string, std::pair<size_t, db::cell_index_type>>::iterator iname = m_name_map.find (cn);
 
   if (iid != m_id_map.end () && ! iid->second.first.empty () && iid->second.first != cn) {
     common_reader_error (tl::sprintf (tl::to_string (tr ("Cell named %s with ID %ld was already given name %s")), cn, id, iid->second.first));
@@ -165,7 +160,6 @@ CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string 
     rename_cell (layout, id, cn_new);
 
     return;
-
   }
 
   m_name_for_id.insert (std::make_pair (id, cn));
@@ -178,7 +172,6 @@ CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string 
       layout.force_update ();
       merge_cell (layout, iname->second.second, iid->second.second, true, false);
       iid->second.second = iname->second.second;
-
     }
 
     iid->second.first = cn;
@@ -202,7 +195,6 @@ CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string 
 
     m_id_map [id] = std::make_pair (cn, ci);
     m_name_map [cn] = std::make_pair (id, ci);
-
   }
 }
 
@@ -211,7 +203,7 @@ CommonReaderBase::cell_for_instance (db::Layout &layout, size_t id)
 {
   tl_assert (id != null_id);
 
-  std::map<size_t, std::pair<std::string, db::cell_index_type> >::iterator iid = m_id_map.find (id);
+  std::map<size_t, std::pair<std::string, db::cell_index_type>>::iterator iid = m_id_map.find (id);
   if (iid != m_id_map.end ()) {
 
     m_temp_cells.erase (iid->second.second);
@@ -224,7 +216,6 @@ CommonReaderBase::cell_for_instance (db::Layout &layout, size_t id)
 
     m_id_map [id] = std::make_pair (std::string (), ci);
     return ci;
-
   }
 }
 
@@ -233,7 +224,7 @@ CommonReaderBase::cell_for_instance (db::Layout &layout, const std::string &cn)
 {
   tl_assert (! cn.empty ());
 
-  std::map<std::string, std::pair<size_t, db::cell_index_type> >::iterator iname = m_name_map.find (cn);
+  std::map<std::string, std::pair<size_t, db::cell_index_type>>::iterator iname = m_name_map.find (cn);
   if (iname != m_name_map.end ()) {
 
     m_temp_cells.erase (iname->second.second);
@@ -246,12 +237,10 @@ CommonReaderBase::cell_for_instance (db::Layout &layout, const std::string &cn)
 
     m_name_map [cn] = std::make_pair (null_id, ci);
     return ci;
-
   }
 }
 
-void
-CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta, bool no_duplicate_instances)
+void CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta, bool no_duplicate_instances)
 {
   const db::Cell &src_cell = layout.cell (src_cell_index);
   db::Cell &target_cell = layout.cell (target_cell_index);
@@ -288,14 +277,12 @@ CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cel
         target_cell.insert (*i);
       }
     }
-
   }
 
   merge_cell_without_instances (layout, target_cell_index, src_cell_index, with_meta);
 }
 
-void
-CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta)
+void CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta)
 {
   const db::Cell &src_cell = layout.cell (src_cell_index);
   db::Cell &target_cell = layout.cell (target_cell_index);
@@ -325,8 +312,7 @@ CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_ind
   layout.delete_cell (src_cell_index);
 }
 
-void
-CommonReaderBase::start ()
+void CommonReaderBase::start ()
 {
   m_id_map.clear ();
   m_name_map.clear ();
@@ -340,12 +326,11 @@ CommonReaderBase::start ()
   m_layer_names.clear ();
 }
 
-void
-CommonReaderBase::finish (db::Layout &layout)
+void CommonReaderBase::finish (db::Layout &layout)
 {
   bool any_missing = false;
 
-  for (std::map<size_t, std::pair<std::string, db::cell_index_type> >::const_iterator i = m_id_map.begin (); i != m_id_map.end (); ++i) {
+  for (std::map<size_t, std::pair<std::string, db::cell_index_type>>::const_iterator i = m_id_map.begin (); i != m_id_map.end (); ++i) {
     if (i->second.first.empty ()) {
       common_reader_warn (tl::sprintf (tl::to_string (tr ("No cellname defined for cell name id %ld")), i->first));
       any_missing = true;
@@ -359,7 +344,7 @@ CommonReaderBase::finish (db::Layout &layout)
   //  check if we need to resolve conflicts
 
   bool has_conflict = false;
-  for (std::map<std::string, std::pair<size_t, db::cell_index_type> >::const_iterator i = m_name_map.begin (); i != m_name_map.end () && ! has_conflict; ++i) {
+  for (std::map<std::string, std::pair<size_t, db::cell_index_type>>::const_iterator i = m_name_map.begin (); i != m_name_map.end () && ! has_conflict; ++i) {
     has_conflict = layout.cell_by_name (i->first.c_str ()).first;
   }
 
@@ -367,7 +352,7 @@ CommonReaderBase::finish (db::Layout &layout)
 
     //  no conflict - plain rename
 
-    for (std::map<std::string, std::pair<size_t, db::cell_index_type> >::const_iterator i = m_name_map.begin (); i != m_name_map.end (); ++i) {
+    for (std::map<std::string, std::pair<size_t, db::cell_index_type>>::const_iterator i = m_name_map.begin (); i != m_name_map.end (); ++i) {
       layout.rename_cell (i->second.second, i->first.c_str ());
     }
 
@@ -378,11 +363,11 @@ CommonReaderBase::finish (db::Layout &layout)
     layout.force_update ();
 
     std::map<db::cell_index_type, std::string> new_cells;
-    for (std::map<std::string, std::pair<size_t, db::cell_index_type> >::const_iterator i = m_name_map.begin (); i != m_name_map.end (); ++i) {
+    for (std::map<std::string, std::pair<size_t, db::cell_index_type>>::const_iterator i = m_name_map.begin (); i != m_name_map.end (); ++i) {
       new_cells.insert (std::make_pair (i->second.second, i->first));
     }
 
-    std::vector<std::pair<db::cell_index_type, db::cell_index_type> > cells_with_conflict;
+    std::vector<std::pair<db::cell_index_type, db::cell_index_type>> cells_with_conflict;
 
     //  First treat all the cells without conflict
     for (db::Layout::bottom_up_iterator bu = layout.begin_bottom_up (); bu != layout.end_bottom_up (); ++bu) {
@@ -405,11 +390,10 @@ CommonReaderBase::finish (db::Layout &layout)
       } else {
         layout.rename_cell (ci_new, layout.uniquify_cell_name (i->second.c_str ()).c_str ());
       }
-
     }
 
     //  Then treat all the cells with conflict
-    for (std::vector<std::pair<db::cell_index_type, db::cell_index_type> >::const_iterator cc = cells_with_conflict.begin (); cc != cells_with_conflict.end (); ++cc) {
+    for (std::vector<std::pair<db::cell_index_type, db::cell_index_type>>::const_iterator cc = cells_with_conflict.begin (); cc != cells_with_conflict.end (); ++cc) {
 
       db::cell_index_type ci_new = cc->first;
       db::cell_index_type ci_org = cc->second;
@@ -424,7 +408,6 @@ CommonReaderBase::finish (db::Layout &layout)
           //  the current cell, we cannot save the "update()" just by traversing bottom-up.
           layout.force_update ();
           layout.prune_subcells (ci_org);
-
         }
 
         layout.cell (ci_org).clear_shapes ();
@@ -442,11 +425,8 @@ CommonReaderBase::finish (db::Layout &layout)
       } else {
 
         merge_cell (layout, ci_org, ci_new, m_cc_resolution != SkipNewCell, m_cc_resolution == AddToCell);
-
       }
-
     }
-
   }
 
   //  remove temporary cells (some that were "declared" by "rename_cell" but not used by cell_for_instance)
@@ -473,11 +453,8 @@ CommonReaderBase::finish (db::Layout &layout)
         } else {
           layout.copy_layer (i->second, *l);
         }
-
       }
-
     }
-
   }
 
   //  rename layers created before if required
@@ -486,7 +463,7 @@ CommonReaderBase::finish (db::Layout &layout)
 
     const db::LayerProperties &lp = layout.get_properties (*i);
 
-    const tl::interval_map <db::ld_type, std::string> *dtmap = layer_names ().mapped (lp.layer);
+    const tl::interval_map<db::ld_type, std::string> *dtmap = layer_names ().mapped (lp.layer);
     const std::string *name = 0;
     if (dtmap) {
       name = dtmap->mapped (lp.datatype);
@@ -499,24 +476,23 @@ CommonReaderBase::finish (db::Layout &layout)
       layout.set_properties (*i, lpp);
       m_layer_map_out.map (LDPair (lp.layer, lp.datatype), *i, lpp);
     }
-
   }
 }
 
-std::pair <bool, unsigned int>
+std::pair<bool, unsigned int>
 CommonReaderBase::open_dl (db::Layout &layout, const LDPair &dl)
 {
-  std::map<db::LDPair, std::pair <bool, unsigned int> >::const_iterator lc = m_layer_cache.find (dl);
+  std::map<db::LDPair, std::pair<bool, unsigned int>>::const_iterator lc = m_layer_cache.find (dl);
   if (lc != m_layer_cache.end ()) {
     return lc->second;
   } else {
-    std::pair <bool, unsigned int> res = open_dl_uncached (layout, dl);
+    std::pair<bool, unsigned int> res = open_dl_uncached (layout, dl);
     m_layer_cache.insert (std::make_pair (dl, res));
     return res;
   }
 }
 
-std::pair <bool, unsigned int>
+std::pair<bool, unsigned int>
 CommonReaderBase::open_dl_uncached (db::Layout &layout, const LDPair &dl)
 {
   std::set<unsigned int> li = m_layer_map.logical (dl, layout);
@@ -532,7 +508,7 @@ CommonReaderBase::open_dl_uncached (db::Layout &layout, const LDPair &dl)
     lp.datatype = dl.datatype;
 
     //  resolve OASIS name if possible
-    const tl::interval_map <db::ld_type, std::string> *names_dmap = m_layer_names.mapped (dl.layer);
+    const tl::interval_map<db::ld_type, std::string> *names_dmap = m_layer_names.mapped (dl.layer);
     if (names_dmap != 0) {
       const std::string *name = names_dmap->mapped (dl.datatype);
       if (name != 0) {
@@ -566,7 +542,6 @@ CommonReaderBase::open_dl_uncached (db::Layout &layout, const LDPair &dl)
     }
 
     return std::make_pair (true, mmp->second);
-
   }
 }
 
@@ -583,7 +558,7 @@ CommonReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
   init (options);
 
-  tl_assert (!layout.under_construction ());
+  tl_assert (! layout.under_construction ());
 
   layer_map ().prepare (layout);
 
@@ -611,8 +586,7 @@ CommonReader::read (db::Layout &layout)
   return read (layout, db::LoadLayoutOptions ());
 }
 
-void
-CommonReader::init (const LoadLayoutOptions &options)
+void CommonReader::init (const LoadLayoutOptions &options)
 {
   ReaderBase::init (options);
   CommonReaderBase::start ();
@@ -677,15 +651,13 @@ public:
   virtual tl::XMLElementBase *xml_reader_options_element () const
   {
     return new db::ReaderOptionsXMLElement<db::CommonReaderOptions> ("common",
-      tl::make_member (&db::CommonReaderOptions::create_other_layers, "create-other-layers") +
-      tl::make_member (&db::CommonReaderOptions::layer_map, "layer-map") +
-      tl::make_member (&db::CommonReaderOptions::enable_properties, "enable-properties") +
-      tl::make_member (&db::CommonReaderOptions::enable_text_objects, "enable-text-objects")
-    );
+                                                                     tl::make_member (&db::CommonReaderOptions::create_other_layers, "create-other-layers") +
+                                                                       tl::make_member (&db::CommonReaderOptions::layer_map, "layer-map") +
+                                                                       tl::make_member (&db::CommonReaderOptions::enable_properties, "enable-properties") +
+                                                                       tl::make_member (&db::CommonReaderOptions::enable_text_objects, "enable-text-objects"));
   }
 };
 
 static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new CommonFormatDeclaration (), 20, "Common");
 
 }
-

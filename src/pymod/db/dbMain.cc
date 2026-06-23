@@ -32,4 +32,4 @@ static PyObject *db_module_init (const char *pymod_name, const char *mod_name, c
   return module_init (pymod_name, mod_name, mod_description);
 }
 
-DEFINE_PYMOD_WITH_INIT(dbcore, "db", "KLayout core module 'db'", db_module_init)
+DEFINE_PYMOD_WITH_INIT (dbcore, "db", "KLayout core module 'db'", db_module_init)

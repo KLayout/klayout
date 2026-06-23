@@ -30,8 +30,8 @@
 
 namespace tl
 {
-  class Heap;
-  class Variant;
+class Heap;
+class Variant;
 }
 
 namespace gsi
@@ -79,4 +79,3 @@ GSI_PUBLIC bool test_arg (const gsi::ArgType &atype, const tl::Variant &arg, boo
 }
 
 #endif
-

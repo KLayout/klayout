@@ -103,4 +103,3 @@ TEST (2)
   EXPECT_EQ (model->parent (model->index (1, 0, inv2PairIndex)).isValid (), true);
   EXPECT_EQ (model->parent (model->index (1, 0, inv2PairIndex)).internalId () == inv2PairIndex.internalId (), true);
 }
-

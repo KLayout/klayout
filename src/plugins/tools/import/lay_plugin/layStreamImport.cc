@@ -42,12 +42,12 @@ class StreamImportPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  StreamImportPluginDeclaration () 
+  StreamImportPluginDeclaration ()
   {
     //  .. nothing yet ..
   }
-  
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_stream_import_spec, ""));
   }
@@ -107,12 +107,11 @@ public:
         data.setup_importer (&importer);
         ok = true;
         END_PROTECTED
-
       }
 
       if (ok) {
 
-        //  clear selection 
+        //  clear selection
         lay::MainWindow::instance ()->cancel ();
 
         config_root->config_set (cfg_stream_import_spec, data.to_string ());
@@ -121,11 +120,11 @@ public:
         int cv_index = view->active_cellview_index ();
         const lay::CellView &cv = view->cellview (cv_index);
 
-        std::vector <unsigned int> new_layer_ids;
+        std::vector<unsigned int> new_layer_ids;
         importer.read (cv->layout (), cv.cell_index (), new_layer_ids);
 
         //  create the initial layer properties
-        std::vector <lay::ParsedLayerSource> new_layers;
+        std::vector<lay::ParsedLayerSource> new_layers;
         new_layers.reserve (cv->layout ().layers ());
 
         for (unsigned int i = 0; i < new_layer_ids.size (); ++i) {
@@ -140,7 +139,7 @@ public:
         lay::LayerPropertiesList new_props (view->get_properties ());
 
         //  create the layers and do a basic recoloring ..
-        for (std::vector <lay::ParsedLayerSource>::const_iterator l = new_layers.begin (); l != new_layers.end (); ++l) {
+        for (std::vector<lay::ParsedLayerSource>::const_iterator l = new_layers.begin (); l != new_layers.end (); ++l) {
           lay::LayerProperties p;
           p.set_source (*l);
           view->init_layer_properties (p);
@@ -153,7 +152,6 @@ public:
 
         config_root->config_set (cfg_stream_import_spec, data.to_string ());
         config_root->config_end ();
-
       }
 
       return true;
@@ -170,4 +168,3 @@ private:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::StreamImportPluginDeclaration (), 1300, "lay::StreamImportPlugin");
 
 }
-

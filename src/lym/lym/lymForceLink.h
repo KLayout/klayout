@@ -32,9 +32,8 @@
 
 namespace lym
 {
-  LYM_PUBLIC int _force_link_f ();
-  static int _force_link_target = _force_link_f ();
+LYM_PUBLIC int _force_link_f ();
+static int _force_link_target = _force_link_f ();
 }
 
 #endif
-

@@ -56,7 +56,7 @@ public:
   {
     m_shapes.push_back (sh);
   }
-  
+
   template <class Iter>
   AnnotationLayerOp (bool insert, Iter from, Iter to)
     : m_insert (insert)
@@ -104,7 +104,7 @@ private:
  *  @brief A collection of DUserObject objects that serves as a container for annotation shapes
  */
 
-class LAYBASIC_PUBLIC AnnotationShapes 
+class LAYBASIC_PUBLIC AnnotationShapes
   : public db::LayoutStateModel,
     public db::Object
 {
@@ -128,7 +128,7 @@ public:
   /**
    *  @brief Dtor: clear all ..
    */
-  ~AnnotationShapes (); 
+  ~AnnotationShapes ();
 
   /**
    *  @brief Copy ctor
@@ -190,7 +190,7 @@ public:
   void reserve (size_t n);
 
   /**
-   *  @brief Erase an element 
+   *  @brief Erase an element
    *
    *  Erases a shape at the given position
    *
@@ -216,19 +216,19 @@ public:
     if (manager () && manager ()->transacting ()) {
       manager ()->queue (this, new AnnotationLayerOp (false /*not insert*/, first, last, true /*dummy*/));
     }
-    invalidate_state ();  //  HINT: must come before the change is done!
+    invalidate_state (); //  HINT: must come before the change is done!
     m_layer.erase_positions (first, last);
   }
 
   /**
-   *  @brief Replace an element at the given position with another shape 
+   *  @brief Replace an element at the given position with another shape
    *
    *  Replaces the element at the position pos with the
    *  new element.
    *
    *  @param pos The position at which to replace the shape
-   *  @param sh The shape to replace 
-   *  
+   *  @param sh The shape to replace
+   *
    *  @return A reference to the object created
    */
   const shape_type &replace (iterator pos, const shape_type &sh);
@@ -239,7 +239,7 @@ public:
   const shape_type &replace (iterator pos, const shape_type &&sh);
 
   /**
-   *  @brief updates the bbox 
+   *  @brief updates the bbox
    *
    *  Updating the bbox is required after insert operations
    *  and is performed only as far as necessary.
@@ -252,7 +252,7 @@ public:
   /**
    *  @brief check if the bounding box needs update
    *
-   *  Returns true if the bounding box of the shapes has changed and 
+   *  Returns true if the bounding box of the shapes has changed and
    *  requires an update.
    */
   bool is_bbox_dirty () const
@@ -261,7 +261,7 @@ public:
   }
 
   /**
-   *  @brief Retrieve the bbox 
+   *  @brief Retrieve the bbox
    *
    *  Retrieving the bbox might required an update_bbox
    *  before the bbox is valid. It will assert if the bbox
@@ -282,9 +282,9 @@ public:
   /**
    *  @brief Do a region search in "touching" mode
    *
-   *  @return The region iterator 
+   *  @return The region iterator
    */
-  layer_type::touching_iterator begin_touching (const box_type &b) const 
+  layer_type::touching_iterator begin_touching (const box_type &b) const
   {
     const_cast<layer_type &> (m_layer).sort (); // ensure the box tree is made
     return m_layer.begin_touching (b);
@@ -293,7 +293,7 @@ public:
   /**
    *  @brief The region iterator end token
    */
-  size_t end_touching () const 
+  size_t end_touching () const
   {
     return 0; // KLUDGE: some shortcut but basically an implementation detail ..
   }
@@ -301,9 +301,9 @@ public:
   /**
    *  @brief Do a region search in "overlapping" mode
    *
-   *  @return The region iterator 
+   *  @return The region iterator
    */
-  layer_type::overlapping_iterator begin_overlapping (const box_type &b) const 
+  layer_type::overlapping_iterator begin_overlapping (const box_type &b) const
   {
     const_cast<layer_type &> (m_layer).sort (); // ensure the box tree is made
     return m_layer.begin_overlapping (b);
@@ -312,7 +312,7 @@ public:
   /**
    *  @brief The region iterator end token
    */
-  size_t end_overlapping () const 
+  size_t end_overlapping () const
   {
     return 0; // KLUDGE: some shortcut but basically an implementation detail ..
   }
@@ -341,7 +341,7 @@ public:
    *  @brief find a given shape (exactly)
    *
    *  @param s The shape to find
-   *  
+   *
    *  @return end(Sh::tag) if the shape was not found, the position otherwise
    */
   layer_type::iterator find (const shape_type &s) const
@@ -360,12 +360,12 @@ public:
     return m_layer.iterator_from_pointer (p);
   }
 
-  /** 
+  /**
    *  @brief Implementation of the redo method
    */
   void redo (db::Op *op);
 
-  /** 
+  /**
    *  @brief Implementation of the undo method
    */
   void undo (db::Op *op);
@@ -398,5 +398,3 @@ inline void mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purp
 }
 
 #endif
-
-

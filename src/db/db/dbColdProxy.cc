@@ -74,16 +74,14 @@ ColdProxy::~ColdProxy ()
   mp_context_info = 0;
 }
 
-void
-ColdProxy::unregister ()
+void ColdProxy::unregister ()
 {
   if (layout ()) {
     layout ()->unregister_cold_proxy (this);
   }
 }
 
-void
-ColdProxy::reregister ()
+void ColdProxy::reregister ()
 {
   if (layout ()) {
     layout ()->register_cold_proxy (this);
@@ -99,7 +97,7 @@ ColdProxy::clone (Layout &layout) const
   return cell;
 }
 
-std::string 
+std::string
 ColdProxy::get_basic_name () const
 {
   if (! mp_context_info->pcell_name.empty ()) {
@@ -151,4 +149,3 @@ ColdProxy::get_qualified_name () const
 }
 
 }
-

@@ -65,20 +65,17 @@ MoveEditorOptionsPage::name () const
   return move_editor_options_name.c_str ();
 }
 
-int
-MoveEditorOptionsPage::order () const
+int MoveEditorOptionsPage::order () const
 {
   return 0;
 }
 
-void
-MoveEditorOptionsPage::deactivated ()
+void MoveEditorOptionsPage::deactivated ()
 {
   hide ();
 }
 
-void
-MoveEditorOptionsPage::commit (lay::Dispatcher *dispatcher)
+void MoveEditorOptionsPage::commit (lay::Dispatcher *dispatcher)
 {
   try {
 
@@ -93,8 +90,7 @@ MoveEditorOptionsPage::commit (lay::Dispatcher *dispatcher)
   }
 }
 
-void
-MoveEditorOptionsPage::configure (const std::string &name, const std::string &value)
+void MoveEditorOptionsPage::configure (const std::string &name, const std::string &value)
 {
   if (name == move_distance_setter_name && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
 
@@ -108,7 +104,6 @@ MoveEditorOptionsPage::configure (const std::string &name, const std::string &va
 
     } catch (...) {
     }
-
   }
 }
 

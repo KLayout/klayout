@@ -24,7 +24,7 @@
 #include "dbCellInstanceSetHasher.h"
 #include "tlUnitTest.h"
 
-TEST(1)
+TEST (1)
 {
   EXPECT_EQ (db::CellInstanceSetHasher::MatrixHash ().to_string (), "(1,0,0) (0,1,0) (0,0,1)");
   EXPECT_EQ (db::CellInstanceSetHasher::MatrixHash (0).to_string (), "(0,0,0) (0,0,0) (0,0,0)");
@@ -57,7 +57,7 @@ TEST(1)
   EXPECT_EQ (db::CellInstanceSetHasher::MatrixHash (hm).to_string (), db::CellInstanceSetHasher::MatrixHash (array).to_string ());
 }
 
-TEST(2)
+TEST (2)
 {
   db::Layout ly;
 
@@ -135,11 +135,10 @@ TEST(2)
 
   EXPECT_EQ (tl::sprintf ("%08lx", hasher3.instance_set_hash (top)), "00004450");
   //  NOTE: C1 hash is not valid as this cell is not selected
-  EXPECT_EQ (tl::sprintf ("%08lx", hasher3.instance_set_hash (c2)), "00000000");  // no path to TOP
+  EXPECT_EQ (tl::sprintf ("%08lx", hasher3.instance_set_hash (c2)), "00000000"); // no path to TOP
   EXPECT_EQ (tl::sprintf ("%08lx", hasher3.instance_set_hash (c3)), "001260aa");
-  EXPECT_EQ (tl::sprintf ("%08lx", hasher3.instance_set_hash (c4a)), "00000000");  // no path to TOP
+  EXPECT_EQ (tl::sprintf ("%08lx", hasher3.instance_set_hash (c4a)), "00000000"); // no path to TOP
   EXPECT_EQ (tl::sprintf ("%08lx", hasher3.instance_set_hash (c4b)), "001270ba");
-  EXPECT_EQ (tl::sprintf ("%08lx", hasher3.instance_set_hash (c5a)), "00000000");  // no path to TOP
-  EXPECT_EQ (tl::sprintf ("%08lx", hasher3.instance_set_hash (c5b)), "0011d5c4");  // != hash of C5A because of 45 degree angle
+  EXPECT_EQ (tl::sprintf ("%08lx", hasher3.instance_set_hash (c5a)), "00000000"); // no path to TOP
+  EXPECT_EQ (tl::sprintf ("%08lx", hasher3.instance_set_hash (c5b)), "0011d5c4"); // != hash of C5A because of 45 degree angle
 }
-

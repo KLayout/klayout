@@ -21,31 +21,31 @@
 */
 
 
-#if !defined(HDR_libCommon_h)
-# define HDR_libCommon_h
+#if ! defined(HDR_libCommon_h)
+#define HDR_libCommon_h
 
-# if defined _WIN32 || defined __CYGWIN__
+#if defined _WIN32 || defined __CYGWIN__
 
-#   ifdef MAKE_LIB_LIBRARY
-#     define LIB_PUBLIC __declspec(dllexport)
-#   else
-#     define LIB_PUBLIC __declspec(dllimport)
-#   endif
-#   define LIB_LOCAL
-#   define LIB_PUBLIC_TEMPLATE
+#ifdef MAKE_LIB_LIBRARY
+#define LIB_PUBLIC __declspec (dllexport)
+#else
+#define LIB_PUBLIC __declspec (dllimport)
+#endif
+#define LIB_LOCAL
+#define LIB_PUBLIC_TEMPLATE
 
-# else
+#else
 
-#   if __GNUC__ >= 4 || defined(__clang__)
-#     define LIB_PUBLIC __attribute__ ((visibility ("default")))
-#     define LIB_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
-#     define LIB_LOCAL  __attribute__ ((visibility ("hidden")))
-#   else
-#     define LIB_PUBLIC
-#     define LIB_PUBLIC_TEMPLATE
-#     define LIB_LOCAL
-#   endif
+#if __GNUC__ >= 4 || defined(__clang__)
+#define LIB_PUBLIC __attribute__ ((visibility ("default")))
+#define LIB_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
+#define LIB_LOCAL __attribute__ ((visibility ("hidden")))
+#else
+#define LIB_PUBLIC
+#define LIB_PUBLIC_TEMPLATE
+#define LIB_LOCAL
+#endif
 
-# endif
+#endif
 
 #endif

@@ -34,7 +34,7 @@ static std::string v2s_2d (const QVector3D &v)
   return tl::to_string (v.x ()) + "," + tl::to_string (v.y ());
 }
 
-TEST(1_CutPoint)
+TEST (1_CutPoint)
 {
   std::pair<bool, QVector3D> r;
 
@@ -50,7 +50,7 @@ TEST(1_CutPoint)
   EXPECT_EQ (v2s (r.second), "1,2,12");
 }
 
-TEST(2_Face)
+TEST (2_Face)
 {
   std::pair<bool, QVector3D> r;
 
@@ -79,7 +79,7 @@ TEST(2_Face)
   EXPECT_EQ (r.first, false);
 }
 
-TEST(3_HitWithCuboid)
+TEST (3_HitWithCuboid)
 {
   std::pair<bool, QVector3D> r;
 
@@ -116,7 +116,7 @@ TEST(3_HitWithCuboid)
   EXPECT_EQ (v2s (r.second), "-1,0,0");
 }
 
-TEST(4_CameraNormal)
+TEST (4_CameraNormal)
 {
   QMatrix4x4 matrix;
   matrix.perspective (60.0f, 1.5, 0.1f, 100.0f);
@@ -152,7 +152,7 @@ TEST(4_CameraNormal)
   EXPECT_EQ (v2s_2d (p), "0,-1");
 }
 
-TEST(5_CameraNormal)
+TEST (5_CameraNormal)
 {
   QMatrix4x4 matrix;
   QVector3D p;
@@ -177,7 +177,7 @@ TEST(5_CameraNormal)
   EXPECT_EQ (v2s_2d (p), "0,1");
 }
 
-TEST(6_NormalizeSceneTrans)
+TEST (6_NormalizeSceneTrans)
 {
   QMatrix4x4 cam;
   cam.perspective (60.0f, 1.5, 0.1f, 100.0f);

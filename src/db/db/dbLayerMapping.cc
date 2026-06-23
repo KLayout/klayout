@@ -40,8 +40,7 @@ void LayerMapping::clear ()
   m_b2a_mapping.clear ();
 }
 
-void 
-LayerMapping::create (const db::Layout &layout_a, const db::Layout &layout_b)
+void LayerMapping::create (const db::Layout &layout_a, const db::Layout &layout_b)
 {
   clear ();
 
@@ -69,11 +68,10 @@ LayerMapping::create (const db::Layout &layout_a, const db::Layout &layout_b)
         }
       }
     }
-
   }
 }
 
-std::vector<unsigned int> 
+std::vector<unsigned int>
 LayerMapping::create_full (db::Layout &layout_a, const db::Layout &layout_b)
 {
   clear ();
@@ -108,16 +106,15 @@ LayerMapping::create_full (db::Layout &layout_a, const db::Layout &layout_b)
         }
       }
     }
-
   }
 
   return new_layers;
 }
 
-std::pair<bool, unsigned int> 
+std::pair<bool, unsigned int>
 LayerMapping::layer_mapping_pair (unsigned int layer_b) const
 {
-  std::map <unsigned int, unsigned int>::const_iterator m = m_b2a_mapping.find (layer_b);
+  std::map<unsigned int, unsigned int>::const_iterator m = m_b2a_mapping.find (layer_b);
   if (m == m_b2a_mapping.end ()) {
     return std::make_pair (false, 0);
   } else {
@@ -125,20 +122,18 @@ LayerMapping::layer_mapping_pair (unsigned int layer_b) const
   }
 }
 
-bool 
-LayerMapping::has_mapping (unsigned int layer_b) const
+bool LayerMapping::has_mapping (unsigned int layer_b) const
 {
-  std::map <unsigned int, unsigned int>::const_iterator m = m_b2a_mapping.find (layer_b);
+  std::map<unsigned int, unsigned int>::const_iterator m = m_b2a_mapping.find (layer_b);
   return (m != m_b2a_mapping.end ());
 }
 
 unsigned int
 LayerMapping::layer_mapping (unsigned int layer_b) const
 {
-  std::map <unsigned int, unsigned int>::const_iterator m = m_b2a_mapping.find (layer_b);
+  std::map<unsigned int, unsigned int>::const_iterator m = m_b2a_mapping.find (layer_b);
   tl_assert (m != m_b2a_mapping.end ());
   return m->second;
 }
 
 }
-

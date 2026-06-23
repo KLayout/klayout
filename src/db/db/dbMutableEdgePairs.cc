@@ -46,8 +46,7 @@ MutableEdgePairs::~MutableEdgePairs ()
   //  .. nothing yet ..
 }
 
-void
-MutableEdgePairs::insert (const db::Shape &shape)
+void MutableEdgePairs::insert (const db::Shape &shape)
 {
   if (shape.is_edge_pair ()) {
     insert (shape.edge_pair ());
@@ -55,4 +54,3 @@ MutableEdgePairs::insert (const db::Shape &shape)
 }
 
 }
-

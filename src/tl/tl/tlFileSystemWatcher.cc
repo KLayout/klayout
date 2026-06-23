@@ -53,8 +53,7 @@ FileSystemWatcher::FileSystemWatcher (QObject *parent)
   m_batch_size = 1000;
 }
 
-void
-FileSystemWatcher::global_enable (bool en)
+void FileSystemWatcher::global_enable (bool en)
 {
   if (en) {
     ++s_global_enable;
@@ -63,8 +62,7 @@ FileSystemWatcher::global_enable (bool en)
   }
 }
 
-void
-FileSystemWatcher::enable (bool en)
+void FileSystemWatcher::enable (bool en)
 {
   if (en) {
     m_timer->start ();
@@ -73,8 +71,7 @@ FileSystemWatcher::enable (bool en)
   }
 }
 
-void
-FileSystemWatcher::clear ()
+void FileSystemWatcher::clear ()
 {
   m_files.clear ();
   m_files_removed.clear ();
@@ -82,14 +79,12 @@ FileSystemWatcher::clear ()
   m_index = 0;
 }
 
-void
-FileSystemWatcher::set_batch_size( size_t n)
+void FileSystemWatcher::set_batch_size (size_t n)
 {
   m_batch_size = n;
 }
 
-void
-FileSystemWatcher::add_file (const std::string &path)
+void FileSystemWatcher::add_file (const std::string &path)
 {
   if (path.empty ()) {
     return;
@@ -124,8 +119,7 @@ FileSystemWatcher::add_file (const std::string &path)
   m_index = 0;
 }
 
-void
-FileSystemWatcher::remove_file (const std::string &path)
+void FileSystemWatcher::remove_file (const std::string &path)
 {
   if (path.empty ()) {
     return;
@@ -144,8 +138,7 @@ FileSystemWatcher::remove_file (const std::string &path)
   }
 }
 
-void
-FileSystemWatcher::timeout ()
+void FileSystemWatcher::timeout ()
 {
   if (s_global_enable < 0) {
     return;
@@ -173,7 +166,7 @@ FileSystemWatcher::timeout ()
       }
 
       // don't drop files that temporarily does not exist - keep them monitored.
-      // This way, programs that delete and write the file will not mess with the 
+      // This way, programs that delete and write the file will not mess with the
       // file watcher.
 #if 0 
       std::map<std::string, FileEntry>::iterator i = m_iter;
@@ -198,11 +191,9 @@ FileSystemWatcher::timeout ()
       m_iter->second.time = time;
 
       ++m_iter;
-
     }
 
     ++m_index;
-
   }
 
   for (std::list<std::string>::const_iterator i = files_removed.begin (); i != files_removed.end (); ++i) {

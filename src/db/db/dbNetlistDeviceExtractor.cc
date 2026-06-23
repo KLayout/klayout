@@ -121,7 +121,6 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layo
 
       //  TODO: maybe use empty layers for optional ones?
       throw tl::Exception (tl::sprintf (tl::to_string (tr ("Missing input layer for device extraction (device %s): %s")), name (), layer_names));
-
     }
 
     tl_assert (l->second != 0);
@@ -145,9 +144,7 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layo
       }
 
       layers.push_back (dr->deep_layer ().layer ());
-
     }
-
   }
 
   extract_without_initialize (dss.layout (layout_index), dss.initial_cell (layout_index), clusters, layers, device_scaling, dss.breakout_cells (layout_index));
@@ -159,10 +156,11 @@ void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const 
   extract_without_initialize (layout, cell, clusters, layers, device_scaling, breakout_cells);
 }
 
-namespace {
+namespace
+{
 
 struct ExtractorCacheValueType {
-  ExtractorCacheValueType () { }
+  ExtractorCacheValueType () {}
   db::Vector disp;
   tl::vector<db::Device *> devices;
 };
@@ -191,7 +189,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
   //  build a cell-id-to-circuit lookup table
   std::map<db::cell_index_type, db::Circuit *> circuits_by_cell;
   for (db::Netlist::circuit_iterator c = m_netlist->begin_circuits (); c != m_netlist->end_circuits (); ++c) {
-    circuits_by_cell.insert (std::make_pair (c->cell_index (), c.operator-> ()));
+    circuits_by_cell.insert (std::make_pair (c->cell_index (), c.operator->()));
   }
 
   //  collect the cells below the top cell
@@ -221,7 +219,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
   size_t n = 0;
   for (std::set<db::cell_index_type>::const_iterator ci = called_cells.begin (); ci != called_cells.end (); ++ci) {
     db::connected_clusters<shape_type> cc = device_clusters.clusters_per_cell (*ci);
-    for (db::connected_clusters<shape_type>::all_iterator c = cc.begin_all (); !c.at_end(); ++c) {
+    for (db::connected_clusters<shape_type>::all_iterator c = cc.begin_all (); ! c.at_end (); ++c) {
       if (cc.is_root (*c)) {
         ++n;
       }
@@ -249,12 +247,11 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
       //  create a new circuit for this cell
       mp_circuit = new db::Circuit (layout, *ci);
       m_netlist->add_circuit (mp_circuit);
-
     }
 
     //  investigate each cluster
     db::connected_clusters<shape_type> cc = device_clusters.clusters_per_cell (*ci);
-    for (db::connected_clusters<shape_type>::all_iterator c = cc.begin_all (); !c.at_end(); ++c) {
+    for (db::connected_clusters<shape_type>::all_iterator c = cc.begin_all (); ! c.at_end (); ++c) {
 
       //  take only root clusters - others have upward connections and are not "whole"
       if (! cc.is_root (*c)) {
@@ -270,7 +267,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
 
       for (std::vector<unsigned int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
         db::Region &r = layer_geometry [l - layers.begin ()];
-        for (db::recursive_cluster_shape_iterator<shape_type> si (device_clusters, *l, *ci, *c); ! si.at_end(); ++si) {
+        for (db::recursive_cluster_shape_iterator<shape_type> si (device_clusters, *l, *ci, *c); ! si.at_end (); ++si) {
           insert_into_region (*si, si.trans (), r);
         }
         r.set_base_verbosity (50);
@@ -304,7 +301,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
           ExtractorCacheValueType &ecv = extractor_cache [layer_geometry];
           ecv.disp = disp;
 
-          for (std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type> >::const_iterator d = m_new_devices.begin (); d != m_new_devices.end (); ++d) {
+          for (std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type>>::const_iterator d = m_new_devices.begin (); d != m_new_devices.end (); ++d) {
             ecv.devices.push_back (d->second.first);
           }
 
@@ -315,7 +312,6 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
           for (auto l = m_log_entries.begin (); l != m_log_entries.end (); ++l) {
             l->set_geometry (l->geometry ().moved (disp_dbu));
           }
-
         }
 
         m_log_entries.splice (m_log_entries.begin (), log_entries);
@@ -325,11 +321,8 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
       } else {
 
         push_cached_devices (ec->second.devices, ec->second.disp, disp);
-
       }
-
     }
-
   }
 }
 
@@ -338,7 +331,7 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
   db::CplxTrans dbu = db::CplxTrans (mp_layout->dbu ());
   db::VCplxTrans dbu_inv = dbu.inverted ();
 
-  for (std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type> >::const_iterator d = m_new_devices.begin (); d != m_new_devices.end (); ++d) {
+  for (std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type>>::const_iterator d = m_new_devices.begin (); d != m_new_devices.end (); ++d) {
 
     db::Device *device = d->second.first;
 
@@ -348,7 +341,7 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
     DeviceCellKey key;
 
     for (geometry_per_terminal_type::const_iterator t = d->second.second.begin (); t != d->second.second.end (); ++t) {
-      std::map<unsigned int, std::set<db::NetShape> > &gt = key.geometry [t->first];
+      std::map<unsigned int, std::set<db::NetShape>> &gt = key.geometry [t->first];
       for (geometry_per_layer_type::const_iterator l = t->second.begin (); l != t->second.end (); ++l) {
         std::set<db::NetShape> &gl = gt [l->first];
         for (std::vector<db::NetShape>::const_iterator p = l->second.begin (); p != l->second.end (); ++p) {
@@ -366,7 +359,7 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
 
     db::PropertiesSet ps;
 
-    std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceAbstract *> >::iterator c = m_device_cells.find (key);
+    std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceAbstract *>>::iterator c = m_device_cells.find (key);
     if (c == m_device_cells.end ()) {
 
       std::string cell_name = "D$" + mp_device_class->name ();
@@ -399,11 +392,8 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
             pr.transform (db::NetShape::trans_type (-disp));
             pr.insert_into (shapes, pi);
           }
-
         }
-
       }
-
     }
 
     //  make the cell index known to the device
@@ -416,7 +406,6 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
 
     db::CellInstArrayWithProperties inst (db::CellInstArray (db::CellInst (c->second.first), db::Trans (disp_cache + disp)), pi);
     mp_layout->cell (m_cell_index).insert (inst);
-
   }
 }
 
@@ -442,7 +431,6 @@ void NetlistDeviceExtractor::push_cached_devices (const tl::vector<db::Device *>
 
     db::CellInstArrayWithProperties inst (db::CellInstArray (db::CellInst (device->device_abstract ()->cell_index ()), db::Trans (new_disp + disp)), pi);
     mp_layout->cell (m_cell_index).insert (inst);
-
   }
 }
 
@@ -489,7 +477,6 @@ void NetlistDeviceExtractor::register_device_class (DeviceClass *device_class)
     mp_device_class->set_name (m_name);
 
     m_netlist->add_device_class (holder.release ());
-
   }
 }
 
@@ -523,11 +510,11 @@ void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id
   tl_assert (geometry_index < m_layers.size ());
   unsigned int layer_index = m_layers [geometry_index];
 
-  std::pair<db::Device *, geometry_per_terminal_type> &dd = m_new_devices[device->id ()];
+  std::pair<db::Device *, geometry_per_terminal_type> &dd = m_new_devices [device->id ()];
   dd.first = device;
-  std::vector<db::NetShape> &geo = dd.second[terminal_id][layer_index];
+  std::vector<db::NetShape> &geo = dd.second [terminal_id][layer_index];
 
-  for (db::Region::const_iterator p = region.begin_merged (); !p.at_end (); ++p) {
+  for (db::Region::const_iterator p = region.begin_merged (); ! p.at_end (); ++p) {
     geo.push_back (db::NetShape (*p, mp_layout->shape_repository ()));
   }
 }
@@ -539,9 +526,9 @@ void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id
   unsigned int layer_index = m_layers [geometry_index];
 
   db::NetShape pr (polygon, mp_layout->shape_repository ());
-  std::pair<db::Device *, geometry_per_terminal_type> &dd = m_new_devices[device->id ()];
+  std::pair<db::Device *, geometry_per_terminal_type> &dd = m_new_devices [device->id ()];
   dd.first = device;
-  dd.second[terminal_id][layer_index].push_back (pr);
+  dd.second [terminal_id][layer_index].push_back (pr);
 }
 
 void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Box &box)

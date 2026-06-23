@@ -26,7 +26,7 @@
 #include "gtfUiDialog.h"
 #include "tlLog.h"
 
-int main (int argc, char *argv[]) 
+int main (int argc, char *argv [])
 {
   int result = 0;
 
@@ -48,8 +48,7 @@ int main (int argc, char *argv[])
 
         tl::info << tl::to_string (QObject::tr ("gtfui [<options>] [<file-au>] [<file-current>]")) << tl::endl
                  << tl::to_string (QObject::tr ("options")) << tl::endl
-                 << tl::to_string (QObject::tr ("  -d <debug level>   Set debug level")) << tl::endl
-                 ;
+                 << tl::to_string (QObject::tr ("  -d <debug level>   Set debug level")) << tl::endl;
         exit (0);
 
       } else if (fn_count == 0) {
@@ -89,6 +88,4 @@ int main (int argc, char *argv[])
   }
 
   return result;
-
 }
-

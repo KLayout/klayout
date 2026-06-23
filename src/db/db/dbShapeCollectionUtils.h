@@ -36,7 +36,8 @@
 
 #include <list>
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief A template base class for a shape processors
@@ -54,19 +55,19 @@ public:
   /**
    *  @brief Constructor
    */
-  shape_collection_processor () { }
+  shape_collection_processor () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~shape_collection_processor () { }
+  virtual ~shape_collection_processor () {}
 
   /**
    *  @brief Performs the actual processing with properties
    *  This method will take the input edge from "shape" and puts the results into "res".
    *  "res" can be empty - in this case, the shape will be skipped.
    */
-  virtual void process (const db::object_with_properties<Shape> &shape, std::vector<db::object_with_properties<Result> > &res) const = 0;
+  virtual void process (const db::object_with_properties<Shape> &shape, std::vector<db::object_with_properties<Result>> &res) const = 0;
 
   /**
    *  @brief Returns the transformation reducer for building cell variants
@@ -107,11 +108,11 @@ template <class Result> struct shape_collection_processor_delivery;
  *  @brief A shape delivery implementation for polygons
  */
 template <>
-struct DB_PUBLIC shape_collection_processor_delivery<db::Polygon>
-{
+struct DB_PUBLIC shape_collection_processor_delivery<db::Polygon> {
   shape_collection_processor_delivery (db::Layout *layout, db::Shapes *shapes)
     : mp_layout (layout), mp_shapes (shapes)
-  { }
+  {
+  }
 
   void put (const db::Polygon &result)
   {
@@ -128,11 +129,11 @@ private:
  *  @brief A shape delivery implementation for polygons with properties
  */
 template <>
-struct DB_PUBLIC shape_collection_processor_delivery<db::PolygonWithProperties>
-{
+struct DB_PUBLIC shape_collection_processor_delivery<db::PolygonWithProperties> {
   shape_collection_processor_delivery (db::Layout *layout, db::Shapes *shapes)
     : mp_layout (layout), mp_shapes (shapes)
-  { }
+  {
+  }
 
   void put (const db::PolygonWithProperties &result)
   {
@@ -149,11 +150,11 @@ private:
  *  @brief A shape delivery implementation for texts
  */
 template <>
-struct DB_PUBLIC shape_collection_processor_delivery<db::Text>
-{
+struct DB_PUBLIC shape_collection_processor_delivery<db::Text> {
   shape_collection_processor_delivery (db::Layout *layout, db::Shapes *shapes)
     : mp_layout (layout), mp_shapes (shapes)
-  { }
+  {
+  }
 
   void put (const db::Text &result)
   {
@@ -170,11 +171,11 @@ private:
  *  @brief A shape delivery implementation for texts with properties
  */
 template <>
-struct DB_PUBLIC shape_collection_processor_delivery<db::TextWithProperties>
-{
+struct DB_PUBLIC shape_collection_processor_delivery<db::TextWithProperties> {
   shape_collection_processor_delivery (db::Layout *layout, db::Shapes *shapes)
     : mp_layout (layout), mp_shapes (shapes)
-  { }
+  {
+  }
 
   void put (const db::TextWithProperties &result)
   {
@@ -191,11 +192,11 @@ private:
  *  @brief A generic delivery
  */
 template <class Result>
-struct DB_PUBLIC shape_collection_processor_delivery
-{
+struct DB_PUBLIC shape_collection_processor_delivery {
   shape_collection_processor_delivery (db::Layout *, db::Shapes *shapes)
     : mp_shapes (shapes)
-  { }
+  {
+  }
 
   void put (const Result &result)
   {
@@ -210,8 +211,7 @@ private:
  *  @brief Provides a generic implementation of the shape collection processor
  */
 template <class Shape, class Result, class OutputContainer>
-DB_PUBLIC_TEMPLATE
-OutputContainer *
+DB_PUBLIC_TEMPLATE OutputContainer *
 shape_collection_processed_impl (const db::DeepLayer &input, const shape_collection_processor<Shape, Result> &filter)
 {
   db::Layout &layout = const_cast<db::Layout &> (input.layout ());
@@ -226,11 +226,10 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
     if (filter.wants_variants ()) {
       vars->separate_variants ();
     }
-
   }
 
-  std::vector<db::object_with_properties<Result> > heap;
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+  std::vector<db::object_with_properties<Result>> heap;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes>> to_commit;
 
   std::unique_ptr<OutputContainer> res (new OutputContainer (input.derived ()));
   if (filter.result_must_not_be_merged ()) {
@@ -248,13 +247,13 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
 
         db::Shapes *st;
         if (vv.size () == 1) {
-          st = & c->shapes (res->deep_layer ().layer ());
+          st = &c->shapes (res->deep_layer ().layer ());
         } else {
-          st = & to_commit [c->cell_index ()] [*v];
+          st = &to_commit [c->cell_index ()][*v];
         }
 
         shape_collection_processor_delivery<Result> delivery (&layout, st);
-        shape_collection_processor_delivery<db::object_with_properties<Result> > delivery_wp (&layout, st);
+        shape_collection_processor_delivery<db::object_with_properties<Result>> delivery_wp (&layout, st);
 
         const db::ICplxTrans &tr = *v;
         db::ICplxTrans trinv = tr.inverted ();
@@ -274,14 +273,13 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
             }
           }
         }
-
       }
 
     } else {
 
       db::Shapes &st = c->shapes (res->deep_layer ().layer ());
       shape_collection_processor_delivery<Result> delivery (&layout, &st);
-      shape_collection_processor_delivery<db::object_with_properties<Result> > delivery_wp (&layout, &st);
+      shape_collection_processor_delivery<db::object_with_properties<Result>> delivery_wp (&layout, &st);
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
         db::object_with_properties<Shape> s;
@@ -297,9 +295,7 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
           }
         }
       }
-
     }
-
   }
 
   if (! to_commit.empty () && vars.get ()) {
@@ -322,11 +318,12 @@ class extents_processor
 public:
   extents_processor (db::Coord dx, db::Coord dy)
     : m_dx (dx), m_dy (dy)
-  { }
+  {
+  }
 
   virtual void process (const db::object_with_properties<Shape> &s, std::vector<db::PolygonWithProperties> &res) const
   {
-    db::box_convert<db::object_with_properties<Shape> > bc;
+    db::box_convert<db::object_with_properties<Shape>> bc;
     db::Box box = bc (s).enlarged (db::Vector (m_dx, m_dy));
     if (! box.empty ()) {
       res.push_back (db::PolygonWithProperties (db::Polygon (box), s.properties_id ()));
@@ -338,9 +335,9 @@ public:
     if (m_dx == 0 && m_dy == 0) {
       return 0;
     } else if (m_dx == m_dy) {
-      return & m_isotropic_reducer;
+      return &m_isotropic_reducer;
     } else {
-      return & m_anisotropic_reducer;
+      return &m_anisotropic_reducer;
     }
   }
 
@@ -358,4 +355,3 @@ private:
 }
 
 #endif
-

@@ -25,8 +25,10 @@
 
 KJ_BEGIN_HEADER
 
-namespace kj {
-namespace _ {  // private
+namespace kj
+{
+namespace _
+{ // private
 
 struct HashCoder {
   // This is a dummy type with only one instance: HASHCODER (below).  To make an arbitrary type
@@ -41,82 +43,87 @@ struct HashCoder {
   // different.  Declaring `operator*` with `HashCoder` as the left operand cannot conflict with
   // anything.
 
-  uint operator*(ArrayPtr<const byte> s) const;
-  inline uint operator*(ArrayPtr<byte> s) const { return operator*(s.asConst()); }
+  uint operator* (ArrayPtr<const byte> s) const;
+  inline uint operator* (ArrayPtr<byte> s) const { return operator* (s.asConst ()); }
 
-  inline uint operator*(ArrayPtr<const char> s) const { return operator*(s.asBytes()); }
-  inline uint operator*(ArrayPtr<char> s) const { return operator*(s.asBytes()); }
-  inline uint operator*(const Array<const char>& s) const { return operator*(s.asBytes()); }
-  inline uint operator*(const Array<char>& s) const { return operator*(s.asBytes()); }
-  inline uint operator*(const String& s) const { return operator*(s.asBytes()); }
-  inline uint operator*(const StringPtr& s) const { return operator*(s.asBytes()); }
-  inline uint operator*(const ConstString& s) const { return operator*(s.asBytes()); }
+  inline uint operator* (ArrayPtr<const char> s) const { return operator* (s.asBytes ()); }
+  inline uint operator* (ArrayPtr<char> s) const { return operator* (s.asBytes ()); }
+  inline uint operator* (const Array<const char> &s) const { return operator* (s.asBytes ()); }
+  inline uint operator* (const Array<char> &s) const { return operator* (s.asBytes ()); }
+  inline uint operator* (const String &s) const { return operator* (s.asBytes ()); }
+  inline uint operator* (const StringPtr &s) const { return operator* (s.asBytes ()); }
+  inline uint operator* (const ConstString &s) const { return operator* (s.asBytes ()); }
 
-  inline uint operator*(decltype(nullptr)) const { return 0; }
-  inline uint operator*(bool b) const { return b; }
-  inline uint operator*(char i) const { return i; }
-  inline uint operator*(signed char i) const { return i; }
-  inline uint operator*(unsigned char i) const { return i; }
-  inline uint operator*(signed short i) const { return i; }
-  inline uint operator*(unsigned short i) const { return i; }
-  inline uint operator*(signed int i) const { return i; }
-  inline uint operator*(unsigned int i) const { return i; }
+  inline uint operator* (decltype (nullptr)) const { return 0; }
+  inline uint operator* (bool b) const { return b; }
+  inline uint operator* (char i) const { return i; }
+  inline uint operator* (signed char i) const { return i; }
+  inline uint operator* (unsigned char i) const { return i; }
+  inline uint operator* (signed short i) const { return i; }
+  inline uint operator* (unsigned short i) const { return i; }
+  inline uint operator* (signed int i) const { return i; }
+  inline uint operator* (unsigned int i) const { return i; }
 
-  inline uint operator*(signed long i) const {
-    if (sizeof(i) == sizeof(uint)) {
-      return operator*(static_cast<uint>(i));
+  inline uint operator* (signed long i) const
+  {
+    if (sizeof (i) == sizeof (uint)) {
+      return operator* (static_cast<uint> (i));
     } else {
-      return operator*(static_cast<unsigned long long>(i));
+      return operator* (static_cast<unsigned long long> (i));
     }
   }
-  inline uint operator*(unsigned long i) const {
-    if (sizeof(i) == sizeof(uint)) {
-      return operator*(static_cast<uint>(i));
+  inline uint operator* (unsigned long i) const
+  {
+    if (sizeof (i) == sizeof (uint)) {
+      return operator* (static_cast<uint> (i));
     } else {
-      return operator*(static_cast<unsigned long long>(i));
+      return operator* (static_cast<unsigned long long> (i));
     }
   }
-  inline uint operator*(signed long long i) const {
-    return operator*(static_cast<unsigned long long>(i));
+  inline uint operator* (signed long long i) const
+  {
+    return operator* (static_cast<unsigned long long> (i));
   }
-  inline uint operator*(unsigned long long i) const {
+  inline uint operator* (unsigned long long i) const
+  {
     // Mix 64 bits to 32 bits in such a way that if our input values differ primarily in the upper
     // 32 bits, we still get good diffusion. (I.e. we cannot just truncate!)
     //
     // 49123 is an arbitrarily-chosen prime that is vaguely close to 2^16.
     //
     // TODO(perf): I just made this up. Is it OK?
-    return static_cast<uint>(i) + static_cast<uint>(i >> 32) * 49123;
+    return static_cast<uint> (i) + static_cast<uint> (i >> 32) * 49123;
   }
 
   template <typename T>
-  uint operator*(T* ptr) const {
-    static_assert(!isSameType<Decay<T>, char>(), "Wrap in StringPtr if you want to hash string "
-        "contents. If you want to hash the pointer, cast to void*");
-    if (sizeof(ptr) == sizeof(uint)) {
+  uint operator* (T *ptr) const
+  {
+    static_assert (! isSameType<Decay<T>, char> (), "Wrap in StringPtr if you want to hash string "
+                                                    "contents. If you want to hash the pointer, cast to void*");
+    if (sizeof (ptr) == sizeof (uint)) {
       // TODO(cleanup): In C++17, make the if() above be `if constexpr ()`, then change this to
       //   reinterpret_cast<uint>(ptr).
-      return reinterpret_cast<unsigned long long>(ptr);
+      return reinterpret_cast<unsigned long long> (ptr);
     } else {
-      return operator*(reinterpret_cast<unsigned long long>(ptr));
+      return operator* (reinterpret_cast<unsigned long long> (ptr));
     }
   }
 
-  template <typename T, typename = decltype(instance<const HashCoder&>() * instance<const T&>())>
-  uint operator*(ArrayPtr<T> arr) const;
-  template <typename T, typename = decltype(instance<const HashCoder&>() * instance<const T&>())>
-  uint operator*(const Array<T>& arr) const;
-  template <typename T, typename = EnableIf<__is_enum(T)>>
-  inline uint operator*(T e) const;
+  template <typename T, typename = decltype (instance<const HashCoder &> () * instance<const T &> ())>
+  uint operator* (ArrayPtr<T> arr) const;
+  template <typename T, typename = decltype (instance<const HashCoder &> () * instance<const T &> ())>
+  uint operator* (const Array<T> &arr) const;
+  template <typename T, typename = EnableIf<__is_enum (T)>>
+  inline uint operator* (T e) const;
 
-  template <typename T, typename Result = decltype(instance<T>().hashCode())>
-  inline Result operator*(T&& value) const { return kj::fwd<T>(value).hashCode(); }
+  template <typename T, typename Result = decltype (instance<T> ().hashCode ())>
+  inline Result operator* (T &&value) const { return kj::fwd<T> (value).hashCode (); }
 };
-static KJ_CONSTEXPR(const) HashCoder HASHCODER = HashCoder();
+static KJ_CONSTEXPR (const) HashCoder HASHCODER = HashCoder ();
 
-}  // namespace _ (private)
+} // namespace _ (private)
 
-#define KJ_HASHCODE(...) operator*(::kj::_::HashCoder, __VA_ARGS__)
+#define KJ_HASHCODE(...) operator* (::kj::_::HashCoder, __VA_ARGS__)
 // Defines a hash function for a custom type.  Example:
 //
 //    class Foo {...};
@@ -128,21 +135,23 @@ static KJ_CONSTEXPR(const) HashCoder HASHCODER = HashCoder();
 // namespace. It can return any type which itself is hashable -- that value will be hashed in turn
 // until a `uint` comes out.
 
-inline uint hashCode(uint value) { return value; }
+inline uint hashCode (uint value) { return value; }
 template <typename T>
-inline uint hashCode(T&& value) { return hashCode(_::HASHCODER * kj::fwd<T>(value)); }
+inline uint hashCode (T &&value) { return hashCode (_::HASHCODER * kj::fwd<T> (value)); }
 template <typename T, size_t N>
-inline uint hashCode(T (&arr)[N]) {
-  static_assert(!isSameType<Decay<T>, char>(), "Wrap in StringPtr if you want to hash string "
-      "contents. If you want to hash the pointer, cast to void*");
-  static_assert(isSameType<Decay<T>, char>(), "Wrap in ArrayPtr if you want to hash a C array. "
-      "If you want to hash the pointer, cast to void*");
+inline uint hashCode (T (&arr) [N])
+{
+  static_assert (! isSameType<Decay<T>, char> (), "Wrap in StringPtr if you want to hash string "
+                                                  "contents. If you want to hash the pointer, cast to void*");
+  static_assert (isSameType<Decay<T>, char> (), "Wrap in ArrayPtr if you want to hash a C array. "
+                                                "If you want to hash the pointer, cast to void*");
   return 0;
 }
 template <typename... T>
-inline uint hashCode(T&&... values) {
-  uint hashes[] = { hashCode(kj::fwd<T>(values))... };
-  return hashCode(kj::ArrayPtr<uint>(hashes).asBytes());
+inline uint hashCode (T &&...values)
+{
+  uint hashes [] = {hashCode (kj::fwd<T> (values))...};
+  return hashCode (kj::ArrayPtr<uint> (hashes).asBytes ());
 }
 // kj::hashCode() is a universal hashing function, like kj::str() is a universal stringification
 // function. Throw stuff in, get a hash code.
@@ -154,20 +163,22 @@ inline uint hashCode(T&&... values) {
 // =======================================================================================
 // inline implementation details
 
-namespace _ {  // private
+namespace _
+{ // private
 
 template <typename T, typename>
-inline uint HashCoder::operator*(ArrayPtr<T> arr) const {
+inline uint HashCoder::operator* (ArrayPtr<T> arr) const
+{
   // Hash each array element to create a string of hashes, then murmur2 over those.
   //
   // TODO(perf): Choose a more-modern hash. (See hash.c++.)
 
   constexpr uint m = 0x5bd1e995;
   constexpr uint r = 24;
-  uint h = arr.size() * sizeof(uint);
+  uint h = arr.size () * sizeof (uint);
 
-  for (auto& e: arr) {
-    uint k = kj::hashCode(e);
+  for (auto &e : arr) {
+    uint k = kj::hashCode (e);
     k *= m;
     k ^= k >> r;
     k *= m;
@@ -181,16 +192,18 @@ inline uint HashCoder::operator*(ArrayPtr<T> arr) const {
   return h;
 }
 template <typename T, typename>
-inline uint HashCoder::operator*(const Array<T>& arr) const {
-  return operator*(arr.asPtr());
+inline uint HashCoder::operator* (const Array<T> &arr) const
+{
+  return operator* (arr.asPtr ());
 }
 
 template <typename T, typename>
-inline uint HashCoder::operator*(T e) const {
-  return operator*(static_cast<__underlying_type(T)>(e));
+inline uint HashCoder::operator* (T e) const
+{
+  return operator* (static_cast<__underlying_type (T)> (e));
 }
 
-}  // namespace _ (private)
+} // namespace _ (private)
 } // namespace kj
 
 KJ_END_HEADER

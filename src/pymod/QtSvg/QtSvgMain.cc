@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "QtSvgMain.h"
-DEFINE_PYMOD(QtSvg, "QtSvg", "KLayout/Qt module 'QtSvg'")
+DEFINE_PYMOD (QtSvg, "QtSvg", "KLayout/Qt module 'QtSvg'")

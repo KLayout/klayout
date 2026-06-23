@@ -15,53 +15,60 @@
 
 CAPNP_BEGIN_HEADER
 
-namespace capnp {
-namespace schemas {
+namespace capnp
+{
+namespace schemas
+{
 
-CAPNP_DECLARE_SCHEMA(f29d05b618de9054);
+CAPNP_DECLARE_SCHEMA (f29d05b618de9054);
 
-}  // namespace schemas
-}  // namespace capnp
+} // namespace schemas
+} // namespace capnp
 
-namespace stream {
-namespace cell {
+namespace stream
+{
+namespace cell
+{
 
 struct Cell {
-  Cell() = delete;
+  Cell () = delete;
 
   class Reader;
   class Builder;
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(f29d05b618de9054, 0, 1)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
+    CAPNP_DECLARE_STRUCT_HEADER (f29d05b618de9054, 0, 1)
+#if ! CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const *brand () { return &schema->defaultBrand; }
+#endif // !CAPNP_LITE
   };
 };
 
 // =======================================================================================
 
-class Cell::Reader {
+class Cell::Reader
+{
 public:
   typedef Cell Reads;
 
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+  Reader () = default;
+  inline explicit Reader (::capnp::_::StructReader base) : _reader (base) {}
 
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
+  inline ::capnp::MessageSize totalSize () const
+  {
+    return _reader.totalSize ().asPublic ();
   }
 
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+#if ! CAPNP_LITE
+  inline ::kj::StringTree toString () const
+  {
+    return ::capnp::_::structString (_reader, *_capnpPrivate::brand ());
   }
-#endif  // !CAPNP_LITE
+#endif // !CAPNP_LITE
 
-  inline bool hasViewIds() const;
-  inline  ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>::Reader getViewIds() const;
+  inline bool hasViewIds () const;
+  inline ::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>::Reader getViewIds () const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -75,29 +82,30 @@ private:
   friend class ::capnp::Orphanage;
 };
 
-class Cell::Builder {
+class Cell::Builder
+{
 public:
   typedef Cell Builds;
 
-  Builder() = delete;  // Deleted to discourage incorrect usage.
+  Builder () = delete; // Deleted to discourage incorrect usage.
                        // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
+  inline Builder (decltype (nullptr)) {}
+  inline explicit Builder (::capnp::_::StructBuilder base) : _builder (base) {}
+  inline operator Reader () const { return Reader (_builder.asReader ()); }
+  inline Reader asReader () const { return *this; }
 
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
+  inline ::capnp::MessageSize totalSize () const { return asReader ().totalSize (); }
+#if ! CAPNP_LITE
+  inline ::kj::StringTree toString () const { return asReader ().toString (); }
+#endif // !CAPNP_LITE
 
-  inline bool hasViewIds();
-  inline  ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>::Builder getViewIds();
-  inline void setViewIds( ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>::Reader value);
-  inline void setViewIds(::kj::ArrayPtr<const  ::uint16_t> value);
-  inline  ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>::Builder initViewIds(unsigned int size);
-  inline void adoptViewIds(::capnp::Orphan< ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>> disownViewIds();
+  inline bool hasViewIds ();
+  inline ::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>::Builder getViewIds ();
+  inline void setViewIds (::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>::Reader value);
+  inline void setViewIds (::kj::ArrayPtr<const ::uint16_t> value);
+  inline ::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>::Builder initViewIds (unsigned int size);
+  inline void adoptViewIds (::capnp::Orphan<::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>> &&value);
+  inline ::capnp::Orphan<::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>> disownViewIds ();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -108,14 +116,15 @@ private:
   friend struct ::capnp::_::PointerHelpers;
 };
 
-#if !CAPNP_LITE
-class Cell::Pipeline {
+#if ! CAPNP_LITE
+class Cell::Pipeline
+{
 public:
   typedef Cell Pipelines;
 
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
+  inline Pipeline (decltype (nullptr)) : _typeless (nullptr) {}
+  inline explicit Pipeline (::capnp::AnyPointer::Pipeline &&typeless)
+    : _typeless (kj::mv (typeless)) {}
 
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
@@ -123,50 +132,64 @@ private:
   template <typename, ::capnp::Kind>
   friend struct ::capnp::ToDynamic_;
 };
-#endif  // !CAPNP_LITE
+#endif // !CAPNP_LITE
 
 // =======================================================================================
 
-inline bool Cell::Reader::hasViewIds() const {
-  return !_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+inline bool Cell::Reader::hasViewIds () const
+{
+  return ! _reader.getPointerField (
+                    ::capnp::bounded<0> () * ::capnp::POINTERS)
+             .isNull ();
 }
-inline bool Cell::Builder::hasViewIds() {
-  return !_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+inline bool Cell::Builder::hasViewIds ()
+{
+  return ! _builder.getPointerField (
+                     ::capnp::bounded<0> () * ::capnp::POINTERS)
+             .isNull ();
 }
-inline  ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>::Reader Cell::Reader::getViewIds() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
+inline ::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>::Reader Cell::Reader::getViewIds () const
+{
+  return ::capnp::_::PointerHelpers<::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>>::get (_reader.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>::Builder Cell::Builder::getViewIds() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
+inline ::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>::Builder Cell::Builder::getViewIds ()
+{
+  return ::capnp::_::PointerHelpers<::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>>::get (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
 }
-inline void Cell::Builder::setViewIds( ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+inline void Cell::Builder::setViewIds (::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>::Reader value)
+{
+  ::capnp::_::PointerHelpers<::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>>::set (_builder.getPointerField (
+                                                                                          ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                                                        value);
 }
-inline void Cell::Builder::setViewIds(::kj::ArrayPtr<const  ::uint16_t> value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+inline void Cell::Builder::setViewIds (::kj::ArrayPtr<const ::uint16_t> value)
+{
+  ::capnp::_::PointerHelpers<::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>>::set (_builder.getPointerField (
+                                                                                          ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                                                        value);
 }
-inline  ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>::Builder Cell::Builder::initViewIds(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
+inline ::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>::Builder Cell::Builder::initViewIds (unsigned int size)
+{
+  return ::capnp::_::PointerHelpers<::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>>::init (_builder.getPointerField (
+                                                                                                  ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                                                                size);
 }
-inline void Cell::Builder::adoptViewIds(
-    ::capnp::Orphan< ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+inline void Cell::Builder::adoptViewIds (
+  ::capnp::Orphan<::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>> &&value)
+{
+  ::capnp::_::PointerHelpers<::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>>::adopt (_builder.getPointerField (
+                                                                                            ::capnp::bounded<0> () * ::capnp::POINTERS),
+                                                                                          kj::mv (value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>> Cell::Builder::disownViewIds() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::uint16_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
+inline ::capnp::Orphan<::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>> Cell::Builder::disownViewIds ()
+{
+  return ::capnp::_::PointerHelpers<::capnp::List<::uint16_t, ::capnp::Kind::PRIMITIVE>>::disown (_builder.getPointerField (
+    ::capnp::bounded<0> () * ::capnp::POINTERS));
 }
 
-}  // namespace
-}  // namespace
+} // namespace
+} // namespace
 
 CAPNP_END_HEADER
-

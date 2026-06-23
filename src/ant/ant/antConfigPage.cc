@@ -54,8 +54,7 @@ ConfigPage::~ConfigPage ()
   mp_ui = 0;
 }
 
-void 
-ConfigPage::setup (lay::Dispatcher *root)
+void ConfigPage::setup (lay::Dispatcher *root)
 {
   //  Snap range
   int snap_range = 0;
@@ -70,8 +69,7 @@ ConfigPage::setup (lay::Dispatcher *root)
   mp_ui->ruler_grid_snap_cbx->setChecked (f);
 }
 
-void 
-ConfigPage::commit (lay::Dispatcher *root)
+void ConfigPage::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_ruler_obj_snap, mp_ui->ruler_obj_snap_cbx->isChecked ());
   root->config_set (cfg_ruler_grid_snap, mp_ui->ruler_grid_snap_cbx->isChecked ());
@@ -100,8 +98,7 @@ ConfigPage2::~ConfigPage2 ()
   mp_ui = 0;
 }
 
-void 
-ConfigPage2::setup (lay::Dispatcher *root)
+void ConfigPage2::setup (lay::Dispatcher *root)
 {
   //  Max. number of rulers
   int max_number_of_rulers = -1;
@@ -123,8 +120,7 @@ ConfigPage2::setup (lay::Dispatcher *root)
   mp_ui->halo_cb->setChecked (halo);
 }
 
-void 
-ConfigPage2::commit (lay::Dispatcher *root)
+void ConfigPage2::commit (lay::Dispatcher *root)
 {
   int mr;
   try {
@@ -154,8 +150,7 @@ ConfigPage3::~ConfigPage3 ()
   mp_ui = 0;
 }
 
-void 
-ConfigPage3::setup (lay::Dispatcher *root)
+void ConfigPage3::setup (lay::Dispatcher *root)
 {
   //  snap mode
   lay::angle_constraint_type rm = lay::AC_Any;
@@ -168,8 +163,7 @@ ConfigPage3::setup (lay::Dispatcher *root)
   mp_ui->ruler_vert_rb->setChecked (rm == lay::AC_Vertical);
 }
 
-void 
-ConfigPage3::commit (lay::Dispatcher *root)
+void ConfigPage3::commit (lay::Dispatcher *root)
 {
   lay::angle_constraint_type rm = lay::AC_Any;
   if (mp_ui->ruler_any_angle_rb->isChecked ()) {
@@ -220,14 +214,13 @@ ConfigPage4::~ConfigPage4 ()
   mp_ui = 0;
 }
 
-void 
-ConfigPage4::setup (lay::Dispatcher *root)
+void ConfigPage4::setup (lay::Dispatcher *root)
 {
   //  templates
   root->config_get (cfg_ruler_templates, m_ruler_templates, TemplatesConverter ());
   m_current_template = 0;
   root->config_get (cfg_current_ruler_template, m_current_template);
-  
+
   //  add one template if the current index is not pointing to a valid one
   if (m_current_template < 0) {
     m_current_template = 0;
@@ -236,23 +229,21 @@ ConfigPage4::setup (lay::Dispatcher *root)
     m_current_template = int (m_ruler_templates.size ());
     m_ruler_templates.push_back (ant::Template ());
   }
-  
+
   update_list ();
   show ();
 }
 
-void 
-ConfigPage4::commit (lay::Dispatcher *root)
+void ConfigPage4::commit (lay::Dispatcher *root)
 {
   commit ();
-  
+
   //  templates
   root->config_set (cfg_ruler_templates, m_ruler_templates, TemplatesConverter ());
   root->config_set (cfg_current_ruler_template, m_current_template);
 }
 
-void 
-ConfigPage4::add_clicked ()
+void ConfigPage4::add_clicked ()
 {
   commit ();
   ant::Template new_one;
@@ -269,10 +260,9 @@ ConfigPage4::add_clicked ()
   double_clicked (0); // to edit the name
 }
 
-void  
-ConfigPage4::del_clicked ()
+void ConfigPage4::del_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (m_current_template >= 0 && m_current_template < int (m_ruler_templates.size ())) {
     if (! m_ruler_templates [m_current_template].category ().empty ()) {
@@ -290,11 +280,10 @@ BEGIN_PROTECTED
     show ();
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-ConfigPage4::up_clicked ()
+void ConfigPage4::up_clicked ()
 {
   if (m_current_template > 0) {
     commit ();
@@ -305,8 +294,7 @@ ConfigPage4::up_clicked ()
   }
 }
 
-void  
-ConfigPage4::down_clicked ()
+void ConfigPage4::down_clicked ()
 {
   if (m_current_template >= 0 && m_current_template < int (m_ruler_templates.size () - 1)) {
     commit ();
@@ -317,12 +305,11 @@ ConfigPage4::down_clicked ()
   }
 }
 
-void 
-ConfigPage4::update_list ()
+void ConfigPage4::update_list ()
 {
   m_current_changed_enabled = false;
   mp_ui->template_list->clear ();
-  for (std::vector <ant::Template>::const_iterator t = m_ruler_templates.begin (); t != m_ruler_templates.end (); ++t) {
+  for (std::vector<ant::Template>::const_iterator t = m_ruler_templates.begin (); t != m_ruler_templates.end (); ++t) {
     mp_ui->template_list->addItem (tl::to_qstring (t->title ()));
     if (! t->category ().empty ()) {
       QListWidgetItem *item = mp_ui->template_list->item (int (t - m_ruler_templates.begin ()));
@@ -335,8 +322,7 @@ ConfigPage4::update_list ()
   m_current_changed_enabled = true;
 }
 
-void  
-ConfigPage4::current_template_changed (int index)
+void ConfigPage4::current_template_changed (int index)
 {
   if (m_current_changed_enabled) {
     commit ();
@@ -345,13 +331,12 @@ ConfigPage4::current_template_changed (int index)
   }
 }
 
-void   
-ConfigPage4::double_clicked (QListWidgetItem *)
+void ConfigPage4::double_clicked (QListWidgetItem *)
 {
   if (m_current_template >= 0 && m_current_template < int (m_ruler_templates.size ())) {
     commit ();
     bool ok = false;
-    QString new_title = QInputDialog::getText (this, 
+    QString new_title = QInputDialog::getText (this,
                                                QObject::tr ("Enter New Title"),
                                                QObject::tr ("New Title"),
                                                QLineEdit::Normal,
@@ -365,13 +350,12 @@ ConfigPage4::double_clicked (QListWidgetItem *)
   }
 }
 
-void 
-ConfigPage4::show ()
+void ConfigPage4::show ()
 {
   mp_ui->fmt_le->setText (tl::to_qstring (m_ruler_templates [m_current_template].fmt ()));
   mp_ui->fmt_x_le->setText (tl::to_qstring (m_ruler_templates [m_current_template].fmt_x ()));
   mp_ui->fmt_y_le->setText (tl::to_qstring (m_ruler_templates [m_current_template].fmt_y ()));
-  
+
   mp_ui->style_cb->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].style ());
   mp_ui->outline_cb->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].outline ());
   mp_ui->t_angle_cb->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].angle_constraint ());
@@ -387,8 +371,7 @@ ConfigPage4::show ()
   mp_ui->ylabel_yalign->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].ylabel_yalign ());
 }
 
-void   
-ConfigPage4::commit ()
+void ConfigPage4::commit ()
 {
   std::string fmt, fmt_x, fmt_y;
   fmt = tl::to_string (mp_ui->fmt_le->text ());
@@ -400,10 +383,10 @@ ConfigPage4::commit ()
 
   ant::Object::style_type style = ant::Object::style_type (mp_ui->style_cb->currentIndex ());
   m_ruler_templates [m_current_template].style (style);
-  
+
   ant::Object::outline_type outline = ant::Object::outline_type (mp_ui->outline_cb->currentIndex ());
   m_ruler_templates [m_current_template].outline (outline);
-  
+
   lay::angle_constraint_type ac = lay::angle_constraint_type (mp_ui->t_angle_cb->currentIndex ());
   m_ruler_templates [m_current_template].angle_constraint (ac);
 

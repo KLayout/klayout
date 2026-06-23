@@ -37,8 +37,7 @@ namespace lay
 /**
  *  @brief A tiny struct describing a native plugin
  */
-struct PluginDescriptor
-{
+struct PluginDescriptor {
   typedef void (*runner_func_t) ();
 
   runner_func_t autorun;
@@ -49,7 +48,8 @@ struct PluginDescriptor
 
   PluginDescriptor ()
     : autorun (0), autorun_early (0)
-  { }
+  {
+  }
 };
 
 /**

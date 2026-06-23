@@ -38,8 +38,8 @@
 
 namespace gsi
 {
-  class ClassBase;
-  class MethodBase;
+class ClassBase;
+class MethodBase;
 }
 
 namespace pya
@@ -76,7 +76,7 @@ public:
   static PYAObjectBase *from_pyobject_unsafe (PyObject *py_object)
   {
     //  the objects must not be a pure static extension
-    return (PYAObjectBase *)((char *) py_object + Py_TYPE (py_object)->tp_basicsize - sizeof (PYAObjectBase));
+    return (PYAObjectBase *) ((char *) py_object + Py_TYPE (py_object)->tp_basicsize - sizeof (PYAObjectBase));
   }
 
   /**
@@ -103,9 +103,9 @@ public:
   /**
    *  @brief Links the Python object with a C++ object
    *  The "owned" attribute indicates that the reference will be owned by the Python object.
-   *  That means that the C++ object is being destroyed when the Python object expires. 
+   *  That means that the C++ object is being destroyed when the Python object expires.
    *  If "const_ref" is true, the Python object is said to be a const object which means
-   *  only const methods can be called on it. That is a somewhat weak emulation for the 
+   *  only const methods can be called on it. That is a somewhat weak emulation for the
    *  constness concept in C++ since there is only one Python object representing multiple
    *  references. If one of these references goes to non-const, the Python object will accept
    *  non-const method calls.
@@ -116,7 +116,7 @@ public:
   /**
    *  @brief Unlinks the C++ object from the Python object
    *  This method can be called to make the Python object cut the link to the C++ object.
-   *  After that operation, the \destroyed attribute will be come true, even though the 
+   *  After that operation, the \destroyed attribute will be come true, even though the
    *  C++ object may not actually be destroyed.
    *  The reference will become invalid.
    */
@@ -125,7 +125,7 @@ public:
   /**
    *  @brief Gets the GSI class object
    */
-  const gsi::ClassBase *cls_decl () const 
+  const gsi::ClassBase *cls_decl () const
   {
     return m_cls_decl;
   }
@@ -136,7 +136,7 @@ public:
    *  the foreign object may expire before the Python object is deleted.
    *  In that case, destroyed becomes true.
    */
-  bool destroyed () const 
+  bool destroyed () const
   {
     return m_destroyed;
   }
@@ -145,7 +145,7 @@ public:
    *  @brief Returns a flag indicating that this Python object is a const reference to a C++ object
    *  See \set for a description of that flag
    */
-  bool const_ref () const 
+  bool const_ref () const
   {
     return m_const_ref;
   }
@@ -154,7 +154,7 @@ public:
    *  @brief Sets a flag indicating that this Python object is a const reference to the C++ object
    *  See \set for a description of that flag.
    */
-  void set_const_ref (bool c) 
+  void set_const_ref (bool c)
   {
     m_const_ref = c;
   }
@@ -186,7 +186,7 @@ public:
    *  @brief Returns true, if the C++ object is owned by the Python object
    *  See \set for details about this flag
    */
-  bool owned () const 
+  bool owned () const
   {
     return m_owned;
   }
@@ -223,10 +223,9 @@ private:
   bool m_const_ref : 1;
   bool m_destroyed : 1;
   bool m_can_destroy : 1;
-  std::map <const gsi::MethodBase *, pya::SignalHandler> m_signal_table;
+  std::map<const gsi::MethodBase *, pya::SignalHandler> m_signal_table;
 };
 
 }
 
 #endif
-

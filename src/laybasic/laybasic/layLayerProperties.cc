@@ -41,7 +41,7 @@ namespace lay
 /**
  *  @brief The brightness correction
  *
- *  The brightness is a logarithmic scaling of the rgb values 
+ *  The brightness is a logarithmic scaling of the rgb values
  *  towards black (x < 0) or white (x > 0). A brightness correction
  *  of 128 reduces the intensity (in case of correction to black)
  *  by a factor of 2, a correction of 256 by a factor of 4.
@@ -55,7 +55,7 @@ LayerProperties::brighter (tl::color_t in, int x)
   if (x == 0) {
     return in;
   }
-  
+
   int r = (in >> 16) & 0xff;
   int g = (in >> 8) & 0xff;
   int b = in & 0xff;
@@ -80,23 +80,23 @@ LayerProperties::brighter (tl::color_t in, int x)
 LayerProperties::LayerProperties ()
   : m_gen_id (0),
     m_frame_color (0),
-    m_frame_color_real (0), 
+    m_frame_color_real (0),
     m_fill_color (0),
     m_fill_color_real (0),
     m_frame_brightness (0),
     m_frame_brightness_real (0),
     m_fill_brightness (0),
     m_fill_brightness_real (0),
-    m_dither_pattern (-1), 
-    m_dither_pattern_real (-1), 
+    m_dither_pattern (-1),
+    m_dither_pattern_real (-1),
     m_line_style (-1),
     m_line_style_real (-1),
     m_valid (true),
     m_valid_real (true),
     m_visible (true),
     m_visible_real (true),
-    m_transparent (false), 
-    m_transparent_real (false), 
+    m_transparent (false),
+    m_transparent_real (false),
     m_width (-1),
     m_width_real (-1),
     m_marked (false),
@@ -117,26 +117,26 @@ LayerProperties::LayerProperties ()
 }
 
 LayerProperties::LayerProperties (const LayerProperties &d)
-  : gsi::ObjectBase (d), 
+  : gsi::ObjectBase (d),
     m_gen_id (0),
-    m_frame_color (0), 
-    m_frame_color_real (0), 
+    m_frame_color (0),
+    m_frame_color_real (0),
     m_fill_color (0),
     m_fill_color_real (0),
     m_frame_brightness (0),
     m_frame_brightness_real (0),
     m_fill_brightness (0),
     m_fill_brightness_real (0),
-    m_dither_pattern (-1), 
-    m_dither_pattern_real (-1), 
+    m_dither_pattern (-1),
+    m_dither_pattern_real (-1),
     m_line_style (-1),
     m_line_style_real (-1),
     m_valid (true),
     m_valid_real (true),
     m_visible (true),
     m_visible_real (true),
-    m_transparent (false), 
-    m_transparent_real (false), 
+    m_transparent (false),
+    m_transparent_real (false),
     m_width (-1),
     m_width_real (-1),
     m_marked (false),
@@ -208,7 +208,6 @@ LayerProperties::operator= (const LayerProperties &d)
     if (flags) {
       need_realize (flags, true /*force on children*/);
     }
-
   }
   return *this;
 }
@@ -218,32 +217,30 @@ LayerProperties::~LayerProperties ()
   //  .. nothing yet ..
 }
 
-bool 
-LayerProperties::operator== (const LayerProperties &d) const
+bool LayerProperties::operator== (const LayerProperties &d) const
 {
   ensure_realized ();
   d.ensure_realized ();
 
   //  do not consider the derived and "real" properties  - these is not really a property
-  return m_frame_color == d.m_frame_color && 
-         m_fill_color == d.m_fill_color && 
+  return m_frame_color == d.m_frame_color &&
+         m_fill_color == d.m_fill_color &&
          m_frame_brightness == d.m_frame_brightness &&
          m_fill_brightness == d.m_fill_brightness &&
-         m_dither_pattern == d.m_dither_pattern && 
+         m_dither_pattern == d.m_dither_pattern &&
          m_line_style == d.m_line_style &&
          m_valid == d.m_valid &&
-         m_visible == d.m_visible && 
-         m_transparent == d.m_transparent && 
+         m_visible == d.m_visible &&
+         m_transparent == d.m_transparent &&
          m_width == d.m_width &&
          m_marked == d.m_marked &&
          m_xfill == d.m_xfill &&
          m_animation == d.m_animation &&
-         m_name == d.m_name && 
+         m_name == d.m_name &&
          m_source == d.m_source;
 }
 
-bool  
-LayerProperties::is_visual () const
+bool LayerProperties::is_visual () const
 {
   return valid (true) && visible (true) && (layer_index () >= 0 || is_cell_box_layer ());
 }
@@ -272,15 +269,14 @@ LayerProperties::eff_fill_color_brighter (bool real, int plus_brightness) const
   return brighter (fill_color (real) & 0xffffff, fill_brightness (real) + plus_brightness);
 }
 
-void
-LayerProperties::merge_visual (const LayerProperties *d) const
+void LayerProperties::merge_visual (const LayerProperties *d) const
 {
-  if (!d || !d->has_frame_color (true)) {
+  if (! d || ! d->has_frame_color (true)) {
     m_frame_color_real = m_frame_color;
   } else {
     m_frame_color_real = d->m_frame_color_real;
   }
-  if (!d || !d->has_fill_color (true)) {
+  if (! d || ! d->has_fill_color (true)) {
     m_fill_color_real = m_fill_color;
   } else {
     m_fill_color_real = d->m_fill_color_real;
@@ -295,20 +291,20 @@ LayerProperties::merge_visual (const LayerProperties *d) const
     m_fill_brightness_real += d->m_fill_brightness_real;
   }
 
-  if (!d || !d->has_dither_pattern (true)) {
+  if (! d || ! d->has_dither_pattern (true)) {
     m_dither_pattern_real = m_dither_pattern;
   } else {
     m_dither_pattern_real = d->m_dither_pattern_real;
   }
 
-  if (!d || !d->has_line_style (true)) {
+  if (! d || ! d->has_line_style (true)) {
     m_line_style_real = m_line_style;
   } else {
     m_line_style_real = d->m_line_style_real;
   }
 
-  m_valid_real = m_valid && (!d || d->m_valid_real);
-  m_visible_real = m_visible && (!d || d->m_visible_real);
+  m_valid_real = m_valid && (! d || d->m_valid_real);
+  m_visible_real = m_visible && (! d || d->m_visible_real);
   m_xfill_real = m_xfill || (d && d->m_xfill_real);
   m_transparent_real = m_transparent || (d && d->m_transparent_real);
   m_marked_real = m_marked || (d && d->m_marked_real);
@@ -324,8 +320,7 @@ LayerProperties::merge_visual (const LayerProperties *d) const
   }
 }
 
-void
-LayerProperties::merge_source (const LayerProperties *d) const
+void LayerProperties::merge_source (const LayerProperties *d) const
 {
   m_source_real = m_source;
   if (d) {
@@ -333,8 +328,7 @@ LayerProperties::merge_source (const LayerProperties *d) const
   }
 }
 
-void
-LayerProperties::ensure_realized () const
+void LayerProperties::ensure_realized () const
 {
   refresh ();
   if (m_realize_needed_source) {
@@ -347,8 +341,7 @@ LayerProperties::ensure_realized () const
   }
 }
 
-void
-LayerProperties::ensure_source_realized () const
+void LayerProperties::ensure_source_realized () const
 {
   refresh ();
   if (m_realize_needed_source) {
@@ -357,8 +350,7 @@ LayerProperties::ensure_source_realized () const
   }
 }
 
-void
-LayerProperties::ensure_visual_realized () const
+void LayerProperties::ensure_visual_realized () const
 {
   refresh ();
   if (m_realize_needed_visual) {
@@ -400,13 +392,13 @@ LayerProperties::flat () const
   return r;
 }
 
-class LayerSourceEval 
+class LayerSourceEval
   : public tl::Eval
 {
 public:
   LayerSourceEval (const lay::LayerProperties &lp, const lay::LayoutViewBase *view, bool real)
     : m_lp (lp), mp_view (view), m_real (real)
-  { 
+  {
     // .. nothing yet ..
   }
 
@@ -436,7 +428,7 @@ public:
     // .. nothing yet ..
   }
 
-  void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+  void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &vv, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
     if (vv.size () != 0) {
       throw tl::EvalError (tl::to_string (tr ("Layer source function must not have arguments")), context);
@@ -508,7 +500,6 @@ LayerProperties::display_string (const lay::LayoutViewBase *view, bool real, boo
         eval.define_function ("T", new LayerSourceEvalFunction ('T', &eval)); // title
 
         ret = eval.interpolate (m_name);
-
       }
 
       if (always_show_source || view->always_show_source ()) {
@@ -527,8 +518,7 @@ LayerProperties::display_string (const lay::LayoutViewBase *view, bool real, boo
   }
 }
 
-void
-LayerProperties::set_xfill (bool xf)
+void LayerProperties::set_xfill (bool xf)
 {
   refresh ();
   if (xf != m_xfill) {
@@ -537,14 +527,12 @@ LayerProperties::set_xfill (bool xf)
   }
 }
 
-void
-LayerProperties::set_source (const std::string &s)
+void LayerProperties::set_source (const std::string &s)
 {
   set_source (lay::ParsedLayerSource (s));
 }
 
-void 
-LayerProperties::set_source (const lay::ParsedLayerSource &s)
+void LayerProperties::set_source (const lay::ParsedLayerSource &s)
 {
   refresh ();
   if (m_source != s) {
@@ -553,33 +541,29 @@ LayerProperties::set_source (const lay::ParsedLayerSource &s)
   }
 }
 
-void
-LayerProperties::realize_visual () const
+void LayerProperties::realize_visual () const
 {
-  //  do as much as we can. The node implementation will provide a 
+  //  do as much as we can. The node implementation will provide a
   //  parent and a view if possible.
   merge_visual (0);
 }
 
-void
-LayerProperties::realize_source () const
+void LayerProperties::realize_source () const
 {
-  //  do as much as we can. The node implementation will provide a 
+  //  do as much as we can. The node implementation will provide a
   //  parent and a view if possible.
   merge_source (0);
   do_realize (0);
 }
 
-void
-LayerProperties::touch ()
+void LayerProperties::touch ()
 {
   if (++m_gen_id == 0) {
     ++m_gen_id;
   }
 }
 
-void
-LayerProperties::need_realize (unsigned int flags, bool /*force*/)
+void LayerProperties::need_realize (unsigned int flags, bool /*force*/)
 {
   touch ();
 
@@ -591,14 +575,12 @@ LayerProperties::need_realize (unsigned int flags, bool /*force*/)
   }
 }
 
-void
-LayerProperties::expanded_state_changed ()
+void LayerProperties::expanded_state_changed ()
 {
   //  .. no effect ..
 }
 
-void 
-LayerProperties::do_realize (const LayoutViewBase *view) const
+void LayerProperties::do_realize (const LayoutViewBase *view) const
 {
   m_layer_index = -1;
   m_cellview_index = -1;
@@ -615,7 +597,7 @@ LayerProperties::do_realize (const LayoutViewBase *view) const
       }
     } else if (m_source_real.cv_index () < int (view->cellviews ())) {
       m_cellview_index = m_source_real.cv_index ();
-    } 
+    }
 
     if (m_cellview_index >= 0) {
 
@@ -637,11 +619,8 @@ LayerProperties::do_realize (const LayoutViewBase *view) const
         if (m_layer_index < 0 && ! m_source_real.is_wildcard_layer ()) {
           m_layer_index = cv->layout ().get_layer_maybe (m_source_real.layer_props ());
         }
-
       }
-
     }
-
   }
 
   if (m_trans.empty ()) {
@@ -702,13 +681,11 @@ LayerPropertiesNode::operator= (const LayerPropertiesNode &d)
     }
 
     need_realize (nr_hierarchy, true);
-
   }
   return *this;
 }
 
-bool 
-LayerPropertiesNode::operator== (const LayerPropertiesNode &d) const
+bool LayerPropertiesNode::operator== (const LayerPropertiesNode &d) const
 {
   if (! LayerProperties::operator== (d)) {
     return false;
@@ -716,13 +693,12 @@ LayerPropertiesNode::operator== (const LayerPropertiesNode &d) const
   return m_children == d.m_children && m_expanded == d.m_expanded;
 }
 
-LayoutViewBase *LayerPropertiesNode::view() const
+LayoutViewBase *LayerPropertiesNode::view () const
 {
   return const_cast<lay::LayoutViewBase *> (mp_view.get ());
 }
 
-void
-LayerPropertiesNode::set_expanded (bool ex)
+void LayerPropertiesNode::set_expanded (bool ex)
 {
   if (expanded () != ex) {
     m_expanded = ex;
@@ -736,8 +712,7 @@ LayerPropertiesNode::list_index () const
   return m_list_index;
 }
 
-void 
-LayerPropertiesNode::realize_visual () const
+void LayerPropertiesNode::realize_visual () const
 {
   //  make sure the parents are realized
   if (mp_parent && mp_parent->realize_needed_visual ()) {
@@ -746,8 +721,7 @@ LayerPropertiesNode::realize_visual () const
   merge_visual (mp_parent.get ());
 }
 
-void 
-LayerPropertiesNode::realize_source () const
+void LayerPropertiesNode::realize_source () const
 {
   //  make sure the parents are realized
   if (mp_parent && mp_parent->realize_needed_source ()) {
@@ -757,14 +731,12 @@ LayerPropertiesNode::realize_source () const
   do_realize (mp_view.get ());
 }
 
-void
-LayerPropertiesNode::expanded_state_changed ()
+void LayerPropertiesNode::expanded_state_changed ()
 {
   touch ();
 }
 
-void
-LayerPropertiesNode::need_realize (unsigned int flags, bool force)
+void LayerPropertiesNode::need_realize (unsigned int flags, bool force)
 {
   LayerProperties::need_realize (flags);
 
@@ -784,10 +756,9 @@ LayerPropertiesNode::need_realize (unsigned int flags, bool force)
   }
 }
 
-void
-LayerPropertiesNode::set_parent (const LayerPropertiesNode *parent)
+void LayerPropertiesNode::set_parent (const LayerPropertiesNode *parent)
 {
-  mp_parent.reset (const_cast<LayerPropertiesNode *>(parent));
+  mp_parent.reset (const_cast<LayerPropertiesNode *> (parent));
 }
 
 db::DBox
@@ -808,7 +779,6 @@ LayerPropertiesNode::overall_bbox () const
       b += (*t * db::CplxTrans (dbu) * cv.context_trans ()) * cv.cell ()->bbox_with_empty ();
     }
     return b;
-
   }
 }
 
@@ -817,7 +787,7 @@ LayerPropertiesNode::bbox () const
 {
   tl_assert (mp_view);
   lay::CellView cv = mp_view->cellview (cellview_index ());
-  
+
   if (! cv.is_valid ()) {
 
     return db::DBox ();
@@ -834,12 +804,10 @@ LayerPropertiesNode::bbox () const
       b += (*t * db::CplxTrans (dbu) * cv.context_trans ()) * cv.cell ()->bbox (layer_index ());
     }
     return b;
-
   }
 }
 
-void 
-LayerPropertiesNode::attach_view (LayoutViewBase *view, unsigned int list_index)
+void LayerPropertiesNode::attach_view (LayoutViewBase *view, unsigned int list_index)
 {
   mp_view.reset (view);
   m_list_index = list_index;
@@ -847,7 +815,7 @@ LayerPropertiesNode::attach_view (LayoutViewBase *view, unsigned int list_index)
   for (iterator c = m_children.begin (); c != m_children.end (); ++c) {
     c->attach_view (view, list_index);
   }
-  //  Attachment of a view is a strong indication that something significant changed - 
+  //  Attachment of a view is a strong indication that something significant changed -
   //  recompute the source specifications on next request.
   m_realize_needed_source = true;
 }
@@ -862,16 +830,14 @@ LayerPropertiesNode::insert_child (const iterator &iter, const LayerPropertiesNo
   return *i;
 }
 
-void 
-LayerPropertiesNode::erase_child (const iterator &iter)
+void LayerPropertiesNode::erase_child (const iterator &iter)
 {
   refresh ();
   m_children.erase (iter);
   need_realize (nr_hierarchy, true);
 }
 
-void 
-LayerPropertiesNode::add_child (const LayerPropertiesNode &child)
+void LayerPropertiesNode::add_child (const LayerPropertiesNode &child)
 {
   refresh ();
   m_children.push_back (child);
@@ -891,7 +857,7 @@ LayerPropertiesConstIterator::LayerPropertiesConstIterator ()
 LayerPropertiesConstIterator::LayerPropertiesConstIterator (const lay::LayerPropertiesNode *node)
   : m_uint (0), m_list ()
 {
-  if (!node) {
+  if (! node) {
     return;
   }
 
@@ -908,14 +874,14 @@ LayerPropertiesConstIterator::LayerPropertiesConstIterator (const lay::LayerProp
         break;
       }
     }
-    if (!found) {
+    if (! found) {
       return;
     }
     child_indexes.push_back (index);
     node = node->parent ();
   }
 
-  if (!node->view ()) {
+  if (! node->view ()) {
     return;
   }
 
@@ -929,7 +895,7 @@ LayerPropertiesConstIterator::LayerPropertiesConstIterator (const lay::LayerProp
         break;
       }
     }
-    if (!found) {
+    if (! found) {
       return;
     }
     child_indexes.push_back (index);
@@ -937,8 +903,8 @@ LayerPropertiesConstIterator::LayerPropertiesConstIterator (const lay::LayerProp
 
   //  unfold the final iterator by recursing down the hierarchy path
 
-  lay::LayerPropertiesConstIterator iter = node->view()->begin_layers ();
-  while (!child_indexes.empty () && !iter.at_end () && !iter.is_null ()) {
+  lay::LayerPropertiesConstIterator iter = node->view ()->begin_layers ();
+  while (! child_indexes.empty () && ! iter.at_end () && ! iter.is_null ()) {
     iter.to_sibling (child_indexes.back ());
     child_indexes.pop_back ();
     if (! child_indexes.empty ()) {
@@ -950,7 +916,7 @@ LayerPropertiesConstIterator::LayerPropertiesConstIterator (const lay::LayerProp
 }
 
 LayerPropertiesConstIterator::LayerPropertiesConstIterator (const LayerPropertiesList &list, bool last)
-    //  NOTE: there should be some "const_weak_ptr"
+  //  NOTE: there should be some "const_weak_ptr"
   : m_uint (0), m_list (const_cast<LayerPropertiesList *> (&list))
 {
   if (last) {
@@ -961,7 +927,7 @@ LayerPropertiesConstIterator::LayerPropertiesConstIterator (const LayerPropertie
 }
 
 LayerPropertiesConstIterator::LayerPropertiesConstIterator (const LayerPropertiesList &list, size_t uint)
-    //  NOTE: there should be some "const_weak_ptr"
+  //  NOTE: there should be some "const_weak_ptr"
   : m_uint (uint), m_list (const_cast<LayerPropertiesList *> (&list))
 {
   //  .. nothing yet ..
@@ -984,8 +950,7 @@ LayerPropertiesConstIterator::operator= (const LayerPropertiesConstIterator &d)
   return *this;
 }
 
-bool 
-LayerPropertiesConstIterator::operator< (const LayerPropertiesConstIterator &d) const
+bool LayerPropertiesConstIterator::operator< (const LayerPropertiesConstIterator &d) const
 {
   tl_assert (m_list);
   tl_assert (m_list == d.m_list);
@@ -996,7 +961,7 @@ LayerPropertiesConstIterator::operator< (const LayerPropertiesConstIterator &d) 
     return false;
   }
 
-  if (!m_list) {
+  if (! m_list) {
     return false;
   }
 
@@ -1014,8 +979,8 @@ LayerPropertiesConstIterator::operator< (const LayerPropertiesConstIterator &d) 
     if (uint == 0 || duint == 0) {
       return uint < duint;
     }
-    n = ((iter[rem - 1].end_children () - iter[rem - 1].begin_children ()) + 2);
-    iter = iter[rem - 1].begin_children ();
+    n = ((iter [rem - 1].end_children () - iter [rem - 1].begin_children ()) + 2);
+    iter = iter [rem - 1].begin_children ();
   }
 }
 
@@ -1023,7 +988,7 @@ std::pair<size_t, size_t>
 LayerPropertiesConstIterator::factor () const
 {
   tl_assert (m_list);
-  
+
   //  with this definition, the 0 iterator can act as the "root"
   if (m_uint == 0) {
     return std::make_pair (size_t (1), size_t (1));
@@ -1039,26 +1004,24 @@ LayerPropertiesConstIterator::factor () const
     uint /= n;
     f *= n;
     tl_assert (rem < n - 1 && rem > 0);
-    n = ((iter[rem - 1].end_children () - iter[rem - 1].begin_children ()) + 2);
-    iter = iter[rem - 1].begin_children ();
+    n = ((iter [rem - 1].end_children () - iter [rem - 1].begin_children ()) + 2);
+    iter = iter [rem - 1].begin_children ();
   }
 
   return std::make_pair (f, n);
 }
 
-bool 
-LayerPropertiesConstIterator::at_end () const
+bool LayerPropertiesConstIterator::at_end () const
 {
   if (! m_list) {
     return true;
   } else {
-    std::pair <size_t, size_t> f = factor ();
+    std::pair<size_t, size_t> f = factor ();
     return (m_uint / f.first == f.second - 1);
   }
 }
 
-bool 
-LayerPropertiesConstIterator::at_top () const
+bool LayerPropertiesConstIterator::at_top () const
 {
   tl_assert (m_list);
   return m_uint < size_t ((m_list->end_const () - m_list->begin_const ()) + 2);
@@ -1083,23 +1046,23 @@ LayerPropertiesConstIterator::next_sibling (ptrdiff_t n)
 LayerPropertiesConstIterator &
 LayerPropertiesConstIterator::to_sibling (size_t n)
 {
-  std::pair <size_t, size_t> f = factor ();
+  std::pair<size_t, size_t> f = factor ();
   m_uint = (m_uint % f.first) + (1 + n) * f.first;
   mp_obj.reset (0);
   return *this;
 }
 
-size_t 
+size_t
 LayerPropertiesConstIterator::num_siblings () const
 {
-  std::pair <size_t, size_t> f = factor ();
+  std::pair<size_t, size_t> f = factor ();
   return f.second - 2;
 }
 
 LayerPropertiesConstIterator &
 LayerPropertiesConstIterator::down_first_child ()
 {
-  std::pair <size_t, size_t> f = factor ();
+  std::pair<size_t, size_t> f = factor ();
   m_uint += f.first * f.second;
   mp_obj.reset (0);
   return *this;
@@ -1108,14 +1071,14 @@ LayerPropertiesConstIterator::down_first_child ()
 LayerPropertiesConstIterator &
 LayerPropertiesConstIterator::down_last_child ()
 {
-  std::pair <size_t, size_t> f = factor ();
+  std::pair<size_t, size_t> f = factor ();
   const LayerPropertiesNode *o = obj ();
   m_uint += f.first * f.second * ((o->end_children () - o->begin_children ()) + 1);
   mp_obj.reset (0);
   return *this;
 }
 
-std::pair <const LayerPropertiesNode *, size_t> 
+std::pair<const LayerPropertiesNode *, size_t>
 LayerPropertiesConstIterator::parent_obj () const
 {
   tl_assert (m_list);
@@ -1129,7 +1092,7 @@ LayerPropertiesConstIterator::parent_obj () const
     size_t rem = uint % n;
     tl_assert (rem > 0);
     tl_assert (rem < n - 1);
-    ret = &iter[rem - 1];
+    ret = &iter [rem - 1];
     uint /= n;
     n = ((ret->end_children () - ret->begin_children ()) + 2);
     iter = ret->begin_children ();
@@ -1139,24 +1102,22 @@ LayerPropertiesConstIterator::parent_obj () const
   return std::make_pair (ret, uint - 1);
 }
 
-void
-LayerPropertiesConstIterator::invalidate () 
+void LayerPropertiesConstIterator::invalidate ()
 {
   mp_obj.reset (0);
 
   //  the iterator may be parked at a position behind the last element.
   //  Move one step further in this case.
-  std::pair <size_t, size_t> f = factor ();
-  if (m_uint / f.first >= f.second - 1 && !at_top ()) {
+  std::pair<size_t, size_t> f = factor ();
+  if (m_uint / f.first >= f.second - 1 && ! at_top ()) {
     up ();
     inc (1);
   }
 }
 
-void
-LayerPropertiesConstIterator::set_obj () const
+void LayerPropertiesConstIterator::set_obj () const
 {
-  if (is_null () || !m_list) {
+  if (is_null () || ! m_list) {
 
     mp_obj.reset (0);
 
@@ -1173,17 +1134,15 @@ LayerPropertiesConstIterator::set_obj () const
       tl_assert (rem > 0);
       tl_assert (rem < n - 1);
       uint /= n;
-      n = ((iter[rem - 1].end_children () - iter[rem - 1].begin_children ()) + 2);
-      iter = iter[rem - 1].begin_children ();
+      n = ((iter [rem - 1].end_children () - iter [rem - 1].begin_children ()) + 2);
+      iter = iter [rem - 1].begin_children ();
     }
 
-    mp_obj.reset (const_cast<lay::LayerPropertiesNode *> (&iter[uint - 1]));
-
+    mp_obj.reset (const_cast<lay::LayerPropertiesNode *> (&iter [uint - 1]));
   }
 }
 
-void 
-LayerPropertiesConstIterator::inc (unsigned int d)
+void LayerPropertiesConstIterator::inc (unsigned int d)
 {
   if (d == 0) {
     return;
@@ -1193,7 +1152,7 @@ LayerPropertiesConstIterator::inc (unsigned int d)
       down_first_child ();
     } else {
       while (true) {
-        std::pair <size_t, size_t> f = factor ();
+        std::pair<size_t, size_t> f = factor ();
         m_uint += f.first;
         mp_obj.reset (0);
         if (m_uint / f.first < f.second - 1) {
@@ -1214,10 +1173,10 @@ LayerPropertiesConstIterator::inc (unsigned int d)
   }
 }
 
-size_t 
+size_t
 LayerPropertiesConstIterator::child_index () const
 {
-  std::pair <size_t, size_t> f = factor ();
+  std::pair<size_t, size_t> f = factor ();
   return ((m_uint / f.first) % f.second) - 1;
 }
 
@@ -1227,12 +1186,12 @@ LayerPropertiesConstIterator::child_index () const
 LayerPropertiesList::LayerPropertiesList ()
   : tl::Object (), m_list_index (0)
 {
-  //  .. nothing yet ..  
+  //  .. nothing yet ..
 }
 
 LayerPropertiesList::~LayerPropertiesList ()
 {
-  //  .. nothing yet ..  
+  //  .. nothing yet ..
 }
 
 LayerPropertiesList::LayerPropertiesList (const LayerPropertiesList &d)
@@ -1253,8 +1212,7 @@ LayerPropertiesList::operator= (const LayerPropertiesList &d)
   return *this;
 }
 
-bool 
-LayerPropertiesList::operator== (const LayerPropertiesList &d) const
+bool LayerPropertiesList::operator== (const LayerPropertiesList &d) const
 {
   if (m_dither_pattern != d.m_dither_pattern) {
     return false;
@@ -1265,10 +1223,9 @@ LayerPropertiesList::operator== (const LayerPropertiesList &d) const
   return m_layer_properties == d.m_layer_properties;
 }
 
-void 
-LayerPropertiesList::translate_cv_references (int cv_index)
+void LayerPropertiesList::translate_cv_references (int cv_index)
 {
-  for (LayerPropertiesIterator l = begin_recursive (); !l.at_end (); ++l) {
+  for (LayerPropertiesIterator l = begin_recursive (); ! l.at_end (); ++l) {
     if (l->source (false).cv_index () >= 0) {
       ParsedLayerSource new_source (l->source (false));
       new_source.cv_index (cv_index);
@@ -1292,16 +1249,14 @@ static bool has_cv_ref (const LayerPropertiesNode &node, int cv_ref)
     }
 
     return true;
-
   }
 }
 
-void 
-LayerPropertiesList::remove_cv_references (int cv_index, bool except)
+void LayerPropertiesList::remove_cv_references (int cv_index, bool except)
 {
   std::vector<LayerPropertiesIterator> cv_ref;
 
-  for (LayerPropertiesIterator l = begin_recursive (); !l.at_end (); ++l) {
+  for (LayerPropertiesIterator l = begin_recursive (); ! l.at_end (); ++l) {
     if (has_cv_ref (*l, cv_index) != except) {
       cv_ref.push_back (l);
     }
@@ -1321,7 +1276,7 @@ static bool has_wildcard_layout (const LayerPropertiesNode &node, bool any)
     return node.source (true).cv_index () < 0 && (node.is_cell_box_layer () || node.is_standard_layer ());
 
   } else if (any) {
-  
+
     for (LayerPropertiesNode::const_iterator c = node.begin_children (); c != node.end_children (); ++c) {
       if (has_wildcard_layout (*c, true)) {
         return true;
@@ -1339,7 +1294,6 @@ static bool has_wildcard_layout (const LayerPropertiesNode &node, bool any)
     }
 
     return true;
-
   }
 }
 
@@ -1363,13 +1317,12 @@ static LayerPropertiesNode expand_wildcard_layout (const LayerPropertiesNode &so
         new_node.add_child (expand_wildcard_layout (*l, new_cv_index));
       }
     }
-
   }
 
   return new_node;
 }
 
-static std::vector<LayerPropertiesNode> 
+static std::vector<LayerPropertiesNode>
 expand_wildcard_layers (const LayerPropertiesNode &lp, const LayerPropertiesList &current_props, lay::LayoutViewBase *view, unsigned int list_index)
 {
   std::vector<LayerPropertiesNode> new_props;
@@ -1378,11 +1331,11 @@ expand_wildcard_layers (const LayerPropertiesNode &lp, const LayerPropertiesList
   if (cv_index >= 0 && cv_index < int (view->cellviews ())) {
 
     //  determine the layers not assigned so far.
-    //  NOTE: we use lay::ParsedLayerSource, but in a normalized form that does not 
-    //  include transformations and such. Hence we really figure out which layer is 
+    //  NOTE: we use lay::ParsedLayerSource, but in a normalized form that does not
+    //  include transformations and such. Hence we really figure out which layer is
     //  missing or not.
 
-    std::set <lay::ParsedLayerSource> present;
+    std::set<lay::ParsedLayerSource> present;
     for (LayerPropertiesConstIterator l = current_props.begin_const_recursive (); ! l.at_end (); ++l) {
       if (! l->has_children ()) {
         lay::ParsedLayerSource src = l->source (true /*real*/);
@@ -1392,7 +1345,7 @@ expand_wildcard_layers (const LayerPropertiesNode &lp, const LayerPropertiesList
       }
     }
 
-    std::vector <lay::ParsedLayerSource> actual;
+    std::vector<lay::ParsedLayerSource> actual;
     const db::Layout &layout = view->cellview (cv_index)->layout ();
     for (unsigned int l = 0; l < layout.layers (); ++l) {
       if (layout.is_valid_layer (l)) {
@@ -1402,7 +1355,7 @@ expand_wildcard_layers (const LayerPropertiesNode &lp, const LayerPropertiesList
 
     std::sort (actual.begin (), actual.end ());
 
-    for (std::vector <lay::ParsedLayerSource>::const_iterator a = actual.begin (); a != actual.end (); ++a) {
+    for (std::vector<lay::ParsedLayerSource>::const_iterator a = actual.begin (); a != actual.end (); ++a) {
 
       if (present.find (*a) == present.end ()) {
 
@@ -1410,36 +1363,32 @@ expand_wildcard_layers (const LayerPropertiesNode &lp, const LayerPropertiesList
         lay::LayerPropertiesNode node ((const LayerProperties &) lp);
         node.attach_view (view, list_index);
 
-        //  Build a new ParsedLayerSource combining the transformation, hierarchy levels and 
+        //  Build a new ParsedLayerSource combining the transformation, hierarchy levels and
         //  property selections from the wildcard one and the requested layer source
         lay::ParsedLayerSource src (*a);
         src += lp.source (true /*real*/);
         node.set_source (src);
 
         new_props.push_back (node);
-
       }
-
     }
-
   }
 
   return new_props;
 }
 
-void 
-LayerPropertiesList::append (const LayerPropertiesList &other)
+void LayerPropertiesList::append (const LayerPropertiesList &other)
 {
   {
     lay::DitherPattern dp (other.dither_pattern ());
 
-    std::map <unsigned int, unsigned int> index_map;
+    std::map<unsigned int, unsigned int> index_map;
     dp.merge (dither_pattern (), index_map);
 
     //  remap the dither pattern index
     for (lay::LayerPropertiesIterator l = begin_recursive (); l != end_recursive (); ++l) {
       int dpi = l->dither_pattern (false /*local*/);
-      std::map <unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) dpi);
+      std::map<unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) dpi);
       if (m != index_map.end ()) {
         l->set_dither_pattern (int (m->second));
       }
@@ -1451,13 +1400,13 @@ LayerPropertiesList::append (const LayerPropertiesList &other)
   {
     lay::LineStyles ls (other.line_styles ());
 
-    std::map <unsigned int, unsigned int> index_map;
+    std::map<unsigned int, unsigned int> index_map;
     ls.merge (line_styles (), index_map);
 
     //  remap the line style index
     for (lay::LayerPropertiesIterator l = begin_recursive (); l != end_recursive (); ++l) {
       int lsi = l->line_style (false /*local*/);
-      std::map <unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) lsi);
+      std::map<unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) lsi);
       if (m != index_map.end ()) {
         l->set_line_style (int (m->second));
       }
@@ -1471,8 +1420,7 @@ LayerPropertiesList::append (const LayerPropertiesList &other)
   }
 }
 
-void
-LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_default)
+void LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_default)
 {
   tl_assert (view () != 0);
 
@@ -1482,12 +1430,12 @@ LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_de
     push_back (LayerPropertiesNode ());
   }
 
-  //  Apply cv mapping 
+  //  Apply cv mapping
   if (! map_cv_index.empty ()) {
 
     std::set<int> cvrefs_to_erase;
 
-    for (LayerPropertiesIterator l = begin_recursive (); !l.at_end (); ++l) {
+    for (LayerPropertiesIterator l = begin_recursive (); ! l.at_end (); ++l) {
 
       ParsedLayerSource new_source (l->source (false));
 
@@ -1495,7 +1443,7 @@ LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_de
       if (new_source.cv_index () >= 0) {
         m = map_cv_index.find (new_source.cv_index ());
       }
-      if (m == map_cv_index.end () && !l->has_children ()) {
+      if (m == map_cv_index.end () && ! l->has_children ()) {
         m = map_cv_index.find (-1);
       }
 
@@ -1508,28 +1456,26 @@ LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_de
           l->set_source (new_source);
         }
       }
-
     }
 
     //  erase the items specified to removal (cv mapping to -1)
     for (std::set<int>::const_iterator cv = cvrefs_to_erase.begin (); cv != cvrefs_to_erase.end (); ++cv) {
       remove_cv_references (*cv, false);
     }
-
   }
 
   //  Test if any layer has a wildcard layout spec
   bool lywc = false;
-  for (const_iterator l = begin (); l != end () && !lywc; ++l) {
+  for (const_iterator l = begin (); l != end () && ! lywc; ++l) {
     lywc = has_wildcard_layout (*l, true /*any*/);
   }
 
   if (lywc) {
 
-    //  If that is the case, iterate over all layouts (outer iteration) and create the 
-    //  wildcarded 
+    //  If that is the case, iterate over all layouts (outer iteration) and create the
+    //  wildcarded
 
-    std::vector <lay::LayerPropertiesNode> new_nodes;
+    std::vector<lay::LayerPropertiesNode> new_nodes;
 
     for (unsigned int cv_index = 0; cv_index < view ()->cellviews (); ++cv_index) {
       for (const_iterator l = begin (); l != end (); ++l) {
@@ -1539,7 +1485,7 @@ LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_de
       }
     }
 
-    for (std::vector <lay::LayerPropertiesNode>::const_iterator n = new_nodes.begin (); n != new_nodes.end (); ++n) {
+    for (std::vector<lay::LayerPropertiesNode>::const_iterator n = new_nodes.begin (); n != new_nodes.end (); ++n) {
       push_back (*n);
       back ().attach_view (view (), list_index ());
     }
@@ -1549,7 +1495,7 @@ LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_de
 
     std::vector<LayerPropertiesIterator> expanded;
 
-    for (LayerPropertiesIterator l = begin_recursive (); !l.at_end (); ++l) {
+    for (LayerPropertiesIterator l = begin_recursive (); ! l.at_end (); ++l) {
       if (has_wildcard_layout (*l, false /*all*/)) {
         expanded.push_back (l);
       }
@@ -1560,7 +1506,6 @@ LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_de
     for (std::vector<LayerPropertiesIterator>::const_iterator ll = expanded.begin (); ll != expanded.end (); ++ll) {
       erase (*ll);
     }
-
   }
 
   //  Expand layer wildcard layers
@@ -1568,7 +1513,7 @@ LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_de
   std::vector<LayerPropertiesIterator> lwc;
 
   //  find the wildcard layers
-  for (LayerPropertiesIterator l = begin_recursive (); !l.at_end (); ++l) {
+  for (LayerPropertiesIterator l = begin_recursive (); ! l.at_end (); ++l) {
     if (! l->has_children () && l->source (true).is_wildcard_layer ()) {
       lwc.push_back (l);
     }
@@ -1581,8 +1526,8 @@ LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_de
     LayerPropertiesIterator pos = *ll;
     //  Note: expand_wildcard_layers will recompute the already present layers on every call. Thus, only the
     //  first matching wildcard is effective.
-    std::vector <LayerPropertiesNode> new_nodes = expand_wildcard_layers (*pos, *this, view (), list_index ());
-    for (std::vector <LayerPropertiesNode>::const_iterator n = new_nodes.begin (); n != new_nodes.end (); ++n) {
+    std::vector<LayerPropertiesNode> new_nodes = expand_wildcard_layers (*pos, *this, view (), list_index ());
+    for (std::vector<LayerPropertiesNode>::const_iterator n = new_nodes.begin (); n != new_nodes.end (); ++n) {
       insert (pos, *n);
       pos.next_sibling ();
     }
@@ -1590,9 +1535,9 @@ LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_de
   }
 
   //  Assign default colors and stipples for layers without any ...
-  
+
   int stipple_index = 0;
-  for (LayerPropertiesIterator l = begin_recursive (); !l.at_end (); ++l) {
+  for (LayerPropertiesIterator l = begin_recursive (); ! l.at_end (); ++l) {
 
     if (! l->has_children ()) {
 
@@ -1609,62 +1554,60 @@ LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_de
       }
 
       ++stipple_index;
-
     }
-
   }
 }
 
-LayerPropertiesConstIterator 
+LayerPropertiesConstIterator
 LayerPropertiesList::begin_const_recursive () const
 {
   return LayerPropertiesConstIterator (*this);
 }
 
-LayerPropertiesConstIterator 
+LayerPropertiesConstIterator
 LayerPropertiesList::end_const_recursive () const
 {
   return LayerPropertiesConstIterator (*this, true);
 }
 
-LayerPropertiesIterator 
-LayerPropertiesList::begin_recursive () 
+LayerPropertiesIterator
+LayerPropertiesList::begin_recursive ()
 {
   return LayerPropertiesIterator (*this);
 }
 
-LayerPropertiesIterator 
-LayerPropertiesList::end_recursive () 
+LayerPropertiesIterator
+LayerPropertiesList::end_recursive ()
 {
   return LayerPropertiesIterator (*this, true);
 }
 
-LayerPropertiesList::const_iterator 
+LayerPropertiesList::const_iterator
 LayerPropertiesList::begin_const () const
 {
   return m_layer_properties.begin ();
 }
 
-LayerPropertiesList::const_iterator 
+LayerPropertiesList::const_iterator
 LayerPropertiesList::end_const () const
 {
   return m_layer_properties.end ();
 }
 
-LayerPropertiesList::iterator 
-LayerPropertiesList::begin () 
+LayerPropertiesList::iterator
+LayerPropertiesList::begin ()
 {
   return m_layer_properties.begin ();
 }
 
 LayerPropertiesList::iterator
-LayerPropertiesList::end () 
+LayerPropertiesList::end ()
 {
   return m_layer_properties.end ();
 }
 
 LayerPropertiesNode &
-LayerPropertiesList::back () 
+LayerPropertiesList::back ()
 {
   return m_layer_properties.back ();
 }
@@ -1678,9 +1621,8 @@ LayerPropertiesList::back () const
 /**
  *  @brief A helper class for XML parser: convert a string to a color and vice versa
  */
-struct UIntColorConverter 
-  : private ColorConverter
-{
+struct UIntColorConverter
+  : private ColorConverter {
   std::string to_string (const tl::color_t &c) const
   {
     if (c == 0) {
@@ -1705,8 +1647,7 @@ struct UIntColorConverter
 /**
  *  @brief A helper class for XML parser: convert a string to a integer index and vice versa (with -1 being a blank string)
  */
-struct WidthConverter 
-{
+struct WidthConverter {
   std::string to_string (int b) const
   {
     if (b < 0) {
@@ -1729,8 +1670,7 @@ struct WidthConverter
 /**
  *  @brief A helper class for XML parser: convert a string to a integer index and vice versa
  */
-struct DitherPatternIndexConverter
-{
+struct DitherPatternIndexConverter {
   std::string to_string (int b) const
   {
     if (b < 0) {
@@ -1748,9 +1688,9 @@ struct DitherPatternIndexConverter
   {
     if (s.empty ()) {
       b = -1;
-    } else if (s[0] == 'I') {
+    } else if (s [0] == 'I') {
       tl::from_string (s.c_str () + 1, b);
-    } else if (s[0] == 'C') {
+    } else if (s [0] == 'C') {
       tl::from_string (s.c_str () + 1, b);
       b = b + std::distance (lay::DitherPattern::default_pattern ().begin (), lay::DitherPattern::default_pattern ().begin_custom ());
     } else {
@@ -1766,8 +1706,7 @@ struct DitherPatternIndexConverter
 /**
  *  @brief A helper class for XML parser: convert a style string to a integer index and vice versa
  */
-struct LineStyleIndexConverter
-{
+struct LineStyleIndexConverter {
   std::string to_string (int b) const
   {
     if (b < 0) {
@@ -1785,9 +1724,9 @@ struct LineStyleIndexConverter
   {
     if (s.empty ()) {
       b = -1;
-    } else if (s[0] == 'I') {
+    } else if (s [0] == 'I') {
       tl::from_string (s.c_str () + 1, b);
-    } else if (s[0] == 'C') {
+    } else if (s [0] == 'C') {
       tl::from_string (s.c_str () + 1, b);
       b = b + std::distance (lay::LineStyles::default_style ().begin (), lay::LineStyles::default_style ().begin_custom ());
     } else {
@@ -1803,77 +1742,68 @@ struct LineStyleIndexConverter
 static const tl::XMLElementList layer_element = tl::XMLElementList (
   //  HINT: these make_member calls want to be qualified: otherwise an internal error
   //  was observed ..
-  tl::make_member<bool, LayerPropertiesNode>         (&LayerPropertiesNode::expanded,             &LayerPropertiesNode::set_expanded,         "expanded") +
-  tl::make_member<tl::color_t, LayerPropertiesNode>  (&LayerPropertiesNode::frame_color_loc,      &LayerPropertiesNode::set_frame_color_code, "frame-color",        UIntColorConverter ()) +
-  tl::make_member<tl::color_t, LayerPropertiesNode>  (&LayerPropertiesNode::fill_color_loc,       &LayerPropertiesNode::set_fill_color_code,  "fill-color",         UIntColorConverter ()) +
-  tl::make_member<int, LayerPropertiesNode>          (&LayerPropertiesNode::frame_brightness_loc, &LayerPropertiesNode::set_frame_brightness, "frame-brightness") + 
-  tl::make_member<int, LayerPropertiesNode>          (&LayerPropertiesNode::fill_brightness_loc,  &LayerPropertiesNode::set_fill_brightness,  "fill-brightness") + 
-  tl::make_member<int, LayerPropertiesNode>          (&LayerPropertiesNode::dither_pattern_loc,   &LayerPropertiesNode::set_dither_pattern,   "dither-pattern",     DitherPatternIndexConverter ()) + 
-  tl::make_member<int, LayerPropertiesNode>          (&LayerPropertiesNode::line_style_loc,       &LayerPropertiesNode::set_line_style,       "line-style",         LineStyleIndexConverter ()) +
-  tl::make_member<bool, LayerPropertiesNode>         (&LayerPropertiesNode::valid_loc,            &LayerPropertiesNode::set_valid,            "valid") +
-  tl::make_member<bool, LayerPropertiesNode>         (&LayerPropertiesNode::visible_loc,          &LayerPropertiesNode::set_visible,          "visible") + 
-  tl::make_member<bool, LayerPropertiesNode>         (&LayerPropertiesNode::transparent_loc,      &LayerPropertiesNode::set_transparent,      "transparent") + 
-  tl::make_member<int, LayerPropertiesNode>          (&LayerPropertiesNode::width_loc,            &LayerPropertiesNode::set_width,            "width",              WidthConverter ()) + 
-  tl::make_member<bool, LayerPropertiesNode>         (&LayerPropertiesNode::marked_loc,           &LayerPropertiesNode::set_marked,           "marked") + 
-  tl::make_member<bool, LayerPropertiesNode>         (&LayerPropertiesNode::xfill_loc,            &LayerPropertiesNode::set_xfill,            "xfill") +
-  tl::make_member<int, LayerPropertiesNode>          (&LayerPropertiesNode::animation_loc,        &LayerPropertiesNode::set_animation,        "animation") +
-  tl::make_member<std::string, LayerPropertiesNode>  (&LayerPropertiesNode::name,                 &LayerPropertiesNode::set_name,             "name") +
-  tl::make_member<std::string, LayerPropertiesNode>  (&LayerPropertiesNode::source_string_loc,    &LayerPropertiesNode::set_source,           "source") +
-  tl::make_element<LayerPropertiesNode, LayerPropertiesNode::const_iterator, LayerPropertiesNode> (&LayerPropertiesNode::begin_children, &LayerPropertiesNode::end_children,     &LayerPropertiesNode::add_child, "group-members", &layer_element)
-);
+  tl::make_member<bool, LayerPropertiesNode> (&LayerPropertiesNode::expanded, &LayerPropertiesNode::set_expanded, "expanded") +
+  tl::make_member<tl::color_t, LayerPropertiesNode> (&LayerPropertiesNode::frame_color_loc, &LayerPropertiesNode::set_frame_color_code, "frame-color", UIntColorConverter ()) +
+  tl::make_member<tl::color_t, LayerPropertiesNode> (&LayerPropertiesNode::fill_color_loc, &LayerPropertiesNode::set_fill_color_code, "fill-color", UIntColorConverter ()) +
+  tl::make_member<int, LayerPropertiesNode> (&LayerPropertiesNode::frame_brightness_loc, &LayerPropertiesNode::set_frame_brightness, "frame-brightness") +
+  tl::make_member<int, LayerPropertiesNode> (&LayerPropertiesNode::fill_brightness_loc, &LayerPropertiesNode::set_fill_brightness, "fill-brightness") +
+  tl::make_member<int, LayerPropertiesNode> (&LayerPropertiesNode::dither_pattern_loc, &LayerPropertiesNode::set_dither_pattern, "dither-pattern", DitherPatternIndexConverter ()) +
+  tl::make_member<int, LayerPropertiesNode> (&LayerPropertiesNode::line_style_loc, &LayerPropertiesNode::set_line_style, "line-style", LineStyleIndexConverter ()) +
+  tl::make_member<bool, LayerPropertiesNode> (&LayerPropertiesNode::valid_loc, &LayerPropertiesNode::set_valid, "valid") +
+  tl::make_member<bool, LayerPropertiesNode> (&LayerPropertiesNode::visible_loc, &LayerPropertiesNode::set_visible, "visible") +
+  tl::make_member<bool, LayerPropertiesNode> (&LayerPropertiesNode::transparent_loc, &LayerPropertiesNode::set_transparent, "transparent") +
+  tl::make_member<int, LayerPropertiesNode> (&LayerPropertiesNode::width_loc, &LayerPropertiesNode::set_width, "width", WidthConverter ()) +
+  tl::make_member<bool, LayerPropertiesNode> (&LayerPropertiesNode::marked_loc, &LayerPropertiesNode::set_marked, "marked") +
+  tl::make_member<bool, LayerPropertiesNode> (&LayerPropertiesNode::xfill_loc, &LayerPropertiesNode::set_xfill, "xfill") +
+  tl::make_member<int, LayerPropertiesNode> (&LayerPropertiesNode::animation_loc, &LayerPropertiesNode::set_animation, "animation") +
+  tl::make_member<std::string, LayerPropertiesNode> (&LayerPropertiesNode::name, &LayerPropertiesNode::set_name, "name") +
+  tl::make_member<std::string, LayerPropertiesNode> (&LayerPropertiesNode::source_string_loc, &LayerPropertiesNode::set_source, "source") +
+  tl::make_element<LayerPropertiesNode, LayerPropertiesNode::const_iterator, LayerPropertiesNode> (&LayerPropertiesNode::begin_children, &LayerPropertiesNode::end_children, &LayerPropertiesNode::add_child, "group-members", &layer_element));
 
 static const tl::XMLElementList layer_prop_list = tl::XMLElementList (
   tl::make_element<LayerPropertiesNode, LayerPropertiesList::const_iterator, LayerPropertiesList> (&LayerPropertiesList::begin_const, &LayerPropertiesList::end_const, &LayerPropertiesList::push_back, "properties", &layer_element) +
   tl::make_member (&LayerPropertiesList::name, &LayerPropertiesList::set_name, "name") +
-  tl::make_element (&LayerPropertiesList::begin_custom_dither_pattern, &LayerPropertiesList::end_custom_dither_pattern, &LayerPropertiesList::push_custom_dither_pattern, "custom-dither-pattern", 
-    tl::make_element (&lay::DitherPatternInfo::to_strings, &lay::DitherPatternInfo::from_strings, "pattern",
-      tl::make_member<std::string, std::vector<std::string>::const_iterator, std::vector<std::string> > (&std::vector<std::string>::begin, &std::vector<std::string>::end, &std::vector<std::string>::push_back, "line")
-    ) +
-    tl::make_member (&lay::DitherPatternInfo::order_index, &lay::DitherPatternInfo::set_order_index, "order") +
-    tl::make_member (&lay::DitherPatternInfo::name, &lay::DitherPatternInfo::set_name, "name") 
-  ) +
+  tl::make_element (&LayerPropertiesList::begin_custom_dither_pattern, &LayerPropertiesList::end_custom_dither_pattern, &LayerPropertiesList::push_custom_dither_pattern, "custom-dither-pattern",
+                    tl::make_element (&lay::DitherPatternInfo::to_strings, &lay::DitherPatternInfo::from_strings, "pattern",
+                                      tl::make_member<std::string, std::vector<std::string>::const_iterator, std::vector<std::string>> (&std::vector<std::string>::begin, &std::vector<std::string>::end, &std::vector<std::string>::push_back, "line")) +
+                      tl::make_member (&lay::DitherPatternInfo::order_index, &lay::DitherPatternInfo::set_order_index, "order") +
+                      tl::make_member (&lay::DitherPatternInfo::name, &lay::DitherPatternInfo::set_name, "name")) +
   tl::make_element (&LayerPropertiesList::begin_custom_line_styles, &LayerPropertiesList::end_custom_line_styles, &LayerPropertiesList::push_custom_line_style, "custom-line-style",
-    tl::make_member (&lay::LineStyleInfo::to_string, &lay::LineStyleInfo::from_string, "pattern") +
-    tl::make_member (&lay::LineStyleInfo::order_index, &lay::LineStyleInfo::set_order_index, "order") +
-    tl::make_member (&lay::LineStyleInfo::name, &lay::LineStyleInfo::set_name, "name")
-  )
-);
+                    tl::make_member (&lay::LineStyleInfo::to_string, &lay::LineStyleInfo::from_string, "pattern") +
+                      tl::make_member (&lay::LineStyleInfo::order_index, &lay::LineStyleInfo::set_order_index, "order") +
+                      tl::make_member (&lay::LineStyleInfo::name, &lay::LineStyleInfo::set_name, "name")));
 
 //  declaration of the layer properties file XML structure
-static const tl::XMLStruct <LayerPropertiesList>
-layer_prop_list_structure ("layer-properties", &layer_prop_list);
+static const tl::XMLStruct<LayerPropertiesList>
+  layer_prop_list_structure ("layer-properties", &layer_prop_list);
 
 //  declaration of the layer properties file XML structure for a multi-tab file
-static const tl::XMLStruct <std::vector<LayerPropertiesList> >
-layer_prop_lists_structure ("layer-properties-tabs", 
-  tl::make_element<LayerPropertiesList, std::vector<LayerPropertiesList>::const_iterator, std::vector<LayerPropertiesList> > (&std::vector<LayerPropertiesList>::begin, &std::vector<LayerPropertiesList>::end, &std::vector<LayerPropertiesList>::push_back, "layer-properties", &layer_prop_list) 
-);
+static const tl::XMLStruct<std::vector<LayerPropertiesList>>
+  layer_prop_lists_structure ("layer-properties-tabs",
+                              tl::make_element<LayerPropertiesList, std::vector<LayerPropertiesList>::const_iterator, std::vector<LayerPropertiesList>> (&std::vector<LayerPropertiesList>::begin, &std::vector<LayerPropertiesList>::end, &std::vector<LayerPropertiesList>::push_back, "layer-properties", &layer_prop_list));
 
 const tl::XMLElementList *
-LayerPropertiesList::xml_format () 
+LayerPropertiesList::xml_format ()
 {
   return &layer_prop_list;
 }
 
-void 
-LayerPropertiesList::load (tl::XMLSource &stream)
+void LayerPropertiesList::load (tl::XMLSource &stream)
 {
-  layer_prop_list_structure.parse (stream, *this); 
+  layer_prop_list_structure.parse (stream, *this);
 }
 
-void 
-LayerPropertiesList::save (tl::OutputStream &os) const
+void LayerPropertiesList::save (tl::OutputStream &os) const
 {
   layer_prop_list_structure.write (os, *this);
 }
 
-void 
-LayerPropertiesList::load (tl::XMLSource &stream, std::vector <lay::LayerPropertiesList> &properties_lists)
+void LayerPropertiesList::load (tl::XMLSource &stream, std::vector<lay::LayerPropertiesList> &properties_lists)
 {
   try {
     // "old" way
     lay::LayerPropertiesList properties_list;
-    layer_prop_list_structure.parse (stream, properties_list); 
+    layer_prop_list_structure.parse (stream, properties_list);
     properties_lists.push_back (properties_list);
   } catch (tl::Exception &ex) {
     try {
@@ -1886,15 +1816,13 @@ LayerPropertiesList::load (tl::XMLSource &stream, std::vector <lay::LayerPropert
     }
   }
 }
-  
-void 
-LayerPropertiesList::save (tl::OutputStream &os, const std::vector <lay::LayerPropertiesList> &properties_lists)
+
+void LayerPropertiesList::save (tl::OutputStream &os, const std::vector<lay::LayerPropertiesList> &properties_lists)
 {
-  layer_prop_lists_structure.write (os, properties_lists); 
+  layer_prop_lists_structure.write (os, properties_lists);
 }
-  
-void 
-LayerPropertiesList::attach_view (lay::LayoutViewBase *view, unsigned int list_index)
+
+void LayerPropertiesList::attach_view (lay::LayoutViewBase *view, unsigned int list_index)
 {
   mp_view.reset (view);
   m_list_index = list_index;
@@ -1918,20 +1846,17 @@ LayerPropertiesList::list_index () const
   return m_list_index;
 }
 
-void 
-LayerPropertiesList::push_back (const LayerPropertiesNode &d)
+void LayerPropertiesList::push_back (const LayerPropertiesNode &d)
 {
   m_layer_properties.push_back (d);
 }
 
-void 
-LayerPropertiesList::set_dither_pattern (const lay::DitherPattern &pattern) 
+void LayerPropertiesList::set_dither_pattern (const lay::DitherPattern &pattern)
 {
   m_dither_pattern = pattern;
 }
 
-void
-LayerPropertiesList::set_line_styles (const lay::LineStyles &styles)
+void LayerPropertiesList::set_line_styles (const lay::LineStyles &styles)
 {
   m_line_styles = styles;
 }
@@ -1962,13 +1887,12 @@ LayerPropertiesList::insert (const LayerPropertiesIterator &iter, const LayerPro
 
   return *ret;
 }
-  
-void
-LayerPropertiesList::erase (const LayerPropertiesIterator &iter)
+
+void LayerPropertiesList::erase (const LayerPropertiesIterator &iter)
 {
   tl_assert (! iter.is_null ());
 
-  std::pair <LayerPropertiesNode *, size_t> pp = iter.parent_obj ();
+  std::pair<LayerPropertiesNode *, size_t> pp = iter.parent_obj ();
 
   if (pp.first == 0) {
     if (pp.second >= m_layer_properties.size ()) {
@@ -2000,16 +1924,15 @@ LayerPropertiesNodeRef::LayerPropertiesNodeRef (LayerPropertiesNode *node)
     set_parent (node->parent ());
 
     mp_node.reset (node);
-
   }
 }
 
 LayerPropertiesNodeRef::LayerPropertiesNodeRef (const LayerPropertiesConstIterator &iter)
   : m_iter (iter), m_synched_gen_id (0)
 {
-  if (!iter.at_end () && !iter.is_null ()) {
+  if (! iter.at_end () && ! iter.is_null ()) {
 
-    const lay::LayerPropertiesNode *node = iter.operator-> ();
+    const lay::LayerPropertiesNode *node = iter.operator->();
 
     //  NOTE: we do assignment before we set the iterator reference - hence there won't be
     //  updates triggered.
@@ -2020,7 +1943,6 @@ LayerPropertiesNodeRef::LayerPropertiesNodeRef (const LayerPropertiesConstIterat
     set_parent (node->parent ());
 
     mp_node.reset (const_cast<lay::LayerPropertiesNode *> (node));
-
   }
 }
 
@@ -2050,13 +1972,11 @@ LayerPropertiesNodeRef &LayerPropertiesNodeRef::operator= (const LayerProperties
 
     //  NOTE: this will update the view
     LayerPropertiesNode::operator= (other);
-
   }
   return *this;
 }
 
-void
-LayerPropertiesNodeRef::erase ()
+void LayerPropertiesNodeRef::erase ()
 {
   if (is_valid ()) {
     view ()->delete_layer ((unsigned int) list_index (), m_iter);
@@ -2071,14 +1991,12 @@ LayerPropertiesNodeRef::iter () const
   return m_iter;
 }
 
-bool
-LayerPropertiesNodeRef::is_valid () const
+bool LayerPropertiesNodeRef::is_valid () const
 {
-  return !m_iter.is_null () && !m_iter.at_end () && view ();
+  return ! m_iter.is_null () && ! m_iter.at_end () && view ();
 }
 
-void
-LayerPropertiesNodeRef::need_realize (unsigned int flags, bool force)
+void LayerPropertiesNodeRef::need_realize (unsigned int flags, bool force)
 {
   LayerPropertiesNode::need_realize (flags, force);
   if (is_valid ()) {
@@ -2098,12 +2016,10 @@ LayerPropertiesNodeRef::need_realize (unsigned int flags, bool force)
     //  fallback mode is to use the target node directly.
     *mp_node = *this;
     m_synched_gen_id = mp_node->gen_id ();
-
   }
 }
 
-void
-LayerPropertiesNodeRef::expanded_state_changed ()
+void LayerPropertiesNodeRef::expanded_state_changed ()
 {
   LayerPropertiesNode::expanded_state_changed ();
 
@@ -2112,8 +2028,7 @@ LayerPropertiesNodeRef::expanded_state_changed ()
   }
 }
 
-void
-LayerPropertiesNodeRef::refresh () const
+void LayerPropertiesNodeRef::refresh () const
 {
   if (! mp_node.get () || m_synched_gen_id == mp_node->gen_id ()) {
     return;
@@ -2126,4 +2041,3 @@ LayerPropertiesNodeRef::refresh () const
 }
 
 } // namespace lay
-

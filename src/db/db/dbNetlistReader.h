@@ -30,7 +30,7 @@
 
 namespace tl
 {
-  class InputStream;
+class InputStream;
 }
 
 namespace db
@@ -44,8 +44,8 @@ class Netlist;
 class DB_PUBLIC NetlistReader
 {
 public:
-  NetlistReader () { }
-  virtual ~NetlistReader () { }
+  NetlistReader () {}
+  virtual ~NetlistReader () {}
 
   virtual void read (tl::InputStream &stream, db::Netlist &netlist) = 0;
 };

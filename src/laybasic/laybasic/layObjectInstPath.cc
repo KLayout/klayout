@@ -29,7 +29,8 @@
 #include "layLayoutViewBase.h"
 #include "tlException.h"
 
-namespace lay {
+namespace lay
+{
 
 // ----------------------------------------------------------------------
 //  ObjectInstPath implementation
@@ -40,8 +41,7 @@ ObjectInstPath::ObjectInstPath ()
   //  .. nothing yet ..
 }
 
-bool
-ObjectInstPath::is_valid (lay::LayoutViewBase *view) const
+bool ObjectInstPath::is_valid (lay::LayoutViewBase *view) const
 {
   const lay::CellView &cv = view->cellview (cv_index ());
   if (! cv.is_valid ()) {
@@ -76,7 +76,7 @@ ObjectInstPath::is_valid (lay::LayoutViewBase *view) const
   return true;
 }
 
-db::cell_index_type 
+db::cell_index_type
 ObjectInstPath::cell_index_tot () const
 {
   if (m_path.empty ()) {
@@ -97,7 +97,7 @@ ObjectInstPath::trans_tot () const
   return t;
 }
 
-db::cell_index_type 
+db::cell_index_type
 ObjectInstPath::cell_index () const
 {
   if (m_path.empty ()) {
@@ -131,8 +131,7 @@ ObjectInstPath::trans () const
   return t;
 }
 
-void 
-ObjectInstPath::remove_front (unsigned int n)
+void ObjectInstPath::remove_front (unsigned int n)
 {
   while (n > 0) {
     --n;
@@ -144,16 +143,14 @@ ObjectInstPath::remove_front (unsigned int n)
   }
 }
 
-void 
-ObjectInstPath::insert_front (db::cell_index_type topcell, const db::InstElement &elem)
+void ObjectInstPath::insert_front (db::cell_index_type topcell, const db::InstElement &elem)
 {
   tl_assert (m_topcell == elem.inst_ptr.cell_index ());
   m_topcell = topcell;
   m_path.insert (m_path.begin (), elem);
 }
 
-bool 
-ObjectInstPath::operator< (const ObjectInstPath &d) const
+bool ObjectInstPath::operator< (const ObjectInstPath &d) const
 {
   if (is_cell_inst () != d.is_cell_inst ()) {
     return is_cell_inst () < d.is_cell_inst ();
@@ -175,8 +172,7 @@ ObjectInstPath::operator< (const ObjectInstPath &d) const
   return m_path < d.m_path;
 }
 
-bool 
-ObjectInstPath::operator== (const ObjectInstPath &d) const
+bool ObjectInstPath::operator== (const ObjectInstPath &d) const
 {
   if (is_cell_inst () != d.is_cell_inst ()) {
     return false;
@@ -184,7 +180,7 @@ ObjectInstPath::operator== (const ObjectInstPath &d) const
   if (! is_cell_inst ()) {
     if (m_layer != d.m_layer) {
       return false;
-    } 
+    }
     if (m_shape != d.m_shape) {
       return false;
     }
@@ -199,5 +195,3 @@ ObjectInstPath::operator== (const ObjectInstPath &d) const
 }
 
 }
-
-

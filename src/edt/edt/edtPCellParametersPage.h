@@ -38,8 +38,8 @@ class QScrollArea;
 
 namespace lay
 {
-  class LayoutViewBase;
-  class Dispatcher;
+class LayoutViewBase;
+class Dispatcher;
 }
 
 namespace edt
@@ -49,14 +49,14 @@ namespace edt
  *  @brief A QScrollArea that displays and allows editing PCell parameters
  */
 class PCellParametersPage
-  : public QFrame, public tl::Object
+  : public QFrame,
+    public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-  struct State
-  {
-    State () : valid (false), hScrollPosition (0), vScrollPosition (0) { }
+  struct State {
+    State () : valid (false), hScrollPosition (0), vScrollPosition (0) {}
 
     bool valid;
     int hScrollPosition;
@@ -137,7 +137,7 @@ public:
   /**
    *  @brief Sets the given parameters as values
    */
-  void set_parameters (const  std::vector<tl::Variant> &values);
+  void set_parameters (const std::vector<tl::Variant> &values);
 
   /**
    *  @brief Reimplementation of deleteLater
@@ -174,7 +174,7 @@ private:
   tl::weak_ptr<db::PCellDeclaration> mp_pcell_decl;
   std::vector<QWidget *> m_widgets;
   std::vector<QLabel *> m_icon_widgets;
-  std::vector<std::vector<QWidget *> > m_all_widgets;
+  std::vector<std::vector<QWidget *>> m_all_widgets;
   lay::LayoutViewBase *mp_view;
   int m_cv_index;
   bool m_dense, m_show_parameter_names;
@@ -192,7 +192,7 @@ private:
   void get_parameters_internal (db::ParameterStates &states, bool &edit_error);
   std::vector<tl::Variant> parameter_from_states (const db::ParameterStates &states) const;
   void states_from_parameters (db::ParameterStates &states, const std::vector<tl::Variant> &parameters);
-  void check_range (const tl::Variant& value, const db::PCellParameterDeclaration &decl);
+  void check_range (const tl::Variant &value, const db::PCellParameterDeclaration &decl);
 };
 
 }

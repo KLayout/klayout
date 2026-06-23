@@ -28,9 +28,11 @@
 
 CAPNP_BEGIN_HEADER
 
-namespace capnp {
+namespace capnp
+{
 
-class TextCodec {
+class TextCodec
+{
   // Reads and writes Cap'n Proto objects in a plain text format (as used in the schema
   // language for constants, and read/written by the 'decode' and 'encode' commands of
   // the capnp tool).
@@ -46,31 +48,31 @@ class TextCodec {
   // Requires linking with the capnpc library.
 
 public:
-  TextCodec();
-  ~TextCodec() noexcept(true);
+  TextCodec ();
+  ~TextCodec () noexcept (true);
 
-  void setPrettyPrint(bool enabled);
+  void setPrettyPrint (bool enabled);
   // If enabled, pads the output of `encode()` with spaces and newlines to make it more
   // human-readable.
 
   template <typename T>
-  kj::String encode(T&& value) const;
-  kj::String encode(DynamicValue::Reader value) const;
+  kj::String encode (T &&value) const;
+  kj::String encode (DynamicValue::Reader value) const;
   // Encode any Cap'n Proto value.
 
   template <typename T>
-  Orphan<T> decode(kj::StringPtr input, Orphanage orphanage) const;
+  Orphan<T> decode (kj::StringPtr input, Orphanage orphanage) const;
   // Decode a text message into a Cap'n Proto object of type T, allocated in the given
   // orphanage. Any errors parsing the input or assigning the fields of T are thrown as
   // exceptions.
 
-  void decode(kj::StringPtr input, DynamicStruct::Builder output) const;
+  void decode (kj::StringPtr input, DynamicStruct::Builder output) const;
   // Decode a text message for a struct into the given builder. Any errors parsing the
   // input or assigning the fields of the output are thrown as exceptions.
 
   // TODO(someday): expose some control over the error handling?
 private:
-  Orphan<DynamicValue> decode(kj::StringPtr input, Type type, Orphanage orphanage) const;
+  Orphan<DynamicValue> decode (kj::StringPtr input, Type type, Orphanage orphanage) const;
 
   bool prettyPrint;
 };
@@ -79,15 +81,17 @@ private:
 // inline stuff
 
 template <typename T>
-inline kj::String TextCodec::encode(T&& value) const {
-  return encode(DynamicValue::Reader(ReaderFor<FromAny<T>>(kj::fwd<T>(value))));
+inline kj::String TextCodec::encode (T &&value) const
+{
+  return encode (DynamicValue::Reader (ReaderFor<FromAny<T>> (kj::fwd<T> (value))));
 }
 
 template <typename T>
-inline Orphan<T> TextCodec::decode(kj::StringPtr input, Orphanage orphanage) const {
-  return decode(input, Type::from<T>(), orphanage).template releaseAs<T>();
+inline Orphan<T> TextCodec::decode (kj::StringPtr input, Orphanage orphanage) const
+{
+  return decode (input, Type::from<T> (), orphanage).template releaseAs<T> ();
 }
 
-}  // namespace capnp
+} // namespace capnp
 
 CAPNP_END_HEADER

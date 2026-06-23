@@ -39,7 +39,7 @@
 
 namespace tl
 {
-  class InputStream;
+class InputStream;
 }
 
 namespace db
@@ -51,18 +51,18 @@ class WriterBase;
 /**
  *  @brief A stream format declaration
  */
-class DB_PUBLIC StreamFormatDeclaration 
+class DB_PUBLIC StreamFormatDeclaration
 {
 public:
   /**
    *  @brief Constructor
    */
-  StreamFormatDeclaration () { }
+  StreamFormatDeclaration () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~StreamFormatDeclaration () { }
+  virtual ~StreamFormatDeclaration () {}
 
   /**
    *  @brief Obtain the format name
@@ -166,7 +166,7 @@ public:
     // .. nothing yet ..
   }
 
-  const OPT &operator () () const
+  const OPT &operator() () const
   {
     return mp_options->template get_options<OPT> ();
   }
@@ -207,7 +207,7 @@ public:
     // .. nothing yet ..
   }
 
-  void operator () (HOST &options, tl::XMLReaderState &reader) const
+  void operator() (HOST &options, tl::XMLReaderState &reader) const
   {
     std::unique_ptr<OPT> opt (new OPT ());
 
@@ -223,17 +223,17 @@ public:
  */
 template <class OPT, class HOST>
 class StreamOptionsXMLElement
-  : public tl::XMLElement<OPT, HOST, StreamOptionsReadAdaptor<OPT, HOST>, StreamOptionsWriteAdaptor<OPT, HOST> >
+  : public tl::XMLElement<OPT, HOST, StreamOptionsReadAdaptor<OPT, HOST>, StreamOptionsWriteAdaptor<OPT, HOST>>
 {
 public:
   StreamOptionsXMLElement (const std::string &element_name, const tl::XMLElementList &children)
-    : tl::XMLElement<OPT, HOST, StreamOptionsReadAdaptor<OPT, HOST>, StreamOptionsWriteAdaptor<OPT, HOST> > (StreamOptionsReadAdaptor<OPT, HOST> (), StreamOptionsWriteAdaptor<OPT, HOST> (), element_name, children)
+    : tl::XMLElement<OPT, HOST, StreamOptionsReadAdaptor<OPT, HOST>, StreamOptionsWriteAdaptor<OPT, HOST>> (StreamOptionsReadAdaptor<OPT, HOST> (), StreamOptionsWriteAdaptor<OPT, HOST> (), element_name, children)
   {
     //  .. nothing yet ..
   }
 
   StreamOptionsXMLElement (const StreamOptionsXMLElement &d)
-    : tl::XMLElement<OPT, HOST, StreamOptionsReadAdaptor<OPT, HOST>, StreamOptionsWriteAdaptor<OPT, HOST> > (d)
+    : tl::XMLElement<OPT, HOST, StreamOptionsReadAdaptor<OPT, HOST>, StreamOptionsWriteAdaptor<OPT, HOST>> (d)
   {
     //  .. nothing yet ..
   }
@@ -312,5 +312,3 @@ DB_PUBLIC tl::XMLElementList save_options_xml_element_list ();
 }
 
 #endif
-
-

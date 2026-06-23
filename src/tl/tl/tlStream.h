@@ -61,15 +61,15 @@ extern TL_PUBLIC bool match_filename_to_format (const std::string &fn, const std
 class TL_PUBLIC InputStreamBase
 {
 public:
-  InputStreamBase () { }
-  virtual ~InputStreamBase () { }
+  InputStreamBase () {}
+  virtual ~InputStreamBase () {}
 
-  /** 
+  /**
    *  @brief Read a block of n bytes
    *
    *  Read the requested number of bytes or less.
    *  May throw an exception if a read error occurs.
-   *  
+   *
    *  @param b The buffer where to write to
    *  @param n The number of bytes to read (or less)
    *
@@ -405,7 +405,7 @@ public:
   /**
    *  @brief Opens a stream from a abstract path
    *
-   *  This will automatically create the appropriate delegate and 
+   *  This will automatically create the appropriate delegate and
    *  delete it later.
    *
    *  @param abstract_path The abstract path (can be "pipe:<cmd>", "data:<base64-data>", "file:...", "http(s):...".
@@ -422,10 +422,10 @@ public:
    */
   virtual ~InputStream ();
 
-  /** 
+  /**
    *  @brief This is the outer read method to call
-   *  
-   *  This implementation obtains data through the 
+   *
+   *  This implementation obtains data through the
    *  protected read call and buffers the data accordingly so
    *  a contigious memory block can be returned.
    *  If inline deflating is enabled, the method will return
@@ -435,9 +435,9 @@ public:
    */
   const char *get (size_t n, bool bypass_inflate = false);
 
-  /** 
+  /**
    *  @brief Undo a previous get call
-   *  
+   *
    *  This call puts back the bytes read by a previous get call.
    *  Only one call can be made undone.
    */
@@ -449,7 +449,7 @@ public:
   std::string read_all ();
 
   /**
-   *  @brief Reads all remaining bytes into the string 
+   *  @brief Reads all remaining bytes into the string
    *
    *  This function reads all remaining of max_count bytes.
    */
@@ -487,7 +487,7 @@ public:
   /**
    *  @brief Obtain the current file position
    */
-  size_t pos () const 
+  size_t pos () const
   {
     return m_pos;
   }
@@ -524,7 +524,7 @@ public:
   }
 
   /**
-   *  @brief Get the absolute path 
+   *  @brief Get the absolute path
    *
    *  Returns an empty string if no absolute path is available.
    */
@@ -620,7 +620,7 @@ private:
   std::string m_suffix;
   bool m_explicit_suffix;
 
-  //  inflate support 
+  //  inflate support
   InflateFilter *mp_inflate;
   bool m_inflate_always;
   bool m_stop_after_inflate;
@@ -701,7 +701,8 @@ public:
    */
   InflatingInputPipe (const std::string &source)
     : inflating_input_stream<InputPipe> (new InputPipe (source))
-  { }
+  {
+  }
 };
 
 // ---------------------------------------------------------------------------------
@@ -711,13 +712,13 @@ public:
  *
  *  This class is put in front of a InputStream to format the input as text input stream.
  */
-class TL_PUBLIC TextInputStream 
+class TL_PUBLIC TextInputStream
 {
 public:
   /**
    *  @brief Default constructor
    *
-   *  This constructor takes a delegate object. 
+   *  This constructor takes a delegate object.
    */
   TextInputStream (InputStream &stream);
 
@@ -782,7 +783,7 @@ public:
   /**
    *  @brief Returns false, if no more characters can be obtained
    */
-  bool at_end () const 
+  bool at_end () const
   {
     return m_at_end;
   }
@@ -815,8 +816,8 @@ private:
 class TL_PUBLIC OutputStreamBase
 {
 public:
-  OutputStreamBase () { }
-  virtual ~OutputStreamBase () { }
+  OutputStreamBase () {}
+  virtual ~OutputStreamBase () {}
 
   /**
    *  @brief Write a block a n bytes
@@ -824,16 +825,16 @@ public:
    *  May throw an exception if a write error occurs.
    *
    *  @param b What to write
-   *  @param n The number of bytes to write 
+   *  @param n The number of bytes to write
    */
   virtual void write (const char *b, size_t n) = 0;
 
   /**
-   *  @brief Seek to the specified position 
+   *  @brief Seek to the specified position
    *
    *  Writing continues at that position after a seek.
    */
-  virtual void seek (size_t /*s*/) 
+  virtual void seek (size_t /*s*/)
   {
     //  .. the default implementation does nothing ..
   }
@@ -841,7 +842,7 @@ public:
   /**
    *  @brief Returns a value indicating whether that stream supports seek
    */
-  virtual bool supports_seek () 
+  virtual bool supports_seek ()
   {
     return false;
   }
@@ -886,9 +887,9 @@ public:
   }
 
   /**
-   *  @brief Write to a string 
+   *  @brief Write to a string
    *
-   *  Implements the basic write method. 
+   *  Implements the basic write method.
    */
   virtual void write (const char *b, size_t n)
   {
@@ -900,7 +901,7 @@ public:
    */
   const char *data () const
   {
-    return & m_buffer.front ();
+    return &m_buffer.front ();
   }
 
   /**
@@ -945,9 +946,9 @@ public:
   }
 
   /**
-   *  @brief Write to a string 
+   *  @brief Write to a string
    *
-   *  Implements the basic write method. 
+   *  Implements the basic write method.
    */
   virtual void write (const char *b, size_t n)
   {
@@ -955,7 +956,7 @@ public:
   }
 
   /**
-   *  @brief Seek to the specified position 
+   *  @brief Seek to the specified position
    *
    *  Writing continues at that position after a seek.
    */
@@ -967,7 +968,7 @@ public:
   /**
    *  @brief Returns a value indicating whether that stream supports seek
    */
-  bool supports_seek () 
+  bool supports_seek ()
   {
     return true;
   }
@@ -975,9 +976,9 @@ public:
   /**
    *  @brief Get the content as a STL string
    *
-   *  This method will return an char pointer containing the data written. 
+   *  This method will return an char pointer containing the data written.
    */
-  std::string string () 
+  std::string string ()
   {
     return m_stream.str ();
   }
@@ -1114,7 +1115,7 @@ protected:
   /**
    *  @brief The seek operation isn't implemented for zlib files
    */
-  virtual void seek_file (size_t /*s*/) { }
+  virtual void seek_file (size_t /*s*/) {}
 
   /**
    *  @brief Returns a value indicating whether this steam is compressing
@@ -1251,8 +1252,7 @@ public:
   /**
    *  @brief Definitions of the output options
    */
-  enum OutputStreamMode
-  {
+  enum OutputStreamMode {
     /**
      *  @brief Without compression
      */
@@ -1272,7 +1272,7 @@ public:
   /**
    *  @brief Determine the output mode from the filename and a given mode
    *
-   *  This method will replace OM_Auto by the appropriate mode given by the 
+   *  This method will replace OM_Auto by the appropriate mode given by the
    *  file name.
    */
   static OutputStreamMode output_mode_from_filename (const std::string &abstract_path, OutputStreamMode om = OM_Auto);
@@ -1280,7 +1280,7 @@ public:
   /**
    *  @brief Default constructor
    *
-   *  This constructor takes a delegate object. 
+   *  This constructor takes a delegate object.
    */
   OutputStream (OutputStreamBase &delegate, bool as_text = false);
 
@@ -1311,9 +1311,9 @@ public:
    */
   void close ();
 
-  /** 
+  /**
    *  @brief Puts a string into the stream
-   *  
+   *
    *  In text mode, this handles line separator conversion.
    *  In binary mode, this method is equivalent to "put_raw".
    */
@@ -1421,7 +1421,7 @@ public:
   }
 
   /**
-   *  @brief Seek to the specified position 
+   *  @brief Seek to the specified position
    *
    *  Writing continues at that position after a seek.
    *  Seek is not supported while in deflate mode.
@@ -1431,11 +1431,11 @@ public:
   /**
    *  @brief Obtain the current file position
    */
-  size_t pos () const 
+  size_t pos () const
   {
     return m_pos;
   }
-    
+
   /**
    *  @brief Flush buffered data
    */
@@ -1477,4 +1477,3 @@ private:
 }
 
 #endif
-

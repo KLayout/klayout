@@ -45,42 +45,42 @@ public:
   /**
    *  @brief Constructor: create a "nil" object
    */
-  Value () { }
+  Value () {}
 
   /**
    *  @brief Constructor: create an object with a value
    */
-  Value (const tl::Variant &v) : m_v (v) { }
+  Value (const tl::Variant &v) : m_v (v) {}
 
   /**
-   *  @brief Obtain the value 
+   *  @brief Obtain the value
    */
-  const tl::Variant &value () const 
-  { 
+  const tl::Variant &value () const
+  {
     return m_v;
   }
 
   /**
    *  @brief Obtain the value (non-const)
    */
-  tl::Variant &value () 
-  { 
+  tl::Variant &value ()
+  {
     return m_v;
   }
 
   /**
-   *  @brief Set the value 
+   *  @brief Set the value
    */
   void set_value (const tl::Variant &v)
-  { 
+  {
     m_v = v;
   }
 
   /**
    *   @brief Converts the value to a string
    */
-  std::string to_string () const 
-  { 
+  std::string to_string () const
+  {
     return m_v.to_string ();
   }
 
@@ -91,5 +91,3 @@ protected:
 }
 
 #endif
-
-

@@ -31,15 +31,17 @@
 
 #include <vector>
 
-namespace lay {
+namespace lay
+{
 
 class LayoutViewBase;
 class StatisticsSource;
 
 class LayoutStatisticsForm
-  : public QDialog, private Ui::LayoutStatisticsForm
+  : public QDialog,
+    private Ui::LayoutStatisticsForm
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   LayoutStatisticsForm (QWidget *parent, lay::LayoutViewBase *view, const char *name);
@@ -49,7 +51,7 @@ public slots:
   void layout_selected (int);
 
 private:
-  std::vector <lay::LayoutHandleRef> m_handles;
+  std::vector<lay::LayoutHandleRef> m_handles;
   StatisticsSource *mp_source;
 };
 
@@ -57,4 +59,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

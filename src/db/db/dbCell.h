@@ -61,7 +61,7 @@ class PCellDeclaration;
 
 /**
  *  @brief The cell object
- * 
+ *
  *  A cell object consists of a set of shape containers (called layers),
  *  a set of child cell instances and auxiliary information such as
  *  the parent instance list.
@@ -109,13 +109,13 @@ public:
   virtual ~Cell ();
 
   /**
-   *  @brief The assignment operator 
+   *  @brief The assignment operator
    *
    *  The assignment operator does not change the association of the cell
    *  with a layout. It copies the "content" of the cell, where the instances
    *  refer to the same cell index than in the source cell.
    *
-   *  HINT: this implementation can copy cell contents from one layout to 
+   *  HINT: this implementation can copy cell contents from one layout to
    *  another. However, currently property id are not translated which limits
    *  the use of this method in this case to 1-to-1 copies of layouts.
    */
@@ -225,7 +225,7 @@ public:
    *  Erasing a cell instance will destroy the sorting order and invalidate
    *  other instance proxies.
    *  sort() must be called before a region query can be done
-   *  on the cell instances. 
+   *  on the cell instances.
    */
   void erase (const instance_type &ref)
   {
@@ -234,10 +234,10 @@ public:
 
   /**
    *  @brief Erase a cell instance
-   *  
+   *
    *  Erasing a cell instance will destroy the sorting order.
    *  sort() must be called before a region query can be done
-   *  on the cell instances. update_bbox() must be called 
+   *  on the cell instances. update_bbox() must be called
    *  explicitly before the bounding box can be updated.
    */
   void erase (const_iterator e)
@@ -262,11 +262,11 @@ public:
   }
 
   /**
-   *  @brief Insert a generic cell instance 
-   *  
+   *  @brief Insert a generic cell instance
+   *
    *  Inserting a cell instance will destroy the sorting order.
    *  sort() must be called before a region query can be done
-   *  on the cell instances. update_bbox() must be called 
+   *  on the cell instances. update_bbox() must be called
    *  explicitly before the bounding box can be updated.
    */
   template <class Inst>
@@ -277,7 +277,7 @@ public:
 
   /**
    *  @brief Insert a sequence [from,to) of cell instances
-   *  
+   *
    *  @param from The start of the sequence
    *  @param to The past-the-end pointer of the sequence
    */
@@ -288,10 +288,10 @@ public:
   }
 
   /**
-   *  @brief Insert an instance given by a instance reference 
+   *  @brief Insert an instance given by a instance reference
    *
    *  This member may be used to copy an instance from one cell to another.
-   *  Because of the inherent instability of the instance pointer it must not be 
+   *  Because of the inherent instability of the instance pointer it must not be
    *  used to copy instances within one cell.
    *
    *  @param instance The instance reference of which to insert a copy
@@ -350,7 +350,7 @@ public:
   /**
    *  @brief Transforms the cell into a new coordinate system.
    *
-   *  The transformation is not applied to the children, but this method enables propagation 
+   *  The transformation is not applied to the children, but this method enables propagation
    *  because the transformation is only applied to the instances insofar that it can be
    *  applied to the children as well.
    *
@@ -362,7 +362,7 @@ public:
     m_instances.transform_into (t);
     for (typename shapes_map::iterator s = m_shapes_map.begin (); s != m_shapes_map.end (); ++s) {
       if (! s->second.empty ()) {
-        //  Note: don't use the copy ctor here - it will copy the attachment to the manager 
+        //  Note: don't use the copy ctor here - it will copy the attachment to the manager
         //  and create problems when destroyed. Plus: swap would be more efficient. But by using
         //  assign_transformed we get undo support for free.
         shapes_type d;
@@ -375,7 +375,7 @@ public:
   /**
    *  @brief Insert an instance given by a instance reference with a different cell index
    *
-   *  This member may be used to map an instance to another layout object. 
+   *  This member may be used to map an instance to another layout object.
    *
    *  @param ref The instance reference of which to insert a copy
    *  @param im The mapper to new cell index to use (for mapping to a different layout for example)
@@ -388,10 +388,10 @@ public:
 
   /**
    *  @brief Test if the given reference is valid
-   *  
-   *  Returns true, if the given instance is valid. It is not valid, if it has been 
-   *  deleted already. However, it may happen, that the instance memory has been 
-   *  reused already. Therefore this method can safely be used only if nothing 
+   *
+   *  Returns true, if the given instance is valid. It is not valid, if it has been
+   *  deleted already. However, it may happen, that the instance memory has been
+   *  reused already. Therefore this method can safely be used only if nothing
    *  has been inserted into this container in between.
    *  This method can only be used in editable mode.
    *
@@ -402,10 +402,10 @@ public:
     return m_instances.is_valid (ref);
   }
 
-  /** 
+  /**
    *  @brief Replace the properties ID of an element (pointed to by the iterator) with the given one
    *
-   *  The iterator must point to a instance already having a property ID. 
+   *  The iterator must point to a instance already having a property ID.
    *  If this is not the case, an exception is thrown
    */
   instance_type replace_prop_id (const instance_type &ref, db::properties_id_type prop_id)
@@ -416,10 +416,10 @@ public:
   /**
    *  @brief Replace the instance pointed to by the iterator with the given instance
    *
-   *  This method will delete the former object if it is not of the correct kind - i.e. it will 
+   *  This method will delete the former object if it is not of the correct kind - i.e. it will
    *  delete an object without a property and insert a new one with a property.
    *  This may invalidate other references in non-editable mode.
-   *  If the inserted instance is one without a property and the existing instance has a property, 
+   *  If the inserted instance is one without a property and the existing instance has a property,
    *  the latter is not touched.
    */
   template <class InstArray>
@@ -459,7 +459,7 @@ public:
   /**
    *  @brief Gets the PCell parameters of a PCell instance as a name to value map
    *
-   *  @return The PCell parameter values by name 
+   *  @return The PCell parameter values by name
    */
   std::map<std::string, tl::Variant> get_named_pcell_parameters (const instance_type &ref) const;
 
@@ -507,14 +507,14 @@ public:
 
   /**
    *  @brief Update the child-parent relationships
-   * 
+   *
    *  This will update the child-parent relationships. Basically
    *  this means entering the cell as a parent into all it's child
    *  cells.
    */
   void update_relations ();
 
-  /** 
+  /**
    *  @brief Check if the bbox needs update because the shapes have changed
    *
    *  Returns true if the bounding box needs update because the
@@ -525,7 +525,7 @@ public:
   /**
    *  @brief Sorts the shapes lists
    *
-   *  This will sort the shapes lists for query of regions 
+   *  This will sort the shapes lists for query of regions
    *  on a per-shape basis. Since sorting of the shapes is
    *  guarded against redundant sorting (db::Layer::sort),
    *  we can safely call the sort method in any case.
@@ -536,7 +536,7 @@ public:
    *  @brief Retrieve the bounding box of the cell
    *
    *  Before the bounding box can be retrieved, it must have
-   *  been computed using update_bbox. This is performed by 
+   *  been computed using update_bbox. This is performed by
    *  requesting an update from the layout.
    *
    *  @return The bounding box that was computed by update_bbox
@@ -558,7 +558,7 @@ public:
    *  @brief Retrieve the per-layer bounding box of the cell
    *
    *  Before the bounding box can be retrieved, it must have
-   *  been computed using update_bbox. This is performed by 
+   *  been computed using update_bbox. This is performed by
    *  requesting an update from the layout.
    *
    *  @return The bounding box that was computed by update_bbox
@@ -569,7 +569,7 @@ public:
    *  @brief Region query for the instances in "overlapping" mode
    *
    *  This will return the region query iterator for the child cell
-   *  instances overlapping with the given region b. 
+   *  instances overlapping with the given region b.
    *
    *  @param b The region to query
    *
@@ -581,7 +581,7 @@ public:
    *  @brief Region query for the instances in "touching" mode
    *
    *  This will return the region query iterator for the child cell
-   *  instances touching the given region b. 
+   *  instances touching the given region b.
    *
    *  @param b The region to query
    *
@@ -597,7 +597,7 @@ public:
    */
   child_cell_iterator begin_child_cells () const;
 
-  /** 
+  /**
    *  @brief Report the number of child cells
    *
    *  Just the number of child cells with distinct cell indices are
@@ -607,7 +607,7 @@ public:
   size_t child_cells () const;
 
   /**
-   *  @brief The number of cell instances 
+   *  @brief The number of cell instances
    */
   size_t cell_instances () const
   {
@@ -669,7 +669,7 @@ public:
   parent_inst_iterator begin_parent_insts () const;
 
   /**
-   *  @brief Report the number of parent cells 
+   *  @brief Report the number of parent cells
    *
    *  Since the m_parent_insts vector just stores references to those cells
    *  that have distinct cell indices, we can simply report their length.
@@ -678,7 +678,7 @@ public:
 
   /**
    *  @brief The parent cell iterator
-   * 
+   *
    *  This iterator will iterate over the parent cells, just returning their
    *  cell index.
    */
@@ -709,13 +709,13 @@ public:
   unsigned int hierarchy_levels () const;
 
   /**
-   *  @brief begin iterator of all shapes 
+   *  @brief begin iterator of all shapes
    *
    *  @param layer The layer from which to query the shapes
    *  @param flags The flags of shapes to query (see db::shape documentation)
    *  @param prop_sel A property selector (a set of property set ids)
    *  @param inv_prop_sel true, if prop_sel should select all ids that should not be iterated
-   *  
+   *
    *  @return The iterator delivering all these shapes
    */
   shape_iterator begin (unsigned int layer, unsigned int flags, const shape_iterator::property_selector *prop_sel = 0, bool inv_prop_sel = false) const
@@ -731,7 +731,7 @@ public:
    *  @param flags The flags of shapes to query (see db::shape documentation)
    *  @param prop_sel A property selector (a set of property set ids)
    *  @param inv_prop_sel true, if prop_sel should select all ids that should not be iterated
-   *  
+   *
    *  @return The iterator delivering all these shapes
    */
   shape_iterator begin_overlapping (unsigned int layer, const box_type &box, unsigned int flags, const shape_iterator::property_selector *prop_sel = 0, bool inv_prop_sel = false) const
@@ -750,7 +750,7 @@ public:
    *  @param flags The flags of shapes to query (see db::shape documentation)
    *  @param prop_sel A property selector (a set of property set ids)
    *  @param inv_prop_sel true, if prop_sel should select all ids that should not be iterated
-   *  
+   *
    *  @return The iterator delivering all these shapes
    */
   shape_iterator begin_touching (unsigned int layer, const box_type &box, unsigned int flags, const shape_iterator::property_selector *prop_sel = 0, bool inv_prop_sel = false) const
@@ -766,22 +766,22 @@ public:
   /**
    *  @brief Collect all calling cells (either calling this cell directly or indirectly)
    *
-   *  This method adds all cell indices of all cells that either directly or indirectly 
+   *  This method adds all cell indices of all cells that either directly or indirectly
    *  call this cell to the set given. It is assumed that the if the set contains a cell, it
    *  will also contain all called cells, so it may act as a cache.
-   *  
-   *  @param callers The set of called cells (used as cache) 
+   *
+   *  @param callers The set of called cells (used as cache)
    */
   void collect_caller_cells (std::set<cell_index_type> &callers) const;
 
   /**
    *  @brief Collect all calling cells (either calling this cell directly or indirectly) up to a certain level of hierarchy
    *
-   *  This method adds all cell indices of all cells that either directly or indirectly 
+   *  This method adds all cell indices of all cells that either directly or indirectly
    *  call this cell to the set given. It is assumed that the if the set contains a cell, it
    *  will also contain all called cells, so it may act as a cache.
-   *  
-   *  @param callers The set of called cells (used as cache) 
+   *
+   *  @param callers The set of called cells (used as cache)
    *  @param levels The number of levels to descend (0: none, 1: direct callers ...)
    */
   void collect_caller_cells (std::set<cell_index_type> &callers, int levels) const;
@@ -789,15 +789,15 @@ public:
   /**
    *  @brief Collect all calling cells (either calling this cell directly or indirectly) up to a certain level of hierarchy
    *
-   *  This method adds all cell indices of all cells that either directly or indirectly 
+   *  This method adds all cell indices of all cells that either directly or indirectly
    *  call this cell to the set given. It is assumed that the if the set contains a cell, it
    *  will also contain all called cells, so it may act as a cache.
    *
    *  This version allows one to restrict the search to a cone of the hierarchy tree, that is
    *  a set of cells which are collected from another call of "collect_called_cells" with another initial cell.
-   *  
-   *  @param callers The set of called cells (used as cache) 
-   *  @param cone The selection cone 
+   *
+   *  @param callers The set of called cells (used as cache)
+   *  @param cone The selection cone
    *  @param levels The number of levels to descend (0: none, 1: direct callers ..., -1: all)
    */
   void collect_caller_cells (std::set<cell_index_type> &callers, const std::set<cell_index_type> &cone, int levels) const;
@@ -805,22 +805,22 @@ public:
   /**
    *  @brief Collect all cells called either directly or indirectly by this cell
    *
-   *  This method adds all cell indices of all cells called either directly or indirectly 
+   *  This method adds all cell indices of all cells called either directly or indirectly
    *  by this cell to the set given. It is assumed that the if the set contains a cell, it
    *  will also contain all called cells, so it may act as a cache.
-   *  
-   *  @param called The set of called cells (used as cache) 
+   *
+   *  @param called The set of called cells (used as cache)
    */
   void collect_called_cells (std::set<cell_index_type> &called) const;
 
   /**
    *  @brief Collect all cells called either directly or indirectly by this cell  down to a certain level of hierarchy
    *
-   *  This method adds all cell indices of all cells called either directly or indirectly 
+   *  This method adds all cell indices of all cells called either directly or indirectly
    *  by this cell to the set given. It is assumed that the if the set contains a cell, it
    *  will also contain all called cells, so it may act as a cache.
-   *  
-   *  @param called The set of called cells (used as cache) 
+   *
+   *  @param called The set of called cells (used as cache)
    *  @param levels The number of levels to descend (0: none, 1: direct callers ...)
    */
   void collect_called_cells (std::set<cell_index_type> &called, int level) const;
@@ -831,7 +831,7 @@ public:
    *  This method is called when a cell es taken out of a layout.
    *  It can for example, unregister a PCell variant from a PCell header.
    */
-  virtual void unregister () { }
+  virtual void unregister () {}
 
   /**
    *  @brief Reregister a cell from it's context.
@@ -839,7 +839,7 @@ public:
    *  This method is called when a cell es inserted again into a layout.
    *  It can for example, register a PCell variant at a PCell header.
    */
-  virtual void reregister () { }
+  virtual void reregister () {}
 
   /**
    *  @brief Update the layout
@@ -847,7 +847,7 @@ public:
    *  This method does not have any effect except for derived classes where it updates the layout
    *  with the current state, i.e. if a PCell declaration has changed.
    */
-  virtual void update (ImportLayerMapping * /*layer_mapping*/ = 0) { }
+  virtual void update (ImportLayerMapping * /*layer_mapping*/ = 0) {}
 
   /**
    *  @brief Checks if the cell is locked
@@ -862,9 +862,9 @@ public:
    *  Proxy cells are such whose layout represents a snapshot of another entity.
    *  Such cells can be PCell variants or library references for example.
    */
-  virtual bool is_proxy () const 
-  { 
-    return false; 
+  virtual bool is_proxy () const
+  {
+    return false;
   }
 
   /**
@@ -995,12 +995,12 @@ public:
    */
   void invalidate_hier ();
 
-  /** 
+  /**
    *  @brief Implementation of the redo method
    */
   void redo (db::Op *op);
 
-  /** 
+  /**
    *  @brief Implementation of the undo method
    */
   void undo (db::Op *op);
@@ -1026,7 +1026,7 @@ public:
   /**
    *  @brief Get a reference to the layout object
    */
-  db::Layout *layout () 
+  db::Layout *layout ()
   {
     return mp_layout;
   }
@@ -1137,7 +1137,7 @@ public:
 protected:
   /**
    *  @brief Standard constructor: create an empty cell object
-   * 
+   *
    *  Takes the manager object from the layout object.
    *
    *  @param ci The index of the cell
@@ -1203,7 +1203,7 @@ private:
   }
 
   /**
-   *  @brief Return a reference to the instances object 
+   *  @brief Return a reference to the instances object
    */
   instances_type &instances ()
   {
@@ -1212,12 +1212,12 @@ private:
 
   /**
    *  @brief Count the number of parent instances
-   * 
+   *
    *  This will accumulate the number of parent instances in the vector
    *  provided. Later, this count is used to resize the parent instance
    *  vector.
    */
-  void count_parent_insts (std::vector <size_t> &count) const;
+  void count_parent_insts (std::vector<size_t> &count) const;
 
   /**
    *  @brief Clear the parent instance list
@@ -1228,7 +1228,7 @@ private:
 
   /**
    *  @brief Sort the child instance list
-   * 
+   *
    *  The child instances are first sorted by cell index, then by raw transformation
    *  (excluding displacement). This allows one to simplify the bbox computation by
    *  convolution of the displacements bboxes with the object bboxes.
@@ -1273,4 +1273,3 @@ mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const 
 } // namespace db
 
 #endif
-

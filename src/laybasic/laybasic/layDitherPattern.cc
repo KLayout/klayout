@@ -44,7 +44,7 @@ static const char *dither_strings [] = {
 
   // 1: hollow
   "hollow",
-  ".", 
+  ".",
 
   // 2: dotted
   "dotted",
@@ -309,7 +309,7 @@ static const char *dither_strings [] = {
   "*...*...\n"
   "........",
 
-  // 29: sine 
+  // 29: sine
   "sine",
   "..***...\n"
   ".*...*..\n"
@@ -347,7 +347,7 @@ static const char *dither_strings [] = {
   "*.\n"
   "*.\n",
 
-  // 33: vertical 
+  // 33: vertical
   "vertical",
   ".*..\n"
   ".*..\n"
@@ -380,7 +380,7 @@ static const char *dither_strings [] = {
   "**\n"
   "..\n",
 
-  // 38: horizontal 
+  // 38: horizontal
   "horizontal",
   "....\n"
   "****\n"
@@ -394,7 +394,7 @@ static const char *dither_strings [] = {
   "****\n"
   "....\n",
 
-  // 40: horizontal 
+  // 40: horizontal
   "horizontal sparse",
   "........\n"
   "........\n"
@@ -405,7 +405,7 @@ static const char *dither_strings [] = {
   "........\n"
   "........\n",
 
-  // 41: horizontal 
+  // 41: horizontal
   "horizontal sparse, thick",
   "........\n"
   "........\n"
@@ -421,7 +421,7 @@ static const char *dither_strings [] = {
   "**\n"
   "*.\n",
 
-  // 43: grid 
+  // 43: grid
   "grid",
   ".*..\n"
   "****\n"
@@ -473,26 +473,25 @@ DitherPatternInfo::DitherPatternInfo ()
   }
   memset (m_buffer, 0xff, sizeof (m_buffer));
 }
-  
+
 DitherPatternInfo::DitherPatternInfo (const DitherPatternInfo &d)
   : m_width (d.m_width), m_height (d.m_height), m_order_index (d.m_order_index), m_name (d.m_name)
 {
   operator= (d);
 }
-  
+
 DitherPatternInfo &
 DitherPatternInfo::operator= (const DitherPatternInfo &d)
 {
   if (&d != this) {
-    tl::MutexLocker locker (& s_mutex);
+    tl::MutexLocker locker (&s_mutex);
     assign_no_lock (d);
   }
 
   return *this;
 }
 
-void
-DitherPatternInfo::assign_no_lock (const DitherPatternInfo &d)
+void DitherPatternInfo::assign_no_lock (const DitherPatternInfo &d)
 {
   m_scaled_pattern.reset ();
 
@@ -508,8 +507,7 @@ DitherPatternInfo::assign_no_lock (const DitherPatternInfo &d)
   memcpy (m_buffer, d.m_buffer, sizeof (m_buffer));
 }
 
-bool
-DitherPatternInfo::same_bitmap (const DitherPatternInfo &d) const
+bool DitherPatternInfo::same_bitmap (const DitherPatternInfo &d) const
 {
   if (m_width != d.m_width || m_height != d.m_height) {
     return false;
@@ -526,8 +524,7 @@ DitherPatternInfo::same_bitmap (const DitherPatternInfo &d) const
   return true;
 }
 
-bool 
-DitherPatternInfo::less_bitmap (const DitherPatternInfo &d) const
+bool DitherPatternInfo::less_bitmap (const DitherPatternInfo &d) const
 {
   if (m_width != d.m_width) {
     return m_width < d.m_width;
@@ -549,18 +546,16 @@ DitherPatternInfo::less_bitmap (const DitherPatternInfo &d) const
   return false;
 }
 
-bool 
-DitherPatternInfo::operator== (const DitherPatternInfo &d) const
+bool DitherPatternInfo::operator== (const DitherPatternInfo &d) const
 {
   return same_bitmap (d) && m_name == d.m_name && m_order_index == d.m_order_index;
 }
 
-bool 
-DitherPatternInfo::operator< (const DitherPatternInfo &d) const
+bool DitherPatternInfo::operator< (const DitherPatternInfo &d) const
 {
   if (! same_bitmap (d)) {
     return less_bitmap (d);
-  } 
+  }
   if (m_name != d.m_name) {
     return m_name < d.m_name;
   }
@@ -581,10 +576,10 @@ DitherPatternInfo::get_bitmap (int width, int height, int frame_width) const
   }
   unsigned int fw = frame_width < 0 ? 1 : frame_width;
 
-  const uint32_t * const *p = pattern ();
+  const uint32_t *const *p = pattern ();
   unsigned int stride = (width + 7) / 8;
 
-  unsigned char *data = new unsigned char[stride * height];
+  unsigned char *data = new unsigned char [stride * height];
   memset (data, 0x00, size_t (stride * height));
 
   for (unsigned int i = 0; i < (unsigned int) height; ++i) {
@@ -600,24 +595,22 @@ DitherPatternInfo::get_bitmap (int width, int height, int frame_width) const
   }
 
   QBitmap bitmap (QBitmap::fromData (QSize (width, height), data, QImage::Format_MonoLSB));
-  delete[] data;
+  delete [] data;
 
   return bitmap;
 }
 
 #endif
 
-void 
-DitherPatternInfo::set_pattern (const uint32_t *pt, unsigned int w, unsigned int h) 
+void DitherPatternInfo::set_pattern (const uint32_t *pt, unsigned int w, unsigned int h)
 {
-  tl::MutexLocker locker (& s_mutex);
+  tl::MutexLocker locker (&s_mutex);
   m_scaled_pattern.reset (0);
 
   set_pattern_impl (pt, w, h);
 }
 
-void
-DitherPatternInfo::set_pattern_impl (const uint32_t *pt, unsigned int w, unsigned int h)
+void DitherPatternInfo::set_pattern_impl (const uint32_t *pt, unsigned int w, unsigned int h)
 {
   //  pattern size must be 1x1 at least
   if (w == 0 || h == 0) {
@@ -635,7 +628,7 @@ DitherPatternInfo::set_pattern_impl (const uint32_t *pt, unsigned int w, unsigne
 
   if (h >= 32) {
     h = 32;
-  } 
+  }
   m_height = h;
 
   //  compute pattern stride
@@ -644,13 +637,13 @@ DitherPatternInfo::set_pattern_impl (const uint32_t *pt, unsigned int w, unsigne
     ++m_pattern_stride;
   }
 
-  uint32_t *pp = &m_buffer[0];
+  uint32_t *pp = &m_buffer [0];
 
   for (unsigned int j = 0; j < sizeof (m_pattern) / sizeof (m_pattern [0]); ++j) {
 
     m_pattern [j] = pp;
 
-    uint32_t din = pt[j % h];
+    uint32_t din = pt [j % h];
     uint32_t dd = din;
 
     unsigned int b = 0;
@@ -668,21 +661,18 @@ DitherPatternInfo::set_pattern_impl (const uint32_t *pt, unsigned int w, unsigne
       }
       *pp++ = dout;
     }
-
   }
 }
 
-void
-DitherPatternInfo::set_pattern (const uint64_t *pt, unsigned int w, unsigned int h)
+void DitherPatternInfo::set_pattern (const uint64_t *pt, unsigned int w, unsigned int h)
 {
-  tl::MutexLocker locker (& s_mutex);
+  tl::MutexLocker locker (&s_mutex);
   m_scaled_pattern.reset (0);
 
   set_pattern_impl (pt, w, h);
 }
 
-void
-DitherPatternInfo::set_pattern_impl (const uint64_t *pt, unsigned int w, unsigned int h)
+void DitherPatternInfo::set_pattern_impl (const uint64_t *pt, unsigned int w, unsigned int h)
 {
   //  pattern size must be 1x1 at least
   if (w == 0 || h == 0) {
@@ -709,13 +699,13 @@ DitherPatternInfo::set_pattern_impl (const uint64_t *pt, unsigned int w, unsigne
     ++m_pattern_stride;
   }
 
-  uint32_t *pp = &m_buffer[0];
+  uint32_t *pp = &m_buffer [0];
 
   for (unsigned int j = 0; j < sizeof (m_pattern) / sizeof (m_pattern [0]); ++j) {
 
     m_pattern [j] = pp;
 
-    uint64_t din = pt[j % h];
+    uint64_t din = pt [j % h];
     uint64_t dd = din;
 
     unsigned int b = 0;
@@ -733,7 +723,6 @@ DitherPatternInfo::set_pattern_impl (const uint64_t *pt, unsigned int w, unsigne
       }
       *pp++ = dout;
     }
-
   }
 }
 
@@ -744,7 +733,7 @@ DitherPatternInfo::scaled (unsigned int n) const
     return *this;
   }
 
-  tl::MutexLocker locker (& s_mutex);
+  tl::MutexLocker locker (&s_mutex);
 
   if (! m_scaled_pattern.get ()) {
     m_scaled_pattern.reset (new std::map<unsigned int, DitherPatternInfo> ());
@@ -761,8 +750,7 @@ DitherPatternInfo::scaled (unsigned int n) const
   return sp;
 }
 
-void
-DitherPatternInfo::scale_pattern (unsigned int n)
+void DitherPatternInfo::scale_pattern (unsigned int n)
 {
   //  limit scale factor such that the width and height do not get larger than 64
   while (n * m_width > 64 || n * m_height > 64) {
@@ -822,13 +810,13 @@ DitherPatternInfo::scale_pattern (unsigned int n)
             //
             uint32_t mx1 = (b < n / 2) ? ml : mr;
             uint32_t mx2 = (b < n / 2) ? mr : ml;
-            uint8_t k = ((*py2 & mx2) != 0 ? 1   : 0) |
-                        ((*py2 & m)   != 0 ? 2   : 0) |
-                        ((*py2 & mx1) != 0 ? 4   : 0) |
-                        ((*p & mx2)   != 0 ? 8   : 0) |
-                        ((*p & mx1)   != 0 ? 16  : 0) |
-                        ((*py1 & mx2) != 0 ? 32  : 0) |
-                        ((*py1 & m)   != 0 ? 64  : 0) |
+            uint8_t k = ((*py2 & mx2) != 0 ? 1 : 0) |
+                        ((*py2 & m) != 0 ? 2 : 0) |
+                        ((*py2 & mx1) != 0 ? 4 : 0) |
+                        ((*p & mx2) != 0 ? 8 : 0) |
+                        ((*p & mx1) != 0 ? 16 : 0) |
+                        ((*py1 & mx2) != 0 ? 32 : 0) |
+                        ((*py1 & m) != 0 ? 64 : 0) |
                         ((*py1 & mx1) != 0 ? 128 : 0);
             if ((k & 0x7e) == 0x50 /*(A1)*/ ||
                 (k & 0x7e) == 0x70 /*(A2)*/ ||
@@ -850,12 +838,10 @@ DitherPatternInfo::scale_pattern (unsigned int n)
       }
 
       new_pattern [r * n + l] = d;
-
     }
-
   }
 
-  set_pattern_impl (new_pattern.begin ().operator-> (), n * m_width, n * m_height);
+  set_pattern_impl (new_pattern.begin ().operator->(), n * m_width, n * m_height);
 }
 
 std::string
@@ -877,11 +863,11 @@ DitherPatternInfo::to_string () const
   return res;
 }
 
-std::vector <std::string>
+std::vector<std::string>
 DitherPatternInfo::to_strings () const
 {
-  std::vector <std::string> res;
-  
+  std::vector<std::string> res;
+
   for (unsigned int i = 0; i < m_height; ++i) {
     std::string r;
     for (unsigned int j = 0; j < m_width; ++j) {
@@ -920,15 +906,14 @@ static const char *uint_from_string (const char *s, uint32_t &w, unsigned int &w
   return s;
 }
 
-void
-DitherPatternInfo::from_strings (const std::vector<std::string> &strv) 
+void DitherPatternInfo::from_strings (const std::vector<std::string> &strv)
 {
   unsigned int h = std::min ((unsigned int) 32, (unsigned int) strv.size ());
   unsigned int w = 0;
 
   uint32_t data [32];
   for (unsigned int l = 0; l < 32; ++l) {
-    data[l] = 0;
+    data [l] = 0;
   }
 
   for (size_t i = 0; i < h; ++i) {
@@ -938,15 +923,14 @@ DitherPatternInfo::from_strings (const std::vector<std::string> &strv)
   set_pattern (data, w, h);
 }
 
-void
-DitherPatternInfo::from_string (const std::string &cstr)
+void DitherPatternInfo::from_string (const std::string &cstr)
 {
   unsigned int h = 0;
   unsigned int w = 0;
 
   uint32_t data [32];
   for (unsigned int l = 0; l < 32; ++l) {
-    data[l] = 0;
+    data [l] = 0;
   }
 
   const char *s = cstr.c_str ();
@@ -961,7 +945,7 @@ DitherPatternInfo::from_string (const std::string &cstr)
     }
   }
 
-  std::reverse (&data[0], &data[h]);
+  std::reverse (&data [0], &data [h]);
 
   set_pattern (data, w, h);
 }
@@ -970,18 +954,17 @@ DitherPatternInfo::from_string (const std::string &cstr)
 //  DitherPattern implementation
 
 struct ReplaceDitherPatternOp
-  : public db::Op
-{
-  ReplaceDitherPatternOp (unsigned int i, const DitherPatternInfo &o, const DitherPatternInfo &n) 
-    : db::Op (), index (i), m_old (o), m_new (n) 
-  { }
+  : public db::Op {
+  ReplaceDitherPatternOp (unsigned int i, const DitherPatternInfo &o, const DitherPatternInfo &n)
+    : db::Op (), index (i), m_old (o), m_new (n)
+  {
+  }
 
   unsigned int index;
   DitherPatternInfo m_old, m_new;
 };
 
-DitherPattern::DitherPattern () :
-    db::Object (0)
+DitherPattern::DitherPattern () : db::Object (0)
 {
   for (unsigned int d = 0; d < sizeof (dither_strings) / sizeof (dither_strings [0]); d += 2) {
     m_pattern.push_back (DitherPatternInfo ());
@@ -995,13 +978,12 @@ DitherPattern::~DitherPattern ()
   //  .. nothing yet ..
 }
 
-DitherPattern::DitherPattern (const DitherPattern &p) :
-    db::Object (0)
+DitherPattern::DitherPattern (const DitherPattern &p) : db::Object (0)
 {
   m_pattern = p.m_pattern;
 }
 
-DitherPattern & 
+DitherPattern &
 DitherPattern::operator= (const DitherPattern &p)
 {
   if (this != &p) {
@@ -1009,7 +991,7 @@ DitherPattern::operator= (const DitherPattern &p)
     for (i = 0; i < p.count (); ++i) {
       replace_pattern (i, p.begin () [i]);
     }
-    for ( ; i < count (); ++i) {
+    for (; i < count (); ++i) {
       replace_pattern (i, DitherPatternInfo ());
     }
   }
@@ -1027,8 +1009,7 @@ DitherPattern::pattern (unsigned int i) const
   }
 }
 
-void 
-DitherPattern::replace_pattern (unsigned int i, const DitherPatternInfo &p)
+void DitherPattern::replace_pattern (unsigned int i, const DitherPatternInfo &p)
 {
   while (i >= count ()) {
     m_pattern.push_back (DitherPatternInfo ());
@@ -1042,7 +1023,7 @@ DitherPattern::replace_pattern (unsigned int i, const DitherPatternInfo &p)
   }
 }
 
-unsigned int 
+unsigned int
 DitherPattern::add_pattern (const DitherPatternInfo &p)
 {
   unsigned int oi = 0;
@@ -1052,7 +1033,7 @@ DitherPattern::add_pattern (const DitherPatternInfo &p)
       iempty = i;
     } else if (i->order_index () > oi) {
       oi = i->order_index ();
-    } 
+    }
   }
 
   unsigned int index = std::distance (begin (), iempty);
@@ -1066,36 +1047,34 @@ DitherPattern::add_pattern (const DitherPatternInfo &p)
   return index;
 }
 
-void
-DitherPattern::scale_pattern (unsigned int n)
+void DitherPattern::scale_pattern (unsigned int n)
 {
   for (auto i = m_pattern.begin (); i != m_pattern.end (); ++i) {
     i->scale_pattern (n);
   }
 }
 
-namespace {
-  struct display_order
+namespace
+{
+struct display_order {
+  bool operator() (lay::DitherPattern::iterator a, lay::DitherPattern::iterator b)
   {
-    bool operator () (lay::DitherPattern::iterator a, lay::DitherPattern::iterator b)
-    {
-      return a->order_index () < b->order_index ();
-    }
-  };
+    return a->order_index () < b->order_index ();
+  }
+};
 }
 
-void 
-DitherPattern::renumber ()
+void DitherPattern::renumber ()
 {
   //  renumber the order indices
-  std::vector <lay::DitherPattern::iterator> iters; 
+  std::vector<lay::DitherPattern::iterator> iters;
   for (lay::DitherPattern::iterator i = begin_custom (); i != end (); ++i) {
     iters.push_back (i);
   }
   std::sort (iters.begin (), iters.end (), display_order ());
 
   unsigned int oi = 1;
-  for (std::vector <lay::DitherPattern::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
+  for (std::vector<lay::DitherPattern::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
     if ((*i)->order_index () > 0) {
       lay::DitherPatternInfo p (**i);
       p.set_order_index (oi++);
@@ -1104,47 +1083,43 @@ DitherPattern::renumber ()
   }
 }
 
-DitherPattern::iterator 
-DitherPattern::begin_custom () const 
+DitherPattern::iterator
+DitherPattern::begin_custom () const
 {
   return m_pattern.begin () + sizeof (dither_strings) / sizeof (dither_strings [0]) / 2;
 }
 
 const DitherPattern &
-DitherPattern::default_pattern () 
+DitherPattern::default_pattern ()
 {
   static DitherPattern empty;
   return empty;
 }
 
-void 
-DitherPattern::undo (db::Op *op)
+void DitherPattern::undo (db::Op *op)
 {
-  const ReplaceDitherPatternOp *rop = dynamic_cast <const ReplaceDitherPatternOp *> (op);
+  const ReplaceDitherPatternOp *rop = dynamic_cast<const ReplaceDitherPatternOp *> (op);
   if (rop) {
     replace_pattern (rop->index, rop->m_old);
   }
 }
 
-void 
-DitherPattern::redo (db::Op *op)
+void DitherPattern::redo (db::Op *op)
 {
-  const ReplaceDitherPatternOp *rop = dynamic_cast <const ReplaceDitherPatternOp *> (op);
+  const ReplaceDitherPatternOp *rop = dynamic_cast<const ReplaceDitherPatternOp *> (op);
   if (rop) {
     replace_pattern (rop->index, rop->m_new);
   }
 }
 
-struct pattern_less_f
-{
+struct pattern_less_f {
   bool operator() (const DitherPatternInfo &a, const DitherPatternInfo &b) const
   {
     return a.less_bitmap (b);
   }
 };
 
-void 
-DitherPattern::merge (const DitherPattern &other, std::map<unsigned int, unsigned int> &index_map)
+void DitherPattern::merge (const DitherPattern &other, std::map<unsigned int, unsigned int> &index_map)
 {
   //  insert the standard pattern into the map (for completeness)
   for (iterator c = begin (); c != begin_custom (); ++c) {
@@ -1152,14 +1127,14 @@ DitherPattern::merge (const DitherPattern &other, std::map<unsigned int, unsigne
   }
 
   //  build an index of present pattern
-  std::map <DitherPatternInfo, unsigned int, pattern_less_f> patterns;
+  std::map<DitherPatternInfo, unsigned int, pattern_less_f> patterns;
   for (iterator c = begin_custom (); c != end (); ++c) {
     patterns.insert (std::make_pair (*c, (unsigned int) std::distance (begin (), c)));
   }
 
   //  map the pattern of other into *this, possibly creating new ones
   for (iterator c = other.begin_custom (); c != other.end (); ++c) {
-    std::map <DitherPatternInfo, unsigned int, pattern_less_f>::const_iterator p = patterns.find (*c);
+    std::map<DitherPatternInfo, unsigned int, pattern_less_f>::const_iterator p = patterns.find (*c);
     unsigned int new_index;
     if (p == patterns.end ()) {
       new_index = add_pattern (*c);
@@ -1172,4 +1147,3 @@ DitherPattern::merge (const DitherPattern &other, std::map<unsigned int, unsigne
 }
 
 }
-

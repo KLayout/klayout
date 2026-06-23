@@ -114,8 +114,7 @@ Edges::Edges (DeepShapeStore &dss)
   mp_delegate = new DeepEdges (DeepLayer (&dss, layout_index, dss.layout (layout_index).insert_layer ()));
 }
 
-void
-Edges::convert_to_deep (const db::DeepLayer &layer)
+void Edges::convert_to_deep (const db::DeepLayer &layer)
 {
   tl_assert (mp_delegate->deep () == 0);
   set_delegate (copy_data_id (new db::DeepEdges (layer)));
@@ -129,8 +128,7 @@ Edges::iter () const
   return *(i ? i : &def_iter);
 }
 
-void
-Edges::set_delegate (EdgesDelegate *delegate, bool keep_attributes)
+void Edges::set_delegate (EdgesDelegate *delegate, bool keep_attributes)
 {
   if (delegate != mp_delegate) {
     if (keep_attributes && mp_delegate && delegate) {
@@ -142,8 +140,7 @@ Edges::set_delegate (EdgesDelegate *delegate, bool keep_attributes)
   }
 }
 
-void
-Edges::write (const std::string &fn) const
+void Edges::write (const std::string &fn) const
 {
   //  method provided for debugging purposes
 
@@ -158,14 +155,12 @@ Edges::write (const std::string &fn) const
   writer.write (layout, os);
 }
 
-void
-Edges::clear ()
+void Edges::clear ()
 {
   set_delegate (new EmptyEdges ());
 }
 
-void
-Edges::reserve (size_t n)
+void Edges::reserve (size_t n)
 {
   mutable_edges ()->reserve (n);
 }
@@ -200,8 +195,7 @@ Edges Edges::centers (length_type length, double fraction) const
   return Edges (mp_delegate->processed (EdgeSegmentSelector (0, length, fraction)));
 }
 
-void
-Edges::flatten ()
+void Edges::flatten ()
 {
   mutable_edges ()->flatten ();
 }
@@ -273,31 +267,30 @@ Edges::mutable_edges ()
 
 namespace tl
 {
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Edges &b)
-  {
-    db::Edge p;
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Edges &b)
+{
+  db::Edge p;
 
-    if (ex.at_end ()) {
-      return true;
-    }
-    if (! ex.try_read (p)) {
-      return false;
-    }
-    b.insert (p);
-
-    while (ex.test (";")) {
-      ex.read (p);
-      b.insert (p);
-    } 
-
+  if (ex.at_end ()) {
     return true;
   }
-
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Edges &b)
-  {
-    if (! test_extractor_impl (ex, b)) {
-      ex.error (tl::to_string (tr ("Expected an edge set specification")));
-    }
+  if (! ex.try_read (p)) {
+    return false;
   }
+  b.insert (p);
+
+  while (ex.test (";")) {
+    ex.read (p);
+    b.insert (p);
+  }
+
+  return true;
 }
 
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Edges &b)
+{
+  if (! test_extractor_impl (ex, b)) {
+    ex.error (tl::to_string (tr ("Expected an edge set specification")));
+  }
+}
+}

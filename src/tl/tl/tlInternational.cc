@@ -25,15 +25,15 @@
 #include "tlString.h"
 
 #if defined(HAVE_QT)
-# include <QTextCodec>
+#include <QTextCodec>
 #endif
 
 #include <memory>
 #include <iostream>
 #include <locale.h>
 #include <stdio.h>
-#if !defined(_WIN32)
-# include <langinfo.h>
+#if ! defined(_WIN32)
+#include <langinfo.h>
 #endif
 
 namespace tl
@@ -54,7 +54,7 @@ std::string to_string (const QString &s)
   return std::string (utf8.constData (), utf8.size ());
 }
 
-#if !defined(_WIN32)
+#if ! defined(_WIN32)
 std::string system_to_string (const std::string &s)
 {
   if (! ms_system_codec) {
@@ -128,4 +128,3 @@ std::string tr_fallback (const char *s)
 }
 
 }
-

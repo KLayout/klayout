@@ -55,11 +55,11 @@ void DB_PUBLIC set_default_editable_mode (bool editable);
 //  circle resolution
 
 /**
- *  @brief Returns the number of points per full circle 
+ *  @brief Returns the number of points per full circle
  *
  *  This value is used as default in some places.
  */
-inline unsigned int num_circle_points () 
+inline unsigned int num_circle_points ()
 {
   extern DB_PUBLIC unsigned int ms_num_circle_points;
   return ms_num_circle_points < 4 ? 4 : ms_num_circle_points;
@@ -73,4 +73,3 @@ void DB_PUBLIC set_num_circle_points (unsigned int n);
 }
 
 #endif
-

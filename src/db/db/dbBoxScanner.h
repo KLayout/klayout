@@ -72,7 +72,7 @@ private:
 template <class BoxConvertAdaptor, class Obj, class Prop, class SideOp>
 struct bs_side_compare_vs_const_func
 #if __cplusplus < 201703L
-        : std::unary_function<std::pair<const Obj *, Prop>, bool>
+  : std::unary_function<std::pair<const Obj *, Prop>, bool>
 #endif
 {
   typedef typename BoxConvertAdaptor::box_type box_type;
@@ -112,13 +112,12 @@ bool bs_boxes_overlap (const Box &b1, const Box &b2, typename Box::coord_type en
 /**
  *  @brief A template for the box scanner output receiver
  *
- *  This template specifies the methods or provides a default implementation for them 
+ *  This template specifies the methods or provides a default implementation for them
  *  for use as the output receiver of the box scanner.
  */
 template <class Obj, class Prop>
-struct box_scanner_receiver
-{
-  virtual ~box_scanner_receiver () { }
+struct box_scanner_receiver {
+  virtual ~box_scanner_receiver () {}
 
   /**
    *  @brief Indicates that the given object is no longer used
@@ -126,15 +125,15 @@ struct box_scanner_receiver
    *  The finish method is called when an object is no longer in the queue and can be
    *  discarded.
    */
-  virtual void finish (const Obj * /*obj*/, Prop /*prop*/) { }
+  virtual void finish (const Obj * /*obj*/, Prop /*prop*/) {}
 
   /**
    *  @brief Callback for an interaction of o1 with o2.
    *
-   *  This method is called when the object o1 interacts with o2 within the current 
+   *  This method is called when the object o1 interacts with o2 within the current
    *  definition.
    */
-  virtual void add (const Obj * /*o1*/, Prop /*p1*/, const Obj * /*o2*/, Prop /*p2*/) { }
+  virtual void add (const Obj * /*o1*/, Prop /*p1*/, const Obj * /*o2*/, Prop /*p2*/) {}
 
   /**
    *  @brief Indicates whether the scanner may stop
@@ -142,14 +141,14 @@ struct box_scanner_receiver
    *  The scanner will stop if this method returns true. This feature can be used to
    *  terminate the scan process early if the outcome is known.
    */
- virtual  bool stop () const { return false; }
+  virtual bool stop () const { return false; }
 
   /**
    *  @brief Pre-scanning operations
    *
    *  This method is called before the scanning starts.
    */
-  virtual void initialize () { }
+  virtual void initialize () {}
 
   /**
    *  @brief Post-scanning operations
@@ -157,7 +156,7 @@ struct box_scanner_receiver
    *  This method is called after the scan has finished (without exception). The argument is the
    *  return value (false if "stop" stopped the process).
    */
-  virtual void finalize (bool) { }
+  virtual void finalize (bool) {}
 };
 
 /**
@@ -167,10 +166,10 @@ struct box_scanner_receiver
  *  properties (of type Prop). It will store pointers to these objects, so they lifetime of these objects
  *  must exceed that of the box scanner.
  *
- *  The basic function of the box scanner is to derive interactions. This is done in the process 
+ *  The basic function of the box scanner is to derive interactions. This is done in the process
  *  method. After the box scanner has been filled with object pointers, the process method can be called.
- *  The process method will derive all interactions and report these to the Rec argument of the 
- *  process method. 
+ *  The process method will derive all interactions and report these to the Rec argument of the
+ *  process method.
  *
  *  "Rec" is the interaction receiver. It will receive events when an interaction is encountered.
  *  See the box_scanner_receiver template for a description of the methods this object must provide.
@@ -178,22 +177,22 @@ struct box_scanner_receiver
  *  See the process method for the description of the options of the interaction test.
  */
 template <class Obj, class Prop>
-class box_scanner 
+class box_scanner
 {
 public:
   typedef Obj object_type;
   typedef Prop property_type;
-  typedef std::vector<std::pair<const Obj *, Prop> > container_type;
+  typedef std::vector<std::pair<const Obj *, Prop>> container_type;
   typedef typename container_type::iterator iterator_type;
 
   template <class BoxConvert>
-  struct box_convert_adaptor_take_first
-  {
+  struct box_convert_adaptor_take_first {
     typedef typename BoxConvert::box_type box_type;
 
     box_convert_adaptor_take_first (const BoxConvert &bc)
       : m_bc (bc)
-    { }
+    {
+    }
 
     box_type operator() (const std::pair<const Obj *, Prop> &p) const
     {
@@ -204,8 +203,7 @@ public:
     const BoxConvert &m_bc;
   };
 
-  struct BoxConvertAdaptorTakeSecond
-  {
+  struct BoxConvertAdaptorTakeSecond {
     typedef Prop box_type;
 
     const box_type &operator() (const std::pair<const Obj *, Prop> &p) const
@@ -218,7 +216,7 @@ public:
    *  @brief Default ctor
    */
   box_scanner (bool report_progress = false, const std::string &progress_desc = std::string ())
-    : m_fill_factor (2), m_scanner_thr (100), 
+    : m_fill_factor (2), m_scanner_thr (100),
       m_report_progress (report_progress), m_progress_desc (progress_desc)
   {
     //  .. nothing yet ..
@@ -227,7 +225,7 @@ public:
   /**
    *  @brief Sets the scanner threshold
    *
-   *  This value determines for how many elements the implementation switches to the scanner 
+   *  This value determines for how many elements the implementation switches to the scanner
    *  implementation instead of the plain element-by-element interaction test.
    *  The default value is 100.
    */
@@ -247,8 +245,8 @@ public:
   /**
    *  @brief Sets the fill factor
    *
-   *  The fill factor determines how many new entries will be collected for a band. 
-   *  A fill factor of 2 means that the number of elements in the band will be 
+   *  The fill factor determines how many new entries will be collected for a band.
+   *  A fill factor of 2 means that the number of elements in the band will be
    *  doubled after elements outside of the band have been removed.
    *  The default fill factor is 2.
    */
@@ -284,8 +282,8 @@ public:
   /**
    *  @brief Inserts a new object into the scanner
    *
-   *  The object's pointer is stored, so the object must remain valid until the 
-   *  scanner does not need it any longer. An additional property can be attached to 
+   *  The object's pointer is stored, so the object must remain valid until the
+   *  scanner does not need it any longer. An additional property can be attached to
    *  the object which will be stored along with the object.
    */
   void insert (const Obj *obj, const Prop &prop)
@@ -303,9 +301,9 @@ public:
    *  An enlargement of 1 means that boxes have to touch only in order to get an interaction.
    *
    *  The box scanner will report all interactions to the receiver object. See box_scanner_receiver
-   *  for details about the methods that this object must provide. 
+   *  for details about the methods that this object must provide.
    *
-   *  The box converter must be capable of converting the Obj object into a box. 
+   *  The box converter must be capable of converting the Obj object into a box.
    *  It must provide a box_type typedef.
    *
    *  The scanner process can be terminated early by making the receiver's
@@ -348,10 +346,10 @@ private:
   {
     typedef typename BoxConvertAdaptor::box_type box_type;
     typedef typename box_type::coord_type coord_type;
-    typedef bs_side_compare_func<BoxConvertAdaptor, Obj, Prop, box_bottom<Box> > bottom_side_compare_func;
-    typedef bs_side_compare_func<BoxConvertAdaptor, Obj, Prop, box_left<Box> > left_side_compare_func;
-    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor, Obj, Prop, box_top<Box> > below_func;
-    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor, Obj, Prop, box_right<Box> > left_func;
+    typedef bs_side_compare_func<BoxConvertAdaptor, Obj, Prop, box_bottom<Box>> bottom_side_compare_func;
+    typedef bs_side_compare_func<BoxConvertAdaptor, Obj, Prop, box_left<Box>> left_side_compare_func;
+    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor, Obj, Prop, box_top<Box>> below_func;
+    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor, Obj, Prop, box_right<Box>> left_func;
 
     //  sort out the entries with an empty bbox (we must not put that into sort)
 
@@ -394,7 +392,7 @@ private:
 
     } else {
 
-      std::set<std::pair<const Obj *, const Obj *> > seen;
+      std::set<std::pair<const Obj *, const Obj *>> seen;
 
       std::sort (m_pp.begin (), m_pp.end (), bottom_side_compare_func (bc));
 
@@ -419,7 +417,7 @@ private:
 
         while (cc != current) {
           rec.finish (cc->first, cc->second);
-          auto s = seen.lower_bound (std::make_pair (cc->first, (const Obj *)0));
+          auto s = seen.lower_bound (std::make_pair (cc->first, (const Obj *) 0));
           auto s0 = s;
           while (s != seen.end () && s->first == cc->first) {
             ++s;
@@ -485,22 +483,18 @@ private:
           }
 
           x = xx;
-
         }
 
         y = yy;
-
       }
 
       while (current != m_pp.end ()) {
         rec.finish (current->first, current->second);
         ++current;
       }
-
     }
 
     return true;
-
   }
 };
 
@@ -511,15 +505,14 @@ private:
  *  for use as the output receiver of the twofold box scanner.
  */
 template <class Obj1, class Prop1, class Obj2, class Prop2>
-struct box_scanner_receiver2
-{
+struct box_scanner_receiver2 {
   /**
    *  @brief Indicates that the given object of first type is no longer used
    *
    *  The finish1 method is called when an object of the first type is no longer in the queue and can be
    *  discarded.
    */
-  void finish1 (const Obj1 * /*obj*/, const Prop1 & /*prop*/) { }
+  void finish1 (const Obj1 * /*obj*/, const Prop1 & /*prop*/) {}
 
   /**
    *  @brief Indicates that the given object of second type is no longer used
@@ -527,7 +520,7 @@ struct box_scanner_receiver2
    *  The finish method is called when an object of the second type is no longer in the queue and can be
    *  discarded.
    */
-  void finish2 (const Obj2 * /*obj*/, const Prop2 & /*prop*/) { }
+  void finish2 (const Obj2 * /*obj*/, const Prop2 & /*prop*/) {}
 
   /**
    *  @brief Callback for an interaction of o1 with o2.
@@ -535,7 +528,7 @@ struct box_scanner_receiver2
    *  This method is called when the object o1 interacts with o2 within the current
    *  definition.
    */
-  void add (const Obj1 * /*o1*/, const Prop1 & /*p1*/, const Obj2 * /*o2*/, const Prop2 & /*p2*/) { }
+  void add (const Obj1 * /*o1*/, const Prop1 & /*p1*/, const Obj2 * /*o2*/, const Prop2 & /*p2*/) {}
 
   /**
    *  @brief Indicates whether the scanner may stop
@@ -550,7 +543,7 @@ struct box_scanner_receiver2
    *
    *  This method is called before the scanning starts.
    */
-  void initialize () { }
+  void initialize () {}
 
   /**
    *  @brief Post-scanning operations
@@ -558,7 +551,7 @@ struct box_scanner_receiver2
    *  This method is called after the scan has finished (without exception). The argument is the
    *  return value (false if "stop" stopped the process).
    */
-  void finalize (bool) { }
+  void finalize (bool) {}
 };
 
 /**
@@ -576,19 +569,19 @@ class box_scanner2
 public:
   typedef Obj1 object_type1;
   typedef Obj2 object_type2;
-  typedef std::vector<std::pair<const Obj1 *, Prop1> > container_type1;
-  typedef std::vector<std::pair<const Obj2 *, Prop2> > container_type2;
+  typedef std::vector<std::pair<const Obj1 *, Prop1>> container_type1;
+  typedef std::vector<std::pair<const Obj2 *, Prop2>> container_type2;
   typedef typename container_type1::iterator iterator_type1;
   typedef typename container_type2::iterator iterator_type2;
 
   template <class BoxConvert>
-  struct box_convert_adaptor_take_first1
-  {
+  struct box_convert_adaptor_take_first1 {
     typedef typename BoxConvert::box_type box_type;
 
     box_convert_adaptor_take_first1 (const BoxConvert &bc)
       : m_bc (bc)
-    { }
+    {
+    }
 
     box_type operator() (const std::pair<const Obj1 *, Prop1> &p) const
     {
@@ -600,13 +593,13 @@ public:
   };
 
   template <class BoxConvert>
-  struct box_convert_adaptor_take_first2
-  {
+  struct box_convert_adaptor_take_first2 {
     typedef typename BoxConvert::box_type box_type;
 
     box_convert_adaptor_take_first2 (const BoxConvert &bc)
       : m_bc (bc)
-    { }
+    {
+    }
 
     box_type operator() (const std::pair<const Obj2 *, Prop2> &p) const
     {
@@ -617,8 +610,7 @@ public:
     const BoxConvert &m_bc;
   };
 
-  struct BoxConvertAdaptorTakeSecond1
-  {
+  struct BoxConvertAdaptorTakeSecond1 {
     typedef Prop1 box_type;
 
     const box_type &operator() (const std::pair<const Obj1 *, Prop1> &p) const
@@ -627,8 +619,7 @@ public:
     }
   };
 
-  struct BoxConvertAdaptorTakeSecond2
-  {
+  struct BoxConvertAdaptorTakeSecond2 {
     typedef Prop2 box_type;
 
     const box_type &operator() (const std::pair<const Obj2 *, Prop2> &p) const
@@ -814,14 +805,14 @@ private:
   {
     typedef typename BoxConvertAdaptor1::box_type box_type; //  must be same as BoxConvert2::box_type
     typedef typename box_type::coord_type coord_type;
-    typedef bs_side_compare_func<BoxConvertAdaptor1, Obj1, Prop1, box_bottom<Box> > bottom_side_compare_func1;
-    typedef bs_side_compare_func<BoxConvertAdaptor1, Obj1, Prop1, box_left<Box> > left_side_compare_func1;
-    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor1, Obj1, Prop1, box_top<Box> > below_func1;
-    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor1, Obj1, Prop1, box_right<Box> > left_func1;
-    typedef bs_side_compare_func<BoxConvertAdaptor2, Obj2, Prop2, box_bottom<Box> > bottom_side_compare_func2;
-    typedef bs_side_compare_func<BoxConvertAdaptor2, Obj2, Prop2, box_left<Box> > left_side_compare_func2;
-    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor2, Obj2, Prop2, box_top<Box> > below_func2;
-    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor2, Obj2, Prop2, box_right<Box> > left_func2;
+    typedef bs_side_compare_func<BoxConvertAdaptor1, Obj1, Prop1, box_bottom<Box>> bottom_side_compare_func1;
+    typedef bs_side_compare_func<BoxConvertAdaptor1, Obj1, Prop1, box_left<Box>> left_side_compare_func1;
+    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor1, Obj1, Prop1, box_top<Box>> below_func1;
+    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor1, Obj1, Prop1, box_right<Box>> left_func1;
+    typedef bs_side_compare_func<BoxConvertAdaptor2, Obj2, Prop2, box_bottom<Box>> bottom_side_compare_func2;
+    typedef bs_side_compare_func<BoxConvertAdaptor2, Obj2, Prop2, box_left<Box>> left_side_compare_func2;
+    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor2, Obj2, Prop2, box_top<Box>> below_func2;
+    typedef bs_side_compare_vs_const_func<BoxConvertAdaptor2, Obj2, Prop2, box_right<Box>> left_func2;
 
     //  sort out the entries with an empty bbox (we must not put that into sort)
 
@@ -895,8 +886,8 @@ private:
 
     } else {
 
-      std::set<std::pair<const Obj1 *, const Obj2 *> > seen1;
-      std::set<std::pair<const Obj2 *, const Obj1 *> > seen2;
+      std::set<std::pair<const Obj1 *, const Obj2 *>> seen1;
+      std::set<std::pair<const Obj2 *, const Obj1 *>> seen2;
 
       std::sort (m_pp1.begin (), m_pp1.end (), bottom_side_compare_func1 (bc1));
       std::sort (m_pp2.begin (), m_pp2.end (), bottom_side_compare_func2 (bc2));
@@ -926,7 +917,7 @@ private:
 
         while (cc1 != current1) {
           rec.finish1 (cc1->first, cc1->second);
-          auto s = seen1.lower_bound (std::make_pair (cc1->first, (const Obj2 *)0));
+          auto s = seen1.lower_bound (std::make_pair (cc1->first, (const Obj2 *) 0));
           auto s0 = s;
           while (s != seen1.end () && s->first == cc1->first) {
             ++s;
@@ -937,7 +928,7 @@ private:
 
         while (cc2 != current2) {
           rec.finish2 (cc2->first, cc2->second);
-          auto s = seen2.lower_bound (std::make_pair (cc2->first, (const Obj1 *)0));
+          auto s = seen2.lower_bound (std::make_pair (cc2->first, (const Obj1 *) 0));
           auto s0 = s;
           while (s != seen2.end () && s->first == cc2->first) {
             ++s;
@@ -1022,13 +1013,10 @@ private:
             if (m_report_progress) {
               progress->set ((f1 - m_pp1.begin ()) + (f2 - m_pp2.begin ()));
             }
-
           }
-
         }
 
         y = yy;
-
       }
 
       while (current1 != m_pp1.end ()) {
@@ -1039,11 +1027,9 @@ private:
         rec.finish2 (current2->first, current2->second);
         ++current2;
       }
-
     }
 
     return true;
-
   }
 };
 
@@ -1051,21 +1037,21 @@ private:
  *  @brief A cluster template that stores properties
  *
  *  This template provides the definitions of the methods required for the
- *  cluster collector. It should be used as the base class because it provides 
+ *  cluster collector. It should be used as the base class because it provides
  *  a storage for the object pointers inside the cluster.
  *
  *  One requirement for implementations of the cluster class is that they
  *  provide a copy constructor since the cluster objects are derived from
  *  a seed (initial template) cluster.
  *
- *  This cluster template also stores properties along with the 
+ *  This cluster template also stores properties along with the
  *  object pointers.
  */
 template <class Obj, class Prop>
 class cluster
 {
 public:
-  typedef typename std::vector<std::pair<const Obj *, Prop> >::const_iterator iterator;
+  typedef typename std::vector<std::pair<const Obj *, Prop>>::const_iterator iterator;
 
   /**
    *  @brief Adds an object to the cluster
@@ -1073,8 +1059,8 @@ public:
    *  The implementation of this method is supposed to add the given object to
    *  the cluster's data structure.
    */
-  void add (const Obj *obj, const Prop &prop) 
-  { 
+  void add (const Obj *obj, const Prop &prop)
+  {
     m_objects.push_back (std::make_pair (obj, prop));
   }
 
@@ -1082,13 +1068,13 @@ public:
    *  @brief Joins the cluster with another one
    *
    *  The implementation of this method is supposed to import
-   *  the data from the other cluster. After that the other cluster is 
+   *  the data from the other cluster. After that the other cluster is
    *  deleted.
    *
    *  The actual implementation shall use it's own class for the
    *  Argument.
    */
-  void join (const cluster<Obj, Prop> &other) 
+  void join (const cluster<Obj, Prop> &other)
   {
     m_objects.insert (m_objects.end (), other.begin (), other.end ());
   }
@@ -1099,7 +1085,7 @@ public:
    *  This method is called after the last member has been added to the cluster.
    *  After the cluster has been finished it is deleted.
    */
-  void finish () { }
+  void finish () {}
 
   /**
    *  @brief Begin iterator the objects in this cluster
@@ -1134,7 +1120,7 @@ public:
   }
 
 private:
-  std::vector<std::pair<const Obj *, Prop> > m_objects;
+  std::vector<std::pair<const Obj *, Prop>> m_objects;
 };
 
 /**
@@ -1143,7 +1129,7 @@ private:
  *  "Clustering" means that all objects interacting are grouped into one
  *  cluster.
  *
- *  For this, the cluster collector requires a cluster object which 
+ *  For this, the cluster collector requires a cluster object which
  *  provides the methods described by the cluster template.
  *
  *  It is important that the cluster object has a copy constructor
@@ -1163,16 +1149,16 @@ public:
   typedef Obj object_type;
   typedef Prop property_type;
   typedef Cluster cluster_type;
-  typedef std::list<std::pair<size_t, Cluster> > cl_type;
-  typedef typename std::list<std::pair<size_t, Cluster> >::iterator cl_iterator_type;
+  typedef std::list<std::pair<size_t, Cluster>> cl_type;
+  typedef typename std::list<std::pair<size_t, Cluster>>::iterator cl_iterator_type;
   typedef std::pair<const Obj *, Prop> om_key_type;
   typedef std::map<om_key_type, cl_iterator_type> om_type;
   typedef typename om_type::iterator om_iterator_type;
 
   /**
-   *  @brief The constructor 
+   *  @brief The constructor
    *
-   *  It is important to provide a cluster seed (template) which is used to derive 
+   *  It is important to provide a cluster seed (template) which is used to derive
    *  new clusters by copying this one.
    */
   cluster_collector (const Cluster &cl_template, bool report_single = true)
@@ -1203,7 +1189,6 @@ public:
       Cluster cl (m_cl_template);
       cl.add (obj, prop);
       cl.finish ();
-
     }
   }
 
@@ -1230,7 +1215,6 @@ public:
 
       //  second one is new: add to existing cluster
       om1->second->second.add (o2, p2);
-
     }
   }
 
@@ -1272,7 +1256,7 @@ public:
       om1->second->second.join (om2->second->second);
 
       //  remap the other entries
-      cl_iterator_type c2 = om2->second; 
+      cl_iterator_type c2 = om2->second;
       for (typename Cluster::iterator o = c2->second.begin (); o != c2->second.end (); ++o) {
         om_iterator_type omi = m_om.find (Cluster::key_from_iter (o));
         if (omi != m_om.end ()) {
@@ -1282,7 +1266,6 @@ public:
 
       //  and erase the other cluster
       m_cl.erase (c2);
-
     }
   }
 
@@ -1297,4 +1280,3 @@ private:
 }
 
 #endif
-

@@ -58,8 +58,7 @@ LibraryProxy::~LibraryProxy ()
   }
 }
 
-void 
-LibraryProxy::unregister ()
+void LibraryProxy::unregister ()
 {
   if (layout ()) {
     layout ()->unregister_lib_proxy (this);
@@ -72,8 +71,7 @@ LibraryProxy::unregister ()
   }
 }
 
-void 
-LibraryProxy::reregister ()
+void LibraryProxy::reregister ()
 {
   if (layout ()) {
     layout ()->register_lib_proxy (this);
@@ -86,8 +84,7 @@ LibraryProxy::reregister ()
   }
 }
 
-void 
-LibraryProxy::remap (lib_id_type lib_id, cell_index_type lib_cell_index)
+void LibraryProxy::remap (lib_id_type lib_id, cell_index_type lib_cell_index)
 {
   if (lib_id == m_lib_id && m_library_cell_index == lib_cell_index) {
     //  we trigger an update in any case to implement the library's "refresh"
@@ -126,7 +123,7 @@ LibraryProxy::clone (Layout &layout) const
   return cell;
 }
 
-std::vector<int> 
+std::vector<int>
 LibraryProxy::get_layer_indices (db::Layout &layout, db::ImportLayerMapping *layer_mapping)
 {
   std::vector<int> m_layer_indices; // TODO: should be somewhere "global" ..
@@ -139,9 +136,7 @@ LibraryProxy::get_layer_indices (db::Layout &layout, db::ImportLayerMapping *lay
 
   bool reuse_layer_list = (m_layer_indices.size () == lib->layout ().layers ());
   for (unsigned int i = 0; i < m_layer_indices.size () && reuse_layer_list; ++i) {
-    reuse_layer_list = layout.is_valid_layer (m_layer_indices[i]) 
-                         && lib->layout ().is_valid_layer (i)
-                         && layout.get_properties (m_layer_indices[i]).log_equal (lib->layout ().get_properties (i));
+    reuse_layer_list = layout.is_valid_layer (m_layer_indices [i]) && lib->layout ().is_valid_layer (i) && layout.get_properties (m_layer_indices [i]).log_equal (lib->layout ().get_properties (i));
   }
 
   if (! reuse_layer_list) {
@@ -178,18 +173,14 @@ LibraryProxy::get_layer_indices (db::Layout &layout, db::ImportLayerMapping *lay
         } else {
           m_layer_indices.push_back (layout.waste_layer ());
         }
-
       }
-
     }
-
   }
 
   return m_layer_indices;
 }
 
-void 
-LibraryProxy::update (db::ImportLayerMapping *layer_mapping)
+void LibraryProxy::update (db::ImportLayerMapping *layer_mapping)
 {
   tl_assert (layout () != 0);
   std::vector<int> layer_indices (get_layer_indices (*layout (), layer_mapping));
@@ -249,18 +240,16 @@ LibraryProxy::update (db::ImportLayerMapping *layer_mapping)
     } else {
       insert (inst);
     }
-
   }
 }
 
-bool
-LibraryProxy::can_skip_replica () const
+bool LibraryProxy::can_skip_replica () const
 {
   const Library *lib = LibraryManager::instance ().lib (lib_id ());
   return lib && ! lib->replicate ();
 }
 
-std::string 
+std::string
 LibraryProxy::get_basic_name () const
 {
   Library *lib = LibraryManager::instance ().lib (lib_id ());
@@ -325,4 +314,3 @@ LibraryProxy::get_qualified_name () const
 }
 
 }
-

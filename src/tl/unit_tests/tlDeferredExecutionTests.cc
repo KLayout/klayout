@@ -24,20 +24,28 @@
 #include "tlUnitTest.h"
 
 #if defined(HAVE_QT)
-#  include <QCoreApplication>
+#include <QCoreApplication>
 #endif
 
 int g_na = 0;
 int g_nb = 0;
 
-class X 
+class X
 {
 public:
-  X () : da (this, &X::a), db (this, &X::b, false), na (0), nb (0) { }
+  X () : da (this, &X::a), db (this, &X::b, false), na (0), nb (0) {}
 
-  void a () { ++na; ++g_na; }
-  void b () { ++nb; ++g_nb; }
-  
+  void a ()
+  {
+    ++na;
+    ++g_na;
+  }
+  void b ()
+  {
+    ++nb;
+    ++g_nb;
+  }
+
   tl::DeferredMethod<X> da, db;
   int na, nb;
 };
@@ -55,7 +63,7 @@ void trigger_execution ()
   tl::DeferredMethodScheduler::execute ();
 }
 
-TEST(1) 
+TEST (1)
 {
   g_na = g_nb = 0;
 
@@ -113,14 +121,14 @@ TEST(1)
   EXPECT_EQ (x->nb, 2);
   EXPECT_EQ (g_na, 1);
   EXPECT_EQ (g_nb, 2);
-  
+
   trigger_execution ();
 
   EXPECT_EQ (x->na, 1);
   EXPECT_EQ (x->nb, 2);
   EXPECT_EQ (g_na, 1);
   EXPECT_EQ (g_nb, 2);
-  
+
   x->da ();
   x->da ();
   x->db ();
@@ -130,7 +138,7 @@ TEST(1)
   EXPECT_EQ (x->nb, 2);
   EXPECT_EQ (g_na, 1);
   EXPECT_EQ (g_nb, 2);
-  
+
   trigger_execution ();
 
   EXPECT_EQ (x->na, 2);
@@ -144,7 +152,7 @@ TEST(1)
   EXPECT_EQ (x->nb, 4);
   EXPECT_EQ (g_na, 2);
   EXPECT_EQ (g_nb, 4);
-  
+
   delete x;
 
   trigger_execution ();
@@ -179,14 +187,14 @@ TEST(1)
   EXPECT_EQ (x->nb, 2);
   EXPECT_EQ (g_na, 3);
   EXPECT_EQ (g_nb, 6);
-  
+
   trigger_execution ();
 
   EXPECT_EQ (x->na, 1);
   EXPECT_EQ (x->nb, 2);
   EXPECT_EQ (g_na, 3);
   EXPECT_EQ (g_nb, 6);
-  
+
   x->da ();
   x->da ();
   x->db ();
@@ -198,7 +206,6 @@ TEST(1)
 
   EXPECT_EQ (g_na, 3);
   EXPECT_EQ (g_nb, 6);
-
 }
 
 static int y_inst = 0;
@@ -210,12 +217,12 @@ public:
   ~Y () { --y_inst; }
 
   void a () { delete this; }
-  void b () { tl_assert(false); }
+  void b () { tl_assert (false); }
 
   tl::DeferredMethod<Y> da, db;
 };
 
-TEST(2)
+TEST (2)
 {
   //  execution of a deletes db which must not be executed
   y_inst = 0;

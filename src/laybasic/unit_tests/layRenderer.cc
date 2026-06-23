@@ -27,7 +27,7 @@
 #include "layBitmap.h"
 #include "tlUnitTest.h"
 
-static std::string 
+static std::string
 to_string (const lay::Bitmap &bm)
 {
   std::string r;
@@ -35,7 +35,7 @@ to_string (const lay::Bitmap &bm)
   for (unsigned int j = bm.height (); j > 0; --j) {
     std::string s;
     for (unsigned int k = 0; k < bm.width (); ++k) {
-      const char *t = (bm.scanline (j - 1)[k / 32] & (1 << (k % 32))) != 0 ? "#" : "-";
+      const char *t = (bm.scanline (j - 1) [k / 32] & (1 << (k % 32))) != 0 ? "#" : "-";
       s += t;
     }
     r += s;
@@ -45,7 +45,7 @@ to_string (const lay::Bitmap &bm)
   return r;
 }
 
-static std::string 
+static std::string
 to_string (const lay::Bitmap &bm, const lay::Bitmap &bf)
 {
   std::string r;
@@ -53,8 +53,8 @@ to_string (const lay::Bitmap &bm, const lay::Bitmap &bf)
   for (unsigned int j = bm.height (); j > 0; --j) {
     std::string s;
     for (unsigned int k = 0; k < bm.width (); ++k) {
-      const char *t = (bm.scanline (j - 1)[k / 32] & (1 << (k % 32))) != 0 ? "#" : "-";
-      if ((bf.scanline (j - 1)[k / 32] & (1 << (k % 32))) != 0) {
+      const char *t = (bm.scanline (j - 1) [k / 32] & (1 << (k % 32))) != 0 ? "#" : "-";
+      if ((bf.scanline (j - 1) [k / 32] & (1 << (k % 32))) != 0) {
         t = "*";
       }
       s += t;
@@ -66,10 +66,10 @@ to_string (const lay::Bitmap &bm, const lay::Bitmap &bf)
   return r;
 }
 
-TEST(1) 
+TEST (1)
 {
   lay::Bitmap b1 (16, 16, 1.0, 1.0);
-   
+
   lay::BitmapRenderer r (16, 16, 1.0, 1.0);
   r.insert (db::DEdge (3.4, 2.1, 12.7, -2.1));
   r.insert (db::DEdge (12.7, -2.1, 3.4, 2.1));
@@ -97,15 +97,14 @@ TEST(1)
                              "---#---------#--\n"
                              "----------------\n"
                              "----------------\n");
-
 }
 
 
-TEST(2) 
+TEST (2)
 {
   lay::Bitmap b1 (16, 16, 1.0, 1.0);
 
-  lay::BitmapRenderer r(16, 16, 1.0, 1.0);
+  lay::BitmapRenderer r (16, 16, 1.0, 1.0);
   r.clear ();
   r.insert (db::DEdge (3.4, 2.1, 12.7, 12.1));
   r.insert (db::DEdge (3.4, 0.1, 100.0, 22.5));
@@ -154,15 +153,14 @@ TEST(2)
                              "##-----------#--\n"
                              "--##------------\n"
                              "----###---------\n");
-
 }
 
-TEST(3) 
+TEST (3)
 {
   lay::Bitmap b1 (16, 16, 1.0, 1.0);
   lay::Bitmap b2 (16, 16, 1.0, 1.0);
-   
-  lay::BitmapRenderer r(16, 16, 1.0, 1.0);
+
+  lay::BitmapRenderer r (16, 16, 1.0, 1.0);
   r.insert (db::DEdge (3.4, 2.1, 12.7, 14.5));
   r.insert (db::DEdge (12.7, 14.5, 10.7, 0.6));
   r.insert (db::DEdge (10.7, 0.6, 3.4, 2.1));
@@ -272,5 +270,3 @@ TEST(3)
                                  "---------***----\n"
                                  "------------*---\n");
 }
-
-

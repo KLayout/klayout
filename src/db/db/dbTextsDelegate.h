@@ -30,7 +30,8 @@
 #include "dbGenericShapeIterator.h"
 #include "dbText.h"
 
-namespace db {
+namespace db
+{
 
 class RecursiveShapeIterator;
 class Texts;
@@ -43,7 +44,7 @@ class Layout;
 typedef shape_collection_processor<db::Text, db::Text> TextProcessorBase;
 typedef shape_collection_processor<db::Text, db::Polygon> TextToPolygonProcessorBase;
 
-typedef db::generic_shape_iterator_delegate_base <db::Text> TextsIteratorDelegate;
+typedef db::generic_shape_iterator_delegate_base<db::Text> TextsIteratorDelegate;
 
 /**
  *  @brief The delegate for the actual edge set implementation
@@ -77,9 +78,9 @@ public:
   void disable_progress ();
 
   //  dummy features to harmonize the interface of region, edges and edge pair delegates
-  void set_merged_semantics (bool) { }
+  void set_merged_semantics (bool) {}
   bool merged_semantics () const { return false; }
-  void set_is_merged (bool) { }
+  void set_is_merged (bool) {}
   bool is_merged () const { return false; }
 
   virtual std::string to_string (size_t nmax) const = 0;
@@ -144,4 +145,3 @@ private:
 }
 
 #endif
-

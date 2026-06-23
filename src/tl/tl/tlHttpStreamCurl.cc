@@ -22,7 +22,7 @@
 
 #if defined(HAVE_CURL)
 
-#define NOMINMAX   //  for windows.h -> min/max not defined
+#define NOMINMAX //  for windows.h -> min/max not defined
 
 #include "tlHttpStream.h"
 #include "tlHttpStreamCurl.h"
@@ -37,11 +37,11 @@
 #include "tlUri.h"
 #include "tlString.h"
 
-#if !defined(_MSC_VER)
-# include <sys/time.h>
-# include <unistd.h>
+#if ! defined(_MSC_VER)
+#include <sys/time.h>
+#include <unistd.h>
 #else
-# include <WinSock2.h>
+#include <WinSock2.h>
 #endif
 
 #include <curl/curl.h>
@@ -100,7 +100,6 @@ std::string parse_realm (const std::string &header)
         return value;
       }
     }
-
   }
 
   return std::string ();
@@ -117,7 +116,6 @@ std::string parse_realm (const std::string &header)
 class CurlCredentialManager
 {
 public:
-
   enum Mode {
     UseAsIs,
     Inquire,
@@ -136,11 +134,10 @@ public:
 
     if (mode != ForceInquire) {
 
-      std::map<std::pair<std::string, std::string>, std::pair<std::string, std::string> >::const_iterator c = m_credentials.find (std::make_pair (server, realm));
+      std::map<std::pair<std::string, std::string>, std::pair<std::string, std::string>>::const_iterator c = m_credentials.find (std::make_pair (server, realm));
       if (c != m_credentials.end ()) {
         return &c->second;
       }
-
     }
 
     if (mode != UseAsIs && mp_provider.get ()) {
@@ -160,7 +157,7 @@ public:
 
   void set_credentials (const std::string &url, const std::string &realm, const std::string &user, const std::string &passwd)
   {
-    m_credentials[std::make_pair (url, realm)] = std::make_pair (user, passwd);
+    m_credentials [std::make_pair (url, realm)] = std::make_pair (user, passwd);
   }
 
   void set_provider (HttpCredentialProvider *provider)
@@ -174,7 +171,7 @@ public:
   }
 
 private:
-  std::map<std::pair<std::string, std::string>, std::pair<std::string, std::string> > m_credentials;
+  std::map<std::pair<std::string, std::string>, std::pair<std::string, std::string>> m_credentials;
   bool m_proxy;
   tl::weak_ptr<HttpCredentialProvider> mp_provider;
 };
@@ -192,8 +189,7 @@ private:
 class ChunkedBuffer
 {
 private:
-  struct ChunkInfo
-  {
+  struct ChunkInfo {
     ChunkInfo ()
       : pos (0), start (0), size (0)
     {
@@ -295,7 +291,6 @@ public:
       if (m_current_chunk->empty ()) {
         ++m_current_chunk;
       }
-
     }
 
     return data - start;
@@ -611,45 +606,38 @@ InputHttpStream::~InputHttpStream ()
   mp_data = 0;
 }
 
-void
-InputHttpStream::set_credential_provider (HttpCredentialProvider *cp)
+void InputHttpStream::set_credential_provider (HttpCredentialProvider *cp)
 {
   CurlNetworkManager::instance ()->credentials ().set_provider (cp);
   CurlNetworkManager::instance ()->proxy_credentials ().set_provider (cp);
 }
 
-void
-InputHttpStream::send ()
+void InputHttpStream::send ()
 {
   mp_data->send ();
 }
 
-void
-InputHttpStream::close ()
+void InputHttpStream::close ()
 {
   mp_data->close ();
 }
 
-void
-InputHttpStream::set_request (const char *r)
+void InputHttpStream::set_request (const char *r)
 {
   mp_data->set_request (r);
 }
 
-void
-InputHttpStream::set_data (const char *data)
+void InputHttpStream::set_data (const char *data)
 {
   mp_data->set_data (data);
 }
 
-void
-InputHttpStream::set_data (const char *data, size_t n)
+void InputHttpStream::set_data (const char *data, size_t n)
 {
   mp_data->set_data (data, n);
 }
 
-void
-InputHttpStream::add_header (const std::string &name, const std::string &value)
+void InputHttpStream::add_header (const std::string &name, const std::string &value)
 {
   mp_data->add_header (name, value);
 }
@@ -660,8 +648,7 @@ InputHttpStream::ready ()
   return mp_data->ready ();
 }
 
-bool
-InputHttpStream::data_available ()
+bool InputHttpStream::data_available ()
 {
   return mp_data->data_available ();
 }
@@ -672,8 +659,7 @@ InputHttpStream::read (char *b, size_t n)
   return mp_data->read (b, n);
 }
 
-void
-InputHttpStream::reset ()
+void InputHttpStream::reset ()
 {
   mp_data->reset ();
 }
@@ -696,14 +682,12 @@ InputHttpStream::filename () const
   return mp_data->filename ();
 }
 
-bool
-InputHttpStream::is_available ()
+bool InputHttpStream::is_available ()
 {
   return true;
 }
 
-void
-InputHttpStream::tick ()
+void InputHttpStream::tick ()
 {
   if (mp_callback) {
     mp_callback->wait_for_input ();
@@ -711,8 +695,7 @@ InputHttpStream::tick ()
   CurlNetworkManager::instance ()->tick ();
 }
 
-void
-InputHttpStream::set_timeout (double to)
+void InputHttpStream::set_timeout (double to)
 {
   mp_data->set_timeout (to);
 }
@@ -736,7 +719,7 @@ CurlConnection::CurlConnection (CURL *handle)
   : mp_handle (handle)
 {
 #if defined(DEBUG_CURL)
-  std::cerr << "CurlConnection(" << (void *)handle << ")" << std::endl;
+  std::cerr << "CurlConnection(" << (void *) handle << ")" << std::endl;
 #endif
   init ();
 }
@@ -745,7 +728,7 @@ CurlConnection::CurlConnection (const CurlConnection &other)
   : mp_handle (other.mp_handle)
 {
 #if defined(DEBUG_CURL)
-  std::cerr << "CurlConnection(" << (void *)mp_handle << ")" << std::endl;
+  std::cerr << "CurlConnection(" << (void *) mp_handle << ")" << std::endl;
 #endif
   init ();
 }
@@ -777,7 +760,7 @@ void CurlConnection::init ()
 CurlConnection::~CurlConnection ()
 {
 #if defined(DEBUG_CURL)
-  std::cerr << "~CurlConnection(" << (void *)mp_handle << ")" << std::endl;
+  std::cerr << "~CurlConnection(" << (void *) mp_handle << ")" << std::endl;
 #endif
   if (mp_handle) {
     CurlNetworkManager::instance ()->release_connection (this);
@@ -865,9 +848,9 @@ void CurlConnection::send ()
   m_read_data.clear ();
   m_header_data.clear ();
 
-  if (tl::verbosity() >= 30) {
+  if (tl::verbosity () >= 30) {
     tl::info << "HTTP request URL: " << m_url;
-    if (tl::verbosity() >= 40) {
+    if (tl::verbosity () >= 40) {
       curl_slist *hl = mp_headers;
       tl::info << "HTTP request header: ";
       while (hl) {
@@ -971,7 +954,6 @@ void CurlConnection::check () const
     } else {
       throw tl::HttpErrorException (tl::to_string (tr ("HTTP error")), m_http_status, m_url);
     }
-
   }
 }
 
@@ -989,9 +971,9 @@ void CurlConnection::finished (int status)
   long http_code = -1;
   curl_easy_getinfo (mp_handle, CURLINFO_RESPONSE_CODE, &http_code);
 
-  if (tl::verbosity() >= 30) {
+  if (tl::verbosity () >= 30) {
     tl::info << "HTTP response code: " << http_code;
-    if (tl::verbosity() >= 40) {
+    if (tl::verbosity () >= 40) {
       tl::info << "HTTP response header: " << m_header_data.to_string ();
     }
   }
@@ -1022,10 +1004,9 @@ void CurlConnection::finished (int status)
     } catch (tl::CancelException &) {
 
       m_finished = true;
-      m_status = -1;  // cancelled
+      m_status = -1; // cancelled
       finished_event ();
       return;
-
     }
 
     if (pwd) {
@@ -1044,9 +1025,7 @@ void CurlConnection::finished (int status)
 
       send ();
       return;
-
     }
-
   }
 
   m_http_status = http_code;
@@ -1123,43 +1102,42 @@ CurlNetworkManager *CurlNetworkManager::instance ()
 
 CurlConnection *CurlNetworkManager::create_connection ()
 {
-  CURL *handle = curl_easy_init();
+  CURL *handle = curl_easy_init ();
   return new CurlConnection (handle);
 }
 
 void CurlNetworkManager::start (CurlConnection *connection)
 {
 #if defined(DEBUG_CURL)
-  std::cerr << "CurlNetworkManager::start(" << (void*)connection->mp_handle << ")" << std::endl;
+  std::cerr << "CurlNetworkManager::start(" << (void *) connection->mp_handle << ")" << std::endl;
 #endif
   curl_multi_add_handle (mp_multi_handle, connection->mp_handle);
-  curl_multi_perform(mp_multi_handle, &m_still_running);
-  m_handle2connection[connection->mp_handle] = connection;
+  curl_multi_perform (mp_multi_handle, &m_still_running);
+  m_handle2connection [connection->mp_handle] = connection;
 
   dm_tick ();
 }
 
 void CurlNetworkManager::add_connection (CurlConnection *connection)
 {
-  ++m_handle_refcount[connection->mp_handle];
+  ++m_handle_refcount [connection->mp_handle];
 }
 
 void CurlNetworkManager::release_connection (CurlConnection *connection)
 {
-  --m_handle_refcount[connection->mp_handle];
-  if (m_handle_refcount[connection->mp_handle] == 0) {
+  --m_handle_refcount [connection->mp_handle];
+  if (m_handle_refcount [connection->mp_handle] == 0) {
 
 #if defined(DEBUG_CURL)
-    std::cerr << "CurlNetworkManager::release_connection(" << (void*)connection->mp_handle << ")" << std::endl;
+    std::cerr << "CurlNetworkManager::release_connection(" << (void *) connection->mp_handle << ")" << std::endl;
 #endif
-    curl_easy_cleanup(connection->mp_handle);
+    curl_easy_cleanup (connection->mp_handle);
     m_handle_refcount.erase (connection->mp_handle);
 
     std::map<CURL *, CurlConnection *>::iterator h = m_handle2connection.find (connection->mp_handle);
     if (h != m_handle2connection.end ()) {
       m_handle2connection.erase (h);
     }
-
   }
 }
 
@@ -1190,8 +1168,8 @@ void CurlNetworkManager::tick ()
   }
 
   struct timeval timeout;
-  int rc;                   // select() return code
-  CURLMcode mc;             // curl_multi_fdset() return code
+  int rc;       // select() return code
+  CURLMcode mc; // curl_multi_fdset() return code
 
   fd_set fdread;
   fd_set fdwrite;
@@ -1236,11 +1214,10 @@ void CurlNetworkManager::tick ()
     rc = 0;
 #else
     // Portable sleep for platforms other than Windows.
-    struct timeval wait = { 0, 10 * 1000 }; /* 10ms */
+    struct timeval wait = {0, 10 * 1000}; /* 10ms */
     rc = select (0, NULL, NULL, NULL, &wait);
 #endif
-  }
-  else {
+  } else {
     /* Note that on some platforms 'timeout' may be modified by select().
        If you need access to the original value save a copy beforehand. */
     rc = select (maxfd + 1, &fdread, &fdwrite, &fdexcep, &timeout);
@@ -1252,8 +1229,8 @@ void CurlNetworkManager::tick ()
   case -1:
     // select error
     break;
-  case 0:   // timeout
-  default:  // action
+  case 0:  // timeout
+  default: // action
     curl_multi_perform (mp_multi_handle, &m_still_running);
     break;
   }
@@ -1275,9 +1252,7 @@ void CurlNetworkManager::tick ()
         curl_multi_remove_handle (mp_multi_handle, msg->easy_handle);
         h->second->finished (msg->data.result);
       }
-
     }
-
   }
 }
 
@@ -1301,8 +1276,7 @@ InputHttpStreamPrivateData::~InputHttpStreamPrivateData ()
   // .. nothing yet ..
 }
 
-void
-InputHttpStreamPrivateData::set_timeout (double to)
+void InputHttpStreamPrivateData::set_timeout (double to)
 {
   m_timeout = to;
 }
@@ -1313,45 +1287,38 @@ InputHttpStreamPrivateData::timeout () const
   return m_timeout;
 }
 
-bool
-InputHttpStreamPrivateData::data_available ()
+bool InputHttpStreamPrivateData::data_available ()
 {
   return m_connection->read_available () > 0;
 }
 
-void
-InputHttpStreamPrivateData::set_request (const char *r)
+void InputHttpStreamPrivateData::set_request (const char *r)
 {
   m_connection->set_request (r);
 }
 
-void
-InputHttpStreamPrivateData::set_data (const char *data)
+void InputHttpStreamPrivateData::set_data (const char *data)
 {
   m_connection->set_data (data);
 }
 
-void
-InputHttpStreamPrivateData::set_data (const char *data, size_t n)
+void InputHttpStreamPrivateData::set_data (const char *data, size_t n)
 {
   m_connection->set_data (data, n);
 }
 
-void
-InputHttpStreamPrivateData::add_header (const std::string &name, const std::string &value)
+void InputHttpStreamPrivateData::add_header (const std::string &name, const std::string &value)
 {
   m_connection->add_header (name.c_str (), value.c_str ());
 }
 
-void
-InputHttpStreamPrivateData::on_finished ()
+void InputHttpStreamPrivateData::on_finished ()
 {
   m_progress.reset (0);
   m_ready_event ();
 }
 
-void
-InputHttpStreamPrivateData::on_data_available ()
+void InputHttpStreamPrivateData::on_data_available ()
 {
   //  send the ready event just once
   if (! m_ready) {
@@ -1360,8 +1327,7 @@ InputHttpStreamPrivateData::on_data_available ()
   }
 }
 
-void
-InputHttpStreamPrivateData::send ()
+void InputHttpStreamPrivateData::send ()
 {
   m_ready = false;
   m_progress.reset (0);
@@ -1369,8 +1335,7 @@ InputHttpStreamPrivateData::send ()
   m_sent = true;
 }
 
-void
-InputHttpStreamPrivateData::check ()
+void InputHttpStreamPrivateData::check ()
 {
   if (m_connection->finished ()) {
     m_connection->check ();
@@ -1397,12 +1362,12 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
     while (n > m_connection->read_available () && ! m_connection->finished () && ! tl::CurlNetworkManager::instance ()->has_reply ()) {
 
       //  Check for timeout
-      if (m_timeout > 0.0 && (tl::Clock::current() - start_time).seconds () >= m_timeout) {
+      if (m_timeout > 0.0 && (tl::Clock::current () - start_time).seconds () >= m_timeout) {
         throw tl::HttpErrorException (tl::sprintf (tl::to_string (tr ("Connection timed out (timeout is %.1fs)")), m_timeout), 0, m_connection->url ());
       }
 
       mp_stream->tick ();
-      if (m_progress.get ()) {  //  might have been reset by tick()
+      if (m_progress.get ()) { //  might have been reset by tick()
         ++*m_progress;
       }
     }
@@ -1410,15 +1375,14 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
 
   if (m_connection->finished ()) {
     m_connection->check ();
-  } else if (tl::verbosity() >= 40) {
+  } else if (tl::verbosity () >= 40) {
     tl::info << "HTTP response data read: " << m_connection->read_data_to_string ();
   }
 
   return m_connection->fetch_read_data (b, n);
 }
 
-void
-InputHttpStreamPrivateData::close ()
+void InputHttpStreamPrivateData::close ()
 {
   m_progress.reset (0);
   if (m_connection.get ()) {
@@ -1427,8 +1391,7 @@ InputHttpStreamPrivateData::close ()
   m_sent = m_ready = false;
 }
 
-void
-InputHttpStreamPrivateData::reset ()
+void InputHttpStreamPrivateData::reset ()
 {
   throw tl::Exception (tl::to_string (tr ("'reset' is not supported on HTTP input streams")));
 }
@@ -1454,4 +1417,3 @@ InputHttpStreamPrivateData::absolute_path () const
 }
 
 #endif
-

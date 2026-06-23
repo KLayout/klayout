@@ -42,7 +42,7 @@ namespace lay
 ConfigurationDialog::ConfigurationDialog (QWidget *parent, lay::Dispatcher *root, const std::string &plugin_name, const char *name)
   : QDialog (parent),
     mp_root (root)
-{ 
+{
   mp_ui = 0;
 
   setObjectName (QString::fromUtf8 (name));
@@ -62,7 +62,7 @@ ConfigurationDialog::ConfigurationDialog (QWidget *parent, lay::Dispatcher *root
 ConfigurationDialog::ConfigurationDialog (QWidget *parent, lay::Dispatcher *root, lay::PluginDeclaration *decl, const char *name)
   : QDialog (parent),
     mp_root (root)
-{ 
+{
   setObjectName (QString::fromUtf8 (name));
 
   init (decl);
@@ -75,15 +75,14 @@ ConfigurationDialog::~ConfigurationDialog ()
   mp_ui = 0;
 }
 
-void
-ConfigurationDialog::init (const lay::PluginDeclaration *decl)
+void ConfigurationDialog::init (const lay::PluginDeclaration *decl)
 {
   mp_ui = new Ui::ConfigurationDialog ();
   mp_ui->setupUi (this);
 
   //  signals and slots connections
-  connect( mp_ui->ok_button, SIGNAL( clicked() ), this, SLOT( ok_clicked() ) );
-  connect( mp_ui->cancel_button, SIGNAL( clicked() ), this, SLOT( reject() ) );
+  connect (mp_ui->ok_button, SIGNAL (clicked ()), this, SLOT (ok_clicked ()));
+  connect (mp_ui->cancel_button, SIGNAL (clicked ()), this, SLOT (reject ()));
 
   QVBoxLayout *layout = new QVBoxLayout (mp_ui->centralFrame);
 
@@ -98,8 +97,8 @@ ConfigurationDialog::init (const lay::PluginDeclaration *decl)
     layout->addWidget (page);
   }
 
-  std::vector <std::pair <std::string, lay::ConfigPage *> > pages = decl->config_pages (mp_ui->centralFrame);
-  for (std::vector <std::pair <std::string, lay::ConfigPage *> >::iterator p = pages.begin (); p != pages.end (); ++p) {
+  std::vector<std::pair<std::string, lay::ConfigPage *>> pages = decl->config_pages (mp_ui->centralFrame);
+  for (std::vector<std::pair<std::string, lay::ConfigPage *>>::iterator p = pages.begin (); p != pages.end (); ++p) {
     m_config_pages.push_back (p->second);
     if (p->second->layout () == 0) {
       tl::warn << "No layout in configuration page " << p->first;
@@ -110,10 +109,10 @@ ConfigurationDialog::init (const lay::PluginDeclaration *decl)
 
   layout->addStretch (0);
 
-  for (std::vector <lay::ConfigPage *>::iterator p = m_config_pages.begin (); p != m_config_pages.end (); ++p) {
+  for (std::vector<lay::ConfigPage *>::iterator p = m_config_pages.begin (); p != m_config_pages.end (); ++p) {
     if ((*p)->layout ()) {
       (*p)->layout ()->setContentsMargins (0, 0, 0, 0);
-    } 
+    }
     (*p)->setup (mp_root);
   }
 
@@ -121,18 +120,16 @@ ConfigurationDialog::init (const lay::PluginDeclaration *decl)
   setWindowTitle (tl::to_qstring (tl::to_string (QObject::tr ("Configuration")) + " - " + config_title));
 }
 
-void 
-ConfigurationDialog::commit ()
+void ConfigurationDialog::commit ()
 {
-  for (std::vector <lay::ConfigPage *>::iterator p = m_config_pages.begin (); p != m_config_pages.end (); ++p) {
+  for (std::vector<lay::ConfigPage *>::iterator p = m_config_pages.begin (); p != m_config_pages.end (); ++p) {
     (*p)->commit (mp_root);
   }
 
   mp_root->config_end ();
 }
 
-void 
-ConfigurationDialog::ok_clicked ()
+void ConfigurationDialog::ok_clicked ()
 {
   try {
     commit ();
@@ -140,7 +137,7 @@ ConfigurationDialog::ok_clicked ()
   } catch (tl::Exception &ex) {
     tl::error << ex.msg ();
     QMessageBox::critical (this, QObject::tr ("Error"), tl::to_qstring (ex.msg ()));
-  } 
+  }
 }
 
 }

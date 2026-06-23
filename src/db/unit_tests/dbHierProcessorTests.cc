@@ -42,8 +42,7 @@ static std::string testdata (const std::string &fn)
   return tl::testdata () + "/algo/" + fn;
 }
 
-enum TestMode
-{
+enum TestMode {
   TMAnd = 0,
   TMNot = 1,
   TMAndSwapped = 2,
@@ -65,7 +64,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, const db::LocalProcessorBase *proc) const
+  virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef>> &results, const db::LocalProcessorBase *proc) const
   {
     db::shape_interactions<db::PolygonRef, db::PolygonRef> sized_interactions = interactions;
     for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
@@ -102,7 +101,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, const db::LocalProcessorBase *proc) const
+  virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef>> &results, const db::LocalProcessorBase *proc) const
   {
     db::shape_interactions<db::PolygonRef, db::PolygonRef> sized_interactions = interactions;
     for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
@@ -120,7 +119,6 @@ public:
         poly.size (m_dist / 2, m_dist / 2);
         sized_interactions.add_intruder_shape (*j, il, db::PolygonRef (poly, layout->shape_repository ()));
       }
-
     }
 
     SelfOverlapMergeLocalOperation::do_compute_local (layout, cell, sized_interactions, results, proc);
@@ -144,7 +142,7 @@ static void normalize_layer (db::Layout &layout, unsigned int layer)
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
     db::Shapes s (layout.is_editable ());
     s.swap (c->shapes (layer));
-    for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes); !i.at_end (); ++i) {
+    for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes); ! i.at_end (); ++i) {
       db::Polygon poly;
       i->polygon (poly);
       c->shapes (layer).insert (db::PolygonRef (poly, layout.shape_repository ()));
@@ -157,13 +155,13 @@ static std::string contexts_to_s (db::Layout *layout, db::local_processor_contex
 {
   std::string res;
 
-  for (db::Layout::top_down_const_iterator i = layout->begin_top_down (); i != layout->end_top_down(); ++i) {
+  for (db::Layout::top_down_const_iterator i = layout->begin_top_down (); i != layout->end_top_down (); ++i) {
     db::local_processor_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>::iterator cc = contexts.context_map ().find (&layout->cell (*i));
     if (cc != contexts.context_map ().end ()) {
       int index = 1;
       for (db::local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>::iterator j = cc->second.begin (); j != cc->second.end (); ++j) {
         size_t nshapes = 0;
-        for (std::map<unsigned int, std::set<db::PolygonRef> >::const_iterator i = j->first.second.begin (); i != j->first.second.end (); ++i) {
+        for (std::map<unsigned int, std::set<db::PolygonRef>>::const_iterator i = j->first.second.begin (); i != j->first.second.end (); ++i) {
           nshapes += i->second.size ();
         }
         if (j->first.first.size () > 1) {
@@ -297,7 +295,6 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
       *context_doc = contexts_to_s (&layout_org, contexts);
       proc.compute_results (contexts, lop, olv);
     }
-
   }
 
   db::compare_layouts (_this, layout_org, testdata (file), lmap, false /*skip other layers*/, db::AsPolygons);
@@ -432,863 +429,853 @@ static void run_test_bool22_flat (tl::TestBase *_this, const char *file, TestMod
 }
 
 
-TEST(BasicAnd1)
+TEST (BasicAnd1)
 {
   //  Simple flat AND
   run_test_bool (_this, "hlp1.oas", TMAnd, 100);
 }
 
-TEST(BasicAnd1SingleThread)
+TEST (BasicAnd1SingleThread)
 {
   //  Simple flat AND
   run_test_bool (_this, "hlp1.oas", TMAnd, 100, 0, 1);
 }
 
-TEST(BasicAnd1FourThreads)
+TEST (BasicAnd1FourThreads)
 {
   //  Simple flat AND
   run_test_bool (_this, "hlp1.oas", TMAnd, 100, 0, 4);
 }
 
-TEST(BasicNot1)
+TEST (BasicNot1)
 {
   //  Simple flat AND
   run_test_bool (_this, "hlp1.oas", TMNot, 101);
 }
 
-TEST(BasicNot1SingleThread)
+TEST (BasicNot1SingleThread)
 {
   //  Simple flat NOT
   run_test_bool (_this, "hlp1.oas", TMNot, 101, 0, 1);
 }
 
-TEST(BasicNot1FourThreads)
+TEST (BasicNot1FourThreads)
 {
   //  Simple flat NOT
   run_test_bool (_this, "hlp1.oas", TMNot, 101, 0, 4);
 }
 
-TEST(BasicAnd2)
+TEST (BasicAnd2)
 {
   //  Up/down and down/up interactions, AND
   run_test_bool (_this, "hlp2.oas", TMAnd, 100);
 }
 
-TEST(BasicAnd2SingleThread)
+TEST (BasicAnd2SingleThread)
 {
   //  Up/down and down/up interactions, AND
   run_test_bool (_this, "hlp2.oas", TMAnd, 100, 0, 1);
 }
 
-TEST(BasicAnd2FourThreads)
+TEST (BasicAnd2FourThreads)
 {
   //  Up/down and down/up interactions, AND
   run_test_bool (_this, "hlp2.oas", TMAnd, 100, 0, 4);
 }
 
-TEST(BasicNot2)
+TEST (BasicNot2)
 {
   //  Up/down and down/up interactions, NOT
   run_test_bool (_this, "hlp2.oas", TMNot, 101);
 }
 
-TEST(BasicNot2SingleThread)
+TEST (BasicNot2SingleThread)
 {
   //  Up/down and down/up interactions, NOT
   run_test_bool (_this, "hlp2.oas", TMNot, 101, 0, 1);
 }
 
-TEST(BasicNot2FourThreads)
+TEST (BasicNot2FourThreads)
 {
   //  Up/down and down/up interactions, NOT
   run_test_bool (_this, "hlp2.oas", TMNot, 101, 0, 4);
 }
 
-TEST(BasicAnd3)
+TEST (BasicAnd3)
 {
   //  Variant building, AND
   run_test_bool (_this, "hlp3.oas", TMAnd, 100);
 }
 
-TEST(BasicAnd3SingleThread)
+TEST (BasicAnd3SingleThread)
 {
   //  Variant building, AND
   run_test_bool (_this, "hlp3.oas", TMAnd, 100, 0, 1);
 }
 
-TEST(BasicAnd3FourThreads)
+TEST (BasicAnd3FourThreads)
 {
   //  Variant building, AND
   run_test_bool (_this, "hlp3.oas", TMAnd, 100, 0, 4);
 }
 
-TEST(BasicNot3)
+TEST (BasicNot3)
 {
   //  Variant building, NOT
   run_test_bool (_this, "hlp3.oas", TMNot, 101);
 }
 
-TEST(BasicNot3SingleThread)
+TEST (BasicNot3SingleThread)
 {
   //  Variant building, NOT
   run_test_bool (_this, "hlp3.oas", TMNot, 101, 0, 1);
 }
 
-TEST(BasicNot3FourThreads)
+TEST (BasicNot3FourThreads)
 {
   //  Variant building, NOT
   run_test_bool (_this, "hlp3.oas", TMNot, 101, 0, 4);
 }
 
-TEST(BasicAnd4)
+TEST (BasicAnd4)
 {
   //  Sibling interactions, variant building, AND
   run_test_bool (_this, "hlp4.oas", TMAnd, 100);
 }
 
-TEST(BasicNot4)
+TEST (BasicNot4)
 {
   //  Sibling interactions, variant building, NOT
   run_test_bool (_this, "hlp4.oas", TMNot, 101);
 }
 
-TEST(BasicAnd5)
+TEST (BasicAnd5)
 {
   //  Variant building with intermediate hierarchy, AND
   run_test_bool (_this, "hlp5.oas", TMAnd, 100);
 }
 
-TEST(BasicNot5)
+TEST (BasicNot5)
 {
   //  Variant building with intermediate hierarchy, NOT
   run_test_bool (_this, "hlp5.oas", TMNot, 101);
 }
 
-TEST(BasicAnd6)
+TEST (BasicAnd6)
 {
   //  Extreme variants (copy, vanishing), AND
   run_test_bool (_this, "hlp6.oas", TMAnd, 100);
 }
 
-TEST(BasicNot6)
+TEST (BasicNot6)
 {
   //  Extreme variants (copy, vanishing), NOT
   run_test_bool (_this, "hlp6.oas", TMNot, 101);
 }
 
-TEST(BasicAnd7)
+TEST (BasicAnd7)
 {
   //  Context replication - direct and indirect, AND
   run_test_bool (_this, "hlp7.oas", TMAnd, 100);
 }
 
-TEST(BasicNot7)
+TEST (BasicNot7)
 {
   //  Context replication - direct and indirect, NOT
   run_test_bool (_this, "hlp7.oas", TMNot, 101);
 }
 
-TEST(BasicAnd8)
+TEST (BasicAnd8)
 {
   //  Mixed sibling-parent contexts, AND
   run_test_bool (_this, "hlp8.oas", TMAnd, 100);
 }
 
-TEST(BasicNot8)
+TEST (BasicNot8)
 {
   //  Mixed sibling-parent contexts, NOT
   run_test_bool (_this, "hlp8.oas", TMNot, 101);
 }
 
-TEST(BasicAnd9)
+TEST (BasicAnd9)
 {
   //  Top-level ring structure, AND
   std::string doc;
   run_test_bool (_this, "hlp9.oas", TMAnd, 100, &doc);
   EXPECT_EQ (doc,
-    //  This means: the interaction test is strong enough, so it does not see interactions between the
-    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
-    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
-    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
-    "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
-    "RING[1] 0 insts, 0 shapes (1 times)\n"
-  );
+             //  This means: the interaction test is strong enough, so it does not see interactions between the
+             //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+             //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+             //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+             "TOP[1] 0 insts, 0 shapes (1 times)\n"
+             "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
+             "RING[1] 0 insts, 0 shapes (1 times)\n");
 }
 
-TEST(BasicNot9)
+TEST (BasicNot9)
 {
   //  Top-level ring structure, NOT
   std::string doc;
   run_test_bool (_this, "hlp9.oas", TMNot, 101, &doc);
   EXPECT_EQ (doc,
-    //  This means: the interaction test is strong enough, so it does not see interactions between the
-    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
-    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
-    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
-    "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
-    "RING[1] 0 insts, 0 shapes (1 times)\n"
-  );
+             //  This means: the interaction test is strong enough, so it does not see interactions between the
+             //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+             //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+             //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+             "TOP[1] 0 insts, 0 shapes (1 times)\n"
+             "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
+             "RING[1] 0 insts, 0 shapes (1 times)\n");
 }
 
-TEST(BasicAnd10)
+TEST (BasicAnd10)
 {
   //  Array instances, AND
   run_test_bool (_this, "hlp10.oas", TMAnd, 100);
 }
 
-TEST(BasicNot10)
+TEST (BasicNot10)
 {
   //  Array instances, NOT
   run_test_bool (_this, "hlp10.oas", TMNot, 101);
 }
 
-TEST(BasicAndWithSize1)
+TEST (BasicAndWithSize1)
 {
   //  Simple flat AND
   run_test_bool_with_size (_this, "hlp1.oas", TMAnd, 1500, 102);
 }
 
-TEST(BasicNotWithSize1)
+TEST (BasicNotWithSize1)
 {
   //  Simple flat NOT
   run_test_bool_with_size (_this, "hlp1.oas", TMNot, 1500, 103);
 }
 
-TEST(BasicAndWithSize2)
+TEST (BasicAndWithSize2)
 {
   //  Up/down and down/up interactions, AND
   run_test_bool_with_size (_this, "hlp2.oas", TMAnd, 1500, 102);
 }
 
-TEST(BasicNotWithSize2)
+TEST (BasicNotWithSize2)
 {
   //  Up/down and down/up interactions, NOT
   run_test_bool_with_size (_this, "hlp2.oas", TMNot, 1500, 103);
 }
 
-TEST(BasicAndWithSize3)
+TEST (BasicAndWithSize3)
 {
   //  Variant building, AND
   run_test_bool_with_size (_this, "hlp3.oas", TMAnd, 1500, 102);
 }
 
-TEST(BasicNotWithSize3)
+TEST (BasicNotWithSize3)
 {
   //  Variant building, NOT
   run_test_bool_with_size (_this, "hlp3.oas", TMNot, 1500, 103);
 }
 
-TEST(BasicAndWithSize4)
+TEST (BasicAndWithSize4)
 {
   //  Sibling interactions, variant building, AND
   run_test_bool_with_size (_this, "hlp4.oas", TMAnd, 1500, 102);
 }
 
-TEST(BasicNotWithSize4)
+TEST (BasicNotWithSize4)
 {
   //  Sibling interactions, variant building, NOT
   run_test_bool_with_size (_this, "hlp4.oas", TMNot, 1500, 103);
 }
 
-TEST(BasicAndWithSize5)
+TEST (BasicAndWithSize5)
 {
   //  Variant building with intermediate hierarchy, AND
   run_test_bool_with_size (_this, "hlp5.oas", TMAnd, 1500, 102);
 }
 
-TEST(BasicNotWithSize5)
+TEST (BasicNotWithSize5)
 {
   //  Variant building with intermediate hierarchy, NOT
   run_test_bool_with_size (_this, "hlp5.oas", TMNot, 1500, 103);
 }
 
-TEST(BasicAndWithSize6)
+TEST (BasicAndWithSize6)
 {
   //  Extreme variants (copy, vanishing), AND
   run_test_bool_with_size (_this, "hlp6.oas", TMAnd, 1500, 102);
 }
 
-TEST(BasicNotWithSize6)
+TEST (BasicNotWithSize6)
 {
   //  Extreme variants (copy, vanishing), NOT
   run_test_bool_with_size (_this, "hlp6.oas", TMNot, 1500, 103);
 }
 
-TEST(BasicAndWithSize7)
+TEST (BasicAndWithSize7)
 {
   //  Context replication - direct and indirect, AND
   run_test_bool_with_size (_this, "hlp7.oas", TMAnd, 1500, 102);
 }
 
-TEST(BasicNotWithSize7)
+TEST (BasicNotWithSize7)
 {
   //  Context replication - direct and indirect, NOT
   run_test_bool_with_size (_this, "hlp7.oas", TMNot, 1500, 103);
 }
 
-TEST(BasicAndWithSize8)
+TEST (BasicAndWithSize8)
 {
   //  Mixed sibling-parent contexts, AND
   run_test_bool_with_size (_this, "hlp8.oas", TMAnd, 1500, 102);
 }
 
-TEST(BasicNotWithSize8)
+TEST (BasicNotWithSize8)
 {
   //  Mixed sibling-parent contexts, NOT
   run_test_bool_with_size (_this, "hlp8.oas", TMNot, 1500, 103);
 }
 
-TEST(BasicAndWithSize9)
+TEST (BasicAndWithSize9)
 {
   //  Top-level ring structure, AND
   std::string doc;
   run_test_bool_with_size (_this, "hlp9.oas", TMAnd, 1500, 102, &doc);
   EXPECT_EQ (doc,
-    //  This means: the interaction test is strong enough, so it does not see interactions between the
-    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
-    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
-    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
-    "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
-    "RING[1] 0 insts, 0 shapes (1 times)\n"
-  );
+             //  This means: the interaction test is strong enough, so it does not see interactions between the
+             //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+             //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+             //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+             "TOP[1] 0 insts, 0 shapes (1 times)\n"
+             "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
+             "RING[1] 0 insts, 0 shapes (1 times)\n");
 }
 
-TEST(BasicNotWithSize9)
+TEST (BasicNotWithSize9)
 {
   //  Top-level ring structure, NOT
   std::string doc;
   run_test_bool_with_size (_this, "hlp9.oas", TMNot, 1500, 103, &doc);
   EXPECT_EQ (doc,
-    //  This means: the interaction test is strong enough, so it does not see interactions between the
-    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
-    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
-    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
-    "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
-    "RING[1] 0 insts, 0 shapes (1 times)\n"
-  );
+             //  This means: the interaction test is strong enough, so it does not see interactions between the
+             //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+             //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+             //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+             "TOP[1] 0 insts, 0 shapes (1 times)\n"
+             "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
+             "RING[1] 0 insts, 0 shapes (1 times)\n");
 }
 
-TEST(BasicAndWithSize10)
+TEST (BasicAndWithSize10)
 {
   //  Array instances, AND
   run_test_bool_with_size (_this, "hlp10.oas", TMAnd, 150, 102);
 }
 
-TEST(BasicNotWithSize10)
+TEST (BasicNotWithSize10)
 {
   //  Array instances, NOT
   run_test_bool_with_size (_this, "hlp10.oas", TMNot, 150, 103);
 }
 
-TEST(BasicNotWithSize11)
+TEST (BasicNotWithSize11)
 {
   //  Up/down and down/up interactions, NOT
   run_test_bool_with_size (_this, "hlp11.oas", TMNot, 1500, 103);
 }
 
-TEST(BasicNotWithSizeSwappedLayers11)
+TEST (BasicNotWithSizeSwappedLayers11)
 {
   //  Up/down and down/up interactions, NOT
   run_test_bool_with_size (_this, "hlp11.oas", TMNotSwapped, 1500, 104);
 }
 
-TEST(TwoInputsAnd1)
+TEST (TwoInputsAnd1)
 {
   //  Simple flat AND
   run_test_bool2 (_this, "hlp1.oas", TMAnd, 100);
 }
 
-TEST(TwoInputsNot1)
+TEST (TwoInputsNot1)
 {
   //  Simple flat NOT
   run_test_bool2 (_this, "hlp1.oas", TMNot, 101);
 }
 
-TEST(TwoInputsAnd2)
+TEST (TwoInputsAnd2)
 {
   //  Up/down and down/up interactions, AND
   run_test_bool2 (_this, "hlp2.oas", TMAnd, 100);
 }
 
-TEST(TwoInputsNot2)
+TEST (TwoInputsNot2)
 {
   //  Up/down and down/up interactions, NOT
   run_test_bool2 (_this, "hlp2.oas", TMNot, 101);
 }
 
-TEST(TwoInputsAnd3)
+TEST (TwoInputsAnd3)
 {
   //  Variant building, AND
   run_test_bool2 (_this, "hlp3.oas", TMAnd, 100);
 }
 
-TEST(TwoInputsNot3)
+TEST (TwoInputsNot3)
 {
   //  Variant building, NOT
   run_test_bool2 (_this, "hlp3.oas", TMNot, 101);
 }
 
-TEST(TwoInputsAnd4)
+TEST (TwoInputsAnd4)
 {
   //  Sibling interactions, variant building, AND
   run_test_bool2 (_this, "hlp4.oas", TMAnd, 100);
 }
 
-TEST(TwoInputsNot4)
+TEST (TwoInputsNot4)
 {
   //  Sibling interactions, variant building, NOT
   run_test_bool2 (_this, "hlp4.oas", TMNot, 101);
 }
 
-TEST(TwoInputsAnd5)
+TEST (TwoInputsAnd5)
 {
   //  Variant building with intermediate hierarchy, AND
   run_test_bool2 (_this, "hlp5.oas", TMAnd, 100);
 }
 
-TEST(TwoInputsNot5)
+TEST (TwoInputsNot5)
 {
   //  Variant building with intermediate hierarchy, NOT
   run_test_bool2 (_this, "hlp5.oas", TMNot, 101);
 }
 
-TEST(TwoInputsAnd6)
+TEST (TwoInputsAnd6)
 {
   //  Extreme variants (copy, vanishing), AND
   run_test_bool2 (_this, "hlp6.oas", TMAnd, 120);
 }
 
-TEST(TwoInputsNot6)
+TEST (TwoInputsNot6)
 {
   //  Extreme variants (copy, vanishing), NOT
   run_test_bool2 (_this, "hlp6.oas", TMNot, 121);
 }
 
-TEST(TwoInputsAnd7)
+TEST (TwoInputsAnd7)
 {
   //  Context replication - direct and indirect, AND
   run_test_bool2 (_this, "hlp7.oas", TMAnd, 100);
 }
 
-TEST(TwoInputsNot7)
+TEST (TwoInputsNot7)
 {
   //  Context replication - direct and indirect, NOT
   run_test_bool2 (_this, "hlp7.oas", TMNot, 101);
 }
 
-TEST(TwoInputsAnd8)
+TEST (TwoInputsAnd8)
 {
   //  Mixed sibling-parent contexts, AND
   run_test_bool2 (_this, "hlp8.oas", TMAnd, 100);
 }
 
-TEST(TwoInputsNot8)
+TEST (TwoInputsNot8)
 {
   //  Mixed sibling-parent contexts, NOT
   run_test_bool2 (_this, "hlp8.oas", TMNot, 101);
 }
 
-TEST(TwoInputsAnd9)
+TEST (TwoInputsAnd9)
 {
   //  Top-level ring structure, AND
   std::string doc;
   run_test_bool2 (_this, "hlp9.oas", TMAnd, 100, &doc);
   EXPECT_EQ (doc,
-    //  This means: the interaction test is strong enough, so it does not see interactions between the
-    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
-    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
-    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
-    "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
-    "RING[1] 1 insts, 0 shapes (1 times)\n"
-  );
+             //  This means: the interaction test is strong enough, so it does not see interactions between the
+             //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+             //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+             //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+             "TOP[1] 0 insts, 0 shapes (1 times)\n"
+             "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
+             "RING[1] 1 insts, 0 shapes (1 times)\n");
 }
 
-TEST(TwoInputsNot9)
+TEST (TwoInputsNot9)
 {
   //  Top-level ring structure, NOT
   std::string doc;
   run_test_bool2 (_this, "hlp9.oas", TMNot, 101, &doc);
   EXPECT_EQ (doc,
-    //  This means: the interaction test is strong enough, so it does not see interactions between the
-    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
-    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
-    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
-    "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
-    "RING[1] 1 insts, 0 shapes (1 times)\n"
-  );
+             //  This means: the interaction test is strong enough, so it does not see interactions between the
+             //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+             //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+             //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+             "TOP[1] 0 insts, 0 shapes (1 times)\n"
+             "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
+             "RING[1] 1 insts, 0 shapes (1 times)\n");
 }
 
-TEST(TwoInputsAnd10)
+TEST (TwoInputsAnd10)
 {
   //  Array instances, AND
   run_test_bool2 (_this, "hlp10.oas", TMAnd, 100);
 }
 
-TEST(TwoInputsNot10)
+TEST (TwoInputsNot10)
 {
   //  Array instances, NOT
   run_test_bool2 (_this, "hlp10.oas", TMNot, 101);
 }
 
-TEST(TwoInputsAndWithSize1)
+TEST (TwoInputsAndWithSize1)
 {
   //  Simple flat AND
   run_test_bool2_with_size (_this, "hlp1.oas", TMAnd, 1500, 102);
 }
 
-TEST(TwoInputsNotWithSize1)
+TEST (TwoInputsNotWithSize1)
 {
   //  Simple flat NOT
   run_test_bool2_with_size (_this, "hlp1.oas", TMNot, 1500, 103);
 }
 
-TEST(TwoInputsAndWithSize2)
+TEST (TwoInputsAndWithSize2)
 {
   //  Up/down and down/up interactions, AND
   run_test_bool2_with_size (_this, "hlp2.oas", TMAnd, 1500, 102);
 }
 
-TEST(TwoInputsNotWithSize2)
+TEST (TwoInputsNotWithSize2)
 {
   //  Up/down and down/up interactions, NOT
   run_test_bool2_with_size (_this, "hlp2.oas", TMNot, 1500, 103);
 }
 
-TEST(TwoInputsAndWithSize3)
+TEST (TwoInputsAndWithSize3)
 {
   //  Variant building, AND
   run_test_bool2_with_size (_this, "hlp3.oas", TMAnd, 1500, 102);
 }
 
-TEST(TwoInputsNotWithSize3)
+TEST (TwoInputsNotWithSize3)
 {
   //  Variant building, NOT
   run_test_bool2_with_size (_this, "hlp3.oas", TMNot, 1500, 103);
 }
 
-TEST(TwoInputsAndWithSize4)
+TEST (TwoInputsAndWithSize4)
 {
   //  Sibling interactions, variant building, AND
   run_test_bool2_with_size (_this, "hlp4.oas", TMAnd, 1500, 102);
 }
 
-TEST(TwoInputsNotWithSize4)
+TEST (TwoInputsNotWithSize4)
 {
   //  Sibling interactions, variant building, NOT
   run_test_bool2_with_size (_this, "hlp4.oas", TMNot, 1500, 103);
 }
 
-TEST(TwoInputsAndWithSize5)
+TEST (TwoInputsAndWithSize5)
 {
   //  Variant building with intermediate hierarchy, AND
   run_test_bool2_with_size (_this, "hlp5.oas", TMAnd, 1500, 102);
 }
 
-TEST(TwoInputsNotWithSize5)
+TEST (TwoInputsNotWithSize5)
 {
   //  Variant building with intermediate hierarchy, NOT
   run_test_bool2_with_size (_this, "hlp5.oas", TMNot, 1500, 103);
 }
 
-TEST(TwoInputsAndWithSize6)
+TEST (TwoInputsAndWithSize6)
 {
   //  Extreme variants (copy, vanishing), AND
   run_test_bool2_with_size (_this, "hlp6.oas", TMAnd, 1500, 122);
 }
 
-TEST(TwoInputsNotWithSize6)
+TEST (TwoInputsNotWithSize6)
 {
   //  Extreme variants (copy, vanishing), NOT
   run_test_bool2_with_size (_this, "hlp6.oas", TMNot, 1500, 123);
 }
 
-TEST(TwoInputsAndWithSize7)
+TEST (TwoInputsAndWithSize7)
 {
   //  Context replication - direct and indirect, AND
   run_test_bool2_with_size (_this, "hlp7.oas", TMAnd, 1500, 102);
 }
 
-TEST(TwoInputsNotWithSize7)
+TEST (TwoInputsNotWithSize7)
 {
   //  Context replication - direct and indirect, NOT
   run_test_bool2_with_size (_this, "hlp7.oas", TMNot, 1500, 103);
 }
 
-TEST(TwoInputsAndWithSize8)
+TEST (TwoInputsAndWithSize8)
 {
   //  Mixed sibling-parent contexts, AND
   run_test_bool2_with_size (_this, "hlp8.oas", TMAnd, 1500, 102);
 }
 
-TEST(TwoInputsNotWithSize8)
+TEST (TwoInputsNotWithSize8)
 {
   //  Mixed sibling-parent contexts, NOT
   run_test_bool2_with_size (_this, "hlp8.oas", TMNot, 1500, 103);
 }
 
-TEST(TwoInputsAndWithSize9)
+TEST (TwoInputsAndWithSize9)
 {
   //  Top-level ring structure, AND
   std::string doc;
   run_test_bool2_with_size (_this, "hlp9.oas", TMAnd, 1500, 102, &doc);
   EXPECT_EQ (doc,
-    //  This means: the interaction test is strong enough, so it does not see interactions between the
-    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
-    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
-    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
-    "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
-    "RING[1] 1 insts, 0 shapes (1 times)\n"
-  );
+             //  This means: the interaction test is strong enough, so it does not see interactions between the
+             //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+             //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+             //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+             "TOP[1] 0 insts, 0 shapes (1 times)\n"
+             "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
+             "RING[1] 1 insts, 0 shapes (1 times)\n");
 }
 
-TEST(TwoInputsNotWithSize9)
+TEST (TwoInputsNotWithSize9)
 {
   //  Top-level ring structure, NOT
   std::string doc;
   run_test_bool2_with_size (_this, "hlp9.oas", TMNot, 1500, 103, &doc);
   EXPECT_EQ (doc,
-    //  This means: the interaction test is strong enough, so it does not see interactions between the
-    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
-    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
-    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
-    "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
-    "RING[1] 1 insts, 0 shapes (1 times)\n"
-  );
+             //  This means: the interaction test is strong enough, so it does not see interactions between the
+             //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+             //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+             //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+             "TOP[1] 0 insts, 0 shapes (1 times)\n"
+             "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
+             "RING[1] 1 insts, 0 shapes (1 times)\n");
 }
 
-TEST(TwoInputsAndWithSize10)
+TEST (TwoInputsAndWithSize10)
 {
   //  Array instances, AND
   run_test_bool2_with_size (_this, "hlp10.oas", TMAnd, 150, 102);
 }
 
-TEST(TwoInputsNotWithSize10)
+TEST (TwoInputsNotWithSize10)
 {
   //  Array instances, NOT
   run_test_bool2_with_size (_this, "hlp10.oas", TMNot, 150, 103);
 }
 
-TEST(BasicSelfOverlap1)
+TEST (BasicSelfOverlap1)
 {
   //  Simple flat Self overlap
   run_test_bool (_this, "hlp1.oas", TMSelfOverlap, 110);
 }
 
-TEST(BasicSelfOverlap2)
+TEST (BasicSelfOverlap2)
 {
   //  Up/down and down/up interactions, Self overlap
   run_test_bool (_this, "hlp2.oas", TMSelfOverlap, 110);
 }
 
-TEST(BasicSelfOverlap3)
+TEST (BasicSelfOverlap3)
 {
   //  Variant building, Self overlap
   run_test_bool (_this, "hlp3.oas", TMSelfOverlap, 110);
 }
 
-TEST(BasicSelfOverlap4)
+TEST (BasicSelfOverlap4)
 {
   //  Sibling interactions, variant building, Self overlap
   run_test_bool (_this, "hlp4.oas", TMSelfOverlap, 110);
 }
 
-TEST(BasicSelfOverlap5)
+TEST (BasicSelfOverlap5)
 {
   //  Variant building with intermediate hierarchy, Self overlap
   run_test_bool (_this, "hlp5.oas", TMSelfOverlap, 110);
 }
 
-TEST(BasicSelfOverlap6)
+TEST (BasicSelfOverlap6)
 {
   //  Extreme variants (copy, vanishing), Self overlap
   run_test_bool (_this, "hlp6.oas", TMSelfOverlap, 110);
 }
 
-TEST(BasicSelfOverlap7)
+TEST (BasicSelfOverlap7)
 {
   //  Context replication - direct and indirect, Self overlap
   run_test_bool (_this, "hlp7.oas", TMSelfOverlap, 110);
 }
 
-TEST(BasicSelfOverlap8)
+TEST (BasicSelfOverlap8)
 {
   //  Mixed sibling-parent contexts, Self overlap
   run_test_bool (_this, "hlp8.oas", TMSelfOverlap, 110);
 }
 
-TEST(BasicSelfOverlap9)
+TEST (BasicSelfOverlap9)
 {
   //  Top-level ring structure, Self overlap
   std::string doc;
   run_test_bool (_this, "hlp9.oas", TMSelfOverlap, 110, &doc);
   EXPECT_EQ (doc,
-    //  This means: the interaction test is strong enough, so it does not see interactions between the
-    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
-    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
-    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
-    "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
-    "RING[1] 0 insts, 1 shapes (1 times)\n"
-  );
+             //  This means: the interaction test is strong enough, so it does not see interactions between the
+             //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+             //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+             //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+             "TOP[1] 0 insts, 0 shapes (1 times)\n"
+             "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
+             "RING[1] 0 insts, 1 shapes (1 times)\n");
 }
 
-TEST(BasicSelfOverlap10)
+TEST (BasicSelfOverlap10)
 {
   //  Array instances, Self overlap
   run_test_bool (_this, "hlp10.oas", TMSelfOverlap, 110);
 }
 
-TEST(BasicSelfOverlapWithSize1)
+TEST (BasicSelfOverlapWithSize1)
 {
   //  Simple flat Self overlap
   run_test_bool_with_size (_this, "hlp1.oas", TMSelfOverlap, 1500, 111);
 }
 
-TEST(BasicSelfOverlapWithSize2)
+TEST (BasicSelfOverlapWithSize2)
 {
   //  Up/down and down/up interactions, Self overlap
   run_test_bool_with_size (_this, "hlp2.oas", TMSelfOverlap, 1500, 111);
 }
 
-TEST(BasicSelfOverlapWithSize3)
+TEST (BasicSelfOverlapWithSize3)
 {
   //  Variant building, Self overlap
   run_test_bool_with_size (_this, "hlp3.oas", TMSelfOverlap, 1500, 111);
 }
 
-TEST(BasicSelfOverlapWithSize4)
+TEST (BasicSelfOverlapWithSize4)
 {
   //  Sibling interactions, variant building, Self overlap
   run_test_bool_with_size (_this, "hlp4.oas", TMSelfOverlap, 1500, 111);
 }
 
-TEST(BasicSelfOverlapWithSize5)
+TEST (BasicSelfOverlapWithSize5)
 {
   //  Variant building with intermediate hierarchy, Self overlap
   run_test_bool_with_size (_this, "hlp5.oas", TMSelfOverlap, 1500, 111);
 }
 
-TEST(BasicSelfOverlapWithSize6)
+TEST (BasicSelfOverlapWithSize6)
 {
   //  Extreme variants (copy, vanishing), Self overlap
   run_test_bool_with_size (_this, "hlp6.oas", TMSelfOverlap, 1500, 111);
 }
 
-TEST(BasicSelfOverlapWithSize7)
+TEST (BasicSelfOverlapWithSize7)
 {
   //  Context replication - direct and indirect, Self overlap
   run_test_bool_with_size (_this, "hlp7.oas", TMSelfOverlap, 1500, 111);
 }
 
-TEST(BasicSelfOverlapWithSize8)
+TEST (BasicSelfOverlapWithSize8)
 {
   //  Mixed sibling-parent contexts, Self overlap
   run_test_bool_with_size (_this, "hlp8.oas", TMSelfOverlap, 1500, 111);
 }
 
-TEST(BasicSelfOverlapWithSize9)
+TEST (BasicSelfOverlapWithSize9)
 {
   //  Top-level ring structure, Self overlap
   std::string doc;
   run_test_bool_with_size (_this, "hlp9.oas", TMSelfOverlap, 1500, 111, &doc);
   EXPECT_EQ (doc,
-    //  This means: the interaction test is strong enough, so it does not see interactions between the
-    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
-    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
-    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
-    "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
-    "RING[1] 0 insts, 1 shapes (1 times)\n"
-  );
+             //  This means: the interaction test is strong enough, so it does not see interactions between the
+             //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+             //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+             //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+             "TOP[1] 0 insts, 0 shapes (1 times)\n"
+             "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
+             "RING[1] 0 insts, 1 shapes (1 times)\n");
 }
 
-TEST(BasicSelfOverlapWithSize10)
+TEST (BasicSelfOverlapWithSize10)
 {
   //  Array instances, Self overlap
   run_test_bool_with_size (_this, "hlp10.oas", TMSelfOverlap, 150, 111);
 }
 
-TEST(TopWithBelow1)
+TEST (TopWithBelow1)
 {
   run_test_bool (_this, "hlp12.oas", TMNot, 100);
 }
 
-TEST(TopWithBelow2)
+TEST (TopWithBelow2)
 {
   run_test_bool (_this, "hlp12.oas", TMNotSwapped, 101);
 }
 
-TEST(BasicHierarchyVariantsAnd)
+TEST (BasicHierarchyVariantsAnd)
 {
   run_test_bool (_this, "hlp13.oas", TMAnd, 100);
 }
 
-TEST(BasicHierarchyVariantsNot)
+TEST (BasicHierarchyVariantsNot)
 {
   run_test_bool (_this, "hlp13.oas", TMNot, 101);
 }
 
-TEST(BasicHierarchyVariantsAnd2)
+TEST (BasicHierarchyVariantsAnd2)
 {
   run_test_bool (_this, "hlp14.oas", TMAnd, 100);
 }
 
-TEST(BasicHierarchyVariantsNot2)
+TEST (BasicHierarchyVariantsNot2)
 {
   run_test_bool (_this, "hlp14.oas", TMNot, 101);
 }
 
-TEST(RedundantHierarchyAnd1)
+TEST (RedundantHierarchyAnd1)
 {
   //  Redundant hierarchy, NOT
   run_test_bool2 (_this, "hlp15.oas", TMAnd, 100);
 }
 
-TEST(RedundantHierarchyNot1)
+TEST (RedundantHierarchyNot1)
 {
   //  Redundant hierarchy, NOT
   run_test_bool2 (_this, "hlp15.oas", TMNot, 101);
 }
 
-TEST(RedundantHierarchyAnd2)
+TEST (RedundantHierarchyAnd2)
 {
   //  Redundant hierarchy, NOT
   run_test_bool2 (_this, "hlp16.gds", TMAnd, 100);
 }
 
-TEST(RedundantHierarchyNot2)
+TEST (RedundantHierarchyNot2)
 {
   //  Redundant hierarchy, NOT
   run_test_bool2 (_this, "hlp16.gds", TMNot, 101);
 }
 
-TEST(MultipleOutputs)
+TEST (MultipleOutputs)
 {
   //  Redundant hierarchy, NOT
   run_test_bool22 (_this, "hlp17.oas", TMAndNot, 100, 101);
 }
 
-TEST(FlatOperation)
+TEST (FlatOperation)
 {
   //  Redundant hierarchy, NOT
   run_test_bool22_flat (_this, "hlp17_flat.oas", TMAndNot, 100, 101);
 }
 
-TEST(Arrays)
+TEST (Arrays)
 {
   //  Large arrays, NOT
   run_test_bool2 (_this, "hlp18.oas", TMNot, 100);
 }
 
-TEST(XORTool)
+TEST (XORTool)
 {
   test_is_long_runner ();
 
@@ -1332,7 +1319,7 @@ TEST(XORTool)
   unsigned int l2_out = ly_out.insert_layer (db::LayerProperties (2, 0));
 
   db::DeepShapeStore dss;
-  dss.set_wants_all_cells (true);  //  saves time for less cell mapping operations
+  dss.set_wants_all_cells (true); //  saves time for less cell mapping operations
 
   {
     db::RecursiveShapeIterator ri_a, ri_b;

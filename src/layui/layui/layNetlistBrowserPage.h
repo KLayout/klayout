@@ -57,7 +57,7 @@ class NetlistBrowserPage
     public Ui::NetlistBrowserPage,
     public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -92,7 +92,7 @@ public:
   /**
    *  @brief Attaches the page to a L2N DB
    */
-  bool set_db(db::LayoutToNetlist *database);
+  bool set_db (db::LayoutToNetlist *database);
 
   /**
    *  @brief Gets the database the page is connected to
@@ -245,13 +245,13 @@ private:
   std::vector<QModelIndex> m_history;
   size_t m_history_ptr;
   bool m_signals_enabled;
-  std::vector <lay::Marker *> mp_markers;
+  std::vector<lay::Marker *> mp_markers;
   bool m_enable_updates;
   bool m_update_needed;
   lay::NetlistObjectsPath m_current_path;
   std::vector<lay::NetlistObjectsPath> m_selected_paths;
-  std::vector<std::pair<const db::Circuit *, db::DPolygon> > m_markers;
-  std::vector<std::pair<const db::Circuit *, const db::Net *> > m_net_markers;
+  std::vector<std::pair<const db::Circuit *, db::DPolygon>> m_markers;
+  std::vector<std::pair<const db::Circuit *, const db::Net *>> m_net_markers;
   lay::NetInfoDialog *mp_info_dialog;
   tl::DeferredMethod<NetlistBrowserPage> dm_update_highlights;
   tl::DeferredMethod<NetlistBrowserPage> dm_rerun_macro;
@@ -270,7 +270,7 @@ private:
   void set_color_for_selected_nets (const tl::Color &color);
   void layer_list_changed (int);
   tl::Color make_valid_color (const tl::Color &color);
-  bool produce_highlights_for_net(const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv);
+  bool produce_highlights_for_net (const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv);
   bool produce_highlights_for_device (const db::Device *device, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
   bool produce_highlights_for_circuit (const db::Circuit *circuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
   void configure_marker (lay::Marker *marker, bool with_fill);
@@ -288,4 +288,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

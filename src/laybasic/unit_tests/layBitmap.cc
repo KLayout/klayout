@@ -22,11 +22,10 @@
 
 
 
-
 #include "layBitmap.h"
 #include "tlUnitTest.h"
 
-static std::string 
+static std::string
 to_string (const lay::Bitmap &bm)
 {
   std::string r;
@@ -34,7 +33,7 @@ to_string (const lay::Bitmap &bm)
   for (unsigned int j = bm.height (); j > 0; --j) {
     std::string s;
     for (unsigned int k = 0; k < bm.width (); ++k) {
-      s += (bm.scanline (j - 1)[k / 32] & (1 << (k % 32))) != 0 ? "#" : "-";
+      s += (bm.scanline (j - 1) [k / 32] & (1 << (k % 32))) != 0 ? "#" : "-";
     }
     r += s;
     r += "\n";
@@ -43,7 +42,7 @@ to_string (const lay::Bitmap &bm)
   return r;
 }
 
-TEST(1) 
+TEST (1)
 {
   lay::Bitmap b1 (8, 8, 1.0, 1.0);
   EXPECT_EQ (to_string (b1), "--------\n"
@@ -76,7 +75,7 @@ TEST(1)
   EXPECT_EQ (to_string (b1), to_string (b2));
 }
 
-TEST(2) 
+TEST (2)
 {
   lay::Bitmap b1 (8, 8, 1.0, 1.0);
   EXPECT_EQ (to_string (b1), "--------\n"
@@ -200,6 +199,4 @@ TEST(2)
                              "----------------------------------------\n"
                              "------##########-------------------#----\n"
                              "-----################################---\n");
-
 }
-

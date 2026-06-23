@@ -44,7 +44,7 @@ class BrowseInstancesConfigPage
   : public lay::ConfigPage,
     private Ui::BrowseInstancesConfigPage
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   BrowseInstancesConfigPage (QWidget *parent);
@@ -61,11 +61,17 @@ class BrowseInstancesForm
   : public lay::Browser,
     private Ui::BrowseInstancesForm
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
-  enum mode_type { ToCellView = 0, AnyTop, Parent };
-  enum window_type { DontChange = 0, FitCell, FitMarker, Center, CenterSize };
+  enum mode_type { ToCellView = 0,
+                   AnyTop,
+                   Parent };
+  enum window_type { DontChange = 0,
+                     FitCell,
+                     FitMarker,
+                     Center,
+                     CenterSize };
 
   BrowseInstancesForm (lay::Dispatcher *root, lay::LayoutViewBase *view);
   ~BrowseInstancesForm ();
@@ -81,7 +87,7 @@ public slots:
   void next_inst ();
   void prev_inst ();
   void configure ();
-  
+
 private:
   unsigned int m_cv_index;
   std::vector<db::DCplxTrans> m_global_trans;
@@ -91,7 +97,7 @@ private:
   bool m_cell_inst_changed_enabled;
   bool m_ef_enabled;
   QList<QTreeWidgetItem *> m_items;
-  
+
   std::vector<lay::Marker *> mp_markers;
 
   lay::CellView m_context_cv;
@@ -127,11 +133,10 @@ private:
 
   //  change to the given cell in the given cellview
   void change_cell (db::cell_index_type cell, int cv_index);
-
 };
 
 }
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

@@ -26,7 +26,7 @@
 #include "rba.h"
 #include "gsiDecl.h"
 
-// On Windows, ruby.h is not compatible with windows.h which is included by utHead - at least not if 
+// On Windows, ruby.h is not compatible with windows.h which is included by utHead - at least not if
 // windows.h is included before ruby.h ...
 #include "tlUnitTest.h"
 
@@ -57,7 +57,7 @@ TEST (basic)
     rba::RubyInterpreter::instance ()->eval_string ("Quatsch");
   } catch (tl::Exception &ex) {
     EXPECT_EQ (std::string (ex.msg (), 0, 41) == std::string ("NameError: uninitialized constant Quatsch") ||
-               std::string (ex.msg (), 0, 49) == std::string ("NameError: uninitialized constant Object::Quatsch"),
+                 std::string (ex.msg (), 0, 49) == std::string ("NameError: uninitialized constant Object::Quatsch"),
                true);
     err = true;
   }
@@ -89,7 +89,7 @@ void run_rubytest (tl::TestBase * /*_this*/, const std::string &fn)
 }
 
 #define RUBYTEST(n, file) \
-  TEST(n) { run_rubytest(_this, file); }
+  TEST (n) { run_rubytest (_this, file); }
 
 RUBYTEST (kwargsTest, "kwargs.rb")
 RUBYTEST (antTest, "antTest.rb")
@@ -165,4 +165,3 @@ RUBYTEST (rdbTest, "rdbTest.rb")
 RUBYTEST (tlTest, "tlTest.rb")
 
 #endif
-

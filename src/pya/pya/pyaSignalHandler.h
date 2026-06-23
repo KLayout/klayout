@@ -36,8 +36,7 @@ namespace pya
 /**
  *  @brief A storage object for a function to callback
  */
-struct CallbackFunction
-{
+struct CallbackFunction {
   CallbackFunction (PythonRef pym, const gsi::MethodBase *m);
 
   PythonRef callable () const;

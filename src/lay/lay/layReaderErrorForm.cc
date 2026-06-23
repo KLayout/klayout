@@ -60,12 +60,11 @@ static std::string format_hex_dump (const std::string &s)
     }
     hex_dump += " ";
     for (int i = 0; i < bytes_per_line; ++i) {
-      unsigned char uc = (unsigned char) c[i];
-      hex_dump += (uc < 32 || uc >= 128) ? '.' : c[i];
+      unsigned char uc = (unsigned char) c [i];
+      hex_dump += (uc < 32 || uc >= 128) ? '.' : c [i];
     }
 
     hex_dump += "\n";
-
   }
 
   return hex_dump;
@@ -100,14 +99,13 @@ ReaderErrorForm::ReaderErrorForm (QWidget *parent, const char *name, const db::R
   resize (size ().width (), 50);
 }
 
-void 
-ReaderErrorForm::show_details ()
+void ReaderErrorForm::show_details ()
 {
   QString t (details_pb->text ());
   if (details_frame->isVisible ()) {
     details_frame->hide ();
     t.replace (QString::fromUtf8 ("<<"), QString::fromUtf8 (">>"));
-    //  It looks like the minimum size is set to a too large value internally. 
+    //  It looks like the minimum size is set to a too large value internally.
     //  Resetting it helps to keep a small-as-possible dialog size.
     setMinimumSize (QSize (0, 0));
     resize (size ().width (), 0);
@@ -120,4 +118,3 @@ ReaderErrorForm::show_details ()
 }
 
 }
-

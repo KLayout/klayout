@@ -36,12 +36,12 @@
 
 namespace db
 {
-  class StreamFormatDeclaration;
-  class FormatSpecificWriterOptions;
-  class FormatSpecificReaderOptions;
-  class LoadLayoutOptions;
-  class SaveLayoutOptions;
-  class Technology;
+class StreamFormatDeclaration;
+class FormatSpecificWriterOptions;
+class FormatSpecificReaderOptions;
+class LoadLayoutOptions;
+class SaveLayoutOptions;
+class Technology;
 }
 
 namespace lay
@@ -56,11 +56,11 @@ class LayoutHandle;
  *  This interface defines some services the configuration page
  *  must provide (i.e. setup, commit)
  */
-class LAYBASIC_PUBLIC StreamWriterOptionsPage 
+class LAYBASIC_PUBLIC StreamWriterOptionsPage
   : public QFrame
 {
 public:
-  StreamWriterOptionsPage (QWidget *parent) 
+  StreamWriterOptionsPage (QWidget *parent)
     : QFrame (parent)
   {
     // .. nothing else ..
@@ -81,9 +81,9 @@ public:
   /**
    *  @brief Commit the page
    *
-   *  The implementation is supposed to read the configuration (and 
+   *  The implementation is supposed to read the configuration (and
    *  throw exceptions if the configuration something is invalid)
-   *  and commit the changes through 
+   *  and commit the changes through
    *  The options object can be cast to the specific format object.
    */
   virtual void commit (db::FormatSpecificWriterOptions * /*options*/, const db::Technology * /*tech*/, bool /*gzip*/)
@@ -98,11 +98,11 @@ public:
  *  This interface defines some services the configuration page
  *  must provide (i.e. setup, commit)
  */
-class LAYBASIC_PUBLIC StreamReaderOptionsPage 
+class LAYBASIC_PUBLIC StreamReaderOptionsPage
   : public QFrame
 {
 public:
-  StreamReaderOptionsPage (QWidget *parent) 
+  StreamReaderOptionsPage (QWidget *parent)
     : QFrame (parent)
   {
     // .. nothing else ..
@@ -123,9 +123,9 @@ public:
   /**
    *  @brief Commit the page
    *
-   *  The implementation is supposed to read the configuration (and 
+   *  The implementation is supposed to read the configuration (and
    *  throw exceptions if the configuration something is invalid)
-   *  and commit the changes through 
+   *  and commit the changes through
    *  The options object can be cast to the specific format object.
    */
   virtual void commit (db::FormatSpecificReaderOptions * /*options*/, const db::Technology * /*tech*/)
@@ -138,15 +138,15 @@ public:
  *  This plugin specializations add the stream readers and writers to the configuration
  *  system. The plugins can provide menu entries, configuration parameters, configuration
  *  pages etc.
- */  
-  
+ */
+
 class LAYBASIC_PUBLIC StreamPluginDeclarationBase
   : public PluginDeclaration
 {
 public:
   StreamPluginDeclarationBase (const std::string &format_name)
     : PluginDeclaration (), m_format_name (format_name), mp_stream_fmt (0)
-  { 
+  {
     //  .. nothing yet ..
   }
 
@@ -155,7 +155,7 @@ public:
   const db::StreamFormatDeclaration &stream_fmt () const
   {
     //  dirty hack:
-    return const_cast <StreamPluginDeclarationBase *> (this)->stream_fmt ();
+    return const_cast<StreamPluginDeclarationBase *> (this)->stream_fmt ();
   }
 
   const std::string &format_name () const
@@ -173,7 +173,7 @@ private:
     return 0;
   }
 };
-  
+
 /**
  *  @brief A specialization of Plugin declaration for stream reader plugins
  */
@@ -186,7 +186,7 @@ public:
    */
   StreamReaderPluginDeclaration (const std::string &format_name)
     : StreamPluginDeclarationBase (format_name)
-  { 
+  {
     //  .. nothing yet ..
   }
 
@@ -196,9 +196,9 @@ public:
   static const StreamReaderPluginDeclaration *plugin_for_format (const std::string &format_name);
 
   /**
-   *  @brief Create a format specific options page 
+   *  @brief Create a format specific options page
    */
-  virtual StreamReaderOptionsPage *format_specific_options_page (QWidget * /*parent*/) const 
+  virtual StreamReaderOptionsPage *format_specific_options_page (QWidget * /*parent*/) const
   {
     return 0;
   }
@@ -223,7 +223,7 @@ class LAYBASIC_PUBLIC StreamWriterPluginDeclaration
 public:
   StreamWriterPluginDeclaration (const std::string &format_name)
     : StreamPluginDeclarationBase (format_name)
-  { 
+  {
     //  .. nothing yet ..
   }
 
@@ -241,9 +241,9 @@ public:
   }
 
   /**
-   *  @brief Create a format specific options page 
+   *  @brief Create a format specific options page
    */
-  virtual StreamWriterOptionsPage *format_specific_options_page (QWidget * /*parent*/) const 
+  virtual StreamWriterOptionsPage *format_specific_options_page (QWidget * /*parent*/) const
   {
     return 0;
   }
@@ -264,4 +264,4 @@ public:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

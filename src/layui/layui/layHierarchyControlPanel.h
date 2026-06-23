@@ -51,7 +51,7 @@ class QLineEdit;
 class QAction;
 class QCheckBox;
 
-namespace lay 
+namespace lay
 {
 
 /**
@@ -61,10 +61,10 @@ namespace lay
  *  events and processes double clicks by bypassing the standard implementation
  *  that closes and opens branches.
  */
-class HCPCellTreeWidget 
+class HCPCellTreeWidget
   : public QTreeView
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   HCPCellTreeWidget (QWidget *parent, const char *name, QWidget *key_event_receiver);
@@ -89,7 +89,7 @@ protected:
 };
 
 /**
- *  @brief The hierarchy control panel 
+ *  @brief The hierarchy control panel
  *
  *  The hierarchy control panel allows changing the cell shown, to
  *  browse the hierarchy and disable/enable cells
@@ -101,7 +101,7 @@ class LAYUI_PUBLIC HierarchyControlPanel
   : public QFrame,
     public tl::Object
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   typedef lay::CellView::unspecific_cell_path_type cell_path_type;
@@ -114,7 +114,7 @@ public:
    */
   HierarchyControlPanel (lay::LayoutViewBase *view, QWidget *parent = 0, const char *name = "control_panel");
 
-  /** 
+  /**
    *  @brief Destructor
    */
   ~HierarchyControlPanel ();
@@ -145,7 +145,7 @@ public:
   /**
    *  @brief Get the active cellview
    *
-   *  get the active cellview index. 
+   *  get the active cellview index.
    */
   int active ()
   {
@@ -206,12 +206,12 @@ public:
   /**
    *  @brief Return the path to the current cell for the given cellview index
    *
-   *  The current cell is the cell that is highlighted. 
+   *  The current cell is the cell that is highlighted.
    */
   void current_cell (int cv_index, cell_path_type &path) const;
 
   /**
-   *  @brief Set the path to the current cell 
+   *  @brief Set the path to the current cell
    *
    *  The current cell is the cell that is highlighted. The current cv index
    *  can be obtained with the "active" method.
@@ -221,31 +221,31 @@ public:
   /**
    *  @brief Event handler
    *
-   *  The object subclasses the event handler in order to intercept 
+   *  The object subclasses the event handler in order to intercept
    *  the GTF probe events (Qt::MaxUser).
    */
   virtual bool event (QEvent *e);
 
   /**
    *  @brief Update the contents if necessary
-   *  
-   *  Update the cell trees according to the hierarchy found in 
+   *
+   *  Update the cell trees according to the hierarchy found in
    *  the layouts. This version includes a hint which cellview has changed.
    */
   void do_update_content (int cv_index);
 
   /**
    *  @brief Update the contents if necessary
-   *  
-   *  Update the cell trees according to the hierarchy found in 
-   *  the layouts. 
+   *
+   *  Update the cell trees according to the hierarchy found in
+   *  the layouts.
    */
   void do_update_content ()
   {
     do_update_content (-1);
   }
 
-  /** 
+  /**
    *  @brief Return true, if the tree view has the focus
    */
   bool has_focus () const;
@@ -317,7 +317,7 @@ public:
   }
 
 signals:
-  void cell_selected (cell_path_type path, int cellview_index); 
+  void cell_selected (cell_path_type path, int cellview_index);
   void active_cellview_changed (int cellview_index);
   void search_options_changed ();
 
@@ -327,7 +327,7 @@ public slots:
   void double_clicked (const QModelIndex &index);
   void middle_clicked (const QModelIndex &index);
   void selection_changed (int index);
-  void context_menu (const QPoint &pt);  
+  void context_menu (const QPoint &pt);
   void search_triggered (const QString &t);
   void search_edited ();
   void search_edited_no_signal ();
@@ -340,12 +340,12 @@ private:
   db::Layout *mp_layout;
   bool m_enable_cb;
   lay::LayoutViewBase *mp_view;
-  std::vector <lay::CellView> m_cellviews; 
-  std::vector <QTreeView *> mp_cell_lists;
-  std::vector <QToolButton *> mp_cell_list_headers;
-  std::vector <QFrame *> mp_cell_list_frames;
-  std::vector <bool> m_force_close;
-  std::vector <bool> m_needs_update;
+  std::vector<lay::CellView> m_cellviews;
+  std::vector<QTreeView *> mp_cell_lists;
+  std::vector<QToolButton *> mp_cell_list_headers;
+  std::vector<QFrame *> mp_cell_list_frames;
+  std::vector<bool> m_force_close;
+  std::vector<bool> m_needs_update;
   bool m_visibility_needs_update;
   int m_active_index;
   bool m_flat;
@@ -403,4 +403,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

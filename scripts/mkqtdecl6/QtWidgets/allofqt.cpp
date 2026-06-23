@@ -181,8 +181,8 @@
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QTreeWidgetItem>
 #include <QtWidgets/QTreeWidgetItemIterator>
-//#include <QtWidgets/QtWidgets>
-//#include <QtWidgets/QtWidgetsDepends>
+// #include <QtWidgets/QtWidgets>
+// #include <QtWidgets/QtWidgetsDepends>
 #include <QtWidgets/QtWidgetsVersion>
 #include <QtWidgets/QUndoView>
 #include <QtWidgets/QVBoxLayout>

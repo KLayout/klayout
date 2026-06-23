@@ -87,7 +87,7 @@ public:
   void push_back (NetlistModelItemData *child);
 
   iterator begin () { return m_children.begin (); }
-  iterator end ()   { return m_children.end (); }
+  iterator end () { return m_children.end (); }
 
   size_t child_count () { return m_children_per_index.size (); }
   size_t index () { return m_index; }
@@ -141,7 +141,7 @@ public:
   typedef std::list<const db::SubCircuit *> path_type;
   typedef path_type::const_iterator path_iterator;
 
-  NetlistObjectPath () : root (0), net (0), device (0) { }
+  NetlistObjectPath () : root (0), net (0), device (0) {}
 
   bool is_null () const
   {
@@ -173,10 +173,10 @@ public:
 class LAYUI_PUBLIC NetlistObjectsPath
 {
 public:
-  typedef std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> > path_type;
+  typedef std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *>> path_type;
   typedef path_type::const_iterator path_iterator;
 
-  NetlistObjectsPath () { }
+  NetlistObjectsPath () {}
 
   bool is_null () const
   {
@@ -201,7 +201,7 @@ public:
   }
 
   std::pair<const db::Circuit *, const db::Circuit *> root;
-  std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> > path;
+  std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *>> path;
   std::pair<const db::Net *, const db::Net *> net;
   std::pair<const db::Device *, const db::Device *> device;
 };
@@ -225,9 +225,10 @@ public:
  *      - terminals and nets
  */
 class LAYUI_PUBLIC NetlistBrowserModel
-  : public QAbstractItemModel, public tl::Object
+  : public QAbstractItemModel,
+    public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   NetlistBrowserModel (QWidget *parent, db::Netlist *netlist, NetColorizer *colorizer);
@@ -324,7 +325,7 @@ private:
 
   std::pair<const db::Netlist *, const db::Netlist *> netlists () const
   {
-    return std::pair<const db::Netlist *, const db::Netlist *> (mp_l2ndb->netlist (), (const db::Netlist *)0);
+    return std::pair<const db::Netlist *, const db::Netlist *> (mp_l2ndb->netlist (), (const db::Netlist *) 0);
   }
 
   void show_or_hide_items (QTreeView *view, const QModelIndex &parent, bool show_all, bool with_warnings, int levels);
@@ -348,4 +349,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

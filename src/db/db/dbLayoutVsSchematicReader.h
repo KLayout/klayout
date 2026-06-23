@@ -31,7 +31,8 @@
 #include "dbLog.h"
 #include "tlStream.h"
 
-namespace db {
+namespace db
+{
 
 class LayoutVsSchematic;
 class Circuit;
@@ -47,8 +48,8 @@ class Region;
 class DB_PUBLIC LayoutVsSchematicReaderBase
 {
 public:
-  LayoutVsSchematicReaderBase () { }
-  virtual ~LayoutVsSchematicReaderBase () { }
+  LayoutVsSchematicReaderBase () {}
+  virtual ~LayoutVsSchematicReaderBase () {}
 
   void read (db::LayoutVsSchematic *lvs)
   {
@@ -63,7 +64,8 @@ protected:
  *  @brief The standard writer
  */
 class DB_PUBLIC LayoutVsSchematicStandardReader
-  : public LayoutVsSchematicReaderBase, protected LayoutToNetlistStandardReader
+  : public LayoutVsSchematicReaderBase,
+    protected LayoutToNetlistStandardReader
 {
 public:
   LayoutVsSchematicStandardReader (tl::InputStream &stream);
@@ -96,4 +98,3 @@ private:
 }
 
 #endif
-

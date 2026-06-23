@@ -40,14 +40,13 @@
 #include "rdbForceLink.h"
 #include "pexForceLink.h"
 #if defined(HAVE_RUBY)
-#  include "drcForceLink.h"
-#  include "lvsForceLink.h"
+#include "drcForceLink.h"
+#include "lvsForceLink.h"
 #endif
 
-struct RunnerData
-{
+struct RunnerData {
   std::string script;
-  std::vector<std::pair<std::string, std::string> > vars;
+  std::vector<std::pair<std::string, std::string>> vars;
 
   void add_var (const std::string &def)
   {
@@ -62,19 +61,16 @@ struct RunnerData
   }
 };
 
-BD_PUBLIC int strmrun (int argc, char *argv[])
+BD_PUBLIC int strmrun (int argc, char *argv [])
 {
   tl::CommandLineOptions cmd;
   RunnerData data;
 
-  cmd << tl::arg ("script",                     &data.script, "The script to execute",
+  cmd << tl::arg ("script", &data.script, "The script to execute",
                   "This script will be executed by the script interpreter. "
-                  "The script can be either Ruby (\".rb\") or Python (\".py\")."
-                 )
+                  "The script can be either Ruby (\".rb\") or Python (\".py\").")
       << tl::arg ("*-v|--var=\"name=value\"", &data, &RunnerData::add_var, "Defines a variable",
-                  "When using this option, a global variable with name \"var\" will be defined with the string value \"value\"."
-                 )
-    ;
+                  "When using this option, a global variable with name \"var\" will be defined with the string value \"value\".");
 
   cmd.brief ("This program runs Ruby or Python scripts with a subset of KLayout's API.");
 
@@ -86,7 +82,7 @@ BD_PUBLIC int strmrun (int argc, char *argv[])
   rba::RubyInterpreter ruby;
   pya::PythonInterpreter python;
 
-  for (std::vector< std::pair<std::string, std::string> >::const_iterator v = data.vars.begin (); v != data.vars.end (); ++v) {
+  for (std::vector<std::pair<std::string, std::string>>::const_iterator v = data.vars.begin (); v != data.vars.end (); ++v) {
     ruby.define_variable (v->first, v->second);
     python.define_variable (v->first, v->second);
   }

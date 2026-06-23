@@ -48,17 +48,16 @@ EditorOptionsFrame::~EditorOptionsFrame ()
   //  .. nothing yet ..
 }
 
-void
-EditorOptionsFrame::populate (LayoutViewBase *view)
+void EditorOptionsFrame::populate (LayoutViewBase *view)
 {
   std::vector<lay::EditorOptionsPage *> editor_options_pages;
-  std::map<std::string, std::vector<const lay::PluginDeclaration *> > additional_pages;
+  std::map<std::string, std::vector<const lay::PluginDeclaration *>> additional_pages;
 
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     cls->get_editor_options_pages (editor_options_pages, view, view->dispatcher ());
     std::vector<std::string> ap = cls->additional_editor_options_pages (view);
     for (auto i = ap.begin (); i != ap.end (); ++i) {
-      additional_pages [*i].push_back (cls.operator-> ());
+      additional_pages [*i].push_back (cls.operator->());
     }
   }
 

@@ -60,7 +60,6 @@ parse_git_url (tl::Extractor &ex, std::string &url, std::string &branch, std::st
       //  subfolder starts here
       break;
     }
-
   }
 
   url = std::string (org_str, ex.get () - org_str);
@@ -112,18 +111,16 @@ parse_git_url (tl::Extractor &ex, std::string &url, std::string &branch, std::st
 
     } else if (parts.size () >= 2 && parts.front () == "tags") {
 
-      branch = "refs/tags/" + parts[1];
+      branch = "refs/tags/" + parts [1];
       parts.erase (parts.begin (), parts.begin () + 2);
       subfolder = tl::join (parts, "/");
 
     } else if (parts.size () >= 2 && parts.front () == "branches") {
 
-      branch = "refs/heads/" + parts[1];
+      branch = "refs/heads/" + parts [1];
       parts.erase (parts.begin (), parts.begin () + 2);
       subfolder = tl::join (parts, "/");
-
     }
-
   }
 }
 

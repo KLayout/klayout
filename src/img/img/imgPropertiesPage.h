@@ -43,7 +43,7 @@ class PropertiesPage
   : public lay::PropertiesPage,
     public Ui::ImagePropertiesPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   PropertiesPage (img::Service *service, db::Manager *manager, QWidget *parent);
@@ -90,7 +90,7 @@ private slots:
   void define_landmarks_pressed ();
 
 private:
-  std::vector <img::Service::obj_iterator> m_selection;
+  std::vector<img::Service::obj_iterator> m_selection;
   size_t m_index;
   img::Service *mp_service;
   img::Object *mp_direct_image;

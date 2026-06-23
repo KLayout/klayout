@@ -37,69 +37,64 @@ namespace gsi
 
 template <class X, class Y> struct address_of;
 
-template<class X> 
-struct address_of<X, X> 
-{
-  address_of () : b () { }
-  const void *operator() (const X &x) const { b = x; return &b; }
+template <class X>
+struct address_of<X, X> {
+  address_of () : b () {}
+  const void *operator() (const X &x) const
+  {
+    b = x;
+    return &b;
+  }
   mutable X b;
 };
 
-template<class X> 
-struct address_of<X &, X> 
-{
+template <class X>
+struct address_of<X &, X> {
   const void *operator() (X &x) const { return &x; }
 };
 
-template<class X> 
-struct address_of<const X &, X> 
-{
+template <class X>
+struct address_of<const X &, X> {
   const void *operator() (const X &x) const { return &x; }
 };
 
-template<class X> 
-struct address_of<X *, X *> 
-{
+template <class X>
+struct address_of<X *, X *> {
   const void *operator() (X *x) const { return x; }
 };
 
-template<class X> 
-struct address_of<const X *, const X *> 
-{
+template <class X>
+struct address_of<const X *, const X *> {
   const void *operator() (const X *x) const { return x; }
 };
 
-template<class X> 
-struct address_of<X * const &, X *> 
-{
+template <class X>
+struct address_of<X *const &, X *> {
   const void *operator() (X *x) const { return x; }
 };
 
-template<class X> 
-struct address_of<const X * const &, const X *> 
-{
+template <class X>
+struct address_of<const X *const &, const X *> {
   const void *operator() (const X *x) const { return x; }
 };
 
-template<class X> 
-struct address_of<X * &, X *> 
-{
+template <class X>
+struct address_of<X *&, X *> {
   const void *operator() (X *x) const { return x; }
 };
 
-template<class X> 
-struct address_of<const X * &, const X *> 
-{
+template <class X>
+struct address_of<const X *&, const X *> {
   const void *operator() (const X *x) const { return x; }
 };
 
 /**
- *  @brief The basic iterator abstraction 
+ *  @brief The basic iterator abstraction
  */
 class IterAdaptorAbstractBase
 {
 public:
-  virtual ~IterAdaptorAbstractBase () { }
+  virtual ~IterAdaptorAbstractBase () {}
 
   virtual void get (SerialArgs &w) const = 0;
   virtual size_t serial_size () const = 0;
@@ -111,11 +106,11 @@ public:
  *  @brief The template providing a binding of a specific C++ iterator to the abstraction
  */
 template <class V>
-class IterPtrAdaptor 
+class IterPtrAdaptor
   : public IterAdaptorAbstractBase
 {
 public:
-  IterPtrAdaptor (V *b, V *e) 
+  IterPtrAdaptor (V *b, V *e)
     : m_b (b), m_e (e)
   {
     //  .. nothing yet ..
@@ -125,18 +120,18 @@ public:
   {
     w.write<V &> (*m_b);
   }
-  
-  virtual size_t serial_size () const 
+
+  virtual size_t serial_size () const
   {
     return gsi::type_traits<V &>::serial_size ();
   }
 
-  virtual bool at_end () const 
+  virtual bool at_end () const
   {
     return m_b == m_e;
   }
 
-  virtual void inc () 
+  virtual void inc ()
   {
     ++m_b;
   }
@@ -149,11 +144,11 @@ private:
  *  @brief The template providing a binding of a specific C++ iterator to the abstraction
  */
 template <class V>
-class ConstIterPtrAdaptor 
+class ConstIterPtrAdaptor
   : public IterAdaptorAbstractBase
 {
 public:
-  ConstIterPtrAdaptor (const V *b, const V *e) 
+  ConstIterPtrAdaptor (const V *b, const V *e)
     : m_b (b), m_e (e)
   {
     //  .. nothing yet ..
@@ -164,17 +159,17 @@ public:
     w.write<const V &> (*m_b);
   }
 
-  virtual size_t serial_size () const 
+  virtual size_t serial_size () const
   {
     return gsi::type_traits<const V &>::serial_size ();
   }
 
-  virtual bool at_end () const 
+  virtual bool at_end () const
   {
     return m_b == m_e;
   }
 
-  virtual void inc () 
+  virtual void inc ()
   {
     ++m_b;
   }
@@ -187,14 +182,14 @@ private:
  *  @brief The template providing a binding of a specific C++ iterator to the abstraction
  */
 template <class I>
-class IterAdaptor 
+class IterAdaptor
   : public IterAdaptorAbstractBase
 {
 public:
   typedef std::iterator_traits<I> it;
   typedef typename it::reference reference;
-  
-  IterAdaptor (const I &b, const I &e) 
+
+  IterAdaptor (const I &b, const I &e)
     : m_b (b), m_e (e)
   {
     //  .. nothing yet ..
@@ -205,17 +200,17 @@ public:
     w.write<reference> (*m_b);
   }
 
-  virtual size_t serial_size () const 
+  virtual size_t serial_size () const
   {
     return gsi::type_traits<reference>::serial_size ();
   }
 
-  virtual bool at_end () const 
+  virtual bool at_end () const
   {
     return m_b == m_e;
   }
 
-  virtual void inc () 
+  virtual void inc ()
   {
     ++m_b;
   }
@@ -228,14 +223,14 @@ private:
  *  @brief The template providing a binding of a "free iterator" (one that provides its own at_end method)
  */
 template <class I>
-class FreeIterAdaptor 
+class FreeIterAdaptor
   : public IterAdaptorAbstractBase
 {
 public:
   typedef std::iterator_traits<I> it;
   typedef typename it::reference reference;
-  
-  FreeIterAdaptor (const I &i) 
+
+  FreeIterAdaptor (const I &i)
     : m_i (i)
   {
     //  .. nothing yet ..
@@ -246,17 +241,17 @@ public:
     w.write<reference> (*m_i);
   }
 
-  virtual size_t serial_size () const 
+  virtual size_t serial_size () const
   {
     return gsi::type_traits<reference>::serial_size ();
   }
 
-  virtual bool at_end () const 
+  virtual bool at_end () const
   {
     return m_i.at_end ();
   }
 
-  virtual void inc () 
+  virtual void inc ()
   {
     ++m_i;
   }
@@ -268,4 +263,3 @@ private:
 }
 
 #endif
-

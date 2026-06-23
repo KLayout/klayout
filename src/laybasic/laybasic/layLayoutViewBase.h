@@ -55,22 +55,25 @@
 #include "dbInstElement.h"
 
 #if defined(HAVE_QT)
-# include <QImage>
+#include <QImage>
 class QWidget;
 #endif
 
-namespace rdb {
-  class Database;
+namespace rdb
+{
+class Database;
 }
 
-namespace db {
-  class Layout;
-  class Manager;
-  class SaveLayoutOptions;
-  class LayoutToNetlist;
+namespace db
+{
+class Layout;
+class Manager;
+class SaveLayoutOptions;
+class LayoutToNetlist;
 }
 
-namespace lay {
+namespace lay
+{
 
 class LayoutView;
 class MouseTracker;
@@ -89,15 +92,14 @@ class HierarchyControlPanel;
  *  @brief Stores a layer reference to create layers which have been added by some action
  *
  *  This object is delivered by LayoutViewBase::layer_snapshot and can be used in add_missing_layers
- *  to create new layer views for layers which have been created between layer_snapshot and 
+ *  to create new layer views for layers which have been created between layer_snapshot and
  *  add_missing_layers.
  */
-struct LayerState
-{
-  /** 
+struct LayerState {
+  /**
    *  @brief Constructor
    */
-  LayerState () { }
+  LayerState () {}
 
   std::set<lay::ParsedLayerSource> present;
 };
@@ -109,12 +111,11 @@ struct LayerState
  *  the display of a layer.
  *
  *  "brightness" is a index that indicates how much to make the
- *  color brighter to darker rendering the effective color 
+ *  color brighter to darker rendering the effective color
  *  (eff_frame_color (), eff_fill_color ()). It's value is roughly between
  *  -255 and 255.
  */
-struct LAYBASIC_PUBLIC LayerDisplayProperties
-{
+struct LAYBASIC_PUBLIC LayerDisplayProperties {
   LayerDisplayProperties ();
 
   bool operator== (const LayerDisplayProperties &d);
@@ -122,7 +123,7 @@ struct LAYBASIC_PUBLIC LayerDisplayProperties
 
   /**
    *  @brief render the effective frame color
-   *  
+   *
    *  The effective frame color is computed from the frame color brightness and the
    *  frame color.
    */
@@ -130,7 +131,7 @@ struct LAYBASIC_PUBLIC LayerDisplayProperties
 
   /**
    *  @brief render the effective frame color
-   *  
+   *
    *  The effective frame color is computed from the frame color brightness and the
    *  frame color.
    */
@@ -171,7 +172,7 @@ public:
     m_actions.push_back (std::make_pair (name, title));
   }
 
-  const std::vector<std::pair<std::string, std::string> > &actions () const
+  const std::vector<std::pair<std::string, std::string>> &actions () const
   {
     return m_actions;
   }
@@ -191,7 +192,7 @@ public:
     return m_parameter;
   }
 
-  bool operator<(const LayoutViewNotification &other) const
+  bool operator< (const LayoutViewNotification &other) const
   {
     if (m_name != other.name ()) {
       return m_name < other.name ();
@@ -199,7 +200,7 @@ public:
     return m_parameter < other.parameter ();
   }
 
-  bool operator==(const LayoutViewNotification &other) const
+  bool operator== (const LayoutViewNotification &other) const
   {
     if (m_name != other.name ()) {
       return false;
@@ -211,7 +212,7 @@ private:
   std::string m_name;
   std::string m_title;
   tl::Variant m_parameter;
-  std::vector<std::pair<std::string, std::string> > m_actions;
+  std::vector<std::pair<std::string, std::string>> m_actions;
 };
 
 /**
@@ -221,9 +222,8 @@ private:
  *  It is composed of a canvas and controls to control the appearance.
  *  It manages the layer display list, bookmark list etc.
  */
-class LAYBASIC_PUBLIC LayoutViewBase :
-    public lay::Dispatcher,   //  needs to be first as it is the GSI base class
-    public lay::Editables
+class LAYBASIC_PUBLIC LayoutViewBase : public lay::Dispatcher, //  needs to be first as it is the GSI base class
+                                       public lay::Editables
 {
 public:
   typedef lay::CellView::unspecific_cell_path_type cell_path_type;
@@ -232,10 +232,10 @@ public:
   /**
    *  @brief Define some options for the view
    */
-  enum options_type { 
-    LV_Normal = 0, 
-    LV_NoLayers = 1, 
-    LV_NoHierarchyPanel = 2, 
+  enum options_type {
+    LV_Normal = 0,
+    LV_NoLayers = 1,
+    LV_NoHierarchyPanel = 2,
     LV_NoLibrariesView = 4,
     LV_NoEditorOptionsPanel = 8,
     LV_NoBookmarksView = 16,
@@ -250,14 +250,16 @@ public:
     LV_NoServices = LV_NoMove + LV_NoTracker + LV_NoSelection + LV_NoPlugins
   };
 
-  enum drop_small_cells_cond_type { DSC_Max = 0, DSC_Min = 1, DSC_Sum = 2 };
+  enum drop_small_cells_cond_type { DSC_Max = 0,
+                                    DSC_Min = 1,
+                                    DSC_Sum = 2 };
 
   /**
    *  @brief Stand-alone Constructor
    */
   LayoutViewBase (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
 
-  /** 
+  /**
    *  @brief Destructor
    */
   ~LayoutViewBase ();
@@ -371,7 +373,7 @@ public:
   /**
    *  @brief Gets the explicit title string of the view
    *
-   *  This is the one explicitly set, not the one displayed. The displayed text is composed of internal information 
+   *  This is the one explicitly set, not the one displayed. The displayed text is composed of internal information
    *  if no title string is set.
    */
   const std::string &title_string () const
@@ -423,7 +425,7 @@ public:
   /**
    *  @brief Create a set of new layers for the given layers of the given cellview
    */
-  void add_new_layers (const std::vector <unsigned int> &layer_ids, int cv_index);
+  void add_new_layers (const std::vector<unsigned int> &layer_ids, int cv_index);
 
   /**
    *  @brief Set the layer properties of a layer with the given position (by iterator) for the current layer list
@@ -466,14 +468,14 @@ public:
   void set_layer_node_expanded (unsigned int index, const LayerPropertiesConstIterator &iter, bool ex);
 
   /**
-   *  @brief Expand the layer properties of all tabs 
+   *  @brief Expand the layer properties of all tabs
    *
-   *  This method will replace the wildcard specifications in the layer properties of all 
-   *  tabs. All unspecific cv index specifications will be expanded to all cellviews, all 
+   *  This method will replace the wildcard specifications in the layer properties of all
+   *  tabs. All unspecific cv index specifications will be expanded to all cellviews, all
    *  layer and datatype specs will be expanded into all available (remaining) specs.
    */
   void expand_properties ();
-  
+
   /**
    *  @brief Expand the layer properties for the given tab
    *
@@ -530,7 +532,7 @@ public:
 
   /**
    *  @brief Delete the layer properties node for the current layer list
-   *  
+   *
    *  This method deletes the object that the iterator points to and invalidates
    *  the iterator since the object that the iterator points to is no longer valid.
    */
@@ -541,7 +543,7 @@ public:
 
   /**
    *  @brief Delete the layer properties node for the layer list with the given index
-   *  
+   *
    *  This method deletes the object that the iterator points to and invalidates
    *  the iterator since the object that the iterator points to is no longer valid.
    */
@@ -620,7 +622,7 @@ public:
   }
 
   /**
-   *  @brief Access the specified layer properties list 
+   *  @brief Access the specified layer properties list
    */
   const LayerPropertiesList &get_properties (unsigned int index) const;
 
@@ -722,12 +724,12 @@ public:
   virtual void set_selected_layers (const std::vector<lay::LayerPropertiesConstIterator> &sel);
 
   /**
-   *  @brief Set the custom dither pattern 
+   *  @brief Set the custom dither pattern
    */
   void set_dither_pattern (const DitherPattern &pattern);
 
   /**
-   *  @brief Obtain the custom dither pattern 
+   *  @brief Obtain the custom dither pattern
    */
   const DitherPattern &dither_pattern () const
   {
@@ -761,7 +763,7 @@ public:
 
   /**
    *  @brief An event signalling a change in the hierarchy of the layouts
-   *  
+   *
    *  If the hierarchy of a layout is changed, this event is triggered.
    *  This may happen due to the removal or insertion of cells or instances.
    */
@@ -769,7 +771,7 @@ public:
 
   /**
    *  @brief An event signalling a change in the geometries of the layouts
-   *  
+   *
    *  If something on the geometries of a cell in one the layouts changes, this
    *  event is triggered. This may happed due to the removal or insertion of shapes or cell instances.
    *  In general, this indicates the need for redrawing of the layout for example.
@@ -797,7 +799,7 @@ public:
 
   /**
    *  @brief An event signalling that the cell views have changed.
-   *  
+   *
    *  When a cellview is added or removed, this event is triggered after the change has been made.
    *  The corresponding event that is triggered before the change is made is cellviews_about_to_change_event.
    */
@@ -805,7 +807,7 @@ public:
 
   /**
    *  @brief An event signalling a change in a cellview.
-   *  
+   *
    *  If a cellview is changed (i.e. the cell is changed) this event is triggered.
    *  The integer argument will receive the index of the cellview that has changed.
    *  The corresponding event that is triggered before the change is made is cellview_about_to_change_event.
@@ -822,14 +824,14 @@ public:
 
   /**
    *  @brief An event signalling that a file has been loaded.
-   *  
+   *
    *  If a new file is loaded, this event is triggered.
    */
   tl::Event file_open_event;
 
   /**
    *  @brief An event signalling that the viewport has changed.
-   *  
+   *
    *  If the viewport (the rectangle that is shown) changes, this event
    *  is triggered.
    */
@@ -842,7 +844,7 @@ public:
 
   /**
    *  @brief An event signalling that the layer list has changed.
-   *  
+   *
    *  If the layer list changes, this event is triggered with an integer argument.
    *  The arguments's bit 0 is set, if the properties have changed. If the arguments bit 1 is
    *  set, the hierarchy has changed. If the name of layer properties is changed, bit 2 is
@@ -852,7 +854,7 @@ public:
 
   /**
    *  @brief An event signalling that a layer list was deleted.
-   *  
+   *
    *  If a layer list is deleted from the layer list set, the event is triggered with
    *  the index of the deleted list as an integer parameter.
    */
@@ -860,7 +862,7 @@ public:
 
   /**
    *  @brief An event signalling that a layer list was inserted.
-   *  
+   *
    *  If a layer list is inserted into the layer list set, the event is triggered with
    *  the index of the new list as an integer parameter.
    */
@@ -868,7 +870,7 @@ public:
 
   /**
    *  @brief An event signalling that the current layer list has changed.
-   *  
+   *
    *  If the current layer list is changed, this event is triggered.
    */
   tl::event<int> current_layer_list_changed_event;
@@ -913,11 +915,11 @@ public:
    */
   virtual void redo (db::Op *op);
 
-  /** 
+  /**
    *  @brief Set the cellview at the given index
    *
-   *  If cvindex is used as the cellview index to associate the 
-   *  layout with. As a side effect, this method will emit a 
+   *  If cvindex is used as the cellview index to associate the
+   *  layout with. As a side effect, this method will emit a
    *  title_changed signal, which means that the cellview passed
    *  should be correctly named before to reflect the correct
    *  title if no explicit title is set.
@@ -935,33 +937,33 @@ public:
   void erase_cellview (unsigned int index);
 
   /**
-   *  @brief Save the layer properties 
+   *  @brief Save the layer properties
    */
   void save_layer_props (const std::string &fn);
 
   /**
-   *  @brief Load the layer properties 
+   *  @brief Load the layer properties
    *
    *  @param fn The file to load.
    */
   void load_layer_props (const std::string &fn);
 
   /**
-   *  @brief Load the layer properties 
+   *  @brief Load the layer properties
    *
    *  @param fn The file to load
    *
-   *  This version allows one to specify whether defaults should be used for all other layers by 
+   *  This version allows one to specify whether defaults should be used for all other layers by
    *  setting add_default to true
    */
   void load_layer_props (const std::string &fn, bool add_default);
 
   /**
-   *  @brief Load the layer properties 
+   *  @brief Load the layer properties
    *
    *  @param fn The file to load
    *
-   *  This version allows one to specify whether defaults should be used for all other layers by 
+   *  This version allows one to specify whether defaults should be used for all other layers by
    *  setting add_default to true. In addition, this version will apply the .lyp definitions
    *  to a specific cellview after removing all definitions for this one. If cv_index is set
    *  to -1, the .lyp file will be applied to each cellview. In any case, the cv index specs
@@ -1199,12 +1201,12 @@ public:
     return m_box_font;
   }
 
-  /** 
+  /**
    *  @brief Visibility of cell boxes
    */
   void cell_box_visible (bool vis);
 
-  /** 
+  /**
    *  @brief Visibility of cell boxes
    */
   bool cell_box_visible () const
@@ -1256,7 +1258,7 @@ public:
    */
   void text_visible (bool vis);
 
-  /** 
+  /**
    *  @brief Visibility of text objects
    */
   bool text_visible () const
@@ -1264,44 +1266,44 @@ public:
     return m_text_visible;
   }
 
-  /** 
-   *  @brief Show properties 
+  /**
+   *  @brief Show properties
    */
   void show_properties_as_text (bool sp);
 
-  /** 
-   *  @brief Show properties 
+  /**
+   *  @brief Show properties
    */
-  bool show_properties_as_text () 
+  bool show_properties_as_text ()
   {
     return m_show_properties;
   }
 
-  /** 
+  /**
    *  @brief Enable or disable bitmap caching
    *
    *  Bitmap caching is used to optimize drawing by storing bitmaps
-   *  in a cache for each cell. Repeated cells will be drawn faster then. 
+   *  in a cache for each cell. Repeated cells will be drawn faster then.
    */
   void bitmap_caching (bool en);
 
-  /** 
+  /**
    *  @brief Lazy rendering of text objects
    */
-  bool bitmap_caching () 
+  bool bitmap_caching ()
   {
     return m_bitmap_caching;
   }
 
-  /** 
+  /**
    *  @brief Lazy rendering of text objects
    */
   void text_lazy_rendering (bool lzy);
 
-  /** 
+  /**
    *  @brief Lazy rendering of text objects
    */
-  bool text_lazy_rendering () 
+  bool text_lazy_rendering ()
   {
     return m_text_lazy_rendering;
   }
@@ -1365,7 +1367,7 @@ public:
    *  @brief Don't show stipples
    */
   void no_stipples (bool f);
-  
+
   /**
    *  @brief "Don't show stipples" property getter
    */
@@ -1373,12 +1375,12 @@ public:
   {
     return m_no_stipples;
   }
-  
+
   /**
    *  @brief Offset stipples property
    */
   void offset_stipples (bool f);
-  
+
   /**
    *  @brief Offset stipples property getter
    */
@@ -1386,12 +1388,12 @@ public:
   {
     return m_stipple_offset;
   }
-  
+
   /**
    *  @brief Apply text transformation property
    */
   void apply_text_trans (bool f);
-  
+
   /**
    *  @brief Apply text transformation property
    */
@@ -1399,7 +1401,7 @@ public:
   {
     return m_apply_text_trans;
   }
-  
+
   /**
    *  @brief Sets the mode how to apply the text transformation
    *
@@ -1440,7 +1442,7 @@ public:
    *  if the cell is changed.
    */
   void clear_ruler_new_cell (bool f);
-  
+
   /**
    *  @brief Clear all rulers if a new cell is selected (getter)
    *
@@ -1451,7 +1453,7 @@ public:
   {
     return m_clear_ruler_new_cell;
   }
-  
+
   /**
    *  @brief Switch new cell to full hierarchy property
    *
@@ -1459,7 +1461,7 @@ public:
    *  if the cell is changed.
    */
   void full_hier_new_cell (bool f);
-  
+
   /**
    *  @brief Switch new cell to full hierarchy property
    *
@@ -1470,7 +1472,7 @@ public:
   {
     return m_full_hier_new_cell;
   }
-  
+
   /**
    *  @brief Fit new cell property
    *
@@ -1478,7 +1480,7 @@ public:
    *  changed if the cell is changed.
    */
   void fit_new_cell (bool f);
-  
+
   /**
    *  @brief Fit new cell
    *
@@ -1489,14 +1491,14 @@ public:
   {
     return m_fit_new_cell;
   }
-  
+
   /**
    *  @brief The pan distance
    *
    *  The pan distance is given relative to the current width and height.
    */
   void pan_distance (double d);
-  
+
   /**
    *  @brief Gets the pan distance
    */
@@ -1505,27 +1507,27 @@ public:
   /**
    *  @brief Get the mouse wheel mode
    *
-   *  The mouse wheel mode determines how the wheel behaves. Mode 0 is the 
-   *  default mode, mode 1 is the alternative mode (default is up/down, 
+   *  The mouse wheel mode determines how the wheel behaves. Mode 0 is the
+   *  default mode, mode 1 is the alternative mode (default is up/down,
    *  shift is left/right, ctrl is zoom).
    */
-  int mouse_wheel_mode () const 
-  { 
-    return m_wheel_mode; 
+  int mouse_wheel_mode () const
+  {
+    return m_wheel_mode;
   }
 
   /**
    *  @brief Set the mouse wheel mode
    *
-   *  The mouse wheel mode determines how the wheel behaves. Mode 0 is the 
-   *  default mode, mode 1 is the alternative mode (default is up/down, 
+   *  The mouse wheel mode determines how the wheel behaves. Mode 0 is the
+   *  default mode, mode 1 is the alternative mode (default is up/down,
    *  shift is left/right, ctrl is zoom).
    */
   void mouse_wheel_mode (int m)
-  { 
-    m_wheel_mode = m; 
+  {
+    m_wheel_mode = m;
   }
-  
+
   /**
    *  @brief Sets the color palette
    *
@@ -1533,7 +1535,7 @@ public:
    *  layer toolbox.
    */
   void set_palette (const lay::ColorPalette &);
-  
+
   /**
    *  @brief Gets the color palette
    */
@@ -1541,7 +1543,7 @@ public:
   {
     return m_palette;
   }
-  
+
   /**
    *  @brief Sets the stipple palette
    *
@@ -1549,7 +1551,7 @@ public:
    *  layer toolbox.
    */
   void set_palette (const lay::StipplePalette &);
-  
+
   /**
    *  @brief Gets the stipple palette
    */
@@ -1557,7 +1559,7 @@ public:
   {
     return m_stipple_palette;
   }
-  
+
   /**
    *  @brief Sets the line style palette
    *
@@ -1581,7 +1583,7 @@ public:
    */
   void reload_layout (unsigned int cv_index);
 
-  /** 
+  /**
    *  @brief Load a (new) file into the layout
    *
    *  The add_cellview param controls whether to create a new cellview
@@ -1596,7 +1598,7 @@ public:
     return load_layout (filename, std::string (), add_cellview);
   }
 
-  /** 
+  /**
    *  @brief Load a (new) file into the layout associating it with the given technology
    *
    *  The add_cellview param controls whether to create a new cellview
@@ -1606,7 +1608,7 @@ public:
    */
   unsigned int load_layout (const std::string &filename, const std::string &technology, bool add_cellview);
 
-  /** 
+  /**
    *  @brief Load a (new) file into the layout with the options
    *
    *  The add_cellview param controls whether to create a new cellview
@@ -1623,7 +1625,7 @@ public:
     return load_layout (filename, options, std::string (), add_cellview);
   }
 
-  /**  
+  /**
    *  @brief Load a (new) file into the layout with the options and using the specified technology
    *
    *  The add_cellview param controls whether to create a new cellview
@@ -1635,8 +1637,8 @@ public:
    */
   unsigned int load_layout (const std::string &filename, const db::LoadLayoutOptions &options, const std::string &technology, bool add_cellview);
 
-  /** 
-   *  @brief Create a new, empty layout 
+  /**
+   *  @brief Create a new, empty layout
    *
    *  The add_cellview param controls whether to create a new cellview
    *  or clear all cellviews before.
@@ -1650,7 +1652,7 @@ public:
     return create_layout (std::string (), add_cellview, true);
   }
 
-  /** 
+  /**
    *  @brief Create a new, empty layout using the specified technology
    *
    *  The add_cellview param controls whether to create a new cellview
@@ -1663,7 +1665,7 @@ public:
     return create_layout (technology, add_cellview, true);
   }
 
-  /** 
+  /**
    *  @brief Create a new, empty layout using the specified technology
    *
    *  The add_cellview param controls whether to create a new cellview
@@ -1687,7 +1689,7 @@ public:
 
   /**
    *  @brief Indicates the current position
-   */ 
+   */
   virtual void current_pos (double x, double y);
 
   /**
@@ -1697,7 +1699,7 @@ public:
   {
     return (unsigned int) m_cellviews.size ();
   }
-  
+
   /**
    *  @brief Obtain the cellviews as a vector
    */
@@ -1705,7 +1707,7 @@ public:
   {
     return m_cellviews;
   }
-  
+
   /**
    *  @brief Obtain the cell view reference for an index
    *
@@ -1737,24 +1739,24 @@ public:
   /**
    *  @brief Obtain the list of annotation shapes (non-const version)
    */
-  lay::AnnotationShapes &annotation_shapes () 
+  lay::AnnotationShapes &annotation_shapes ()
   {
     return m_annotation_shapes;
   }
 
-  /** 
+  /**
    *  @brief Select the list of cellviews for this window and fit cell
    *
    *  Warning: use with care!
    */
-  void select_cellviews_fit (const std::list <CellView> &cvs);
+  void select_cellviews_fit (const std::list<CellView> &cvs);
 
-  /** 
+  /**
    *  @brief Select the list of cellviews for this window
    *
    *  Warning: use with care!
    */
-  void select_cellviews (const std::list <CellView> &cvs);
+  void select_cellviews (const std::list<CellView> &cvs);
 
   /**
    *  @brief Configures the cellview with the given index
@@ -1763,12 +1765,12 @@ public:
    */
   void select_cellview (int index, const CellView &cv);
 
-  /** 
+  /**
    *  @brief Shift and scale the window
    */
   void shift_window (double f, double dx, double dy);
 
-  /** 
+  /**
    *  @brief Goto window
    *
    *  Position the window to the new position x and y with a size of s (approximately).
@@ -1776,7 +1778,7 @@ public:
    */
   void goto_window (const db::DPoint &p, double s = -1.0);
 
-  /** 
+  /**
    *  @brief Return the displayed window
    */
   db::DBox box () const;
@@ -1789,15 +1791,15 @@ public:
    *  @return The index of the new cell
    */
   db::cell_index_type new_cell (int cv_index, const std::string &cell_name);
-  
-  std::pair <bool, std::string> redo_available ();
-  std::pair <bool, std::string> undo_available ();
+
+  std::pair<bool, std::string> redo_available ();
+  std::pair<bool, std::string> undo_available ();
 
   /**
    *  @brief Select a certain mode (by index)
    */
   virtual void mode (int m);
-  
+
   /**
    *  @brief Test, if the view is currently in move mode.
    */
@@ -1819,17 +1821,17 @@ public:
   static int default_mode ();
 
   /**
-   *  @brief Get a list of cellview index and transform variants 
+   *  @brief Get a list of cellview index and transform variants
    */
-  std::set< std::pair<db::DCplxTrans, int> > cv_transform_variants () const;
-  
+  std::set<std::pair<db::DCplxTrans, int>> cv_transform_variants () const;
+
   /**
    *  @brief Get a list of cellview index and transform variants including empty cellviews
    *
    *  This version delivers a unit-transformation variant for cell views for which
    *  no layer is present. This version is used for instance box drawing.
    */
-  std::set< std::pair<db::DCplxTrans, int> > cv_transform_variants_with_empty () const;
+  std::set<std::pair<db::DCplxTrans, int>> cv_transform_variants_with_empty () const;
 
   /**
    *  @brief Get the global transform variants for a given cellview index
@@ -1852,20 +1854,20 @@ public:
   /**
    *  @brief Get the transformation variants for a given cellview index ordered by layer
    */
-  std::map<unsigned int, std::vector<db::DCplxTrans> > cv_transform_variants_by_layer (int cv_index) const;
-  
+  std::map<unsigned int, std::vector<db::DCplxTrans>> cv_transform_variants_by_layer (int cv_index) const;
+
   /**
    *  @brief Access to the hidden cell list
    */
-  const std::vector <std::set <cell_index_type> > &hidden_cells () const
-  { 
+  const std::vector<std::set<cell_index_type>> &hidden_cells () const
+  {
     return m_hidden_cells;
   }
 
   /**
-   *  @brief Get the "dbu_coordinates" flag 
-   *  
-   *  If this flag is true, the property dialogs and other display functions should use 
+   *  @brief Get the "dbu_coordinates" flag
+   *
+   *  If this flag is true, the property dialogs and other display functions should use
    *  database units to display coordinates etc.
    */
   bool dbu_coordinates () const
@@ -1874,19 +1876,19 @@ public:
   }
 
   /**
-   *  @brief Set the "dbu_coordinates" flag 
-   *  
-   *  If this flag is true, the property dialogs and other display functions should use 
+   *  @brief Set the "dbu_coordinates" flag
+   *
+   *  If this flag is true, the property dialogs and other display functions should use
    *  database units to display coordinates etc.
    */
-  void dbu_coordinates (bool f); 
+  void dbu_coordinates (bool f);
 
   /**
-   *  @brief Get the "absolute_coordinates" flag 
-   *  
-   *  If this flag is true, the property dialogs and other display functions should use 
+   *  @brief Get the "absolute_coordinates" flag
+   *
+   *  If this flag is true, the property dialogs and other display functions should use
    *  absolute (on top level) coordinates for points etc.
-   *  "absolute" may as well refer to orientation, not only to coordinates, 
+   *  "absolute" may as well refer to orientation, not only to coordinates,
    *  if transformations are considered.
    */
   bool absolute_coordinates () const
@@ -1895,11 +1897,11 @@ public:
   }
 
   /**
-   *  @brief Set the "absolute_coordinates" flag 
-   *  
-   *  If this flag is true, the property dialogs and other display functions should use 
+   *  @brief Set the "absolute_coordinates" flag
+   *
+   *  If this flag is true, the property dialogs and other display functions should use
    *  absolute (on top level) coordinates for points etc.
-   *  "absolute" may as well refer to orientation, not only to coordinates, 
+   *  "absolute" may as well refer to orientation, not only to coordinates,
    *  if transformations are considered.
    */
   void absolute_coordinates (bool f);
@@ -1963,7 +1965,7 @@ public:
   }
 
   /**
-   *  @brief Get the current viewport 
+   *  @brief Get the current viewport
    */
   const lay::Viewport &viewport () const
   {
@@ -2026,12 +2028,12 @@ public:
   }
 
   /**
-   *  @brief Write accessor to the "drop small cells" condition 
+   *  @brief Write accessor to the "drop small cells" condition
    */
   void drop_small_cells_cond (drop_small_cells_cond_type t);
 
   /**
-   *  @brief Read accessor to the "drop small cells" condition 
+   *  @brief Read accessor to the "drop small cells" condition
    */
   drop_small_cells_cond_type drop_small_cells_cond () const
   {
@@ -2128,7 +2130,7 @@ public:
   /**
    *  @brief Get the Drawings interface
    */
-  lay::Drawings *drawings () 
+  lay::Drawings *drawings ()
   {
     return mp_canvas;
   }
@@ -2152,7 +2154,7 @@ public:
   void set_drawing_workers (int workers);
 
   /**
-   *  @brief Get the number of drawing workers 
+   *  @brief Get the number of drawing workers
    */
   int drawing_workers () const
   {
@@ -2193,7 +2195,7 @@ public:
    */
   Plugin *get_plugin_by_name (const std::string &name) const;
 
-  /** 
+  /**
    *  @brief Localize the plugin of the given Type
    *
    *  This method will return 0, if no such plugin is registered
@@ -2202,13 +2204,13 @@ public:
   PI *get_plugin () const
   {
     PI *pi = 0;
-    for (std::vector<lay::Plugin *>::const_iterator p = mp_plugins.begin (); p != mp_plugins.end () && !pi; ++p) {
+    for (std::vector<lay::Plugin *>::const_iterator p = mp_plugins.begin (); p != mp_plugins.end () && ! pi; ++p) {
       pi = dynamic_cast<PI *> (*p);
     }
     return pi;
   }
 
-  /** 
+  /**
    *  @brief Localize the plugins of the given Type
    *
    *  This method will return 0, if no such plugin is registered
@@ -2233,7 +2235,7 @@ public:
     return mp_active_plugin;
   }
 
-  /** 
+  /**
    *  @brief Create a plugin of the given type
    *
    *  This method can be used to selectively create plugins when the NoPlugin option
@@ -2245,12 +2247,12 @@ public:
   void create_plugin ()
   {
     for (std::vector<lay::Plugin *>::const_iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
-      if (dynamic_cast <const PD *> ((*p)->plugin_declaration ()) != 0) {
+      if (dynamic_cast<const PD *> ((*p)->plugin_declaration ()) != 0) {
         return;
       }
     }
     for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-      if (dynamic_cast <const PD *> (&*cls) != 0) {
+      if (dynamic_cast<const PD *> (&*cls) != 0) {
         create_plugin (&*cls);
         break;
       }
@@ -2259,8 +2261,8 @@ public:
 
 
   /**
-   *  @brief Enable or disable the actions for edit functions 
-   * 
+   *  @brief Enable or disable the actions for edit functions
+   *
    *  This method is used by non-modal dialogs that want to suppress any editing
    *  activities (like browsers) while they are open.
    *
@@ -2286,12 +2288,12 @@ public:
    */
   void rename_cellview (const std::string &name, int cellview_index);
 
-  /** 
+  /**
    *  @brief Descend into the hierarchy along the given specific path for the given cellview
    */
   void descend (const std::vector<db::InstElement> &path, int cellview_index);
 
-  /** 
+  /**
    *  @brief Ascend one level in the hierarchy for the given cellview
    *
    *  @return The instance element removed by ascending the path
@@ -2398,17 +2400,17 @@ public:
    */
   void select_cell_fit (const cell_path_type &path, int cellview_index);
 
-  /** 
+  /**
    *  @brief Select a cell by index for a certain cell view and fit cell
    */
   void select_cell_fit (cell_index_type index, int cellview_index);
 
-  /** 
+  /**
    *  @brief Select a cell by path for a certain cell view
    */
   void select_cell (const cell_path_type &path, int cellview_index);
 
-  /** 
+  /**
    *  @brief Select a cell by index for a certain cell view
    */
   void select_cell (cell_index_type index, int cellview_index);
@@ -2419,7 +2421,7 @@ public:
   bool is_cell_hidden (cell_index_type ci, int cellview_index) const;
 
   /**
-   *  @brief Get the hidden cells for a certain cellview 
+   *  @brief Get the hidden cells for a certain cellview
    */
   const std::set<cell_index_type> &hidden_cells (int cellview_index) const;
 
@@ -2461,7 +2463,7 @@ public:
   void force_update_content ();
 
   /**
-   *  @brief Create a set of initial layer properties for the given cellview 
+   *  @brief Create a set of initial layer properties for the given cellview
    *
    *  @param cv_index The cellview for which to produce a set of layer properties
    *  @param lyp_file The layer properties file to load or empty if no file should be loaded
@@ -2470,7 +2472,7 @@ public:
   void create_initial_layer_props (int cv_index, const std::string &lyp_file, bool add_missing);
 
   /**
-   *  @brief Merges the given properties into the cell properties of this view 
+   *  @brief Merges the given properties into the cell properties of this view
    */
   void merge_layer_props (const std::vector<lay::LayerPropertiesList> &props);
 
@@ -2485,7 +2487,7 @@ public:
   }
 
   /**
-   *  @brief Get the transient selection mode 
+   *  @brief Get the transient selection mode
    *
    *  @return true, if transient (hover) selection mode is enabled
    */
@@ -2623,15 +2625,15 @@ public:
   /**
    *  @brief Get the view_op's for rendering the layers
    */
-  const std::vector <lay::ViewOp> &get_view_ops () const
+  const std::vector<lay::ViewOp> &get_view_ops () const
   {
     return mp_canvas->get_view_ops ();
   }
 
   /**
-   *  @brief Get the redraw layer info vector 
+   *  @brief Get the redraw layer info vector
    */
-  const std::vector <lay::RedrawLayerInfo> &get_redraw_layers () const
+  const std::vector<lay::RedrawLayerInfo> &get_redraw_layers () const
   {
     return mp_canvas->get_redraw_layers ();
   }
@@ -2660,7 +2662,7 @@ public:
    *  @brief Add a marker database
    *
    *  The layout view will become owner of the database.
-   *  
+   *
    *  @param rdb The database to add
    *  @return The index of the database
    */
@@ -2696,7 +2698,7 @@ public:
   /**
    *  @brief Remove the marker database with the given index
    *
-   *  This will release the marker database at the given index. The list 
+   *  This will release the marker database at the given index. The list
    *  will be reduced by that element. This means, that the following elements
    *  will have different indicies.
    */
@@ -2713,11 +2715,11 @@ public:
   /**
    *  @brief Open the RDB browser for a given database and associated cv index
    */
-  virtual void open_rdb_browser (int /*rdb_index*/, int /*cv_index*/) { }
+  virtual void open_rdb_browser (int /*rdb_index*/, int /*cv_index*/) {}
 
   /**
    *  @brief An event signalling a change in the marker database list
-   *  
+   *
    *  If marker databases are added or removed, this event is triggered.
    */
   tl::Event rdb_list_changed_event;
@@ -2779,7 +2781,7 @@ public:
   /**
    *  @brief Open the L2NDB browser for a given database and associated cv index
    */
-  virtual void open_l2ndb_browser (int /*l2ndb_index*/, int /*cv_index*/) { }
+  virtual void open_l2ndb_browser (int /*l2ndb_index*/, int /*cv_index*/) {}
 
   /**
    *  @brief An event signalling a change in the netlist database list
@@ -2852,7 +2854,7 @@ public:
   void pan_center (const db::DPoint &p);
 
   /**
-   *  @brief Goto a position/cell view that was saved with save_view 
+   *  @brief Goto a position/cell view that was saved with save_view
    */
   void goto_view (const DisplayState &state);
 
@@ -2932,18 +2934,18 @@ public:
    */
   void stop_redraw ();
 
-  /** 
+  /**
    *  @brief Select last display state
    */
   void prev_display_state ();
 
-  /** 
+  /**
    *  @brief Select next display state
    */
   void next_display_state ();
 
   /**
-   *  @brief Ensure the selection is visible 
+   *  @brief Ensure the selection is visible
    */
   void ensure_selection_visible ();
 
@@ -3050,13 +3052,13 @@ private:
   int m_disabled_edits;
   unsigned int m_options;
   lay::LayoutCanvas *mp_canvas;
-  std::list <CellView> m_cellviews;
+  std::list<CellView> m_cellviews;
   lay::AnnotationShapes m_annotation_shapes;
-  std::vector <std::set <cell_index_type> > m_hidden_cells;
+  std::vector<std::set<cell_index_type>> m_hidden_cells;
   std::string m_title;
   std::string m_current_title;
-  tl::vector <rdb::Database *> m_rdbs;
-  tl::vector <db::LayoutToNetlist *> m_l2ndbs;
+  tl::vector<rdb::Database *> m_rdbs;
+  tl::vector<db::LayoutToNetlist *> m_l2ndbs;
   std::string m_def_lyp_file;
   bool m_add_other_layers;
   bool m_synchronous;
@@ -3148,7 +3150,7 @@ private:
   lay::StipplePalette m_stipple_palette;
   lay::LineStylePalette m_line_style_palette;
 
-  std::vector <DisplayState> m_display_states;
+  std::vector<DisplayState> m_display_states;
   unsigned int m_display_state_ptr;
 
   BookmarkList m_bookmarks;
@@ -3158,7 +3160,7 @@ private:
 
   //  service and editable management
   int m_mode;
-  
+
   //  services & editables
   lay::MouseTracker *mp_tracker;
   lay::ZoomService *mp_zoom_service;
@@ -3252,17 +3254,17 @@ protected:
   virtual void update_content_for_cv (int cv_index);
   virtual bool set_hier_levels_basic (std::pair<int, int> l);
 
-  virtual void bookmarks_changed () { }
+  virtual void bookmarks_changed () {}
 
   void ensure_layer_selected ();
 
   void enable_active_cellview_changed_event (bool enable, bool silent = false);
   void active_cellview_changed (int index);
 
-  virtual void emit_edits_enabled_changed () { }
-  virtual void emit_title_changed () { }
-  virtual void emit_dirty_changed () { }
-  virtual void emit_layer_order_changed () { }
+  virtual void emit_edits_enabled_changed () {}
+  virtual void emit_title_changed () {}
+  virtual void emit_dirty_changed () {}
+  virtual void emit_layer_order_changed () {}
 };
 
 }

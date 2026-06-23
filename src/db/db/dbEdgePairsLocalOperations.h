@@ -39,12 +39,14 @@ class DB_PUBLIC EdgePair2EdgeInteractingLocalOperation
   : public local_operation<db::EdgePair, db::Edge, db::EdgePair>
 {
 public:
-  enum output_mode_t { Normal, Inverse, Both };
+  enum output_mode_t { Normal,
+                       Inverse,
+                       Both };
 
   EdgePair2EdgeInteractingLocalOperation (output_mode_t output_mode, size_t min_count, size_t max_count);
 
   virtual db::Coord dist () const;
-  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::EdgePair, db::Edge> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::EdgePair, db::Edge> &interactions, std::vector<std::unordered_set<db::EdgePair>> &results, const db::LocalProcessorBase * /*proc*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -63,7 +65,7 @@ public:
   EdgePair2EdgePullLocalOperation ();
 
   virtual db::Coord dist () const;
-  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::EdgePair, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::EdgePair, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge>> &results, const db::LocalProcessorBase * /*proc*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 };
@@ -71,17 +73,19 @@ public:
 /**
  *  @brief Implements edge-to-polygon interactions
  */
-template<class TI>
+template <class TI>
 class DB_PUBLIC edge_pair_to_polygon_interacting_local_operation
   : public local_operation<db::EdgePair, TI, db::EdgePair>
 {
 public:
-  enum output_mode_t { Normal, Inverse, Both };
+  enum output_mode_t { Normal,
+                       Inverse,
+                       Both };
 
   edge_pair_to_polygon_interacting_local_operation (EdgePairInteractionMode mode, output_mode_t output_mode, size_t min_count, size_t max_count);
 
   virtual db::Coord dist () const;
-  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::EdgePair, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::EdgePair, TI> &interactions, std::vector<std::unordered_set<db::EdgePair>> &results, const db::LocalProcessorBase * /*proc*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -101,7 +105,7 @@ public:
   EdgePair2PolygonPullLocalOperation ();
 
   virtual db::Coord dist () const;
-  virtual void do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::EdgePair, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::EdgePair, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef>> &results, const db::LocalProcessorBase * /*proc*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 };

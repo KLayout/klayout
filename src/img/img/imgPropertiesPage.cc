@@ -67,12 +67,10 @@ PropertiesPage::~PropertiesPage ()
       delete mp_direct_image;
       mp_direct_image = 0;
     }
-
   }
 }
 
-void
-PropertiesPage::init ()
+void PropertiesPage::init ()
 {
   m_no_signals = false;
   m_in_color_mapping_signal = false;
@@ -149,8 +147,7 @@ PropertiesPage::init ()
   connect (define_landmarks_pb, SIGNAL (clicked ()), this, SLOT (define_landmarks_pressed ()));
 }
 
-void
-PropertiesPage::attach_service (img::Service *service)
+void PropertiesPage::attach_service (img::Service *service)
 {
   layer_binding_cbx->set_new_layer_enabled (false);
   layer_binding_cbx->set_no_layer_available (true);
@@ -163,8 +160,7 @@ PropertiesPage::attach_service (img::Service *service)
   }
 }
 
-void
-PropertiesPage::invalidate ()
+void PropertiesPage::invalidate ()
 {
   if (mp_direct_image) {
     delete mp_direct_image;
@@ -178,8 +174,7 @@ PropertiesPage::count () const
   return m_selection.size ();
 }
 
-void
-PropertiesPage::select_entries (const std::vector<size_t> &entries)
+void PropertiesPage::select_entries (const std::vector<size_t> &entries)
 {
   if (! entries.empty ()) {
     m_index = entries.front ();
@@ -190,7 +185,7 @@ PropertiesPage::select_entries (const std::vector<size_t> &entries)
 std::string
 PropertiesPage::description (size_t entry) const
 {
-  const img::Object *obj = dynamic_cast <const img::Object *> (m_selection [entry]->ptr ());
+  const img::Object *obj = dynamic_cast<const img::Object *> (m_selection [entry]->ptr ());
   if (! obj) {
     return std::string ("nil");
   }
@@ -209,14 +204,13 @@ PropertiesPage::description () const
   return tl::to_string (tr ("Images"));
 }
 
-void
-PropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
+void PropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
 {
   if (! mp_service) {
     return;
   }
 
-  std::vector <img::Service::obj_iterator> org_selection;
+  std::vector<img::Service::obj_iterator> org_selection;
   m_selection.swap (org_selection);
   for (auto i = remaining_entries.begin (); i != remaining_entries.end (); ++i) {
     m_selection.push_back (org_selection [*i]);
@@ -226,27 +220,23 @@ PropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
   mp_service->clear_highlights ();
 }
 
-void
-PropertiesPage::leave ()
+void PropertiesPage::leave ()
 {
   mp_service->clear_highlights ();
 }
 
-void 
-PropertiesPage::set_direct_image (img::Object *image)
+void PropertiesPage::set_direct_image (img::Object *image)
 {
   tl_assert (mp_service == 0);
   mp_direct_image = image;
 }
 
-bool 
-PropertiesPage::readonly ()
+bool PropertiesPage::readonly ()
 {
   return false;
 }
 
-void
-PropertiesPage::get_xmin_xmax (double &xmin, double &xmax, bool &has_error_out)
+void PropertiesPage::get_xmin_xmax (double &xmin, double &xmax, bool &has_error_out)
 {
   bool has_error = false;
 
@@ -278,8 +268,7 @@ PropertiesPage::get_xmin_xmax (double &xmin, double &xmax, bool &has_error_out)
   }
 }
 
-void 
-PropertiesPage::min_max_value_changed ()
+void PropertiesPage::min_max_value_changed ()
 {
   value_le->setText (QString ());
   value_le->setEnabled (false);
@@ -306,7 +295,6 @@ PropertiesPage::min_max_value_changed ()
   } else if (false_color_control->has_selection ()) {
 
     colors->set_single_mode (true);
-
   }
 
   recompute_histogram ();
@@ -314,8 +302,7 @@ PropertiesPage::min_max_value_changed ()
   emit edited ();
 }
 
-bool
-PropertiesPage::update_controls ()
+bool PropertiesPage::update_controls ()
 {
   bool has_error = false;
 
@@ -337,20 +324,17 @@ PropertiesPage::update_controls ()
 
       value_le->setText (tl::to_qstring (tl::sprintf ("%.4g", xx)));
       value_le->setEnabled (true);
-
     }
 
   } else if (false_color_control->has_selection ()) {
 
     colors->set_single_mode (true);
-
   }
 
   return has_error;
 }
 
-void
-PropertiesPage::color_mapping_changed ()
+void PropertiesPage::color_mapping_changed ()
 {
   if (! m_no_signals && ! update_controls ()) {
     m_in_color_mapping_signal = true;
@@ -359,8 +343,7 @@ PropertiesPage::color_mapping_changed ()
   }
 }
 
-void
-PropertiesPage::value_changed ()
+void PropertiesPage::value_changed ()
 {
   double xx = 0;
   bool has_error = false;
@@ -391,18 +374,16 @@ PropertiesPage::value_changed ()
     m_no_signals = false;
 
     emit edited ();
-
   }
 }
 
-inline double 
+inline double
 round_to_zero (double x)
 {
   return 1e-6 * floor (0.5 + 1e6 * x);
 }
 
-void 
-PropertiesPage::update ()
+void PropertiesPage::update ()
 {
   if (m_in_color_mapping_signal) {
     return;
@@ -416,10 +397,9 @@ PropertiesPage::update ()
 
     //  create a local copy in which we can apply modifications
     if (! mp_direct_image) {
-      const img::Object *image = dynamic_cast <const img::Object *> (m_selection [m_index]->ptr ());
+      const img::Object *image = dynamic_cast<const img::Object *> (m_selection [m_index]->ptr ());
       mp_direct_image = new img::Object (*image);
     }
-
   }
 
   std::string mode;
@@ -440,7 +420,7 @@ PropertiesPage::update ()
     file_info_lbl->setText (QObject::tr ("No data loaded"));
   }
 
-  data_mapping_tab_widget->setTabEnabled (0, !mp_direct_image->is_color ());
+  data_mapping_tab_widget->setTabEnabled (0, ! mp_direct_image->is_color ());
 
   db::Matrix3d matrix = mp_direct_image->matrix ();
 
@@ -515,10 +495,9 @@ PropertiesPage::update ()
   recompute_histogram ();
 }
 
-void
-PropertiesPage::recompute_histogram ()
+void PropertiesPage::recompute_histogram ()
 {
-  std::vector <size_t> histogram;
+  std::vector<size_t> histogram;
 
   try {
 
@@ -548,7 +527,6 @@ PropertiesPage::recompute_histogram ()
             histogram [size_t (hi)] += 1;
           }
         }
-
       }
 
     } else {
@@ -570,18 +548,16 @@ PropertiesPage::recompute_histogram ()
             histogram [size_t (hi)] += 1;
           }
         }
-
       }
-
     }
 
-  } catch (...) { }
+  } catch (...) {
+  }
 
   false_color_control->set_histogram (histogram);
 }
 
-void 
-PropertiesPage::brightness_slider_changed (int value)
+void PropertiesPage::brightness_slider_changed (int value)
 {
   if (m_no_signals) {
     return;
@@ -593,8 +569,7 @@ PropertiesPage::brightness_slider_changed (int value)
   m_no_signals = false;
 }
 
-void 
-PropertiesPage::brightness_spinbox_changed (int value)
+void PropertiesPage::brightness_spinbox_changed (int value)
 {
   if (m_no_signals) {
     return;
@@ -606,8 +581,7 @@ PropertiesPage::brightness_spinbox_changed (int value)
   m_no_signals = false;
 }
 
-void 
-PropertiesPage::contrast_slider_changed (int value)
+void PropertiesPage::contrast_slider_changed (int value)
 {
   if (m_no_signals) {
     return;
@@ -619,8 +593,7 @@ PropertiesPage::contrast_slider_changed (int value)
   m_no_signals = false;
 }
 
-void 
-PropertiesPage::contrast_spinbox_changed (int value)
+void PropertiesPage::contrast_spinbox_changed (int value)
 {
   if (m_no_signals) {
     return;
@@ -632,8 +605,7 @@ PropertiesPage::contrast_spinbox_changed (int value)
   m_no_signals = false;
 }
 
-void 
-PropertiesPage::gamma_spinbox_changed (double value)
+void PropertiesPage::gamma_spinbox_changed (double value)
 {
   if (m_no_signals) {
     return;
@@ -652,8 +624,7 @@ PropertiesPage::gamma_spinbox_changed (double value)
   m_no_signals = false;
 }
 
-void 
-PropertiesPage::gamma_slider_changed (int value)
+void PropertiesPage::gamma_slider_changed (int value)
 {
   if (m_no_signals) {
     return;
@@ -674,8 +645,7 @@ PropertiesPage::gamma_slider_changed (int value)
   m_no_signals = false;
 }
 
-void 
-PropertiesPage::red_slider_changed (int value)
+void PropertiesPage::red_slider_changed (int value)
 {
   if (m_no_signals) {
     return;
@@ -691,8 +661,7 @@ PropertiesPage::red_slider_changed (int value)
   m_no_signals = false;
 }
 
-void 
-PropertiesPage::red_spinbox_changed (double value)
+void PropertiesPage::red_spinbox_changed (double value)
 {
   if (m_no_signals) {
     return;
@@ -706,8 +675,7 @@ PropertiesPage::red_spinbox_changed (double value)
   m_no_signals = false;
 }
 
-void 
-PropertiesPage::green_slider_changed (int value)
+void PropertiesPage::green_slider_changed (int value)
 {
   if (m_no_signals) {
     return;
@@ -723,8 +691,7 @@ PropertiesPage::green_slider_changed (int value)
   m_no_signals = false;
 }
 
-void 
-PropertiesPage::green_spinbox_changed (double value)
+void PropertiesPage::green_spinbox_changed (double value)
 {
   if (m_no_signals) {
     return;
@@ -738,8 +705,7 @@ PropertiesPage::green_spinbox_changed (double value)
   m_no_signals = false;
 }
 
-void 
-PropertiesPage::blue_slider_changed (int value)
+void PropertiesPage::blue_slider_changed (int value)
 {
   if (m_no_signals) {
     return;
@@ -755,8 +721,7 @@ PropertiesPage::blue_slider_changed (int value)
   m_no_signals = false;
 }
 
-void 
-PropertiesPage::blue_spinbox_changed (double value)
+void PropertiesPage::blue_spinbox_changed (double value)
 {
   if (m_no_signals) {
     return;
@@ -767,53 +732,48 @@ PropertiesPage::blue_spinbox_changed (double value)
   b_slider->setValue (int (0.5 + value * 50.0));
   emit edited ();
 
-  m_no_signals = false;  
+  m_no_signals = false;
 }
 
-void  
-PropertiesPage::black_to_white ()
+void PropertiesPage::black_to_white ()
 {
-  std::vector <std::pair <double, std::pair<tl::Color, tl::Color> > > nodes;
+  std::vector<std::pair<double, std::pair<tl::Color, tl::Color>>> nodes;
   nodes.push_back (std::make_pair (0.0, std::make_pair (tl::Color (0, 0, 0), tl::Color (0, 0, 0))));
   nodes.push_back (std::make_pair (1.0, std::make_pair (tl::Color (255, 255, 255), tl::Color (255, 255, 255))));
   false_color_control->set_nodes (nodes);
   emit edited ();
 }
 
-void  
-PropertiesPage::white_to_black ()
+void PropertiesPage::white_to_black ()
 {
-  std::vector <std::pair <double, std::pair<tl::Color, tl::Color> > > nodes;
+  std::vector<std::pair<double, std::pair<tl::Color, tl::Color>>> nodes;
   nodes.push_back (std::make_pair (0.0, std::make_pair (tl::Color (255, 255, 255), tl::Color (255, 255, 255))));
   nodes.push_back (std::make_pair (1.0, std::make_pair (tl::Color (0, 0, 0), tl::Color (0, 0, 0))));
   false_color_control->set_nodes (nodes);
   emit edited ();
 }
 
-void  
-PropertiesPage::red_to_blue ()
+void PropertiesPage::red_to_blue ()
 {
-  std::vector <std::pair <double, std::pair<tl::Color, tl::Color> > > nodes;
+  std::vector<std::pair<double, std::pair<tl::Color, tl::Color>>> nodes;
   nodes.push_back (std::make_pair (0.0, std::make_pair (tl::Color (255, 0, 0), tl::Color (255, 0, 0))));
   nodes.push_back (std::make_pair (1.0, std::make_pair (tl::Color (0, 0, 255), tl::Color (0, 0, 255))));
   false_color_control->set_nodes (nodes);
   emit edited ();
 }
 
-void  
-PropertiesPage::blue_to_red ()
+void PropertiesPage::blue_to_red ()
 {
-  std::vector <std::pair <double, std::pair<tl::Color, tl::Color> > > nodes;
+  std::vector<std::pair<double, std::pair<tl::Color, tl::Color>>> nodes;
   nodes.push_back (std::make_pair (0.0, std::make_pair (tl::Color (0, 0, 255), tl::Color (0, 0, 255))));
   nodes.push_back (std::make_pair (1.0, std::make_pair (tl::Color (255, 0, 0), tl::Color (255, 0, 0))));
   false_color_control->set_nodes (nodes);
   emit edited ();
 }
 
-void  
-PropertiesPage::reverse_color_order ()
+void PropertiesPage::reverse_color_order ()
 {
-  std::vector <std::pair <double, std::pair<tl::Color, tl::Color> > > nodes (false_color_control->nodes ());
+  std::vector<std::pair<double, std::pair<tl::Color, tl::Color>>> nodes (false_color_control->nodes ());
   for (size_t i = 0; i < nodes.size () / 2; ++i) {
     std::swap (nodes [i].second.second, nodes [nodes.size () - 1 - i].second.first);
     std::swap (nodes [i].second.first, nodes [nodes.size () - 1 - i].second.second);
@@ -822,8 +782,7 @@ PropertiesPage::reverse_color_order ()
   emit edited ();
 }
 
-void 
-PropertiesPage::apply (bool /*commit*/)
+void PropertiesPage::apply (bool /*commit*/)
 {
   bool has_error = false;
 
@@ -835,7 +794,7 @@ PropertiesPage::apply (bool /*commit*/)
   double ph2 = std::max (0.5, 0.5 * matrix.mag_y () * mp_direct_image->height ());
   double z = pw2 + ph2;
 
-  double w = matrix.mag_x (), h = matrix.mag_y (), x = matrix.disp ().x (), y = matrix.disp ().y (), 
+  double w = matrix.mag_x (), h = matrix.mag_y (), x = matrix.disp ().x (), y = matrix.disp ().y (),
          a = matrix.angle (), sa = matrix.shear_angle (), tx = matrix.perspective_tilt_x (z), ty = matrix.perspective_tilt_y (z);
 
   try {
@@ -951,10 +910,9 @@ PropertiesPage::apply (bool /*commit*/)
   }
 }
 
-void
-PropertiesPage::browse ()
+void PropertiesPage::browse ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   apply (true);
 
@@ -974,13 +932,12 @@ BEGIN_PROTECTED
     }
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-PropertiesPage::save_pressed ()
+void PropertiesPage::save_pressed ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   apply (true);
 
@@ -996,14 +953,12 @@ BEGIN_PROTECTED
     tl::OutputFile file (filename);
     tl::OutputStream stream (file);
     img::ImageStreamer::write (stream, *mp_direct_image);
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-PropertiesPage::reset_pressed ()
+void PropertiesPage::reset_pressed ()
 {
   m_no_signals = true;
 
@@ -1030,8 +985,7 @@ PropertiesPage::reset_pressed ()
   emit edited ();
 }
 
-void
-PropertiesPage::define_landmarks_pressed ()
+void PropertiesPage::define_landmarks_pressed ()
 {
   if (mp_direct_image) {
     img::LandmarksDialog dialog (this, *mp_direct_image);

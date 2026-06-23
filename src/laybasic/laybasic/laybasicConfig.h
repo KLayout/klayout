@@ -30,7 +30,7 @@
 namespace lay
 {
 
-/** 
+/**
  *  @brief Declaration of the configuration names
  */
 

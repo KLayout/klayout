@@ -40,7 +40,7 @@ DirectLayerMapping::DirectLayerMapping (db::Layout *target_layout)
   // .. nothing yet ..
 }
 
-std::pair <bool, unsigned int> 
+std::pair<bool, unsigned int>
 DirectLayerMapping::map_layer (const LayerProperties &lprops)
 {
   if (! m_initialized) {
@@ -50,7 +50,7 @@ DirectLayerMapping::map_layer (const LayerProperties &lprops)
     m_initialized = true;
   }
 
-  std::map <db::LayerProperties, unsigned int, db::LPLogicalLessFunc>::const_iterator lm = m_lmap.find (lprops);
+  std::map<db::LayerProperties, unsigned int, db::LPLogicalLessFunc>::const_iterator lm = m_lmap.find (lprops);
   if (lm != m_lmap.end ()) {
     return std::make_pair (true, lm->second);
   } else {
@@ -91,18 +91,16 @@ collect_cells_to_copy (const db::Layout &source,
       all_cells_to_copy.erase (*i);
       all_top_level_cells.erase (*i);
     }
-
   }
 }
 
-void 
-merge_layouts (db::Layout &target, 
-               const db::Layout &source, 
-               const db::ICplxTrans &trans,
-               const std::vector<db::cell_index_type> &source_cells, 
-               const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
-               const std::map<unsigned int, unsigned int> &layer_mapping,
-               std::map<db::cell_index_type, db::cell_index_type> *final_cell_mapping)
+void merge_layouts (db::Layout &target,
+                    const db::Layout &source,
+                    const db::ICplxTrans &trans,
+                    const std::vector<db::cell_index_type> &source_cells,
+                    const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
+                    const std::map<unsigned int, unsigned int> &layer_mapping,
+                    std::map<db::cell_index_type, db::cell_index_type> *final_cell_mapping)
 {
   //  collect all called cells and all top level cells
   std::set<db::cell_index_type> all_top_level_cells;
@@ -137,7 +135,7 @@ merge_layouts (db::Layout &target,
     db::cell_index_type target_cell_index = 0;
     std::map<db::cell_index_type, db::cell_index_type>::const_iterator cm = cell_mapping.find (*c);
     if (cm == cell_mapping.end ()) {
-      target_cell_index = new_cell_mapping[*c];
+      target_cell_index = new_cell_mapping [*c];
     } else {
       target_cell_index = cm->second;
     }
@@ -159,7 +157,7 @@ merge_layouts (db::Layout &target,
     }
 
     //  copy the instances
-    for (db::Cell::const_iterator inst = source_cell.begin (); !inst.at_end (); ++inst) {
+    for (db::Cell::const_iterator inst = source_cell.begin (); ! inst.at_end (); ++inst) {
 
       //  only copy instances for new cells ..
       std::map<db::cell_index_type, db::cell_index_type>::const_iterator nc = new_cell_mapping.find (inst->cell_index ());
@@ -175,18 +173,14 @@ merge_layouts (db::Layout &target,
         } else {
           target_cell.insert (new_inst_array);
         }
-
       }
-
     }
-
   }
-
 }
 
-static void 
-copy_or_propagate_shapes (db::Layout &target, 
-                          const db::Layout &source, 
+static void
+copy_or_propagate_shapes (db::Layout &target,
+                          const db::Layout &source,
                           const db::ICplxTrans &trans,
                           const db::ICplxTrans &propagate_trans,
                           db::cell_index_type source_cell_index,
@@ -211,14 +205,12 @@ copy_or_propagate_shapes (db::Layout &target,
           copy_or_propagate_shapes (target, source, trans, t, source_cell_index, p->parent_cell_index (), target_layer, source_layer, all_cells_to_copy, cell_mapping, transformer);
         }
       }
-
     }
 
   } else if (cm->second != DropCell) {
 
     db::Cell &target_cell = target.cell (cm->second);
     transformer->insert_transformed (target_cell.shapes (target_layer), source_cell.shapes (source_layer), trans * propagate_trans);
-
   }
 }
 
@@ -230,8 +222,7 @@ copy_or_move_shapes (db::Layout &target,
                      const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
                      const std::map<unsigned int, unsigned int> &layer_mapping,
                      const ShapesTransformer *transformer,
-                     bool move
-                    )
+                     bool move)
 {
   //  collect all called cells and all top level cells
   std::set<db::cell_index_type> all_top_level_cells;
@@ -255,25 +246,24 @@ copy_or_move_shapes (db::Layout &target,
 
 namespace
 {
-  class StandardShapesTransformer
-    : public ShapesTransformer
+class StandardShapesTransformer
+  : public ShapesTransformer
+{
+public:
+  void insert_transformed (Shapes &into, const Shapes &from, const ICplxTrans &trans) const
   {
-  public:
-    void insert_transformed (Shapes &into, const Shapes &from, const ICplxTrans &trans) const
-    {
-      into.insert_transformed (from, trans);
-    }
-  };
+    into.insert_transformed (from, trans);
+  }
+};
 }
 
-void
-copy_shapes (db::Layout &target, 
-             const db::Layout &source, 
-             const db::ICplxTrans &trans,
-             const std::vector<db::cell_index_type> &source_cells, 
-             const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
-             const std::map<unsigned int, unsigned int> &layer_mapping,
-             const ShapesTransformer *transformer)
+void copy_shapes (db::Layout &target,
+                  const db::Layout &source,
+                  const db::ICplxTrans &trans,
+                  const std::vector<db::cell_index_type> &source_cells,
+                  const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
+                  const std::map<unsigned int, unsigned int> &layer_mapping,
+                  const ShapesTransformer *transformer)
 {
   StandardShapesTransformer st;
   if (! transformer) {
@@ -282,14 +272,13 @@ copy_shapes (db::Layout &target,
   copy_or_move_shapes (target, const_cast<db::Layout &> (source), trans, source_cells, cell_mapping, layer_mapping, transformer, false);
 }
 
-void 
-move_shapes (db::Layout &target, 
-             db::Layout &source, 
-             const db::ICplxTrans &trans,
-             const std::vector<db::cell_index_type> &source_cells, 
-             const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
-             const std::map<unsigned int, unsigned int> &layer_mapping,
-             const ShapesTransformer *transformer)
+void move_shapes (db::Layout &target,
+                  db::Layout &source,
+                  const db::ICplxTrans &trans,
+                  const std::vector<db::cell_index_type> &source_cells,
+                  const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
+                  const std::map<unsigned int, unsigned int> &layer_mapping,
+                  const ShapesTransformer *transformer)
 {
   StandardShapesTransformer st;
   if (! transformer) {
@@ -301,8 +290,8 @@ move_shapes (db::Layout &target,
 // ------------------------------------------------------------
 //  Implementation of "find_layout_context"
 
-static std::pair<bool, db::ICplxTrans> 
-find_layout_context (const db::Layout &layout, db::cell_index_type from, db::cell_index_type to, std::set <db::cell_index_type> &visited, const db::ICplxTrans &trans) 
+static std::pair<bool, db::ICplxTrans>
+find_layout_context (const db::Layout &layout, db::cell_index_type from, db::cell_index_type to, std::set<db::cell_index_type> &visited, const db::ICplxTrans &trans)
 {
   const db::Cell &cell = layout.cell (from);
   for (db::Cell::parent_inst_iterator p = cell.begin_parent_insts (); ! p.at_end (); ++p) {
@@ -319,21 +308,19 @@ find_layout_context (const db::Layout &layout, db::cell_index_type from, db::cel
       if (context.first) {
         return context;
       }
-
     }
-
   }
 
   return std::pair<bool, db::ICplxTrans> (false, db::ICplxTrans ());
 }
 
-std::pair<bool, db::ICplxTrans> 
+std::pair<bool, db::ICplxTrans>
 find_layout_context (const db::Layout &layout, db::cell_index_type from, db::cell_index_type to)
 {
   if (from == to) {
     return std::make_pair (true, db::ICplxTrans ());
   } else {
-    std::set <db::cell_index_type> v;
+    std::set<db::cell_index_type> v;
     return find_layout_context (layout, from, to, v, db::ICplxTrans ());
   }
 }
@@ -355,7 +342,7 @@ ContextCache::find_layout_context (db::cell_index_type from, db::cell_index_type
     return nothing;
   }
 
-  std::map<std::pair<db::cell_index_type, db::cell_index_type>, std::pair<bool, db::ICplxTrans> >::iterator c = m_cache.find (std::make_pair (from, to));
+  std::map<std::pair<db::cell_index_type, db::cell_index_type>, std::pair<bool, db::ICplxTrans>>::iterator c = m_cache.find (std::make_pair (from, to));
   if (c == m_cache.end ()) {
     c = m_cache.insert (std::make_pair (std::make_pair (from, to), std::make_pair (false, db::ICplxTrans ()))).first;
     c->second = db::find_layout_context (*mp_layout, from, to);
@@ -393,8 +380,7 @@ scaled_and_snapped_edge (const db::Edge &e, db::Coord g, db::Coord m, db::Coord 
   return db::Edge (db::Point (x1, y1), db::Point (x2, y2));
 }
 
-void
-scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db::Coord d)
+void scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db::Coord d)
 {
   tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("scale_and_snap")));
 
@@ -470,7 +456,6 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
             new_shapes.insert (poly);
           }
         }
-
       }
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
@@ -486,7 +471,6 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         } else {
           new_shapes.insert (text);
         }
-
       }
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
@@ -494,7 +478,7 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         db::Edge edge;
         si->edge (edge);
         edge.transform (tr);
-        edge = scaled_and_snapped_edge (edge, g, m , d, tr_disp.x (), tr_disp.y ());
+        edge = scaled_and_snapped_edge (edge, g, m, d, tr_disp.x (), tr_disp.y ());
         edge.transform (trinv);
 
         if (si->has_prop_id ()) {
@@ -502,7 +486,6 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         } else {
           new_shapes.insert (edge);
         }
-
       }
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::EdgePairs); ! si.at_end (); ++si) {
@@ -510,8 +493,8 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         db::EdgePair edge_pair;
         si->edge_pair (edge_pair);
         edge_pair.transform (tr);
-        edge_pair = db::EdgePair (scaled_and_snapped_edge (edge_pair.first (), g, m , d, tr_disp.x (), tr_disp.y ()),
-                                  scaled_and_snapped_edge (edge_pair.second (), g, m , d, tr_disp.x (), tr_disp.y ()));
+        edge_pair = db::EdgePair (scaled_and_snapped_edge (edge_pair.first (), g, m, d, tr_disp.x (), tr_disp.y ()),
+                                  scaled_and_snapped_edge (edge_pair.second (), g, m, d, tr_disp.x (), tr_disp.y ()));
         edge_pair.transform (trinv);
 
         if (si->has_prop_id ()) {
@@ -519,11 +502,9 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         } else {
           new_shapes.insert (edge_pair);
         }
-
       }
 
       s.swap (new_shapes);
-
     }
 
     //  Snap instance placements to grid and magnify
@@ -562,14 +543,11 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         b = scaled_and_snapped_vector (b, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
 
         new_array = db::CellInstArray (ia.object (), ia.complex_trans (ia.front ()), a, b, na, nb);
-
       }
 
       scale_and_snap_cell_instance (new_array, tr, trinv, tr_disp, g, m, d);
       c->replace (*inst, new_array);
-
     }
-
   }
 }
 
@@ -597,12 +575,10 @@ static bool split_polygon (bool first, db::Polygon &poly, size_t max_vertex_coun
     }
 
     return false;
-
   }
 }
 
-void
-break_polygons (db::Shapes &shapes, size_t max_vertex_count, double max_area_ratio)
+void break_polygons (db::Shapes &shapes, size_t max_vertex_count, double max_area_ratio)
 {
   if (shapes.is_editable ()) {
 
@@ -633,13 +609,11 @@ break_polygons (db::Shapes &shapes, size_t max_vertex_count, double max_area_rat
     break_polygons (tmp, max_vertex_count, max_area_ratio);
     shapes.insert (tmp);
 
-    tl_assert (!shapes.is_editable ());
-
+    tl_assert (! shapes.is_editable ());
   }
 }
 
-void
-break_polygons (db::Layout &layout, db::cell_index_type cell_index, unsigned int layer, size_t max_vertex_count, double max_area_ratio)
+void break_polygons (db::Layout &layout, db::cell_index_type cell_index, unsigned int layer, size_t max_vertex_count, double max_area_ratio)
 {
   if (layout.is_valid_cell_index (cell_index) && layout.is_valid_layer (layer)) {
     db::Cell &cell = layout.cell (cell_index);
@@ -647,8 +621,7 @@ break_polygons (db::Layout &layout, db::cell_index_type cell_index, unsigned int
   }
 }
 
-void
-break_polygons (db::Layout &layout, unsigned int layer, size_t max_vertex_count, double max_area_ratio)
+void break_polygons (db::Layout &layout, unsigned int layer, size_t max_vertex_count, double max_area_ratio)
 {
   for (db::cell_index_type ci = 0; ci < layout.cells (); ++ci) {
     if (layout.is_valid_cell_index (ci)) {
@@ -658,8 +631,7 @@ break_polygons (db::Layout &layout, unsigned int layer, size_t max_vertex_count,
   }
 }
 
-void
-break_polygons (db::Layout &layout, size_t max_vertex_count, double max_area_ratio)
+void break_polygons (db::Layout &layout, size_t max_vertex_count, double max_area_ratio)
 {
   for (db::cell_index_type ci = 0; ci < layout.cells (); ++ci) {
     if (layout.is_valid_cell_index (ci)) {
@@ -674,4 +646,3 @@ break_polygons (db::Layout &layout, size_t max_vertex_count, double max_area_rat
 }
 
 }
-

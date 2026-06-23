@@ -44,7 +44,8 @@ namespace db
  *  @brief The LEF importer object
  */
 class DB_PLUGIN_PUBLIC LEFImporter
-  : public LEFDEFImporter, public LEFDEFNumberOfMasks
+  : public LEFDEFImporter,
+    public LEFDEFNumberOfMasks
 {
 public:
   /**
@@ -151,16 +152,16 @@ protected:
   void do_read (db::Layout &layout);
 
 private:
-  std::map<std::string, std::map<std::string, std::pair<double, double> > > m_nondefault_widths;
-  std::map<std::string, std::pair<double, double> > m_default_widths;
+  std::map<std::string, std::map<std::string, std::pair<double, double>>> m_nondefault_widths;
+  std::map<std::string, std::pair<double, double>> m_default_widths;
   std::map<std::string, double> m_default_ext;
-  std::map<std::string, std::pair<double, double> > m_min_widths;
+  std::map<std::string, std::pair<double, double>> m_min_widths;
   std::map<std::string, MacroDesc> m_macros;
   std::map<std::string, ViaDesc> m_vias;
   std::set<std::string> m_routing_layers, m_cut_layers, m_overlap_layers;
   std::map<std::string, unsigned int> m_num_masks;
 
-  std::vector <db::Trans> get_iteration (double dbu);
+  std::vector<db::Trans> get_iteration (double dbu);
   void read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0, properties_id_type prop_id = 0);
   void read_nondefaultrule (Layout &layout);
   void read_viadef (Layout &layout, const std::string &nondefaultrule);
@@ -174,4 +175,3 @@ private:
 }
 
 #endif
-

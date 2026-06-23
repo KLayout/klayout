@@ -56,7 +56,7 @@ static void run_test (tl::TestBase *_this, const char *dir)
   db::compare_layouts (_this, layout, tl::testdata_private () + "/pcb/" + dir + "/au.oas.gz", db::WriteOAS, 1);
 }
 
-TEST(0_Metadata)
+TEST (0_Metadata)
 {
   db::GerberMetaData data;
 
@@ -159,225 +159,225 @@ TEST(0_Metadata)
   EXPECT_EQ (data.cu_layer_number, 0);
 }
 
-TEST(1)
+TEST (1)
 {
   test_is_long_runner ();
   run_test (_this, "microchip-1");
 }
 
-TEST(2)
+TEST (2)
 {
   run_test (_this, "allegro");
 }
 
-TEST(3)
+TEST (3)
 {
   run_test (_this, "sample-board");
 }
 
-TEST(4)
+TEST (4)
 {
   run_test (_this, "exc-test");
 }
 
-TEST(5)
+TEST (5)
 {
   run_test (_this, "burstDrive");
 }
 
-TEST(6)
+TEST (6)
 {
   run_test (_this, "mentor");
 }
 
-TEST(7)
+TEST (7)
 {
   test_is_long_runner ();
   run_test (_this, "pcb-1");
 }
 
-TEST(8)
+TEST (8)
 {
   test_is_long_runner ();
   run_test (_this, "microchip-2");
 }
 
-TEST(9)
+TEST (9)
 {
   test_is_long_runner ();
   run_test (_this, "microchip-3");
 }
 
-TEST(10)
+TEST (10)
 {
   run_test (_this, "gerbv_examples/am-test");
 }
 
-TEST(11)
+TEST (11)
 {
   run_test (_this, "gerbv_examples/trailing");
 }
 
-TEST(12)
+TEST (12)
 {
   run_test (_this, "gerbv_examples/nollezappare");
 }
 
-TEST(13)
+TEST (13)
 {
   run_test (_this, "gerbv_examples/thermal");
 }
 
-TEST(14)
+TEST (14)
 {
   test_is_long_runner ();
   run_test (_this, "gerbv_examples/amacro-ref");
 }
 
-TEST(15)
+TEST (15)
 {
   run_test (_this, "gerbv_examples/polarity");
 }
 
-TEST(16)
+TEST (16)
 {
   test_is_long_runner ();
   run_test (_this, "gerbv_examples/protel-pnp");
 }
 
-TEST(17)
+TEST (17)
 {
   run_test (_this, "gerbv_examples/hellboard");
 }
 
-TEST(18)
+TEST (18)
 {
   run_test (_this, "gerbv_examples/274X");
 }
 
-TEST(19)
+TEST (19)
 {
   run_test (_this, "gerbv_examples/eaglecad1");
 }
 
-TEST(20)
+TEST (20)
 {
   run_test (_this, "gerbv_examples/jj");
 }
 
-TEST(21)
+TEST (21)
 {
   run_test (_this, "gerbv_examples/orcad");
 }
 
-TEST(22)
+TEST (22)
 {
   run_test (_this, "gerbv_examples/pick-and-place");
 }
 
-TEST(23)
+TEST (23)
 {
   run_test (_this, "gerbv_examples/Mentor-BoardStation");
 }
 
-TEST(24)
+TEST (24)
 {
   test_is_long_runner ();
   run_test (_this, "sr-sample");
 }
 
-TEST(25)
+TEST (25)
 {
   run_test (_this, "sr-sample2");
 }
 
-TEST(26)
+TEST (26)
 {
   test_is_long_runner ();
   run_test (_this, "pos-neg");
 }
 
-TEST(27)
+TEST (27)
 {
   run_test (_this, "polygon-mode");
 }
 
-TEST(X2_1)
+TEST (X2_1)
 {
   run_test (_this, "x2-1");
 }
 
-TEST(X2_2a)
+TEST (X2_2a)
 {
   run_test (_this, "x2-2a");
 }
 
-TEST(X2_2b)
+TEST (X2_2b)
 {
   run_test (_this, "x2-2b");
 }
 
-TEST(X2_2c)
+TEST (X2_2c)
 {
   run_test (_this, "x2-2c");
 }
 
-TEST(X2_2d)
+TEST (X2_2d)
 {
   run_test (_this, "x2-2d");
 }
 
-TEST(X2_2e)
+TEST (X2_2e)
 {
   run_test (_this, "x2-2e");
 }
 
-TEST(X2_2f)
+TEST (X2_2f)
 {
   run_test (_this, "x2-2f");
 }
 
-TEST(X2_2g)
+TEST (X2_2g)
 {
   run_test (_this, "x2-2g");
 }
 
-TEST(X2_2h)
+TEST (X2_2h)
 {
   run_test (_this, "x2-2h");
 }
 
-TEST(X2_2i)
+TEST (X2_2i)
 {
   run_test (_this, "x2-2i");
 }
 
-TEST(X2_2j)
+TEST (X2_2j)
 {
   run_test (_this, "x2-2j");
 }
 
-TEST(X2_2k)
+TEST (X2_2k)
 {
   run_test (_this, "x2-2k");
 }
 
-TEST(X2_3)
+TEST (X2_3)
 {
   run_test (_this, "x2-3");
 }
 
-TEST(X2_4)
+TEST (X2_4)
 {
   run_test (_this, "x2-4");
 }
 
-TEST(X2_5a)
+TEST (X2_5a)
 {
   run_test (_this, "x2-5a");
 }
 
-TEST(X2_5b)
+TEST (X2_5b)
 {
   run_test (_this, "x2-5b");
 }

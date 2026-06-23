@@ -129,7 +129,7 @@ public:
   void camera_init ();
 
 protected:
-  virtual void camera_changed () { }
+  virtual void camera_changed () {}
   virtual double aspect_ratio () const { return 1.0; }
 
 private:
@@ -137,10 +137,8 @@ private:
   bool m_top_view;
   QVector3D m_displacement;
   double m_fov;
-
 };
 
 }
 
 #endif
-

@@ -34,7 +34,7 @@ namespace lib
 /**
  *  @brief Implements the "ARC" PCell of the basic library
  */
-class BasicArc 
+class BasicArc
   : public db::PCellDeclaration
 {
 public:
@@ -72,4 +72,3 @@ public:
 }
 
 #endif
-

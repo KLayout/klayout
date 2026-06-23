@@ -102,11 +102,9 @@ tl::Variant LayoutContextHandler::eval_double_bracket (const std::string &s) con
     } else {
       throw tl::Exception (tl::to_string (tr ("Not a valid cell name: ")) + s);
     }
-
   }
 
   return tl::Variant (ci.second);
 }
 
 }
-

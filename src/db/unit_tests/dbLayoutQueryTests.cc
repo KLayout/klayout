@@ -40,7 +40,7 @@ static std::string q2s_var (db::Layout &g, const std::string &query, const std::
   db::LayoutQueryIterator iq (q, &g);
   std::string res;
   while (! iq.at_end ()) {
-    if (!res.empty ()) {
+    if (! res.empty ()) {
       res += sep;
     }
     tl::Variant v;
@@ -56,7 +56,7 @@ static std::string q2s_var_skip (db::LayoutQueryIterator &iq, const std::string 
   iq.reset ();
   std::string res;
   while (! iq.at_end ()) {
-    if (!res.empty ()) {
+    if (! res.empty ()) {
       res += sep;
     }
     tl::Variant v;
@@ -72,7 +72,7 @@ static std::string q2s_var (db::LayoutQueryIterator &iq, const std::string &pnam
   iq.reset ();
   std::string res;
   while (! iq.at_end ()) {
-    if (!res.empty ()) {
+    if (! res.empty ()) {
       res += sep;
     }
     tl::Variant v;
@@ -90,10 +90,10 @@ static std::string q2s_expr (db::LayoutQueryIterator &iq, const std::string &es)
   tl::Expression ex;
   iq.eval ().parse (ex, es, true);
   while (! iq.at_end ()) {
-    if (!res.empty ()) {
+    if (! res.empty ()) {
       res += ",";
     }
-    res += ex.execute().to_string ();
+    res += ex.execute ().to_string ();
     ++iq;
   }
   return res;
@@ -104,7 +104,7 @@ static std::string q2s_cell (db::LayoutQueryIterator &iq, const std::string &pna
   iq.reset ();
   std::string res;
   while (! iq.at_end ()) {
-    if (!res.empty ()) {
+    if (! res.empty ()) {
       res += ",";
     }
     tl::Variant v;
@@ -119,7 +119,7 @@ static std::string q2s_cell (db::LayoutQueryIterator &iq, const std::string &pna
   return res;
 }
 
-TEST(0)
+TEST (0)
 {
   //  FilterStateObjectives tests
   db::FilterStateObjectives o1;
@@ -164,7 +164,7 @@ TEST(0)
   EXPECT_EQ (o3.wants_cell (db::cell_index_type (16)), true);
 }
 
-TEST(1)
+TEST (1)
 {
   db::Layout g;
   g.insert_layer (0);
@@ -183,26 +183,26 @@ TEST(1)
   db::Trans tt (0, pp);
 
   //  c4->c1 (aref)
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t, db::Vector(1, 1), db::Vector (0, 2), 2, 3));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t, db::Vector (1, 1), db::Vector (0, 2), 2, 3));
   //  c5->c1
-  c5.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c5.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
   //  c3->c5 (3x)
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
   //  c4->c3
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   //  c4->c1
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
   //  c2->c1 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
   //  c2->c4 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
   //  c2->c5 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
 
   {
     db::LayoutQuery q ("*");
@@ -532,7 +532,7 @@ TEST(1)
   }
 }
 
-TEST(2) 
+TEST (2)
 {
   db::Layout g;
   g.insert_layer (0);
@@ -552,26 +552,26 @@ TEST(2)
   db::Trans tt (0, pp);
 
   //  c4->c1 (aref)
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t, db::Vector(1, 1), db::Vector (0, 2), 2, 3));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t, db::Vector (1, 1), db::Vector (0, 2), 2, 3));
   //  c5->c1
-  c5.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c5.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
   //  c3->c5 (3x)
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
   //  c4->c3
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   //  c4->c1
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
   //  c2->c1 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
   //  c2->c4 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
   //  c2->c5 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
 
   {
     db::LayoutQuery q ("instances of c2x.c1");
@@ -726,7 +726,7 @@ TEST(2)
   }
 }
 
-TEST(3) 
+TEST (3)
 {
   db::Layout g;
   g.insert_layer (0, db::LayerProperties ("l0"));
@@ -750,26 +750,26 @@ TEST(3)
   db::Trans tt (0, pp);
 
   //  c4->c1 (aref)
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t, db::Vector(1, 1), db::Vector (0, 2), 2, 3));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t, db::Vector (1, 1), db::Vector (0, 2), 2, 3));
   //  c5->c1
-  c5.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c5.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
   //  c3->c5 (3x)
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
   //  c4->c3
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   //  c4->c1
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
   //  c2->c1 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
   //  c2->c4 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
   //  c2->c5 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
 
   {
     db::LayoutQuery q ("shapes of c1");
@@ -999,26 +999,26 @@ void init_layout (db::Layout &g)
   db::Trans tt (0, pp);
 
   //  c4->c1 (aref)
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t, db::Vector(1, 1), db::Vector (0, 2), 2, 3));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t, db::Vector (1, 1), db::Vector (0, 2), 2, 3));
   //  c5->c1
-  c5.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c5.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
   //  c3->c5 (3x)
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
   //  c4->c3
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   //  c4->c1
-  c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+  c4.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
   //  c2->c1 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
   //  c2->c4 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
   //  c2->c5 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
 }
 
 void init_layout2 (db::Layout &g)
@@ -1047,13 +1047,13 @@ void init_layout2 (db::Layout &g)
   db::Vector pp (10, -20);
   db::Trans tt (0, pp);
 
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c2.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c2.cell_index ()), tt));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c2.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c2.cell_index ()), tt));
 
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
 }
 
-TEST(4)
+TEST (4)
 {
   db::Layout g;
   init_layout (g);
@@ -1064,42 +1064,42 @@ TEST(4)
     std::string s = q2s_var (iq, "data");
     EXPECT_EQ (s, "(c2x#1),(c4#3),(c3#2),(c5x#4),(c1#0)");
   }
- 
+
   {
     db::LayoutQuery q ("select $1 from 'c(*)'");
     db::LayoutQueryIterator iq (q, &g);
     std::string s = q2s_var (iq, "data");
     EXPECT_EQ (s, "(2x),(4),(3),(5x),(1)");
   }
- 
+
   {
     db::LayoutQuery q ("select cell_index+'#'+cell_name from * sorted by cell_name");
     db::LayoutQueryIterator iq (q, &g);
     std::string s = q2s_var (iq, "data");
     EXPECT_EQ (s, "(0#c1),(1#c2x),(2#c3),(3#c4),(4#c5x)");
   }
- 
+
   {
     db::LayoutQuery q ("select cell_index+'#'+cell_name from ..* sorted by cell_name");
     db::LayoutQueryIterator iq (q, &g);
     std::string s = q2s_var (iq, "data");
     EXPECT_EQ (s, "(0#c1),(0#c1),(0#c1),(0#c1),(1#c2x),(2#c3),(3#c4),(4#c5x),(4#c5x)");
   }
- 
+
   {
     db::LayoutQuery q ("select cell_index+'#'+cell_name from ..* sorted by cell_name unique");
     db::LayoutQueryIterator iq (q, &g);
     std::string s = q2s_var (iq, "data");
     EXPECT_EQ (s, "(0#c1),(1#c2x),(2#c3),(3#c4),(4#c5x)");
   }
- 
+
   {
     db::LayoutQuery q ("select cell_index+'#'+cell_name from instances of ..* sorted by cell_name");
     db::LayoutQueryIterator iq (q, &g);
     std::string s = q2s_var (iq, "data");
     EXPECT_EQ (s, "(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(0#c1),(1#c2x),(2#c3),(2#c3),(3#c4),(3#c4),(4#c5x),(4#c5x),(4#c5x),(4#c5x),(4#c5x),(4#c5x),(4#c5x),(4#c5x)");
   }
- 
+
   {
     db::LayoutQuery q ("select cell_index+'#'+cell_name from instances of ..* sorted by cell_name unique");
     db::LayoutQueryIterator iq (q, &g);
@@ -1108,9 +1108,11 @@ TEST(4)
   }
 }
 
-TEST(51a) 
+TEST (51a)
 {
-  if (! db::default_editable_mode ()) { return; }
+  if (! db::default_editable_mode ()) {
+    return;
+  }
 
   db::Layout g;
   init_layout (g);
@@ -1132,9 +1134,11 @@ TEST(51a)
   }
 }
 
-TEST(51b) 
+TEST (51b)
 {
-  if (! db::default_editable_mode ()) { return; }
+  if (! db::default_editable_mode ()) {
+    return;
+  }
 
   db::Layout g;
   init_layout (g);
@@ -1147,9 +1151,11 @@ TEST(51b)
   }
 }
 
-TEST(51c) 
+TEST (51c)
 {
-  if (! db::default_editable_mode ()) { return; }
+  if (! db::default_editable_mode ()) {
+    return;
+  }
 
   db::Layout g;
   init_layout (g);
@@ -1176,9 +1182,11 @@ TEST(51c)
   }
 }
 
-TEST(52a) 
+TEST (52a)
 {
-  if (! db::default_editable_mode ()) { return; }
+  if (! db::default_editable_mode ()) {
+    return;
+  }
 
   db::Layout g;
   init_layout (g);
@@ -1222,12 +1230,13 @@ TEST(52a)
     s = q2s_var (iq, "shape");
     EXPECT_EQ (s, "box (0,1;2,3),edge (0,1;2,3),text ('hallo',r0 10,11)");
   }
-
 }
 
-TEST(52b) 
+TEST (52b)
 {
-  if (! db::default_editable_mode ()) { return; }
+  if (! db::default_editable_mode ()) {
+    return;
+  }
 
   db::Layout g;
   init_layout (g);
@@ -1241,9 +1250,11 @@ TEST(52b)
   }
 }
 
-TEST(53) 
+TEST (53)
 {
-  if (! db::default_editable_mode ()) { return; }
+  if (! db::default_editable_mode ()) {
+    return;
+  }
 
   db::Manager m;
   db::Layout g (&m);
@@ -1282,7 +1293,7 @@ TEST(53)
     s = q2s_var (iq, "path_names", ";");
     EXPECT_EQ (s, "(c1);(c2x);(c2x,c4);(c2x,c5x);(c2x,c4,c3);(c2x,c4,c3,c5x)");
   }
- 
+
   init_layout (g);
 
   {
@@ -1309,9 +1320,11 @@ TEST(53)
   }
 }
 
-TEST(61)
+TEST (61)
 {
-  if (! db::default_editable_mode ()) { return; }
+  if (! db::default_editable_mode ()) {
+    return;
+  }
 
   db::Layout g;
   init_layout (g);
@@ -1440,13 +1453,15 @@ TEST(61)
   }
 }
 
-TEST(62)
+TEST (62)
 {
-  if (! db::default_editable_mode ()) { return; }
+  if (! db::default_editable_mode ()) {
+    return;
+  }
 
   db::Library *basic_lib = db::LibraryManager::instance ().lib_ptr_by_name ("Basic");
   EXPECT_EQ (basic_lib != 0, true);
-  if (!basic_lib) {
+  if (! basic_lib) {
     return;
   }
 
@@ -1499,12 +1514,12 @@ TEST(62)
   db::Trans tt (0, pp);
 
   //  c1->c3
-  c1.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c1.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   //  c2->c4
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
   //  c2->c1 (2x)
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
 
   {
     db::LayoutQuery q ("\"Basic.*\"");
@@ -1549,7 +1564,7 @@ TEST(62)
   }
 }
 
-TEST(63)
+TEST (63)
 {
   db::Layout g;
 
@@ -1567,7 +1582,7 @@ TEST(63)
 }
 
 //  issue-787
-TEST(64)
+TEST (64)
 {
   db::Layout g;
   init_layout (g);
@@ -1587,7 +1602,7 @@ TEST(64)
   }
 }
 
-TEST(65)
+TEST (65)
 {
   db::Layout g;
   init_layout (g);
@@ -1604,7 +1619,7 @@ TEST(65)
   }
 }
 
-TEST(66)
+TEST (66)
 {
   db::Layout g;
   init_layout (g);
@@ -1622,7 +1637,7 @@ TEST(66)
 }
 
 //  Bug: path_dtrans was ICplxTrans on top level
-TEST(67)
+TEST (67)
 {
   db::Layout g;
   init_layout (g);

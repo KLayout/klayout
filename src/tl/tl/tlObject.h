@@ -134,7 +134,7 @@ private:
   void unregister_ptr (WeakOrSharedPtr *p);
   bool has_strong_references () const;
 
-  WeakOrSharedPtr *mp_ptrs;  
+  WeakOrSharedPtr *mp_ptrs;
 };
 
 /**
@@ -338,7 +338,7 @@ public:
   /**
    *  @brief Access operator
    */
-  T *operator-> ()
+  T *operator->()
   {
     return get ();
   }
@@ -346,7 +346,7 @@ public:
   /**
    *  @brief Access operator (const version)
    */
-  const T *operator-> () const
+  const T *operator->() const
   {
     return get ();
   }
@@ -446,4 +446,3 @@ private:
 }
 
 #endif
-

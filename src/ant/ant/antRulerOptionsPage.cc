@@ -63,17 +63,15 @@ RulerOptionsPage::title () const
 
 //  Must match order in angle_cb
 static std::vector<lay::angle_constraint_type> s_ac_options =
-{
-  lay::AC_Any,
-  lay::AC_Diagonal,
-  lay::AC_DiagonalOnly,
-  lay::AC_Ortho,
-  lay::AC_Horizontal,
-  lay::AC_Vertical
-};
+  {
+    lay::AC_Any,
+    lay::AC_Diagonal,
+    lay::AC_DiagonalOnly,
+    lay::AC_Ortho,
+    lay::AC_Horizontal,
+    lay::AC_Vertical};
 
-void
-RulerOptionsPage::apply (lay::Dispatcher *root)
+void RulerOptionsPage::apply (lay::Dispatcher *root)
 {
   lay::angle_constraint_type ac = lay::AC_Any;
   int ai = mp_ui->angle_cb->currentIndex ();
@@ -88,8 +86,7 @@ RulerOptionsPage::apply (lay::Dispatcher *root)
   root->config_set (cfg_ruler_grid_snap, tl::to_string (mp_ui->snap_to_grid_cbx->isChecked ()));
 }
 
-void
-RulerOptionsPage::setup (lay::Dispatcher *root)
+void RulerOptionsPage::setup (lay::Dispatcher *root)
 {
   lay::ACConverter acc;
   lay::angle_constraint_type ac;
@@ -116,4 +113,3 @@ static tl::RegisteredClass<lay::EditorOptionsPageFactoryBase> s_factory_ruler_op
 }
 
 #endif
-

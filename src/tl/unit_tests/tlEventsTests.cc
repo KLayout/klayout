@@ -53,13 +53,35 @@ private:
 class Observer : public tl::Object
 {
 public:
-  Observer () : data (0), events (0), obj (0), arg (0) { }
-  void receives_event (Observed *o, int a) { data = -1, obj = o; arg = a; ++events; }
-  void receives_event_with_data (int d, Observed *o, int a) { data = d; obj = o; arg = a; ++events; }
+  Observer () : data (0), events (0), obj (0), arg (0) {}
+  void receives_event (Observed *o, int a)
+  {
+    data = -1, obj = o;
+    arg = a;
+    ++events;
+  }
+  void receives_event_with_data (int d, Observed *o, int a)
+  {
+    data = d;
+    obj = o;
+    arg = a;
+    ++events;
+  }
   void receives_void_event () { data = -1, obj = 0, arg = -1, ++events; }
   void receives_void_event_with_data (int d) { data = d, obj = 0, arg = -1, ++events; }
-  void receives_generic_event (int, void **argv) { data = -1, obj = *(Observed **)argv[0]; arg = *(int *)argv[1]; ++events; }
-  void receives_generic_event_with_data (int d, int, void **argv) { data = d; obj = *(Observed **)argv[0]; arg = *(int *)argv[1]; ++events; }
+  void receives_generic_event (int, void **argv)
+  {
+    data = -1, obj = *(Observed **) argv [0];
+    arg = *(int *) argv [1];
+    ++events;
+  }
+  void receives_generic_event_with_data (int d, int, void **argv)
+  {
+    data = d;
+    obj = *(Observed **) argv [0];
+    arg = *(int *) argv [1];
+    ++events;
+  }
 
   int data;
   int events;
@@ -68,7 +90,7 @@ public:
 };
 
 // basics
-TEST(1)
+TEST (1)
 {
   Observed x;
   std::unique_ptr<Observer> yp;
@@ -126,7 +148,7 @@ TEST(1)
 }
 
 // events with data
-TEST(2)
+TEST (2)
 {
   Observed x1, x2;
   std::unique_ptr<Observer> yp;
@@ -171,7 +193,7 @@ TEST(2)
 }
 
 // void events
-TEST(3)
+TEST (3)
 {
   Observed x;
   Observer y;
@@ -202,7 +224,7 @@ TEST(3)
 }
 
 // generic events
-TEST(4)
+TEST (4)
 {
   Observed x;
   std::unique_ptr<Observer> yp;
@@ -260,7 +282,7 @@ TEST(4)
 }
 
 // generic events with data
-TEST(5)
+TEST (5)
 {
   Observed x1, x2;
   std::unique_ptr<Observer> yp;
@@ -303,4 +325,3 @@ TEST(5)
   EXPECT_EQ (yp->arg, 42);
   EXPECT_EQ (yp->obj == &x1, true);
 }
-

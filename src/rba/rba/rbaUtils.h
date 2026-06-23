@@ -50,41 +50,41 @@ void rb_release_top_self ();
 //  Add some compatibility definitions for Ruby 1.8
 #if HAVE_RUBY_VERSION_CODE < 10900
 
-#  include "node.h"
+#include "node.h"
 
 //  Compatibility macros for Ruby 1.8
-#  if !defined(RSTRING_PTR)
-#    define RSTRING_PTR(s) (RSTRING(s)->ptr)
-#  endif
+#if ! defined(RSTRING_PTR)
+#define RSTRING_PTR(s) (RSTRING (s)->ptr)
+#endif
 
-#  if !defined(RSTRING_LEN)
-#    define RSTRING_LEN(s) (RSTRING(s)->len)
-#  endif
+#if ! defined(RSTRING_LEN)
+#define RSTRING_LEN(s) (RSTRING (s)->len)
+#endif
 
-#  if !defined(RARRAY_PTR)
-#    define RARRAY_PTR(s) (RARRAY(s)->ptr)
-#  endif
+#if ! defined(RARRAY_PTR)
+#define RARRAY_PTR(s) (RARRAY (s)->ptr)
+#endif
 
-#  if !defined(RARRAY_LEN)
-#    define RARRAY_LEN(s) (RARRAY(s)->len)
-#  endif
+#if ! defined(RARRAY_LEN)
+#define RARRAY_LEN(s) (RARRAY (s)->len)
+#endif
 
-#  if !defined(RCLASS_SUPER)
-#    define RCLASS_SUPER(k) (RCLASS (k)->super)
-#  endif
+#if ! defined(RCLASS_SUPER)
+#define RCLASS_SUPER(k) (RCLASS (k)->super)
+#endif
 
 //  Ruby 1.8 does not define NUL2ULL
-#  if !defined(NUM2ULL)
-#    define NUM2ULL(x) rb_num2ull((VALUE)x)
-#  endif
+#if ! defined(NUM2ULL)
+#define NUM2ULL(x) rb_num2ull ((VALUE) x)
+#endif
 
 //  add rb_errinfo and rb_set_errinfo for Ruby 1.8
-inline VALUE rb_errinfo()
+inline VALUE rb_errinfo ()
 {
   return rb_gv_get ("$!");
 }
 
-inline void rb_set_errinfo(VALUE v)
+inline void rb_set_errinfo (VALUE v)
 {
   rb_gv_set ("$!", v);
 }
@@ -105,7 +105,7 @@ inline int rb_sourceline ()
 //  add an emulation of rb_binding_new
 inline VALUE rb_binding_new ()
 {
-  return rb_funcall (rb_get_top_self(), rb_intern ("binding"), 0);
+  return rb_funcall (rb_get_top_self (), rb_intern ("binding"), 0);
 }
 
 #endif
@@ -122,11 +122,11 @@ inline int push_map_key_i (VALUE key, VALUE /*value*/, VALUE arg)
 /**
  *  @brief Emulate rb_hash_clear for Ruby <2.0
  */
-inline void rb_hash_clear(VALUE hash)
+inline void rb_hash_clear (VALUE hash)
 {
   std::vector<VALUE> keys;
   keys.reserve (RHASH_SIZE (hash));
-  rb_hash_foreach (hash, (int (*)(...)) &push_map_key_i, (VALUE) &keys);
+  rb_hash_foreach (hash, (int (*) (...)) &push_map_key_i, (VALUE) &keys);
 
   for (std::vector<VALUE>::const_iterator k = keys.begin (); k != keys.end (); ++k) {
     rb_hash_delete (hash, *k);
@@ -149,7 +149,7 @@ inline VALUE rb_utf8_str_new (const char *ptr, long len)
 
 #endif
 
-typedef VALUE (*ruby_func)(ANYARGS);
+typedef VALUE (*ruby_func) (ANYARGS);
 
 /**
  *  A method to create a Ruby const char * string from a UTF-8 strings.
@@ -179,21 +179,29 @@ inline std::string rb_cstring_from_utf8 (const std::string &utf8)
  */
 inline void rb_protect_init ()
 {
-#if HAVE_RUBY_VERSION_CODE<10900
+#if HAVE_RUBY_VERSION_CODE < 10900
   ruby_sourcefile = 0;
   ruby_sourceline = 0;
 #endif
 }
 
-#define RUBY_BEGIN_EXEC \
-  try { \
-    if (rba::RubyInterpreter::instance ()) { rba::RubyInterpreter::instance ()->begin_exec (); }
+#define RUBY_BEGIN_EXEC                                 \
+  try {                                                 \
+    if (rba::RubyInterpreter::instance ()) {            \
+      rba::RubyInterpreter::instance ()->begin_exec (); \
+    }
 
-#define RUBY_END_EXEC \
-    if (rba::RubyInterpreter::instance ()) { rba::RubyInterpreter::instance()->end_exec (); } \
-  } catch (...) { \
-    if (rba::RubyInterpreter::instance ()) { rba::RubyInterpreter::instance()->end_exec (); } \
-    throw; \
+#define RUBY_END_EXEC                                 \
+  if (rba::RubyInterpreter::instance ()) {            \
+    rba::RubyInterpreter::instance ()->end_exec ();   \
+  }                                                   \
+  }                                                   \
+  catch (...)                                         \
+  {                                                   \
+    if (rba::RubyInterpreter::instance ()) {          \
+      rba::RubyInterpreter::instance ()->end_exec (); \
+    }                                                 \
+    throw;                                            \
   }
 
 namespace rba
@@ -237,9 +245,8 @@ void block_exceptions (bool f);
  *  @brief A struct encapsulating the call parameters for a function
  */
 template <class R, class A>
-struct rba_func_callparam
-{
-  rba_func_callparam () : r (), a (), f () { }
+struct rba_func_callparam {
+  rba_func_callparam () : r (), a (), f () {}
   R r;
   A a;
   R (*f) (A);
@@ -270,12 +277,12 @@ R rba_safe_func (R (*f) (A), A arg)
   int error = 0;
 
   RUBY_BEGIN_EXEC
-    //  NOTE: we do not want exceptions to be seen in the debugger here - later they are rethrown after
-    //  being annotated. This is when we want to see them.
-    bool eb = exceptions_blocked ();
-    block_exceptions (true);
-    rb_protect (&rba_safe_func_caller<R, A>, (VALUE) &cp, &error);
-    block_exceptions (eb);
+  //  NOTE: we do not want exceptions to be seen in the debugger here - later they are rethrown after
+  //  being annotated. This is when we want to see them.
+  bool eb = exceptions_blocked ();
+  block_exceptions (true);
+  rb_protect (&rba_safe_func_caller<R, A>, (VALUE) &cp, &error);
+  block_exceptions (eb);
   RUBY_END_EXEC
 
   if (error) {
@@ -289,4 +296,3 @@ R rba_safe_func (R (*f) (A), A arg)
 #endif
 
 #endif
-

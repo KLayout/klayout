@@ -34,16 +34,16 @@ class TestableGraph
   : public db::plc::Graph
 {
 public:
-  using db::plc::Graph::Graph;
-  using db::plc::Graph::create_vertex;
   using db::plc::Graph::create_edge;
-  using db::plc::Graph::create_triangle;
   using db::plc::Graph::create_polygon;
+  using db::plc::Graph::create_triangle;
+  using db::plc::Graph::create_vertex;
+  using db::plc::Graph::Graph;
 };
 
 }
 
-TEST(basic)
+TEST (basic)
 {
   TestableGraph plc;
 
@@ -64,7 +64,7 @@ TEST(basic)
   EXPECT_EQ (*v1->ids ().begin (), 1u);
 }
 
-TEST(edge)
+TEST (edge)
 {
   TestableGraph plc;
 
@@ -81,7 +81,7 @@ TEST(edge)
   EXPECT_EQ ((*v2->begin_edges ())->edge ().to_string (), "(1,2;3,4)");
 }
 
-TEST(polygon)
+TEST (polygon)
 {
   TestableGraph plc;
   EXPECT_EQ (plc.num_polygons (), size_t (0));

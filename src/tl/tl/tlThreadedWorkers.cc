@@ -41,22 +41,26 @@ const size_t max_errors = 100;
 // -----------------------------------------------------------------------------
 //  Some special tasks and exceptions
 
-class ExitTask : public Task 
+class ExitTask : public Task
 {
 public:
   ExitTask ()
-  { }
+  {
+  }
 };
 
-class StartTask : public Task 
+class StartTask : public Task
 {
 public:
   StartTask ()
-  { }
+  {
+  }
 };
 
-struct WorkerTerminatedException { };
-struct TaskTerminatedException { };
+struct WorkerTerminatedException {
+};
+struct TaskTerminatedException {
+};
 
 // -----------------------------------------------------------------------------
 //  tl::Boss implementation
@@ -75,22 +79,19 @@ Boss::~Boss ()
   m_jobs.clear ();
 }
 
-void 
-Boss::register_job (JobBase *job)
+void Boss::register_job (JobBase *job)
 {
   m_jobs.insert (job);
   job->m_bosses.insert (this);
 }
 
-void 
-Boss::unregister_job (JobBase *job)
+void Boss::unregister_job (JobBase *job)
 {
   m_jobs.erase (job);
   job->m_bosses.erase (this);
 }
 
-void 
-Boss::stop_all ()
+void Boss::stop_all ()
 {
   for (iterator j = begin (); j != end (); ++j) {
     (*j)->stop ();
@@ -131,8 +132,7 @@ TaskList::fetch ()
   return task;
 }
 
-void 
-TaskList::put (Task *task)
+void TaskList::put (Task *task)
 {
   task->mp_next = 0;
   task->mp_last = mp_last;
@@ -145,8 +145,7 @@ TaskList::put (Task *task)
   }
 }
 
-void 
-TaskList::put_front (Task *task)
+void TaskList::put_front (Task *task)
 {
   task->mp_last = 0;
   task->mp_next = mp_first;
@@ -176,7 +175,7 @@ JobBase::JobBase (int nworkers)
   : m_nworkers (nworkers), m_idle_workers (0), m_stopping (false), m_running (false)
 {
   if (nworkers > 0) {
-    mp_per_worker_task_lists = new TaskList[nworkers];
+    mp_per_worker_task_lists = new TaskList [nworkers];
   } else {
     mp_per_worker_task_lists = 0;
   }
@@ -191,13 +190,12 @@ JobBase::~JobBase ()
   }
 
   if (mp_per_worker_task_lists) {
-    delete[] mp_per_worker_task_lists;
+    delete [] mp_per_worker_task_lists;
     mp_per_worker_task_lists = 0;
   }
 }
 
-void
-JobBase::log_error (const std::string &s)
+void JobBase::log_error (const std::string &s)
 {
   tl::error << tl::to_string (tr ("Worker thread: ")) << s;
 
@@ -210,8 +208,7 @@ JobBase::log_error (const std::string &s)
   m_lock.unlock ();
 }
 
-bool
-JobBase::has_error () 
+bool JobBase::has_error ()
 {
   bool r;
   m_lock.lock ();
@@ -221,7 +218,7 @@ JobBase::has_error ()
 }
 
 std::vector<std::string>
-JobBase::error_messages () 
+JobBase::error_messages ()
 {
   std::vector<std::string> r;
   m_lock.lock ();
@@ -230,8 +227,7 @@ JobBase::error_messages ()
   return r;
 }
 
-void
-JobBase::set_num_workers (int nworkers)
+void JobBase::set_num_workers (int nworkers)
 {
   terminate ();
 
@@ -239,18 +235,17 @@ JobBase::set_num_workers (int nworkers)
   m_idle_workers = 0;
 
   if (mp_per_worker_task_lists) {
-    delete[] mp_per_worker_task_lists;
+    delete [] mp_per_worker_task_lists;
   }
 
   if (nworkers > 0) {
-    mp_per_worker_task_lists = new TaskList[nworkers];
+    mp_per_worker_task_lists = new TaskList [nworkers];
   } else {
     mp_per_worker_task_lists = 0;
   }
 }
 
-void 
-JobBase::start ()
+void JobBase::start ()
 {
   m_lock.lock ();
 
@@ -259,12 +254,12 @@ JobBase::start ()
   tl_assert (! m_running);
 
   m_running = true;
-  
+
   //  Add a start task for each worker
   //  This serves as a synchronization measure such that each task gets called once and
   //  the empty queue detection works properly.
   for (int i = 0; i < m_nworkers; ++i) {
-    mp_per_worker_task_lists[i].put_front (new StartTask ());
+    mp_per_worker_task_lists [i].put_front (new StartTask ());
   }
 
   m_task_available_condition.wakeAll ();
@@ -288,9 +283,9 @@ JobBase::start ()
 
   if (mp_workers.empty ()) {
 
-    //  synchronous case: create a temporary worker and 
+    //  synchronous case: create a temporary worker and
     //  perform the tasks in the order they were delivered
-    std::unique_ptr <Worker> sync_worker (create_worker ());
+    std::unique_ptr<Worker> sync_worker (create_worker ());
     setup_worker (sync_worker.get ());
 
     try {
@@ -317,7 +312,6 @@ JobBase::start ()
         }
 
         after_sync_task (task.get ());
-
       }
 
     } catch (...) {
@@ -330,12 +324,10 @@ JobBase::start ()
     cleanup ();
     finished ();
     m_running = false;
-
   }
 }
 
-void
-JobBase::cleanup ()
+void JobBase::cleanup ()
 {
   //  clean up any remaining tasks
   while (! m_task_list.is_empty ()) {
@@ -346,14 +338,12 @@ JobBase::cleanup ()
   }
 }
 
-bool 
-JobBase::is_running () 
+bool JobBase::is_running ()
 {
   return m_running;
 }
 
-bool 
-JobBase::wait (long timeout) 
+bool JobBase::wait (long timeout)
 {
   //  return value will be false if the wait timed out
   bool status = true;
@@ -367,8 +357,7 @@ JobBase::wait (long timeout)
   return status;
 }
 
-void 
-JobBase::stop ()
+void JobBase::stop ()
 {
   if (! m_running) {
     return;
@@ -389,7 +378,7 @@ JobBase::stop ()
 
     //  Add a stop task for each worker which is not idle
     for (int i = 0; i < int (mp_workers.size ()); ++i) {
-      if (! mp_workers[i]->is_idle ()) {
+      if (! mp_workers [i]->is_idle ()) {
         mp_workers [i]->stop_request ();
         any_working = true;
       }
@@ -402,7 +391,6 @@ JobBase::stop ()
 
       //  Wait for the stop tasks being processed ...
       m_queue_empty_condition.wait (&m_lock);
-
     }
 
     //  Unless new tasks are scheduled, we can be sure that now all workers
@@ -417,8 +405,7 @@ JobBase::stop ()
   m_lock.unlock ();
 }
 
-void
-JobBase::terminate ()
+void JobBase::terminate ()
 {
   stop ();
 
@@ -429,7 +416,7 @@ JobBase::terminate ()
     //  Add a stop task for each worker and request a stop
     for (int i = 0; i < int (mp_workers.size ()); ++i) {
       mp_workers [i]->stop_request ();
-      mp_per_worker_task_lists[i].put (new ExitTask ());
+      mp_per_worker_task_lists [i].put (new ExitTask ());
     }
 
     //  signal that we have new tasks
@@ -445,17 +432,15 @@ JobBase::terminate ()
       mp_workers [i]->wait ();
     }
 
-    for (std::vector <Worker *>::iterator w = mp_workers.begin (); w != mp_workers.end (); ++w) {
+    for (std::vector<Worker *>::iterator w = mp_workers.begin (); w != mp_workers.end (); ++w) {
       delete (*w);
     }
 
     mp_workers.clear ();
-
   }
 }
 
-void 
-JobBase::schedule (Task *task)
+void JobBase::schedule (Task *task)
 {
   m_lock.lock ();
 
@@ -472,7 +457,6 @@ JobBase::schedule (Task *task)
     if (m_running) {
       m_task_available_condition.wakeAll ();
     }
-
   }
 
   m_lock.unlock ();
@@ -508,8 +492,7 @@ JobBase::get_task (int worker)
       }
 
       --m_idle_workers;
-
-    } 
+    }
 
     Task *task = 0;
     if (! mp_per_worker_task_lists [worker].is_empty ()) {
@@ -520,17 +503,16 @@ JobBase::get_task (int worker)
 
     m_lock.unlock ();
 
-    if (dynamic_cast <ExitTask *> (task) != 0) {
+    if (dynamic_cast<ExitTask *> (task) != 0) {
       delete task;
       //  stops the thread
       throw WorkerTerminatedException ();
-    } else if (dynamic_cast <StartTask *> (task) != 0) {
+    } else if (dynamic_cast<StartTask *> (task) != 0) {
       delete task;
       //  dummy task for synchronization - wait for new tasks to arrive.
     } else if (task) {
       return task;
     }
-
   }
 }
 
@@ -546,7 +528,7 @@ class TL_PUBLIC WorkerProgressAdaptor : public tl::ProgressAdaptor
 {
 public:
   WorkerProgressAdaptor (Worker *worker);
-  
+
   virtual void trigger (Progress *progress);
   virtual void yield (Progress *progress);
 
@@ -557,12 +539,12 @@ private:
 WorkerProgressAdaptor::WorkerProgressAdaptor (Worker *worker)
   : mp_worker (worker)
 {
-  // .. nothing yet .. 
+  // .. nothing yet ..
 }
-  
+
 void WorkerProgressAdaptor::trigger (Progress * /*progress*/)
 {
-  // .. nothing yet .. 
+  // .. nothing yet ..
 }
 
 void WorkerProgressAdaptor::yield (Progress * /*progress*/)
@@ -585,29 +567,25 @@ Worker::~Worker ()
   // .. nothing yet ..
 }
 
-void 
-Worker::start (JobBase *job, int worker_index)
+void Worker::start (JobBase *job, int worker_index)
 {
   mp_job = job;
   m_worker_index = worker_index;
   tl::Thread::start ();
 }
 
-void 
-Worker::checkpoint ()
+void Worker::checkpoint ()
 {
   if (m_stop_requested) {
     throw TaskTerminatedException ();
   }
 }
 
-void  
-Worker::run ()
+void Worker::run ()
 {
   WorkerProgressAdaptor progress_adaptor (this);
 
-  while (true)
-  {
+  while (true) {
     try {
       std::unique_ptr<Task> task (mp_job->get_task (m_worker_index));
       perform_task (task.get ());
@@ -626,17 +604,14 @@ Worker::run ()
   }
 }
 
-void 
-Worker::reset_stop_request ()
+void Worker::reset_stop_request ()
 {
   m_stop_requested = false;
 }
 
-void 
-Worker::stop_request ()
+void Worker::stop_request ()
 {
   m_stop_requested = true;
 }
 
 }
-

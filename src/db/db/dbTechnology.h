@@ -71,7 +71,7 @@ public:
   /**
    *  @brief Copy ctor
    */
-  Technologies (const Technologies &other); 
+  Technologies (const Technologies &other);
 
   /**
    *  @brief Assignment operator
@@ -79,7 +79,7 @@ public:
   Technologies &operator= (const Technologies &other);
 
   /**
-   *  @brief Const iterator - begin 
+   *  @brief Const iterator - begin
    */
   const_iterator begin () const
   {
@@ -87,7 +87,7 @@ public:
   }
 
   /**
-   *  @brief Const iterator - end 
+   *  @brief Const iterator - end
    */
   const_iterator end () const
   {
@@ -254,11 +254,11 @@ private:
   bool m_changed;
   bool m_in_update;
 
-  Technology *add_tech(const Technology &technology, bool replace_same);
+  Technology *add_tech (const Technology &technology, bool replace_same);
 };
 
 /**
- *  @brief A technology 
+ *  @brief A technology
  *
  *  This class represents one technology.
  *  A technology has a name and a description.
@@ -268,17 +268,17 @@ class DB_PUBLIC Technology
 {
 public:
   /**
-   *  @brief The default constructor 
+   *  @brief The default constructor
    */
   Technology ();
 
   /**
-   *  @brief The constructor 
+   *  @brief The constructor
    */
   Technology (const std::string &name, const std::string &description, const std::string &group = std::string ());
 
   /**
-   *  @brief The copy constructor 
+   *  @brief The copy constructor
    */
   Technology (const Technology &tech);
 
@@ -293,7 +293,7 @@ public:
   Technology &operator= (const Technology &tech);
 
   /**
-   *  @brief Gets the name 
+   *  @brief Gets the name
    */
   const std::string &name () const
   {
@@ -301,9 +301,9 @@ public:
   }
 
   /**
-   *  @brief Sets the name 
+   *  @brief Sets the name
    */
-  void set_name (const std::string &n) 
+  void set_name (const std::string &n)
   {
     if (n != m_name) {
       m_name = n;
@@ -330,9 +330,9 @@ public:
   }
 
   /**
-   *  @brief Gets the base path 
+   *  @brief Gets the base path
    *
-   *  The base path is an effective path - if the explicit path is set, it is 
+   *  The base path is an effective path - if the explicit path is set, it is
    *  used. If not, the default path is used. The default path is the one from which
    *  a technology file was imported. The explicit one is the one that is specified
    *  explicitly.
@@ -348,7 +348,7 @@ public:
   std::string correct_path (const std::string &fp) const;
 
   /**
-   *  @brief Gets the default base path 
+   *  @brief Gets the default base path
    */
   const std::string &default_base_path () const
   {
@@ -356,9 +356,9 @@ public:
   }
 
   /**
-   *  @brief Sets the default base path 
+   *  @brief Sets the default base path
    */
-  void set_default_base_path (const std::string &p) 
+  void set_default_base_path (const std::string &p)
   {
     if (m_default_base_path != p) {
       m_default_base_path = p;
@@ -367,7 +367,7 @@ public:
   }
 
   /**
-   *  @brief Gets the explicit base path 
+   *  @brief Gets the explicit base path
    */
   const std::string &explicit_base_path () const
   {
@@ -375,9 +375,9 @@ public:
   }
 
   /**
-   *  @brief Sets the explicit base path 
+   *  @brief Sets the explicit base path
    */
-  void set_explicit_base_path (const std::string &p) 
+  void set_explicit_base_path (const std::string &p)
   {
     if (m_explicit_base_path != p) {
       m_explicit_base_path = p;
@@ -403,7 +403,7 @@ public:
   }
 
   /**
-   *  @brief Gets the description 
+   *  @brief Gets the description
    */
   const std::string &description () const
   {
@@ -411,9 +411,9 @@ public:
   }
 
   /**
-   *  @brief Sets the description 
+   *  @brief Sets the description
    */
-  void set_description (const std::string &d) 
+  void set_description (const std::string &d)
   {
     if (m_description != d) {
       m_description = d;
@@ -625,7 +625,7 @@ public:
   /**
    *  @brief Gets the component names
    */
-  std::vector <std::string> component_names () const;
+  std::vector<std::string> component_names () const;
 
   /**
    *  @brief Builds the effective path from a relative or absolute one using the base path if necessary
@@ -690,7 +690,7 @@ private:
   std::string m_lyp_path;
   std::string m_lyt_path;
   bool m_add_other_layers;
-  std::vector <TechnologyComponent *> m_components;
+  std::vector<TechnologyComponent *> m_components;
   bool m_persisted;
   bool m_readonly;
   std::string m_lyt_file;
@@ -707,7 +707,7 @@ private:
 /**
  *  @brief A technology component
  *
- *  A technology component is a part of the data for one technology. 
+ *  A technology component is a part of the data for one technology.
  *  Plugins may register technology components in every technology and
  *  use those components to store their specific data.
  *  A technology component has a name and a description. The name is used
@@ -739,7 +739,7 @@ public:
   }
 
   /**
-   *  @brief Gets the name 
+   *  @brief Gets the name
    */
   const std::string &name () const
   {
@@ -747,7 +747,7 @@ public:
   }
 
   /**
-   *  @brief Gets the description 
+   *  @brief Gets the description
    */
   const std::string &description () const
   {
@@ -803,7 +803,7 @@ public:
  */
 
 template <class TC>
-class TechnologyComponentReadAdaptor 
+class TechnologyComponentReadAdaptor
 {
 public:
   typedef tl::pass_by_ref_tag tag;
@@ -814,9 +814,9 @@ public:
     // .. nothing yet ..
   }
 
-  const TC &operator () () const
+  const TC &operator() () const
   {
-    const TC *tc = dynamic_cast<const TC *> ((const_cast <db::Technology *> (mp_t))->component_by_name (m_name));
+    const TC *tc = dynamic_cast<const TC *> ((const_cast<db::Technology *> (mp_t))->component_by_name (m_name));
     if (! tc) {
       throw tl::Exception (tl::to_string (tr ("Unknown technology component: ")) + m_name);
     }
@@ -824,7 +824,7 @@ public:
     return *tc;
   }
 
-  bool at_end () const 
+  bool at_end () const
   {
     return m_done;
   }
@@ -835,7 +835,7 @@ public:
     m_done = false;
   }
 
-  void next () 
+  void next ()
   {
     m_done = true;
   }
@@ -851,7 +851,7 @@ private:
  */
 
 template <class TC>
-class TechnologyComponentWriteAdaptor 
+class TechnologyComponentWriteAdaptor
 {
 public:
   TechnologyComponentWriteAdaptor (const std::string &name)
@@ -860,7 +860,7 @@ public:
     // .. nothing yet ..
   }
 
-  void operator () (db::Technology &t, tl::XMLReaderState &reader) const
+  void operator() (db::Technology &t, tl::XMLReaderState &reader) const
   {
     const TechnologyComponent *tc_basic = t.component_by_name (m_name);
     TC *tc = 0;
@@ -886,8 +886,8 @@ private:
 /**
  *  @brief A custom XMLElement for the serialization of technology components
  *
- *  TechnologyComponentProvider::xml_element can return such an element to 
- *  insert a custom XML element into the XML tree which represents the 
+ *  TechnologyComponentProvider::xml_element can return such an element to
+ *  insert a custom XML element into the XML tree which represents the
  *  technology component.
  *
  *  The name of the element will be the name of the technology component.
@@ -895,22 +895,22 @@ private:
 
 template <class TC>
 class TechnologyComponentXMLElement
-  : public tl::XMLElement<TC, db::Technology, TechnologyComponentReadAdaptor<TC>, TechnologyComponentWriteAdaptor<TC> >
+  : public tl::XMLElement<TC, db::Technology, TechnologyComponentReadAdaptor<TC>, TechnologyComponentWriteAdaptor<TC>>
 {
 public:
   TechnologyComponentXMLElement (const std::string &name, const tl::XMLElementList &children)
-    : tl::XMLElement<TC, db::Technology, TechnologyComponentReadAdaptor<TC>, TechnologyComponentWriteAdaptor<TC> > (TechnologyComponentReadAdaptor<TC> (name), TechnologyComponentWriteAdaptor<TC> (name), name, children)
+    : tl::XMLElement<TC, db::Technology, TechnologyComponentReadAdaptor<TC>, TechnologyComponentWriteAdaptor<TC>> (TechnologyComponentReadAdaptor<TC> (name), TechnologyComponentWriteAdaptor<TC> (name), name, children)
   {
     //  .. nothing yet ..
   }
 
   TechnologyComponentXMLElement (const TechnologyComponentXMLElement &d)
-    : tl::XMLElement<TC, db::Technology, TechnologyComponentReadAdaptor<TC>, TechnologyComponentWriteAdaptor<TC> > (d)
+    : tl::XMLElement<TC, db::Technology, TechnologyComponentReadAdaptor<TC>, TechnologyComponentWriteAdaptor<TC>> (d)
   {
     //  .. nothing yet ..
   }
 
-  virtual tl::XMLElementBase *clone () const 
+  virtual tl::XMLElementBase *clone () const
   {
     return new TechnologyComponentXMLElement (*this);
   }
@@ -919,4 +919,3 @@ public:
 }
 
 #endif
-

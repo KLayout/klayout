@@ -20,7 +20,7 @@
 
 */
 
-#if !defined(HAVE_QT) && !defined(HAVE_CURL)
+#if ! defined(HAVE_QT) && ! defined(HAVE_CURL)
 
 #include "tlHttpStream.h"
 #include "tlEvents.h"
@@ -41,44 +41,37 @@ InputHttpStream::~InputHttpStream ()
   //  .. nothing yet ..
 }
 
-void
-InputHttpStream::set_credential_provider (HttpCredentialProvider *)
+void InputHttpStream::set_credential_provider (HttpCredentialProvider *)
 {
   //  .. nothing yet ..
 }
 
-void
-InputHttpStream::send ()
+void InputHttpStream::send ()
 {
   //  .. nothing yet ..
 }
 
-void
-InputHttpStream::close ()
+void InputHttpStream::close ()
 {
   //  .. nothing yet ..
 }
 
-void
-InputHttpStream::set_request (const char *)
+void InputHttpStream::set_request (const char *)
 {
   //  .. nothing yet ..
 }
 
-void
-InputHttpStream::set_data (const char *)
+void InputHttpStream::set_data (const char *)
 {
   //  .. nothing yet ..
 }
 
-void
-InputHttpStream::set_data (const char *, size_t)
+void InputHttpStream::set_data (const char *, size_t)
 {
   //  .. nothing yet ..
 }
 
-void
-InputHttpStream::add_header (const std::string &, const std::string &)
+void InputHttpStream::add_header (const std::string &, const std::string &)
 {
   //  .. nothing yet ..
 }
@@ -91,8 +84,7 @@ InputHttpStream::ready ()
   return dummy;
 }
 
-bool
-InputHttpStream::data_available ()
+bool InputHttpStream::data_available ()
 {
   //  .. nothing yet ..
   return false;
@@ -105,8 +97,7 @@ InputHttpStream::read (char *, size_t)
   return 0;
 }
 
-void
-InputHttpStream::reset ()
+void InputHttpStream::reset ()
 {
   //  .. nothing yet ..
 }
@@ -132,20 +123,17 @@ InputHttpStream::filename () const
   return std::string ();
 }
 
-bool
-InputHttpStream::is_available ()
+bool InputHttpStream::is_available ()
 {
   return false;
 }
 
-void
-InputHttpStream::tick ()
+void InputHttpStream::tick ()
 {
   //  .. nothing yet ..
 }
 
-void
-InputHttpStream::set_timeout (double)
+void InputHttpStream::set_timeout (double)
 {
   //  .. nothing yet ..
 }

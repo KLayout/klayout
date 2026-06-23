@@ -29,7 +29,7 @@
 namespace lay
 {
 
-QCursor 
+QCursor
 Cursor::qcursor (cursor_shape cursor)
 {
   switch (int (cursor)) {

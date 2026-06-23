@@ -33,7 +33,7 @@ namespace lay
 {
 
 /**
- *  @brief Gets the application data path 
+ *  @brief Gets the application data path
  *  The application data path is the path where the application stores it's
  *  data for each user.
  *  By default this is HOME/.klayout or HOME/KLayout (Windows). The value
@@ -42,7 +42,7 @@ namespace lay
 LAY_PUBLIC std::string get_appdata_path ();
 
 /**
- *  @brief Gets the KLayout path 
+ *  @brief Gets the KLayout path
  *  This is a path (in the sense of a search path - i.e. multiple paths)
  *  where KLayout (and derived applications) looks for configuration files.
  *  The path is created from the appdata and inst path by default. It can

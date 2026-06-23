@@ -65,7 +65,7 @@ public:
 
 }
 
-TEST(1)
+TEST (1)
 {
   tl::copy_on_write_ptr<copy_on_write_tests::A> ptr1, ptr2;
 
@@ -102,7 +102,7 @@ TEST(1)
   EXPECT_EQ (copy_on_write_tests::a_instances, 0);
 }
 
-TEST(2)
+TEST (2)
 {
   tl::copy_on_write_ptr<copy_on_write_tests::A> ptr1;
 
@@ -133,7 +133,7 @@ TEST(2)
   EXPECT_EQ (ptr2.get_const ()->name (), "A");
 }
 
-TEST(3)
+TEST (3)
 {
   tl::copy_on_write_ptr<copy_on_write_tests::A> ptr1;
 
@@ -170,9 +170,9 @@ TEST(3)
   EXPECT_EQ (copy_on_write_tests::a_instances, 0);
 }
 
-TEST(4)
+TEST (4)
 {
-  tl::copy_on_write_ptr<copy_on_write_tests::X, tl::clone_duplicator<copy_on_write_tests::X> > ptr1, ptr2;
+  tl::copy_on_write_ptr<copy_on_write_tests::X, tl::clone_duplicator<copy_on_write_tests::X>> ptr1, ptr2;
 
   EXPECT_EQ (copy_on_write_tests::x_instances, 0);
 
@@ -210,4 +210,3 @@ TEST(4)
   ptr2.reset (0);
   EXPECT_EQ (copy_on_write_tests::x_instances, 0);
 }
-

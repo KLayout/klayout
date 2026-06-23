@@ -78,14 +78,12 @@ EmptyTexts::add (const Texts &other) const
   return other.delegate ()->clone ();
 }
 
-bool 
-EmptyTexts::equals (const Texts &other) const
+bool EmptyTexts::equals (const Texts &other) const
 {
   return other.empty ();
 }
 
-bool 
-EmptyTexts::less (const Texts &other) const
+bool EmptyTexts::less (const Texts &other) const
 {
   return other.empty () ? false : true;
 }
@@ -109,4 +107,3 @@ EmptyTexts::selected_not_interacting (const Region &) const
 }
 
 }
-

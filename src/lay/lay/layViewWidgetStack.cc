@@ -78,7 +78,7 @@ void ViewWidgetStack::raise_widget (size_t index)
   }
 
   size_t i = 0;
-  for (std::vector <LayoutViewWidget *>::iterator child = m_widgets.begin (); child != m_widgets.end (); ++child, ++i) {
+  for (std::vector<LayoutViewWidget *>::iterator child = m_widgets.begin (); child != m_widgets.end (); ++child, ++i) {
     if (i != index) {
       (*child)->hide ();
     }
@@ -102,7 +102,7 @@ QWidget *ViewWidgetStack::background_widget ()
 void ViewWidgetStack::resize_children ()
 {
   //  set the geometry of all children
-  for (std::vector <LayoutViewWidget *>::iterator child = m_widgets.begin (); child != m_widgets.end (); ++child) {
+  for (std::vector<LayoutViewWidget *>::iterator child = m_widgets.begin (); child != m_widgets.end (); ++child) {
     (*child)->setGeometry (0, 0, width (), height ());
   }
   mp_bglabel->setGeometry (0, 0, width (), height ());

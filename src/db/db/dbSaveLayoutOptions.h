@@ -46,8 +46,8 @@ namespace db
 class DB_PUBLIC FormatSpecificWriterOptions
 {
 public:
-  FormatSpecificWriterOptions () { }  
-  virtual ~FormatSpecificWriterOptions () { }  //  to enable RTTI
+  FormatSpecificWriterOptions () {}
+  virtual ~FormatSpecificWriterOptions () {} //  to enable RTTI
 
   virtual FormatSpecificWriterOptions *clone () const = 0;
   virtual const std::string &format_name () const = 0;
@@ -62,7 +62,7 @@ public:
   /**
    *  @brief Default constructor
    *
-   *  By default, the scale factor will be 1.0, the database unit is set to 
+   *  By default, the scale factor will be 1.0, the database unit is set to
    *  "same as original" and all layers are selected.
    */
   SaveLayoutOptions ();
@@ -73,7 +73,7 @@ public:
   SaveLayoutOptions (const SaveLayoutOptions &d);
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   SaveLayoutOptions &operator= (const SaveLayoutOptions &d);
 
@@ -88,7 +88,7 @@ public:
   void set_format (const std::string &format_name);
 
   /**
-   *  @brief Get the format name 
+   *  @brief Get the format name
    */
   const std::string &format () const
   {
@@ -96,12 +96,12 @@ public:
   }
 
   /**
-   *  @brief Add a layer to be saved 
+   *  @brief Add a layer to be saved
    *
    *  Add the layer with the given index to the layers to be saved.
-   *  If all layers have been selected previously, this state will 
+   *  If all layers have been selected previously, this state will
    *  be cleared. By default, the layer properties given in the
-   *  layout to be saved will be used. If certain properties are 
+   *  layout to be saved will be used. If certain properties are
    *  specified, these will be used.
    */
   void add_layer (unsigned int layer, const db::LayerProperties &props = db::LayerProperties ());
@@ -121,7 +121,7 @@ public:
   /**
    *  @brief Add a cell to save (without their children)
    *
-   *  Give the cell index of the cell. The actual cell is determined when the layout is given. 
+   *  Give the cell index of the cell. The actual cell is determined when the layout is given.
    *  Clears the "all_cells" flag.
    */
   void select_this_cell (db::cell_index_type cell)
@@ -133,7 +133,7 @@ public:
   /**
    *  @brief Add a cell to save
    *
-   *  Give the cell index of the cell. The actual cell is determined when the layout is given. 
+   *  Give the cell index of the cell. The actual cell is determined when the layout is given.
    *  Clears the "all_cells" flag.
    */
   void select_cell (db::cell_index_type cell)
@@ -145,7 +145,7 @@ public:
   /**
    *  @brief Add a cell to save (with it's children)
    *
-   *  Give the cell index of the cell. The actual cell is determined when the layout is given. 
+   *  Give the cell index of the cell. The actual cell is determined when the layout is given.
    *  Clears the "all_cells" flag.
    */
   void add_cell (db::cell_index_type cell);
@@ -153,7 +153,7 @@ public:
   /**
    *  @brief Add a cell to save (without it's children)
    *
-   *  Give the cell index of the cell. The actual cell is determined when the layout is given. 
+   *  Give the cell index of the cell. The actual cell is determined when the layout is given.
    *  Clears the "all_cells" flag.
    */
   void add_this_cell (db::cell_index_type cell);
@@ -174,7 +174,7 @@ public:
   void set_dbu (double dbu);
 
   /**
-   *  @brief Get the database unit 
+   *  @brief Get the database unit
    */
   double dbu () const
   {
@@ -182,12 +182,12 @@ public:
   }
 
   /**
-   *  @brief Set the scaling factor for the saving 
+   *  @brief Set the scaling factor for the saving
    */
   void set_scale_factor (double f);
 
   /**
-   *  @brief Get the scaling factor 
+   *  @brief Get the scaling factor
    */
   double scale_factor () const
   {
@@ -223,7 +223,7 @@ public:
   /**
    *  @brief The "keep instances" property (getter)
    *
-   *  With this property set to true, instances of dropped cells (i.e. empty cells, 
+   *  With this property set to true, instances of dropped cells (i.e. empty cells,
    *  hidden cells) are kept if the format allows. This leads to ghost cells.
    */
   bool keep_instances () const
@@ -236,7 +236,7 @@ public:
    *
    *  See keep_instances for a description of that property.
    */
-  void set_keep_instances (bool ki) 
+  void set_keep_instances (bool ki)
   {
     m_keep_instances = ki;
   }
@@ -244,7 +244,7 @@ public:
   /**
    *  @brief The "write context information" property (getter)
    *
-   *  With this property set to true, context information for cells is written to 
+   *  With this property set to true, context information for cells is written to
    *  the file in a suitable way. This way it is possible to recover PCell instantiation
    *  information and library references.
    */
@@ -258,7 +258,7 @@ public:
    *
    *  See write_context_info for a description of that property.
    */
-  void set_write_context_info (bool ctx_info) 
+  void set_write_context_info (bool ctx_info)
   {
     m_write_context_info = ctx_info;
   }
@@ -268,7 +268,7 @@ public:
    *
    *  Returns true, if the suffix indicates a known format.
    */
-  std::pair<bool, std::string> set_format_from_filename(const std::string &fn);
+  std::pair<bool, std::string> set_format_from_filename (const std::string &fn);
 
   /**
    *  @brief Sets specific options for the given format
@@ -315,7 +315,7 @@ public:
   const T &get_options () const
   {
     static const T default_format;
-    std::map <std::string, FormatSpecificWriterOptions *>::const_iterator o = m_options.find (default_format.format_name ());
+    std::map<std::string, FormatSpecificWriterOptions *>::const_iterator o = m_options.find (default_format.format_name ());
     if (o != m_options.end () && dynamic_cast<const T *> (o->second)) {
       return *(dynamic_cast<const T *> (o->second));
     } else {
@@ -332,7 +332,7 @@ public:
   T &get_options ()
   {
     static const T default_format;
-    std::map <std::string, FormatSpecificWriterOptions *>::iterator o = m_options.find (default_format.format_name ());
+    std::map<std::string, FormatSpecificWriterOptions *>::iterator o = m_options.find (default_format.format_name ());
     if (o != m_options.end () && dynamic_cast<T *> (o->second)) {
       return *(dynamic_cast<T *> (o->second));
     } else {
@@ -399,8 +399,7 @@ public:
   /**
    *  @brief See get_valid_layers
    */
-  enum LayerAssignmentMode
-  {
+  enum LayerAssignmentMode {
     LP_OnlyNumbered = 0,
     LP_OnlyNamed = 1,
     LP_AssignName = 2,
@@ -410,24 +409,24 @@ public:
   };
 
   /**
-   *  @brief Report all valid layers 
+   *  @brief Report all valid layers
    *
    *  Given the layout, report all pairs or layer indices and valid properties.
-   *  The lm mode specifies how to create layer properties for "halfway defined" layers - 
+   *  The lm mode specifies how to create layer properties for "halfway defined" layers -
    *    - LP_OnlyNamed will only select named ones
    *    - LP_OnlyNumbered will select only numbered ones
    *    - LP_AssignName will assign a name when no name is given plus encode layer/datatype when given
    *    - LP_AssignNameWithPriority will assign a name when no name is given and does not encore layer/datatype together with a name
-   *    - LP_AssignNumber will assign numbers when no number is given 
+   *    - LP_AssignNumber will assign numbers when no number is given
    */
-  void get_valid_layers (const db::Layout &layout, std::vector <std::pair <unsigned int, db::LayerProperties> > &valid_layers, LayerAssignmentMode lm) const;
+  void get_valid_layers (const db::Layout &layout, std::vector<std::pair<unsigned int, db::LayerProperties>> &valid_layers, LayerAssignmentMode lm) const;
 
   /**
    *  @brief Report all cells to write
    *
    *  It must be given a list of valid layers which is used to determine empty cells if dont_save_empty_cells is true.
    */
-  void get_cells (const db::Layout &layout, std::set <db::cell_index_type> &cells, const std::vector <std::pair <unsigned int, db::LayerProperties> > &valid_layers, bool require_unique_names = true) const;
+  void get_cells (const db::Layout &layout, std::set<db::cell_index_type> &cells, const std::vector<std::pair<unsigned int, db::LayerProperties>> &valid_layers, bool require_unique_names = true) const;
 
   /**
    *  @brief Sets a layout reader option by name
@@ -458,7 +457,7 @@ private:
   bool m_keep_instances;
   bool m_write_context_info;
   bool m_dont_write_empty_cells;
-  std::map <std::string, FormatSpecificWriterOptions *> m_options;
+  std::map<std::string, FormatSpecificWriterOptions *> m_options;
 
   void release ();
 };
@@ -466,4 +465,3 @@ private:
 }
 
 #endif
-

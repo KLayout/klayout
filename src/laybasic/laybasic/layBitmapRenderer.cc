@@ -38,22 +38,19 @@ BitmapRenderer::BitmapRenderer (unsigned int width, unsigned int height, double 
   // .. nothing else ..
 }
 
-void 
-BitmapRenderer::reserve_edges (size_t n)
+void BitmapRenderer::reserve_edges (size_t n)
 {
   m_edges.reserve (n);
 }
 
-void 
-BitmapRenderer::reserve_texts (size_t n)
+void BitmapRenderer::reserve_texts (size_t n)
 {
   m_texts.reserve (n);
 }
 
-void 
-BitmapRenderer::clear ()
+void BitmapRenderer::clear ()
 {
-  //  this implementation is efficient but does not free memory - 
+  //  this implementation is efficient but does not free memory -
   //  the idea is to let the BitmapRenderer object manage its workspace.
   m_edges.erase (m_edges.begin (), m_edges.end ());
   //  might be manhattan
@@ -62,8 +59,7 @@ BitmapRenderer::clear ()
   m_texts.erase (m_texts.begin (), m_texts.end ());
 }
 
-void 
-BitmapRenderer::insert (const db::DBox &box, const std::string &text, db::Font font, db::HAlign halign, db::VAlign valign, db::DFTrans trans)
+void BitmapRenderer::insert (const db::DBox &box, const std::string &text, db::Font font, db::HAlign halign, db::VAlign valign, db::DFTrans trans)
 {
   m_texts.push_back (lay::RenderText ());
   m_texts.back ().b = box;
@@ -74,9 +70,8 @@ BitmapRenderer::insert (const db::DBox &box, const std::string &text, db::Font f
   m_texts.back ().trans = trans;
 }
 
-void 
-BitmapRenderer::draw (const db::DBox &box, const std::string &text, db::Font font, db::HAlign halign, db::VAlign valign, db::DFTrans trans, 
-                     lay::CanvasPlane * /*fill*/, lay::CanvasPlane * /*frame*/, lay::CanvasPlane * /*vertices*/, lay::CanvasPlane *texts)
+void BitmapRenderer::draw (const db::DBox &box, const std::string &text, db::Font font, db::HAlign halign, db::VAlign valign, db::DFTrans trans,
+                           lay::CanvasPlane * /*fill*/, lay::CanvasPlane * /*frame*/, lay::CanvasPlane * /*vertices*/, lay::CanvasPlane *texts)
 {
   clear ();
   insert (box, text, font, halign, valign, trans);
@@ -85,8 +80,7 @@ BitmapRenderer::draw (const db::DBox &box, const std::string &text, db::Font fon
   }
 }
 
-void 
-BitmapRenderer::insert (const db::Box &b, const db::CplxTrans &t)
+void BitmapRenderer::insert (const db::Box &b, const db::CplxTrans &t)
 {
   if (t.is_ortho ()) {
     insert (t * b);
@@ -98,8 +92,7 @@ BitmapRenderer::insert (const db::Box &b, const db::CplxTrans &t)
   }
 }
 
-void 
-BitmapRenderer::insert (const db::DBox &b, const db::DCplxTrans &t)
+void BitmapRenderer::insert (const db::DBox &b, const db::DCplxTrans &t)
 {
   if (t.is_ortho ()) {
     insert (t * b);
@@ -111,15 +104,13 @@ BitmapRenderer::insert (const db::DBox &b, const db::DCplxTrans &t)
   }
 }
 
-void 
-BitmapRenderer::insert (const db::DBox &b)
+void BitmapRenderer::insert (const db::DBox &b)
 {
   db::DEdge edges [] = {
     db::DEdge (b.p1 (), db::DPoint (b.p1 ().x (), b.p2 ().y ())),
     db::DEdge (db::DPoint (b.p1 ().x (), b.p2 ().y ()), b.p2 ()),
     db::DEdge (b.p2 (), db::DPoint (b.p2 ().x (), b.p1 ().y ())),
-    db::DEdge (db::DPoint (b.p2 ().x (), b.p1 ().y ()), b.p1 ())
-  };
+    db::DEdge (db::DPoint (b.p2 ().x (), b.p1 ().y ()), b.p1 ())};
 
   if (m_edges.begin () == m_edges.end ()) {
     m_xmin = b.left ();
@@ -136,8 +127,7 @@ BitmapRenderer::insert (const db::DBox &b)
   m_edges.insert (m_edges.end (), edges, edges + 4);
 }
 
-void 
-BitmapRenderer::insert (const db::DEdge &e)
+void BitmapRenderer::insert (const db::DEdge &e)
 {
   if (m_edges.begin () == m_edges.end ()) {
     m_xmin = std::min (e.x1 (), e.x2 ());
@@ -151,10 +141,9 @@ BitmapRenderer::insert (const db::DEdge &e)
     m_ymax = std::max (m_ymax, std::max (e.y1 (), e.y2 ()));
   }
 
-  //  check, if the edge is neither horizontal nor vertical - 
+  //  check, if the edge is neither horizontal nor vertical -
   //  reset the orthogonal flag in this case.
-  if (m_ortho && fabs (e.x1 () - e.x2 ()) > render_epsilon 
-              && fabs (e.y1 () - e.y2 ()) > render_epsilon) {
+  if (m_ortho && fabs (e.x1 () - e.x2 ()) > render_epsilon && fabs (e.y1 () - e.y2 ()) > render_epsilon) {
     m_ortho = false;
   }
 
@@ -167,8 +156,7 @@ static inline bool point_inside_box (const db::DPoint &pt, const db::DBox &box)
           ! (db::coord_traits<db::DBox::coord_type>::equal (pt.y (), box.bottom ()) || db::coord_traits<db::DBox::coord_type>::equal (pt.y (), box.top ())));
 }
 
-void
-BitmapRenderer::add_xfill ()
+void BitmapRenderer::add_xfill ()
 {
   db::DBox box;
   for (std::vector<lay::RenderEdge>::const_iterator e = m_edges.begin (); e != m_edges.end (); ++e) {
@@ -189,12 +177,10 @@ BitmapRenderer::add_xfill ()
 
     insert (db::DEdge (box.p1 (), box.p2 ()));
     insert (db::DEdge (box.lower_right (), box.upper_left ()));
-
   }
 }
 
-void 
-BitmapRenderer::render_texts (lay::CanvasPlane &plane)
+void BitmapRenderer::render_texts (lay::CanvasPlane &plane)
 {
   lay::Bitmap *bitmap = static_cast<lay::Bitmap *> (&plane);
   for (std::vector<lay::RenderText>::const_iterator t = m_texts.begin (); t != m_texts.end (); ++t) {
@@ -202,8 +188,7 @@ BitmapRenderer::render_texts (lay::CanvasPlane &plane)
   }
 }
 
-void 
-BitmapRenderer::render_vertices (lay::CanvasPlane &plane, int mode)
+void BitmapRenderer::render_vertices (lay::CanvasPlane &plane, int mode)
 {
   lay::Bitmap *bitmap = static_cast<lay::Bitmap *> (&plane);
 
@@ -215,7 +200,7 @@ BitmapRenderer::render_vertices (lay::CanvasPlane &plane, int mode)
   //  basic optimization: just a dot
   if (floor (m_xmax + 0.5) == floor (m_xmin + 0.5) &&
       floor (m_ymax + 0.5) == floor (m_ymin + 0.5)) {
-    if (m_xmin > -0.5 && m_ymin > -0.5 && 
+    if (m_xmin > -0.5 && m_ymin > -0.5 &&
         m_xmin < double (bitmap->width ()) - 0.5 &&
         m_ymin < double (bitmap->height ()) - 0.5) {
       unsigned int yint = (unsigned int) (m_ymin + 0.5);
@@ -228,8 +213,7 @@ BitmapRenderer::render_vertices (lay::CanvasPlane &plane, int mode)
   bitmap->render_vertices (m_edges, mode);
 }
 
-void 
-BitmapRenderer::render_contour (lay::CanvasPlane &plane)
+void BitmapRenderer::render_contour (lay::CanvasPlane &plane)
 {
   lay::Bitmap *bitmap = static_cast<lay::Bitmap *> (&plane);
 
@@ -254,7 +238,7 @@ BitmapRenderer::render_contour (lay::CanvasPlane &plane)
     }
     return;
   }
-    
+
   if (floor (m_ymax + 0.5) == floor (m_ymin + 0.5)) {
     unsigned int x1int = (unsigned int) (std::max (0.0, std::min (m_xmin + 0.5, double (bitmap->width () - 1))));
     unsigned int x2int = (unsigned int) (std::max (0.0, std::min (m_xmax + 0.5, double (bitmap->width () - 1))));
@@ -262,7 +246,7 @@ BitmapRenderer::render_contour (lay::CanvasPlane &plane)
     bitmap->fill (yint, x1int, x2int + 1);
     return;
   }
-  
+
   if (! m_ortho) {
     bitmap->render_contour (m_edges);
   } else {
@@ -270,8 +254,7 @@ BitmapRenderer::render_contour (lay::CanvasPlane &plane)
   }
 }
 
-void 
-BitmapRenderer::render_fill (lay::CanvasPlane &plane)
+void BitmapRenderer::render_fill (lay::CanvasPlane &plane)
 {
   lay::Bitmap *bitmap = static_cast<lay::Bitmap *> (&plane);
 
@@ -296,7 +279,7 @@ BitmapRenderer::render_fill (lay::CanvasPlane &plane)
     }
     return;
   }
-    
+
   if (floor (m_ymax + 0.5) == floor (m_ymin + 0.5)) {
     unsigned int x1int = (unsigned int) (std::max (0.0, std::min (m_xmin + 0.5, double (bitmap->width () - 1))));
     unsigned int x2int = (unsigned int) (std::max (0.0, std::min (m_xmax + 0.5, double (bitmap->width () - 1))));
@@ -312,8 +295,7 @@ BitmapRenderer::render_fill (lay::CanvasPlane &plane)
   }
 }
 
-void 
-BitmapRenderer::render_dot (double x, double y, lay::CanvasPlane *plane)
+void BitmapRenderer::render_dot (double x, double y, lay::CanvasPlane *plane)
 {
   lay::Bitmap *bitmap = static_cast<lay::Bitmap *> (plane);
 
@@ -330,9 +312,8 @@ BitmapRenderer::render_dot (double x, double y, lay::CanvasPlane *plane)
   unsigned int xint = (unsigned int) x;
   bitmap->fill (yint, xint, xint + 1);
 }
-    
-void 
-BitmapRenderer::render_box (double xmin, double ymin, double xmax, double ymax, lay::CanvasPlane *plane)
+
+void BitmapRenderer::render_box (double xmin, double ymin, double xmax, double ymax, lay::CanvasPlane *plane)
 {
   lay::Bitmap *bitmap = static_cast<lay::Bitmap *> (plane);
 
@@ -356,17 +337,16 @@ BitmapRenderer::render_box (double xmin, double ymin, double xmax, double ymax, 
   }
 }
 
-void 
-BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
+void BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
 {
   if (shape.is_text ()) {
-    
+
     db::Point p = db::Point () + shape.text_trans ().disp ();
     db::DPoint dp = trans * p;
 
     if ((vertices || frame) &&
-        dp.x () < m_width - 0.5 && dp.x () > -0.5 && 
+        dp.x () < m_width - 0.5 && dp.x () > -0.5 &&
         dp.y () < m_height - 0.5 && dp.y () > -0.5) {
 
       clear ();
@@ -380,7 +360,6 @@ BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
       if (frame) {
         frame->pixel (pp.x (), pp.y ());
       }
-
     }
 
     if (m_draw_texts && text) {
@@ -423,7 +402,6 @@ BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
       insert (db::DBox (dp + fp (tp1), dp + fp (tp2)), shape.text_string (), font, halign, valign, fp);
 
       render_texts (*text);
-
     }
 
   } else {
@@ -431,15 +409,15 @@ BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
     db::Box bbox = shape.bbox ();
     double threshold = 1.0 / trans.mag ();
 
-    if (bbox.width () <= threshold && bbox.height () <= threshold && !shape.is_point ()) {
+    if (bbox.width () <= threshold && bbox.height () <= threshold && ! shape.is_point ()) {
 
       db::DPoint dc = trans * bbox.center ();
       if (fill && ! shape.is_edge ()) {
         render_dot (dc.x (), dc.y (), fill);
-      } 
+      }
       if (frame) {
         render_dot (dc.x (), dc.y (), frame);
-      } 
+      }
       if (vertices) {
         render_dot (dc.x (), dc.y (), vertices);
       }
@@ -457,8 +435,8 @@ BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
       } else {
 
         clear ();
-        db::Shape::polygon_edge_iterator e = shape.begin_edge (); 
-        for ( ; ! e.at_end (); ++e) {
+        db::Shape::polygon_edge_iterator e = shape.begin_edge ();
+        for (; ! e.at_end (); ++e) {
           insert (trans * *e);
         }
 
@@ -474,7 +452,6 @@ BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
           }
           render_contour (*frame);
         }
-
       }
 
     } else if (shape.is_edge ()) {
@@ -493,17 +470,13 @@ BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
         db::Path path;
         shape.path (path);
         draw (path, trans, fill, frame, vertices, text);
-
       }
-
     }
-
   }
 }
 
-void 
-BitmapRenderer::draw (const db::Polygon &poly, const db::CplxTrans &trans,
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
+void BitmapRenderer::draw (const db::Polygon &poly, const db::CplxTrans &trans,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
 {
   //  simplify to a rectangle if possible
   db::Box b (poly.box ());
@@ -549,13 +522,11 @@ BitmapRenderer::draw (const db::Polygon &poly, const db::CplxTrans &trans,
       }
       render_contour (*frame);
     }
-
   }
 }
 
-void 
-BitmapRenderer::draw (const db::DPolygon &poly, const db::DCplxTrans &trans,
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
+void BitmapRenderer::draw (const db::DPolygon &poly, const db::DCplxTrans &trans,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
 {
   //  simplify to a rectangle or dot if possible
   db::DBox b (poly.box ());
@@ -601,13 +572,11 @@ BitmapRenderer::draw (const db::DPolygon &poly, const db::DCplxTrans &trans,
       }
       render_contour (*frame);
     }
-
   }
 }
 
-void 
-BitmapRenderer::draw (const db::DPolygon &poly, 
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
+void BitmapRenderer::draw (const db::DPolygon &poly,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
 {
   //  simplify to a rectangle or dot if possible
   db::DBox b (poly.box ());
@@ -652,13 +621,11 @@ BitmapRenderer::draw (const db::DPolygon &poly,
       }
       render_contour (*frame);
     }
-
   }
 }
 
-void 
-BitmapRenderer::draw (const db::ShortBox &box, const db::CplxTrans &trans,
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
+void BitmapRenderer::draw (const db::ShortBox &box, const db::CplxTrans &trans,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
 {
   if (! box.empty ()) {
 
@@ -694,18 +661,15 @@ BitmapRenderer::draw (const db::ShortBox &box, const db::CplxTrans &trans,
         }
         render_contour (*frame);
       }
-
     }
-
   }
 }
 
-void 
-BitmapRenderer::draw (const db::Box &box, const db::CplxTrans &trans,
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
+void BitmapRenderer::draw (const db::Box &box, const db::CplxTrans &trans,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
 {
   if (! box.empty ()) {
-  
+
     double threshold = 1.0 / trans.mag ();
     if (box.width () < threshold && box.height () < threshold) {
 
@@ -738,18 +702,15 @@ BitmapRenderer::draw (const db::Box &box, const db::CplxTrans &trans,
         }
         render_contour (*frame);
       }
-
     }
-
   }
 }
 
-void 
-BitmapRenderer::draw (const db::DBox &box, 
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
+void BitmapRenderer::draw (const db::DBox &box,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
 {
   if (! box.empty ()) {
-  
+
     if (box.width () < 1.0 && box.height () < 1.0) {
 
       db::DPoint dp = box.center ();
@@ -781,18 +742,15 @@ BitmapRenderer::draw (const db::DBox &box,
         }
         render_contour (*frame);
       }
-
     }
-
   }
 }
 
-void 
-BitmapRenderer::draw (const db::DBox &box, const db::DCplxTrans &trans,
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
+void BitmapRenderer::draw (const db::DBox &box, const db::DCplxTrans &trans,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
 {
   if (! box.empty ()) {
-  
+
     double threshold = 1.0 / trans.mag ();
     if (box.width () < threshold && box.height () < threshold) {
 
@@ -825,17 +783,14 @@ BitmapRenderer::draw (const db::DBox &box, const db::DCplxTrans &trans,
         }
         render_contour (*frame);
       }
-
     }
-
   }
 }
 
-void 
-BitmapRenderer::draw (const db::Path &path, const db::CplxTrans &trans,
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
+void BitmapRenderer::draw (const db::Path &path, const db::CplxTrans &trans,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
 {
-  //  simplify to a rectangle or dot if possible 
+  //  simplify to a rectangle or dot if possible
   db::Box b (path.box ());
 
   double threshold = 1.0 / trans.mag ();
@@ -859,11 +814,11 @@ BitmapRenderer::draw (const db::Path &path, const db::CplxTrans &trans,
     if (simplify_box (b, trans)) {
       draw (b, trans, fill, frame, vertices, text);
       return;
-    } 
+    }
 
     //  generate the hull and produce the edges from this only if the path is considerably wide
     //  otherwise just render the spine
-    
+
     double w = trans.ctrans (path.width ());
 
     bool thin = (w < 0.5);
@@ -899,7 +854,6 @@ BitmapRenderer::draw (const db::Path &path, const db::CplxTrans &trans,
         }
         render_contour (*frame);
       }
-
     }
 
     //  render the spine edges
@@ -927,14 +881,14 @@ BitmapRenderer::draw (const db::Path &path, const db::CplxTrans &trans,
 
           //  If the path is simplified, the spine is drawn instead of the contour.
           //  We must apply the begin/end extensions then.
-          
+
           if (thin && qq == path.end ()) {
             if (path.extensions ().second != 0 && (seg.dx () != 0 || seg.dy () != 0)) {
               db::DVector ed (seg.p2 () - seg.p1 ());
               ed *= 1.0 / ed.double_length ();
               seg = db::Edge (seg.p1 (), seg.p2 () + db::Vector (ed * double (path.extensions ().second)));
             }
-          } 
+          }
 
           if (first) {
             first = false;
@@ -944,11 +898,9 @@ BitmapRenderer::draw (const db::Path &path, const db::CplxTrans &trans,
               seg = db::Edge (seg.p1 () - db::Vector (ed * double (path.extensions ().first)), seg.p2 ());
             }
           }
-            
+
           insert (trans * seg);
-
         }
-
       }
 
       if (vertices) {
@@ -957,22 +909,18 @@ BitmapRenderer::draw (const db::Path &path, const db::CplxTrans &trans,
       if (frame) {
         render_contour (*frame);
       }
-
     }
-
   }
 }
 
-void 
-BitmapRenderer::draw (const db::DPath &path, 
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
+void BitmapRenderer::draw (const db::DPath &path,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
 {
   draw (path, db::DCplxTrans (), fill, frame, vertices, text);
 }
 
-void 
-BitmapRenderer::draw (const db::DPath &path, const db::DCplxTrans &trans,
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
+void BitmapRenderer::draw (const db::DPath &path, const db::DCplxTrans &trans,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
 {
   //  simplify to a rectangle if possible
   db::DBox b (path.box ());
@@ -998,9 +946,9 @@ BitmapRenderer::draw (const db::DPath &path, const db::DCplxTrans &trans,
     if (simplify_box (b, trans)) {
       draw (b, trans, fill, frame, vertices, text);
       return;
-    } 
+    }
 
-    //  generate the hull and produce the edges from this 
+    //  generate the hull and produce the edges from this
 
     db::DPath::pointlist_type pts;
     path.hull (pts);
@@ -1050,7 +998,6 @@ BitmapRenderer::draw (const db::DPath &path, const db::DCplxTrans &trans,
         q = qq;
         ++qq;
       }
-
     }
 
     if (vertices) {
@@ -1059,19 +1006,17 @@ BitmapRenderer::draw (const db::DPath &path, const db::DCplxTrans &trans,
     if (frame) {
       render_contour (*frame);
     }
-
   }
 }
 
-void 
-BitmapRenderer::draw (const db::Text &txt, const db::CplxTrans &trans,
-                      lay::CanvasPlane * /*fill*/, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
+void BitmapRenderer::draw (const db::Text &txt, const db::CplxTrans &trans,
+                           lay::CanvasPlane * /*fill*/, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
 {
   db::Point p = db::Point () + txt.trans ().disp ();
   db::DPoint dp = trans * p;
 
   if ((vertices || frame) &&
-      dp.x () < m_width - 0.5 && dp.x () > -0.5 && 
+      dp.x () < m_width - 0.5 && dp.x () > -0.5 &&
       dp.y () < m_height - 0.5 && dp.y () > -0.5) {
 
     clear ();
@@ -1085,7 +1030,6 @@ BitmapRenderer::draw (const db::Text &txt, const db::CplxTrans &trans,
     if (frame) {
       frame->pixel (pp.x (), pp.y ());
     }
-
   }
 
   if (m_draw_texts && text) {
@@ -1124,29 +1068,25 @@ BitmapRenderer::draw (const db::Text &txt, const db::CplxTrans &trans,
     clear ();
 
     insert (db::DBox (dp + fp (tp1), dp + fp (tp2)), txt.string (), font, txt.halign (), txt.valign (), fp);
-    
+
     render_texts (*text);
-
   }
-
 }
 
-void 
-BitmapRenderer::draw (const db::DText &txt, 
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
+void BitmapRenderer::draw (const db::DText &txt,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
 {
   draw (txt, db::DCplxTrans (), fill, frame, vertices, text);
 }
 
-void 
-BitmapRenderer::draw (const db::DText &txt, const db::DCplxTrans &trans,
-                      lay::CanvasPlane * /*fill*/, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
+void BitmapRenderer::draw (const db::DText &txt, const db::DCplxTrans &trans,
+                           lay::CanvasPlane * /*fill*/, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
 {
   db::DPoint p = db::DPoint () + txt.trans ().disp ();
   db::DPoint dp = trans * p;
 
   if ((vertices || frame) &&
-      dp.x () < m_width - 0.5 && dp.x () > -0.5 && 
+      dp.x () < m_width - 0.5 && dp.x () > -0.5 &&
       dp.y () < m_height - 0.5 && dp.y () > -0.5) {
 
     clear ();
@@ -1160,7 +1100,6 @@ BitmapRenderer::draw (const db::DText &txt, const db::DCplxTrans &trans,
     if (frame) {
       frame->pixel (pp.x (), pp.y ());
     }
-
   }
 
   if (m_draw_texts && text) {
@@ -1198,16 +1137,13 @@ BitmapRenderer::draw (const db::DText &txt, const db::DCplxTrans &trans,
     clear ();
 
     insert (db::DBox (dp + fp (tp1), dp + fp (tp2)), txt.string (), font, txt.halign (), txt.valign (), fp);
-    
+
     render_texts (*text);
-
   }
-
 }
 
-void 
-BitmapRenderer::draw (const db::DEdge &edge, 
-                      lay::CanvasPlane * /*fill*/, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
+void BitmapRenderer::draw (const db::DEdge &edge,
+                           lay::CanvasPlane * /*fill*/, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane * /*text*/)
 {
   if (fabs (edge.dy ()) < 1.0 && fabs (edge.dx ()) < 1.0) {
 
@@ -1232,45 +1168,41 @@ BitmapRenderer::draw (const db::DEdge &edge,
     if (frame) {
       render_contour (*frame);
     }
-
   }
 }
 
-void 
-BitmapRenderer::draw (const db::Edge &edge, const db::CplxTrans &trans,
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
+void BitmapRenderer::draw (const db::Edge &edge, const db::CplxTrans &trans,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
 {
   draw (trans * edge, fill, frame, vertices, text);
 }
 
-void 
-BitmapRenderer::draw (const db::DEdge &edge, const db::DCplxTrans &trans,
-                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
+void BitmapRenderer::draw (const db::DEdge &edge, const db::DCplxTrans &trans,
+                           lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *text)
 {
   draw (trans * edge, fill, frame, vertices, text);
 }
 
 template <class Box, class Trans>
-bool 
-BitmapRenderer::simplify_box (Box &b, const Trans &trans)
+bool BitmapRenderer::simplify_box (Box &b, const Trans &trans)
 {
   const double small_size_threshold = 1.0;
 
   bool ortho = trans.is_ortho ();
-  if (! m_precise && ((ortho && trans.ctrans (std::min (b.width (), b.height ())) < small_size_threshold) || 
+  if (! m_precise && ((ortho && trans.ctrans (std::min (b.width (), b.height ())) < small_size_threshold) ||
                       (! ortho && trans.ctrans (std::max (b.width (), b.height ())) < small_size_threshold))) {
 
     if (trans.ctrans (b.width ()) < small_size_threshold) {
       typename Box::coord_type c = b.center ().x ();
       b.set_left (c);
       b.set_right (c);
-    } 
+    }
 
     if (trans.ctrans (b.height ()) < small_size_threshold) {
       typename Box::coord_type c = b.center ().y ();
       b.set_top (c);
       b.set_bottom (c);
-    } 
+    }
 
     return true;
 
@@ -1280,4 +1212,3 @@ BitmapRenderer::simplify_box (Box &b, const Trans &trans)
 }
 
 }
-

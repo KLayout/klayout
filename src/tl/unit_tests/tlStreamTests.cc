@@ -32,7 +32,7 @@ TL_PUBLIC void file_utils_force_linux ();
 TL_PUBLIC void file_utils_force_reset ();
 }
 
-TEST(InputPipe1)
+TEST (InputPipe1)
 {
   tl::InputPipe pipe ("echo HELLOWORLD");
   tl::InputStream str (pipe);
@@ -41,7 +41,7 @@ TEST(InputPipe1)
   EXPECT_EQ (pipe.wait (), 0);
 }
 
-TEST(InputPipe2)
+TEST (InputPipe2)
 {
   tl::InputPipe pipe ("thiscommanddoesnotexistithink 2>&1");
   tl::InputStream str (pipe);
@@ -52,14 +52,14 @@ TEST(InputPipe2)
   EXPECT_NE (ret, 0);
 }
 
-TEST(InputPipe3)
+TEST (InputPipe3)
 {
   tl::InputStream str ("pipe:echo HELLOWORLD");
   tl::TextInputStream tstr (str);
   EXPECT_EQ (tstr.get_line (), "HELLOWORLD");
 }
 
-TEST(OutputPipe1)
+TEST (OutputPipe1)
 {
   std::string tf = tmp_file ("pipe_out");
 
@@ -76,7 +76,7 @@ TEST(OutputPipe1)
   }
 }
 
-TEST(TextOutputStream)
+TEST (TextOutputStream)
 {
   std::string fn = tmp_file ("test.txt");
 
@@ -96,7 +96,7 @@ TEST(TextOutputStream)
     tl::file_utils_force_linux ();
 
     {
-      tl::rm_file (fn);  //  avoids trouble with wrong path delimeters and backup files
+      tl::rm_file (fn); //  avoids trouble with wrong path delimeters and backup files
       tl::OutputStream os (fn, tl::OutputStream::OM_Auto, true);
       os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
     }
@@ -117,7 +117,7 @@ TEST(TextOutputStream)
     tl::file_utils_force_windows ();
 
     {
-      tl::rm_file (fn);  //  avoids trouble with wrong path delimeters and backup files
+      tl::rm_file (fn); //  avoids trouble with wrong path delimeters and backup files
       tl::OutputStream os (fn, tl::OutputStream::OM_Auto, true);
       os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
     }
@@ -134,7 +134,7 @@ TEST(TextOutputStream)
   }
 }
 
-TEST(TextInputStream)
+TEST (TextInputStream)
 {
   std::string fn = tmp_file ("test.txt");
 
@@ -172,7 +172,7 @@ TEST(TextInputStream)
   }
 }
 
-TEST(DataInputStream)
+TEST (DataInputStream)
 {
   tl::InputStream is ("data:SGVsbG8sIHdvcmxkIQpXaXRoIGFub3RoZXIgbGluZQoNDQpzZXBhcmF0ZWQgYnkgYSBMRkNSIGFuZCBDUkxGLg==");
   tl::TextInputStream tis (is);
@@ -192,7 +192,7 @@ TEST(DataInputStream)
   EXPECT_EQ (is.suffix (), "");
 }
 
-TEST(DataInputStreamWithSuffix)
+TEST (DataInputStreamWithSuffix)
 {
   tl::InputStream is ("data:SGVsbG8sIHdvcmxkIQpXaXRoIGFub3RoZXIgbGluZQoNDQpzZXBhcmF0ZWQgYnkgYSBMRkNSIGFuZCBDUkxGLg==[txt]");
   tl::TextInputStream tis (is);
@@ -221,9 +221,10 @@ class BrokenOutputStream
 public:
   BrokenOutputStream (const std::string &path, int keep_backups)
     : tl::OutputFile (path, keep_backups)
-  { }
+  {
+  }
 
-  void write_file(const char *b, size_t n)
+  void write_file (const char *b, size_t n)
   {
     for (const char *p = b; p < b + n; ++p) {
       if (*p == '!') {
@@ -236,7 +237,7 @@ public:
 
 }
 
-TEST(SafeOutput)
+TEST (SafeOutput)
 {
   std::string tp = tmp_file ("x");
 
@@ -269,7 +270,7 @@ TEST(SafeOutput)
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
     os.put ("Hi!\n");
-    os.flush ();   //  raises the exception
+    os.flush (); //  raises the exception
     EXPECT_EQ (true, false);
   } catch (...) {
     //  '!' raises an exception
@@ -292,7 +293,7 @@ TEST(SafeOutput)
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
     os.put ("Hi!\n");
-    os.flush ();   //  raises the exception
+    os.flush (); //  raises the exception
     EXPECT_EQ (true, false);
   } catch (...) {
     //  '!' raises an exception
@@ -309,7 +310,7 @@ TEST(SafeOutput)
   }
 }
 
-TEST(SafeOutput2)
+TEST (SafeOutput2)
 {
   std::string cd = tl::current_dir ();
   tl_assert (tl::chdir (tmp_file (".")));
@@ -352,7 +353,7 @@ TEST(SafeOutput2)
   }
 }
 
-TEST(Backups)
+TEST (Backups)
 {
   std::string tp = tmp_file ("x");
 
@@ -457,7 +458,7 @@ TEST(Backups)
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
     os.put ("5!\n");
-    os.flush ();   //  raises the exception
+    os.flush (); //  raises the exception
     EXPECT_EQ (true, false);
   } catch (...) {
     //  '!' raises an exception
@@ -485,7 +486,7 @@ TEST(Backups)
   }
 }
 
-TEST(RefuseToWrite)
+TEST (RefuseToWrite)
 {
   try {
     tl::OutputStream os ("");
@@ -502,7 +503,7 @@ TEST(RefuseToWrite)
   }
 }
 
-TEST(AbstractPathFunctions)
+TEST (AbstractPathFunctions)
 {
   EXPECT_EQ (tl::InputStream::absolute_file_path (""), tl::absolute_file_path ("."));
   EXPECT_EQ (tl::InputStream::absolute_file_path ("."), tl::absolute_file_path ("."));
@@ -612,7 +613,7 @@ TEST(AbstractPathFunctions)
   tl::file_utils_force_reset ();
 }
 
-TEST(MatchFormat)
+TEST (MatchFormat)
 {
   EXPECT_EQ (tl::match_filename_to_format ("abc.txt", "Text files (*.txt *.TXT)"), true);
   EXPECT_EQ (tl::match_filename_to_format ("abc.txt", "Text files (*.txt)"), true);

@@ -29,7 +29,7 @@
 #include "dbRegion.h"
 #include "dbTestSupport.h"
 
-TEST(1) 
+TEST (1)
 {
   db::Texts texts;
   EXPECT_EQ (texts.empty (), true);
@@ -83,7 +83,7 @@ TEST(1)
   EXPECT_EQ (texts2.bbox ().to_string (), "(210,-110;210,-110)");
 }
 
-TEST(2) 
+TEST (2)
 {
   db::Texts texts;
   texts.insert (db::Text ("abc", db::Trans (db::Vector (100, -200))));
@@ -106,7 +106,7 @@ TEST(2)
   EXPECT_EQ (db::compare (r, "(99,-201;99,-199;101,-199;101,-201);(109,209;109,211;111,211;111,209)"), true);
 }
 
-TEST(3) 
+TEST (3)
 {
   db::Texts texts;
   texts.insert (db::Text ("abc", db::Trans (db::Vector (100, -200))));
@@ -127,7 +127,7 @@ TEST(3)
   EXPECT_EQ (texts.to_string (), "('uvw',r0 110,210)");
 }
 
-TEST(4)
+TEST (4)
 {
   db::Texts texts;
   texts.insert (db::Text ("abc", db::Trans (db::Vector (100, -200))));
@@ -148,7 +148,7 @@ TEST(4)
   EXPECT_EQ (texts.to_string (), "('abc',r0 100,-200)");
 }
 
-TEST(5)
+TEST (5)
 {
   db::Texts texts;
   texts.insert (db::Text ("abc", db::Trans (db::Vector (100, -200))));
@@ -164,7 +164,7 @@ TEST(5)
   EXPECT_EQ (db::compare (r, "(99,-201;99,-199;101,-199;101,-201);(109,209;109,211;111,211;111,209)"), true);
 }
 
-TEST(6)
+TEST (6)
 {
   db::Texts texts;
   texts.insert (db::Text ("abc", db::Trans (db::Vector (100, -200))));
@@ -180,7 +180,7 @@ TEST(6)
   EXPECT_EQ (db::compare (r, "('abc',r0 100,-200);('uvw',r0 110,210)"), true);
 }
 
-TEST(7)
+TEST (7)
 {
   db::Texts texts;
   texts.insert (db::Text ("abc", db::Trans (db::Vector (100, -200))));
@@ -209,7 +209,7 @@ TEST(7)
   EXPECT_EQ (region_out.to_string (), "(50,-300;50,-100;150,-100;150,-300)");
 }
 
-TEST(8_add_with_properties)
+TEST (8_add_with_properties)
 {
   db::DeepShapeStore dss ("TOP", 0.001);
   db::Texts rd1 (dss), rd2 (dss);
@@ -277,7 +277,7 @@ TEST(8_add_with_properties)
   EXPECT_EQ ((ro1 + rf2).to_string (), "('uvw',r0 -10,20){net=>17};('abc',r0 10,20){net=>17}");
 }
 
-TEST(9_polygons)
+TEST (9_polygons)
 {
   db::DeepShapeStore dss ("TOP", 0.001);
   db::Texts rf;
@@ -307,7 +307,7 @@ TEST(9_polygons)
   EXPECT_EQ (r.to_string (), "(9,19;9,21;11,21;11,19){17=>ABC};(-11,-21;-11,-19;-9,-19;-9,-21){17=>XZY}");
 }
 
-TEST(10_properties)
+TEST (10_properties)
 {
   db::PropertiesSet ps;
 
@@ -325,4 +325,3 @@ TEST(10_properties)
   EXPECT_EQ (texts.nth_prop_id (0), db::properties_id_type (0));
   EXPECT_EQ (texts.nth_prop_id (1), pid1);
 }
-

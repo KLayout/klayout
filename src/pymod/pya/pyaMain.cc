@@ -29,42 +29,42 @@
 #include "../lay/layMain.h"
 
 #if defined(HAVE_QT)
-#  if defined(HAVE_QTBINDINGS)
-#    include "../QtCore/QtCoreMain.h"
-#    include "../QtGui/QtGuiMain.h"
-#    if defined(INCLUDE_QTNETWORK)
-#      include "../QtNetwork/QtNetworkMain.h"
-#    endif
-#    if defined(INCLUDE_QTWIDGETS)
-#      include "../QtWidgets/QtWidgetsMain.h"
-#    endif
-#    if defined(INCLUDE_QTPRINTSUPPORT)
-#      include "../QtPrintSupport/QtPrintSupportMain.h"
-#    endif
-#    if defined(INCLUDE_QTSVG)
-#      include "../QtSvg/QtSvgMain.h"
-#    endif
-#    if defined(INCLUDE_QTXML)
-#      include "../QtXml/QtXmlMain.h"
-#    endif
-#    if defined(INCLUDE_QTXMLPATTERNS)
-#      include "../QtXmlPatterns/QtXmlPatternsMain.h"
-#    endif
-#    if defined(INCLUDE_QTSQL)
-#      include "../QtSql/QtSqlMain.h"
-#    endif
-#    if defined(INCLUDE_QTDESIGNER)
-#      include "../QtDesigner/QtDesignerMain.h"
-#    endif
-#    if defined(INCLUDE_QTUITOOLS)
-#      include "../QtUiTools/QtUiToolsMain.h"
-#    endif
-#    if defined(INCLUDE_QTCORE5COMPAT)
-#      include "../QtCore5Compat/QtCore5CompatMain.h"
-#    endif
-#  endif
+#if defined(HAVE_QTBINDINGS)
+#include "../QtCore/QtCoreMain.h"
+#include "../QtGui/QtGuiMain.h"
+#if defined(INCLUDE_QTNETWORK)
+#include "../QtNetwork/QtNetworkMain.h"
 #endif
-  
+#if defined(INCLUDE_QTWIDGETS)
+#include "../QtWidgets/QtWidgetsMain.h"
+#endif
+#if defined(INCLUDE_QTPRINTSUPPORT)
+#include "../QtPrintSupport/QtPrintSupportMain.h"
+#endif
+#if defined(INCLUDE_QTSVG)
+#include "../QtSvg/QtSvgMain.h"
+#endif
+#if defined(INCLUDE_QTXML)
+#include "../QtXml/QtXmlMain.h"
+#endif
+#if defined(INCLUDE_QTXMLPATTERNS)
+#include "../QtXmlPatterns/QtXmlPatternsMain.h"
+#endif
+#if defined(INCLUDE_QTSQL)
+#include "../QtSql/QtSqlMain.h"
+#endif
+#if defined(INCLUDE_QTDESIGNER)
+#include "../QtDesigner/QtDesignerMain.h"
+#endif
+#if defined(INCLUDE_QTUITOOLS)
+#include "../QtUiTools/QtUiToolsMain.h"
+#endif
+#if defined(INCLUDE_QTCORE5COMPAT)
+#include "../QtCore5Compat/QtCore5CompatMain.h"
+#endif
+#endif
+#endif
+
 #include "../../db/db/dbInit.h"
 
 static PyObject *pya_module_init (const char *pymod_name, const char *mod_name, const char *mod_description)
@@ -73,4 +73,4 @@ static PyObject *pya_module_init (const char *pymod_name, const char *mod_name, 
   return module_init (pymod_name, mod_name, mod_description);
 }
 
-DEFINE_PYMOD_WITH_INIT(pyacore, 0, "KLayout generic Python module (pya)", pya_module_init)
+DEFINE_PYMOD_WITH_INIT (pyacore, 0, "KLayout generic Python module (pya)", pya_module_init)

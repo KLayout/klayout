@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "edtMain.h"
-DEFINE_PYMOD(edtcore, "edt", "KLayout core module 'edt'")
+DEFINE_PYMOD (edtcore, "edt", "KLayout core module 'edt'")

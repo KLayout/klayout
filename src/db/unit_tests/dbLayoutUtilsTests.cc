@@ -40,7 +40,7 @@ unsigned int find_layer (const db::Layout &l, int ly, int dt)
   tl_assert (false);
 }
 
-TEST(1)
+TEST (1)
 {
   db::Layout l1;
   {
@@ -95,7 +95,7 @@ TEST(1)
 }
 
 //  Tests merge_layout with no specific mapping (plain duplication of the tree)
-TEST(2)
+TEST (2)
 {
   db::Layout l1;
   {
@@ -130,7 +130,7 @@ TEST(2)
   src.push_back (l1.cell_by_name ("TOP").second);
   db::merge_layouts (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table (), &fm);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2, tl::testdata () + "/algo/layout_utils_au2.gds");
 
   EXPECT_EQ (fm.find (l1.cell_by_name ("TOP").second) != fm.end (), true);
@@ -144,7 +144,7 @@ TEST(2)
 }
 
 //  Tests merge_layout with a single mapped cell (the others are mapped automatically)
-TEST(3)
+TEST (3)
 {
   db::Layout l1;
   {
@@ -180,7 +180,7 @@ TEST(3)
   cm.map (src.front (), l2.add_cell ("TOPTOP"));
   db::merge_layouts (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table (), &fm);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2, tl::testdata () + "/algo/layout_utils_au3.gds");
 
   EXPECT_EQ (fm.find (l1.cell_by_name ("TOP").second) != fm.end (), true);
@@ -194,7 +194,7 @@ TEST(3)
 }
 
 //  Tests merge_layout with a mapped tree (by name)
-TEST(4)
+TEST (4)
 {
   db::Layout l1;
   {
@@ -230,7 +230,7 @@ TEST(4)
   std::map<db::cell_index_type, db::cell_index_type> fm;
   db::merge_layouts (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table (), &fm);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2, tl::testdata () + "/algo/layout_utils_au4.gds");
 
   EXPECT_EQ (fm.find (l1.cell_by_name ("TOP").second) != fm.end (), true);
@@ -244,7 +244,7 @@ TEST(4)
 }
 
 //  Tests merge_layout with a equivalence-mapped tree
-TEST(5)
+TEST (5)
 {
   db::Layout l1;
   {
@@ -280,7 +280,7 @@ TEST(5)
   std::map<db::cell_index_type, db::cell_index_type> fm;
   db::merge_layouts (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table (), &fm);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2, tl::testdata () + "/algo/layout_utils_au5.gds");
 
   EXPECT_EQ (fm.find (l1.cell_by_name ("TOP").second) != fm.end (), true);
@@ -294,7 +294,7 @@ TEST(5)
 }
 
 //  Tests merge_layout with dropping of cell B
-TEST(6)
+TEST (6)
 {
   db::Layout l1;
   {
@@ -333,7 +333,7 @@ TEST(6)
   src.push_back (l1.cell_by_name ("TOP").second);
   db::merge_layouts (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table (), &fm);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2, tl::testdata () + "/algo/layout_utils_au6.gds");
 
   EXPECT_EQ (fm.find (l1.cell_by_name ("TOP").second) != fm.end (), true);
@@ -346,7 +346,7 @@ TEST(6)
 }
 
 //  Tests merge_layout with transformation
-TEST(7)
+TEST (7)
 {
   db::Layout l1;
   {
@@ -385,7 +385,7 @@ TEST(7)
   src.push_back (l1.cell_by_name ("TOP").second);
   db::merge_layouts (l2, l1, db::ICplxTrans (4.0), src, cm.table (), lm.table (), &fm);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2, tl::testdata () + "/algo/layout_utils_au7.gds");
 
   EXPECT_EQ (fm.find (l1.cell_by_name ("TOP").second) != fm.end (), true);
@@ -400,12 +400,12 @@ TEST(7)
   //  Once with final_mapping = 0 ...
   db::merge_layouts (l2copy, l1, db::ICplxTrans (4.0), src, cm.table (), lm.table ());
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2copy, tl::testdata () + "/algo/layout_utils_au7.gds");
 }
 
 //  Tests copy_shapes with no specific mapping (flattening)
-TEST(12)
+TEST (12)
 {
   db::Layout l1;
   {
@@ -441,12 +441,12 @@ TEST(12)
   cm.map (src.front (), l2.cell_by_name ("TOP").second);
   db::copy_shapes (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table ());
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2, tl::testdata () + "/algo/layout_utils_au12.gds");
 }
 
 //  Tests copy_shapes with full name mapping
-TEST(13)
+TEST (13)
 {
   db::Layout l1;
   {
@@ -481,12 +481,12 @@ TEST(13)
   cm.create_from_names_full (l2, l2.cell_by_name ("TOP").second, l1, src.front ());
   db::copy_shapes (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table ());
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2, tl::testdata () + "/algo/layout_utils_au13.gds");
 }
 
 //  Tests copy_shapes with geo mapping
-TEST(14)
+TEST (14)
 {
   db::Layout l1;
   {
@@ -521,12 +521,12 @@ TEST(14)
   cm.create_from_geometry_full (l2, l2.cell_by_name ("TOP").second, l1, src.front ());
   db::copy_shapes (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table ());
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2, tl::testdata () + "/algo/layout_utils_au14.gds");
 }
 
 //  Tests copy_shapes with flattening minus one cell
-TEST(15)
+TEST (15)
 {
   db::Layout l1;
   {
@@ -562,12 +562,12 @@ TEST(15)
   cm.map (l1.cell_by_name ("B").second, db::DropCell);
   db::copy_shapes (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table ());
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2, tl::testdata () + "/algo/layout_utils_au15.gds");
 }
 
 //  Tests copy_shapes/move_shapes with no specific mapping (flattening)
-TEST(16)
+TEST (16)
 {
   db::Layout l1;
   {
@@ -605,19 +605,18 @@ TEST(16)
   cm.map (src.front (), l2.cell_by_name ("TOP").second);
   db::copy_shapes (l2, l1, db::ICplxTrans (4.0), src, cm.table (), lm.table ());
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2, tl::testdata () + "/algo/layout_utils_au16.gds");
 
   //  ... and one test for move:
   db::move_shapes (l2copy, l1, db::ICplxTrans (4.0), src, cm.table (), lm.table ());
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l2copy, tl::testdata () + "/algo/layout_utils_au16.gds");
   db::compare_layouts (_this, l1, tl::testdata () + "/algo/layout_utils_au16b.gds");
-
 }
 
-TEST(17_scale_and_snap)
+TEST (17_scale_and_snap)
 {
   db::Layout l1;
   {
@@ -630,16 +629,16 @@ TEST(17_scale_and_snap)
 
   db::scale_and_snap (l1, l1.cell (*l1.begin_top_down ()), 1, 20, 19);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l1, tl::testdata () + "/algo/layout_utils_au_sns1.gds");
 
   db::scale_and_snap (l1, l1.cell (*l1.begin_top_down ()), 1, 19, 20);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l1, tl::testdata () + "/algo/layout_utils_au_sns2.gds");
 }
 
-TEST(18_scale_and_snap)
+TEST (18_scale_and_snap)
 {
   db::Layout l1;
   {
@@ -652,11 +651,11 @@ TEST(18_scale_and_snap)
 
   db::scale_and_snap (l1, l1.cell (*l1.begin_top_down ()), 19, 1, 1);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l1, tl::testdata () + "/algo/layout_utils_au_sns3.gds");
 }
 
-TEST(19_scale_and_snap_basic)
+TEST (19_scale_and_snap_basic)
 {
   db::Layout l1;
   db::Layout l2;
@@ -705,23 +704,21 @@ TEST(19_scale_and_snap_basic)
   top1.shapes (layer1).insert (db::PolygonWithProperties (db::Polygon (db::Box (11, 21, 31, 41)), pid1));
   top2.shapes (layer2).insert (db::PolygonWithProperties (db::Polygon (db::Box (10, 20, 30, 40)), pid2));
 
-  db::Point pts1[] = {
+  db::Point pts1 [] = {
     db::Point (1, 101),
     db::Point (101, 101),
-    db::Point (101, 201)
-  };
+    db::Point (101, 201)};
 
-  db::Point pts2[] = {
+  db::Point pts2 [] = {
     db::Point (0, 100),
     db::Point (100, 100),
-    db::Point (100, 200)
-  };
+    db::Point (100, 200)};
 
-  top1.shapes (layer1).insert (db::Path (&pts1 [0], &pts1 [sizeof (pts1) / sizeof(pts1 [0])], 20));
-  top2.shapes (layer2).insert (db::Path (&pts2 [0], &pts2 [sizeof (pts2) / sizeof(pts2 [0])], 20));
+  top1.shapes (layer1).insert (db::Path (&pts1 [0], &pts1 [sizeof (pts1) / sizeof (pts1 [0])], 20));
+  top2.shapes (layer2).insert (db::Path (&pts2 [0], &pts2 [sizeof (pts2) / sizeof (pts2 [0])], 20));
 
-  top1.shapes (layer1).insert (db::PathWithProperties (db::Path (&pts1 [0], &pts1 [sizeof (pts1) / sizeof(pts1 [0])], 20), pid1));
-  top2.shapes (layer2).insert (db::PathWithProperties (db::Path (&pts2 [0], &pts2 [sizeof (pts2) / sizeof(pts2 [0])], 20), pid2));
+  top1.shapes (layer1).insert (db::PathWithProperties (db::Path (&pts1 [0], &pts1 [sizeof (pts1) / sizeof (pts1 [0])], 20), pid1));
+  top2.shapes (layer2).insert (db::PathWithProperties (db::Path (&pts2 [0], &pts2 [sizeof (pts2) / sizeof (pts2 [0])], 20), pid2));
 
   top1.shapes (layer1).insert (db::Text ("t1", db::Trans (db::Vector (11, 21))));
   top2.shapes (layer2).insert (db::Text ("t1", db::Trans (db::Vector (10, 20))));
@@ -755,14 +752,11 @@ TEST(19_scale_and_snap_basic)
   db::scale_and_snap (l1, top1, 10, 1, 1);
 
   bool equal = db::compare_layouts (l1, l2,
-                                     db::layout_diff::f_verbose
-                                     | db::layout_diff::f_boxes_as_polygons
-                                     | db::layout_diff::f_paths_as_polygons
-                                   , 0, 100 /*max diff lines*/);
+                                    db::layout_diff::f_verbose | db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_paths_as_polygons, 0, 100 /*max diff lines*/);
   EXPECT_EQ (equal, true);
 }
 
-TEST(20_scale_and_snap)
+TEST (20_scale_and_snap)
 {
   db::Layout l1;
   {
@@ -775,12 +769,12 @@ TEST(20_scale_and_snap)
 
   db::scale_and_snap (l1, l1.cell (*l1.begin_top_down ()), 10, 95, 100);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l1, tl::testdata () + "/algo/layout_utils_au_sns4.oas", db::NormalizationMode (db::WriteOAS + db::WithArrays));
 }
 
 
-TEST(21_break1)
+TEST (21_break1)
 {
   db::Layout l1;
   {
@@ -793,11 +787,11 @@ TEST(21_break1)
 
   db::break_polygons (l1, 10, 3.0);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l1, tl::testdata () + "/algo/layout_utils_au_bp1.gds");
 }
 
-TEST(22_break2)
+TEST (22_break2)
 {
   db::Layout l1;
   {
@@ -814,7 +808,6 @@ TEST(22_break2)
   db::break_polygons (l1, li1, 10, 0.0);
   db::break_polygons (l1, li2, 0, 3.0);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, l1, tl::testdata () + "/algo/layout_utils_au_bp2.gds");
 }
-

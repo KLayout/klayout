@@ -40,11 +40,11 @@ namespace tl
  *    0: none
  *    10: basic
  *    11: basic timing
- *    20: detailed 
+ *    20: detailed
  *    21: detailed timing
  *    30: verbose
  *    31: verbose timing
- *    100+: very verbose 
+ *    100+: very verbose
  */
 TL_PUBLIC void verbosity (int level);
 
@@ -59,8 +59,7 @@ TL_PUBLIC int verbosity ();
  *  This class is supposed to issue a end-of-line.
  */
 
-struct TL_PUBLIC ChannelEndl 
-{
+struct TL_PUBLIC ChannelEndl {
   //  just a "tag"
 };
 
@@ -72,8 +71,7 @@ extern TL_PUBLIC ChannelEndl endl;
  *  This class is supposed to suppress the implicit end-of-line.
  */
 
-struct TL_PUBLIC ChannelNoendl 
-{
+struct TL_PUBLIC ChannelNoendl {
   //  just a "tag"
 };
 
@@ -85,7 +83,7 @@ class TL_PUBLIC ChannelProxy;
 /**
  *  @brief A basic channel
  *
- *  Channels are supposed to be derived by subclasses providing 
+ *  Channels are supposed to be derived by subclasses providing
  *  a special implementation for the channels.
  */
 
@@ -94,7 +92,7 @@ class TL_PUBLIC Channel
 {
 public:
   /**
-   *  @brief Construct a channel 
+   *  @brief Construct a channel
    */
   Channel ();
 
@@ -105,12 +103,12 @@ public:
 
   /**
    *  @brief Output "something"
-   *  
+   *
    *  A proxy object to the original channel is returned that does
    *  locking of the channel and reference counting such that the
    *  channel is freed again once it is no longer used.
    */
-  template <class T> 
+  template <class T>
   ChannelProxy operator<< (const T &t);
 
   /**
@@ -124,12 +122,12 @@ public:
    *  @brief A end-of-line output
    */
   ChannelProxy operator<< (ChannelEndl);
-  
+
   /**
    *  @brief Suppress the implicit end of line at the end
    */
   ChannelProxy operator<< (ChannelNoendl);
-  
+
 protected:
   //  this is the interface implemented by the subclasses
   virtual void puts (const char *s) = 0;
@@ -180,7 +178,7 @@ public:
   /**
    *  @brief Output "something"
    */
-  template <class T> 
+  template <class T>
   ChannelProxy &operator<< (const T &t)
   {
     mp_channel->puts (tl::to_string (t).c_str ());
@@ -204,7 +202,7 @@ public:
     mp_channel->endl ();
     return *this;
   }
-  
+
   /**
    *  @brief A end-of-line output
    */
@@ -213,9 +211,9 @@ public:
     mp_channel->noendl ();
     return *this;
   }
-  
+
 private:
-  Channel *mp_channel; 
+  Channel *mp_channel;
 
   //  copying only by the Channel class. This one knows what it does
   friend class Channel;
@@ -223,8 +221,8 @@ private:
   ChannelProxy (const ChannelProxy &);
 };
 
-template <class T> 
-inline ChannelProxy 
+template <class T>
+inline ChannelProxy
 Channel::operator<< (const T &t)
 {
   ChannelProxy p = issue_proxy ();
@@ -232,7 +230,7 @@ Channel::operator<< (const T &t)
   return p;
 }
 
-inline ChannelProxy 
+inline ChannelProxy
 Channel::operator<< (const char *s)
 {
   ChannelProxy p = issue_proxy ();
@@ -240,7 +238,7 @@ Channel::operator<< (const char *s)
   return p;
 }
 
-inline ChannelProxy 
+inline ChannelProxy
 Channel::operator<< (ChannelEndl)
 {
   ChannelProxy p = issue_proxy ();
@@ -275,7 +273,7 @@ private:
 };
 
 /// The static instance of the log channel
-/// The log channel is identical to the info channel but is silent depending on the verbosity and 
+/// The log channel is identical to the info channel but is silent depending on the verbosity and
 /// the output mode. It should be used for general notifications like the beginning of a operation.
 extern TL_PUBLIC LogTee log;
 
@@ -292,4 +290,3 @@ extern TL_PUBLIC LogTee error;
 } // namespace tl
 
 #endif
-

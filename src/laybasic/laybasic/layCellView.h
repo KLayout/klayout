@@ -38,7 +38,7 @@
 #include "dbTechnology.h"
 #include "gsi.h"
 
-namespace lay 
+namespace lay
 {
 
 /**
@@ -47,10 +47,10 @@ namespace lay
  *  A cell view reference points to a certain cell within a certain layout.
  *  The layout pointer can be 0, indicating that it is invalid.
  *  Also, the cell view describes a cell within that layout. The cell
- *  is addressed by an cell_index or a cell pointer. 
- *  The cell is not only identified by it's index or pointer but as well 
+ *  is addressed by an cell_index or a cell pointer.
+ *  The cell is not only identified by it's index or pointer but as well
  *  by the path leading to that cell. This path describes how to find the
- *  cell in the context of parent cells. 
+ *  cell in the context of parent cells.
  *  The path is in fact composed in twofold: once in an unspecific fashion,
  *  just describing which parent cells are used. The target of this path
  *  is called the context cell. It is accessible by the ctx_cell_index
@@ -69,8 +69,8 @@ class LAYBASIC_PUBLIC CellView
 {
 public:
   typedef db::cell_index_type cell_index_type;
-  typedef std::vector <cell_index_type> unspecific_cell_path_type;
-  typedef std::vector <db::InstElement> specific_cell_path_type;
+  typedef std::vector<cell_index_type> unspecific_cell_path_type;
+  typedef std::vector<db::InstElement> specific_cell_path_type;
 
   /**
    *  @brief Constructor: create an invalid cellview
@@ -87,7 +87,7 @@ public:
    */
   bool operator!= (const CellView &cv) const
   {
-    return !operator== (cv);
+    return ! operator== (cv);
   }
 
   /**
@@ -98,7 +98,7 @@ public:
   /**
    *  @brief Return the layout handle
    */
-  lay::LayoutHandle *operator-> () const
+  lay::LayoutHandle *operator->() const
   {
     return m_layout_href.get ();
   }
@@ -122,7 +122,7 @@ public:
   /**
    *  @brief Set the context part of the path explicitly
    *
-   *  This method assumes that the unspecific part of the path 
+   *  This method assumes that the unspecific part of the path
    *  is established already and that the context part starts
    *  from the context cell.
    */
@@ -131,7 +131,7 @@ public:
   /**
    *  @brief Set the path to the given cell
    *
-   *  This method will construct any path to this cell, not a 
+   *  This method will construct any path to this cell, not a
    *  particular one. It will clear the context part of the path
    *  and update the context and target cell.
    */
@@ -142,14 +142,14 @@ public:
    *
    *  If the name is not a valid one, the cellview will become
    *  invalid.
-   *  This method will construct any path to this cell, not a 
+   *  This method will construct any path to this cell, not a
    *  particular one. It will clear the context part of the path
    *  and update the context and target cell.
    */
   void set_cell (const std::string &name);
 
   /**
-   *  @brief Reset the cell 
+   *  @brief Reset the cell
    *
    *  The cellview will become invalid. The layout object will
    *  still be attached to the cellview.
@@ -232,7 +232,7 @@ public:
    *
    *  This method performs a deep copy on the cellview.
    *  A layout must be set already. Rather the creating another reference to the layout
-   *  (which is done on operator= for example), this method copies the content of the 
+   *  (which is done on operator= for example), this method copies the content of the
    *  source layout to the current one and transfers cell path and other parameters.
    *
    *  @param manager The database object manager that the new layout is put under
@@ -297,7 +297,7 @@ public:
    */
   bool operator!= (const CellView &cv) const
   {
-    return !operator== (cv);
+    return ! operator== (cv);
   }
 
   /**
@@ -313,7 +313,7 @@ public:
    */
   bool operator!= (const CellViewRef &cv) const
   {
-    return !operator== (cv);
+    return ! operator== (cv);
   }
 
   /**
@@ -324,14 +324,14 @@ public:
   /**
    *  @brief Returns the layout handle
    */
-  lay::LayoutHandle *operator-> () const;
+  lay::LayoutHandle *operator->() const;
 
   /**
    *  @brief Return the layout handle (not via operator->)
    */
   lay::LayoutHandle *handle () const
   {
-    return operator-> ();
+    return operator->();
   }
 
   /**
@@ -438,7 +438,7 @@ public:
   /**
    *  @brief Retrive the accumulated transformation induced by the context part of the path in micron units
    */
-  db::DCplxTrans context_dtrans() const;
+  db::DCplxTrans context_dtrans () const;
 
 private:
   tl::weak_ptr<lay::CellView> mp_cv;
@@ -448,4 +448,3 @@ private:
 }
 
 #endif
-

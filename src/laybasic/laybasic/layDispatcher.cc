@@ -78,8 +78,7 @@ void Dispatcher::make_menu ()
   mp_menu.reset (new lay::AbstractMenu (this));
 }
 
-bool
-Dispatcher::configure (const std::string &name, const std::string &value)
+bool Dispatcher::configure (const std::string &name, const std::string &value)
 {
   if (mp_menu) {
     std::vector<lay::ConfigureAction *> ca = mp_menu->configure_actions (name);
@@ -95,16 +94,14 @@ Dispatcher::configure (const std::string &name, const std::string &value)
   }
 }
 
-void
-Dispatcher::config_finalize ()
+void Dispatcher::config_finalize ()
 {
   if (mp_delegate) {
     return mp_delegate->config_finalize ();
   }
 }
 
-void
-Dispatcher::function (const std::string &symbol, const std::string &args)
+void Dispatcher::function (const std::string &symbol, const std::string &args)
 {
   if (mp_delegate) {
     mp_delegate->function (symbol, args);
@@ -114,15 +111,14 @@ Dispatcher::function (const std::string &symbol, const std::string &args)
 
 //  Writing and Reading of configuration
 
-struct ConfigGetAdaptor
-{
+struct ConfigGetAdaptor {
   ConfigGetAdaptor (const std::string &name)
     : mp_owner (0), m_done (false), m_name (name)
   {
     // .. nothing yet ..
   }
 
-  std::string operator () () const
+  std::string operator() () const
   {
     std::string s;
     mp_owner->config_get (m_name, s);
@@ -151,14 +147,13 @@ private:
   std::string m_name;
 };
 
-struct ConfigGetNullAdaptor
-{
+struct ConfigGetNullAdaptor {
   ConfigGetNullAdaptor ()
   {
     // .. nothing yet ..
   }
 
-  std::string operator () () const
+  std::string operator() () const
   {
     return std::string ();
   }
@@ -168,33 +163,31 @@ struct ConfigGetNullAdaptor
     return true;
   }
 
-  void start (const lay::Dispatcher & /*owner*/) { }
-  void next () { }
+  void start (const lay::Dispatcher & /*owner*/) {}
+  void next () {}
 };
 
-struct ConfigNamedSetAdaptor
-{
+struct ConfigNamedSetAdaptor {
   ConfigNamedSetAdaptor ()
   {
     // .. nothing yet ..
   }
 
-  void operator () (lay::Dispatcher &w, tl::XMLReaderState &reader, const std::string &name) const
+  void operator() (lay::Dispatcher &w, tl::XMLReaderState &reader, const std::string &name) const
   {
     tl::XMLObjTag<std::string> tag;
     w.config_set (name, *reader.back (tag));
   }
 };
 
-struct ConfigSetAdaptor
-{
+struct ConfigSetAdaptor {
   ConfigSetAdaptor (const std::string &name)
     : m_name (name)
   {
     // .. nothing yet ..
   }
 
-  void operator () (lay::Dispatcher &w, tl::XMLReaderState &reader) const
+  void operator() (lay::Dispatcher &w, tl::XMLReaderState &reader) const
   {
     tl::XMLObjTag<std::string> tag;
     w.config_set (m_name, *reader.back (tag));
@@ -211,13 +204,13 @@ config_structure (const lay::Dispatcher *plugin)
   tl::XMLElementList body;
   std::string n_with_underscores;
 
-  std::vector <std::string> names;
+  std::vector<std::string> names;
   plugin->get_config_names (names);
 
-  for (std::vector <std::string>::const_iterator n = names.begin (); n != names.end (); ++n) {
+  for (std::vector<std::string>::const_iterator n = names.begin (); n != names.end (); ++n) {
 
-    body.append (tl::XMLMember<std::string, lay::Dispatcher, ConfigGetAdaptor, ConfigSetAdaptor, tl::XMLStdConverter <std::string> > (
-                       ConfigGetAdaptor (*n), ConfigSetAdaptor (*n), *n));
+    body.append (tl::XMLMember<std::string, lay::Dispatcher, ConfigGetAdaptor, ConfigSetAdaptor, tl::XMLStdConverter<std::string>> (
+      ConfigGetAdaptor (*n), ConfigSetAdaptor (*n), *n));
 
     //  for compatibility, provide an alternative with underscores (i.e. 0.20->0.21 because of default_grids)
     n_with_underscores.clear ();
@@ -225,20 +218,18 @@ config_structure (const lay::Dispatcher *plugin)
       n_with_underscores += (*c == '-' ? '_' : *c);
     }
 
-    body.append (tl::XMLMember<std::string, lay::Dispatcher, ConfigGetNullAdaptor, ConfigSetAdaptor, tl::XMLStdConverter <std::string> > (
-                       ConfigGetNullAdaptor (), ConfigSetAdaptor (*n), n_with_underscores));
-
+    body.append (tl::XMLMember<std::string, lay::Dispatcher, ConfigGetNullAdaptor, ConfigSetAdaptor, tl::XMLStdConverter<std::string>> (
+      ConfigGetNullAdaptor (), ConfigSetAdaptor (*n), n_with_underscores));
   }
 
   //  add a wildcard member to read all others unspecifically into the repository
-  body.append (tl::XMLWildcardMember<std::string, lay::Dispatcher, ConfigNamedSetAdaptor, tl::XMLStdConverter <std::string> > (ConfigNamedSetAdaptor ()));
+  body.append (tl::XMLWildcardMember<std::string, lay::Dispatcher, ConfigNamedSetAdaptor, tl::XMLStdConverter<std::string>> (ConfigNamedSetAdaptor ()));
 
   return tl::XMLStruct<lay::Dispatcher> ("config", body);
 }
 
 
-bool
-Dispatcher::write_config (const std::string &config_file, int keep_backups)
+bool Dispatcher::write_config (const std::string &config_file, int keep_backups)
 {
   try {
     tl::OutputStream os (config_file, tl::OutputStream::OM_Plain, true, keep_backups);
@@ -249,8 +240,7 @@ Dispatcher::write_config (const std::string &config_file, int keep_backups)
   }
 }
 
-bool
-Dispatcher::read_config (const std::string &config_file)
+bool Dispatcher::read_config (const std::string &config_file)
 {
   std::unique_ptr<tl::XMLFileSource> file;
 

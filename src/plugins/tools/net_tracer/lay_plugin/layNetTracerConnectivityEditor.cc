@@ -62,14 +62,14 @@ public:
     //  .. nothing yet ..
   }
 
-  QWidget *createEditor (QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const 
+  QWidget *createEditor (QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const
   {
     return new QLineEdit (parent);
   }
 
-  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
+  void updateEditorGeometry (QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
   {
-    editor->setGeometry(option.rect);
+    editor->setGeometry (option.rect);
   }
 
   void setEditorData (QWidget *widget, const QModelIndex &index) const
@@ -77,7 +77,7 @@ public:
     QLineEdit *editor = dynamic_cast<QLineEdit *> (widget);
     if (editor) {
       int n = index.model ()->data (index, Qt::UserRole).toInt ();
-      if (mp_data->size () > size_t (n)) { 
+      if (mp_data->size () > size_t (n)) {
         if (index.column () == 0) {
           editor->setText (tl::to_qstring (mp_data->begin () [n].layer_a ().to_string ()));
         } else if (index.column () == 1) {
@@ -95,7 +95,7 @@ public:
     if (editor) {
 
       int n = model->data (index, Qt::UserRole).toInt ();
-      if (mp_data->size () > size_t (n)) { 
+      if (mp_data->size () > size_t (n)) {
 
         db::NetTracerLayerExpressionInfo expr;
 
@@ -133,13 +133,11 @@ public:
         } else if (index.column () == 2) {
           mp_data->begin () [n].set_layer_b (expr);
         }
-
       }
-
     }
   }
 
-  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const 
+  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const
   {
     QWidget *editor = createEditor (0, option, index);
     QSize size = editor->sizeHint ();
@@ -164,14 +162,14 @@ public:
     //  .. nothing yet ..
   }
 
-  QWidget *createEditor (QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const 
+  QWidget *createEditor (QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const
   {
     return new QLineEdit (parent);
   }
 
-  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
+  void updateEditorGeometry (QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
   {
-    editor->setGeometry(option.rect);
+    editor->setGeometry (option.rect);
   }
 
   void setEditorData (QWidget *widget, const QModelIndex &index) const
@@ -179,7 +177,7 @@ public:
     QLineEdit *editor = dynamic_cast<QLineEdit *> (widget);
     if (editor) {
       int n = index.model ()->data (index, Qt::UserRole).toInt ();
-      if (mp_data->symbols () > size_t (n)) { 
+      if (mp_data->symbols () > size_t (n)) {
         if (index.column () == 0) {
           editor->setText (tl::to_qstring (mp_data->begin_symbols () [n].symbol ().to_string ()));
         } else if (index.column () == 1) {
@@ -195,7 +193,7 @@ public:
     if (editor) {
 
       int n = model->data (index, Qt::UserRole).toInt ();
-      if (mp_data->symbols () > size_t (n)) { 
+      if (mp_data->symbols () > size_t (n)) {
 
         std::string text = tl::to_string (editor->text ());
 
@@ -236,7 +234,6 @@ public:
           model->setData (index, QVariant (tl::to_qstring (text)), Qt::DisplayRole);
           model->setData (index, QVariant (), Qt::ForegroundRole);
           model->setData (index, QVariant (), Qt::BackgroundRole);
-
         }
 
         if (index.column () == 0) {
@@ -247,13 +244,11 @@ public:
         } else if (index.column () == 1) {
           mp_data->begin_symbols () [n].set_expression (text);
         }
-
       }
-
     }
   }
 
-  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const 
+  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const
   {
     QWidget *editor = createEditor (0, option, index);
     QSize size = editor->sizeHint ();
@@ -293,8 +288,7 @@ NetTracerConnectivityEditor::NetTracerConnectivityEditor (QWidget *parent)
   symbol_table->verticalHeader ()->hide ();
 }
 
-void
-NetTracerConnectivityEditor::get_connectivity (db::NetTracerConnectivity &data)
+void NetTracerConnectivityEditor::get_connectivity (db::NetTracerConnectivity &data)
 {
   std::string name = data.name ();
   std::string description = data.description ();
@@ -303,8 +297,7 @@ NetTracerConnectivityEditor::get_connectivity (db::NetTracerConnectivity &data)
   data.set_description (description);
 }
 
-void 
-NetTracerConnectivityEditor::set_connectivity (const db::NetTracerConnectivity &data)
+void NetTracerConnectivityEditor::set_connectivity (const db::NetTracerConnectivity &data)
 {
   m_data = data;
 
@@ -325,11 +318,10 @@ NetTracerConnectivityEditor::set_connectivity (const db::NetTracerConnectivity &
   update ();
 }
 
-void 
-NetTracerConnectivityEditor::add_clicked ()
+void NetTracerConnectivityEditor::add_clicked ()
 {
   //  removes focus from the tree view - commits the data
-  add_conductor_pb->setFocus (); 
+  add_conductor_pb->setFocus ();
 
   int row = connectivity_table->currentItem () ? connectivity_table->row (connectivity_table->currentItem ()) : -1;
   if (row < 0) {
@@ -344,11 +336,10 @@ NetTracerConnectivityEditor::add_clicked ()
   connectivity_table->setCurrentItem (connectivity_table->item (row, 0));
 }
 
-void 
-NetTracerConnectivityEditor::del_clicked ()
+void NetTracerConnectivityEditor::del_clicked ()
 {
   //  removes focus from the tree view - commits the data
-  del_conductor_pb->setFocus (); 
+  del_conductor_pb->setFocus ();
 
   std::set<int> selected_rows;
   QModelIndexList selected_indices = connectivity_table->selectionModel ()->selectedIndexes ();
@@ -367,11 +358,10 @@ NetTracerConnectivityEditor::del_clicked ()
   update ();
 }
 
-void 
-NetTracerConnectivityEditor::move_up_clicked ()
+void NetTracerConnectivityEditor::move_up_clicked ()
 {
   //  removes focus from the tree view - commits the data
-  move_conductor_up_pb->setFocus (); 
+  move_conductor_up_pb->setFocus ();
 
   std::set<int> selected_rows;
   QModelIndexList selected_indices = connectivity_table->selectionModel ()->selectedIndexes ();
@@ -399,7 +389,7 @@ NetTracerConnectivityEditor::move_up_clicked ()
   update ();
 
   // select the new items
-  for (std::set <int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
+  for (std::set<int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
     connectivity_table->selectionModel ()->select (connectivity_table->model ()->index (*s, 0), QItemSelectionModel::Select | QItemSelectionModel::Rows);
   }
 
@@ -408,11 +398,10 @@ NetTracerConnectivityEditor::move_up_clicked ()
   }
 }
 
-void 
-NetTracerConnectivityEditor::move_down_clicked ()
+void NetTracerConnectivityEditor::move_down_clicked ()
 {
   //  removes focus from the tree view - commits the data
-  move_conductor_down_pb->setFocus (); 
+  move_conductor_down_pb->setFocus ();
 
   std::set<int> selected_rows;
   QModelIndexList selected_indices = connectivity_table->selectionModel ()->selectedIndexes ();
@@ -426,7 +415,7 @@ NetTracerConnectivityEditor::move_down_clicked ()
   connectivity_table->setCurrentIndex (QModelIndex ());
 
   int n = int (m_data.size ());
-  for (db::NetTracerConnectivity::iterator l = m_data.end (); l != m_data.begin (); ) {
+  for (db::NetTracerConnectivity::iterator l = m_data.end (); l != m_data.begin ();) {
     --l;
     --n;
     if (selected_rows.find (n - 1) != selected_rows.end () && selected_rows.find (n) == selected_rows.end ()) {
@@ -442,7 +431,7 @@ NetTracerConnectivityEditor::move_down_clicked ()
   update ();
 
   // select the new items
-  for (std::set <int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
+  for (std::set<int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
     connectivity_table->selectionModel ()->select (connectivity_table->model ()->index (*s, 0), QItemSelectionModel::Select | QItemSelectionModel::Rows);
   }
 
@@ -451,11 +440,10 @@ NetTracerConnectivityEditor::move_down_clicked ()
   }
 }
 
-void 
-NetTracerConnectivityEditor::symbol_add_clicked ()
+void NetTracerConnectivityEditor::symbol_add_clicked ()
 {
   //  removes focus from the tree view - commits the data
-  add_symbol_pb->setFocus (); 
+  add_symbol_pb->setFocus ();
 
   int row = symbol_table->currentItem () ? symbol_table->row (symbol_table->currentItem ()) : -1;
   if (row < 0) {
@@ -470,11 +458,10 @@ NetTracerConnectivityEditor::symbol_add_clicked ()
   symbol_table->setCurrentItem (symbol_table->item (row, 0));
 }
 
-void 
-NetTracerConnectivityEditor::symbol_del_clicked ()
+void NetTracerConnectivityEditor::symbol_del_clicked ()
 {
   //  removes focus from the tree view - commits the data
-  del_symbol_pb->setFocus (); 
+  del_symbol_pb->setFocus ();
 
   std::set<int> selected_rows;
   QModelIndexList selected_indices = symbol_table->selectionModel ()->selectedIndexes ();
@@ -493,11 +480,10 @@ NetTracerConnectivityEditor::symbol_del_clicked ()
   update ();
 }
 
-void 
-NetTracerConnectivityEditor::symbol_move_up_clicked ()
+void NetTracerConnectivityEditor::symbol_move_up_clicked ()
 {
   //  removes focus from the tree view - commits the data
-  move_symbol_up_pb->setFocus (); 
+  move_symbol_up_pb->setFocus ();
 
   std::set<int> selected_rows;
   QModelIndexList selected_indices = symbol_table->selectionModel ()->selectedIndexes ();
@@ -525,7 +511,7 @@ NetTracerConnectivityEditor::symbol_move_up_clicked ()
   update ();
 
   // select the new items
-  for (std::set <int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
+  for (std::set<int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
     symbol_table->selectionModel ()->select (symbol_table->model ()->index (*s, 0), QItemSelectionModel::Select | QItemSelectionModel::Rows);
   }
 
@@ -534,11 +520,10 @@ NetTracerConnectivityEditor::symbol_move_up_clicked ()
   }
 }
 
-void 
-NetTracerConnectivityEditor::symbol_move_down_clicked ()
+void NetTracerConnectivityEditor::symbol_move_down_clicked ()
 {
   //  removes focus from the tree view - commits the data
-  move_symbol_down_pb->setFocus (); 
+  move_symbol_down_pb->setFocus ();
 
   std::set<int> selected_rows;
   QModelIndexList selected_indices = symbol_table->selectionModel ()->selectedIndexes ();
@@ -552,7 +537,7 @@ NetTracerConnectivityEditor::symbol_move_down_clicked ()
   symbol_table->setCurrentIndex (QModelIndex ());
 
   int n = int (m_data.symbols ());
-  for (db::NetTracerConnectivity::symbol_iterator l = m_data.end_symbols (); l != m_data.begin_symbols (); ) {
+  for (db::NetTracerConnectivity::symbol_iterator l = m_data.end_symbols (); l != m_data.begin_symbols ();) {
     --l;
     --n;
     if (selected_rows.find (n - 1) != selected_rows.end () && selected_rows.find (n) == selected_rows.end ()) {
@@ -568,7 +553,7 @@ NetTracerConnectivityEditor::symbol_move_down_clicked ()
   update ();
 
   // select the new items
-  for (std::set <int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
+  for (std::set<int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
     symbol_table->selectionModel ()->select (symbol_table->model ()->index (*s, 0), QItemSelectionModel::Select | QItemSelectionModel::Rows);
   }
 
@@ -577,8 +562,7 @@ NetTracerConnectivityEditor::symbol_move_down_clicked ()
   }
 }
 
-void
-NetTracerConnectivityEditor::update ()
+void NetTracerConnectivityEditor::update ()
 {
   QStringList labels;
   int n;
@@ -629,9 +613,7 @@ NetTracerConnectivityEditor::update ()
       }
 
       item->setData (Qt::UserRole, QVariant (n));
-
     }
-
   }
 
   connectivity_table->clearSelection ();
@@ -691,19 +673,14 @@ NetTracerConnectivityEditor::update ()
           }
 
           item->setData (Qt::DisplayRole, QVariant (tl::to_qstring (l->expression ())));
-
         }
-
       }
 
       item->setData (Qt::UserRole, QVariant (n));
-
     }
-
   }
 
   symbol_table->clearSelection ();
 }
 
 }
-

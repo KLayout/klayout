@@ -41,8 +41,7 @@ ArrayRepository::~ArrayRepository ()
   clear ();
 }
 
-void
-ArrayRepository::clear ()
+void ArrayRepository::clear ()
 {
   for (repositories::iterator r = m_reps.begin (); r != m_reps.end (); ++r) {
     for (basic_repository::iterator rr = r->begin (); rr != r->end (); ++rr) {
@@ -66,8 +65,7 @@ ArrayRepository::operator= (const ArrayRepository &d)
   return *this;
 }
 
-void
-ArrayRepository::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+void ArrayRepository::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
   db::mem_stat (stat, purpose, cat, m_reps, no_self, parent);
   for (repositories::const_iterator r = m_reps.begin (); r != m_reps.end (); ++r) {
@@ -78,4 +76,3 @@ ArrayRepository::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose
 }
 
 }
-

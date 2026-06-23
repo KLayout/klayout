@@ -37,9 +37,9 @@ namespace tl
 class StaticObjectReferenceBase
 {
 public:
-  virtual ~StaticObjectReferenceBase () { };
+  virtual ~StaticObjectReferenceBase () {};
 
-  virtual void clear() = 0;
+  virtual void clear () = 0;
 };
 
 /**
@@ -60,7 +60,7 @@ public:
     clear ();
   }
 
-  void clear()
+  void clear ()
   {
     if (mp_x) {
       delete *mp_x;
@@ -78,18 +78,17 @@ private:
  *
  *  The basic purpose of this facility is to provide a way to clean up those
  *  objects without having to rely on some destructors being called from the
- *  exit handler. It registers locations where objects are stored and will 
+ *  exit handler. It registers locations where objects are stored and will
  *  release the stored objects and reset their pointer to 0.
  */
-struct TL_PUBLIC StaticObjects
-{
+struct TL_PUBLIC StaticObjects {
   /**
    *  @brief Destructor
    */
   ~StaticObjects ();
 
   /**
-   *  @brief Register a static object 
+   *  @brief Register a static object
    *
    *  After registration, the object behind the location is automatically deleted on the static destructor.
    */
@@ -121,4 +120,3 @@ protected:
 }
 
 #endif
-

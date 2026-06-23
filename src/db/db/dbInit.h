@@ -36,14 +36,14 @@ namespace db
 /**
  *  @brief A tiny structure describing a db plugin
  */
-struct PluginDescriptor
-{
+struct PluginDescriptor {
   std::string version;
   std::string path;
   std::string description;
 
   PluginDescriptor ()
-  { }
+  {
+  }
 };
 
 /**

@@ -202,7 +202,6 @@ string_to_pixels (img::Object *img, const std::string &s, size_t row, size_t w, 
       ++i;
 
       ex.test (",");
-
     }
 
     if (color) {
@@ -216,9 +215,7 @@ string_to_pixels (img::Object *img, const std::string &s, size_t row, size_t w, 
     }
 
     ++column;
-
   }
-
 }
 
 img::Object *
@@ -243,7 +240,6 @@ ImageProxy::get_image () const
     for (size_t i = 0; i < m_height && s != m_data.end (); ++i) {
       string_to_pixels<float, unsigned char> (img.get (), *s++, i, m_width, m_color);
     }
-
   }
 
   return img.release ();
@@ -290,10 +286,9 @@ static const std::string &data_to_string (std::string &heap, size_t l, const T1 
   return heap;
 }
 
-void
-ImageProxy::init ()
+void ImageProxy::init ()
 {
-  if (!mp_img) {
+  if (! mp_img) {
     return;
   }
 
@@ -325,7 +320,6 @@ ImageProxy::init ()
       for (size_t i = 0; i < h; ++i) {
         m_data.push_back (data_to_string (s, w, r + i * w, g + i * w, b + i * w, m ? (m + i * w) : 0));
       }
-
     }
 
   } else {
@@ -347,101 +341,94 @@ ImageProxy::init ()
       for (size_t i = 0; i < h; ++i) {
         m_data.push_back (data_to_string (s, w, g + i * w, (const float *) 0, (const float *) 0, m ? (m + i * w) : 0));
       }
-
     }
-
   }
 }
 
 // --------------------------------------------------------------------------------------------------------------------------
 
-namespace {
+namespace
+{
 
-  struct PointConverter
+struct PointConverter {
+  std::string to_string (const db::DPoint &p) const
   {
-    std::string to_string (const db::DPoint &p) const
-    {
-      return p.to_string ();
-    }
+    return p.to_string ();
+  }
 
-    void from_string (const std::string &s, db::DPoint &p) const
-    {
-      tl::Extractor ex (s.c_str ());
-      ex.read (p);
-    }
-  };
-
-  struct ColorMapConverter
+  void from_string (const std::string &s, db::DPoint &p) const
   {
-    std::string to_string (const std::pair<double, std::pair<tl::Color, tl::Color> > &cm) const
-    {
-      std::string s;
-      s = tl::to_string (cm.first);
-      s += ":";
+    tl::Extractor ex (s.c_str ());
+    ex.read (p);
+  }
+};
 
-      lay::ColorConverter cc;
-      s += tl::to_word_or_quoted_string (cc.to_string (cm.second.first));
-      if (cm.second.first != cm.second.second) {
-        s += ",";
-        s += tl::to_word_or_quoted_string (cc.to_string (cm.second.second));
-      }
+struct ColorMapConverter {
+  std::string to_string (const std::pair<double, std::pair<tl::Color, tl::Color>> &cm) const
+  {
+    std::string s;
+    s = tl::to_string (cm.first);
+    s += ":";
 
-      return s;
+    lay::ColorConverter cc;
+    s += tl::to_word_or_quoted_string (cc.to_string (cm.second.first));
+    if (cm.second.first != cm.second.second) {
+      s += ",";
+      s += tl::to_word_or_quoted_string (cc.to_string (cm.second.second));
     }
 
-    void from_string (const std::string &s, std::pair<double, std::pair<tl::Color, tl::Color> > &cm) const
-    {
-      tl::Extractor ex (s.c_str ());
+    return s;
+  }
 
-      ex.read (cm.first);
-      ex.test (":");
+  void from_string (const std::string &s, std::pair<double, std::pair<tl::Color, tl::Color>> &cm) const
+  {
+    tl::Extractor ex (s.c_str ());
 
-      lay::ColorConverter cc;
+    ex.read (cm.first);
+    ex.test (":");
 
-      std::string w;
+    lay::ColorConverter cc;
+
+    std::string w;
+    ex.read_word_or_quoted (w);
+
+    cc.from_string (w, cm.second.first);
+
+    if (ex.test (",")) {
+
+      w.clear ();
       ex.read_word_or_quoted (w);
 
-      cc.from_string (w, cm.second.first);
+      cc.from_string (w, cm.second.second);
 
-      if (ex.test (",")) {
-
-        w.clear ();
-        ex.read_word_or_quoted (w);
-
-        cc.from_string (w, cm.second.second);
-
-      } else {
-        cm.second.second = cm.second.first;
-      }
+    } else {
+      cm.second.second = cm.second.first;
     }
-  };
+  }
+};
 
 }
 
 tl::XMLStruct<ImageProxy> s_img_structure ("image-data",
-  tl::make_member (&ImageProxy::is_color, &ImageProxy::set_color, "color") +
-  tl::make_member (&ImageProxy::width, &ImageProxy::set_width, "width") +
-  tl::make_member (&ImageProxy::height, &ImageProxy::set_height, "height") +
-  tl::make_member (&ImageProxy::matrix, &ImageProxy::set_matrix, "matrix") +
-  tl::make_member (&ImageProxy::min_value, &ImageProxy::set_min_value, "min-value") +
-  tl::make_member (&ImageProxy::max_value, &ImageProxy::set_max_value, "max-value") +
-  tl::make_element (&ImageProxy::data_mapping, &ImageProxy::set_data_mapping, "data-mapping",
-    tl::make_element (&img::DataMapping::false_color_nodes, "color-map",
-      tl::make_member<std::pair<double, std::pair<tl::Color, tl::Color> >, img::DataMapping::false_color_nodes_type::const_iterator, img::DataMapping::false_color_nodes_type, ColorMapConverter> (&img::DataMapping::false_color_nodes_type::begin, &img::DataMapping::false_color_nodes_type::end, &img::DataMapping::false_color_nodes_type::push_back, "color-map-entry", ColorMapConverter ())
-    ) +
-    tl::make_member (&img::DataMapping::brightness, "brightness") +
-    tl::make_member (&img::DataMapping::contrast, "contrast") +
-    tl::make_member (&img::DataMapping::gamma, "gamma") +
-    tl::make_member (&img::DataMapping::red_gain, "red-gain") +
-    tl::make_member (&img::DataMapping::green_gain, "green-gain") +
-    tl::make_member (&img::DataMapping::blue_gain, "blue-gain")
-  ) +
-  tl::make_element (&ImageProxy::landmarks, &ImageProxy::set_landmarks, "landmarks",
-    tl::make_member<db::DPoint, img::Object::landmarks_type::const_iterator, img::Object::landmarks_type, PointConverter> (&img::Object::landmarks_type::begin, &img::Object::landmarks_type::end, &img::Object::landmarks_type::push_back, "landmark", PointConverter ())
-  ) +
-  tl::make_member (&ImageProxy::begin_byte_data, &ImageProxy::end_byte_data, &ImageProxy::push_byte_data, "byte-data") +
-  tl::make_member (&ImageProxy::begin_data, &ImageProxy::end_data, &ImageProxy::push_data, "data")
-);
+                                           tl::make_member (&ImageProxy::is_color, &ImageProxy::set_color, "color") +
+                                             tl::make_member (&ImageProxy::width, &ImageProxy::set_width, "width") +
+                                             tl::make_member (&ImageProxy::height, &ImageProxy::set_height, "height") +
+                                             tl::make_member (&ImageProxy::matrix, &ImageProxy::set_matrix, "matrix") +
+                                             tl::make_member (&ImageProxy::min_value, &ImageProxy::set_min_value, "min-value") +
+                                             tl::make_member (&ImageProxy::max_value, &ImageProxy::set_max_value, "max-value") +
+                                             tl::make_element (&ImageProxy::data_mapping, &ImageProxy::set_data_mapping, "data-mapping",
+                                                               tl::make_element (&img::DataMapping::false_color_nodes, "color-map",
+                                                                                 tl::make_member<std::pair<double, std::pair<tl::Color, tl::Color>>, img::DataMapping::false_color_nodes_type::const_iterator, img::DataMapping::false_color_nodes_type, ColorMapConverter> (&img::DataMapping::false_color_nodes_type::begin, &img::DataMapping::false_color_nodes_type::end, &img::DataMapping::false_color_nodes_type::push_back, "color-map-entry", ColorMapConverter ())) +
+                                                                 tl::make_member (&img::DataMapping::brightness, "brightness") +
+                                                                 tl::make_member (&img::DataMapping::contrast, "contrast") +
+                                                                 tl::make_member (&img::DataMapping::gamma, "gamma") +
+                                                                 tl::make_member (&img::DataMapping::red_gain, "red-gain") +
+                                                                 tl::make_member (&img::DataMapping::green_gain, "green-gain") +
+                                                                 tl::make_member (&img::DataMapping::blue_gain, "blue-gain")) +
+                                             tl::make_element (&ImageProxy::landmarks, &ImageProxy::set_landmarks, "landmarks",
+                                                               tl::make_member<db::DPoint, img::Object::landmarks_type::const_iterator, img::Object::landmarks_type, PointConverter> (&img::Object::landmarks_type::begin, &img::Object::landmarks_type::end, &img::Object::landmarks_type::push_back, "landmark", PointConverter ())) +
+                                             tl::make_member (&ImageProxy::begin_byte_data, &ImageProxy::end_byte_data, &ImageProxy::push_byte_data, "byte-data") +
+                                             tl::make_member (&ImageProxy::begin_data, &ImageProxy::end_data, &ImageProxy::push_data, "data"));
 
 // --------------------------------------------------------------------------------------------------------------------------
 
@@ -457,8 +444,7 @@ ImageStreamer::read (tl::InputStream &stream)
   return proxy.get_image ();
 }
 
-void
-ImageStreamer::write (tl::OutputStream &stream, const img::Object &img)
+void ImageStreamer::write (tl::OutputStream &stream, const img::Object &img)
 {
   ImageProxy proxy (&img);
 
@@ -467,4 +453,3 @@ ImageStreamer::write (tl::OutputStream &stream, const img::Object &img)
 }
 
 } // namespace img
-

@@ -37,7 +37,7 @@ class PolygonService
 {
 public:
   PolygonService (db::Manager *manager, lay::LayoutViewBase *view);
-  
+
 #if defined(HAVE_QT)
   virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
 #endif
@@ -52,7 +52,7 @@ public:
   virtual void function (const std::string &name, const std::string &value);
 
 private:
-  std::vector <db::DPoint> m_points;
+  std::vector<db::DPoint> m_points;
   bool m_closure_set;
   db::DPoint m_closure;
   db::DPoint m_last;
@@ -66,4 +66,3 @@ private:
 }
 
 #endif
-

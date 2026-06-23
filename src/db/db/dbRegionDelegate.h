@@ -41,7 +41,8 @@
 #include <set>
 #include <unordered_set>
 
-namespace db {
+namespace db
+{
 
 class RecursiveShapeIterator;
 class EdgeFilterBase;
@@ -62,9 +63,9 @@ public:
   /**
    *  @brief Constructor
    */
-  PolygonFilterBase () { }
+  PolygonFilterBase () {}
 
-  virtual ~PolygonFilterBase () { }
+  virtual ~PolygonFilterBase () {}
 
   /**
    *  @brief Filters the polygon
@@ -115,7 +116,7 @@ typedef shape_collection_processor<db::Polygon, db::EdgePair> PolygonToEdgePairP
 /**
  *  @brief The region iterator delegate
  */
-typedef db::generic_shape_iterator_delegate_base <db::Polygon> RegionIteratorDelegate;
+typedef db::generic_shape_iterator_delegate_base<db::Polygon> RegionIteratorDelegate;
 
 /**
  *  @brief The delegate for the actual region implementation
@@ -306,9 +307,9 @@ public:
   }
 
 protected:
-  virtual void merged_semantics_changed () { }
-  virtual void min_coherence_changed () { }
-  virtual void join_properties_on_merge_changed () { }
+  virtual void merged_semantics_changed () {}
+  virtual void min_coherence_changed () {}
+  virtual void join_properties_on_merge_changed () {}
 
 private:
   bool m_merged_semantics;
@@ -323,4 +324,3 @@ private:
 }
 
 #endif
-

@@ -46,4 +46,3 @@ create_inspector (PyObject *container, bool symbolic = false);
 }
 
 #endif
-

@@ -45,11 +45,10 @@ public:
   /**
    *  @brief An enum describing the visiblity of items
    *
-   *  The item's visibility controls under which circumstances an item will become visible 
+   *  The item's visibility controls under which circumstances an item will become visible
    *  in the list of variables.
    */
-  enum Visibility
-  {
+  enum Visibility {
     /**
      *  @brief The entry is never visible
      */
@@ -91,7 +90,7 @@ public:
    *  @brief Gets the key (name) of the element given by the index
    */
   virtual std::string key (size_t /*index*/) const;
-  
+
   /**
    *  @brief Gets the key (name) of the element given by the index as a tl::Variant
    *  If the string key returns an empty value, the evaluation will fall back to the tl::Variant.

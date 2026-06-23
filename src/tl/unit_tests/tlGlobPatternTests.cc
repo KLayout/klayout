@@ -25,7 +25,7 @@
 #include "tlGlobPattern.h"
 #include "tlUnitTest.h"
 
-TEST(1) 
+TEST (1)
 {
   tl::GlobPattern a ("*");
   tl::GlobPattern b ("a");
@@ -47,7 +47,7 @@ TEST(1)
   EXPECT_EQ (b.match (""), false);
 }
 
-TEST(2) 
+TEST (2)
 {
   tl::GlobPattern a ("*a*");
   tl::GlobPattern b ("*a?");
@@ -89,7 +89,7 @@ TEST(2)
   EXPECT_EQ (c.match ("ba?"), true);
 }
 
-TEST(3) 
+TEST (3)
 {
   tl::GlobPattern a ("*a[bcd]");
 
@@ -115,7 +115,7 @@ TEST(3)
   EXPECT_EQ (b.match ("a"), false);
 }
 
-TEST(4) 
+TEST (4)
 {
   tl::GlobPattern a ("*a[^bcd]");
 
@@ -133,7 +133,7 @@ TEST(4)
   EXPECT_EQ (aa.match ("hax"), true);
 }
 
-TEST(5) 
+TEST (5)
 {
   tl::GlobPattern a ("*a[bcd]*");
 
@@ -157,7 +157,7 @@ TEST(5)
   EXPECT_EQ (aa.match ("hadx"), true);
 }
 
-TEST(6) 
+TEST (6)
 {
   tl::GlobPattern a ("a{bc,d}g");
 
@@ -203,7 +203,7 @@ TEST(6)
   EXPECT_EQ (a.match ("ah"), false);
 }
 
-TEST(7)
+TEST (7)
 {
   tl::GlobPattern a ("a{bc*,d?}g");
 
@@ -235,38 +235,38 @@ TEST(7)
   EXPECT_EQ (aa.match ("ah"), false);
 }
 
-TEST(8)
+TEST (8)
 {
   tl::GlobPattern a ("(*({bc,d}))(*)");
 
-  std::vector <std::string> v;
+  std::vector<std::string> v;
   EXPECT_EQ (a.match ("abcg", v), true);
   EXPECT_EQ (v.size (), size_t (3));
-  EXPECT_EQ (v[0], "abc");
-  EXPECT_EQ (v[1], "bc");
-  EXPECT_EQ (v[2], "g");
+  EXPECT_EQ (v [0], "abc");
+  EXPECT_EQ (v [1], "bc");
+  EXPECT_EQ (v [2], "g");
 
   //  copy works too ...
   EXPECT_EQ (tl::GlobPattern (a).match ("abcg", v), true);
   EXPECT_EQ (v.size (), size_t (3));
-  EXPECT_EQ (v[0], "abc");
-  EXPECT_EQ (v[1], "bc");
-  EXPECT_EQ (v[2], "g");
+  EXPECT_EQ (v [0], "abc");
+  EXPECT_EQ (v [1], "bc");
+  EXPECT_EQ (v [2], "g");
 
   EXPECT_EQ (a.match ("bc", v), true);
   EXPECT_EQ (v.size (), size_t (3));
-  EXPECT_EQ (v[0], "bc");
-  EXPECT_EQ (v[1], "bc");
-  EXPECT_EQ (v[2], "");
+  EXPECT_EQ (v [0], "bc");
+  EXPECT_EQ (v [1], "bc");
+  EXPECT_EQ (v [2], "");
 }
 
-TEST(9)
+TEST (9)
 {
   //  case insensitive
 
   tl::GlobPattern a ("(*({bc,d}))(*)");
 
-  std::vector <std::string> v;
+  std::vector<std::string> v;
   EXPECT_EQ (a.case_sensitive (), true);
   EXPECT_EQ (a.match ("aBcG", v), false);
 
@@ -274,16 +274,16 @@ TEST(9)
   EXPECT_EQ (a.case_sensitive (), false);
   EXPECT_EQ (a.match ("aBcG", v), true);
   EXPECT_EQ (v.size (), size_t (3));
-  EXPECT_EQ (v[0], "aBc");
-  EXPECT_EQ (v[1], "Bc");
-  EXPECT_EQ (v[2], "G");
+  EXPECT_EQ (v [0], "aBc");
+  EXPECT_EQ (v [1], "Bc");
+  EXPECT_EQ (v [2], "G");
 
   //  copy works too ...
   EXPECT_EQ (tl::GlobPattern (a).match ("aBcG", v), true);
   EXPECT_EQ (v.size (), size_t (3));
-  EXPECT_EQ (v[0], "aBc");
-  EXPECT_EQ (v[1], "Bc");
-  EXPECT_EQ (v[2], "G");
+  EXPECT_EQ (v [0], "aBc");
+  EXPECT_EQ (v [1], "Bc");
+  EXPECT_EQ (v [2], "G");
 
   tl::GlobPattern b ("*a[bcd]");
 
@@ -297,7 +297,7 @@ TEST(9)
   EXPECT_EQ (b.match ("aB"), true);
 }
 
-TEST(10)
+TEST (10)
 {
   //  exact match
 
@@ -315,7 +315,7 @@ TEST(10)
   EXPECT_EQ (a.match ("(*({bc,D}))(*)"), true);
 }
 
-TEST(11)
+TEST (11)
 {
   //  header match
 

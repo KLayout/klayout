@@ -30,7 +30,7 @@
 
 namespace Ui
 {
-  class CommonReaderOptionPage;
+class CommonReaderOptionPage;
 }
 
 namespace lay
@@ -39,7 +39,7 @@ namespace lay
 class CommonReaderOptionPage
   : public StreamReaderOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   CommonReaderOptionPage (QWidget *parent);
@@ -55,5 +55,3 @@ private:
 }
 
 #endif
-
-

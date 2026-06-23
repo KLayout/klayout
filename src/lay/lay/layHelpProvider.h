@@ -35,11 +35,11 @@ class HelpSource;
 /**
  *  @brief A provider for documentation in the help system
  *
- *  A help provider is responsible for providing documention of a certain 
+ *  A help provider is responsible for providing documention of a certain
  *  category. That can be written documentation or generated documentation.
  *  Each help provider provides documents under a certain folder, i.e.
  *  "doc/..".
- *  It must be able to deliver a keyword list for the search system and 
+ *  It must be able to deliver a keyword list for the search system and
  *  a DOM model for a given URL below that folder.
  */
 class HelpProvider
@@ -53,7 +53,7 @@ public:
   /**
    *  @brief Destructor
    */
-  virtual ~HelpProvider () { }
+  virtual ~HelpProvider () {}
 
   /**
    *  @brief Gets the main entry page for this category
@@ -75,7 +75,7 @@ public:
   {
     return QDomDocument ();
   }
-  
+
   /**
    *  @brief Delivers the folder name below which the help documents of this provider are located
    *
@@ -93,4 +93,3 @@ public:
 }
 
 #endif
-

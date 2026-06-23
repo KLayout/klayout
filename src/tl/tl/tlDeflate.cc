@@ -40,7 +40,7 @@ namespace tl
  *  @brief The decoder for Huffmann codes
  *
  *  The decoder keeps a Huffmann code tree and decodes a value from a bit stream
- *  using this tree. 
+ *  using this tree.
  *  As specified by RFC1951, the code tree is constructed from a list of code lengths
  *  vs. value alone.
  */
@@ -49,7 +49,7 @@ class HuffmannDecoder
 public:
   /**
    *  @brief Constructor
-   *  
+   *
    *  Creates an empty code tree.
    */
   HuffmannDecoder ()
@@ -87,16 +87,16 @@ public:
 
     unsigned short lengths [288];
     for (unsigned int i = 0; i < 144; ++i) {
-      lengths[i] = 8;
+      lengths [i] = 8;
     }
     for (unsigned int i = 144; i < 256; ++i) {
-      lengths[i] = 9;
+      lengths [i] = 9;
     }
     for (unsigned int i = 256; i < 280; ++i) {
-      lengths[i] = 7;
+      lengths [i] = 7;
     }
     for (unsigned int i = 280; i < 288; ++i) {
-      lengths[i] = 8;
+      lengths [i] = 8;
     }
 
     init_codes (lengths, lengths + sizeof (lengths) / sizeof (lengths [0]));
@@ -114,7 +114,7 @@ public:
 
     unsigned short lengths [32];
     for (unsigned int i = 0; i < 32; ++i) {
-      lengths[i] = 5;
+      lengths [i] = 5;
     }
     init_codes (lengths, lengths + sizeof (lengths) / sizeof (lengths [0]));
   }
@@ -122,8 +122,8 @@ public:
   /**
    *  @brief Initialize the code tree from a list of lengths
    *
-   *  This method initializes the code tree from a list of lengths, given 
-   *  by the sequence [begin_lengths, end_lengths). The codes are assumed to 
+   *  This method initializes the code tree from a list of lengths, given
+   *  by the sequence [begin_lengths, end_lengths). The codes are assumed to
    *  range from 0 to distance(begin_lengths, end_lengths).
    *  See RFC1951 for a description about the procedure.
    */
@@ -131,13 +131,13 @@ public:
   void init_codes (Iter begin_lengths, Iter end_lengths)
   {
     const unsigned int MAX_BITS = 16;
-    unsigned short bl_count[MAX_BITS + 1];
-    unsigned short bitmasks[MAX_BITS + 1];
-    unsigned short next_code[MAX_BITS + 1];
+    unsigned short bl_count [MAX_BITS + 1];
+    unsigned short bitmasks [MAX_BITS + 1];
+    unsigned short next_code [MAX_BITS + 1];
     unsigned int max_bits = 0;
 
     for (unsigned int bits = 0; bits <= MAX_BITS; bits++) {
-      bl_count[bits] = 0;
+      bl_count [bits] = 0;
     }
 
     for (Iter l = begin_lengths; l != end_lengths; ++l) {
@@ -149,11 +149,11 @@ public:
 
     unsigned int code = 0;
     for (unsigned int bits = 1; bits <= MAX_BITS; bits++) {
-      if (bl_count[bits - 1] > 0) {
+      if (bl_count [bits - 1] > 0) {
         max_bits = bits - 1;
       }
-      code = (code + bl_count[bits - 1]) << 1;
-      next_code[bits] = code;
+      code = (code + bl_count [bits - 1]) << 1;
+      next_code [bits] = code;
     }
 
     for (unsigned int bits = 0; bits <= max_bits; bits++) {
@@ -170,7 +170,7 @@ public:
         tl_assert (code < (unsigned int) (1 << max_bits));
         mp_codes [code] = symbol;
         mp_bitmasks [code] = bitmasks [*l];
-      } 
+      }
     }
   }
 
@@ -185,7 +185,7 @@ public:
     tl_assert (mp_codes != 0);
 
     unsigned int m = m_num_codes / 2;
-    
+
     unsigned int c = 0;
     do {
       if (s.get_bit ()) {
@@ -223,10 +223,10 @@ private:
 //  InflateFilter implementation
 
 InflateFilter::InflateFilter (tl::InputStream &input)
-  : m_input (input), 
+  : m_input (input),
     m_b_insert (0), m_b_read (0), m_at_end (false),
-    m_last_block (false), 
-    m_uncompressed_length (0)  //  this forces a new block on "process()"
+    m_last_block (false),
+    m_uncompressed_length (0) //  this forces a new block on "process()"
 {
   //  NOTE: the minimum buffer size of 65536 corresponds to the maximum block size
   //  of the block repetition decoder
@@ -241,7 +241,7 @@ InflateFilter::InflateFilter (tl::InputStream &input)
 
 InflateFilter::~InflateFilter ()
 {
-  delete[] m_buffer;
+  delete [] m_buffer;
   m_buffer = 0;
   m_blen = 0;
   delete mp_dist_decoder;
@@ -250,11 +250,11 @@ InflateFilter::~InflateFilter ()
   mp_lit_decoder = 0;
 }
 
-const char * 
+const char *
 InflateFilter::get (size_t n)
 {
   size_t blen = m_blen;
-  while (n >= blen / 2)  {
+  while (n >= blen / 2) {
     blen *= 2;
   }
 
@@ -265,7 +265,7 @@ InflateFilter::get (size_t n)
     //  (in put_byte_dist), so we have to maintain the bytes between m_b_read
     //  and m_b_insert too.
 
-    char *new_buffer = new char[blen];
+    char *new_buffer = new char [blen];
 
     //  place the current block twice at start and end of the block
     std::memcpy (new_buffer, m_buffer, m_blen);
@@ -276,10 +276,9 @@ InflateFilter::get (size_t n)
       m_b_read += blen - m_blen;
     }
 
-    delete[] m_buffer;
+    delete [] m_buffer;
     m_buffer = new_buffer;
     m_blen = blen;
-
   }
 
   while ((m_b_insert + m_blen - m_b_read) % m_blen < n) {
@@ -302,15 +301,13 @@ InflateFilter::get (size_t n)
   return r;
 }
 
-void
-InflateFilter::unget (size_t n)
+void InflateFilter::unget (size_t n)
 {
   tl_assert (m_b_read >= n);
   m_b_read -= (unsigned int) n;
 }
 
-bool 
-InflateFilter::at_end () 
+bool InflateFilter::at_end ()
 {
   if (! m_at_end && m_b_read == m_b_insert) {
     if (! process ()) {
@@ -320,8 +317,7 @@ InflateFilter::at_end ()
   return m_at_end;
 }
 
-void 
-InflateFilter::put_byte (char b) 
+void InflateFilter::put_byte (char b)
 {
   m_buffer [m_b_insert] = b;
   m_b_insert = (m_b_insert + 1) % m_blen;
@@ -329,15 +325,13 @@ InflateFilter::put_byte (char b)
   tl_assert (m_b_insert != m_b_read);
 }
 
-void 
-InflateFilter::put_byte_dist (unsigned int d) 
+void InflateFilter::put_byte_dist (unsigned int d)
 {
   tl_assert (d < m_blen);
   put_byte (m_buffer [(m_b_insert + m_blen - d) % m_blen]);
 }
 
-bool 
-InflateFilter::process ()
+bool InflateFilter::process ()
 {
   while (true) {
 
@@ -418,9 +412,7 @@ InflateFilter::process ()
         while (length-- > 0) {
           put_byte_dist (dist);
         }
-
       }
-
     }
 
     if (new_block) {
@@ -441,7 +433,7 @@ InflateFilter::process ()
         m_input.get_bits (16);
 
       } else if (t == 1 || t == 2) {
-        
+
         if (t == 1) {
 
           //  KLUDGE: should use a different decoder object, so we save time to do this:
@@ -460,20 +452,19 @@ InflateFilter::process ()
           }
 
           static unsigned int hclen_order [] = {
-            16, 17, 18, 0,   8,  7,  9,  6,  10,  5, 11,  4,  12,  3, 13,  2, 
-            14,  1, 15
-          };
+            16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2,
+            14, 1, 15};
           for (unsigned int i = 0; i < hclen; ++i) {
             hclengths [hclen_order [i]] = m_input.get_bits (3);
           }
 
           HuffmannDecoder ldecoder;
-          ldecoder.init_codes (hclengths, hclengths + sizeof (hclengths) / sizeof (hclengths[0]));
+          ldecoder.init_codes (hclengths, hclengths + sizeof (hclengths) / sizeof (hclengths [0]));
 
           unsigned int lengths [286 + 32];
           unsigned int nlengths = hlit + hdist;
 
-          for (unsigned int i = 0; i < nlengths; ) {
+          for (unsigned int i = 0; i < nlengths;) {
 
             unsigned short l = ldecoder.decode (m_input);
             if (l < 16) {
@@ -501,12 +492,10 @@ InflateFilter::process ()
             } else {
               tl_assert (false);
             }
-
           }
 
           mp_lit_decoder->init_codes (lengths, lengths + hlit);
           mp_dist_decoder->init_codes (lengths + hlit, lengths + nlengths);
-
         }
 
       } else {
@@ -516,7 +505,6 @@ InflateFilter::process ()
     } else {
       return true;
     }
-
   }
 }
 
@@ -528,12 +516,12 @@ DeflateFilter::DeflateFilter (tl::OutputStream &output)
   : m_finished (false), mp_output (&output), m_uc (0), m_cc (0)
 {
   mp_stream = new z_stream ();
-  mp_stream->zalloc = (alloc_func)0;
-  mp_stream->zfree = (free_func)0;
-  mp_stream->opaque = (voidpf)0;
-  mp_stream->next_in = (Byte *)0;
+  mp_stream->zalloc = (alloc_func) 0;
+  mp_stream->zfree = (free_func) 0;
+  mp_stream->opaque = (voidpf) 0;
+  mp_stream->next_in = (Byte *) 0;
   mp_stream->avail_in = 0;
-  mp_stream->next_out = (Byte *)m_buffer;
+  mp_stream->next_out = (Byte *) m_buffer;
   mp_stream->avail_out = sizeof (m_buffer);
 
   int err = deflateInit2 (mp_stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, -15 /* == raw deflate data*/, 8 /* == default memory level */, Z_DEFAULT_STRATEGY);
@@ -545,12 +533,11 @@ DeflateFilter::~DeflateFilter ()
   delete mp_stream;
 }
 
-void
-DeflateFilter::put (const char *b, size_t n)
+void DeflateFilter::put (const char *b, size_t n)
 {
   m_uc += n;
 
-  mp_stream->next_in = (Byte *)b;
+  mp_stream->next_in = (Byte *) b;
   mp_stream->avail_in = (unsigned int) n;
 
   while (mp_stream->avail_in > 0) {
@@ -561,15 +548,13 @@ DeflateFilter::put (const char *b, size_t n)
     if (mp_stream->avail_out == 0) {
       m_cc += sizeof (m_buffer);
       mp_output->put (m_buffer, sizeof (m_buffer));
-      mp_stream->next_out = (Byte *)m_buffer;
+      mp_stream->next_out = (Byte *) m_buffer;
       mp_stream->avail_out = sizeof (m_buffer);
     }
-
   }
 }
 
-void
-DeflateFilter::flush ()
+void DeflateFilter::flush ()
 {
   while (true) {
 
@@ -578,13 +563,12 @@ DeflateFilter::flush ()
 
     m_cc += sizeof (m_buffer) - mp_stream->avail_out;
     mp_output->put (m_buffer, sizeof (m_buffer) - mp_stream->avail_out);
-    mp_stream->next_out = (Byte *)m_buffer;
+    mp_stream->next_out = (Byte *) m_buffer;
     mp_stream->avail_out = sizeof (m_buffer);
 
     if (err == Z_STREAM_END) {
       break;
-    } 
-
+    }
   }
 
   int err = deflateEnd (mp_stream);
@@ -595,4 +579,3 @@ DeflateFilter::flush ()
 }
 
 }
-

@@ -47,17 +47,17 @@ static bool s_replicate_messages = tl::app_flag ("lstream-replicate-messages");
 namespace lstr
 {
 
-class OutputStream 
+class OutputStream
   : public kj::OutputStream
 {
 public:
   OutputStream (tl::OutputStream *os)
     : mp_os (os)
-  { 
+  {
     //  .. nothing yet ..
   }
 
-  virtual void write (const void* buffer, size_t size)
+  virtual void write (const void *buffer, size_t size)
   {
     mp_os->put ((const char *) buffer, size);
   }
@@ -80,8 +80,7 @@ Writer::Writer ()
   m_permissive = true;
 }
 
-void 
-Writer::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
+void Writer::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
 {
   //  TODO: this seems to be needed to properly enumerate the properties in "collect_property_ids"
   layout.update ();
@@ -159,11 +158,10 @@ Writer::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayou
 
 /**
  *  @brief Replicates a single message to a separate file for debugging
- * 
+ *
  *  Decoding a message is easer when it is written to a separate file.
  */
-void 
-Writer::replicate_message (const std::string &suffix, capnp::MessageBuilder &message)
+void Writer::replicate_message (const std::string &suffix, capnp::MessageBuilder &message)
 {
   if (s_replicate_messages) {
     tl::OutputStream os_msg (mp_stream->path () + suffix);
@@ -176,19 +174,17 @@ Writer::replicate_message (const std::string &suffix, capnp::MessageBuilder &mes
 /**
  *  @brief Is called "frequently" to report the progress
  */
-void
-Writer::yield_progress ()
+void Writer::yield_progress ()
 {
   m_progress.set (mp_stream->pos ());
 }
 
 /**
  *  @brief Issues a warning on the writer
- * 
+ *
  *  With "m_permissive" set to false, every warning will become an error.
  */
-void 
-Writer::warn (const std::string &msg)
+void Writer::warn (const std::string &msg)
 {
   std::string msg_full = msg;
   if (! m_cellname.empty ()) {
@@ -205,14 +201,13 @@ Writer::warn (const std::string &msg)
 
 /**
  *  @brief Writes the header message to the stream
- * 
+ *
  *  This is the main header provided by the LStream.
  *  It lists the libraries available inside this stream.
  *  For KLayout, this is only one library - of "layout"
  *  type.
  */
-void
-Writer::write_header (kj::BufferedOutputStream &os)
+void Writer::write_header (kj::BufferedOutputStream &os)
 {
   capnp::MallocMessageBuilder message;
 
@@ -238,13 +233,12 @@ Writer::write_header (kj::BufferedOutputStream &os)
 
 /**
  *  @brief Writes the library header message to the stream
- * 
+ *
  *  This involves build a number of tables before they are written.
  *  As these tables are the basis for LStream Id allocation, this
  *  method must be called before LStream Ids can be obtained.
  */
-void
-Writer::write_library (kj::BufferedOutputStream &os)
+void Writer::write_library (kj::BufferedOutputStream &os)
 {
   capnp::MallocMessageBuilder message;
 
@@ -280,7 +274,7 @@ Writer::write_library (kj::BufferedOutputStream &os)
     m_meta_data_view_id = -1;
 
     bool needs_meta_data_view = false;
-    for (auto c = m_cells_to_write.begin (); c != m_cells_to_write.end () && !needs_meta_data_view; ++c) {
+    for (auto c = m_cells_to_write.begin (); c != m_cells_to_write.end () && ! needs_meta_data_view; ++c) {
       needs_meta_data_view = (mp_layout->begin_meta (*c) != mp_layout->end_meta (*c));
     }
 
@@ -295,7 +289,7 @@ Writer::write_library (kj::BufferedOutputStream &os)
     layout_view.setPropertySetId (get_property_id (mp_layout->prop_id ()));
 
     //  Computes the resolution:
-    //  Rounds to integer if "close to one". This achieves a 
+    //  Rounds to integer if "close to one". This achieves a
     //  kind of normalization and prevents propagation of rounding
     //  errors.
     double resolution = 1.0 / mp_layout->dbu ();
@@ -343,8 +337,7 @@ Writer::write_library (kj::BufferedOutputStream &os)
 /**
  *  @brief Produces a variant value to a stream::variant::Variant struct
  */
-void
-Writer::make_variant_value (const tl::Variant &value, stream::variant::Variant::Builder builder)
+void Writer::make_variant_value (const tl::Variant &value, stream::variant::Variant::Builder builder)
 {
   if (value.is_nil ()) {
     builder.getValue ().setNil ();
@@ -366,27 +359,26 @@ Writer::make_variant_value (const tl::Variant &value, stream::variant::Variant::
     builder.getValue ().initList (value.size ());
     size_t index = 0;
     for (auto i = value.begin (); i != value.end (); ++i, ++index) {
-      make_variant_value (*i, builder.getValue ().getList ()[index]);
+      make_variant_value (*i, builder.getValue ().getList () [index]);
     }
   } else if (value.is_array ()) {
     builder.getValue ().initArray (value.array_size ());
     size_t index = 0;
     for (auto i = value.begin_array (); i != value.end_array (); ++i, ++index) {
-      make_variant_value (i->first, builder.getValue ().getArray ()[index].getKey ());
-      make_variant_value (i->second, builder.getValue ().getArray ()[index].getValue ());
+      make_variant_value (i->first, builder.getValue ().getArray () [index].getKey ());
+      make_variant_value (i->second, builder.getValue ().getArray () [index].getValue ());
     }
   }
 }
 
 /**
  *  @brief Produces the library names table
- * 
- *  This method collects the library references from all cells to write and 
- *  produces a table with all these references. It will also assign 
+ *
+ *  This method collects the library references from all cells to write and
+ *  produces a table with all these references. It will also assign
  *  library name Ids in that step.
  */
-void
-Writer::make_library_refs_table (stream::library::LibraryRefs::Builder library_refs)
+void Writer::make_library_refs_table (stream::library::LibraryRefs::Builder library_refs)
 {
   m_ls_lib_ids.clear ();
   std::vector<std::string> lib_names;
@@ -403,25 +395,23 @@ Writer::make_library_refs_table (stream::library::LibraryRefs::Builder library_r
         lib_names.push_back (lib->get_name ());
         m_ls_lib_ids.insert (std::make_pair (lib_id, lib_names.size ()));
       }
-
     }
-
   }
 
   library_refs.initRefs (lib_names.size ());
   for (auto n = lib_names.begin (); n != lib_names.end (); ++n) {
-    auto ref = library_refs.getRefs ()[n - lib_names.begin ()];
+    auto ref = library_refs.getRefs () [n - lib_names.begin ()];
     ref.setLibraryName (*n);
   }
 }
 
 /**
  *  @brief Gets the library name Id from a given library Id
- * 
+ *
  *  Note that "make_library_names_table" must have been called before
  *  this method can be used.
  */
-uint64_t 
+uint64_t
 Writer::get_library_ref_id (db::lib_id_type lib_id)
 {
   auto i = m_ls_lib_ids.find (lib_id);
@@ -431,15 +421,14 @@ Writer::get_library_ref_id (db::lib_id_type lib_id)
 
 /**
  *  @brief Collect all KLayout property name Ids and properties Ids used in the context of this writer
- * 
+ *
  *  This method scans layout, cells, meta info, instances and shapes for used properties
  *  and registers properties Ids and names.
- * 
+ *
  *  @param prop_ids Where the properties Ids are collected
  *  @param prop_names Where the property names are collected
  */
-void 
-Writer::collect_property_ids (std::vector<db::properties_id_type> &prop_ids, std::vector<db::property_names_id_type> &prop_names)
+void Writer::collect_property_ids (std::vector<db::properties_id_type> &prop_ids, std::vector<db::property_names_id_type> &prop_names)
 {
   make_property_id (mp_layout->prop_id (), prop_ids, prop_names);
 
@@ -464,15 +453,13 @@ Writer::collect_property_ids (std::vector<db::properties_id_type> &prop_ids, std
     for (auto i = cell.begin (); ! i.at_end (); ++i) {
       make_property_id (i->prop_id (), prop_ids, prop_names);
     }
-
   }
 }
 
-namespace 
+namespace
 {
 
-struct ComparePropertyNameIdByValue
-{
+struct ComparePropertyNameIdByValue {
   bool operator() (db::property_names_id_type a, db::property_names_id_type b) const
   {
     const tl::Variant &na = db::property_name (a);
@@ -485,14 +472,14 @@ struct ComparePropertyNameIdByValue
 
 /**
  *  @brief Gets the LStream property set Id from a KLayout properties Id
- * 
+ *
  *  If the properties Id is not registered yet, a new LStream Id will be generated.
- * 
+ *
  *  @param id The KLayout properties Id
  *  @param prop_id New KLayout properties Ids will be added here
  *  @param prop_names New property names go here (happens when a new property set is registered)
  */
-uint64_t 
+uint64_t
 Writer::make_property_id (db::properties_id_type id, std::vector<db::properties_id_type> &prop_ids, std::vector<db::property_names_id_type> &prop_names)
 {
   if (id != 0) {
@@ -519,7 +506,6 @@ Writer::make_property_id (db::properties_id_type id, std::vector<db::properties_
       }
 
       return ls_id;
-
     }
 
   } else {
@@ -529,11 +515,11 @@ Writer::make_property_id (db::properties_id_type id, std::vector<db::properties_
 
 /**
  *  @brief Gets the LStream property name Id for a given name (by variant)
- * 
+ *
  *  @param name The name to register
  *  @param prop_names New names will be added here
  */
-uint64_t 
+uint64_t
 Writer::make_property_name_id_from_variant (const tl::Variant &name, std::vector<db::property_names_id_type> &prop_names)
 {
   return make_property_name_id_from_id (db::property_names_id (name), prop_names);
@@ -541,11 +527,11 @@ Writer::make_property_name_id_from_variant (const tl::Variant &name, std::vector
 
 /**
  *  @brief Gets the LStream property name Id for a given name (by KLayout property name Id)
- * 
+ *
  *  @param name_id The name Id to register
  *  @param prop_names New names will be added here
  */
-uint64_t 
+uint64_t
 Writer::make_property_name_id_from_id (db::property_names_id_type name_id, std::vector<db::property_names_id_type> &prop_names)
 {
   auto i = m_ls_prop_name_ids.find (name_id);
@@ -561,7 +547,7 @@ Writer::make_property_name_id_from_id (db::property_names_id_type name_id, std::
 
 /**
  *  @brief Gets the LStream property set Id from a KLayout properties Id
- *  
+ *
  *  If the properties Id is not valid, this method will assert.
  *  Note, that "make_property_id" must have been called before to register
  *  the property set.
@@ -580,12 +566,12 @@ Writer::get_property_id (db::properties_id_type id)
 
 /**
  *  @brief Obtain the LStream property name Id from KLayout property name Id
- * 
+ *
  *  If the KLayout property name Id is not valid, this method asserts.
  *  Note that "make_property_name_id_from_id" must have been called before to
  *  register the name.
  */
-uint64_t 
+uint64_t
 Writer::get_property_name_id_from_id (db::property_names_id_type name_id)
 {
   auto i = m_ls_prop_name_ids.find (name_id);
@@ -595,7 +581,7 @@ Writer::get_property_name_id_from_id (db::property_names_id_type name_id)
 
 /**
  *  @brief Obtain the LStream property name Id from a name variant
- * 
+ *
  *  If the name variant is not a valid name, this method asserts.
  */
 uint64_t
@@ -607,13 +593,12 @@ Writer::get_property_name_id_from_variant (const tl::Variant &name)
 /**
  *  @brief Produces the property names table from a given set of KLayout property name Ids
  */
-void
-Writer::make_property_names_tables (const std::vector<db::property_names_id_type> &prop_names, stream::library::PropertyNamesTable::Builder property_names)
+void Writer::make_property_names_tables (const std::vector<db::property_names_id_type> &prop_names, stream::library::PropertyNamesTable::Builder property_names)
 {
   property_names.initNames (prop_names.size ());
 
   for (auto i = prop_names.begin (); i != prop_names.end (); ++i) {
-    stream::propertySet::PropertyName::Builder property_name = property_names.getNames ()[i - prop_names.begin ()];
+    stream::propertySet::PropertyName::Builder property_name = property_names.getNames () [i - prop_names.begin ()];
     //  No namespace yet: property_name.setNamespaceId (0);
     make_variant_value (db::property_name (*i), property_name.getName ());
   }
@@ -621,18 +606,17 @@ Writer::make_property_names_tables (const std::vector<db::property_names_id_type
 
 /**
  *  @brief Produces the property sets table from a given set of KLayout properties Ids
- * 
- *  Note that the property names must have been collected already before this 
+ *
+ *  Note that the property names must have been collected already before this
  *  method can be used ("make_property_name_id_from_id").
  */
-void
-Writer::make_properties_tables (const std::vector<db::properties_id_type> &prop_ids, stream::library::PropertiesTable::Builder properties)
+void Writer::make_properties_tables (const std::vector<db::properties_id_type> &prop_ids, stream::library::PropertiesTable::Builder properties)
 {
   properties.initPropertySets (prop_ids.size ());
 
   for (auto p = prop_ids.begin (); p != prop_ids.end (); ++p) {
 
-    auto set = properties.getPropertySets ()[p - prop_ids.begin ()];
+    auto set = properties.getPropertySets () [p - prop_ids.begin ()];
 
     //  NOTE: we go through the map to become independent from the name order
     auto map = db::properties (*p).to_map ();
@@ -642,19 +626,17 @@ Writer::make_properties_tables (const std::vector<db::properties_id_type> &prop_
     for (auto m = map.begin (); m != map.end (); ++m, ++index) {
       auto ni = m_ls_prop_name_ids.find (db::property_names_id (m->first));
       tl_assert (ni != m_ls_prop_name_ids.end ());
-      auto prop = set.getProperties ()[index];
+      auto prop = set.getProperties () [index];
       prop.setNameId (ni->second);
       make_variant_value (m->second, prop.getValue ());
     }
-
   }
 }
 
 /**
  *  @brief Collects all used text strings
  */
-void 
-Writer::collect_text_strings (std::vector<std::string> &text_strings)
+void Writer::collect_text_strings (std::vector<std::string> &text_strings)
 {
   for (auto c = m_cells_to_write.begin (); c != m_cells_to_write.end (); ++c) {
 
@@ -665,16 +647,15 @@ Writer::collect_text_strings (std::vector<std::string> &text_strings)
         make_text_string_id (std::string (s->text_string ()), text_strings);
       }
     }
-
   }
 }
 
 /**
  *  @brief Gets the LStream text string Id for a given text
- * 
+ *
  *  This method will create a new entry if the string had not been
  *  registered before.
- * 
+ *
  *  @param string The new text string
  *  @param text_strings New strings are added here
  */
@@ -694,9 +675,9 @@ Writer::make_text_string_id (const std::string &string, std::vector<std::string>
 
 /**
  *  @brief Gets the LStream text string Id for a given text
- * 
+ *
  *  Note that make_text_string_id had to be called before.
- *  This method will assert if the string does not have an associated 
+ *  This method will assert if the string does not have an associated
  *  text string Id.
  */
 uint64_t
@@ -709,12 +690,11 @@ Writer::get_text_string_id (const std::string &string)
 
 /**
  *  @brief Produces the text strings table on stream::library::TextStringsTable
- * 
+ *
  *  @param text_strings The list of text strings, where the LStream text string Id in an index in that table
  *  @param table The Builder for the table
  */
-void 
-Writer::make_text_strings_table (const std::vector<std::string> &text_strings, stream::library::TextStringsTable::Builder table)
+void Writer::make_text_strings_table (const std::vector<std::string> &text_strings, stream::library::TextStringsTable::Builder table)
 {
   table.initTextStrings (text_strings.size ());
 
@@ -725,11 +705,10 @@ Writer::make_text_strings_table (const std::vector<std::string> &text_strings, s
 
 /**
  *  @brief Produces the layer table on stream::library::LayerTable
- * 
+ *
  *  Only selected layers will be produced.
  */
-void
-Writer::make_layer_table (stream::library::LayerTable::Builder layers)
+void Writer::make_layer_table (stream::library::LayerTable::Builder layers)
 {
   layers.initLayerEntries (m_layers_to_write.size ());
 
@@ -738,7 +717,7 @@ Writer::make_layer_table (stream::library::LayerTable::Builder layers)
     auto lp = l->second;
 
     //  NOTE: currently, the purpose is always DRAWING
-    auto le = layers.getLayerEntries ()[l - m_layers_to_write.begin ()];
+    auto le = layers.getLayerEntries () [l - m_layers_to_write.begin ()];
     if (lp.layer >= 0 && lp.datatype >= 0) {
       le.initLayerNumbers (2);
       le.getLayerNumbers ().set (0, lp.layer);
@@ -746,17 +725,15 @@ Writer::make_layer_table (stream::library::LayerTable::Builder layers)
     }
     le.setName (lp.name);
     le.setPurpose (stream::library::LayerEntry::Purpose::DRAWING);
-
   }
 }
 
 /**
  *  @brief Produces the cell specifications on stream::library::CellSpecsTable
- * 
+ *
  *  Only selected cells will be produced. The cell specs are generated top-down.
  */
-void
-Writer::make_cell_specs (stream::library::CellSpecsTable::Builder cell_specs)
+void Writer::make_cell_specs (stream::library::CellSpecsTable::Builder cell_specs)
 {
   cell_specs.initCellSpecs (m_cells_to_write.size ());
 
@@ -771,7 +748,7 @@ Writer::make_cell_specs (stream::library::CellSpecsTable::Builder cell_specs)
 
     m_ls_cell_ids.insert (std::make_pair (*c, index));
 
-    auto cs = cell_specs.getCellSpecs ()[index];
+    auto cs = cell_specs.getCellSpecs () [index];
     const db::Cell &cell = mp_layout->cell (*c);
 
     cs.setName (mp_layout->cell_name (*c));
@@ -790,27 +767,25 @@ Writer::make_cell_specs (stream::library::CellSpecsTable::Builder cell_specs)
 
       size_t pindex = 0;
       for (auto p = param_dict.begin (); p != param_dict.end (); ++p, ++pindex) {
-        auto pn = pcell_parameters[pindex];
+        auto pn = pcell_parameters [pindex];
         pn.setNameId (get_property_name_id_from_variant (tl::Variant (p->first)));
         make_variant_value (p->second, pn.getValue ());
       }
-
     }
 
     cs.setPropertySetId (get_property_id (cell.prop_id ()));
 
     ++index;
-
   }
 }
 
 /**
  *  @brief Gets the LStream Id for a given KLayout cell Id
- * 
+ *
  *  Note that the "make_cell_specs" must have been executed, before this method
  *  can be used.
  */
-uint64_t 
+uint64_t
 Writer::get_cell_id (db::cell_index_type ci)
 {
   auto i = m_ls_cell_ids.find (ci);
@@ -820,12 +795,11 @@ Writer::get_cell_id (db::cell_index_type ci)
 
 /**
  *  @brief Produces the cell hierarchy tree on stream::library::CellHierarchyTree
- * 
+ *
  *  This method will consider the selected cells and produce a cell hierarchy
  *  tree in top-down mode.
  */
-void
-Writer::make_cell_hierarchy_tree (stream::library::CellHierarchyTree::Builder cell_tree)
+void Writer::make_cell_hierarchy_tree (stream::library::CellHierarchyTree::Builder cell_tree)
 {
   size_t top_cell_count = 0;
   for (auto c = mp_layout->begin_top_down (); c != mp_layout->end_top_cells (); ++c) {
@@ -844,7 +818,7 @@ Writer::make_cell_hierarchy_tree (stream::library::CellHierarchyTree::Builder ce
       continue;
     }
 
-    auto cn = cell_tree.getNodes ()[index];
+    auto cn = cell_tree.getNodes () [index];
     cn.setCellId (get_cell_id (*c));
 
     std::set<uint64_t> children;
@@ -862,7 +836,6 @@ Writer::make_cell_hierarchy_tree (stream::library::CellHierarchyTree::Builder ce
     }
 
     ++index;
-
   }
 
   //  all cells have been written
@@ -871,16 +844,15 @@ Writer::make_cell_hierarchy_tree (stream::library::CellHierarchyTree::Builder ce
 
 /**
  *  @brief Generates meta info for the given cell or layout in the stream::propertySet::PropertySet struct
- * 
+ *
  *  If cell is 0, the layout meta info will be generated. Otherwise the
  *  cell specific meta info will be produced. In both cases the meta info
  *  is written to the given PropertySet builder.
  */
-void
-Writer::make_meta_data (const db::Cell *cell, stream::metaData::MetaData::Builder meta_data)
+void Writer::make_meta_data (const db::Cell *cell, stream::metaData::MetaData::Builder meta_data)
 {
   auto mfrom = cell ? mp_layout->begin_meta (cell->cell_index ()) : mp_layout->begin_meta ();
-  auto mto   = cell ? mp_layout->end_meta (cell->cell_index ()) : mp_layout->end_meta ();
+  auto mto = cell ? mp_layout->end_meta (cell->cell_index ()) : mp_layout->end_meta ();
 
   size_t count = 0;
   for (auto m = mfrom; m != mto; ++m) {
@@ -893,26 +865,25 @@ Writer::make_meta_data (const db::Cell *cell, stream::metaData::MetaData::Builde
   size_t index = 0;
   for (auto m = mfrom; m != mto; ++m) {
     if (m->second.persisted) {
-      auto p = meta_data.getEntries ()[index];
+      auto p = meta_data.getEntries () [index];
       auto name = mp_layout->meta_info_name (m->first);
       p.setName (name);
       p.setDescription (m->second.description);
       make_variant_value (m->second.value, p.getValue ());
       ++index;
     }
-  } 
+  }
 }
 
 /**
  *  @brief Writes the cell message for the given cell, followed by the layout view message
- * 
+ *
  *  @param ci The cell for which to generate the message
  *  @param os The stream where to write the message
- * 
+ *
  *  This method generates a single-view cell message (the view is only a layout view).
  */
-void 
-Writer::write_cell (db::cell_index_type ci, kj::BufferedOutputStream &os, bool skip_body)
+void Writer::write_cell (db::cell_index_type ci, kj::BufferedOutputStream &os, bool skip_body)
 {
   bool needs_layout_view = ! mp_layout->cell (ci).is_real_ghost_cell () && ! skip_body;
   bool needs_meta_data_view = mp_layout->begin_meta (ci) != mp_layout->end_meta (ci);
@@ -947,22 +918,21 @@ Writer::write_cell (db::cell_index_type ci, kj::BufferedOutputStream &os, bool s
 
 /**
  *  @brief generates and writes a layout view message for the given cell
- * 
+ *
  *  @param ci The cell for which to generate the message
  *  @param os The stream where to write the message
- * 
+ *
  *  Generating the message involves compressing and producing the
  *  instances and shapes for various kinds on each layer.
  */
-void 
-Writer::write_layout_view (db::cell_index_type ci, kj::BufferedOutputStream &os)
+void Writer::write_layout_view (db::cell_index_type ci, kj::BufferedOutputStream &os)
 {
   capnp::MallocMessageBuilder message;
 
   auto layout_view = message.initRoot<stream::layoutView::LayoutView> ();
   const db::Cell &cell = mp_layout->cell (ci);
 
-  std::vector<std::pair<unsigned int, size_t> > layers_for_cell;
+  std::vector<std::pair<unsigned int, size_t>> layers_for_cell;
   layers_for_cell.reserve (m_layers_to_write.size ());
   for (auto l = m_layers_to_write.begin (); l != m_layers_to_write.end (); ++l) {
     if (! cell.shapes (l->first).empty ()) {
@@ -978,16 +948,16 @@ Writer::write_layout_view (db::cell_index_type ci, kj::BufferedOutputStream &os)
     layer.setLayerId (l->second);
 
     Compressed compressed;
-    compressed.compress_shapes (cell.shapes (l->first), m_compression_level, m_recompress); 
+    compressed.compress_shapes (cell.shapes (l->first), m_compression_level, m_recompress);
 
     layer.initRepetitions (compressed.num_arrays ());
     for (auto r = compressed.begin_regular_arrays (); r != compressed.end_regular_arrays (); ++r) {
       tl_assert (r->second > 0);
-      make_repetition (r->first, layer.getRepetitions ()[r->second - 1]);
+      make_repetition (r->first, layer.getRepetitions () [r->second - 1]);
     }
     for (auto r = compressed.begin_irregular_arrays (); r != compressed.end_irregular_arrays (); ++r) {
       tl_assert (r->second > 0);
-      make_repetition (r->first, layer.getRepetitions ()[r->second - 1]);
+      make_repetition (r->first, layer.getRepetitions () [r->second - 1]);
     }
 
     make_objects (compressed.get_container<db::Point> (), layer.getPoints ());
@@ -998,7 +968,6 @@ Writer::write_layout_view (db::cell_index_type ci, kj::BufferedOutputStream &os)
     make_objects (compressed.get_container<db::Polygon> (), layer.getPolygons ());
     make_objects (compressed.get_container<db::SimplePolygon> (), layer.getSimplePolygons ());
     make_objects (compressed.get_container<db::Path> (), layer.getPaths ());
-
   }
 
   //  collects and writes the bounding box from the layers we want to write
@@ -1008,19 +977,19 @@ Writer::write_layout_view (db::cell_index_type ci, kj::BufferedOutputStream &os)
   }
   make_object (bbox, layout_view.getBoundingBox ());
 
-  //  instances 
+  //  instances
   {
     Compressed compressed;
-    compressed.compress_instances (cell.begin (), m_cells_to_write, m_compression_level); 
+    compressed.compress_instances (cell.begin (), m_cells_to_write, m_compression_level);
 
     layout_view.initInstanceRepetitions (compressed.num_arrays ());
     for (auto r = compressed.begin_regular_arrays (); r != compressed.end_regular_arrays (); ++r) {
       tl_assert (r->second > 0);
-      make_repetition (r->first, layout_view.getInstanceRepetitions ()[r->second - 1]);
+      make_repetition (r->first, layout_view.getInstanceRepetitions () [r->second - 1]);
     }
     for (auto r = compressed.begin_irregular_arrays (); r != compressed.end_irregular_arrays (); ++r) {
       tl_assert (r->second > 0);
-      make_repetition (r->first, layout_view.getInstanceRepetitions ()[r->second - 1]);
+      make_repetition (r->first, layout_view.getInstanceRepetitions () [r->second - 1]);
     }
 
     make_objects (compressed.get_container<db::CellInstArray> (), layout_view.getInstances ());
@@ -1033,12 +1002,11 @@ Writer::write_layout_view (db::cell_index_type ci, kj::BufferedOutputStream &os)
 
 /**
  *  @brief generates and writes a meta data view message for the given cell
- * 
+ *
  *  @param ci The cell for which to generate the message
  *  @param os The stream where to write the message
  */
-void 
-Writer::write_meta_data_view (db::cell_index_type ci, kj::BufferedOutputStream &os)
+void Writer::write_meta_data_view (db::cell_index_type ci, kj::BufferedOutputStream &os)
 {
   capnp::MallocMessageBuilder message;
 
@@ -1053,11 +1021,10 @@ Writer::write_meta_data_view (db::cell_index_type ci, kj::BufferedOutputStream &
 
 /**
  *  @brief Creates a regular repetition from the RegularArray object
- * 
+ *
  *  The regular array should not be a null array.
  */
-void 
-Writer::make_repetition (const RegularArray &array, stream::repetition::Repetition::Builder builder)
+void Writer::make_repetition (const RegularArray &array, stream::repetition::Repetition::Builder builder)
 {
   if (array.a ().y () == 0 && array.b ().x () == 0) {
 
@@ -1086,18 +1053,16 @@ Writer::make_repetition (const RegularArray &array, stream::repetition::Repetiti
     b.setDy (array.b ().y ());
     regular.setNa (array.na ());
     regular.setNb (array.nb ());
-
   }
 }
 
 /**
  *  @brief Creates an enumerated stream::repetition::Repetition object from a sequence of displacements
- *  
+ *
  *  The list of displacements is directly converted into the repetition object.
  *  The implied zero-displacement element at the beginning must not be added at the front.
  */
-void 
-Writer::make_repetition (const std::vector<db::Vector> &disp_array, stream::repetition::Repetition::Builder builder)
+void Writer::make_repetition (const std::vector<db::Vector> &disp_array, stream::repetition::Repetition::Builder builder)
 {
   auto enumerated = builder.getTypes ().initEnumerated ();
 
@@ -1106,9 +1071,9 @@ Writer::make_repetition (const std::vector<db::Vector> &disp_array, stream::repe
   size_t index = 0;
   db::Vector dl;
   for (auto d = disp_array.begin (); d != disp_array.end (); ++d, ++index) {
-    auto delta = enumerated.getDeltas ()[index];
+    auto delta = enumerated.getDeltas () [index];
     db::Vector dd = *d - dl;
-    dl = *d; 
+    dl = *d;
     delta.setDx (dd.x ());
     delta.setDy (dd.y ());
   }
@@ -1116,14 +1081,14 @@ Writer::make_repetition (const std::vector<db::Vector> &disp_array, stream::repe
 
 /**
  *  @brief Creates a stream::geometry::Contour struct from a sequence of points
- * 
+ *
  *  @param begin The begin iterator for the point sequence
  *  @param end The end iterator for the point sequence
  *  @param n The number of points
  *  @param builder The stream::geometry::Contour builder
  */
 template <class Iter>
-static void 
+static void
 make_contour (Iter begin, Iter end, size_t n, stream::geometry::Contour::Builder builder)
 {
   auto p = begin;
@@ -1136,8 +1101,8 @@ make_contour (Iter begin, Iter end, size_t n, stream::geometry::Contour::Builder
 
   builder.initDeltas (n - 1);
   size_t index = 0;
-  for ( ; p != end; ++p, ++index) {
-    auto d = builder.getDeltas ()[index];
+  for (; p != end; ++p, ++index) {
+    auto d = builder.getDeltas () [index];
     auto pd = *p - pl;
     d.setDx (pd.x ());
     d.setDy (pd.y ());
@@ -1148,8 +1113,7 @@ make_contour (Iter begin, Iter end, size_t n, stream::geometry::Contour::Builder
 /**
  *  @brief "make_object" overload for db::SimplePolygon and stream::layoutView::SimplePolygon
  */
-void
-Writer::make_object (const db::SimplePolygon &obj, stream::geometry::SimplePolygon::Builder cpnp_obj)
+void Writer::make_object (const db::SimplePolygon &obj, stream::geometry::SimplePolygon::Builder cpnp_obj)
 {
   make_contour (obj.hull ().begin (), obj.hull ().end (), obj.hull ().size (), cpnp_obj.getHull ());
 }
@@ -1157,22 +1121,20 @@ Writer::make_object (const db::SimplePolygon &obj, stream::geometry::SimplePolyg
 /**
  *  @brief "make_object" overload for db::Polygon and stream::layoutView::Polygon
  */
-void
-Writer::make_object (const db::Polygon &obj, stream::geometry::Polygon::Builder cpnp_obj)
+void Writer::make_object (const db::Polygon &obj, stream::geometry::Polygon::Builder cpnp_obj)
 {
   make_contour (obj.hull ().begin (), obj.hull ().end (), obj.hull ().size (), cpnp_obj.getHull ());
 
   cpnp_obj.initHoles (obj.holes ());
   for (unsigned int h = 0; h < obj.holes (); ++h) {
-    make_contour (obj.hole (h).begin (), obj.hole (h).end (), obj.hole (h).size (), cpnp_obj.getHoles ()[h]);
+    make_contour (obj.hole (h).begin (), obj.hole (h).end (), obj.hole (h).size (), cpnp_obj.getHoles () [h]);
   }
 }
 
 /**
  *  @brief "make_object" overload for db::Edge and stream::layoutView::Edge
  */
-void
-Writer::make_object (const db::Edge &obj, stream::geometry::Edge::Builder cpnp_obj)
+void Writer::make_object (const db::Edge &obj, stream::geometry::Edge::Builder cpnp_obj)
 {
   auto p1 = cpnp_obj.getP1 ();
   p1.setX (obj.p1 ().x ());
@@ -1186,8 +1148,7 @@ Writer::make_object (const db::Edge &obj, stream::geometry::Edge::Builder cpnp_o
 /**
  *  @brief "make_object" overload for db::EdgePair and stream::layoutView::EdgePair
  */
-void
-Writer::make_object (const db::EdgePair &obj, stream::geometry::EdgePair::Builder cpnp_obj)
+void Writer::make_object (const db::EdgePair &obj, stream::geometry::EdgePair::Builder cpnp_obj)
 {
   make_object (obj.first (), cpnp_obj.getE1 ());
   make_object (obj.second (), cpnp_obj.getE2 ());
@@ -1196,8 +1157,7 @@ Writer::make_object (const db::EdgePair &obj, stream::geometry::EdgePair::Builde
 /**
  *  @brief "make_object" overload for db::Box and stream::layoutView::Box
  */
-void
-Writer::make_object (const db::Box &obj, stream::geometry::Box::Builder cpnp_obj)
+void Writer::make_object (const db::Box &obj, stream::geometry::Box::Builder cpnp_obj)
 {
   auto p1 = cpnp_obj.getP1 ();
   p1.setX (obj.p1 ().x ());
@@ -1239,8 +1199,7 @@ Writer::make_fixpoint_transformation (const db::Trans &trans)
 /**
  *  @brief "make_object" overload for db::Text and stream::layoutView::Text
  */
-void
-Writer::make_object (const db::Text &obj, stream::geometry::Label::Builder cpnp_obj)
+void Writer::make_object (const db::Text &obj, stream::geometry::Label::Builder cpnp_obj)
 {
   db::Point pos = db::Point () + obj.trans ().disp ();
   cpnp_obj.getPosition ().setX (pos.x ());
@@ -1279,8 +1238,7 @@ Writer::make_object (const db::Text &obj, stream::geometry::Label::Builder cpnp_
 /**
  *  @brief "make_object" overload for db::Point and stream::layoutView::Point
  */
-void
-Writer::make_object (const db::Point &obj, stream::geometry::Point::Builder cpnp_obj)
+void Writer::make_object (const db::Point &obj, stream::geometry::Point::Builder cpnp_obj)
 {
   cpnp_obj.setX (obj.x ());
   cpnp_obj.setY (obj.y ());
@@ -1289,8 +1247,7 @@ Writer::make_object (const db::Point &obj, stream::geometry::Point::Builder cpnp
 /**
  *  @brief "make_object" overload for db::Path and stream::layoutView::Path
  */
-void
-Writer::make_object (const db::Path &obj, stream::geometry::Path::Builder cpnp_obj)
+void Writer::make_object (const db::Path &obj, stream::geometry::Path::Builder cpnp_obj)
 {
   make_contour (obj.begin (), obj.end (), obj.points (), cpnp_obj.getSpine ());
   if ((obj.width () / 2) * 2 != obj.width ()) {
@@ -1317,8 +1274,7 @@ Writer::make_object (const db::Path &obj, stream::geometry::Path::Builder cpnp_o
 /**
  *  @brief "make_object" overload for db::CellInstArray and stream::layoutView::CellInstance
  */
-void
-Writer::make_object (const db::CellInstArray &obj, stream::layoutView::CellInstance::Builder cpnp_obj)
+void Writer::make_object (const db::CellInstArray &obj, stream::layoutView::CellInstance::Builder cpnp_obj)
 {
   //  NOTE: the "CellInstArray" will actually be a single instance always
   tl_assert (obj.size () == 1);
@@ -1345,39 +1301,38 @@ Writer::make_object (const db::CellInstArray &obj, stream::layoutView::CellInsta
 
 /**
  *  @brief Writes the given compressed container to the container builder
- * 
+ *
  *  "Object" is an object that is supported by the compression scheme
  *  (those are db::CellInstArray and the geometrical primitives such as db::Box etc.).
- * 
+ *
  *  "Builder" is the Builder object of a "ObjectContainerForType" generic struct.
- * 
+ *
  *  This method will use the "make_object" overloads to actually create the objects.
- *  The "compressed_container" will contain various variants involved plain and 
- *  arrayed objects, optionally combined with properties. 
- * 
+ *  The "compressed_container" will contain various variants involved plain and
+ *  arrayed objects, optionally combined with properties.
+ *
  *  These schemes are placed in the corresponding slots of the "ObjectContainerForType"
  *  struct.
- * 
+ *
  *  This method is called after the compressed objects have been computed.
  *  This also involves generating repetition Ids which are already available when
  *  this method is called.
  */
 template <class Object, class Builder>
-void
-Writer::make_objects (const Compressed::compressed_container<Object> &container, Builder builder)
+void Writer::make_objects (const Compressed::compressed_container<Object> &container, Builder builder)
 {
   size_t i;
 
   builder.initBasic (container.plain.size ());
   i = 0;
   for (auto s = container.plain.begin (); s != container.plain.end (); ++s, ++i) {
-    make_object (*s, builder.getBasic ()[i].getBasic ());
+    make_object (*s, builder.getBasic () [i].getBasic ());
   }
 
   builder.initArrays (container.array.size ());
   i = 0;
   for (auto s = container.array.begin (); s != container.array.end (); ++s, ++i) {
-    auto a = builder.getArrays ()[i];
+    auto a = builder.getArrays () [i];
     make_object (s->first, a.getBasic ());
     a.setRepetitionId (s->second);
   }
@@ -1385,7 +1340,7 @@ Writer::make_objects (const Compressed::compressed_container<Object> &container,
   builder.initWithProperties (container.with_properties.size ());
   i = 0;
   for (auto s = container.with_properties.begin (); s != container.with_properties.end (); ++s, ++i) {
-    auto a = builder.getWithProperties ()[i];
+    auto a = builder.getWithProperties () [i];
     make_object (s->first, a.getBasic ());
     a.setPropertySetId (get_property_id (s->second));
   }
@@ -1393,7 +1348,7 @@ Writer::make_objects (const Compressed::compressed_container<Object> &container,
   builder.initArraysWithProperties (container.array_with_properties.size ());
   i = 0;
   for (auto s = container.array_with_properties.begin (); s != container.array_with_properties.end (); ++s, ++i) {
-    auto a = builder.getArraysWithProperties ()[i];
+    auto a = builder.getArraysWithProperties () [i];
     auto ab = a.getBasic ();
     make_object (s->first.first, ab.getBasic ());
     ab.setRepetitionId (s->second);
@@ -1402,4 +1357,3 @@ Writer::make_objects (const Compressed::compressed_container<Object> &container,
 }
 
 } // namespace db
-

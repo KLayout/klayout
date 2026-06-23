@@ -37,7 +37,7 @@ class PropertiesPage
   : public lay::PropertiesPage,
     public Ui::RulerPropertiesPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   PropertiesPage (ant::Service *rulers, db::Manager *manager, QWidget *parent);
@@ -59,7 +59,7 @@ private slots:
   void something_changed ();
 
 private:
-  std::vector <ant::Service::obj_iterator> m_selection;
+  std::vector<ant::Service::obj_iterator> m_selection;
   size_t m_index;
   ant::Service *mp_rulers;
   bool m_enable_cb_callback;

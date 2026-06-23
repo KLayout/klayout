@@ -44,17 +44,20 @@ class RubyError
   : public tl::ScriptError
 {
 public:
-  RubyError (VALUE exc, const char *msg, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
+  RubyError (VALUE exc, const char *msg, const char *cls, const std::vector<tl::BacktraceElement> &backtrace)
     : tl::ScriptError (msg, cls, backtrace), m_exc (exc)
-  { }
+  {
+  }
 
-  RubyError (VALUE exc, const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
+  RubyError (VALUE exc, const char *msg, const char *sourcefile, int line, const char *cls, const std::vector<tl::BacktraceElement> &backtrace)
     : tl::ScriptError (msg, sourcefile, line, cls, backtrace), m_exc (exc)
-  { }
+  {
+  }
 
   RubyError (const RubyError &d)
     : tl::ScriptError (d), m_exc (d.m_exc)
-  { }
+  {
+  }
 
   VALUE exc () const
   {
@@ -74,7 +77,8 @@ class RubyContinueException
 public:
   RubyContinueException (int state)
     : tl::CancelException (), m_state (state)
-  { }
+  {
+  }
 
   int state () const
   {
@@ -92,8 +96,7 @@ class Proxy
   : public gsi::Callee
 {
 public:
-  struct CallbackFunction
-  {
+  struct CallbackFunction {
     CallbackFunction (ID id, const gsi::MethodBase *m)
       : method_id (id), method (m)
     {
@@ -308,4 +311,3 @@ void make_locked_object_vault (VALUE module);
 #endif
 
 #endif
-

@@ -44,8 +44,7 @@ class DeviceAbstract;
 /**
  *  @brief A structure describing a terminal reference into another device abstract
  */
-struct DeviceReconnectedTerminal
-{
+struct DeviceReconnectedTerminal {
   DeviceReconnectedTerminal (size_t _device_index, unsigned int _other_terminal_id)
     : device_index (_device_index), other_terminal_id (_other_terminal_id)
   {
@@ -68,8 +67,7 @@ struct DeviceReconnectedTerminal
  *  This structure is used within Device to reference more than the standard
  *  device abstract.
  */
-struct DeviceAbstractRef
-{
+struct DeviceAbstractRef {
   DeviceAbstractRef (const db::DeviceAbstract *_device_abstract, const db::DCplxTrans &_trans)
     : device_abstract (_device_abstract), trans (_trans)
   {
@@ -99,7 +97,7 @@ class DB_PUBLIC Device
   : public db::NetlistObject
 {
 public:
-  typedef std::vector<std::pair<size_t, size_t> > global_connections;
+  typedef std::vector<std::pair<size_t, size_t>> global_connections;
   typedef global_connections::const_iterator global_connections_iterator;
 
   /**
@@ -329,9 +327,9 @@ public:
    */
   const std::vector<DeviceReconnectedTerminal> *reconnected_terminals_for (unsigned int this_terminal) const
   {
-    std::map<unsigned int, std::vector<DeviceReconnectedTerminal> >::const_iterator t = m_reconnected_terminals.find (this_terminal);
+    std::map<unsigned int, std::vector<DeviceReconnectedTerminal>>::const_iterator t = m_reconnected_terminals.find (this_terminal);
     if (t != m_reconnected_terminals.end ()) {
-      return & t->second;
+      return &t->second;
     } else {
       return 0;
     }
@@ -340,7 +338,7 @@ public:
   /**
    *  @brief Gets the map of reconnected terminals
    */
-  const std::map<unsigned int, std::vector<DeviceReconnectedTerminal> > &reconnected_terminals () const
+  const std::map<unsigned int, std::vector<DeviceReconnectedTerminal>> &reconnected_terminals () const
   {
     return m_reconnected_terminals;
   }
@@ -350,7 +348,7 @@ public:
    *
    *  NOTE: don't use this method to modify this container! It's provided for persistence implementation only.
    */
-  std::map<unsigned int, std::vector<DeviceReconnectedTerminal> > &reconnected_terminals ()
+  std::map<unsigned int, std::vector<DeviceReconnectedTerminal>> &reconnected_terminals ()
   {
     return m_reconnected_terminals;
   }
@@ -406,7 +404,7 @@ private:
   size_t m_id;
   Circuit *mp_circuit;
   std::vector<DeviceAbstractRef> m_other_abstracts;
-  std::map<unsigned int, std::vector<DeviceReconnectedTerminal> > m_reconnected_terminals;
+  std::map<unsigned int, std::vector<DeviceReconnectedTerminal>> m_reconnected_terminals;
 
   /**
    * @brief Translates the device abstracts

@@ -43,8 +43,7 @@ namespace edt
 
 static const size_t max_entries = 100;
 
-void
-RecentConfigurationPage::init ()
+void RecentConfigurationPage::init ()
 {
   QVBoxLayout *ly = new QVBoxLayout (this);
   ly->setContentsMargins (0, 0, 0, 0);
@@ -89,12 +88,12 @@ int RecentConfigurationPage::order () const
   return 100;
 }
 
-std::list<std::vector<std::string> >
+std::list<std::vector<std::string>>
 RecentConfigurationPage::get_stored_values () const
 {
   std::string serialized_list = dispatcher ()->config_get (m_recent_cfg_name);
 
-  std::list<std::vector<std::string> > values;
+  std::list<std::vector<std::string>> values;
 
   try {
 
@@ -107,7 +106,6 @@ RecentConfigurationPage::get_stored_values () const
         ex.read_word_or_quoted (values.back ().back ());
         ex.test (",");
       }
-
     }
 
   } catch (tl::Exception &ex) {
@@ -118,11 +116,10 @@ RecentConfigurationPage::get_stored_values () const
   return values;
 }
 
-void
-RecentConfigurationPage::set_stored_values (const std::list<std::vector<std::string> > &values) const
+void RecentConfigurationPage::set_stored_values (const std::list<std::vector<std::string>> &values) const
 {
   std::string serialized_list;
-  for (std::list<std::vector<std::string> >::const_iterator v = values.begin (); v != values.end (); ++v) {
+  for (std::list<std::vector<std::string>>::const_iterator v = values.begin (); v != values.end (); ++v) {
     if (v != values.begin ()) {
       serialized_list += ";";
     }
@@ -160,8 +157,7 @@ lp_iter_from_string (lay::LayoutViewBase *view, const std::string &s)
 }
 
 
-void
-RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std::vector<std::string> &values, RecentConfigurationPage::ConfigurationRendering rendering)
+void RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std::vector<std::string> &values, RecentConfigurationPage::ConfigurationRendering rendering)
 {
 #if QT_VERSION >= 0x050000
   double dpr = devicePixelRatio ();
@@ -175,37 +171,33 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
   switch (rendering) {
 
   case RecentConfigurationPage::ArrayFlag:
-  case RecentConfigurationPage::Bool:
-    {
-      bool f = false;
-      try {
-        tl::from_string (values [column], f);
-      } catch (tl::Exception &ex) {
-        tl::error << tl::to_string (tr ("Configuration error (ArrayFlag/Bool): ")) << ex.msg ();
-      }
-      static QString checkmark = QString::fromUtf8 ("\xe2\x9c\x93");
-      item->setText (column, f ? checkmark : QString ()); // "checkmark"
+  case RecentConfigurationPage::Bool: {
+    bool f = false;
+    try {
+      tl::from_string (values [column], f);
+    } catch (tl::Exception &ex) {
+      tl::error << tl::to_string (tr ("Configuration error (ArrayFlag/Bool): ")) << ex.msg ();
     }
-    break;
+    static QString checkmark = QString::fromUtf8 ("\xe2\x9c\x93");
+    item->setText (column, f ? checkmark : QString ()); // "checkmark"
+  } break;
 
-  case RecentConfigurationPage::Layer:
-    {
-      int icon_size = item->treeWidget ()->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
-      lay::LayerPropertiesConstIterator l;
-      try {
-        l = lp_iter_from_string (view (), values [column]);
-      } catch (tl::Exception &ex) {
-        tl::error << tl::to_string (tr ("Configuration error (Layer): ")) << ex.msg ();
-      }
-      if (! l.is_null () && ! l.at_end ()) {
-        item->setIcon (column, lay::LayerTreeModel::icon_for_layer (l, view (), icon_size, icon_size, dpr, 0, true));
-        item->setText (column, tl::to_qstring (values [column]));
-      } else {
-        item->setIcon (column, QIcon ());
-        item->setText (column, tl::to_qstring ("(" + values [column] + ")"));
-      }
+  case RecentConfigurationPage::Layer: {
+    int icon_size = item->treeWidget ()->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
+    lay::LayerPropertiesConstIterator l;
+    try {
+      l = lp_iter_from_string (view (), values [column]);
+    } catch (tl::Exception &ex) {
+      tl::error << tl::to_string (tr ("Configuration error (Layer): ")) << ex.msg ();
     }
-    break;
+    if (! l.is_null () && ! l.at_end ()) {
+      item->setIcon (column, lay::LayerTreeModel::icon_for_layer (l, view (), icon_size, icon_size, dpr, 0, true));
+      item->setText (column, tl::to_qstring (values [column]));
+    } else {
+      item->setIcon (column, QIcon ());
+      item->setText (column, tl::to_qstring ("(" + values [column] + ")"));
+    }
+  } break;
 
   case RecentConfigurationPage::Int:
   case RecentConfigurationPage::Double:
@@ -222,125 +214,113 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
     break;
 
   case RecentConfigurationPage::IntIfArray:
-  case RecentConfigurationPage::DoubleIfArray:
-    {
-      bool is_array = false;
-      int flag_column = 0;
-      for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++flag_column) {
-        if (c->rendering == RecentConfigurationPage::ArrayFlag) {
-          try {
-            tl::from_string (values [flag_column], is_array);
-          } catch (tl::Exception &ex) {
-            tl::error << tl::to_string (tr ("Configuration error (IntIfArray/DoubleIfArray): ")) << ex.msg ();
-          }
-          break;
+  case RecentConfigurationPage::DoubleIfArray: {
+    bool is_array = false;
+    int flag_column = 0;
+    for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++flag_column) {
+      if (c->rendering == RecentConfigurationPage::ArrayFlag) {
+        try {
+          tl::from_string (values [flag_column], is_array);
+        } catch (tl::Exception &ex) {
+          tl::error << tl::to_string (tr ("Configuration error (IntIfArray/DoubleIfArray): ")) << ex.msg ();
         }
-      }
-
-      if (is_array) {
-        item->setText (column, tl::to_qstring (values [column]));
-      } else {
-        item->setText (column, QString ());
+        break;
       }
     }
-    break;
 
-  case RecentConfigurationPage::CellDisplayName:
-    {
-      //  search for a libname
-      int libname_column = 0;
-      const db::Library *lib = 0;
-      for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++libname_column) {
-        if (c->rendering == RecentConfigurationPage::CellLibraryName) {
-          if (view ()->active_cellview ().is_valid ()) {
-            lib = db::LibraryManager::instance ().lib_ptr_by_name (values [libname_column], view ()->active_cellview ()->tech_name ());
-          } else {
-            lib = db::LibraryManager::instance ().lib_ptr_by_name (values [libname_column]);
-          }
-          break;
-        }
-      }
-
-      if (lib) {
-
-        //  search for a PCell parameters
-        int pcp_column = 0;
-        std::map<std::string, tl::Variant> pcp;
-        for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++pcp_column) {
-          if (c->rendering == RecentConfigurationPage::PCellParameters) {
-            pcp = lay::pcell_parameters_from_string (values [pcp_column]);
-            break;
-          }
-        }
-
-        std::pair<bool, db::Layout::pcell_id_type> pcid = lib->layout ().pcell_by_name (values [column].c_str ());
-        if (pcid.first) {
-          const db::PCellDeclaration *pc_decl = lib->layout ().pcell_declaration (pcid.second);
-          if (pc_decl) {
-            lay::BusySection busy;  //  do not trigger macro IDE breakpoints and exception handling
-            try {
-              item->setText (column, tl::to_qstring (pc_decl->get_display_name (pc_decl->map_parameters (pcp))));
-            } catch (tl::Exception &ex) {
-              item->setText (column, tl::to_qstring (std::string ("ERROR: ") + tl::to_quoted_string (ex.msg ())));
-            }
-            break;
-          }
-        }
-
-      }
-
+    if (is_array) {
       item->setText (column, tl::to_qstring (values [column]));
+    } else {
+      item->setText (column, QString ());
     }
-    break;
+  } break;
 
-  case RecentConfigurationPage::PCellParameters:
-    {
-      std::map<std::string, tl::Variant> pcp;
-      try {
-        pcp = lay::pcell_parameters_from_string (values [column]);
-      } catch (tl::Exception &ex) {
-        tl::error << tl::to_string (tr ("Configuration error (PCellParameters): ")) << ex.msg ();
-      }
-      std::string r;
-      for (std::map<std::string, tl::Variant>::const_iterator p = pcp.begin (); p != pcp.end (); ++p) {
-        if (p != pcp.begin ()) {
-          r += ",";
+  case RecentConfigurationPage::CellDisplayName: {
+    //  search for a libname
+    int libname_column = 0;
+    const db::Library *lib = 0;
+    for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++libname_column) {
+      if (c->rendering == RecentConfigurationPage::CellLibraryName) {
+        if (view ()->active_cellview ().is_valid ()) {
+          lib = db::LibraryManager::instance ().lib_ptr_by_name (values [libname_column], view ()->active_cellview ()->tech_name ());
+        } else {
+          lib = db::LibraryManager::instance ().lib_ptr_by_name (values [libname_column]);
         }
-        r += p->first;
-        r += "=";
-        r += p->second.to_string ();
+        break;
+      }
+    }
+
+    if (lib) {
+
+      //  search for a PCell parameters
+      int pcp_column = 0;
+      std::map<std::string, tl::Variant> pcp;
+      for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++pcp_column) {
+        if (c->rendering == RecentConfigurationPage::PCellParameters) {
+          pcp = lay::pcell_parameters_from_string (values [pcp_column]);
+          break;
+        }
       }
 
-      item->setText (column, tl::to_qstring (r));
+      std::pair<bool, db::Layout::pcell_id_type> pcid = lib->layout ().pcell_by_name (values [column].c_str ());
+      if (pcid.first) {
+        const db::PCellDeclaration *pc_decl = lib->layout ().pcell_declaration (pcid.second);
+        if (pc_decl) {
+          lay::BusySection busy; //  do not trigger macro IDE breakpoints and exception handling
+          try {
+            item->setText (column, tl::to_qstring (pc_decl->get_display_name (pc_decl->map_parameters (pcp))));
+          } catch (tl::Exception &ex) {
+            item->setText (column, tl::to_qstring (std::string ("ERROR: ") + tl::to_quoted_string (ex.msg ())));
+          }
+          break;
+        }
+      }
     }
-    break;
+
+    item->setText (column, tl::to_qstring (values [column]));
+  } break;
+
+  case RecentConfigurationPage::PCellParameters: {
+    std::map<std::string, tl::Variant> pcp;
+    try {
+      pcp = lay::pcell_parameters_from_string (values [column]);
+    } catch (tl::Exception &ex) {
+      tl::error << tl::to_string (tr ("Configuration error (PCellParameters): ")) << ex.msg ();
+    }
+    std::string r;
+    for (std::map<std::string, tl::Variant>::const_iterator p = pcp.begin (); p != pcp.end (); ++p) {
+      if (p != pcp.begin ()) {
+        r += ",";
+      }
+      r += p->first;
+      r += "=";
+      r += p->second.to_string ();
+    }
+
+    item->setText (column, tl::to_qstring (r));
+  } break;
   }
-
 }
 
-void
-RecentConfigurationPage::layers_changed (int)
+void RecentConfigurationPage::layers_changed (int)
 {
   dm_update_list ();
 }
 
-void
-RecentConfigurationPage::technology_changed (const std::string &)
+void RecentConfigurationPage::technology_changed (const std::string &)
 {
   dm_update_list ();
 }
 
-void
-RecentConfigurationPage::update_list ()
+void RecentConfigurationPage::update_list ()
 {
   update_list (get_stored_values ());
 }
 
-void
-RecentConfigurationPage::update_list (const std::list<std::vector<std::string> > &stored_values)
+void RecentConfigurationPage::update_list (const std::list<std::vector<std::string>> &stored_values)
 {
   int row = 0;
-  for (std::list<std::vector<std::string> >::const_iterator v = stored_values.begin (); v != stored_values.end (); ++v, ++row) {
+  for (std::list<std::vector<std::string>>::const_iterator v = stored_values.begin (); v != stored_values.end (); ++v, ++row) {
 
     QTreeWidgetItem *item = 0;
     if (row < mp_tree_widget->topLevelItemCount ()) {
@@ -356,7 +336,6 @@ RecentConfigurationPage::update_list (const std::list<std::vector<std::string> >
         render_to (item, column, *v, c->rendering);
       }
     }
-
   }
 
   while (mp_tree_widget->topLevelItemCount () > row) {
@@ -366,8 +345,7 @@ RecentConfigurationPage::update_list (const std::list<std::vector<std::string> >
   mp_tree_widget->header ()->resizeSections (QHeaderView::ResizeToContents);
 }
 
-void
-RecentConfigurationPage::item_clicked (QTreeWidgetItem *item)
+void RecentConfigurationPage::item_clicked (QTreeWidgetItem *item)
 {
   int column = 0;
   for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++column) {
@@ -390,14 +368,12 @@ RecentConfigurationPage::item_clicked (QTreeWidgetItem *item)
     } else {
       dispatcher ()->config_set (c->cfg_name, v);
     }
-
   }
 
   dispatcher ()->config_end ();
 }
 
-void
-RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
+void RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
 {
   std::vector<std::string> values;
   values.reserve (m_cfg.size ());
@@ -407,7 +383,7 @@ RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
 
       std::string s;
 
-      if (!(view ()->current_layer ().is_null () || view ()->current_layer ().at_end ()) && view ()->current_layer ()->is_visual ()) {
+      if (! (view ()->current_layer ().is_null () || view ()->current_layer ().at_end ()) && view ()->current_layer ()->is_visual ()) {
 
         int cv_index = view ()->current_layer ()->cellview_index ();
         const lay::CellView &cv = view ()->cellview (cv_index);
@@ -415,10 +391,9 @@ RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
         if (cv.is_valid () && cv->layout ().is_valid_layer (li)) {
           s = cv->layout ().get_properties (li).to_string ();
           if (cv_index != view ()->active_cellview_index ()) {
-             s += "@" + tl::to_string (cv_index);
+            s += "@" + tl::to_string (cv_index);
           }
         }
-
       }
 
       values.push_back (s);
@@ -426,12 +401,11 @@ RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
     } else {
       values.push_back (root->config_get (c->cfg_name));
     }
-
   }
 
-  std::list<std::vector<std::string> > stored_values = get_stored_values ();
+  std::list<std::vector<std::string>> stored_values = get_stored_values ();
 
-  for (std::list<std::vector<std::string> >::iterator v = stored_values.begin (); v != stored_values.end (); ++v) {
+  for (std::list<std::vector<std::string>>::iterator v = stored_values.begin (); v != stored_values.end (); ++v) {
     if (*v == values) {
       stored_values.erase (v);
       break;
@@ -449,13 +423,12 @@ RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
   update_list (stored_values);
 }
 
-void
-RecentConfigurationPage::config_recent_for_layer (lay::Dispatcher *root, const db::LayerProperties &lp, int cv_index)
+void RecentConfigurationPage::config_recent_for_layer (lay::Dispatcher *root, const db::LayerProperties &lp, int cv_index)
 {
-  std::list<std::vector<std::string> > stored_values = get_stored_values ();
+  std::list<std::vector<std::string>> stored_values = get_stored_values ();
 
   auto v = stored_values.begin ();
-  for ( ; v != stored_values.end (); ++v) {
+  for (; v != stored_values.end (); ++v) {
 
     bool match = false;
     auto vv = v->begin ();
@@ -473,15 +446,12 @@ RecentConfigurationPage::config_recent_for_layer (lay::Dispatcher *root, const d
         }
 
         match = (lp.log_equal (lp_stored) && (cv_index < 0 || cv_index_stored == cv_index));
-
       }
-
     }
 
     if (match) {
       break;
     }
-
   }
 
   if (v != stored_values.end ()) {
@@ -494,14 +464,14 @@ RecentConfigurationPage::config_recent_for_layer (lay::Dispatcher *root, const d
     }
 
     root->config_end ();
-
   }
 }
 
 // ------------------------------------------------------------------
 //  Configurations and registrations
 
-namespace {
+namespace
+{
 
 class RecentShapeConfigurationPage
   : public edt::RecentConfigurationPage

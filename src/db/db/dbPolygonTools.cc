@@ -40,15 +40,14 @@ namespace db
 
 //  internal: compare edges by higher y coordinate
 template <class E>
-struct inside_poly_test_edge_max_compare_f
-{
+struct inside_poly_test_edge_max_compare_f {
   bool operator() (const E &e1, const E &e2)
   {
     return std::max (e1.p1 ().y (), e1.p2 ().y ()) < std::max (e2.p1 ().y (), e2.p2 ().y ());
   }
 };
 
-template<class P> 
+template <class P>
 inside_poly_test<P>::inside_poly_test (const P &polygon)
 {
   m_edges.reserve (polygon.vertices ());
@@ -58,7 +57,7 @@ inside_poly_test<P>::inside_poly_test (const P &polygon)
   std::sort (m_edges.begin (), m_edges.end (), inside_poly_test_edge_max_compare_f<edge_type> ());
 }
 
-template<class P> 
+template <class P>
 int inside_poly_test<P>::operator() (const typename inside_poly_test<P>::point_type &pt) const
 {
   int wrapcount_left = 0;
@@ -68,7 +67,7 @@ int inside_poly_test<P>::operator() (const typename inside_poly_test<P>::point_t
 
     if ((*e).p1 ().y () <= pt.y () && (*e).p2 ().y () > pt.y ()) {
       int side = (*e).side_of (pt);
-      if (side < 0) { 
+      if (side < 0) {
         ++wrapcount_left;
       } else if (side == 0) {
         //  "on" the line is excluded in the predicate
@@ -76,7 +75,7 @@ int inside_poly_test<P>::operator() (const typename inside_poly_test<P>::point_t
       }
     } else if ((*e).p2 ().y () <= pt.y () && (*e).p1 ().y () > pt.y ()) {
       int side = (*e).side_of (pt);
-      if (side > 0) { 
+      if (side > 0) {
         --wrapcount_left;
       } else if (side == 0) {
         //  "on" the line is excluded in the predicate
@@ -90,7 +89,6 @@ int inside_poly_test<P>::operator() (const typename inside_poly_test<P>::point_t
     }
 
     ++e;
-
   }
 
   return (wrapcount_left != 0) ? 1 : -1;
@@ -108,19 +106,20 @@ template class DB_PUBLIC inside_poly_test<db::DPolygon>;
  *  @brief A helper structure describing an edge cutting the cut line.
  */
 template <class PointType>
-struct cut_polygon_edge
-{
+struct cut_polygon_edge {
   typedef typename PointType::coord_type coord_type;
   typedef typename db::edge<coord_type> edge_type;
   typedef double projection_type;
 
   cut_polygon_edge ()
     : contour (-1), index (0), projected (0), point (), last_point ()
-  { }
+  {
+  }
 
-  cut_polygon_edge (int c, unsigned int n, projection_type p, const PointType &pt, const PointType &lpt) 
+  cut_polygon_edge (int c, unsigned int n, projection_type p, const PointType &pt, const PointType &lpt)
     : contour (c), index (n), projected (p), point (pt), last_point (lpt)
-  { }
+  {
+  }
 
   edge_type edge () const
   {
@@ -135,8 +134,7 @@ struct cut_polygon_edge
 };
 
 template <class CuttingEdgeType>
-struct cut_polygon_segment
-{
+struct cut_polygon_segment {
   typedef typename CuttingEdgeType::edge_type edge_type;
   typedef typename CuttingEdgeType::projection_type projection_type;
 
@@ -152,20 +150,19 @@ struct cut_polygon_segment
 };
 
 template <class CuttingEdgeType>
-struct loose_end_struct
-{
+struct loose_end_struct {
 public:
   typedef typename CuttingEdgeType::edge_type edge_type;
   typedef typename CuttingEdgeType::projection_type projection_type;
 
-  loose_end_struct (bool _enter, typename std::vector<cut_polygon_segment<CuttingEdgeType> >::const_iterator _iter)
+  loose_end_struct (bool _enter, typename std::vector<cut_polygon_segment<CuttingEdgeType>>::const_iterator _iter)
     : enter (_enter), iter (_iter)
   {
     //  .. nothing yet ..
   }
 
   bool enter;
-  typename std::vector<cut_polygon_segment<CuttingEdgeType> >::const_iterator iter;
+  typename std::vector<cut_polygon_segment<CuttingEdgeType>>::const_iterator iter;
 
   edge_type edge () const
   {
@@ -207,8 +204,8 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
   typedef cut_polygon_segment<cut_polygon_edge_type> cutting_segment_type;
 
   bool do_hole_assignment = (input.holes () > 0);
-  std::vector <PolygonType> hull_polygons;
-  std::vector <PolygonType> hole_polygons;
+  std::vector<PolygonType> hull_polygons;
+  std::vector<PolygonType> hole_polygons;
 
   std::vector<cutting_segment_type> cutting_segments;
   double line_length = line.double_length ();
@@ -226,13 +223,13 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
     int sc = -1;
     size_t nfirst = cutting_segments.size ();
 
-    point_type last_pt = contour[nn];
+    point_type last_pt = contour [nn];
     for (unsigned int n = 0; n < contour.size (); ++n) {
 
-      edge_type e (last_pt, contour[n]);
+      edge_type e (last_pt, contour [n]);
       last_pt = e.p2 ();
 
-      std::pair <bool, point_type> ip = line.crossed_by_point (e);
+      std::pair<bool, point_type> ip = line.crossed_by_point (e);
       if (ip.first) {
 
         int s1 = line.side_of (e.p1 ());
@@ -250,29 +247,27 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
         }
 
         if (s1 >= 0 && s2 < 0) {
-          // left or on edge -> right 
+          // left or on edge -> right
           ++sc;
           cutting_segments.push_back (cutting_segment_type ());
           cutting_segments.back ().enter = cut_polygon_edge_type (int (nc), nn, p, ip.second, e.p2 ());
           cutting_segments.back ().segment = sc;
         }
-
       }
 
       nn = n;
-
     }
 
     if (any) {
 
       //  tie together last and first partial segments.
-      if (cutting_segments[nfirst].segment < 0) {
-        cutting_segments[nfirst].enter = cutting_segments.back ().enter;
-        cutting_segments[nfirst].segment = cutting_segments.back ().segment;
+      if (cutting_segments [nfirst].segment < 0) {
+        cutting_segments [nfirst].enter = cutting_segments.back ().enter;
+        cutting_segments [nfirst].segment = cutting_segments.back ().segment;
         cutting_segments.pop_back ();
       }
 
-    } else if (line.side_of (contour[0]) < 0) {
+    } else if (line.side_of (contour [0]) < 0) {
 
       if (do_hole_assignment) {
 
@@ -292,12 +287,11 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
         right_of_line->put (poly);
       }
     }
-
   }
 
   //  build a table of the loose ends
 
-  std::vector<loose_end_struct<cut_polygon_edge_type> > loose_ends;
+  std::vector<loose_end_struct<cut_polygon_edge_type>> loose_ends;
   loose_ends.reserve (cutting_segments.size () * 2);
 
   for (typename std::vector<cutting_segment_type>::const_iterator i = cutting_segments.begin (); i != cutting_segments.end (); ++i) {
@@ -310,27 +304,27 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
   //  we allow single pairs of collinear entry/leave edges (cut lines) and bring them in the right order
 
   bool enter = false;
-  for (typename std::vector<loose_end_struct<cut_polygon_edge_type> >::iterator i = loose_ends.begin (); i != loose_ends.end (); ++i) {
-    if (i + 1 != loose_ends.end () && i[1] == i[0]) {
-      if (i + 2 != loose_ends.end () && i[2] == i[0]) {
+  for (typename std::vector<loose_end_struct<cut_polygon_edge_type>>::iterator i = loose_ends.begin (); i != loose_ends.end (); ++i) {
+    if (i + 1 != loose_ends.end () && i [1] == i [0]) {
+      if (i + 2 != loose_ends.end () && i [2] == i [0]) {
         //  triple collinear
         return false;
       }
-      if (i[0].enter != enter && i[1].enter == enter) {
-        std::swap (i[0], i[1]);
+      if (i [0].enter != enter && i [1].enter == enter) {
+        std::swap (i [0], i [1]);
       }
     }
-    enter = !enter;
+    enter = ! enter;
   }
 
   //  the points now have to be in strict enter/leave order - otherwise fallback to merge
 
   enter = false;
-  for (typename std::vector<loose_end_struct<cut_polygon_edge_type> >::iterator i = loose_ends.begin (); i != loose_ends.end (); ++i) {
+  for (typename std::vector<loose_end_struct<cut_polygon_edge_type>>::iterator i = loose_ends.begin (); i != loose_ends.end (); ++i) {
     if (i->enter != enter) {
       return false;
     }
-    enter = !enter;
+    enter = ! enter;
   }
 
   //  connect the segments a pair each
@@ -338,17 +332,17 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
   std::vector<cut_polygon_edge_type> cutting_edges;
   cutting_edges.reserve (loose_ends.size ());
 
-  for (typename std::vector<loose_end_struct<cut_polygon_edge_type> >::iterator i = loose_ends.begin (); i != loose_ends.end (); ++i) {
+  for (typename std::vector<loose_end_struct<cut_polygon_edge_type>>::iterator i = loose_ends.begin (); i != loose_ends.end (); ++i) {
     cutting_edges.push_back (i->enter ? i->iter->enter : i->iter->leave);
   }
 
   std::vector<point_type> contour_points;
-  typedef std::map <std::pair<int, int>, std::pair<typename std::vector<cut_polygon_edge_type>::iterator, typename std::vector<cut_polygon_edge_type>::iterator> > cut_point_map_type;
+  typedef std::map<std::pair<int, int>, std::pair<typename std::vector<cut_polygon_edge_type>::iterator, typename std::vector<cut_polygon_edge_type>::iterator>> cut_point_map_type;
   cut_point_map_type cut_points;
 
   for (typename std::vector<cut_polygon_edge_type>::iterator c = cutting_edges.begin (); c != cutting_edges.end (); c += 2) {
-    cut_points.insert (std::make_pair (std::make_pair (c[0].contour, c[0].index), std::make_pair (c, c + 1)));
-    cut_points.insert (std::make_pair (std::make_pair (c[1].contour, c[1].index), std::make_pair (c + 1, c)));
+    cut_points.insert (std::make_pair (std::make_pair (c [0].contour, c [0].index), std::make_pair (c, c + 1)));
+    cut_points.insert (std::make_pair (std::make_pair (c [1].contour, c [1].index), std::make_pair (c + 1, c)));
   }
 
   for (typename std::vector<cut_polygon_edge_type>::iterator c = cutting_edges.begin (); c != cutting_edges.end (); c += 2) {
@@ -387,7 +381,7 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
 
         while (n != n0) {
 
-          contour_points.push_back (contour[n]);
+          contour_points.push_back (contour [n]);
 
           typename cut_point_map_type::iterator cp = cut_points.find (std::make_pair (nc, n));
           if (cp != cut_points.end ()) {
@@ -400,7 +394,6 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
           if (n == int (contour.size ())) {
             n = 0;
           }
-
         }
 
         tl_assert (n != n0);
@@ -428,9 +421,7 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
           right_of_line->put (poly);
         }
       }
-
     }
-
   }
 
   //  do hole assignment
@@ -447,7 +438,7 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
           //  look for one point "really" inside ...
           int inside = 0;
           for (size_t i = 0; i < n && inside == 0; ++i) {
-            inside = inside_hull (hole->hull ()[i]);
+            inside = inside_hull (hole->hull () [i]);
           }
           if (inside >= 0) {
             hull->insert_hole (hole->hull ().begin (), hole->hull ().end ());
@@ -459,9 +450,7 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
       hull->sort_holes ();
 
       right_of_line->put (*hull);
-
     }
-
   }
 
   // use non-assigned hole (parts) as hulls
@@ -479,155 +468,159 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
 namespace
 {
 
-  template <class PolygonType>
-  struct get_sink_type;
+template <class PolygonType>
+struct get_sink_type;
 
-  template <>
-  struct get_sink_type<db::Polygon> { typedef db::PolygonSink result; };
+template <>
+struct get_sink_type<db::Polygon> {
+  typedef db::PolygonSink result;
+};
 
-  template <>
-  struct get_sink_type<db::SimplePolygon> { typedef db::SimplePolygonSink result; };
+template <>
+struct get_sink_type<db::SimplePolygon> {
+  typedef db::SimplePolygonSink result;
+};
 
-  /**
-   *  @brief A polygon sink for the edge processor that feeds the polygon into the cut algorithm
-   */
-  template <class Sink, class PolygonType>
-  struct cut_polygon_bool_sink
-    : public Sink
+/**
+ *  @brief A polygon sink for the edge processor that feeds the polygon into the cut algorithm
+ */
+template <class Sink, class PolygonType>
+struct cut_polygon_bool_sink
+  : public Sink {
+  cut_polygon_bool_sink (cut_polygon_receiver_base<PolygonType> *_right_of_line)
+    : right_of_line (_right_of_line)
   {
-    cut_polygon_bool_sink (cut_polygon_receiver_base<PolygonType> *_right_of_line)
-      : right_of_line (_right_of_line)
-    {
-      //  .. nothing yet ..
-    }
-
-    virtual void put (const PolygonType &poly)
-    {
-      right_of_line->put (poly);
-    }
-
-    cut_polygon_receiver_base<PolygonType> *right_of_line;
-  };
-
-  /**
-   *  @brief The cut algorithm driver with fallback to polygon merging when the cut fails
-   *  TODO: this is kind of inefficient as we will first merge all and the cut just a half.
-   *  This means for producing both parts we do this twice. But remember, this is just a
-   *  fallback.
-   */
-  template <class PolygonType, class Edge>
-  void cut_polygon_internal_int (const PolygonType &input, const Edge &line, cut_polygon_receiver_base<PolygonType> *right_of_line)
-  {
-    bool ok = _cut_polygon_internal (input, line, right_of_line);
-    if (! ok) {
-
-      //  If the fast cut operation fails, use boolean AND to perform the cut operation
-
-      PolygonType clip (input.box ());
-      std::vector<PolygonType> mask;
-      cut_polygon (clip, line, std::back_inserter (mask));
-
-      if (! mask.empty ()) {
-
-        db::EdgeProcessor ep;
-        ep.insert_sequence (input.begin_edge (), 0);
-        ep.insert_sequence (mask.begin (), mask.end (), 1);
-
-        db::BooleanOp op (BooleanOp::And);
-
-        cut_polygon_bool_sink<typename get_sink_type<PolygonType>::result, PolygonType> sink (right_of_line);
-        db::PolygonGenerator pg (sink);
-        ep.process (pg, op);
-
-
-      }
-
-    }
-
+    //  .. nothing yet ..
   }
 
-  /**
-   *  A transforming receiver that is put between a int cut algorithm and the double output receiver
-   */
-  template <class PolygonType, class IPolygonType>
-  class cut_polygon_receiver_double_impl
-    : public cut_polygon_receiver_base<IPolygonType>
+  virtual void put (const PolygonType &poly)
   {
-  public:
-    cut_polygon_receiver_double_impl ()
-      : mp_next (0)
-    { }
-
-    void set_next (cut_polygon_receiver_base<PolygonType> *next)
-    {
-      mp_next = next;
-    }
-
-    void set_trans (const db::CplxTrans &tr)
-    {
-      m_tr = tr;
-    }
-
-    virtual void put (const IPolygonType &p)
-    {
-      PolygonType pp = p.transformed_ext (m_tr, false);
-      mp_next->put (pp);
-    }
-
-  private:
-    cut_polygon_receiver_base<PolygonType> *mp_next;
-    db::CplxTrans m_tr;
-  };
-
-  template <class PolygonType>
-  class cut_polygon_receiver_double;
-
-  //  template specializations for the double types
-  template <> class cut_polygon_receiver_double<db::DPolygon>       : public cut_polygon_receiver_double_impl<db::DPolygon, db::Polygon> { };
-  template <> class cut_polygon_receiver_double<db::DSimplePolygon> : public cut_polygon_receiver_double_impl<db::DSimplePolygon, db::SimplePolygon> { };
-
-  /**
-   *  @brief The cut algorithm driver for double types
-   *  This driver will first try to guess a database unit (based on the bounding box) and then
-   *  transform the polygon to int. On output, the polygon is transformed back to double.
-   */
-  template <class PolygonType, class Edge>
-  void cut_polygon_internal_double (const PolygonType &input, const Edge &line, cut_polygon_receiver_base<PolygonType> *right_of_line)
-  {
-    db::DBox bbox = input.box ();
-    bbox += db::DBox (0, 0, 0, 0);
-    bbox += line.bbox ();
-
-    //  guess DBU
-    double dbu = std::max (1e-10, std::max (bbox.width (), bbox.height ()) / (std::numeric_limits<db::Coord>::max () / 2));
-    dbu = pow (10.0, ceil (log10 (dbu)));
-
-    db::CplxTrans tr (dbu);
-    cut_polygon_receiver_double<PolygonType> rec;
-    rec.set_trans (tr);
-    rec.set_next (right_of_line);
-
-    cut_polygon_internal_int (input.transformed_ext (tr.inverted (), false), line.transformed (tr.inverted ()), &rec);
+    right_of_line->put (poly);
   }
+
+  cut_polygon_receiver_base<PolygonType> *right_of_line;
+};
+
+/**
+ *  @brief The cut algorithm driver with fallback to polygon merging when the cut fails
+ *  TODO: this is kind of inefficient as we will first merge all and the cut just a half.
+ *  This means for producing both parts we do this twice. But remember, this is just a
+ *  fallback.
+ */
+template <class PolygonType, class Edge>
+void cut_polygon_internal_int (const PolygonType &input, const Edge &line, cut_polygon_receiver_base<PolygonType> *right_of_line)
+{
+  bool ok = _cut_polygon_internal (input, line, right_of_line);
+  if (! ok) {
+
+    //  If the fast cut operation fails, use boolean AND to perform the cut operation
+
+    PolygonType clip (input.box ());
+    std::vector<PolygonType> mask;
+    cut_polygon (clip, line, std::back_inserter (mask));
+
+    if (! mask.empty ()) {
+
+      db::EdgeProcessor ep;
+      ep.insert_sequence (input.begin_edge (), 0);
+      ep.insert_sequence (mask.begin (), mask.end (), 1);
+
+      db::BooleanOp op (BooleanOp::And);
+
+      cut_polygon_bool_sink<typename get_sink_type<PolygonType>::result, PolygonType> sink (right_of_line);
+      db::PolygonGenerator pg (sink);
+      ep.process (pg, op);
+    }
+  }
+}
+
+/**
+ *  A transforming receiver that is put between a int cut algorithm and the double output receiver
+ */
+template <class PolygonType, class IPolygonType>
+class cut_polygon_receiver_double_impl
+  : public cut_polygon_receiver_base<IPolygonType>
+{
+public:
+  cut_polygon_receiver_double_impl ()
+    : mp_next (0)
+  {
+  }
+
+  void set_next (cut_polygon_receiver_base<PolygonType> *next)
+  {
+    mp_next = next;
+  }
+
+  void set_trans (const db::CplxTrans &tr)
+  {
+    m_tr = tr;
+  }
+
+  virtual void put (const IPolygonType &p)
+  {
+    PolygonType pp = p.transformed_ext (m_tr, false);
+    mp_next->put (pp);
+  }
+
+private:
+  cut_polygon_receiver_base<PolygonType> *mp_next;
+  db::CplxTrans m_tr;
+};
+
+template <class PolygonType>
+class cut_polygon_receiver_double;
+
+//  template specializations for the double types
+template <> class cut_polygon_receiver_double<db::DPolygon> : public cut_polygon_receiver_double_impl<db::DPolygon, db::Polygon>
+{
+};
+template <> class cut_polygon_receiver_double<db::DSimplePolygon> : public cut_polygon_receiver_double_impl<db::DSimplePolygon, db::SimplePolygon>
+{
+};
+
+/**
+ *  @brief The cut algorithm driver for double types
+ *  This driver will first try to guess a database unit (based on the bounding box) and then
+ *  transform the polygon to int. On output, the polygon is transformed back to double.
+ */
+template <class PolygonType, class Edge>
+void cut_polygon_internal_double (const PolygonType &input, const Edge &line, cut_polygon_receiver_base<PolygonType> *right_of_line)
+{
+  db::DBox bbox = input.box ();
+  bbox += db::DBox (0, 0, 0, 0);
+  bbox += line.bbox ();
+
+  //  guess DBU
+  double dbu = std::max (1e-10, std::max (bbox.width (), bbox.height ()) / (std::numeric_limits<db::Coord>::max () / 2));
+  dbu = pow (10.0, ceil (log10 (dbu)));
+
+  db::CplxTrans tr (dbu);
+  cut_polygon_receiver_double<PolygonType> rec;
+  rec.set_trans (tr);
+  rec.set_next (right_of_line);
+
+  cut_polygon_internal_int (input.transformed_ext (tr.inverted (), false), line.transformed (tr.inverted ()), &rec);
+}
 
 }
 
-template<> DB_PUBLIC void cut_polygon_internal (const db::Polygon &polygon, const db::Polygon::edge_type &line, cut_polygon_receiver_base<db::Polygon> *right_of_line)
+template <> DB_PUBLIC void cut_polygon_internal (const db::Polygon &polygon, const db::Polygon::edge_type &line, cut_polygon_receiver_base<db::Polygon> *right_of_line)
 {
   cut_polygon_internal_int (polygon, line, right_of_line);
 }
 
-template<> DB_PUBLIC void cut_polygon_internal (const db::SimplePolygon &polygon, const db::SimplePolygon::edge_type &line, cut_polygon_receiver_base<db::SimplePolygon> *right_of_line)
+template <> DB_PUBLIC void cut_polygon_internal (const db::SimplePolygon &polygon, const db::SimplePolygon::edge_type &line, cut_polygon_receiver_base<db::SimplePolygon> *right_of_line)
 {
   cut_polygon_internal_int (polygon, line, right_of_line);
 }
 
-template<> DB_PUBLIC void cut_polygon_internal (const db::DPolygon &polygon, const db::DPolygon::edge_type &line, cut_polygon_receiver_base<db::DPolygon> *right_of_line)
+template <> DB_PUBLIC void cut_polygon_internal (const db::DPolygon &polygon, const db::DPolygon::edge_type &line, cut_polygon_receiver_base<db::DPolygon> *right_of_line)
 {
   cut_polygon_internal_double (polygon, line, right_of_line);
 }
 
-template<> DB_PUBLIC void cut_polygon_internal (const db::DSimplePolygon &polygon, const db::DSimplePolygon::edge_type &line, cut_polygon_receiver_base<db::DSimplePolygon> *right_of_line)
+template <> DB_PUBLIC void cut_polygon_internal (const db::DSimplePolygon &polygon, const db::DSimplePolygon::edge_type &line, cut_polygon_receiver_base<db::DSimplePolygon> *right_of_line)
 {
   cut_polygon_internal_double (polygon, line, right_of_line);
 }
@@ -637,8 +630,7 @@ template<> DB_PUBLIC void cut_polygon_internal (const db::DSimplePolygon &polygo
 //  Implementation of suggest_split_polygon
 
 template <class PolygonType>
-bool
-suggest_split_polygon (const PolygonType &polygon, size_t max_vertex_count, double max_area_ratio)
+bool suggest_split_polygon (const PolygonType &polygon, size_t max_vertex_count, double max_area_ratio)
 {
   if (polygon.is_box () || polygon.vertices () <= 3) {
     return false;
@@ -666,8 +658,7 @@ template DB_PUBLIC bool suggest_split_polygon<> (const db::DSimplePolygonWithPro
 //  Implementation of split_polygon
 
 template <class PolygonType>
-void
-split_polygon (const PolygonType &polygon, std::vector<PolygonType> &output)
+void split_polygon (const PolygonType &polygon, std::vector<PolygonType> &output)
 {
   typedef typename PolygonType::coord_type coord_type;
   typedef typename PolygonType::point_type point_type;
@@ -697,7 +688,7 @@ split_polygon (const PolygonType &polygon, std::vector<PolygonType> &output)
   }
 
   if (! xx_set && ! yy_set) {
-    if (bbox.width () > bbox.height ()) { 
+    if (bbox.width () > bbox.height ()) {
       xx_set = true;
     } else {
       yy_set = true;
@@ -712,32 +703,30 @@ split_polygon (const PolygonType &polygon, std::vector<PolygonType> &output)
     }
   }
 
-  std::vector <PolygonType> xx_polygons;
+  std::vector<PolygonType> xx_polygons;
   size_t xx_n = std::numeric_limits<size_t>::max ();
   if (xx_set) {
 
     db::cut_polygon (polygon, edge_type (point_type (xx, 0), point_type (xx, 1)), std::back_inserter (xx_polygons));
     db::cut_polygon (polygon, edge_type (point_type (xx, 1), point_type (xx, 0)), std::back_inserter (xx_polygons));
-    
+
     xx_n = 0;
-    for (typename std::vector <PolygonType>::const_iterator p = xx_polygons.begin (); p != xx_polygons.end (); ++p) {
+    for (typename std::vector<PolygonType>::const_iterator p = xx_polygons.begin (); p != xx_polygons.end (); ++p) {
       xx_n += p->vertices ();
     }
-
   }
 
-  std::vector <PolygonType> yy_polygons;
+  std::vector<PolygonType> yy_polygons;
   size_t yy_n = std::numeric_limits<size_t>::max ();
   if (yy_set) {
 
     db::cut_polygon (polygon, edge_type (point_type (0, yy), point_type (1, yy)), std::back_inserter (yy_polygons));
     db::cut_polygon (polygon, edge_type (point_type (1, yy), point_type (0, yy)), std::back_inserter (yy_polygons));
-    
+
     yy_n = 0;
-    for (typename std::vector <PolygonType>::const_iterator p = yy_polygons.begin (); p != yy_polygons.end (); ++p) {
+    for (typename std::vector<PolygonType>::const_iterator p = yy_polygons.begin (); p != yy_polygons.end (); ++p) {
       yy_n += p->vertices ();
     }
-
   }
 
   if (xx_n < yy_n) {
@@ -755,8 +744,7 @@ template DB_PUBLIC void split_polygon<> (const db::DSimplePolygon &polygon, std:
 // -------------------------------------------------------------------------
 //  Smoothing tools
 
-void 
-smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector <db::Point> &points, db::Coord d, bool keep_hv)
+void smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector<db::Point> &points, db::Coord d, bool keep_hv)
 {
   points.clear ();
   points.reserve (std::distance (from, to));
@@ -776,7 +764,7 @@ smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon
   org_points = points;
 
   //  proceed until there is nothing to do
-  
+
   bool even = false;
   int cont = 2;
   while (points.size () >= 3 && cont > 0) {
@@ -825,7 +813,7 @@ smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon
         can_drop = (db::sprod_sign (p2 - p1, p1 - p0) > 0 && std::abs (db::vprod (p2 - p1, p1 - p0)) < 0.8 * p2.distance (p1) * p1.distance (p0));
       }
 
-      for (size_t j = pi0; can_drop; ) {
+      for (size_t j = pi0; can_drop;) {
         if (std::abs (db::DEdge (db::DPoint (p0), db::DPoint (p2)).distance (db::DPoint (org_points [j]))) > d * (1.0 + db::epsilon)) {
           can_drop = false;
         }
@@ -848,7 +836,6 @@ smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon
         new_points.push_back (p1);
         new_point_indexes.push_back (pi1);
       }
-
     }
 
     if (any) {
@@ -866,16 +853,15 @@ smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon
     points.swap (new_points);
     point_indexes.swap (new_point_indexes);
 
-    even = !even;
-
+    even = ! even;
   }
 }
 
-db::Polygon 
+db::Polygon
 smooth (const db::Polygon &polygon, db::Coord d, bool keep_hv)
 {
   db::Polygon new_poly;
-  std::vector <db::Point> new_pts;
+  std::vector<db::Point> new_pts;
 
   smooth_contour (polygon.begin_hull (), polygon.end_hull (), new_pts, d, keep_hv);
   if (new_pts.size () >= 3) {
@@ -891,7 +877,6 @@ smooth (const db::Polygon &polygon, db::Coord d, bool keep_hv)
     }
 
     new_poly.sort_holes ();
-
   }
 
   return new_poly;
@@ -906,8 +891,7 @@ namespace
 /**
  *  @brief A helper class to implement the strange polygon detector
  */
-struct StrangePolygonInsideFunc
-{
+struct StrangePolygonInsideFunc {
   inline bool operator() (int wc) const
   {
     return wc < 0 || wc > 1;
@@ -917,8 +901,7 @@ struct StrangePolygonInsideFunc
 /**
  *  @brief A helper class to implement the non-orientable polygon detector
  */
-struct NonOrientablePolygonFunc
-{
+struct NonOrientablePolygonFunc {
   inline bool operator() (int wc) const
   {
     //  As polygon contours are normalized by default to positive wrap count a negative wrap count
@@ -930,9 +913,8 @@ struct NonOrientablePolygonFunc
 /**
  *  @brief An exception type indicating a strange polygon
  */
-struct OddPolygonException
-{
-  OddPolygonException () { }
+struct OddPolygonException {
+  OddPolygonException () {}
 };
 
 /**
@@ -944,15 +926,14 @@ class ErrorCatchingEdgeSink
   //  TODO: we should not use exceptions to indicate a condition, but right now, there is no good alternative
   //  and this is considered an error anyway.
   virtual void put (const db::Edge &) { throw OddPolygonException (); }
-  virtual void put (const db::Edge &, int) { }
+  virtual void put (const db::Edge &, int) {}
   virtual void crossing_edge (const db::Edge &) { throw OddPolygonException (); }
 };
 
 }
 
 template <class F>
-bool
-check_wrapcount (const db::Polygon &poly, std::vector<db::Polygon> *error_parts)
+bool check_wrapcount (const db::Polygon &poly, std::vector<db::Polygon> *error_parts)
 {
   size_t vn = poly.vertices ();
   if (vn < 4 || (vn == 4 && poly.is_box ())) {
@@ -983,18 +964,15 @@ check_wrapcount (const db::Polygon &poly, std::vector<db::Polygon> *error_parts)
     }
 
     return false;
-
   }
 }
 
-bool
-is_strange_polygon (const db::Polygon &poly, std::vector<db::Polygon> *strange_parts)
+bool is_strange_polygon (const db::Polygon &poly, std::vector<db::Polygon> *strange_parts)
 {
   return check_wrapcount<StrangePolygonInsideFunc> (poly, strange_parts);
 }
 
-bool
-is_non_orientable_polygon (const db::Polygon &poly, std::vector<db::Polygon> *strange_parts)
+bool is_non_orientable_polygon (const db::Polygon &poly, std::vector<db::Polygon> *strange_parts)
 {
   return check_wrapcount<NonOrientablePolygonFunc> (poly, strange_parts);
 }
@@ -1004,7 +982,7 @@ is_non_orientable_polygon (const db::Polygon &poly, std::vector<db::Polygon> *st
 
 template <class C>
 static bool
-do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator from, typename db::polygon<C>::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::point<C> > *new_pts, bool fallback)
+do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator from, typename db::polygon<C>::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector<db::point<C>> *new_pts, bool fallback)
 {
   if (from == to) {
     return false;
@@ -1023,7 +1001,7 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
   const double acute_cos_thr = -0.8;
   const double circle_segment_thr = 2.5;
 
-  //  search for the first circle segment (where cos(a) > cos_thr) 
+  //  search for the first circle segment (where cos(a) > cos_thr)
   double ls_inner = 0.0, ls_outer = 0.0;
   unsigned long n_ls_inner = 0, n_ls_outer = 0;
 
@@ -1059,12 +1037,11 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
     if (n_ls_outer > 0) {
       ls_outer /= n_ls_outer;
     }
-
   }
 
   bool found = false;
 
-  //  search for the first circle segment (where cos(a) > cos_thr) 
+  //  search for the first circle segment (where cos(a) > cos_thr)
   //  or a long segment is followed by a short one or the curvature changes.
 
   typename db::polygon<C>::polygon_contour_iterator pm1 = from;
@@ -1101,13 +1078,11 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
     db::edge<C> e (*p1, *p2);
     db::edge<C> en (*p2, *p3);
 
-    bool first_or_last = fallback || (e.double_length () > circle_segment_thr * ep.double_length () || ep.double_length () > circle_segment_thr * e.double_length ()) 
-                                  || (db::vprod_sign (em, ep) * db::vprod_sign (ep, e) < 0 || db::vprod_sign (ep, e) * db::vprod_sign (e, en) < 0);
+    bool first_or_last = fallback || (e.double_length () > circle_segment_thr * ep.double_length () || ep.double_length () > circle_segment_thr * e.double_length ()) || (db::vprod_sign (em, ep) * db::vprod_sign (ep, e) < 0 || db::vprod_sign (ep, e) * db::vprod_sign (e, en) < 0);
 
     if (first_or_last && db::sprod (ep, e) > cos_thr * e.double_length () * ep.double_length ()) {
       double ls = (db::vprod_sign (ep, e) > 0 ? ls_inner : ls_outer);
-      if (! fallback && ((e.double_length () < circle_segment_thr * ls && ep.double_length () > circle_segment_thr * ls) 
-                         || db::vprod_sign (em, ep) * db::vprod_sign (ep, e) < 0)) {
+      if (! fallback && ((e.double_length () < circle_segment_thr * ls && ep.double_length () > circle_segment_thr * ls) || db::vprod_sign (em, ep) * db::vprod_sign (ep, e) < 0)) {
         found = true;
         break;
       } else if (fallback && (ep.dx () == 0 || ep.dy () == 0)) {
@@ -1162,17 +1137,16 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
     db::edge<C> e (*p1, *p2);
     db::edge<C> en (*p2, *p3);
 
-    //  Heuristic detection of a new circle segment: 
+    //  Heuristic detection of a new circle segment:
     //  In fallback mode vertical or horizontal edges separate circle segments.
     //  In non-fallback mode either a long edge followed by a short one indicates the beginning of a new
     //  circle segment or a circle segment is detected when the curvature changes.
     //  The latter case detects situations where two circle segments directly attach to each other
     //  with different bending direction.
 
-    bool first_or_last = fallback || (e.double_length () > circle_segment_thr * ep.double_length () || ep.double_length () > circle_segment_thr * e.double_length ())
-                                  || (db::vprod_sign (em, ep) * db::vprod_sign (ep, e) < 0 || db::vprod_sign (ep, e) * db::vprod_sign (e, en) < 0);
+    bool first_or_last = fallback || (e.double_length () > circle_segment_thr * ep.double_length () || ep.double_length () > circle_segment_thr * e.double_length ()) || (db::vprod_sign (em, ep) * db::vprod_sign (ep, e) < 0 || db::vprod_sign (ep, e) * db::vprod_sign (e, en) < 0);
 
-    if (db::sprod (ep, e) > cos_thr * e.double_length () * ep.double_length ()) { 
+    if (db::sprod (ep, e) > cos_thr * e.double_length () * ep.double_length ()) {
 
       double ls = db::vprod_sign (ep, e) > 0 ? ls_inner : ls_outer;
 
@@ -1185,15 +1159,15 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
           asum = db::vprod (*p1 - db::point<C> (), *p2 - db::point<C> ());
           nseg = 1;
           ls_corner = ls;
-        } 
+        }
         in_corner = true;
 
-      } else if ((!fallback && first_or_last && ((e.double_length () > circle_segment_thr * ls_corner && ep.double_length () < circle_segment_thr * ls_corner) || db::vprod_sign (ep, e) * db::vprod_sign (e, en) < 0)) ||
+      } else if ((! fallback && first_or_last && ((e.double_length () > circle_segment_thr * ls_corner && ep.double_length () < circle_segment_thr * ls_corner) || db::vprod_sign (ep, e) * db::vprod_sign (e, en) < 0)) ||
                  (fallback && (e.dx () == 0 || e.dy () == 0))) {
 
         if (in_corner) {
 
-          std::pair<bool, db::point<C> > cp = elast.cut_point (e);
+          std::pair<bool, db::point<C>> cp = elast.cut_point (e);
           if (! cp.first || db::sprod (elast, e) < acute_cos_thr * elast.double_length () * e.double_length ()) {
 
             //  We have a full 180 degree bend without a stop (actually two corners).
@@ -1219,7 +1193,6 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
               ++nseg_part;
 
               pp1 = pp2;
-
             }
 
             ++nseg_part;
@@ -1270,7 +1243,6 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
             if (! cp.first) {
               return false;
             }
-
           }
 
           if (new_pts) {
@@ -1299,7 +1271,6 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
 
           da_sum += da;
           ++n_corners;
-
         }
         in_corner = false;
 
@@ -1335,7 +1306,7 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
     n = (unsigned int) floor (2.0 * M_PI / (da_sum / n_corners) + 0.5);
     if (ni_corners > 0) {
       rinner = floor ((rxi_sum / ni_corners * 0.5) + 0.5) * 2;
-    } 
+    }
     if (no_corners > 0) {
       router = floor ((rxo_sum / no_corners * 0.5) + 0.5) * 2;
     }
@@ -1343,14 +1314,12 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
   }
 }
 
-bool
-extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::Point> *new_pts, bool fallback)
+bool extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector<db::Point> *new_pts, bool fallback)
 {
   return do_extract_rad_from_contour (from, to, rinner, router, n, new_pts, fallback);
 }
 
-bool
-extract_rad_from_contour (db::DPolygon::polygon_contour_iterator from, db::DPolygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::DPoint> *new_pts, bool fallback)
+bool extract_rad_from_contour (db::DPolygon::polygon_contour_iterator from, db::DPolygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector<db::DPoint> *new_pts, bool fallback)
 {
   return do_extract_rad_from_contour (from, to, rinner, router, n, new_pts, fallback);
 }
@@ -1361,7 +1330,7 @@ do_extract_rad (const db::polygon<C> &polygon, double &rinner, double &router, u
 {
   if (new_polygon) {
 
-    std::vector <db::point<C> > new_pts;
+    std::vector<db::point<C>> new_pts;
 
     if (! do_extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, &new_pts, false) &&
         ! do_extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, &new_pts, true)) {
@@ -1381,41 +1350,36 @@ do_extract_rad (const db::polygon<C> &polygon, double &rinner, double &router, u
       } else {
         new_polygon->insert_hole (new_pts.begin (), new_pts.end ());
       }
-
     }
 
     new_polygon->sort_holes ();
 
   } else {
 
-    if (! do_extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, (std::vector<db::point<C> > *) 0, false)) {
-      if (! do_extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, (std::vector<db::point<C> > *) 0, true)) {
+    if (! do_extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, (std::vector<db::point<C>> *) 0, false)) {
+      if (! do_extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, (std::vector<db::point<C>> *) 0, true)) {
         return false;
       }
     }
 
     for (unsigned int h = 0; h < polygon.holes (); ++h) {
-      if (! do_extract_rad_from_contour (polygon.begin_hole (h), polygon.end_hole (h), rinner, router, n, (std::vector<db::point<C> > *) 0, false)) {
-        if (! do_extract_rad_from_contour (polygon.begin_hole (h), polygon.end_hole (h), rinner, router, n, (std::vector<db::point<C> > *) 0, true)) {
+      if (! do_extract_rad_from_contour (polygon.begin_hole (h), polygon.end_hole (h), rinner, router, n, (std::vector<db::point<C>> *) 0, false)) {
+        if (! do_extract_rad_from_contour (polygon.begin_hole (h), polygon.end_hole (h), rinner, router, n, (std::vector<db::point<C>> *) 0, true)) {
           return false;
         }
       }
     }
-
   }
 
   return true;
-
 }
 
-bool
-extract_rad (const db::Polygon &polygon, double &rinner, double &router, unsigned int &n, db::Polygon *new_polygon)
+bool extract_rad (const db::Polygon &polygon, double &rinner, double &router, unsigned int &n, db::Polygon *new_polygon)
 {
   return do_extract_rad (polygon, rinner, router, n, new_polygon);
 }
 
-bool
-extract_rad (const db::DPolygon &polygon, double &rinner, double &router, unsigned int &n, db::DPolygon *new_polygon)
+bool extract_rad (const db::DPolygon &polygon, double &rinner, double &router, unsigned int &n, db::DPolygon *new_polygon)
 {
   return do_extract_rad (polygon, rinner, router, n, new_polygon);
 }
@@ -1423,9 +1387,9 @@ extract_rad (const db::DPolygon &polygon, double &rinner, double &router, unsign
 
 template <class C>
 static void
-do_compute_rounded_contour (typename db::polygon<C>::polygon_contour_iterator from, typename db::polygon<C>::polygon_contour_iterator to, std::vector <db::point<C> > &new_pts, double rinner, double router, unsigned int n)
+do_compute_rounded_contour (typename db::polygon<C>::polygon_contour_iterator from, typename db::polygon<C>::polygon_contour_iterator to, std::vector<db::point<C>> &new_pts, double rinner, double router, unsigned int n)
 {
-  std::vector<db::point<C> > points;
+  std::vector<db::point<C>> points;
 
   //  collect the points into a vector
 
@@ -1454,19 +1418,18 @@ do_compute_rounded_contour (typename db::polygon<C>::polygon_contour_iterator fr
       p1 = p2;
 
     } while (p0 != from);
-
   }
 
-  //  compute the radii and segment length 
+  //  compute the radii and segment length
 
   std::vector<double> rad (points.size (), 0.0);
   std::vector<double> seg (points.size (), 0.0);
 
   for (size_t i = 0; i < points.size (); ++i) {
 
-    db::point<C>  p0 = points [(i + points.size () - 1) % points.size ()];
-    db::point<C>  p1 = points [i];
-    db::point<C>  p2 = points [(i + points.size () + 1) % points.size ()];
+    db::point<C> p0 = points [(i + points.size () - 1) % points.size ()];
+    db::point<C> p1 = points [i];
+    db::point<C> p2 = points [(i + points.size () + 1) % points.size ()];
 
     db::DVector e1 = (db::DPoint (p1) - db::DPoint (p0)) * (1.0 / p0.double_distance (p1));
     db::DVector e2 = (db::DPoint (p2) - db::DPoint (p1)) * (1.0 / p1.double_distance (p2));
@@ -1480,16 +1443,15 @@ do_compute_rounded_contour (typename db::polygon<C>::polygon_contour_iterator fr
 
     rad [i] = r;
     seg [i] = s;
-
   }
 
   //  compute the rounded points
 
   for (size_t i = 0; i < points.size (); ++i) {
 
-    db::point<C>  p0 = points [(i + points.size () - 1) % points.size ()];
-    db::point<C>  p1 = points [i];
-    db::point<C>  p2 = points [(i + points.size () + 1) % points.size ()];
+    db::point<C> p0 = points [(i + points.size () - 1) % points.size ()];
+    db::point<C> p1 = points [i];
+    db::point<C> p2 = points [(i + points.size () + 1) % points.size ()];
 
     db::DVector e1 = (db::DPoint (p1) - db::DPoint (p0)) * (1.0 / p0.double_distance (p1));
     db::DVector e2 = (db::DPoint (p2) - db::DPoint (p1)) * (1.0 / p1.double_distance (p2));
@@ -1537,26 +1499,21 @@ do_compute_rounded_contour (typename db::polygon<C>::polygon_contour_iterator fr
           new_pts.push_back (db::point<C> (q));
 
           q0 = q1;
-
         }
-
       }
 
     } else {
       new_pts.push_back (p1);
     }
-
-  } 
+  }
 }
 
-void
-compute_rounded_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector <db::Point> &new_pts, double rinner, double router, unsigned int n)
+void compute_rounded_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector<db::Point> &new_pts, double rinner, double router, unsigned int n)
 {
   do_compute_rounded_contour (from, to, new_pts, rinner, router, n);
 }
 
-void
-compute_rounded_contour (db::DPolygon::polygon_contour_iterator from, db::DPolygon::polygon_contour_iterator to, std::vector <db::DPoint> &new_pts, double rinner, double router, unsigned int n)
+void compute_rounded_contour (db::DPolygon::polygon_contour_iterator from, db::DPolygon::polygon_contour_iterator to, std::vector<db::DPoint> &new_pts, double rinner, double router, unsigned int n)
 {
   do_compute_rounded_contour (from, to, new_pts, rinner, router, n);
 }
@@ -1566,7 +1523,7 @@ static db::polygon<C>
 do_compute_rounded (const db::polygon<C> &polygon, double rinner, double router, unsigned int n)
 {
   db::polygon<C> new_poly;
-  std::vector <db::point<C> > new_pts;
+  std::vector<db::point<C>> new_pts;
 
   compute_rounded_contour (polygon.begin_hull (), polygon.end_hull (), new_pts, rinner, router, n);
   new_poly.assign_hull (new_pts.begin (), new_pts.end (), false /*don't compress*/);
@@ -1646,21 +1603,19 @@ template <class C>
 area_map<C>::~area_map ()
 {
   if (mp_av) {
-    delete[] mp_av;
+    delete [] mp_av;
   }
   mp_av = 0;
 }
 
 template <class C>
-void
-area_map<C>::reinitialize (const area_map::point_type &p0, const area_map::vector_type &d, size_t nx, size_t ny)
+void area_map<C>::reinitialize (const area_map::point_type &p0, const area_map::vector_type &d, size_t nx, size_t ny)
 {
   reinitialize (p0, d, d, nx, ny);
 }
 
 template <class C>
-void
-area_map<C>::reinitialize (const area_map::point_type &p0, const area_map::vector_type &d, const area_map::vector_type &p, size_t nx, size_t ny)
+void area_map<C>::reinitialize (const area_map::point_type &p0, const area_map::vector_type &d, const area_map::vector_type &p, size_t nx, size_t ny)
 {
   m_p0 = p0;
   m_d = d;
@@ -1672,19 +1627,17 @@ area_map<C>::reinitialize (const area_map::point_type &p0, const area_map::vecto
     m_ny = ny;
 
     if (mp_av) {
-      delete[] mp_av;
+      delete [] mp_av;
     }
 
     mp_av = new area_type [nx * ny];
-
   }
 
   clear ();
 }
 
 template <class C>
-void
-area_map<C>::clear ()
+void area_map<C>::clear ()
 {
   if (mp_av) {
     area_type *a = mp_av;
@@ -1695,8 +1648,7 @@ area_map<C>::clear ()
 }
 
 template <class C>
-void
-area_map<C>::swap (area_map &other)
+void area_map<C>::swap (area_map &other)
 {
   std::swap (m_p0, other.m_p0);
   std::swap (m_d, other.m_d);
@@ -1788,8 +1740,7 @@ static size_t npixels_ceil (db::DCoord d, db::DCoord p)
 
 
 template <class C>
-static
-bool
+static bool
 rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
 {
   typedef typename db::area_map<C>::area_type area_type;
@@ -1816,12 +1767,12 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
   size_t ix0 = std::min (nx, npixels_floor (pbox.left () - am.p0 ().x (), am.d ().x ()));
   size_t ix1 = std::min (nx, npixels_ceil (pbox.right () - am.p0 ().x (), am.d ().x ()));
 
-  //  no scanning required (i.e. degenerated polygon) -> do nothing 
+  //  no scanning required (i.e. degenerated polygon) -> do nothing
   if (iy0 == iy1 || ix0 == ix1) {
     return false;
   }
 
-  //  collect edges 
+  //  collect edges
   size_t n = 0;
   for (typename db::polygon<C>::polygon_edge_iterator e = polygon.begin_edge (); ! e.at_end (); ++e) {
     if ((*e).dy () != 0 && db::edge_ymax (*e) > ymin && db::edge_ymin (*e) < ymax) {
@@ -1829,7 +1780,7 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
     }
   }
 
-  std::vector <edge_type> edges;
+  std::vector<edge_type> edges;
   edges.reserve (n);
   for (typename db::polygon<C>::polygon_edge_iterator e = polygon.begin_edge (); ! e.at_end (); ++e) {
     if ((*e).dy () != 0 && db::edge_ymax (*e) > ymin && db::edge_ymin (*e) < ymax) {
@@ -1840,7 +1791,7 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
   //  sort edges
   std::sort (edges.begin (), edges.end (), db::edge_ymin_compare<C> ());
 
-  typename std::vector <edge_type>::iterator c = edges.begin ();
+  typename std::vector<edge_type>::iterator c = edges.begin ();
 
   C y = y0 + dy * C (iy0);
 
@@ -1852,7 +1803,7 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
     return false;
   }
 
-  typename std::vector <edge_type>::iterator f = c;
+  typename std::vector<edge_type>::iterator f = c;
 
   for (size_t iy = iy0; iy < iy1; ++iy) {
 
@@ -1861,13 +1812,13 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
       ++f;
     }
 
-    std::sort (c, f, db::edge_xmin_compare <C> ());
+    std::sort (c, f, db::edge_xmin_compare<C> ());
 
     C x = x0 + dx * C (ix0);
     C xl = pbox.left ();
     area_type a = 0;
 
-    typename std::vector <edge_type>::iterator cc = c;
+    typename std::vector<edge_type>::iterator cc = c;
 
     while (cc != edges.end () && cc != f && db::edge_xmax (*cc) <= x) {
       C y1 = std::max (y, std::min (yy, cc->p1 ().y ()));
@@ -1876,7 +1827,7 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
       ++cc;
     }
 
-    typename std::vector <edge_type>::iterator ff = cc;
+    typename std::vector<edge_type>::iterator ff = cc;
 
     for (size_t ix = ix0; ix < ix1; ++ix) {
 
@@ -1884,15 +1835,15 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
       C xxx = x + dx;
 
       // TODO: edge_xmin_at_interval(y, yy) and edge_xmax.. would be more efficient in the
-      // all-angle case. However, it is crucial that the edge clipping produces 
-      // connected edge segments and it is questionable whether the at_interval 
+      // all-angle case. However, it is crucial that the edge clipping produces
+      // connected edge segments and it is questionable whether the at_interval
       // functions produce a sorting/filter criterion compatible with the clip.
 
       while (ff != f && db::edge_xmin (*ff) < xx) {
         ++ff;
       }
 
-      typename std::vector <edge_type>::iterator fff = ff;
+      typename std::vector<edge_type>::iterator fff = ff;
 
       if (xx < xxx) {
         while (fff != f && db::edge_xmin (*fff) < xxx) {
@@ -1905,15 +1856,13 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
         //  consider all edges or parts of those left of the first cell
         box_type left (xl, y, x, yy);
 
-        for (typename std::vector <edge_type>::iterator e = cc; e != ff; ++e) {
+        for (typename std::vector<edge_type>::iterator e = cc; e != ff; ++e) {
 
           std::pair<bool, edge_type> ec = e->clipped (left);
           if (ec.first && edge_is_partially_left_of (ec.second, *e, x)) {
             a += area_type (ec.second.dy ()) * area_type (px);
           }
-
         }
-
       }
 
       area_type aa = a;
@@ -1922,40 +1871,36 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
 
         box_type cell (x, y, xx, yy);
 
-        for (typename std::vector <edge_type>::iterator e = cc; e != ff; ++e) {
+        for (typename std::vector<edge_type>::iterator e = cc; e != ff; ++e) {
 
           std::pair<bool, edge_type> ec = e->clipped (cell);
           if (ec.first && edge_is_partially_left_of (ec.second, *e, xx)) {
             aa += (area_type (ec.second.dy ()) * area_type (2 * xx - (ec.second.p2 ().x () + ec.second.p1 ().x ()))) / 2;
             a += area_type (ec.second.dy ()) * area_type (px);
           }
-
         }
 
       } else {
 
         box_type cell (x, y, xx, yy);
 
-        for (typename std::vector <edge_type>::iterator e = cc; e != ff; ++e) {
+        for (typename std::vector<edge_type>::iterator e = cc; e != ff; ++e) {
 
           std::pair<bool, edge_type> ec = e->clipped (cell);
           if (ec.first && edge_is_partially_left_of (ec.second, *e, xx)) {
             aa += (area_type (ec.second.dy ()) * area_type (2 * xx - (ec.second.p2 ().x () + ec.second.p1 ().x ()))) / 2;
           }
-
         }
 
         box_type wide_cell (x, y, x + dx, yy);
 
-        for (typename std::vector <edge_type>::iterator e = cc; e != fff; ++e) {
+        for (typename std::vector<edge_type>::iterator e = cc; e != fff; ++e) {
 
           std::pair<bool, edge_type> wide_ec = e->clipped (wide_cell);
           if (wide_ec.first && edge_is_partially_left_of (wide_ec.second, *e, x + dx)) {
             a += area_type (wide_ec.second.dy ()) * area_type (px);
           }
-
         }
-
       }
 
       am.get (ix, iy) += aa;
@@ -1965,13 +1910,12 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
 
       ff = fff;
 
-      for (typename std::vector <edge_type>::iterator ccx = cc; ccx != ff; ++ccx) {
+      for (typename std::vector<edge_type>::iterator ccx = cc; ccx != ff; ++ccx) {
         if (db::edge_xmax (*ccx) <= x) {
           std::swap (*ccx, *cc);
           ++cc;
         }
       }
-
     }
 
     if (yy < y + dy) {
@@ -1983,26 +1927,23 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
 
     y = yy;
 
-    for (typename std::vector <edge_type>::iterator cx = c; cx != f; ++cx) {
+    for (typename std::vector<edge_type>::iterator cx = c; cx != f; ++cx) {
       if (db::edge_ymax (*cx) <= y) {
         std::swap (*cx, *c);
         ++c;
       }
     }
-
   }
 
   return true;
 }
 
-bool
-rasterize (const db::Polygon &polygon, db::AreaMap &am)
+bool rasterize (const db::Polygon &polygon, db::AreaMap &am)
 {
   return rasterize_impl<db::Coord> (polygon, am);
 }
 
-bool
-rasterize (const db::DPolygon &polygon, db::DAreaMap &am)
+bool rasterize (const db::DPolygon &polygon, db::DAreaMap &am)
 {
   return rasterize_impl<db::DCoord> (polygon, am);
 }
@@ -2018,13 +1959,14 @@ class EdgeInputIterator
 public:
   EdgeInputIterator (db::EdgeProcessor &ep, bool inverse = false)
     : m_last_set (false), m_last (), mp_ep (&ep), m_inverse (inverse)
-  { }
+  {
+  }
 
   ~EdgeInputIterator ()
   {
     //  close the polygon
     if (m_last_set && m_last != m_first) {
-      if (!m_inverse) {
+      if (! m_inverse) {
         mp_ep->insert (db::Edge (m_last, m_first));
       } else {
         mp_ep->insert (db::Edge (m_first, m_last));
@@ -2038,7 +1980,7 @@ public:
   void operator+= (const db::Point &p)
   {
     if (m_last_set) {
-      if (!m_inverse) {
+      if (! m_inverse) {
         mp_ep->insert (db::Edge (m_last, p));
       } else {
         mp_ep->insert (db::Edge (p, m_last));
@@ -2064,7 +2006,7 @@ private:
 static void
 ms_production (const db::Polygon &a, const db::Point &p1, const db::Point &p2, db::EdgeProcessor &ep)
 {
-  double d12 = p2.double_distance (p1); 
+  double d12 = p2.double_distance (p1);
   db::DPoint d (-double (p2.y () - p1.y ()) / d12, double (p2.x () - p1.x ()) / d12);
 
   db::EdgeInputIterator e (ep);
@@ -2078,7 +2020,7 @@ ms_production (const db::Polygon &a, const db::Point &p1, const db::Point &p2, d
   //  Look for the points in the contour bounding the partial sum perpendicular to the edge
   for (db::Polygon::polygon_contour_iterator c = ci; c != cf; ++c) {
 
-    double p = (*c).x() * d.x () + (*c).y () * d.y ();
+    double p = (*c).x () * d.x () + (*c).y () * d.y ();
 
     if (cmin == cf || pmin > p) {
       pmin = p;
@@ -2089,7 +2031,6 @@ ms_production (const db::Polygon &a, const db::Point &p1, const db::Point &p2, d
       pmax = p;
       cmax = c;
     }
-
   }
 
   tl_assert (cmin != cf && cmax != cf);
@@ -2103,7 +2044,7 @@ ms_production (const db::Polygon &a, const db::Point &p1, const db::Point &p2, d
 
   while (true) {
 
-    double pc = (*c).x() * d.x () + (*c).y () * d.y ();
+    double pc = (*c).x () * d.x () + (*c).y () * d.y ();
 
     // detect inversion due to a convex pattern and create a cover polygon for that case
     if (pcc_set) {
@@ -2147,9 +2088,7 @@ ms_production (const db::Polygon &a, const db::Point &p1, const db::Point &p2, d
         ee += p2 + (*cl - db::Point ());
 
         cl = cf;
-
       }
-
     }
 
     // produce a new edge
@@ -2165,7 +2104,6 @@ ms_production (const db::Polygon &a, const db::Point &p1, const db::Point &p2, d
 
     pcc = pc;
     pcc_set = true;
-
   }
 
   cl = cf;
@@ -2173,7 +2111,7 @@ ms_production (const db::Polygon &a, const db::Point &p1, const db::Point &p2, d
 
   while (true) {
 
-    double pc = (*c).x() * d.x () + (*c).y () * d.y ();
+    double pc = (*c).x () * d.x () + (*c).y () * d.y ();
 
     // detect inversion due to a convex pattern and create a cover polygon for that case
     if (pcc_set) {
@@ -2184,7 +2122,7 @@ ms_production (const db::Polygon &a, const db::Point &p1, const db::Point &p2, d
       }
       --cc;
 
-      pcc = (*cc).x() * d.x () + (*cc).y () * d.y ();
+      pcc = (*cc).x () * d.x () + (*cc).y () * d.y ();
 
       if (pcc < pc - 1e-6) {
 
@@ -2220,9 +2158,7 @@ ms_production (const db::Polygon &a, const db::Point &p1, const db::Point &p2, d
         ee += p1 + (*cl - db::Point ());
 
         cl = cf;
-
       }
-
     }
 
     e += p2 + (*c - db::Point ());
@@ -2237,16 +2173,14 @@ ms_production (const db::Polygon &a, const db::Point &p1, const db::Point &p2, d
 
     pcc = pc;
     pcc_set = true;
-
   }
-
 }
 
-static db::Polygon 
+static db::Polygon
 ms_extraction (db::EdgeProcessor &ep, bool resolve_holes)
 {
   db::SimpleMerge op (-1);
-  std::vector <db::Polygon> polygons;
+  std::vector<db::Polygon> polygons;
   db::PolygonContainer pc (polygons);
   db::PolygonGenerator out (pc, resolve_holes, false);
   ep.process (out, op);
@@ -2259,7 +2193,7 @@ ms_extraction (db::EdgeProcessor &ep, bool resolve_holes)
   }
 }
 
-static db::Polygon 
+static db::Polygon
 do_minkowski_sum (const db::Polygon &a, const db::Edge &b, bool resolve_holes)
 {
   if (a.begin_hull () == a.end_hull ()) {
@@ -2271,7 +2205,7 @@ do_minkowski_sum (const db::Polygon &a, const db::Edge &b, bool resolve_holes)
   return db::ms_extraction (ep, resolve_holes);
 }
 
-db::Polygon 
+db::Polygon
 minkowski_sum (const db::Polygon &a, const db::Edge &b, bool rh)
 {
   if (a.holes () > 0) {
@@ -2281,7 +2215,7 @@ minkowski_sum (const db::Polygon &a, const db::Edge &b, bool rh)
   }
 }
 
-static db::Polygon 
+static db::Polygon
 do_minkowski_sum (const db::Polygon &a, const db::Polygon &b, bool resolve_holes)
 {
   if (a.begin_hull () == a.end_hull () || b.begin_hull () == b.end_hull ()) {
@@ -2299,7 +2233,7 @@ do_minkowski_sum (const db::Polygon &a, const db::Polygon &b, bool resolve_holes
   return db::ms_extraction (ep, resolve_holes);
 }
 
-db::Polygon 
+db::Polygon
 minkowski_sum (const db::Polygon &a, const db::Polygon &b, bool rh)
 {
   if (a.holes () > 0) {
@@ -2309,13 +2243,13 @@ minkowski_sum (const db::Polygon &a, const db::Polygon &b, bool rh)
   }
 }
 
-static db::Polygon 
+static db::Polygon
 do_minkowski_sum (const db::Polygon &a, const db::Box &b, bool resolve_holes)
 {
   return minkowski_sum (a, db::Polygon (b), resolve_holes);
 }
 
-db::Polygon 
+db::Polygon
 minkowski_sum (const db::Polygon &a, const db::Box &b, bool rh)
 {
   if (a.holes () > 0) {
@@ -2325,18 +2259,18 @@ minkowski_sum (const db::Polygon &a, const db::Box &b, bool rh)
   }
 }
 
-static db::Polygon 
+static db::Polygon
 do_minkowski_sum (const db::Polygon &a, const std::vector<db::Point> &c, bool resolve_holes)
 {
   db::EdgeProcessor ep;
   for (size_t i = 1; i < c.size (); ++i) {
-    db::ms_production (a, c[i - 1], c[i], ep);
+    db::ms_production (a, c [i - 1], c [i], ep);
   }
 
   return db::ms_extraction (ep, resolve_holes);
 }
 
-db::Polygon 
+db::Polygon
 minkowski_sum (const db::Polygon &a, const std::vector<db::Point> &c, bool rh)
 {
   if (a.holes () > 0) {
@@ -2349,7 +2283,7 @@ minkowski_sum (const db::Polygon &a, const std::vector<db::Point> &c, bool rh)
 // -------------------------------------------------------------------------
 //  Implementation of hole resolution and polygon to simple polygon conversion
 
-db::Polygon 
+db::Polygon
 resolve_holes (const db::Polygon &p)
 {
   db::EdgeProcessor ep;
@@ -2370,7 +2304,7 @@ resolve_holes (const db::Polygon &p)
   }
 }
 
-db::Polygon 
+db::Polygon
 simple_polygon_to_polygon (const db::SimplePolygon &sp)
 {
   db::Polygon p;
@@ -2378,7 +2312,7 @@ simple_polygon_to_polygon (const db::SimplePolygon &sp)
   return p;
 }
 
-db::SimplePolygon 
+db::SimplePolygon
 polygon_to_simple_polygon (const db::Polygon &p)
 {
   if (p.holes () > 0) {
@@ -2407,7 +2341,7 @@ static void decompose_convex_helper (int depth, PreferredOrientation po, const d
   db::coord_traits<db::Coord>::area_type atot = 0;
   db::coord_traits<db::Coord>::distance_type min_edge = std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max ();
   for (size_t i = 0; i < n; ++i) {
-    db::Edge ep (sp.hull ()[(i + n - 1) % n], sp.hull ()[i]);
+    db::Edge ep (sp.hull () [(i + n - 1) % n], sp.hull () [i]);
     atot += db::vprod (ep.p2 () - db::Point (), ep.p1 () - db::Point ());
     min_edge = std::min (min_edge, ep.length ());
   }
@@ -2421,35 +2355,34 @@ static void decompose_convex_helper (int depth, PreferredOrientation po, const d
     db::Coord dmin = 0;
     for (size_t i = 0; i < n; ++i) {
 
-      db::Edge ep (sp.hull ()[(i + n - 1) % n], sp.hull ()[i]);
-      db::Edge ec (sp.hull ()[i], sp.hull ()[(i + 1) % n]);
+      db::Edge ep (sp.hull () [(i + n - 1) % n], sp.hull () [i]);
+      db::Edge ec (sp.hull () [i], sp.hull () [(i + 1) % n]);
 
       if (db::vprod_sign (ep, ec) > 0 && skipped.find (ep.p2 ()) == skipped.end ()) {
 
-        db::Vector v = sp.hull ()[i] - bbox.center ();
+        db::Vector v = sp.hull () [i] - bbox.center ();
         db::Coord d = std::min (std::abs (v.x ()), std::abs (v.y ()));
         if (imed == std::numeric_limits<size_t>::max () || d < dmin) {
           imed = i;
           dmin = d;
         }
-
       }
-
     }
 
     //  is convex already
     if (imed == std::numeric_limits<size_t>::max ()) {
       if (! skipped.empty ()) {
-        tl::warn << "sp=" << sp << tl::endl << "po=" << int(po);
+        tl::warn << "sp=" << sp << tl::endl
+                 << "po=" << int (po);
         tl_assert (false);
       }
       sink.put (sp);
       return;
     }
 
-    db::Point p (sp.hull ()[imed]);
-    db::Edge ep (sp.hull ()[(imed + n - 1) % n], p);
-    db::Edge ec (p, sp.hull ()[(imed + 1) % n]);
+    db::Point p (sp.hull () [imed]);
+    db::Edge ep (sp.hull () [(imed + n - 1) % n], p);
+    db::Edge ec (p, sp.hull () [(imed + 1) % n]);
 
     //  convex corner
 
@@ -2494,12 +2427,12 @@ static void decompose_convex_helper (int depth, PreferredOrientation po, const d
 
       for (size_t j = 1; j != n - 1; ++j) {
 
-        db::Edge efc (sp.hull ()[(imed + j) % n], sp.hull ()[(imed + j + 1) % n]);
-        db::Edge efp (sp.hull ()[(imed + j + n - 1) % n], sp.hull ()[(imed + j) % n]);
+        db::Edge efc (sp.hull () [(imed + j) % n], sp.hull () [(imed + j + 1) % n]);
+        db::Edge efp (sp.hull () [(imed + j + n - 1) % n], sp.hull () [(imed + j) % n]);
 
         asum += db::vprod (efp.p2 () - db::Point (), efp.p1 () - db::Point ());
 
-        std::pair <bool, db::Point> x;
+        std::pair<bool, db::Point> x;
 
         if (db::vprod_sign (nv, efc.d ()) == 0) {
 
@@ -2519,7 +2452,6 @@ static void decompose_convex_helper (int depth, PreferredOrientation po, const d
                 x = std::make_pair (true, efc.p2 ());
               }
             }
-
           }
 
         } else {
@@ -2533,15 +2465,15 @@ static void decompose_convex_helper (int depth, PreferredOrientation po, const d
 
             //  a will be the area of the half we cut off
             db::coord_traits<db::Coord>::area_type a = asum +
-              db::vprod (x.second - db::Point (), efp.p2 () - db::Point ()) +
-              db::vprod (p - db::Point (), x.second - db::Point ());
+                                                       db::vprod (x.second - db::Point (), efp.p2 () - db::Point ()) +
+                                                       db::vprod (p - db::Point (), x.second - db::Point ());
 
             //  due to rounding, the new cut point will modify the total
             //  area. We compute the new total area now:
             db::coord_traits<db::Coord>::area_type atot_eff = atot +
-              db::vprod (efc.p2 () - db::Point (), x.second - db::Point ()) +
-              db::vprod (x.second - db::Point (), efc.p1 () - db::Point ()) +
-              db::vprod (efc.p1 () - db::Point (), efc.p2 () - db::Point ());
+                                                              db::vprod (efc.p2 () - db::Point (), x.second - db::Point ()) +
+                                                              db::vprod (x.second - db::Point (), efc.p1 () - db::Point ()) +
+                                                              db::vprod (efc.p1 () - db::Point (), efc.p2 () - db::Point ());
 
             db::coord_traits<db::Coord>::area_type ac;
             if (a > atot_eff / 2) {
@@ -2556,14 +2488,14 @@ static void decompose_convex_helper (int depth, PreferredOrientation po, const d
               int cr = 0;
               if (x.second == efc.p1 ()) {
                 if (db::vprod (efc, efp) < 0) {
-                  cr = 3;   //  cut terminates at another concave corner
+                  cr = 3; //  cut terminates at another concave corner
                 } else {
-                  cr = 2;   //  cut terminates at a convex corner
+                  cr = 2; //  cut terminates at a convex corner
                 }
               } else {
                 db::coord_traits<db::Coord>::distance_type el = std::min (x.second.distance (efc.p1 ()), x.second.distance (efc.p2 ()));
                 if (el >= min_edge) {
-                  cr = 1;   //  does not induce shorter edge than we have so far
+                  cr = 1; //  does not induce shorter edge than we have so far
                 }
               }
 
@@ -2578,24 +2510,18 @@ static void decompose_convex_helper (int depth, PreferredOrientation po, const d
 
               min_dist = dist;
               jmin_inner = 0;
-
             }
-
           }
-
         }
-
       }
 
-      if (jmin_inner > 0 && (!jmin || cut_rating_inner > cut_rating || (cut_rating_inner == cut_rating && acutoff_inner < acutoff))) {
+      if (jmin_inner > 0 && (! jmin || cut_rating_inner > cut_rating || (cut_rating_inner == cut_rating && acutoff_inner < acutoff))) {
 
         jmin = jmin_inner;
         cut_rating = cut_rating_inner;
         xmin = xmin_inner;
         acutoff = acutoff_inner;
-
       }
-
     }
 
     if (jmin > 0) {
@@ -2605,7 +2531,7 @@ static void decompose_convex_helper (int depth, PreferredOrientation po, const d
       db::SimplePolygon sp_out;
 
       for (size_t i = imed; i <= imed + jmin; ++i) {
-        pts.push_back (sp.hull ()[i % n]);
+        pts.push_back (sp.hull () [i % n]);
       }
       if (pts.back () != xmin) {
         pts.push_back (xmin);
@@ -2616,7 +2542,7 @@ static void decompose_convex_helper (int depth, PreferredOrientation po, const d
       pts.clear ();
 
       for (size_t i = imed + jmin + 1; i <= imed + n; ++i) {
-        pts.push_back (sp.hull ()[i % n]);
+        pts.push_back (sp.hull () [i % n]);
       }
       if (pts.front () != xmin) {
         pts.push_back (xmin);
@@ -2630,7 +2556,6 @@ static void decompose_convex_helper (int depth, PreferredOrientation po, const d
       //  no decomposition found -> next try
       skipped.insert (p);
     }
-
   }
 }
 
@@ -2661,8 +2586,7 @@ private:
   bool m_swap_xy;
 };
 
-void
-decompose_convex (const db::Polygon &p, PreferredOrientation po, db::SimplePolygonSink &sink)
+void decompose_convex (const db::Polygon &p, PreferredOrientation po, db::SimplePolygonSink &sink)
 {
   if (p.is_box ()) {
 
@@ -2692,12 +2616,10 @@ decompose_convex (const db::Polygon &p, PreferredOrientation po, db::SimplePolyg
 
     db::SimpleMerge op;
     ep.process (pg, op);
-
   }
 }
 
-void
-decompose_convex (const db::SimplePolygon &sp, PreferredOrientation po, db::SimplePolygonSink &sink)
+void decompose_convex (const db::SimplePolygon &sp, PreferredOrientation po, db::SimplePolygonSink &sink)
 {
   if (sp.is_box ()) {
     sink.put (sp);
@@ -2707,8 +2629,7 @@ decompose_convex (const db::SimplePolygon &sp, PreferredOrientation po, db::Simp
 }
 
 template <class P>
-bool
-is_convex_helper (const P &p)
+bool is_convex_helper (const P &p)
 {
   size_t n = p.hull ().size ();
   if (n < 4) {
@@ -2716,8 +2637,8 @@ is_convex_helper (const P &p)
   }
 
   for (size_t i = 0; i < n; ++i) {
-    db::Edge ep (p.hull ()[(i + n - 1) % n], p.hull ()[i]);
-    db::Edge ec (p.hull ()[i], p.hull ()[(i + 1) % n]);
+    db::Edge ep (p.hull () [(i + n - 1) % n], p.hull () [i]);
+    db::Edge ec (p.hull () [i], p.hull () [(i + 1) % n]);
     if (db::vprod_sign (ep, ec) > 0) {
       return false;
     }
@@ -2726,14 +2647,12 @@ is_convex_helper (const P &p)
   return true;
 }
 
-bool
-is_convex (const db::SimplePolygon &p)
+bool is_convex (const db::SimplePolygon &p)
 {
   return is_convex_helper (p);
 }
 
-bool
-is_convex (const db::Polygon &p)
+bool is_convex (const db::Polygon &p)
 {
   if (p.holes () > 0) {
     return false;
@@ -2776,8 +2695,8 @@ decompose_convex_to_trapezoids (const db::SimplePolygon &sp, bool horizontal, db
     //  this condition will be fulfilled always if the input polygon is convex
     tl_assert (cc - c == 2);
 
-    db::Coord x1 = db::edge_xaty (c[0], y);
-    db::Coord x2 = db::edge_xaty (c[1], y);
+    db::Coord x1 = db::edge_xaty (c [0], y);
+    db::Coord x2 = db::edge_xaty (c [1], y);
     if (x1 > x2) {
       std::swap (x1, x2);
     }
@@ -2785,13 +2704,13 @@ decompose_convex_to_trapezoids (const db::SimplePolygon &sp, bool horizontal, db
     db::Coord yy;
     if (cc == edges.end ()) {
       yy = db::edge_ymax (*c);
-      tl_assert (db::edge_ymax (c[1]) == db::edge_ymax (*c));
+      tl_assert (db::edge_ymax (c [1]) == db::edge_ymax (*c));
     } else {
       yy = db::edge_ymin (*cc);
     }
 
-    db::Coord xx1 = db::edge_xaty (c[0], yy);
-    db::Coord xx2 = db::edge_xaty (c[1], yy);
+    db::Coord xx1 = db::edge_xaty (c [0], yy);
+    db::Coord xx2 = db::edge_xaty (c [1], yy);
     if (xx1 > xx2) {
       std::swap (xx1, xx2);
     }
@@ -2800,35 +2719,31 @@ decompose_convex_to_trapezoids (const db::SimplePolygon &sp, bool horizontal, db
 
     if (x1 == x2) {
 
-      db::Point pts[] = {
+      db::Point pts [] = {
         db::Point (x1, y),
         db::Point (xx1, yy),
-        db::Point (xx2, yy)
-      };
+        db::Point (xx2, yy)};
 
-      sp.assign_hull (&pts[0], &pts[sizeof (pts) / sizeof (pts[0])]);
+      sp.assign_hull (&pts [0], &pts [sizeof (pts) / sizeof (pts [0])]);
 
     } else if (xx1 == xx2) {
 
-      db::Point pts[] = {
+      db::Point pts [] = {
         db::Point (x1, y),
         db::Point (xx1, yy),
-        db::Point (x2, y)
-      };
+        db::Point (x2, y)};
 
-      sp.assign_hull (&pts[0], &pts[sizeof (pts) / sizeof (pts[0])]);
+      sp.assign_hull (&pts [0], &pts [sizeof (pts) / sizeof (pts [0])]);
 
     } else {
 
-      db::Point pts[] = {
+      db::Point pts [] = {
         db::Point (x1, y),
         db::Point (xx1, yy),
         db::Point (xx2, yy),
-        db::Point (x2, y)
-      };
+        db::Point (x2, y)};
 
-      sp.assign_hull (&pts[0], &pts[sizeof (pts) / sizeof (pts[0])]);
-
+      sp.assign_hull (&pts [0], &pts [sizeof (pts) / sizeof (pts [0])]);
     }
 
     if (! horizontal) {
@@ -2850,34 +2765,32 @@ decompose_convex_to_trapezoids (const db::SimplePolygon &sp, bool horizontal, db
 
     y = yy;
     tl_assert (c0 != c);
-
   }
 }
 
-namespace {
+namespace
+{
 
-  struct TrapezoidConverter
-    : public db::SimplePolygonSink
+struct TrapezoidConverter
+  : public db::SimplePolygonSink {
+  TrapezoidConverter (bool horizontal, db::SimplePolygonSink *target)
+    : m_horizontal (horizontal), mp_target (target)
   {
-    TrapezoidConverter (bool horizontal, db::SimplePolygonSink *target)
-      : m_horizontal (horizontal), mp_target (target)
-    {
-      //  .. nothing yet ..
-    }
+    //  .. nothing yet ..
+  }
 
-    virtual void put (const db::SimplePolygon &polygon)
-    {
-      decompose_convex_to_trapezoids (polygon, m_horizontal, *mp_target);
-    }
+  virtual void put (const db::SimplePolygon &polygon)
+  {
+    decompose_convex_to_trapezoids (polygon, m_horizontal, *mp_target);
+  }
 
-  public:
-    bool m_horizontal;
-    db::SimplePolygonSink *mp_target;
-  };
+public:
+  bool m_horizontal;
+  db::SimplePolygonSink *mp_target;
+};
 }
 
-void
-decompose_trapezoids (const db::Polygon &p, TrapezoidDecompositionMode mode, db::SimplePolygonSink &sink)
+void decompose_trapezoids (const db::Polygon &p, TrapezoidDecompositionMode mode, db::SimplePolygonSink &sink)
 {
   if (mode == TD_htrapezoids || mode == TD_vtrapezoids) {
 
@@ -2907,7 +2820,6 @@ decompose_trapezoids (const db::Polygon &p, TrapezoidDecompositionMode mode, db:
 
       db::SimpleMerge op;
       ep.process (pg, op);
-
     }
 
   } else {
@@ -2923,14 +2835,11 @@ decompose_trapezoids (const db::Polygon &p, TrapezoidDecompositionMode mode, db:
       db::SimpleMerge op;
       ep.insert_sequence (p.begin_edge ());
       ep.process (pg, op);
-
     }
-
   }
 }
 
-void
-decompose_trapezoids (const db::SimplePolygon &sp, TrapezoidDecompositionMode mode, db::SimplePolygonSink &sink)
+void decompose_trapezoids (const db::SimplePolygon &sp, TrapezoidDecompositionMode mode, db::SimplePolygonSink &sink)
 {
   if (mode == TD_htrapezoids || mode == TD_vtrapezoids) {
 
@@ -2954,9 +2863,7 @@ decompose_trapezoids (const db::SimplePolygon &sp, TrapezoidDecompositionMode mo
       db::SimpleMerge op;
       ep.insert_sequence (sp.begin_edge ());
       ep.process (pg, op);
-
     }
-
   }
 }
 
@@ -2978,8 +2885,8 @@ snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord gy, std::vecto
       b = poly.begin_hull ();
       e = poly.end_hull ();
     } else {
-      b = poly.begin_hole ((unsigned int)  (i - 1));
-      e = poly.end_hole ((unsigned int)  (i - 1));
+      b = poly.begin_hole ((unsigned int) (i - 1));
+      e = poly.end_hole ((unsigned int) (i - 1));
     }
 
     for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
@@ -2991,7 +2898,6 @@ snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord gy, std::vecto
     } else {
       pnew.insert_hole (heap.begin (), heap.end ());
     }
-
   }
 
   pnew.sort_holes ();
@@ -3017,8 +2923,8 @@ scaled_and_snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord mx,
       b = poly.begin_hull ();
       e = poly.end_hull ();
     } else {
-      b = poly.begin_hole ((unsigned int)  (i - 1));
-      e = poly.end_hole ((unsigned int)  (i - 1));
+      b = poly.begin_hole ((unsigned int) (i - 1));
+      e = poly.end_hole ((unsigned int) (i - 1));
     }
 
     for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
@@ -3032,7 +2938,6 @@ scaled_and_snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord mx,
     } else {
       pnew.insert_hole (heap.begin (), heap.end ());
     }
-
   }
 
   pnew.sort_holes ();
@@ -3053,4 +2958,3 @@ scaled_and_snapped_vector (const db::Vector &v, db::Coord gx, db::Coord mx, db::
 }
 
 }
-

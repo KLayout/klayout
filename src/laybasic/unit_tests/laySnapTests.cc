@@ -25,7 +25,7 @@
 
 #include "tlUnitTest.h"
 
-TEST(1)
+TEST (1)
 {
   db::Manager mgr (true);
   lay::LayoutViewBase view (&mgr, is_editable (), 0);
@@ -41,12 +41,11 @@ TEST(1)
   view.insert_layer (view.begin_layers (), lp);
 
   db::Polygon poly;
-  db::Point pts[] = {
+  db::Point pts [] = {
     db::Point (0, 0),
     db::Point (1000, 0),
-    db::Point (0, 1000)
-  };
-  poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
+    db::Point (0, 1000)};
+  poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts [0]));
   top.shapes (l1).insert (poly);
 
   view.set_max_hier_levels (1);
@@ -63,7 +62,7 @@ TEST(1)
   EXPECT_EQ (res.snapped_point.to_string (), "0.8,0.2");
 
   res = lay::obj_snap (&view, db::DPoint (0.505, 0.505), db::DVector (), 0.1);
-  EXPECT_EQ (res.object_snap, lay::PointSnapToObjectResult::ObjectUnspecific);  //  center point of edge
+  EXPECT_EQ (res.object_snap, lay::PointSnapToObjectResult::ObjectUnspecific); //  center point of edge
   EXPECT_EQ (res.snapped_point.to_string (), "0.5,0.5");
 
   res = lay::obj_snap (&view, db::DPoint (0.385, 0.605), db::DVector (0.01, 0.01), 0.1);

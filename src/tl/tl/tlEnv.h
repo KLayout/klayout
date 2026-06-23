@@ -74,4 +74,3 @@ bool TL_PUBLIC app_flag (const std::string &name);
 }
 
 #endif
-

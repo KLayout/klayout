@@ -39,7 +39,8 @@
 #include <map>
 #include <vector>
 
-namespace img {
+namespace img
+{
 
 class LayoutView;
 class LayoutCanvas;
@@ -50,9 +51,11 @@ class Service;
 class IMG_PUBLIC View
   : public lay::ViewObject
 {
-public: 
+public:
   typedef lay::AnnotationShapes::iterator obj_iterator;
-  enum Mode { mode_normal, mode_transient, mode_transient_move };
+  enum Mode { mode_normal,
+              mode_transient,
+              mode_transient_move };
 
   /**
    *  @brief Constructor attaching to a certain object
@@ -84,7 +87,7 @@ public:
     if (mp_image_object) {
       return mp_image_object;
     } else {
-      return dynamic_cast <const img::Object *> ((*m_image_ref).ptr ());
+      return dynamic_cast<const img::Object *> ((*m_image_ref).ptr ());
     }
   }
 
@@ -121,7 +124,7 @@ class IMG_PUBLIC ImageIterator
 {
 public:
   typedef const img::Object value_type;
-  typedef const value_type *pointer; 
+  typedef const value_type *pointer;
   typedef const value_type &reference;
   typedef std::forward_iterator_tag iterator_category;
   typedef void difference_type;
@@ -155,15 +158,15 @@ public:
 
   const img::Object &operator* () const
   {
-    return *(dynamic_cast <const img::Object *> (m_current->ptr ()));
+    return *(dynamic_cast<const img::Object *> (m_current->ptr ()));
   }
 
-  const img::Object *operator-> () const
+  const img::Object *operator->() const
   {
-    return dynamic_cast <const img::Object *> (m_current->ptr ());
+    return dynamic_cast<const img::Object *> (m_current->ptr ());
   }
 
-  ImageIterator &operator++ () 
+  ImageIterator &operator++ ()
   {
     ++m_current;
     next_valid ();
@@ -199,25 +202,36 @@ class IMG_PUBLIC Service
     public lay::Plugin,
     public db::Object
 {
-public: 
+public:
   typedef lay::AnnotationShapes::iterator obj_iterator;
-  enum MoveMode { move_none, move_selected, move_landmark, move_l, move_r, move_t, move_b, move_lr, move_tr, move_ll, move_tl, move_all };
+  enum MoveMode { move_none,
+                  move_selected,
+                  move_landmark,
+                  move_l,
+                  move_r,
+                  move_t,
+                  move_b,
+                  move_lr,
+                  move_tr,
+                  move_ll,
+                  move_tl,
+                  move_all };
 
   Service (db::Manager *manager, lay::LayoutViewBase *view);
 
   ~Service ();
 
-  /** 
+  /**
    *  @brief Clear all highlights (for current object highlighting)
    */
   void clear_highlights ();
 
-  /** 
+  /**
    *  @brief Restore all highlights (for current object highlighting)
    */
   void restore_highlights ();
 
-  /** 
+  /**
    *  @brief Highlight a certain object
    */
   void highlight (unsigned int n);
@@ -227,22 +241,22 @@ public:
    */
   void edit_cancel ();
 
-  /** 
+  /**
    *  @brief Clear all images (menu callback)
    */
   void clear_images ();
 
-  /** 
+  /**
    *  @brief Add an image (menu callback)
    */
   void add_image ();
 
-  /** 
+  /**
    *  @brief Bring selected images to front
    */
   void bring_to_front ();
 
-  /** 
+  /**
    *  @brief Bring selected images to back
    */
   void bring_to_back ();
@@ -252,24 +266,24 @@ public:
    *
    *  If the Id is not valid, 0 is returned.
    */
-  const img::Object *object_by_id (size_t id) const; 
+  const img::Object *object_by_id (size_t id) const;
 
-  /** 
+  /**
    *  @brief "delete" operation
    */
   virtual void del ();
 
-  /** 
+  /**
    *  @brief "cut" operation
    */
   virtual void cut ();
 
-  /** 
+  /**
    *  @brief "copy" operation
    */
   virtual void copy ();
 
-  /** 
+  /**
    *  @brief "paste" operation
    */
   virtual void paste ();
@@ -330,7 +344,7 @@ public:
   virtual void clear_transient_selection ();
 
   /**
-   *  @brief Insert an image 
+   *  @brief Insert an image
    */
   img::Object *insert_image (const img::Object &image);
 
@@ -384,15 +398,15 @@ public:
   /**
    *  @brief Gets the selection for the properties page
    */
-  void get_selection (std::vector <obj_iterator> &selection) const;
+  void get_selection (std::vector<obj_iterator> &selection) const;
 
   /**
    *  @brief Sets the selection for the properties page
    */
-  void set_selection (const std::vector <obj_iterator> &selection);
+  void set_selection (const std::vector<obj_iterator> &selection);
 
   /**
-   *  @brief Direct access to the selection 
+   *  @brief Direct access to the selection
    */
   const std::set<obj_iterator> &selection () const
   {
@@ -400,7 +414,7 @@ public:
   }
 
   /**
-   *  @brief Delete a specific image 
+   *  @brief Delete a specific image
    */
   void erase_image (obj_iterator pos);
 
@@ -412,7 +426,7 @@ public:
   void erase_image_by_id (size_t id);
 
   /**
-   *  @brief Change a specific image 
+   *  @brief Change a specific image
    */
   void change_image (obj_iterator pos, const img::Object &to);
 
@@ -461,7 +475,7 @@ public:
   {
     return m_images_visible;
   }
-  
+
   /**
    *  @brief Returns a value indicating whether the given image is visible
    */
@@ -470,7 +484,7 @@ public:
   /**
    *  @brief Implement the menu response function
    */
-  void menu_activated (const  std::string &symbol);
+  void menu_activated (const std::string &symbol);
 
   /**
    *  @brief Return the iterator that delivers the image annotations (and only these)
@@ -548,7 +562,7 @@ private:
   void clear_selection ();
 
   /**
-   *  @brief Delete the selected images 
+   *  @brief Delete the selected images
    *
    *  Used as implementation for "del" and "cut"
    */
@@ -581,7 +595,7 @@ private:
    *
    *  If the Id is not valid, the end iterator is returned.
    */
-  obj_iterator object_iter_by_id (size_t id) const; 
+  obj_iterator object_iter_by_id (size_t id) const;
 
   /**
    *  @brief Display a message about the current selection
@@ -623,4 +637,3 @@ private:
 }
 
 #endif
-

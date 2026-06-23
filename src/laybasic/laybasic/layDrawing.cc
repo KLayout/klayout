@@ -39,4 +39,3 @@ Drawing::~Drawing ()
 }
 
 }
-

@@ -104,8 +104,7 @@ LogEntryData::LogEntryData (Severity s, const std::string &cell_name, const std:
   //  .. nothing yet ..
 }
 
-bool
-LogEntryData::operator== (const LogEntryData &other) const
+bool LogEntryData::operator== (const LogEntryData &other) const
 {
   return m_severity == other.m_severity &&
          m_message == other.m_message &&
@@ -122,8 +121,7 @@ LogEntryData::category_name () const
   return s_strings.string_for_id (m_category_name);
 }
 
-void
-LogEntryData::set_category_name (const std::string &s)
+void LogEntryData::set_category_name (const std::string &s)
 {
   m_category_name = s_strings.id_for_string (s);
 }
@@ -134,8 +132,7 @@ LogEntryData::category_description () const
   return s_strings.string_for_id (m_category_description);
 }
 
-void
-LogEntryData::set_category_description (const std::string &s)
+void LogEntryData::set_category_description (const std::string &s)
 {
   m_category_description = s_strings.id_for_string (s);
 }
@@ -146,8 +143,7 @@ LogEntryData::message () const
   return s_strings.string_for_id (m_message);
 }
 
-void
-LogEntryData::set_message (const std::string &n)
+void LogEntryData::set_message (const std::string &n)
 {
   m_message = s_strings.id_for_string (n);
 }
@@ -158,8 +154,7 @@ LogEntryData::cell_name () const
   return s_strings.string_for_id (m_cell_name);
 }
 
-void
-LogEntryData::set_cell_name (const std::string &n)
+void LogEntryData::set_cell_name (const std::string &n)
 {
   m_cell_name = s_strings.id_for_string (n);
 }
@@ -170,8 +165,7 @@ LogEntryData::net_name () const
   return s_strings.string_for_id (m_net_name);
 }
 
-void
-LogEntryData::set_net_name (const std::string &n)
+void LogEntryData::set_net_name (const std::string &n)
 {
   m_net_name = s_strings.id_for_string (n);
 }
@@ -219,7 +213,6 @@ LogEntryData::to_string (bool with_geometry) const
     }
 
     res += msg;
-
   }
 
   if (with_geometry && ! m_geometry.box ().empty ()) {

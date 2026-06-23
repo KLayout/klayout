@@ -76,25 +76,25 @@ static void run_test_public (tl::TestBase *_this, const char *file, const char *
   do_run_test (_this, fn, fn_au, opt, as_oas);
 }
 
-TEST(KeepLN1)
+TEST (KeepLN1)
 {
   db::DXFReaderOptions opt;
   run_test_public (_this, "keep_ln.dxf.gz", "keep_ln1_au.oas.gz", opt, true /*because of layer names*/);
 }
 
-TEST(KeepLN2)
+TEST (KeepLN2)
 {
   db::DXFReaderOptions opt;
   opt.keep_layer_names = true;
   run_test_public (_this, "keep_ln.dxf.gz", "keep_ln2_au.oas.gz", opt, true /*because of layer names*/);
 }
 
-TEST(1a)
+TEST (1a)
 {
   run_test (_this, "t1.dxf.gz", "t1a_au.gds.gz");
 }
 
-TEST(1b)
+TEST (1b)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.01;
@@ -102,17 +102,17 @@ TEST(1b)
   run_test (_this, "t1.dxf.gz", "t1b_au.gds.gz", opt);
 }
 
-TEST(2)
+TEST (2)
 {
   run_test (_this, "t2.dxf.gz", "t2_au2.gds.gz");
 }
 
-TEST(3)
+TEST (3)
 {
   run_test (_this, "t3.dxf.gz", "t3_au.gds.gz");
 }
 
-TEST(4)
+TEST (4)
 {
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("Metal:1,Metal2:5");
@@ -120,22 +120,22 @@ TEST(4)
   run_test (_this, "t4.dxf.gz", "t4_au.gds.gz", opt);
 }
 
-TEST(5)
+TEST (5)
 {
   run_test (_this, "t5.dxf.gz", "t5_au.gds.gz");
 }
 
-TEST(6)
+TEST (6)
 {
   run_test (_this, "t6.dxf.gz", "t6_au.gds.gz");
 }
 
-TEST(7)
+TEST (7)
 {
   run_test (_this, "t7.dxf.gz", "t7_au.gds.gz");
 }
 
-TEST(8)
+TEST (8)
 {
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("Metal:4,Kommentare:3,Bemassung:2");
@@ -143,7 +143,7 @@ TEST(8)
   run_test (_this, "t8.dxf.gz", "t8_au.gds.gz", opt);
 }
 
-TEST(9)
+TEST (9)
 {
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("Bemassung:2,Metal:5,Kommentare:4");
@@ -151,7 +151,7 @@ TEST(9)
   run_test (_this, "t9.dxf.gz", "t9_au.gds.gz", opt);
 }
 
-TEST(10)
+TEST (10)
 {
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("METAL:1,KOMMENTARE:4");
@@ -159,17 +159,17 @@ TEST(10)
   run_test (_this, "t10.dxf.gz", "t10_au.gds.gz", opt);
 }
 
-TEST(11)
+TEST (11)
 {
   run_test (_this, "t11.dxf.gz", "t11_au.gds.gz");
 }
 
-TEST(12)
+TEST (12)
 {
   run_test (_this, "t12.dxf.gz", "t12_au.gds.gz");
 }
 
-TEST(14)
+TEST (14)
 {
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("'A11-STRUKTUR__E_TYP_':10,A21_NITRID:11,'B11-KONTAKT':9,'B11-STRUKTUR':3,HELLFELD:7,MASKE:5,NORM_MIN_MAX_WAFER:6,RASTER:2,_BEGRENZUNG_A11_A21_A31_B1:8");
@@ -177,7 +177,7 @@ TEST(14)
   run_test (_this, "t14.dxf.gz", "t14_au.gds.gz", opt);
 }
 
-TEST(15)
+TEST (15)
 {
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("TEXT:4,IGBT:5,Wire:7,Ceramic:11,LAYER_1:14,Diode:18,'DBC TOP Plate':19,'Terminal Position':20");
@@ -185,7 +185,7 @@ TEST(15)
   run_test (_this, "t15.dxf.gz", "t15_au2_2.gds.gz", opt);
 }
 
-TEST(16)
+TEST (16)
 {
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("TEXT:4,IGBT:5,Wire:7,Ceramic:11,LAYER_1:14,Diode:18,'DBC TOP Plate':19,'Terminal Position':20");
@@ -193,7 +193,7 @@ TEST(16)
   run_test (_this, "t16.dxf.gz", "t16_au2_2.gds.gz", opt);
 }
 
-TEST(17)
+TEST (17)
 {
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("TEXT:4,IGBT:5,Wire:7,Ceramic:11,LAYER_1:14,Diode:18,'DBC TOP Plate':19,'Terminal Position':20");
@@ -201,32 +201,32 @@ TEST(17)
   run_test (_this, "t17.dxf.gz", "t17_au2_2.gds.gz", opt);
 }
 
-TEST(18)
+TEST (18)
 {
   run_test (_this, "t18.dxf.gz", "t18_au.gds.gz");
 }
 
-TEST(19)
+TEST (19)
 {
   run_test (_this, "t19.dxf.gz", "t19_au.gds.gz");
 }
 
-TEST(20)
+TEST (20)
 {
   run_test (_this, "t20.dxf.gz", "t20_au.gds.gz");
 }
 
-TEST(21)
+TEST (21)
 {
   run_test (_this, "t21.dxf.gz", "t21_au.gds.gz");
 }
 
-TEST(22)
+TEST (22)
 {
   run_test (_this, "t22.dxf.gz", "t22_au.gds.gz");
 }
 
-TEST(23a)
+TEST (23a)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -236,7 +236,7 @@ TEST(23a)
   run_test (_this, "t23.dxf.gz", "t23a_au.gds.gz", opt);
 }
 
-TEST(23b)
+TEST (23b)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -246,7 +246,7 @@ TEST(23b)
   run_test (_this, "t23.dxf.gz", "t23b_au.gds.gz", opt);
 }
 
-TEST(23c)
+TEST (23c)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -256,7 +256,7 @@ TEST(23c)
   run_test (_this, "t23.dxf.gz", "t23c_au.gds.gz", opt);
 }
 
-TEST(23d)
+TEST (23d)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -266,7 +266,7 @@ TEST(23d)
   run_test (_this, "t23.dxf.gz", "t23d_au.gds.gz", opt);
 }
 
-TEST(23e)
+TEST (23e)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -276,7 +276,7 @@ TEST(23e)
   run_test (_this, "t23.dxf.gz", "t23e_au.gds.gz", opt);
 }
 
-TEST(26a)
+TEST (26a)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -286,7 +286,7 @@ TEST(26a)
   run_test (_this, "t26.dxf.gz", "t26a_au.gds.gz", opt);
 }
 
-TEST(26b)
+TEST (26b)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -296,7 +296,7 @@ TEST(26b)
   run_test (_this, "t26.dxf.gz", "t26b_au.gds.gz", opt);
 }
 
-TEST(26c)
+TEST (26c)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -306,7 +306,7 @@ TEST(26c)
   run_test (_this, "t26.dxf.gz", "t26c_au.gds.gz", opt);
 }
 
-TEST(26d)
+TEST (26d)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -316,7 +316,7 @@ TEST(26d)
   run_test (_this, "t26.dxf.gz", "t26d_au.gds.gz", opt);
 }
 
-TEST(26e)
+TEST (26e)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -326,7 +326,7 @@ TEST(26e)
   run_test (_this, "t26.dxf.gz", "t26e_au.gds.gz", opt);
 }
 
-TEST(27a)
+TEST (27a)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -336,7 +336,7 @@ TEST(27a)
   run_test (_this, "t27.dxf.gz", "t27a_au.gds.gz", opt);
 }
 
-TEST(27b)
+TEST (27b)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -346,7 +346,7 @@ TEST(27b)
   run_test (_this, "t27.dxf.gz", "t27b_au.gds.gz", opt);
 }
 
-TEST(27c)
+TEST (27c)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -356,7 +356,7 @@ TEST(27c)
   run_test (_this, "t27.dxf.gz", "t27c_au.gds.gz", opt);
 }
 
-TEST(27d)
+TEST (27d)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -366,7 +366,7 @@ TEST(27d)
   run_test (_this, "t27.dxf.gz", "t27d_au.gds.gz", opt);
 }
 
-TEST(27e)
+TEST (27e)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -376,17 +376,17 @@ TEST(27e)
   run_test (_this, "t27.dxf.gz", "t27e_au.gds.gz", opt);
 }
 
-TEST(28)
+TEST (28)
 {
   run_test (_this, "t28.dxf.gz", "t28_au.gds.gz");
 }
 
-TEST(29)
+TEST (29)
 {
   run_test (_this, "t29.dxf.gz", "t29_au.gds.gz");
 }
 
-TEST(29a)
+TEST (29a)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -397,7 +397,7 @@ TEST(29a)
   run_test (_this, "t29.dxf.gz", "t29a_au.gds.gz", opt);
 }
 
-TEST(29b)
+TEST (29b)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -408,7 +408,7 @@ TEST(29b)
   run_test (_this, "t29.dxf.gz", "t29b_au.gds.gz", opt);
 }
 
-TEST(29c)
+TEST (29c)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -419,7 +419,7 @@ TEST(29c)
   run_test (_this, "t29.dxf.gz", "t29c_au.gds.gz", opt);
 }
 
-TEST(29d)
+TEST (29d)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -430,7 +430,7 @@ TEST(29d)
   run_test (_this, "t29.dxf.gz", "t29d_au.gds.gz", opt);
 }
 
-TEST(30)
+TEST (30)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -442,7 +442,7 @@ TEST(30)
 }
 
 //  accuracy
-TEST(31)
+TEST (31)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 0.001;
@@ -462,7 +462,7 @@ TEST(31)
 }
 
 //  issue #198
-TEST(32)
+TEST (32)
 {
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("L11D0:1,L12D0:2");
@@ -486,7 +486,7 @@ TEST(32)
 }
 
 //  issue #704
-TEST(33)
+TEST (33)
 {
   db::DXFReaderOptions opt;
   opt.polyline_mode = 3;
@@ -508,7 +508,7 @@ TEST(33)
 }
 
 //  issue #1173
-TEST(34)
+TEST (34)
 {
   db::DXFReaderOptions opt;
   opt.polyline_mode = 3;
@@ -517,28 +517,28 @@ TEST(34)
 }
 
 //  issue #1422
-TEST(35a)
+TEST (35a)
 {
   db::DXFReaderOptions opt;
   run_test_public (_this, "issue_1422a.dxf", "issue_1422a_au.gds.gz", opt);
 }
 
 //  issue #1422
-TEST(35b)
+TEST (35b)
 {
   db::DXFReaderOptions opt;
   run_test_public (_this, "issue_1422b.dxf", "issue_1422b_au.gds.gz", opt);
 }
 
 //  issue #1422
-TEST(35c)
+TEST (35c)
 {
   db::DXFReaderOptions opt;
   run_test_public (_this, "issue_1422c.dxf", "issue_1422c_au.gds.gz", opt);
 }
 
 //  issue #1592, polyline mode 2
-TEST(36a)
+TEST (36a)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 1e-5;
@@ -547,7 +547,7 @@ TEST(36a)
 }
 
 //  issue #1592
-TEST(36b)
+TEST (36b)
 {
   db::DXFReaderOptions opt;
   opt.dbu = 1e-5;

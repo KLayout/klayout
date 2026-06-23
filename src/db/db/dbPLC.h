@@ -104,7 +104,7 @@ public:
   /**
    *  @brief Gets a list of polygons that are attached to this vertex
    */
-  std::vector<Polygon *> polygons() const;
+  std::vector<Polygon *> polygons () const;
 
   /**
    *  @brief Gets the graph object this vertex belongs to
@@ -204,9 +204,9 @@ public:
     typedef Polygon &reference;
     typedef Polygon *pointer;
 
-    reference operator*() const
+    reference operator* () const
     {
-      return *operator-> ();
+      return *operator->();
     }
 
     pointer operator->() const
@@ -221,12 +221,12 @@ public:
 
     bool operator!= (const PolygonIterator &other) const
     {
-      return !operator== (other);
+      return ! operator== (other);
     }
 
     PolygonIterator &operator++ ()
     {
-      while (++m_index < 2 && operator-> () == 0)
+      while (++m_index < 2 && operator->() == 0)
         ;
       return *this;
     }
@@ -271,7 +271,7 @@ public:
   /**
    *  @brief Gets the polygon on the left side (can be null)
    */
-  Polygon *left  () const { return mp_left; }
+  Polygon *left () const { return mp_left; }
 
   /**
    *  @brief Gets the polygon on the right side (can be null)
@@ -531,7 +531,7 @@ private:
   size_t m_id;
   bool m_is_segment;
 
-  void set_left  (Polygon *t);
+  void set_left (Polygon *t);
   void set_right (Polygon *t);
 };
 
@@ -540,9 +540,8 @@ private:
  *
  *  The ID acts as a more predicable unique ID for the object in sets and maps.
  */
-struct EdgeLessFunc
-{
-  bool operator () (Edge *a, Edge *b) const
+struct EdgeLessFunc {
+  bool operator() (Edge *a, Edge *b) const
   {
     return a->id () < b->id ();
   }
@@ -552,10 +551,10 @@ struct EdgeLessFunc
  *  @brief A class representing a polygon
  */
 class DB_PUBLIC Polygon
-  : public tl::list_node<Polygon>, public tl::Object
+  : public tl::list_node<Polygon>,
+    public tl::Object
 {
 public:
-
   /**
    *  @brief Destructor
    *
@@ -628,9 +627,9 @@ public:
     size_t sz = size ();
     tl_assert (sz > 0);
     if (n >= 0 && size_t (n) < sz) {
-      return mp_v[n];
+      return mp_v [n];
     } else {
-      return mp_v[(n + sz) % sz];
+      return mp_v [(n + sz) % sz];
     }
   }
 
@@ -639,7 +638,7 @@ public:
    */
   inline Vertex *internal_vertex (size_t n) const
   {
-    return mp_v[mp_e.size () + n];
+    return mp_v [mp_e.size () + n];
   }
 
   /**
@@ -650,9 +649,9 @@ public:
     size_t sz = size ();
     tl_assert (sz > 0);
     if (n >= 0 && size_t (n) < sz) {
-      return mp_e[n];
+      return mp_e [n];
     } else {
-      return mp_e[(n + sz) % sz];
+      return mp_e [(n + sz) % sz];
     }
   }
 
@@ -768,7 +767,7 @@ protected:
   Polygon (Graph *graph);
   Polygon (Graph *graph, Edge *e1, Edge *e2, Edge *e3);
 
-  template<class Iter>
+  template <class Iter>
   Polygon (Graph *graph, Iter from, Iter to)
     : mp_graph (graph), mp_e (from, to)
   {
@@ -800,9 +799,8 @@ private:
  *
  *  The ID acts as a more predicable unique ID for the object in sets and maps.
  */
-struct PolygonLessFunc
-{
-  bool operator () (Polygon *a, Polygon *b) const
+struct PolygonLessFunc {
+  bool operator() (Polygon *a, Polygon *b) const
   {
     return a->id () < b->id ();
   }
@@ -880,7 +878,7 @@ protected:
   Polygon *
   create_polygon (Iter from, Iter to)
   {
-    Polygon *res = new Polygon (this, from ,to);
+    Polygon *res = new Polygon (this, from, to);
     res->set_id (++m_id);
     mp_polygons.push_back (res);
     return res;
@@ -910,4 +908,3 @@ private:
 } //  namespace db
 
 #endif
-

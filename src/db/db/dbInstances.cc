@@ -27,16 +27,16 @@
 namespace db
 {
 
-Instances::cell_inst_wp_tree_type        Instances::ms_empty_wp_tree        = Instances::cell_inst_wp_tree_type ();
-Instances::cell_inst_tree_type           Instances::ms_empty_tree           = Instances::cell_inst_tree_type ();
+Instances::cell_inst_wp_tree_type Instances::ms_empty_wp_tree = Instances::cell_inst_wp_tree_type ();
+Instances::cell_inst_tree_type Instances::ms_empty_tree = Instances::cell_inst_tree_type ();
 Instances::stable_cell_inst_wp_tree_type Instances::ms_empty_stable_wp_tree = Instances::stable_cell_inst_wp_tree_type ();
-Instances::stable_cell_inst_tree_type    Instances::ms_empty_stable_tree    = Instances::stable_cell_inst_tree_type ();
+Instances::stable_cell_inst_tree_type Instances::ms_empty_stable_tree = Instances::stable_cell_inst_tree_type ();
 
 // -------------------------------------------------------------------------------------
 //  local classes
 
 /**
- *  @brief A base class for instance operations 
+ *  @brief A base class for instance operations
  *
  *  This class is used for the Op classes for the undo/redo queuing mechanism.
  */
@@ -44,7 +44,7 @@ class InstOpBase
   : public db::Op
 {
 public:
-  InstOpBase () : db::Op () { }
+  InstOpBase () : db::Op () {}
 
   virtual void undo (Instances *instances) = 0;
   virtual void redo (Instances *instances) = 0;
@@ -71,7 +71,7 @@ public:
   {
     m_insts.push_back (sh);
   }
-  
+
   template <class Iter>
   InstOp (bool insert, Iter from, Iter to)
     : m_insert (insert)
@@ -122,16 +122,14 @@ private:
   void erase (Instances *insts);
 };
 
-template <class Inst, class ET> 
-void 
-InstOp<Inst, ET>::insert (Instances *insts)
+template <class Inst, class ET>
+void InstOp<Inst, ET>::insert (Instances *insts)
 {
   insts->insert (m_insts.begin (), m_insts.end ());
 }
 
-template <class Inst, class ET> 
-void 
-InstOp<Inst, ET>::erase (Instances *insts)
+template <class Inst, class ET>
+void InstOp<Inst, ET>::erase (Instances *insts)
 {
   typedef typename instances_editable_traits<ET>::template tree_traits<typename Inst::tag>::tree_type tree_type;
 
@@ -154,17 +152,16 @@ InstOp<Inst, ET>::erase (Instances *insts)
     to_erase.reserve (m_insts.size ());
     for (typename tree_type::const_iterator linst = ((const Instances *) insts)->inst_tree (typename Inst::tag (), ET ()).begin (); linst != ((const Instances *) insts)->inst_tree (typename Inst::tag (), ET ()).end (); ++linst) {
       typename std::vector<Inst>::iterator i = std::lower_bound (m_insts.begin (), m_insts.end (), *linst);
-      while (i != m_insts.end () && done [std::distance(m_insts.begin (), i)] && *i == *linst) {
+      while (i != m_insts.end () && done [std::distance (m_insts.begin (), i)] && *i == *linst) {
         ++i;
       }
       if (i != m_insts.end () && *i == *linst) {
-        done [std::distance(m_insts.begin (), i)] = true;
+        done [std::distance (m_insts.begin (), i)] = true;
         to_erase.push_back (linst);
       }
     }
 
     insts->erase_positions (typename Inst::tag (), ET (), to_erase.begin (), to_erase.end ());
-
   }
 }
 
@@ -183,7 +180,7 @@ ParentInstRep::basic_child_inst () const
   return mp_layout->cell (this->m_parent_cell_index).basic_sorted_inst_ptr (this->m_index);
 }
 
-ParentInstRep::cell_inst_array_type  
+ParentInstRep::cell_inst_array_type
 ParentInstRep::inst () const
 {
   //  create a new parent instance by cloning and inverting the array
@@ -197,7 +194,7 @@ ParentInstRep::inst () const
 //  ParentInstIterator implementation
 
 ParentInstIterator &
-ParentInstIterator::operator++() 
+ParentInstIterator::operator++ ()
 {
   cell_index_type ci = m_rep.basic_child_inst ()->object ().cell_index ();
   m_rep.inc ();
@@ -218,8 +215,8 @@ ParentInstIterator::operator++()
 // -------------------------------------------------------------------------------------
 //  Instance implementation
 
-Instance::cell_inst_array_type::iterator 
-Instance::begin_touching (const cell_inst_array_type::box_type &b, const layout_type *g) const 
+Instance::cell_inst_array_type::iterator
+Instance::begin_touching (const cell_inst_array_type::box_type &b, const layout_type *g) const
 {
   db::box_convert<cell_inst_type> bc (*g);
   return cell_inst ().begin_touching (b, bc);
@@ -262,7 +259,6 @@ Instance::to_string (bool resolve_cell_name) const
         r += " " + (*i).to_string ();
       }
     }
-
   }
 
   if (has_prop_id ()) {
@@ -276,9 +272,8 @@ Instance::to_string (bool resolve_cell_name) const
 //  instance_iterator implementation
 
 template <class Traits>
-void
-instance_iterator<Traits>::release_iter ()
-{ 
+void instance_iterator<Traits>::release_iter ()
+{
   if (m_type == TInstance) {
     if (m_stable && ! m_unsorted) {
       if (m_with_props) {
@@ -303,9 +298,8 @@ instance_iterator<Traits>::release_iter ()
 }
 
 template <class Traits>
-void
-instance_iterator<Traits>::make_iter ()
-{ 
+void instance_iterator<Traits>::make_iter ()
+{
   if (m_type == TInstance) {
     if (m_stable && ! m_unsorted) {
       if (m_with_props) {
@@ -326,13 +320,12 @@ instance_iterator<Traits>::make_iter ()
         new (&basic_iter (cell_inst_array_type::tag (), InstancesNonEditableTag ())) iter_type ();
       }
     }
-    m_traits.init (this); 
+    m_traits.init (this);
   }
 }
 
 template <class Traits>
-bool
-instance_iterator<Traits>::operator== (const instance_iterator<Traits> &d) const
+bool instance_iterator<Traits>::operator== (const instance_iterator<Traits> &d) const
 {
   if (! (m_type == d.m_type && m_stable == d.m_stable && m_with_props == d.m_with_props && m_unsorted == d.m_unsorted)) {
     return false;
@@ -399,9 +392,7 @@ instance_iterator<Traits>::operator= (const instance_iterator<Traits> &iter)
       }
 
       update_ref ();
-
     }
-
   }
 
   return *this;
@@ -464,8 +455,7 @@ instance_iterator<Traits>::quad_id () const
 }
 
 template <class Traits>
-void
-instance_iterator<Traits>::skip_quad () 
+void instance_iterator<Traits>::skip_quad ()
 {
   if (m_type == TInstance) {
     if (m_stable && ! m_unsorted) {
@@ -494,7 +484,7 @@ instance_iterator<Traits>::skip_quad ()
 
 template <class Traits>
 instance_iterator<Traits> &
-instance_iterator<Traits>::operator++() 
+instance_iterator<Traits>::operator++ ()
 {
   if (m_type == TInstance) {
     if (m_stable && ! m_unsorted) {
@@ -523,8 +513,7 @@ instance_iterator<Traits>::operator++()
 }
 
 template <class Traits>
-void
-instance_iterator<Traits>::make_next () 
+void instance_iterator<Traits>::make_next ()
 {
   while (true) {
     if (m_stable && ! m_unsorted) {
@@ -565,12 +554,11 @@ instance_iterator<Traits>::make_next ()
       return;
     }
     make_iter ();
-  } 
+  }
 }
 
 template <class Traits>
-void
-instance_iterator<Traits>::update_ref ()
+void instance_iterator<Traits>::update_ref ()
 {
   if (m_type == TInstance) {
     if (m_stable && ! m_unsorted) {
@@ -606,14 +594,15 @@ template class instance_iterator<OverlappingInstanceIteratorTraits>;
 
 NormalInstanceIteratorTraits::NormalInstanceIteratorTraits ()
   : mp_insts (0)
-{ }
+{
+}
 
 NormalInstanceIteratorTraits::NormalInstanceIteratorTraits (const instances_type *insts)
   : mp_insts (insts)
-{ }
+{
+}
 
-void 
-NormalInstanceIteratorTraits::init (instance_iterator<NormalInstanceIteratorTraits> *iter) const
+void NormalInstanceIteratorTraits::init (instance_iterator<NormalInstanceIteratorTraits> *iter) const
 {
   tl_assert (mp_insts != 0);
   if (iter->m_stable && ! iter->m_unsorted) {
@@ -648,23 +637,23 @@ NormalInstanceIteratorTraits::init (instance_iterator<NormalInstanceIteratorTrai
 
 TouchingInstanceIteratorTraits::TouchingInstanceIteratorTraits ()
   : mp_insts (0), mp_layout (0)
-{ }
+{
+}
 
 TouchingInstanceIteratorTraits::TouchingInstanceIteratorTraits (const instances_type *insts, const box_type &box, const layout_type *layout)
   : mp_insts (insts), m_box (box), mp_layout (layout)
-{ }
+{
+}
 
 template <class InstArray, class ET>
-void 
-TouchingInstanceIteratorTraits::init (instance_iterator<TouchingInstanceIteratorTraits> *iter) const
+void TouchingInstanceIteratorTraits::init (instance_iterator<TouchingInstanceIteratorTraits> *iter) const
 {
   typename InstArray::tag tag = typename InstArray::tag ();
   db::box_convert<InstArray, false> bc (*mp_layout);
   iter->basic_iter (tag, ET ()) = mp_insts->inst_tree (tag, ET ()).begin_touching (m_box, bc);
 }
 
-void 
-TouchingInstanceIteratorTraits::init (instance_iterator<TouchingInstanceIteratorTraits> *iter) const
+void TouchingInstanceIteratorTraits::init (instance_iterator<TouchingInstanceIteratorTraits> *iter) const
 {
   tl_assert (mp_insts != 0);
   if (iter->m_stable) {
@@ -687,23 +676,23 @@ TouchingInstanceIteratorTraits::init (instance_iterator<TouchingInstanceIterator
 
 OverlappingInstanceIteratorTraits::OverlappingInstanceIteratorTraits ()
   : mp_insts (0), mp_layout (0)
-{ }
+{
+}
 
 OverlappingInstanceIteratorTraits::OverlappingInstanceIteratorTraits (const instances_type *insts, const box_type &box, const layout_type *layout)
   : mp_insts (insts), m_box (box), mp_layout (layout)
-{ }
+{
+}
 
 template <class InstArray, class ET>
-void 
-OverlappingInstanceIteratorTraits::init (instance_iterator<OverlappingInstanceIteratorTraits> *iter) const
+void OverlappingInstanceIteratorTraits::init (instance_iterator<OverlappingInstanceIteratorTraits> *iter) const
 {
   typename InstArray::tag tag = typename InstArray::tag ();
   db::box_convert<InstArray, false> bc (*mp_layout);
   iter->basic_iter (tag, ET ()) = mp_insts->inst_tree (tag, ET ()).begin_overlapping (m_box, bc);
 }
 
-void 
-OverlappingInstanceIteratorTraits::init (instance_iterator<OverlappingInstanceIteratorTraits> *iter) const
+void OverlappingInstanceIteratorTraits::init (instance_iterator<OverlappingInstanceIteratorTraits> *iter) const
 {
   tl_assert (mp_insts != 0);
   if (iter->m_stable) {
@@ -726,14 +715,16 @@ OverlappingInstanceIteratorTraits::init (instance_iterator<OverlappingInstanceIt
 
 ChildCellIterator::ChildCellIterator ()
   : m_iter (), m_end ()
-{ }
+{
+}
 
 ChildCellIterator::ChildCellIterator (const instances_type *insts)
   : m_iter (insts->begin_sorted_insts ()),
     m_end (insts->end_sorted_insts ())
-{ }
+{
+}
 
-cell_index_type 
+cell_index_type
 ChildCellIterator::operator* () const
 {
   return (*m_iter)->object ().cell_index ();
@@ -744,7 +735,7 @@ ChildCellIterator::instances () const
 {
   cell_index_type ci = operator* ();
   size_t n = 0;
-  for (inst_iterator_type i = m_iter; i != m_end && (*i)->object ().cell_index () == ci; ++i) { 
+  for (inst_iterator_type i = m_iter; i != m_end && (*i)->object ().cell_index () == ci; ++i) {
     n += 1;
   }
   return n;
@@ -755,14 +746,14 @@ ChildCellIterator::weight () const
 {
   cell_index_type ci = operator* ();
   size_t n = 0;
-  for (inst_iterator_type i = m_iter; i != m_end && (*i)->object ().cell_index () == ci; ++i) { 
+  for (inst_iterator_type i = m_iter; i != m_end && (*i)->object ().cell_index () == ci; ++i) {
     n += (*i)->size ();
   }
   return n;
 }
 
 ChildCellIterator &
-ChildCellIterator::operator++() 
+ChildCellIterator::operator++ ()
 {
   cell_index_type ci = operator* ();
   do {
@@ -776,7 +767,8 @@ ChildCellIterator::operator++()
 
 Instance::Instance ()
   : mp_instances (0), m_with_props (false), m_stable (false), m_type (TNull)
-{ }
+{
+}
 
 Instance::~Instance ()
 {
@@ -791,54 +783,53 @@ Instance::~Instance ()
 
 Instance::Instance (const db::Instances *instances, const cell_inst_array_type &inst)
   : mp_instances (const_cast<db::Instances *> (instances)), m_with_props (false), m_stable (false), m_type (TInstance)
-{ 
+{
   m_generic.inst = &inst;
 }
 
 Instance::Instance (db::Instances *instances, const cell_inst_array_type &inst)
   : mp_instances (instances), m_with_props (false), m_stable (false), m_type (TInstance)
-{ 
+{
   m_generic.inst = &inst;
 }
 
 Instance::Instance (const db::Instances *instances, const cell_inst_wp_array_type &inst)
   : mp_instances (const_cast<db::Instances *> (instances)), m_with_props (true), m_stable (false), m_type (TInstance)
-{ 
+{
   m_generic.pinst = &inst;
 }
 
 Instance::Instance (db::Instances *instances, const cell_inst_wp_array_type &inst)
   : mp_instances (instances), m_with_props (true), m_stable (false), m_type (TInstance)
-{ 
+{
   m_generic.pinst = &inst;
 }
 
 Instance::Instance (const db::Instances *instances, const cell_inst_array_iterator_type &iter)
   : mp_instances (const_cast<db::Instances *> (instances)), m_with_props (false), m_stable (true), m_type (TInstance)
-{ 
+{
   new (m_generic.iter) cell_inst_array_iterator_type (iter);
 }
 
 Instance::Instance (db::Instances *instances, const cell_inst_array_iterator_type &iter)
   : mp_instances (instances), m_with_props (false), m_stable (true), m_type (TInstance)
-{ 
+{
   new (m_generic.iter) cell_inst_array_iterator_type (iter);
 }
 
 Instance::Instance (const db::Instances *instances, const cell_inst_wp_array_iterator_type &iter)
   : mp_instances (const_cast<db::Instances *> (instances)), m_with_props (true), m_stable (true), m_type (TInstance)
-{ 
+{
   new (m_generic.piter) cell_inst_wp_array_iterator_type (iter);
 }
 
 Instance::Instance (db::Instances *instances, const cell_inst_wp_array_iterator_type &iter)
   : mp_instances (instances), m_with_props (true), m_stable (true), m_type (TInstance)
-{ 
+{
   new (m_generic.piter) cell_inst_wp_array_iterator_type (iter);
 }
 
-bool 
-Instance::operator== (const Instance &d) const
+bool Instance::operator== (const Instance &d) const
 {
   //  hint: don't use basic_ptr - this will fail if the reference is no longer valid.
   //  We want to be able to compare valid vs. non-valid references.
@@ -865,12 +856,11 @@ Instance::operator== (const Instance &d) const
   }
 }
 
-bool 
-Instance::operator< (const Instance &d) const
+bool Instance::operator< (const Instance &d) const
 {
   if (m_type != d.m_type) {
     return m_type < d.m_type;
-  } 
+  }
   if (m_with_props != d.m_with_props) {
     return m_with_props < d.m_with_props;
   }
@@ -969,7 +959,6 @@ Instances::operator= (const Instances &d)
             }
           }
         }
-
       }
 
       if (! d.inst_tree (cell_inst_wp_array_type::tag (), InstancesEditableTag ()).empty ()) {
@@ -985,7 +974,6 @@ Instances::operator= (const Instances &d)
             }
           }
         }
-
       }
 
     } else {
@@ -1003,7 +991,6 @@ Instances::operator= (const Instances &d)
             }
           }
         }
-
       }
 
       if (! d.inst_tree (cell_inst_wp_array_type::tag (), InstancesNonEditableTag ()).empty ()) {
@@ -1019,22 +1006,18 @@ Instances::operator= (const Instances &d)
             }
           }
         }
-
       }
-
     }
 
     m_parent_insts = d.m_parent_insts;
 
     set_instance_by_cell_index_needs_made (true);
     set_instance_tree_needs_sort (true);
-
   }
   return *this;
 }
 
-bool 
-Instances::is_editable () const
+bool Instances::is_editable () const
 {
   return cell () && cell ()->layout () ? cell ()->layout ()->is_editable () : true;
 }
@@ -1045,8 +1028,7 @@ Instances::layout () const
   return cell () ? cell ()->layout () : 0;
 }
 
-void
-Instances::invalidate_insts ()
+void Instances::invalidate_insts ()
 {
   db::Cell *cp = cell ();
   if (cp) {
@@ -1060,8 +1042,7 @@ Instances::invalidate_insts ()
   invalidate_prop_ids ();
 }
 
-void
-Instances::invalidate_prop_ids ()
+void Instances::invalidate_prop_ids ()
 {
   if (layout ()) {
     layout ()->invalidate_prop_ids ();
@@ -1069,12 +1050,11 @@ Instances::invalidate_prop_ids ()
 }
 
 template <class Tag, class ET, class I>
-void 
-Instances::erase_positions (Tag tag, ET editable_tag, I first, I last)
+void Instances::erase_positions (Tag tag, ET editable_tag, I first, I last)
 {
   typedef instances_editable_traits<ET> editable_traits;
 
-  invalidate_insts ();  //  HINT: must come before the change is done!
+  invalidate_insts (); //  HINT: must come before the change is done!
 
   if (cell ()) {
     if (cell ()->manager () && cell ()->manager ()->transacting ()) {
@@ -1118,8 +1098,7 @@ Instances::insert (const InstArray &inst)
 }
 
 template <class I, class ET>
-void 
-Instances::insert (I from, I to)
+void Instances::insert (I from, I to)
 {
   typedef std::iterator_traits<I> it_traits;
   typedef typename it_traits::value_type value_type;
@@ -1136,8 +1115,7 @@ Instances::insert (I from, I to)
 }
 
 template <class I>
-void 
-Instances::insert (I from, I to)
+void Instances::insert (I from, I to)
 {
   if (is_editable ()) {
     insert<I, InstancesEditableTag> (from, to);
@@ -1147,8 +1125,7 @@ Instances::insert (I from, I to)
 }
 
 template <class Tag>
-bool 
-Instances::is_valid_by_tag (Tag tag, const instance_type &ref) const
+bool Instances::is_valid_by_tag (Tag tag, const instance_type &ref) const
 {
   if (ref.instances () != this) {
     return false;
@@ -1157,12 +1134,11 @@ Instances::is_valid_by_tag (Tag tag, const instance_type &ref) const
     return ref.basic_iter (tag)->is_valid ();
   } else {
     //  This is not really the case, but there is no other way to check this:
-    return true;  
+    return true;
   }
 }
 
-bool
-Instances::is_valid (const instance_type &ref) const
+bool Instances::is_valid (const instance_type &ref) const
 {
   if (ref.has_prop_id ()) {
     return is_valid_by_tag (cell_inst_wp_array_type::tag (), ref);
@@ -1172,8 +1148,7 @@ Instances::is_valid (const instance_type &ref) const
 }
 
 template <class InstArray>
-void 
-Instances::replace (const InstArray *replace, const InstArray &with)
+void Instances::replace (const InstArray *replace, const InstArray &with)
 {
   if (cell ()) {
     if (cell ()->manager () && cell ()->manager ()->transacting ()) {
@@ -1191,10 +1166,10 @@ Instances::replace (const InstArray *replace, const InstArray &with)
   invalidate_insts ();
 
   //  HINT: this only works because we know our box trees well:
-  *((InstArray *)replace) = with;
+  *((InstArray *) replace) = with;
 }
 
-Instances::instance_type 
+Instances::instance_type
 Instances::replace (const instance_type &ref, const cell_inst_wp_array_type &inst)
 {
   if (ref.instances () != this) {
@@ -1204,7 +1179,7 @@ Instances::replace (const instance_type &ref, const cell_inst_wp_array_type &ins
   const cell_inst_wp_array_type *cp = ref.basic_ptr (cell_inst_wp_array_type::tag ());
   if (cp) {
 
-    //  in-place replacement 
+    //  in-place replacement
     replace (cp, inst);
     return ref;
 
@@ -1213,11 +1188,10 @@ Instances::replace (const instance_type &ref, const cell_inst_wp_array_type &ins
     //  not an in-place replacement - erase and insert
     erase (ref);
     return insert (inst);
-
   }
 }
 
-Instances::instance_type 
+Instances::instance_type
 Instances::replace (const instance_type &ref, const cell_inst_array_type &inst)
 {
   if (ref.instances () != this) {
@@ -1227,12 +1201,12 @@ Instances::replace (const instance_type &ref, const cell_inst_array_type &inst)
   const cell_inst_array_type *cp = ref.basic_ptr (cell_inst_array_type::tag ());
   if (cp) {
 
-    //  in-place replacement 
+    //  in-place replacement
     replace (cp, inst);
     return ref;
 
   } else {
-    
+
     const cell_inst_wp_array_type *cp_wp = ref.basic_ptr (cell_inst_wp_array_type::tag ());
     if (cp_wp) {
 
@@ -1251,15 +1225,12 @@ Instances::replace (const instance_type &ref, const cell_inst_array_type &inst)
       //  NOTE: this should not happen since there are only cell_inst_wp_array_type and cell_inst_array_type objects ..
       erase (ref);
       return insert (inst);
-
     }
-
   }
 }
 
 template <class Tag, class ET, class I>
-void 
-Instances::erase_inst_by_iter (Tag tag, ET editable_tag, I iter)
+void Instances::erase_inst_by_iter (Tag tag, ET editable_tag, I iter)
 {
   if (iter.vector () != &inst_tree (tag, editable_tag).objects ()) {
     throw tl::Exception (tl::to_string (tr ("Trying to erase an object from a list that it does not belong to")));
@@ -1278,8 +1249,7 @@ Instances::erase_inst_by_iter (Tag tag, ET editable_tag, I iter)
 }
 
 template <class Tag, class ET>
-void 
-Instances::erase_inst_by_tag (Tag tag, ET editable_tag, const typename Tag::object_type &obj)
+void Instances::erase_inst_by_tag (Tag tag, ET editable_tag, const typename Tag::object_type &obj)
 {
   invalidate_insts ();
 
@@ -1290,12 +1260,11 @@ Instances::erase_inst_by_tag (Tag tag, ET editable_tag, const typename Tag::obje
     }
   }
 
-  inst_tree (tag, editable_tag).erase (inst_tree (tag, editable_tag).iterator_from_pointer (const_cast <typename Tag::object_type *> (&obj)));
+  inst_tree (tag, editable_tag).erase (inst_tree (tag, editable_tag).iterator_from_pointer (const_cast<typename Tag::object_type *> (&obj)));
 }
 
 template <class Tag, class ET>
-void 
-Instances::erase_insts_by_tag (Tag tag, ET editable_tag, std::vector<instance_type>::const_iterator s1, std::vector<instance_type>::const_iterator s2)
+void Instances::erase_insts_by_tag (Tag tag, ET editable_tag, std::vector<instance_type>::const_iterator s1, std::vector<instance_type>::const_iterator s2)
 {
   typedef typename instances_editable_traits<ET>::template tree_traits<Tag>::tree_type tree_type;
   tree_type &t = inst_tree (tag, editable_tag);
@@ -1304,15 +1273,14 @@ Instances::erase_insts_by_tag (Tag tag, ET editable_tag, std::vector<instance_ty
   iters.reserve (std::distance (s1, s2));
 
   for (std::vector<instance_type>::const_iterator s = s1; s != s2; ++s) {
-    iters.push_back (t.iterator_from_pointer (const_cast <typename Tag::object_type *> (s->basic_ptr (tag))));
+    iters.push_back (t.iterator_from_pointer (const_cast<typename Tag::object_type *> (s->basic_ptr (tag))));
   }
 
   erase_positions (tag, editable_tag, iters.begin (), iters.end ());
 }
 
 template <class ET>
-void
-Instances::clear_insts (ET editable_tag)
+void Instances::clear_insts (ET editable_tag)
 {
   invalidate_insts ();
 
@@ -1332,8 +1300,7 @@ Instances::clear_insts (ET editable_tag)
   do_clear_insts ();
 }
 
-void 
-Instances::clear_insts ()
+void Instances::clear_insts ()
 {
   if (is_editable ()) {
     clear_insts (InstancesEditableTag ());
@@ -1342,8 +1309,7 @@ Instances::clear_insts ()
   }
 }
 
-void 
-Instances::clear (Instances::cell_inst_array_type::tag) 
+void Instances::clear (Instances::cell_inst_array_type::tag)
 {
   invalidate_insts ();
 
@@ -1357,8 +1323,7 @@ Instances::clear (Instances::cell_inst_array_type::tag)
   }
 }
 
-void 
-Instances::clear (Instances::cell_inst_wp_array_type::tag) 
+void Instances::clear (Instances::cell_inst_wp_array_type::tag)
 {
   invalidate_insts ();
 
@@ -1377,24 +1342,23 @@ Instances::instance_from_pointer (const basic_inst_type *p) const
 {
   if (is_editable ()) {
     if (inst_tree (cell_inst_array_type::tag (), InstancesEditableTag ()).is_member_of (p)) {
-      return instance_type (this, inst_tree (cell_inst_array_type::tag (), InstancesEditableTag ()).iterator_from_pointer (static_cast <const cell_inst_array_type *> (p)));
+      return instance_type (this, inst_tree (cell_inst_array_type::tag (), InstancesEditableTag ()).iterator_from_pointer (static_cast<const cell_inst_array_type *> (p)));
     }
     if (inst_tree (cell_inst_wp_array_type::tag (), InstancesEditableTag ()).is_member_of (p)) {
-      return instance_type (this, inst_tree (cell_inst_wp_array_type::tag (), InstancesEditableTag ()).iterator_from_pointer (static_cast <const cell_inst_wp_array_type *> (p)));
+      return instance_type (this, inst_tree (cell_inst_wp_array_type::tag (), InstancesEditableTag ()).iterator_from_pointer (static_cast<const cell_inst_wp_array_type *> (p)));
     }
   } else {
     if (inst_tree (cell_inst_array_type::tag (), InstancesNonEditableTag ()).end () != inst_tree (cell_inst_array_type::tag (), InstancesNonEditableTag ()).begin () && p <= &*(inst_tree (cell_inst_array_type::tag (), InstancesNonEditableTag ()).end () - 1) && p >= &*(inst_tree (cell_inst_array_type::tag (), InstancesNonEditableTag ()).begin ())) {
-      return instance_type (this, *static_cast <const cell_inst_array_type *> (p));
+      return instance_type (this, *static_cast<const cell_inst_array_type *> (p));
     }
     if (inst_tree (cell_inst_wp_array_type::tag (), InstancesNonEditableTag ()).end () != inst_tree (cell_inst_wp_array_type::tag (), InstancesNonEditableTag ()).begin () && p <= &*(inst_tree (cell_inst_wp_array_type::tag (), InstancesNonEditableTag ()).end () - 1) && p >= &*(inst_tree (cell_inst_wp_array_type::tag (), InstancesNonEditableTag ()).begin ())) {
-      return instance_type (this, *static_cast <const cell_inst_wp_array_type *> (p));
+      return instance_type (this, *static_cast<const cell_inst_wp_array_type *> (p));
     }
   }
   return Instance ();
 }
 
-bool 
-Instances::empty () const
+bool Instances::empty () const
 {
   if (is_editable ()) {
     return ((! m_generic.stable_tree || m_generic.stable_tree->empty ()) &&
@@ -1405,8 +1369,7 @@ Instances::empty () const
   }
 }
 
-void 
-Instances::erase (const Instance &ref)
+void Instances::erase (const Instance &ref)
 {
   if (ref.is_null ()) {
     //  .. nothing ..
@@ -1414,11 +1377,10 @@ Instances::erase (const Instance &ref)
     erase_inst_by_tag (cell_inst_wp_array_type::tag (), ref);
   } else {
     erase_inst_by_tag (cell_inst_array_type::tag (), ref);
-  } 
+  }
 }
 
-void 
-Instances::erase (const Instances::const_iterator &e)
+void Instances::erase (const Instances::const_iterator &e)
 {
   if (e.at_end ()) {
     //  .. nothing ..
@@ -1426,13 +1388,12 @@ Instances::erase (const Instances::const_iterator &e)
     erase_inst_by_tag (cell_inst_wp_array_type::tag (), e);
   } else {
     erase_inst_by_tag (cell_inst_array_type::tag (), e);
-  } 
+  }
 }
 
-void 
-Instances::erase_insts (const std::vector<Instance> &instances)
+void Instances::erase_insts (const std::vector<Instance> &instances)
 {
-  for (std::vector<instance_type>::const_iterator i = instances.begin (); i != instances.end (); ) {
+  for (std::vector<instance_type>::const_iterator i = instances.begin (); i != instances.end ();) {
 
     std::vector<instance_type>::const_iterator inext = i;
     while (inext != instances.end () && inext->has_prop_id () == i->has_prop_id ()) {
@@ -1454,15 +1415,13 @@ Instances::erase_insts (const std::vector<Instance> &instances)
     }
 
     i = inext;
-
   }
 }
 
-void 
-Instances::count_parent_insts (std::vector <size_t> &count) const
+void Instances::count_parent_insts (std::vector<size_t> &count) const
 {
   cell_index_type last_ci = (cell_index_type) -1l;
-  
+
   for (sorted_inst_iterator c = begin_sorted_insts (); c != end_sorted_insts (); ++c) {
     cell_index_type ci = (*c)->object ().cell_index ();
     if (ci != last_ci) {
@@ -1476,16 +1435,14 @@ Instances::count_parent_insts (std::vector <size_t> &count) const
  *  @brief A helper function that compares child instances
  */
 template <class I>
-struct cell_inst_compare_f
-{
+struct cell_inst_compare_f {
   bool operator() (const I *a, const I *b) const
   {
     return a->raw_less (*b);
   }
 };
 
-void 
-Instances::sort_child_insts (bool force)
+void Instances::sort_child_insts (bool force)
 {
   if (! force && ! instance_by_cell_index_needs_made ()) {
     return;
@@ -1524,7 +1481,8 @@ Instances::sort_child_insts (bool force)
   std::sort (m_insts_by_cell_index.begin (), m_insts_by_cell_index.end (), cell_inst_compare_f<basic_inst_type> ());
 }
 
-namespace {
+namespace
+{
 
 /**
  *  @brief An alternative box converter for CellInst which does not call layout.update
@@ -1557,15 +1515,15 @@ private:
  *
  *  Using this converter in cell.update_bbox() prevents recursive calls to layout.update.
  */
-struct InternalCellInstArrayWithPropertiesBoxConverter
-{
+struct InternalCellInstArrayWithPropertiesBoxConverter {
   typedef db::Cell::cell_inst_array_type cell_inst_array;
   typedef db::Cell::box_type box_type;
   typedef db::complex_bbox_tag complexity;
 
   InternalCellInstArrayWithPropertiesBoxConverter (const db::Layout *layout)
     : m_bc (layout)
-  { }
+  {
+  }
 
   box_type operator() (const db::object_with_properties<cell_inst_array> &array) const
   {
@@ -1581,15 +1539,15 @@ private:
  *
  *  Using this converter in cell.update_bbox() prevents recursive calls to layout.update.
  */
-struct InternalCellInstArrayBoxConverter
-{
+struct InternalCellInstArrayBoxConverter {
   typedef db::Cell::cell_inst_array_type cell_inst_array;
   typedef db::Cell::box_type box_type;
   typedef db::complex_bbox_tag complexity;
 
   InternalCellInstArrayBoxConverter (const db::Layout *layout)
     : m_bc (layout)
-  { }
+  {
+  }
 
   box_type operator() (const cell_inst_array &array) const
   {
@@ -1602,8 +1560,7 @@ private:
 
 }
 
-void 
-Instances::sort_inst_tree (const Layout *g, bool force)
+void Instances::sort_inst_tree (const Layout *g, bool force)
 {
   if (! force && ! instance_tree_needs_sort ()) {
     return;
@@ -1628,11 +1585,9 @@ Instances::sort_inst_tree (const Layout *g, bool force)
       sort_child_insts (true);
     }
   }
-
 }
 
-void 
-Instances::update_relations (Layout *g, cell_index_type cell_index)
+void Instances::update_relations (Layout *g, cell_index_type cell_index)
 {
   cell_index_type last_ci = (cell_index_type) -1l;
 
@@ -1646,7 +1601,7 @@ Instances::update_relations (Layout *g, cell_index_type cell_index)
   }
 }
 
-size_t 
+size_t
 Instances::child_cells () const
 {
   size_t n = 0;
@@ -1656,7 +1611,7 @@ Instances::child_cells () const
   return n;
 }
 
-size_t 
+size_t
 Instances::cell_instances () const
 {
   if (is_editable ()) {
@@ -1668,10 +1623,9 @@ Instances::cell_instances () const
   }
 }
 
-void
-Instances::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+void Instances::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
-  if (!no_self) {
+  if (! no_self) {
     stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
   }
 
@@ -1695,14 +1649,14 @@ Instances::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int 
   }
 }
 
-Instances::instance_type 
+Instances::instance_type
 Instances::replace_prop_id (const instance_type &ref, db::properties_id_type prop_id)
 {
   if (ref.instances () != this) {
     throw tl::Exception (tl::to_string (tr ("Trying to replace an object in a list that it does not belong to")));
   }
 
-  if (! ref.is_null () && (!ref.has_prop_id () || ref.prop_id () != prop_id)) {
+  if (! ref.is_null () && (! ref.has_prop_id () || ref.prop_id () != prop_id)) {
     invalidate_prop_ids ();
     cell_inst_wp_array_type new_inst (ref.cell_inst (), prop_id);
     return replace (ref, new_inst);
@@ -1729,12 +1683,10 @@ Instances::clear_properties (const instance_type &ref)
   } else {
 
     return ref;
-
   }
 }
 
-void
-Instances::do_clear_insts ()
+void Instances::do_clear_insts ()
 {
   if (m_generic.any) {
     if (is_editable ()) {
@@ -1754,30 +1706,28 @@ Instances::do_clear_insts ()
   }
 }
 
-void
-Instances::undo (db::Op *op)
+void Instances::undo (db::Op *op)
 {
   db::InstOpBase *instop = dynamic_cast<InstOpBase *> (op);
   if (instop) {
     instop->undo (this);
-  } 
+  }
 }
 
-void
-Instances::redo (db::Op *op)
+void Instances::redo (db::Op *op)
 {
-  //  actions are only queued by the instance list - this is should be 
+  //  actions are only queued by the instance list - this is should be
   //  responsible for the handling of the latter.
   //  HACK: this is not really a nice concept, but it saves us a pointer to the manager.
   db::InstOpBase *instop = dynamic_cast<InstOpBase *> (op);
   if (instop) {
     instop->redo (this);
-  } 
+  }
 }
 
-Instances::instance_type 
-Instances::do_insert (const Instances::instance_type &ref, 
-                      tl::func_delegate_base <db::cell_index_type> &im)
+Instances::instance_type
+Instances::do_insert (const Instances::instance_type &ref,
+                      tl::func_delegate_base<db::cell_index_type> &im)
 {
   if (ref.instances () == this) {
 
@@ -1795,7 +1745,6 @@ Instances::do_insert (const Instances::instance_type &ref,
       inst_wp.properties_id (ref.prop_id ());
 
       return insert (inst_wp);
-
     }
 
   } else {
@@ -1813,9 +1762,7 @@ Instances::do_insert (const Instances::instance_type &ref,
       inst.object () = cell_inst_type (im (ref.cell_index ()));
 
       return insert (cell_inst_wp_array_type (inst, ref.prop_id ()));
-
     }
-
   }
 }
 
@@ -1870,25 +1817,24 @@ void Instances::apply_op (const Op &op, ET editable_tag)
   }
 }
 
-namespace {
+namespace
+{
 
-  //  A function to apply a transformation with "transform"
-  template <class T>
-  struct apply_transform_f
-  {
-    apply_transform_f (const T &t) : trans (t) { }
-    template <class Obj> void operator() (Obj &obj) const { obj.transform (trans); }
-    T trans;
-  };
+//  A function to apply a transformation with "transform"
+template <class T>
+struct apply_transform_f {
+  apply_transform_f (const T &t) : trans (t) {}
+  template <class Obj> void operator() (Obj &obj) const { obj.transform (trans); }
+  T trans;
+};
 
-  //  A function to apply a transformation with "transform_into"
-  template <class T>
-  struct apply_transform_into_f
-  {
-    apply_transform_into_f (const T &t) : trans (t) { }
-    template <class Obj> void operator() (Obj &obj) const { obj.transform_into (trans); }
-    T trans;
-  };
+//  A function to apply a transformation with "transform_into"
+template <class T>
+struct apply_transform_into_f {
+  apply_transform_into_f (const T &t) : trans (t) {}
+  template <class Obj> void operator() (Obj &obj) const { obj.transform_into (trans); }
+  T trans;
+};
 
 }
 
@@ -1922,7 +1868,7 @@ template DB_PUBLIC void Instances::transform<> (const ICplxTrans &t);
 template DB_PUBLIC void Instances::transform_into<> (const Trans &t);
 template DB_PUBLIC void Instances::transform_into<> (const ICplxTrans &t);
 
-//  This should not be instantiated explicitly, but without that we'd have to expose the undo/redo code in the 
+//  This should not be instantiated explicitly, but without that we'd have to expose the undo/redo code in the
 //  header
 template DB_PUBLIC void Instances::insert<> (std::vector<Instances::cell_inst_wp_array_type>::const_iterator from, std::vector<Instances::cell_inst_wp_array_type>::const_iterator to);
 template DB_PUBLIC void Instances::insert<> (std::vector<Instances::cell_inst_array_type>::const_iterator from, std::vector<Instances::cell_inst_array_type>::const_iterator to);
@@ -1930,4 +1876,3 @@ template DB_PUBLIC void Instances::insert<> (std::vector<Instances::cell_inst_wp
 template DB_PUBLIC void Instances::insert<> (std::vector<Instances::cell_inst_array_type>::iterator from, std::vector<Instances::cell_inst_array_type>::iterator to);
 
 }
-

@@ -21,31 +21,31 @@
 */
 
 
-#if !defined(HDR_lvsCommon_h)
-# define HDR_lvsCommon_h
+#if ! defined(HDR_lvsCommon_h)
+#define HDR_lvsCommon_h
 
-# if defined _WIN32 || defined __CYGWIN__
+#if defined _WIN32 || defined __CYGWIN__
 
-#   ifdef MAKE_LVS_LIBRARY
-#     define LVS_PUBLIC __declspec(dllexport)
-#   else
-#     define LVS_PUBLIC __declspec(dllimport)
-#   endif
-#   define LVS_LOCAL
-#   define LVS_PUBLIC_TEMPLATE
+#ifdef MAKE_LVS_LIBRARY
+#define LVS_PUBLIC __declspec (dllexport)
+#else
+#define LVS_PUBLIC __declspec (dllimport)
+#endif
+#define LVS_LOCAL
+#define LVS_PUBLIC_TEMPLATE
 
-# else
+#else
 
-#   if __GNUC__ >= 4 || defined(__clang__)
-#     define LVS_PUBLIC __attribute__ ((visibility ("default")))
-#     define LVS_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
-#     define LVS_LOCAL  __attribute__ ((visibility ("hidden")))
-#   else
-#     define LVS_PUBLIC
-#     define LVS_PUBLIC_TEMPLATE
-#     define LVS_LOCAL
-#   endif
+#if __GNUC__ >= 4 || defined(__clang__)
+#define LVS_PUBLIC __attribute__ ((visibility ("default")))
+#define LVS_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
+#define LVS_LOCAL __attribute__ ((visibility ("hidden")))
+#else
+#define LVS_PUBLIC
+#define LVS_PUBLIC_TEMPLATE
+#define LVS_LOCAL
+#endif
 
-# endif
+#endif
 
 #endif

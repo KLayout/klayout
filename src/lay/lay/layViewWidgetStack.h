@@ -55,7 +55,7 @@ protected:
 
   void resize_children ();
 
-  std::vector <LayoutViewWidget *> m_widgets;
+  std::vector<LayoutViewWidget *> m_widgets;
   QLabel *mp_bglabel;
 };
 

@@ -62,7 +62,7 @@
 #include "gsi.h"
 
 #if defined(HAVE_QT)
-#  include <QImageWriter>
+#include <QImageWriter>
 #endif
 
 // Enable this if you have both Qt and libpng and want to use libpng for saving images:
@@ -84,12 +84,12 @@ const int mark_size = 9;
 
 // -------------------------------------------------------------
 
-struct OpHideShowCell 
-  : public db::Op
-{
+struct OpHideShowCell
+  : public db::Op {
   OpHideShowCell (lay::CellView::cell_index_type ci, int cv_index, bool show)
     : m_cell_index (ci), m_cellview_index (cv_index), m_show (show)
-  { }
+  {
+  }
 
   lay::CellView::cell_index_type m_cell_index;
   int m_cellview_index;
@@ -97,11 +97,10 @@ struct OpHideShowCell
 };
 
 struct OpSetDitherPattern
-  : public db::Op 
-{
+  : public db::Op {
   OpSetDitherPattern (const lay::DitherPattern &o, const lay::DitherPattern &n)
     : db::Op (), m_old (o), m_new (n)
-  { 
+  {
     //  nothing yet.
   }
 
@@ -109,8 +108,7 @@ struct OpSetDitherPattern
 };
 
 struct OpSetLineStyles
-  : public db::Op
-{
+  : public db::Op {
   OpSetLineStyles (const lay::LineStyles &o, const lay::LineStyles &n)
     : db::Op (), m_old (o), m_new (n)
   {
@@ -121,93 +119,88 @@ struct OpSetLineStyles
 };
 
 struct OpSetLayerProps
-  : public db::Op
-{
+  : public db::Op {
   OpSetLayerProps (unsigned int li, unsigned int i, const lay::LayerProperties &o, const lay::LayerProperties &n)
     : m_list_index (li), m_index (i), m_old (o), m_new (n)
-  { 
+  {
     //  .. nothing yet ..
   }
-  
+
   unsigned int m_list_index;
   size_t m_index;
   lay::LayerProperties m_old, m_new;
 };
 
-struct OpSetLayerPropsNode 
-  : public db::Op
-{
+struct OpSetLayerPropsNode
+  : public db::Op {
   OpSetLayerPropsNode (unsigned int li, unsigned int i, const lay::LayerPropertiesNode &o, const lay::LayerPropertiesNode &n)
     : m_list_index (li), m_index (i), m_old (o), m_new (n)
-  { 
+  {
     //  .. nothing yet ..
   }
-  
+
   unsigned int m_list_index;
   size_t m_index;
   lay::LayerPropertiesNode m_old, m_new;
 };
 
-struct OpDeleteLayerList 
-  : public db::Op
-{
+struct OpDeleteLayerList
+  : public db::Op {
   OpDeleteLayerList (unsigned int li, const lay::LayerPropertiesList &o)
     : m_list_index (li), m_old (o)
-  { 
+  {
     //  .. nothing yet ..
   }
-  
+
   unsigned int m_list_index;
   lay::LayerPropertiesList m_old;
 };
 
-struct OpInsertLayerList 
-  : public db::Op
-{
+struct OpInsertLayerList
+  : public db::Op {
   OpInsertLayerList (unsigned int li, const lay::LayerPropertiesList &n)
     : m_list_index (li), m_new (n)
-  { 
+  {
     //  .. nothing yet ..
   }
-  
+
   unsigned int m_list_index;
   lay::LayerPropertiesList m_new;
 };
 
-struct OpRenameProps 
-  : public db::Op
-{
+struct OpRenameProps
+  : public db::Op {
   OpRenameProps (unsigned int li, const std::string &old_name, const std::string &new_name)
     : m_list_index (li), m_old (old_name), m_new (new_name)
-  { 
+  {
     //  .. nothing yet ..
   }
-  
+
   unsigned int m_list_index;
   std::string m_old, m_new;
 };
 
-struct OpSetAllProps 
-  : public db::Op
-{
+struct OpSetAllProps
+  : public db::Op {
   OpSetAllProps (unsigned int li, const lay::LayerPropertiesList &o, const lay::LayerPropertiesList &n)
     : m_list_index (li), m_old (o), m_new (n)
-  { 
+  {
     //  .. nothing yet ..
   }
-  
+
   unsigned int m_list_index;
   lay::LayerPropertiesList m_old, m_new;
 };
 
 struct OpLayerList
-  : public db::Op
-{
-  enum Mode { Delete, Insert };
+  : public db::Op {
+  enum Mode { Delete,
+              Insert };
 
   OpLayerList (unsigned int li, unsigned int i, const lay::LayerPropertiesNode &n, Mode m)
     : m_list_index (li), m_index (i), m_mode (m), m_node (n)
-  { }
+  {
+  }
 
   unsigned int m_list_index;
   size_t m_index;
@@ -215,22 +208,20 @@ struct OpLayerList
   lay::LayerPropertiesNode m_node;
 };
 
-struct OpInsertLayerProps 
-  : public OpLayerList
-{
+struct OpInsertLayerProps
+  : public OpLayerList {
   OpInsertLayerProps (unsigned int li, unsigned int i, const lay::LayerPropertiesNode &n)
     : OpLayerList (li, i, n, Insert)
-  { 
+  {
     // .. nothing yet ..
   }
 };
 
-struct OpDeleteLayerProps 
-  : public OpLayerList
-{
+struct OpDeleteLayerProps
+  : public OpLayerList {
   OpDeleteLayerProps (unsigned int li, unsigned int i, const lay::LayerPropertiesNode &n)
     : OpLayerList (li, i, n, Delete)
-  { 
+  {
     // .. nothing yet ..
   }
 };
@@ -267,12 +258,11 @@ LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool 
   tl_assert (dispatcher () != 0);
 }
 
-void
-LayoutViewBase::copy_from (lay::LayoutViewBase *source)
+void LayoutViewBase::copy_from (lay::LayoutViewBase *source)
 {
   m_annotation_shapes = source->m_annotation_shapes;
 
-  //  set the handle reference and clear all cell related stuff 
+  //  set the handle reference and clear all cell related stuff
   m_cellviews = source->cellview_list ();
   m_hidden_cells = source->m_hidden_cells;
 
@@ -309,8 +299,7 @@ LayoutViewBase::copy_from (lay::LayoutViewBase *source)
   finish_cellviews_changed ();
 }
 
-void
-LayoutViewBase::init (db::Manager *mgr)
+void LayoutViewBase::init (db::Manager *mgr)
 {
   manager (mgr);
 
@@ -405,8 +394,7 @@ LayoutViewBase::init (db::Manager *mgr)
   LayoutViewBase::create_plugins ();
 }
 
-void
-LayoutViewBase::finish ()
+void LayoutViewBase::finish ()
 {
   //  if we're the root dispatcher initialize the menu and build the context menus. No other menus are built so far.
   if (dispatcher () == this) {
@@ -414,15 +402,14 @@ LayoutViewBase::finish ()
   }
 }
 
-void
-LayoutViewBase::init_menu ()
+void LayoutViewBase::init_menu ()
 {
   make_menu ();
 
   //  make the plugins create their menu items
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     //  TODO: get rid of the const_cast hack
-    const_cast <lay::PluginDeclaration *> (&*cls)->init_menu (dispatcher ());
+    const_cast<lay::PluginDeclaration *> (&*cls)->init_menu (dispatcher ());
   }
 
   //  if not in editable mode, hide all entries from "edit_mode" group and show all from the "view_mode" group and vice versa
@@ -436,8 +423,7 @@ LayoutViewBase::init_menu ()
   }
 }
 
-void
-LayoutViewBase::shutdown ()
+void LayoutViewBase::shutdown ()
 {
   //  detach all observers
   //  This is to prevent signals to partially destroyed observers that own a LayoutViewBase
@@ -473,7 +459,7 @@ LayoutViewBase::shutdown ()
   //  delete layer lists
   std::vector<LayerPropertiesList *> layer_properties_lists;
   layer_properties_lists.swap (m_layer_properties_lists);
-  for (std::vector<LayerPropertiesList *>::iterator l = layer_properties_lists.begin (); l !=  layer_properties_lists.end (); ++l) {
+  for (std::vector<LayerPropertiesList *>::iterator l = layer_properties_lists.begin (); l != layer_properties_lists.end (); ++l) {
     if (*l) {
       delete *l;
     }
@@ -597,10 +583,10 @@ void LayoutViewBase::create_plugins (const lay::PluginDeclaration *except_this)
   clear_plugins ();
 
   //  create the plugins
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ) {
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end ();) {
 
     //  NOTE: during "create_plugin" a plugin may be unregistered, so don't increment the iterator after
-    auto current = cls.operator-> ();
+    auto current = cls.operator->();
     std::string current_name = cls.current_name ();
     ++cls;
 
@@ -633,9 +619,7 @@ void LayoutViewBase::create_plugins (const lay::PluginDeclaration *except_this)
         //  except grid net plugin which is created on request
         create_plugin (current);
       }
-
     }
-
   }
 
   mode (default_mode ());
@@ -651,14 +635,13 @@ lay::Plugin *LayoutViewBase::create_plugin (const lay::PluginDeclaration *cls)
 
     mp_plugins.push_back (p);
     p->set_plugin_declaration (cls);
-  
+
     //  enable editable functionality
     if (p->editable_interface ()) {
       enable (p->editable_interface (), cls->editable_enabled ());
     }
 
     update_event_handlers ();
-
   }
   return p;
 }
@@ -666,9 +649,9 @@ lay::Plugin *LayoutViewBase::create_plugin (const lay::PluginDeclaration *cls)
 Plugin *LayoutViewBase::get_plugin_by_name (const std::string &name) const
 {
   lay::PluginDeclaration *decl = 0;
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); !decl && cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); ! decl && cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     if (cls.current_name () == name) {
-      decl = cls.operator-> ();
+      decl = cls.operator->();
     }
   }
 
@@ -683,32 +666,27 @@ Plugin *LayoutViewBase::get_plugin_by_name (const std::string &name) const
   return 0;
 }
 
-void
-LayoutViewBase::set_drawing_workers (int workers)
+void LayoutViewBase::set_drawing_workers (int workers)
 {
   m_drawing_workers = std::max (0, std::min (100, workers));
 }
 
-void
-LayoutViewBase::set_synchronous (bool s)
+void LayoutViewBase::set_synchronous (bool s)
 {
   m_synchronous = s;
 }
 
-void
-LayoutViewBase::message (const std::string & /*s*/, int /*timeout*/, int /*priority*/)
+void LayoutViewBase::message (const std::string & /*s*/, int /*timeout*/, int /*priority*/)
 {
   //  .. nothing yet ..
 }
 
-void
-LayoutViewBase::set_focus ()
+void LayoutViewBase::set_focus ()
 {
   //  .. nothing yet ..
 }
 
-bool
-LayoutViewBase::is_dirty () const
+bool LayoutViewBase::is_dirty () const
 {
   return m_dirty;
 }
@@ -719,8 +697,7 @@ LayoutViewBase::title () const
   return m_current_title;
 }
 
-void
-LayoutViewBase::update_title ()
+void LayoutViewBase::update_title ()
 {
   if (! m_title.empty ()) {
 
@@ -766,22 +743,19 @@ LayoutViewBase::update_title ()
   }
 }
 
-void
-LayoutViewBase::set_title (const std::string &t)
+void LayoutViewBase::set_title (const std::string &t)
 {
   m_title = t;
   update_title ();
 }
 
-void
-LayoutViewBase::reset_title ()
+void LayoutViewBase::reset_title ()
 {
   m_title.clear ();
   update_title ();
 }
 
-bool 
-LayoutViewBase::configure (const std::string &name, const std::string &value)
+bool LayoutViewBase::configure (const std::string &name, const std::string &value)
 {
   lay::Dispatcher::configure (name, value);
 
@@ -860,7 +834,8 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
       db::DCplxTrans t;
       ex.read (t);
       set_global_trans (t);
-    } catch (...) { }
+    } catch (...) {
+    }
     return true;
 
   } else if (name == cfg_ctx_color) {
@@ -1219,7 +1194,7 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
         palette.from_string (value);
       }
     } catch (...) {
-      //  ignore errors: just reset the palette 
+      //  ignore errors: just reset the palette
       palette = lay::StipplePalette::default_palette ();
     }
 
@@ -1257,7 +1232,7 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
         palette.from_string (value);
       }
     } catch (...) {
-      //  ignore errors: just reset the palette 
+      //  ignore errors: just reset the palette
       palette = lay::ColorPalette::default_palette ();
     }
 
@@ -1452,14 +1427,12 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
   }
 }
 
-void
-LayoutViewBase::config_finalize ()
+void LayoutViewBase::config_finalize ()
 {
   //  .. nothing yet ..
 }
 
-void 
-LayoutViewBase::enable_edits (bool enable)
+void LayoutViewBase::enable_edits (bool enable)
 {
   //  enable or disable the services that implement "lay::ViewService"
   for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
@@ -1484,8 +1457,7 @@ LayoutViewBase::enable_edits (bool enable)
   }
 }
 
-void
-LayoutViewBase::set_line_styles (const lay::LineStyles &styles)
+void LayoutViewBase::set_line_styles (const lay::LineStyles &styles)
 {
   if (mp_canvas->line_styles () != styles) {
 
@@ -1501,12 +1473,10 @@ LayoutViewBase::set_line_styles (const lay::LineStyles &styles)
     }
 
     layer_list_changed_event (1);
-
   }
 }
 
-void
-LayoutViewBase::set_dither_pattern (const lay::DitherPattern &pattern)
+void LayoutViewBase::set_dither_pattern (const lay::DitherPattern &pattern)
 {
   if (mp_canvas->dither_pattern () != pattern) {
 
@@ -1515,14 +1485,13 @@ LayoutViewBase::set_dither_pattern (const lay::DitherPattern &pattern)
     } else if (manager () && ! replaying ()) {
       manager ()->clear ();
     }
-    mp_canvas->set_dither_pattern (pattern); 
+    mp_canvas->set_dither_pattern (pattern);
 
     for (unsigned int i = 0; i < layer_lists (); ++i) {
       m_layer_properties_lists [i]->set_dither_pattern (pattern);
     }
 
     layer_list_changed_event (1);
-
   }
 }
 
@@ -1537,8 +1506,7 @@ LayoutViewBase::get_properties (unsigned int index) const
   }
 }
 
-void
-LayoutViewBase::set_current_layer_list (unsigned int index)
+void LayoutViewBase::set_current_layer_list (unsigned int index)
 {
   if (index != m_current_layer_list && index < layer_lists ()) {
     m_current_layer_list = index;
@@ -1547,8 +1515,7 @@ LayoutViewBase::set_current_layer_list (unsigned int index)
   }
 }
 
-void 
-LayoutViewBase::insert_layer_list (unsigned index, const LayerPropertiesList &props)
+void LayoutViewBase::insert_layer_list (unsigned index, const LayerPropertiesList &props)
 {
   if (index > layer_lists ()) {
     return;
@@ -1576,8 +1543,7 @@ LayoutViewBase::insert_layer_list (unsigned index, const LayerPropertiesList &pr
   m_prop_changed = true;
 }
 
-void 
-LayoutViewBase::delete_layer_list (unsigned index)
+void LayoutViewBase::delete_layer_list (unsigned index)
 {
   if (index >= layer_lists ()) {
     return;
@@ -1613,15 +1579,13 @@ LayoutViewBase::delete_layer_list (unsigned index)
     layer_list_changed_event (3);
 
     redraw ();
-
   }
 
   layer_list_deleted_event (index);
   m_prop_changed = true;
 }
 
-void 
-LayoutViewBase::rename_properties (unsigned int index, const std::string &new_name)
+void LayoutViewBase::rename_properties (unsigned int index, const std::string &new_name)
 {
   if (index >= layer_lists ()) {
     return;
@@ -1652,8 +1616,7 @@ LayoutViewBase::find_layer (unsigned int cv_index, const db::LayerProperties &lp
   return lay::LayerPropertiesConstIterator ();
 }
 
-bool
-LayoutViewBase::set_current_layer (unsigned int cv_index, const db::LayerProperties &lp)
+bool LayoutViewBase::set_current_layer (unsigned int cv_index, const db::LayerProperties &lp)
 {
   lay::LayerPropertiesConstIterator l = find_layer (cv_index, lp);
   if (! l.is_null ()) {
@@ -1664,15 +1627,13 @@ LayoutViewBase::set_current_layer (unsigned int cv_index, const db::LayerPropert
   }
 }
 
-void
-LayoutViewBase::clear_layer_selection ()
+void LayoutViewBase::clear_layer_selection ()
 {
   m_current_layer = lay::LayerPropertiesConstIterator ();
   m_selected_layers.clear ();
 }
 
-void
-LayoutViewBase::set_current_layer (const lay::LayerPropertiesConstIterator &l)
+void LayoutViewBase::set_current_layer (const lay::LayerPropertiesConstIterator &l)
 {
   m_current_layer = l;
   m_selected_layers.clear ();
@@ -1691,8 +1652,7 @@ LayoutViewBase::selected_layers () const
   return m_selected_layers;
 }
 
-void
-LayoutViewBase::set_selected_layers (const std::vector<lay::LayerPropertiesConstIterator> &sel)
+void LayoutViewBase::set_selected_layers (const std::vector<lay::LayerPropertiesConstIterator> &sel)
 {
   m_selected_layers = sel;
   if (sel.empty ()) {
@@ -1710,10 +1670,10 @@ single_bitmap_to_image (const lay::ViewOp &view_op, lay::Bitmap &bitmap,
                         tl::PixelBuffer *pimage, const lay::DitherPattern &dither_pattern, const lay::LineStyles &line_styles,
                         double dpr, unsigned int width, unsigned int height)
 {
-  std::vector <lay::ViewOp> view_ops;
+  std::vector<lay::ViewOp> view_ops;
   view_ops.push_back (view_op);
 
-  std::vector <lay::Bitmap *> pbitmaps;
+  std::vector<lay::Bitmap *> pbitmaps;
   pbitmaps.push_back (&bitmap);
 
   lay::bitmaps_to_image (view_ops, pbitmaps, dither_pattern, line_styles, dpr, pimage, width, height, false, 0);
@@ -1733,8 +1693,8 @@ LayoutViewBase::icon_for_layer (const LayerPropertiesConstIterator &iter, unsign
   h = std::max ((unsigned int) 16, h) * oversampling * dpr + 0.5;
   w = std::max ((unsigned int) 16, w) * oversampling * dpr + 0.5;
 
-  tl::color_t def_color   = 0x808080;
-  tl::color_t fill_color  = iter->has_fill_color (true)  ? iter->eff_fill_color (true)  : def_color;
+  tl::color_t def_color = 0x808080;
+  tl::color_t fill_color = iter->has_fill_color (true) ? iter->eff_fill_color (true) : def_color;
   tl::color_t frame_color = iter->has_frame_color (true) ? iter->eff_frame_color (true) : def_color;
 
   tl::PixelBuffer image (w, h);
@@ -1767,9 +1727,7 @@ LayoutViewBase::icon_for_layer (const LayerPropertiesConstIterator &iter, unsign
         text.fill (h / 2 - 1 - i, ap, ap + aw - i + 1);
         text.fill (h / 2 - 1 + i, ap, ap + aw - i + 1);
       }
-
     }
-
   }
 
   if (! no_state && no_stipples ()) {
@@ -1833,7 +1791,6 @@ LayoutViewBase::icon_for_layer (const LayerPropertiesConstIterator &iter, unsign
     if (d >= ddx) {
       d -= ddx;
     }
-
   }
 
   if (! no_state && ! iter->valid (true)) {
@@ -1858,7 +1815,6 @@ LayoutViewBase::icon_for_layer (const LayerPropertiesConstIterator &iter, unsign
       text.fill (by + i, bp + bw + i, bp + bw + i + 2);
       text.fill (by + i + 1, bp + bw + i, bp + bw + i + 2);
     }
-
   }
 
   vertex.fill (h / 2 - 1, w - 1 - wp / 2, w - wp / 2);
@@ -1887,19 +1843,18 @@ LayoutViewBase::icon_for_layer (const LayerPropertiesConstIterator &iter, unsign
   }
 }
 
-void
-LayoutViewBase::merge_dither_pattern (lay::LayerPropertiesList &props)
+void LayoutViewBase::merge_dither_pattern (lay::LayerPropertiesList &props)
 {
   {
     lay::DitherPattern dp (dither_pattern ());
 
-    std::map <unsigned int, unsigned int> index_map;
+    std::map<unsigned int, unsigned int> index_map;
     dp.merge (props.dither_pattern (), index_map);
 
     //  remap the dither pattern index
     for (lay::LayerPropertiesIterator l = props.begin_recursive (); l != props.end_recursive (); ++l) {
       int dpi = l->dither_pattern (false /*local*/);
-      std::map <unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) dpi);
+      std::map<unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) dpi);
       if (m != index_map.end ()) {
         l->set_dither_pattern (int (m->second));
       }
@@ -1917,13 +1872,13 @@ LayoutViewBase::merge_dither_pattern (lay::LayerPropertiesList &props)
   {
     lay::LineStyles ls (line_styles ());
 
-    std::map <unsigned int, unsigned int> index_map;
+    std::map<unsigned int, unsigned int> index_map;
     ls.merge (props.line_styles (), index_map);
 
     //  remap the dither pattern index
     for (lay::LayerPropertiesIterator l = props.begin_recursive (); l != props.end_recursive (); ++l) {
       int lsi = l->line_style (false /*local*/);
-      std::map <unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) lsi);
+      std::map<unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) lsi);
       if (m != index_map.end ()) {
         l->set_line_style (int (m->second));
       }
@@ -1939,26 +1894,22 @@ LayoutViewBase::merge_dither_pattern (lay::LayerPropertiesList &props)
   }
 }
 
-bool
-LayoutViewBase::always_show_source () const
+bool LayoutViewBase::always_show_source () const
 {
   return false;
 }
 
-bool
-LayoutViewBase::always_show_ld () const
+bool LayoutViewBase::always_show_ld () const
 {
   return true;
 }
 
-bool
-LayoutViewBase::always_show_layout_index () const
+bool LayoutViewBase::always_show_layout_index () const
 {
   return false;
 }
 
-void 
-LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &props)
+void LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &props)
 {
   //  If index is not a valid tab index, don't do anything except for the case of
   //  index 0 in which the first entry is created (this can happen as a result of
@@ -1972,8 +1923,8 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &p
     }
   }
 
-  //  HINT: this method is quite frequently used in an imperative way. 
-  //  Since it has some desired side effects such as forcing a recomputation of the internals, 
+  //  HINT: this method is quite frequently used in an imperative way.
+  //  Since it has some desired side effects such as forcing a recomputation of the internals,
   //  it should be executed in any case, even if props == get_properties ().
 
   if (transacting ()) {
@@ -1999,52 +1950,45 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &p
   }
 }
 
-void
-LayoutViewBase::clear_layers (unsigned int index)
+void LayoutViewBase::clear_layers (unsigned int index)
 {
   LayerPropertiesList ll;
   ll.set_name (get_properties (index).name ());
   set_properties (index, ll);
 }
 
-void
-LayoutViewBase::clear_layers ()
+void LayoutViewBase::clear_layers ()
 {
   LayerPropertiesList ll;
   ll.set_name (get_properties ().name ());
   set_properties (ll);
 }
 
-void 
-LayoutViewBase::expand_properties ()
+void LayoutViewBase::expand_properties ()
 {
   expand_properties (std::map<int, int> (), false);
 }
-  
-void 
-LayoutViewBase::expand_properties (unsigned int index)
+
+void LayoutViewBase::expand_properties (unsigned int index)
 {
   expand_properties (index, std::map<int, int> (), false);
 }
 
-void 
-LayoutViewBase::expand_properties (const std::map<int, int> &map_cv_index, bool add_default)
+void LayoutViewBase::expand_properties (const std::map<int, int> &map_cv_index, bool add_default)
 {
   for (unsigned int i = 0; i < cellviews (); ++i) {
     expand_properties (i, map_cv_index, add_default);
   }
 }
 
-void 
-LayoutViewBase::expand_properties (unsigned int index, const std::map<int, int> &map_cv_index, bool add_default)
+void LayoutViewBase::expand_properties (unsigned int index, const std::map<int, int> &map_cv_index, bool add_default)
 {
   if (index < m_layer_properties_lists.size ()) {
     m_layer_properties_lists [index]->expand (map_cv_index, add_default);
   }
 }
 
-void
-LayoutViewBase::replace_layer_node (unsigned int index, const LayerPropertiesConstIterator &iter, const LayerPropertiesNode &node)
+void LayoutViewBase::replace_layer_node (unsigned int index, const LayerPropertiesConstIterator &iter, const LayerPropertiesNode &node)
 {
   if (index >= layer_lists ()) {
     return;
@@ -2077,8 +2021,7 @@ LayoutViewBase::replace_layer_node (unsigned int index, const LayerPropertiesCon
   }
 }
 
-void
-LayoutViewBase::set_layer_node_expanded (unsigned int index, const LayerPropertiesConstIterator &iter, bool ex)
+void LayoutViewBase::set_layer_node_expanded (unsigned int index, const LayerPropertiesConstIterator &iter, bool ex)
 {
   if (ex != iter->expanded ()) {
 
@@ -2088,12 +2031,10 @@ LayoutViewBase::set_layer_node_expanded (unsigned int index, const LayerProperti
     if (index == current_layer_list ()) {
       layer_list_changed_event (8 /*expanded state needs update*/);
     }
-
   }
 }
 
-void 
-LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesConstIterator &iter, const LayerProperties &props)
+void LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesConstIterator &iter, const LayerProperties &props)
 {
   if (index >= layer_lists ()) {
     return;
@@ -2121,7 +2062,7 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesConstIt
 
       if (need_redraw) {
         redraw_later ();
-      } 
+      }
 
       if (visible_changed) {
         m_visibility_changed = true;
@@ -2130,7 +2071,6 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesConstIt
       //  perform the callbacks asynchronously to collect the necessary calls instead
       //  of executing them immediately.
       m_prop_changed = true;
-
     }
   }
 }
@@ -2145,7 +2085,7 @@ LayoutViewBase::insert_layer (unsigned int index, const LayerPropertiesConstIter
   } else if (manager () && ! replaying ()) {
     manager ()->clear ();
   }
-  
+
   if (index == current_layer_list ()) {
     begin_layer_updates ();
   }
@@ -2163,8 +2103,7 @@ LayoutViewBase::insert_layer (unsigned int index, const LayerPropertiesConstIter
   return ret;
 }
 
-void 
-LayoutViewBase::delete_layer (unsigned int index, LayerPropertiesConstIterator &iter)
+void LayoutViewBase::delete_layer (unsigned int index, LayerPropertiesConstIterator &iter)
 {
   if (index >= layer_lists ()) {
     return;
@@ -2197,8 +2136,7 @@ LayoutViewBase::delete_layer (unsigned int index, LayerPropertiesConstIterator &
   iter.invalidate ();
 }
 
-void 
-LayoutViewBase::save_as (unsigned int index, const std::string &filename, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update, int keep_backups)
+void LayoutViewBase::save_as (unsigned int index, const std::string &filename, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update, int keep_backups)
 {
   tl_assert (index < cellviews ());
 
@@ -2208,12 +2146,11 @@ LayoutViewBase::save_as (unsigned int index, const std::string &filename, tl::Ou
   cellview_changed (index);
 }
 
-void
-LayoutViewBase::redo (db::Op *op)
+void LayoutViewBase::redo (db::Op *op)
 {
   tl_assert (! transacting ());
 
-  OpSetLayerProps *sop = dynamic_cast <OpSetLayerProps *> (op);
+  OpSetLayerProps *sop = dynamic_cast<OpSetLayerProps *> (op);
   if (sop) {
     if (sop->m_list_index < m_layer_properties_lists.size ()) {
       set_properties (sop->m_list_index, lay::LayerPropertiesConstIterator (*m_layer_properties_lists [sop->m_list_index], sop->m_index), sop->m_new);
@@ -2221,7 +2158,7 @@ LayoutViewBase::redo (db::Op *op)
     return;
   }
 
-  OpSetLayerPropsNode *snop = dynamic_cast <OpSetLayerPropsNode *> (op);
+  OpSetLayerPropsNode *snop = dynamic_cast<OpSetLayerPropsNode *> (op);
   if (snop) {
     if (snop->m_list_index < m_layer_properties_lists.size ()) {
       replace_layer_node (snop->m_list_index, lay::LayerPropertiesConstIterator (*m_layer_properties_lists [snop->m_list_index], snop->m_index), snop->m_new);
@@ -2229,7 +2166,7 @@ LayoutViewBase::redo (db::Op *op)
     return;
   }
 
-  OpInsertLayerList *ilop = dynamic_cast <OpInsertLayerList *> (op);
+  OpInsertLayerList *ilop = dynamic_cast<OpInsertLayerList *> (op);
   if (ilop) {
     if (ilop->m_list_index <= m_layer_properties_lists.size ()) {
       insert_layer_list (ilop->m_list_index, ilop->m_new);
@@ -2237,7 +2174,7 @@ LayoutViewBase::redo (db::Op *op)
     return;
   }
 
-  OpDeleteLayerList *dlop = dynamic_cast <OpDeleteLayerList *> (op);
+  OpDeleteLayerList *dlop = dynamic_cast<OpDeleteLayerList *> (op);
   if (dlop) {
     if (dlop->m_list_index < m_layer_properties_lists.size ()) {
       delete_layer_list (dlop->m_list_index);
@@ -2245,7 +2182,7 @@ LayoutViewBase::redo (db::Op *op)
     return;
   }
 
-  OpSetAllProps *saop = dynamic_cast <OpSetAllProps *> (op);
+  OpSetAllProps *saop = dynamic_cast<OpSetAllProps *> (op);
   if (saop) {
     if (saop->m_list_index < m_layer_properties_lists.size ()) {
       set_properties (saop->m_list_index, saop->m_new);
@@ -2253,7 +2190,7 @@ LayoutViewBase::redo (db::Op *op)
     return;
   }
 
-  OpRenameProps *rnop = dynamic_cast <OpRenameProps *> (op);
+  OpRenameProps *rnop = dynamic_cast<OpRenameProps *> (op);
   if (rnop) {
     if (rnop->m_list_index < m_layer_properties_lists.size ()) {
       rename_properties (rnop->m_list_index, rnop->m_new);
@@ -2261,7 +2198,7 @@ LayoutViewBase::redo (db::Op *op)
     return;
   }
 
-  OpLayerList *lop = dynamic_cast <OpLayerList *> (op);
+  OpLayerList *lop = dynamic_cast<OpLayerList *> (op);
   if (lop) {
     if (lop->m_list_index < m_layer_properties_lists.size ()) {
       if (lop->m_mode == OpLayerList::Insert) {
@@ -2272,15 +2209,15 @@ LayoutViewBase::redo (db::Op *op)
       }
     }
     return;
-  } 
+  }
 
-  OpSetDitherPattern *stpop = dynamic_cast <OpSetDitherPattern *> (op);
+  OpSetDitherPattern *stpop = dynamic_cast<OpSetDitherPattern *> (op);
   if (stpop) {
     set_dither_pattern (stpop->m_new);
     return;
   }
 
-  OpHideShowCell *hscop = dynamic_cast <OpHideShowCell *> (op);
+  OpHideShowCell *hscop = dynamic_cast<OpHideShowCell *> (op);
   if (hscop) {
     if (hscop->m_show) {
       show_cell (hscop->m_cell_index, hscop->m_cellview_index);
@@ -2293,12 +2230,11 @@ LayoutViewBase::redo (db::Op *op)
   db::Object::redo (op);
 }
 
-void 
-LayoutViewBase::undo (db::Op *op)
+void LayoutViewBase::undo (db::Op *op)
 {
   tl_assert (! transacting ());
 
-  OpSetLayerProps *sop = dynamic_cast <OpSetLayerProps *> (op);
+  OpSetLayerProps *sop = dynamic_cast<OpSetLayerProps *> (op);
   if (sop) {
     if (sop->m_list_index < m_layer_properties_lists.size ()) {
       set_properties (sop->m_list_index, lay::LayerPropertiesConstIterator (*m_layer_properties_lists [sop->m_list_index], sop->m_index), sop->m_old);
@@ -2306,7 +2242,7 @@ LayoutViewBase::undo (db::Op *op)
     return;
   }
 
-  OpSetLayerPropsNode *snop = dynamic_cast <OpSetLayerPropsNode *> (op);
+  OpSetLayerPropsNode *snop = dynamic_cast<OpSetLayerPropsNode *> (op);
   if (snop) {
     if (snop->m_list_index < m_layer_properties_lists.size ()) {
       replace_layer_node (snop->m_list_index, lay::LayerPropertiesConstIterator (*m_layer_properties_lists [snop->m_list_index], snop->m_index), snop->m_old);
@@ -2314,7 +2250,7 @@ LayoutViewBase::undo (db::Op *op)
     return;
   }
 
-  OpInsertLayerList *ilop = dynamic_cast <OpInsertLayerList *> (op);
+  OpInsertLayerList *ilop = dynamic_cast<OpInsertLayerList *> (op);
   if (ilop) {
     if (ilop->m_list_index <= m_layer_properties_lists.size ()) {
       delete_layer_list (ilop->m_list_index);
@@ -2322,7 +2258,7 @@ LayoutViewBase::undo (db::Op *op)
     return;
   }
 
-  OpDeleteLayerList *dlop = dynamic_cast <OpDeleteLayerList *> (op);
+  OpDeleteLayerList *dlop = dynamic_cast<OpDeleteLayerList *> (op);
   if (dlop) {
     if (dlop->m_list_index < m_layer_properties_lists.size ()) {
       insert_layer_list (dlop->m_list_index, dlop->m_old);
@@ -2330,7 +2266,7 @@ LayoutViewBase::undo (db::Op *op)
     return;
   }
 
-  OpSetAllProps *saop = dynamic_cast <OpSetAllProps *> (op);
+  OpSetAllProps *saop = dynamic_cast<OpSetAllProps *> (op);
   if (saop) {
     if (saop->m_list_index < m_layer_properties_lists.size ()) {
       set_properties (saop->m_list_index, saop->m_old);
@@ -2338,7 +2274,7 @@ LayoutViewBase::undo (db::Op *op)
     return;
   }
 
-  OpRenameProps *rnop = dynamic_cast <OpRenameProps *> (op);
+  OpRenameProps *rnop = dynamic_cast<OpRenameProps *> (op);
   if (rnop) {
     if (rnop->m_list_index < m_layer_properties_lists.size ()) {
       rename_properties (rnop->m_list_index, rnop->m_old);
@@ -2346,7 +2282,7 @@ LayoutViewBase::undo (db::Op *op)
     return;
   }
 
-  OpLayerList *lop = dynamic_cast <OpLayerList *> (op);
+  OpLayerList *lop = dynamic_cast<OpLayerList *> (op);
   if (lop) {
     if (lop->m_list_index < m_layer_properties_lists.size ()) {
       if (lop->m_mode == OpLayerList::Insert) {
@@ -2357,11 +2293,11 @@ LayoutViewBase::undo (db::Op *op)
       }
     }
     return;
-  } 
+  }
 
-  OpHideShowCell *hscop = dynamic_cast <OpHideShowCell *> (op);
+  OpHideShowCell *hscop = dynamic_cast<OpHideShowCell *> (op);
   if (hscop) {
-    
+
     if (hscop->m_show) {
       hide_cell (hscop->m_cell_index, hscop->m_cellview_index);
     } else {
@@ -2369,10 +2305,9 @@ LayoutViewBase::undo (db::Op *op)
     }
 
     return;
-
   }
 
-  OpSetDitherPattern *stpop = dynamic_cast <OpSetDitherPattern *> (op);
+  OpSetDitherPattern *stpop = dynamic_cast<OpSetDitherPattern *> (op);
   if (stpop) {
     set_dither_pattern (stpop->m_old);
     return;
@@ -2381,8 +2316,7 @@ LayoutViewBase::undo (db::Op *op)
   db::Object::undo (op);
 }
 
-void
-LayoutViewBase::signal_hier_changed ()
+void LayoutViewBase::signal_hier_changed ()
 {
   //  schedule a redraw request for all layers
   redraw_later ();
@@ -2390,8 +2324,7 @@ LayoutViewBase::signal_hier_changed ()
   hier_changed_event ();
 }
 
-void
-LayoutViewBase::signal_bboxes_from_layer_changed (unsigned int cv_index, unsigned int layer_index)
+void LayoutViewBase::signal_bboxes_from_layer_changed (unsigned int cv_index, unsigned int layer_index)
 {
   if (layer_index == std::numeric_limits<unsigned int>::max ()) {
 
@@ -2409,12 +2342,10 @@ LayoutViewBase::signal_bboxes_from_layer_changed (unsigned int cv_index, unsigne
 
     //  forward this event to our observers
     geom_changed_event ();
-
   }
 }
 
-void
-LayoutViewBase::signal_bboxes_changed ()
+void LayoutViewBase::signal_bboxes_changed ()
 {
   //  schedule a redraw request for all layers
   redraw_later ();
@@ -2423,36 +2354,32 @@ LayoutViewBase::signal_bboxes_changed ()
   geom_changed_event ();
 }
 
-void
-LayoutViewBase::signal_cell_name_changed (unsigned int cv_index)
+void LayoutViewBase::signal_cell_name_changed (unsigned int cv_index)
 {
   cellview_changed_event (int (cv_index));
 
   //  Because the title reflects the active cell, emit a title changed event
   update_title ();
 
-  redraw_later ();  //  needs redraw
+  redraw_later (); //  needs redraw
 }
 
-void
-LayoutViewBase::signal_layer_properties_changed ()
+void LayoutViewBase::signal_layer_properties_changed ()
 {
   dm_update_layer_sources ();
 }
 
-void
-LayoutViewBase::signal_prop_ids_changed ()
+void LayoutViewBase::signal_prop_ids_changed ()
 {
   dm_update_layer_sources ();
 }
 
-void
-LayoutViewBase::do_update_layer_sources ()
+void LayoutViewBase::do_update_layer_sources ()
 {
   //  inform the layer list observers that they need to recompute the property selectors
   layer_list_changed_event (1);
 
-  //  recompute the source 
+  //  recompute the source
   //  TODO: this is a side effect of this method - provide a special method for this purpose
   for (unsigned int i = 0; i < layer_lists (); ++i) {
     m_layer_properties_lists [i]->attach_view (this, i);
@@ -2462,8 +2389,7 @@ LayoutViewBase::do_update_layer_sources ()
   redraw_later ();
 }
 
-void
-LayoutViewBase::signal_plugin_enabled_changed ()
+void LayoutViewBase::signal_plugin_enabled_changed ()
 {
   for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
     if ((*p)->editable_interface ()) {
@@ -2472,8 +2398,7 @@ LayoutViewBase::signal_plugin_enabled_changed ()
   }
 }
 
-void
-LayoutViewBase::signal_annotations_changed ()
+void LayoutViewBase::signal_annotations_changed ()
 {
   //  schedule a redraw request for the annotation shapes
   redraw_deco_layer ();
@@ -2481,8 +2406,7 @@ LayoutViewBase::signal_annotations_changed ()
   annotations_changed_event ();
 }
 
-void 
-LayoutViewBase::finish_cellviews_changed ()
+void LayoutViewBase::finish_cellviews_changed ()
 {
   update_event_handlers ();
 
@@ -2515,8 +2439,7 @@ LayoutViewBase::cellview_iter (int cv_index) const
   return i;
 }
 
-void
-LayoutViewBase::erase_cellview (unsigned int index)
+void LayoutViewBase::erase_cellview (unsigned int index)
 {
   if (index >= m_cellviews.size ()) {
     return;
@@ -2562,7 +2485,6 @@ LayoutViewBase::erase_cellview (unsigned int index)
       }
       ++l;
     }
-
   }
 
   //  clear the history
@@ -2580,8 +2502,7 @@ LayoutViewBase::erase_cellview (unsigned int index)
   update_title ();
 }
 
-void
-LayoutViewBase::clear_cellviews ()
+void LayoutViewBase::clear_cellviews ()
 {
   //  issue to event that signals a change in the cellviews
   cellviews_about_to_change_event ();
@@ -2591,7 +2512,7 @@ LayoutViewBase::clear_cellviews ()
     manager ()->clear ();
   }
 
-  //  clear the layer lists and cellviews 
+  //  clear the layer lists and cellviews
   while (layer_lists () > 0) {
     delete_layer_list (layer_lists () - 1);
   }
@@ -2627,24 +2548,22 @@ LayoutViewBase::cellview_ref (unsigned int index)
   if (index >= m_cellviews.size ()) {
     return CellViewRef ();
   } else {
-    return CellViewRef (cellview_iter (index).operator-> (), this);
+    return CellViewRef (cellview_iter (index).operator->(), this);
   }
 }
 
-int
-LayoutViewBase::index_of_cellview (const lay::CellView *cv) const
+int LayoutViewBase::index_of_cellview (const lay::CellView *cv) const
 {
   int index = 0;
   for (std::list<CellView>::const_iterator i = m_cellviews.begin (); i != m_cellviews.end (); ++i, ++index) {
-    if (cv == i.operator-> ()) {
+    if (cv == i.operator->()) {
       return index;
     }
   }
   return -1;
 }
 
-void
-LayoutViewBase::set_layout (const lay::CellView &cv, unsigned int cvindex)
+void LayoutViewBase::set_layout (const lay::CellView &cv, unsigned int cvindex)
 {
   //  issue to event that signals a change in the cellviews
   cellviews_about_to_change_event ();
@@ -2662,7 +2581,7 @@ LayoutViewBase::set_layout (const lay::CellView &cv, unsigned int cvindex)
     m_cellviews.push_back (lay::CellView ());
   }
 
-  //  set the handle reference and clear all cell related stuff 
+  //  set the handle reference and clear all cell related stuff
   *cellview_iter (cvindex) = cv;
 
   //  clear the history, store path and zoom box
@@ -2678,8 +2597,7 @@ LayoutViewBase::set_layout (const lay::CellView &cv, unsigned int cvindex)
   update_title ();
 }
 
-void
-LayoutViewBase::signal_apply_technology (lay::LayoutHandle *layout_handle)
+void LayoutViewBase::signal_apply_technology (lay::LayoutHandle *layout_handle)
 {
   //  find the cellview which issued the event
   for (unsigned int i = 0; i < cellviews (); ++i) {
@@ -2710,33 +2628,27 @@ LayoutViewBase::signal_apply_technology (lay::LayoutHandle *layout_handle)
 
         //  if a layer properties file is set, create the layer properties now
         create_initial_layer_props (i, lyp_file, tech->add_other_layers ());
-
       }
 
       apply_technology_event (int (i));
-
     }
-
   }
 }
 
-void
-LayoutViewBase::bookmarks (const BookmarkList &b)
+void LayoutViewBase::bookmarks (const BookmarkList &b)
 {
   m_bookmarks = b;
   bookmarks_changed ();
 }
 
-void
-LayoutViewBase::bookmark_view (const std::string &name)
+void LayoutViewBase::bookmark_view (const std::string &name)
 {
   DisplayState state (box (), get_min_hier_levels (), get_max_hier_levels (), cellview_list ());
   m_bookmarks.add (name, state);
   bookmarks_changed ();
 }
 
-bool
-LayoutViewBase::is_single_cv_layer_properties_file (const std::string &fn)
+bool LayoutViewBase::is_single_cv_layer_properties_file (const std::string &fn)
 {
   //  If the file contains information for a single layout but we have multiple ones,
   //  show the dialog to determine what layout to apply the information to.
@@ -2752,7 +2664,7 @@ LayoutViewBase::is_single_cv_layer_properties_file (const std::string &fn)
   }
 
   //  Collect all cv indices in the layer properties
-  std::set <int> cv;
+  std::set<int> cv;
   for (std::vector<lay::LayerPropertiesList>::const_iterator p = props.begin (); p != props.end (); ++p) {
     for (lay::LayerPropertiesConstIterator lp = p->begin_const_recursive (); ! lp.at_end (); ++lp) {
       if (! lp->has_children ()) {
@@ -2767,26 +2679,22 @@ LayoutViewBase::is_single_cv_layer_properties_file (const std::string &fn)
   return (cv.size () == 1);
 }
 
-void 
-LayoutViewBase::load_layer_props (const std::string &fn)
+void LayoutViewBase::load_layer_props (const std::string &fn)
 {
   do_load_layer_props (fn, false, -1, false);
 }
 
-void 
-LayoutViewBase::load_layer_props (const std::string &fn, bool add_default)
+void LayoutViewBase::load_layer_props (const std::string &fn, bool add_default)
 {
   do_load_layer_props (fn, false, -1, add_default);
 }
 
-void 
-LayoutViewBase::load_layer_props (const std::string &fn, int cv_index, bool add_default)
+void LayoutViewBase::load_layer_props (const std::string &fn, int cv_index, bool add_default)
 {
   do_load_layer_props (fn, true, cv_index, add_default);
 }
 
-void 
-LayoutViewBase::do_load_layer_props (const std::string &fn, bool map_cv, int cv_index, bool add_default)
+void LayoutViewBase::do_load_layer_props (const std::string &fn, bool map_cv, int cv_index, bool add_default)
 {
   std::vector<lay::LayerPropertiesList> props;
   bool single_list = false;
@@ -2805,7 +2713,7 @@ LayoutViewBase::do_load_layer_props (const std::string &fn, bool map_cv, int cv_
 
   //  expand the wildcards and map to the target cv.
   for (std::vector<lay::LayerPropertiesList>::iterator p = props.begin (); p != props.end (); ++p) {
-    std::map <int, int> cv_map;
+    std::map<int, int> cv_map;
     if (map_cv) {
       cv_map.insert (std::make_pair (-1, cv_index));
     }
@@ -2845,13 +2753,11 @@ LayoutViewBase::do_load_layer_props (const std::string &fn, bool map_cv, int cv_
       } else {
         insert_layer_list (i, props [i]);
       }
-
     }
 
     while (layer_lists () > props.size () && layer_lists () > 1) {
       delete_layer_list (layer_lists () - 1);
     }
-
   }
 
   commit ();
@@ -2861,8 +2767,7 @@ LayoutViewBase::do_load_layer_props (const std::string &fn, bool map_cv, int cv_
   tl::log << "Loaded layer properties from " << fn;
 }
 
-void 
-LayoutViewBase::save_layer_props (const std::string &fn)
+void LayoutViewBase::save_layer_props (const std::string &fn)
 {
   tl::OutputStream os (fn, tl::OutputStream::OM_Plain);
 
@@ -2879,15 +2784,13 @@ LayoutViewBase::save_layer_props (const std::string &fn)
       props.push_back (get_properties (i));
     }
 
-    lay::LayerPropertiesList::save (os, props); 
-
+    lay::LayerPropertiesList::save (os, props);
   }
 
   tl::log << "Saved layer properties to " << fn;
 }
 
-void 
-LayoutViewBase::add_new_layers (const std::vector <unsigned int> &layer_ids, int cv_index)
+void LayoutViewBase::add_new_layers (const std::vector<unsigned int> &layer_ids, int cv_index)
 {
   if (cv_index >= 0 && cv_index < int (cellviews ())) {
 
@@ -2898,9 +2801,9 @@ LayoutViewBase::add_new_layers (const std::vector <unsigned int> &layer_ids, int
 
     bool was_empty = new_props.begin_const_recursive ().at_end ();
 
-    //  don't create new layers for those, for which there are layers already: compute a 
+    //  don't create new layers for those, for which there are layers already: compute a
     //  set of layers already present
-    std::set <db::LayerProperties, db::LPLogicalLessFunc> present_layers;
+    std::set<db::LayerProperties, db::LPLogicalLessFunc> present_layers;
     for (LayerPropertiesConstIterator lay_iter = begin_layers (); ! lay_iter.at_end (); ++lay_iter) {
       if (! lay_iter->has_children () && lay_iter->cellview_index () == cv_index) {
         present_layers.insert (lay_iter->source (true /*real*/).layer_props ());
@@ -2908,8 +2811,8 @@ LayoutViewBase::add_new_layers (const std::vector <unsigned int> &layer_ids, int
     }
 
     //  determine layers which are new and need to be created
-    std::vector <db::LayerProperties> new_layers;
-    for (std::vector <unsigned int>::const_iterator l = layer_ids.begin (); l != layer_ids.end (); ++l) {
+    std::vector<db::LayerProperties> new_layers;
+    for (std::vector<unsigned int>::const_iterator l = layer_ids.begin (); l != layer_ids.end (); ++l) {
       const db::LayerProperties &lp = cv->layout ().get_properties (*l);
       if (present_layers.find (lp) == present_layers.end ()) {
         new_layers.push_back (lp);
@@ -2920,7 +2823,7 @@ LayoutViewBase::add_new_layers (const std::vector <unsigned int> &layer_ids, int
     std::sort (new_layers.begin (), new_layers.end (), db::LPLogicalLessFunc ());
 
     //  and actually create them
-    for (std::vector <db::LayerProperties>::const_iterator l = new_layers.begin (); l != new_layers.end (); ++l) {
+    for (std::vector<db::LayerProperties>::const_iterator l = new_layers.begin (); l != new_layers.end (); ++l) {
       lay::LayerProperties p;
       p.set_source (lay::ParsedLayerSource (*l, cv_index));
       init_layer_properties (p, new_props);
@@ -2932,18 +2835,15 @@ LayoutViewBase::add_new_layers (const std::vector <unsigned int> &layer_ids, int
     if (was_empty) {
       set_current_layer (new_props.begin_const_recursive ());
     }
-
   }
 }
 
-void 
-LayoutViewBase::init_layer_properties (LayerProperties &p) const
+void LayoutViewBase::init_layer_properties (LayerProperties &p) const
 {
   init_layer_properties (p, get_properties ());
 }
 
-void 
-LayoutViewBase::init_layer_properties (LayerProperties &p, const LayerPropertiesList &lp_list) const
+void LayoutViewBase::init_layer_properties (LayerProperties &p, const LayerPropertiesList &lp_list) const
 {
   tl::color_t c = 0;
   if (m_palette.luminous_colors () > 0) {
@@ -2956,21 +2856,21 @@ LayoutViewBase::init_layer_properties (LayerProperties &p, const LayerProperties
   p.set_fill_brightness (0);
   p.set_frame_brightness (0);
   p.set_frame_brightness (0);
-  p.set_transparent (false);  // :TODO: make variable
+  p.set_transparent (false); // :TODO: make variable
   p.set_visible (true);
-  p.set_width (1); 
+  p.set_width (1);
   p.set_animation (0);
   p.set_marked (false);
 }
 
 #if defined(HAVE_QT)
-QImage 
+QImage
 LayoutViewBase::get_screenshot ()
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save screenshot")));
 
   refresh ();
-  
+
   return mp_canvas->screenshot ().to_image_copy ();
 }
 #endif
@@ -2985,10 +2885,10 @@ LayoutViewBase::get_screenshot_pb ()
   return mp_canvas->screenshot ();
 }
 
-static std::vector<std::pair<std::string, std::string> >
+static std::vector<std::pair<std::string, std::string>>
 png_texts (const lay::LayoutViewBase *view, const db::DBox &box)
 {
-  std::vector<std::pair<std::string, std::string> > texts;
+  std::vector<std::pair<std::string, std::string>> texts;
 
   //  Unfortunately the PNG writer does not allow writing of long strings.
   //  We separate the description into a set of keys:
@@ -3005,15 +2905,14 @@ png_texts (const lay::LayoutViewBase *view, const db::DBox &box)
   return texts;
 }
 
-#if defined(HAVE_QT) && !defined(PREFER_LIBPNG_FOR_SAVE)
-void
-LayoutViewBase::save_screenshot (const std::string &fn)
+#if defined(HAVE_QT) && ! defined(PREFER_LIBPNG_FOR_SAVE)
+void LayoutViewBase::save_screenshot (const std::string &fn)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save screenshot")));
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
-  std::vector<std::pair<std::string, std::string> > texts = png_texts (this, box ());
+  std::vector<std::pair<std::string, std::string>> texts = png_texts (this, box ());
   for (auto i = texts.begin (); i != texts.end (); ++i) {
     writer.setText (tl::to_qstring (i->first), tl::to_qstring (i->second));
   }
@@ -3027,8 +2926,7 @@ LayoutViewBase::save_screenshot (const std::string &fn)
   tl::log << "Saved screen shot to " << fn;
 }
 #elif defined(HAVE_PNG)
-void
-LayoutViewBase::save_screenshot (const std::string &fn)
+void LayoutViewBase::save_screenshot (const std::string &fn)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save screenshot")));
 
@@ -3042,8 +2940,7 @@ LayoutViewBase::save_screenshot (const std::string &fn)
   tl::log << "Saved screen shot to " << fn;
 }
 #else
-void
-LayoutViewBase::save_screenshot (const std::string &)
+void LayoutViewBase::save_screenshot (const std::string &)
 {
   throw tl::Exception (tl::to_string (tr ("Unable to write screenshot - PNG library not compiled in")));
 }
@@ -3110,16 +3007,15 @@ LayoutViewBase::get_pixels_with_options_mono (unsigned int width, unsigned int h
   return mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box);
 }
 
-#if defined(HAVE_QT) && !defined(PREFER_LIBPNG_FOR_SAVE)
-void
-LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned int height)
+#if defined(HAVE_QT) && ! defined(PREFER_LIBPNG_FOR_SAVE)
+void LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned int height)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
   lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
-  std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
+  std::vector<std::pair<std::string, std::string>> texts = png_texts (this, vp.box ());
   for (auto i = texts.begin (); i != texts.end (); ++i) {
     writer.setText (tl::to_qstring (i->first), tl::to_qstring (i->second));
   }
@@ -3133,8 +3029,7 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
   tl::log << "Saved image to " << fn;
 }
 #elif defined(HAVE_PNG)
-void
-LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned int height)
+void LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned int height)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
 
@@ -3144,32 +3039,30 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
 
   tl::OutputStream stream (fn);
   tl::PixelBuffer img = mp_canvas->image (width, height);
-  std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
+  std::vector<std::pair<std::string, std::string>> texts = png_texts (this, vp.box ());
   img.set_texts (texts);
   img.write_png (stream);
 
   tl::log << "Saved image to " << fn;
 }
 #else
-void
-LayoutViewBase::save_image (const std::string &, unsigned int, unsigned int)
+void LayoutViewBase::save_image (const std::string &, unsigned int, unsigned int)
 {
   throw tl::Exception (tl::to_string (tr ("Unable to save image - PNG library not compiled in")));
 }
 #endif
 
-#if defined(HAVE_QT) && !defined(PREFER_LIBPNG_FOR_SAVE)
-void
-LayoutViewBase::save_image_with_options (const std::string &fn,
-                                         unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution,
-                                         tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
+#if defined(HAVE_QT) && ! defined(PREFER_LIBPNG_FOR_SAVE)
+void LayoutViewBase::save_image_with_options (const std::string &fn,
+                                              unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution,
+                                              tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
   lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
-  std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
+  std::vector<std::pair<std::string, std::string>> texts = png_texts (this, vp.box ());
   for (auto i = texts.begin (); i != texts.end (); ++i) {
     writer.setText (tl::to_qstring (i->first), tl::to_qstring (i->second));
   }
@@ -3189,15 +3082,14 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
   tl::log << "Saved image to " << fn;
 }
 #elif defined(HAVE_PNG)
-void
-LayoutViewBase::save_image_with_options (const std::string &fn,
-                                         unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution,
-                                         tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
+void LayoutViewBase::save_image_with_options (const std::string &fn,
+                                              unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution,
+                                              tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
 
   lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
-  std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
+  std::vector<std::pair<std::string, std::string>> texts = png_texts (this, vp.box ());
 
   refresh ();
 
@@ -3213,23 +3105,20 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
     tl::PixelBuffer img = mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, font_resolution, background, foreground, active, target_box);
     img.set_texts (texts);
     img.write_png (stream);
-
   }
 
   tl::log << "Saved image to " << fn;
 }
 #else
-void
-LayoutViewBase::save_image_with_options (const std::string &,
-                                         unsigned int, unsigned int, int, int, double, double,
-                                         tl::Color, tl::Color, tl::Color, const db::DBox &, bool)
+void LayoutViewBase::save_image_with_options (const std::string &,
+                                              unsigned int, unsigned int, int, int, double, double,
+                                              tl::Color, tl::Color, tl::Color, const db::DBox &, bool)
 {
   throw tl::Exception (tl::to_string (tr ("Unable to save image - PNG library not compiled in")));
 }
 #endif
 
-void
-LayoutViewBase::reload_layout (unsigned int cv_index)
+void LayoutViewBase::reload_layout (unsigned int cv_index)
 {
   stop ();
   cancel_esc ();
@@ -3241,29 +3130,29 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   //  this is the cellview at the given index (use a copy since the original is overwritten)
   CellView cvorg = cellview (cv_index);
 
-  //  obtain the original filename  
+  //  obtain the original filename
   std::string filename = cvorg->filename ();
   std::string technology = cvorg->tech_name ();
   std::string name = cvorg->name ();
 
   //  recreate hidden cells by doing a name referencing
-  std::vector <std::string> hidden_cells;
+  std::vector<std::string> hidden_cells;
   if (m_hidden_cells.size () > cv_index) {
     hidden_cells.reserve (m_hidden_cells [cv_index].size ());
-    for (std::set <cell_index_type>::const_iterator ci = m_hidden_cells [cv_index].begin (); ci != m_hidden_cells [cv_index].end (); ++ci) {
+    for (std::set<cell_index_type>::const_iterator ci = m_hidden_cells [cv_index].begin (); ci != m_hidden_cells [cv_index].end (); ++ci) {
       hidden_cells.push_back (std::string (cvorg->layout ().cell_name (*ci)));
     }
   }
 
   //  Set up a list of present layers
-  std::set <db::LayerProperties, db::LPLogicalLessFunc> present_layers;
+  std::set<db::LayerProperties, db::LPLogicalLessFunc> present_layers;
   for (LayerPropertiesConstIterator lay_iter = begin_layers (); ! lay_iter.at_end (); ++lay_iter) {
     if (! lay_iter->has_children ()) {
       present_layers.insert (lay_iter->source (true /*real*/).layer_props ());
     }
   }
 
-  std::map <unsigned int, db::LayerProperties> org_layers;
+  std::map<unsigned int, db::LayerProperties> org_layers;
 
   for (unsigned int i = 0; i < cvorg->layout ().layers (); ++i) {
     if (cvorg->layout ().is_valid_layer (i)) {
@@ -3286,7 +3175,7 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   handle->set_tech_name (technology);
   cv_empty.set (handle);
 
-  for (std::map <unsigned int, db::LayerProperties>::const_iterator ol = org_layers.begin (); ol != org_layers.end (); ++ol) {
+  for (std::map<unsigned int, db::LayerProperties>::const_iterator ol = org_layers.begin (); ol != org_layers.end (); ++ol) {
     cv_empty->layout ().insert_layer (ol->first, ol->second);
   }
   cv_empty->rename (name, true);
@@ -3301,10 +3190,10 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   try {
 
     //  re-create the layers required
-    for (std::map <unsigned int, db::LayerProperties>::const_iterator ol = org_layers.begin (); ol != org_layers.end (); ++ol) {
+    for (std::map<unsigned int, db::LayerProperties>::const_iterator ol = org_layers.begin (); ol != org_layers.end (); ++ol) {
       cv->layout ().insert_layer (ol->first, ol->second);
     }
-    
+
     {
       tl::log << tl::to_string (tr ("Loading file: ")) << filename;
       tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Loading")));
@@ -3344,7 +3233,7 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   //  recreate the hidden cell indices from the names
   if (m_hidden_cells.size () > cv_index) {
     m_hidden_cells [cv_index].clear ();
-    for (std::vector <std::string>::const_iterator cn = hidden_cells.begin (); cn != hidden_cells.end (); ++cn) {
+    for (std::vector<std::string>::const_iterator cn = hidden_cells.begin (); cn != hidden_cells.end (); ++cn) {
       std::pair<bool, cell_index_type> cid = cv->layout ().cell_by_name (cn->c_str ());
       if (cid.first) {
         m_hidden_cells [cv_index].insert (cid.second);
@@ -3360,10 +3249,10 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   //  Determine which layers to create as new layers. New layer need to be created
   //  if these have not been present in the original layout and there are no layer views
   //  referring to them.
-  std::vector <db::LayerProperties> new_layers;
+  std::vector<db::LayerProperties> new_layers;
   for (unsigned int i = 0; i < cv->layout ().layers (); ++i) {
     if (cv->layout ().is_valid_layer (i)) {
-      std::map <unsigned int, db::LayerProperties>::iterator ol = org_layers.find (i);
+      std::map<unsigned int, db::LayerProperties>::iterator ol = org_layers.find (i);
       if (ol == org_layers.end () && present_layers.find (cv->layout ().get_properties (i)) == present_layers.end ()) {
         new_layers.push_back (cv->layout ().get_properties (i));
       }
@@ -3375,7 +3264,7 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   //  create the layers and do a basic recoloring ..
   lay::LayerPropertiesList new_props (get_properties ());
 
-  for (std::vector <db::LayerProperties>::const_iterator l = new_layers.begin (); l != new_layers.end (); ++l) {
+  for (std::vector<db::LayerProperties>::const_iterator l = new_layers.begin (); l != new_layers.end (); ++l) {
     lay::LayerProperties p;
     p.set_source (lay::ParsedLayerSource (*l, int (cv_index)));
     init_layer_properties (p, new_props);
@@ -3406,7 +3295,7 @@ get_lyp_from_meta_info (const db::Layout &layout, std::string &lyp_file, bool &a
   }
 }
 
-unsigned int 
+unsigned int
 LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview, bool initialize_layers)
 {
   unsigned int cv_index = 0;
@@ -3438,7 +3327,7 @@ LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview,
     }
 
     if (top != cv->layout ().end_top_down ()) {
-      std::vector <db::cell_index_type> p;
+      std::vector<db::cell_index_type> p;
       p.push_back (*top);
       cv.set_unspecific_path (p);
     }
@@ -3447,7 +3336,7 @@ LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview,
     set_layout (cv, cv_index);
 
     if (top != cv->layout ().end_top_cells ()) {
-      std::vector <db::cell_index_type> p;
+      std::vector<db::cell_index_type> p;
       p.push_back (*top);
       select_cell (p, cv_index);
     }
@@ -3479,7 +3368,6 @@ LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview,
 
       //  create the initial layer properties
       create_initial_layer_props (cv_index, lyp_file, add_other_layers);
-
     }
 
     //  select the first layer if nothing else is selected
@@ -3513,13 +3401,12 @@ LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview,
 
     enable_active_cellview_changed_event (true, true);
     throw;
-
   }
 
   return cv_index;
 }
 
-unsigned int 
+unsigned int
 LayoutViewBase::create_layout (const std::string &technology, bool add_cellview, bool initialize_layers)
 {
   const db::Technology *tech = db::Technologies::instance ()->technology_by_name (technology);
@@ -3534,22 +3421,22 @@ LayoutViewBase::create_layout (const std::string &technology, bool add_cellview,
   return add_layout (handle, add_cellview, initialize_layers);
 }
 
-unsigned int 
+unsigned int
 LayoutViewBase::load_layout (const std::string &filename, const std::string &technology, bool add_cellview)
 {
   return load_layout (filename, db::LoadLayoutOptions (), technology, add_cellview);
 }
 
-unsigned int 
+unsigned int
 LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOptions &options, const std::string &technology, bool add_cellview)
 {
   stop ();
-  
+
   bool set_max_hier = (m_full_hier_new_cell || has_max_hier ());
 
   const db::Technology *tech = db::Technologies::instance ()->technology_by_name (technology);
 
-  //  create a new layout handle 
+  //  create a new layout handle
   lay::CellView cv;
   lay::LayoutHandle *handle = new lay::LayoutHandle (new db::Layout (is_editable (), manager ()), filename);
   cv.set (handle);
@@ -3594,7 +3481,6 @@ LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOp
 
     update_content ();
     throw;
-
   }
 
   try {
@@ -3609,7 +3495,7 @@ LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOp
       }
     }
     if (top != cv->layout ().end_top_cells ()) {
-      std::vector <db::cell_index_type> p;
+      std::vector<db::cell_index_type> p;
       p.push_back (*top);
       select_cell (p, cv_index);
     }
@@ -3665,14 +3551,12 @@ LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOp
 
     enable_active_cellview_changed_event (true, true /*silent*/);
     throw;
-
   }
 
   return cv_index;
 }
 
-void 
-LayoutViewBase::create_initial_layer_props (int cv_index, const std::string &lyp_file, bool add_missing)
+void LayoutViewBase::create_initial_layer_props (int cv_index, const std::string &lyp_file, bool add_missing)
 {
   std::vector<lay::LayerPropertiesList> props;
   bool loaded = false;
@@ -3680,7 +3564,7 @@ LayoutViewBase::create_initial_layer_props (int cv_index, const std::string &lyp
   if (! lyp_file.empty ()) {
 
     //  read the layer properties from the file
-    try { 
+    try {
 
       try {
         tl::XMLFileSource in (lyp_file);
@@ -3700,10 +3584,9 @@ LayoutViewBase::create_initial_layer_props (int cv_index, const std::string &lyp
     } catch (...) {
       tl::warn << tl::to_string (tr ("Initialization of layers failed: unspecific error"));
     }
-
   }
 
-  std::map <int, int> cv_map;
+  std::map<int, int> cv_map;
   cv_map.insert (std::make_pair (-1, cv_index));
 
   if (! loaded) {
@@ -3714,7 +3597,7 @@ LayoutViewBase::create_initial_layer_props (int cv_index, const std::string &lyp
   } else {
 
     //  do't map cv's if the input file is a multi-cv one.
-    std::set <int> cv;
+    std::set<int> cv;
     for (std::vector<lay::LayerPropertiesList>::const_iterator p = props.begin (); p != props.end (); ++p) {
       for (lay::LayerPropertiesConstIterator lp = p->begin_const_recursive (); ! lp.at_end (); ++lp) {
         if (! lp->has_children ()) {
@@ -3729,20 +3612,18 @@ LayoutViewBase::create_initial_layer_props (int cv_index, const std::string &lyp
         }
       }
     }
-
   }
 
   //  expand the wildcards and map to the target cv.
   for (std::vector<lay::LayerPropertiesList>::iterator p = props.begin (); p != props.end (); ++p) {
     p->attach_view (this, p - props.begin ());
-    p->expand (cv_map, add_missing || !loaded);
+    p->expand (cv_map, add_missing || ! loaded);
   }
 
   merge_layer_props (props);
 }
 
-void 
-LayoutViewBase::merge_layer_props (const std::vector<lay::LayerPropertiesList> &props)
+void LayoutViewBase::merge_layer_props (const std::vector<lay::LayerPropertiesList> &props)
 {
   lay::LayerPropertiesList p0;
   if (layer_lists () > 0) {
@@ -3750,7 +3631,7 @@ LayoutViewBase::merge_layer_props (const std::vector<lay::LayerPropertiesList> &
   }
 
   //  merge the new layer views into the present ones
-  //  If the specific list is a single list (no tabs), it is merged into every tab present. 
+  //  If the specific list is a single list (no tabs), it is merged into every tab present.
   if (props.size () == 1) {
 
     for (size_t n = 0; n < layer_lists () || n == 0; ++n) {
@@ -3773,7 +3654,6 @@ LayoutViewBase::merge_layer_props (const std::vector<lay::LayerPropertiesList> &
         }
         insert_layer_list ((unsigned int) n, new_props);
       }
-
     }
 
   } else {
@@ -3796,14 +3676,11 @@ LayoutViewBase::merge_layer_props (const std::vector<lay::LayerPropertiesList> &
         }
         insert_layer_list ((unsigned int) n, new_props);
       }
-
     }
-
   }
 }
 
-void
-LayoutViewBase::pop_state ()
+void LayoutViewBase::pop_state ()
 {
   if (m_display_state_ptr > 0) {
     m_display_states.erase (m_display_states.begin () + m_display_state_ptr, m_display_states.end ());
@@ -3811,15 +3688,13 @@ LayoutViewBase::pop_state ()
   }
 }
 
-void
-LayoutViewBase::clear_states ()
+void LayoutViewBase::clear_states ()
 {
   m_display_states.clear ();
   m_display_state_ptr = 0;
 }
 
-void
-LayoutViewBase::store_state ()
+void LayoutViewBase::store_state ()
 {
   //  erase all states after the current position
   if (m_display_state_ptr + 1 < m_display_states.size ()) {
@@ -3833,7 +3708,7 @@ LayoutViewBase::store_state ()
   m_display_state_ptr = (unsigned int) (m_display_states.size () - 1);
 }
 
-db::DBox 
+db::DBox
 LayoutViewBase::box () const
 {
   return mp_canvas->viewport ().box ();
@@ -3846,8 +3721,7 @@ LayoutViewBase::get_ui ()
 }
 
 //  NOTE: this methods needs to be called "frequently"
-void
-LayoutViewBase::timer ()
+void LayoutViewBase::timer ()
 {
   bool dirty = false;
   for (std::list<lay::CellView>::const_iterator i = m_cellviews.begin (); i != m_cellviews.end () && ! dirty; ++i) {
@@ -3877,12 +3751,10 @@ LayoutViewBase::timer ()
         }
       }
     }
-
   }
 }
 
-void
-LayoutViewBase::refresh ()
+void LayoutViewBase::refresh ()
 {
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
@@ -3894,22 +3766,19 @@ LayoutViewBase::refresh ()
   set_view_ops ();
 }
 
-void
-LayoutViewBase::force_update_content ()
+void LayoutViewBase::force_update_content ()
 {
   set_view_ops ();
 }
 
-void
-LayoutViewBase::update_content ()
+void LayoutViewBase::update_content ()
 {
   if (is_activated ()) {
     set_view_ops ();
   }
 }
 
-void
-LayoutViewBase::zoom_fit_sel ()
+void LayoutViewBase::zoom_fit_sel ()
 {
   db::DBox bbox = selection_bbox ();
   if (! bbox.empty ()) {
@@ -3966,132 +3835,112 @@ LayoutViewBase::full_box () const
   return bbox;
 }
 
-void
-LayoutViewBase::select_all ()
+void LayoutViewBase::select_all ()
 {
   select (full_box (), lay::Editable::Replace);
 }
 
-void
-LayoutViewBase::zoom_fit ()
+void LayoutViewBase::zoom_fit ()
 {
   mp_canvas->zoom_box (full_box (), true /*precious*/);
   store_state ();
 }
 
-void
-LayoutViewBase::ensure_selection_visible ()
+void LayoutViewBase::ensure_selection_visible ()
 {
   ensure_visible (selection_bbox ());
 }
 
-void
-LayoutViewBase::ensure_visible (const db::DBox &bbox)
+void LayoutViewBase::ensure_visible (const db::DBox &bbox)
 {
   db::DBox new_box = bbox + viewport ().box ();
   mp_canvas->zoom_box (new_box);
   store_state ();
 }
 
-void
-LayoutViewBase::zoom_box_and_set_hier_levels (const db::DBox &bbox, const std::pair<int, int> &levels)
+void LayoutViewBase::zoom_box_and_set_hier_levels (const db::DBox &bbox, const std::pair<int, int> &levels)
 {
   mp_canvas->zoom_box (bbox);
   set_hier_levels_basic (levels);
   store_state ();
 }
 
-void
-LayoutViewBase::zoom_box (const db::DBox &bbox)
+void LayoutViewBase::zoom_box (const db::DBox &bbox)
 {
   mp_canvas->zoom_box (bbox);
   store_state ();
 }
 
-void
-LayoutViewBase::set_global_trans (const db::DCplxTrans &trans)
+void LayoutViewBase::set_global_trans (const db::DCplxTrans &trans)
 {
   mp_canvas->set_global_trans (trans);
   store_state ();
 }
 
-void 
-LayoutViewBase::zoom_trans (const db::DCplxTrans &trans)
+void LayoutViewBase::zoom_trans (const db::DCplxTrans &trans)
 {
   mp_canvas->zoom_trans (trans);
   store_state ();
 }
 
-void
-LayoutViewBase::pan_left ()
+void LayoutViewBase::pan_left ()
 {
   shift_window (1.0, -m_pan_distance, 0.0);
 }
 
-void
-LayoutViewBase::pan_right ()
+void LayoutViewBase::pan_right ()
 {
   shift_window (1.0, m_pan_distance, 0.0);
 }
 
-void
-LayoutViewBase::pan_up ()
+void LayoutViewBase::pan_up ()
 {
   shift_window (1.0, 0.0, m_pan_distance);
 }
 
-void
-LayoutViewBase::pan_down ()
+void LayoutViewBase::pan_down ()
 {
   shift_window (1.0, 0.0, -m_pan_distance);
 }
 
-void
-LayoutViewBase::pan_left_fast ()
+void LayoutViewBase::pan_left_fast ()
 {
   shift_window (1.0, -m_pan_distance * fast_factor, 0.0);
 }
 
-void
-LayoutViewBase::pan_right_fast ()
+void LayoutViewBase::pan_right_fast ()
 {
   shift_window (1.0, m_pan_distance * fast_factor, 0.0);
 }
 
-void
-LayoutViewBase::pan_up_fast ()
+void LayoutViewBase::pan_up_fast ()
 {
   shift_window (1.0, 0.0, m_pan_distance * fast_factor);
 }
 
-void
-LayoutViewBase::pan_down_fast ()
+void LayoutViewBase::pan_down_fast ()
 {
   shift_window (1.0, 0.0, -m_pan_distance * fast_factor);
 }
 
-void
-LayoutViewBase::pan_center (const db::DPoint &p)
+void LayoutViewBase::pan_center (const db::DPoint &p)
 {
   db::DBox b = mp_canvas->viewport ().box ();
   db::DVector d (b.width () * 0.5, b.height () * 0.5);
   zoom_box (db::DBox (p - d, p + d));
 }
 
-void
-LayoutViewBase::zoom_in ()
+void LayoutViewBase::zoom_in ()
 {
   zoom_by (zoom_factor);
 }
 
-void
-LayoutViewBase::zoom_out ()
+void LayoutViewBase::zoom_out ()
 {
   zoom_by (1.0 / zoom_factor);
 }
 
-void
-LayoutViewBase::zoom_by (double f)
+void LayoutViewBase::zoom_by (double f)
 {
   db::DBox b = mp_canvas->viewport ().box ();
 
@@ -4103,8 +3952,7 @@ LayoutViewBase::zoom_by (double f)
   zoom_box ((b.moved (db::DPoint () - c) * f).moved (c - db::DPoint ()));
 }
 
-void
-LayoutViewBase::shift_window (double f, double dx, double dy)
+void LayoutViewBase::shift_window (double f, double dx, double dy)
 {
   db::DBox b = mp_canvas->viewport ().box ();
 
@@ -4119,8 +3967,7 @@ LayoutViewBase::shift_window (double f, double dx, double dy)
   zoom_box (db::DBox (c - d, c + d));
 }
 
-void
-LayoutViewBase::goto_window (const db::DPoint &p, double s)
+void LayoutViewBase::goto_window (const db::DPoint &p, double s)
 {
   if (s > 1e-6) {
     db::DBox b (p.x () - s * 0.5, p.y () - s * 0.5, p.x () + s * 0.5, p.y () + s * 0.5);
@@ -4132,20 +3979,17 @@ LayoutViewBase::goto_window (const db::DPoint &p, double s)
   }
 }
 
-void 
-LayoutViewBase::redraw_layer (unsigned int index)
+void LayoutViewBase::redraw_layer (unsigned int index)
 {
   do_redraw (index);
 }
 
-void
-LayoutViewBase::redraw_cell_boxes ()
+void LayoutViewBase::redraw_cell_boxes ()
 {
   do_redraw (lay::draw_boxes_queue_entry);
 }
 
-void
-LayoutViewBase::redraw_deco_layer ()
+void LayoutViewBase::redraw_deco_layer ()
 {
   //  redraw background annotations (images etc.)
   mp_canvas->touch_bg ();
@@ -4154,26 +3998,24 @@ LayoutViewBase::redraw_deco_layer ()
   do_redraw (lay::draw_custom_queue_entry);
 }
 
-void
-LayoutViewBase::redraw_later ()
+void LayoutViewBase::redraw_later ()
 {
   dm_redraw ();
 }
 
-void
-LayoutViewBase::redraw ()
+void LayoutViewBase::redraw ()
 {
-  std::vector <lay::RedrawLayerInfo> layers;
+  std::vector<lay::RedrawLayerInfo> layers;
 
   size_t nlayers = 0;
-  for (lay::LayerPropertiesConstIterator l = begin_layers (); !l.at_end (); ++l) {
+  for (lay::LayerPropertiesConstIterator l = begin_layers (); ! l.at_end (); ++l) {
     if (! l->has_children ()) {
       ++nlayers;
     }
   }
   layers.reserve (nlayers);
 
-  for (lay::LayerPropertiesConstIterator l = begin_layers (); !l.at_end (); ++l) {
+  for (lay::LayerPropertiesConstIterator l = begin_layers (); ! l.at_end (); ++l) {
     if (! l->has_children ()) {
       layers.push_back (RedrawLayerInfo (*l));
     }
@@ -4182,8 +4024,7 @@ LayoutViewBase::redraw ()
   mp_canvas->redraw_new (layers);
 }
 
-void
-LayoutViewBase::transform (const db::DCplxTrans &tr)
+void LayoutViewBase::transform (const db::DCplxTrans &tr)
 {
   //  NOTE: we call "finish_edits" rather than "cancel_edits" because
   //  "move by" while "duplicate interactive" relies on keeping the
@@ -4192,8 +4033,7 @@ LayoutViewBase::transform (const db::DCplxTrans &tr)
   lay::Editables::transform (tr);
 }
 
-void
-LayoutViewBase::cancel_edits ()
+void LayoutViewBase::cancel_edits ()
 {
   //  clear any messages
   message (std::string (), 0, -1);
@@ -4212,8 +4052,7 @@ LayoutViewBase::cancel_edits ()
   enable_edits (true);
 }
 
-void
-LayoutViewBase::finish_edits ()
+void LayoutViewBase::finish_edits ()
 {
   //  the move service takes a special role here as it manages the
   //  transaction for the collective move operation.
@@ -4229,8 +4068,7 @@ LayoutViewBase::finish_edits ()
   enable_edits (true);
 }
 
-void
-LayoutViewBase::cancel ()
+void LayoutViewBase::cancel ()
 {
   //  cancel all drags and pending edit operations such as move operations.
   cancel_edits ();
@@ -4238,21 +4076,19 @@ LayoutViewBase::cancel ()
   clear_selection ();
 }
 
-void
-LayoutViewBase::cancel_esc ()
+void LayoutViewBase::cancel_esc ()
 {
   cancel ();
   switch_mode (default_mode ());
 }
 
-void
-LayoutViewBase::goto_view (const DisplayState &state)
+void LayoutViewBase::goto_view (const DisplayState &state)
 {
   mp_canvas->zoom_box (state.box ());
 
-  std::list <lay::CellView> cellviews;
+  std::list<lay::CellView> cellviews;
   for (unsigned int i = 0; i < m_cellviews.size (); ++i) {
-    cellviews.push_back (state.cellview (i, cellview_iter (i)->operator-> ()));
+    cellviews.push_back (state.cellview (i, cellview_iter (i)->operator->()));
   }
 
   select_cellviews (cellviews);
@@ -4264,14 +4100,12 @@ LayoutViewBase::goto_view (const DisplayState &state)
   update_content ();
 }
 
-void
-LayoutViewBase::save_view (DisplayState &state) const
+void LayoutViewBase::save_view (DisplayState &state) const
 {
   state = DisplayState (box (), get_min_hier_levels (), get_max_hier_levels (), m_cellviews);
 }
 
-void
-LayoutViewBase::do_redraw (int layer)
+void LayoutViewBase::do_redraw (int layer)
 {
   std::vector<int> layers;
   layers.push_back (layer);
@@ -4279,14 +4113,13 @@ LayoutViewBase::do_redraw (int layer)
   mp_canvas->redraw_selected (layers);
 }
 
-void 
-LayoutViewBase::do_prop_changed ()
+void LayoutViewBase::do_prop_changed ()
 {
   if (m_visibility_changed) {
 
     // change visibility and redraw exposed layers
-    std::vector<bool> visibility; 
-    for (lay::LayerPropertiesConstIterator l = begin_layers (); !l.at_end (); ++l) {
+    std::vector<bool> visibility;
+    for (lay::LayerPropertiesConstIterator l = begin_layers (); ! l.at_end (); ++l) {
       if (! l->has_children ()) {
         visibility.push_back (l->visible (true /*real*/));
       }
@@ -4294,14 +4127,12 @@ LayoutViewBase::do_prop_changed ()
     mp_canvas->change_visibility (visibility);
 
     m_visibility_changed = false;
-
   }
 
   update_content ();
 }
 
-void
-LayoutViewBase::set_view_ops ()
+void LayoutViewBase::set_view_ops ()
 {
   bool bright_background = (mp_canvas->background_color ().to_mono ());
   int brightness_for_context = ((bright_background ? m_ctx_dimming : -m_ctx_dimming) * 256) / 100;
@@ -4309,13 +4140,13 @@ LayoutViewBase::set_view_ops ()
 
   //  count the layers to be able to reserve the number of view_ops
   size_t nlayers = 0;
-  for (LayerPropertiesConstIterator lp = get_properties ().begin_const_recursive (); !lp.at_end (); ++lp) {
+  for (LayerPropertiesConstIterator lp = get_properties ().begin_const_recursive (); ! lp.at_end (); ++lp) {
     if (! lp->has_children ()) {
       ++nlayers;
     }
   }
 
-  std::vector <lay::ViewOp> view_ops;
+  std::vector<lay::ViewOp> view_ops;
   view_ops.reserve (nlayers * planes_per_layer + special_planes_before + special_planes_after);
 
   tl::Color box_color;
@@ -4376,7 +4207,7 @@ LayoutViewBase::set_view_ops ()
 
   } else {
     //  invisible
-    for (unsigned int i = 0; i < (unsigned int) planes_per_layer; ++i) {  //  frame, fill, vertex, text
+    for (unsigned int i = 0; i < (unsigned int) planes_per_layer; ++i) { //  frame, fill, vertex, text
       view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
     }
   }
@@ -4432,13 +4263,13 @@ LayoutViewBase::set_view_ops ()
 
   } else {
     //  invisible
-    for (unsigned int i = 0; i < (unsigned int) planes_per_layer; ++i) {  //  frame, fill, vertex, text
+    for (unsigned int i = 0; i < (unsigned int) planes_per_layer; ++i) { //  frame, fill, vertex, text
       view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
     }
   }
 
   //  sanity check: number of planes defined in layRedrawThreadWorker must match to view_ops layout
-  tl_assert (view_ops.size () == (size_t)cell_box_planes);
+  tl_assert (view_ops.size () == (size_t) cell_box_planes);
 
   //  produce the ViewOps for the guiding shapes
 
@@ -4452,7 +4283,7 @@ LayoutViewBase::set_view_ops ()
     lay::ViewOp::Mode mode = lay::ViewOp::Copy;
 
     tl::color_t fill_color, frame_color, text_color;
-    int dp = 1; // no stipples for guiding shapes 
+    int dp = 1; // no stipples for guiding shapes
 
     if (ctx == 0) {
 
@@ -4484,25 +4315,24 @@ LayoutViewBase::set_view_ops ()
 
       //  current level planes
       frame_color = text_color = fill_color = gs_color;
-
     }
 
     if (m_guiding_shape_visible) {
 
-      //  fill 
+      //  fill
       view_ops.push_back (lay::ViewOp (fill_color, mode, 0, dp, 0)); // fill
 
-      //  frame 
+      //  frame
       view_ops.push_back (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Rect, m_guiding_shape_line_width));
 
-      //  text 
+      //  text
       if (m_text_visible) {
         view_ops.push_back (lay::ViewOp (text_color, mode, 0, 0, 0));
       } else {
         view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
       }
 
-      // vertex 
+      // vertex
       view_ops.push_back (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Rect, m_guiding_shape_vertex_size /*mark size*/)); // vertex
 
     } else {
@@ -4511,18 +4341,17 @@ LayoutViewBase::set_view_ops ()
       view_ops.push_back (lay::ViewOp ());
       view_ops.push_back (lay::ViewOp ());
     }
-
   }
 
   //  sanity check: number of planes defined in layRedrawThreadWorker must match to view_ops layout
-  tl_assert (view_ops.size () == (size_t)special_planes_before);
+  tl_assert (view_ops.size () == (size_t) special_planes_before);
 
   bool animated = false;
 
   for (int ctx = 0; ctx < 3; ++ctx) { // 0 (context), 1 (child), 2 (current)
 
     unsigned int ilayer = 0;
-    for (LayerPropertiesConstIterator lp = get_properties ().begin_const_recursive (); !lp.at_end (); ++lp, ++ilayer) {
+    for (LayerPropertiesConstIterator lp = get_properties ().begin_const_recursive (); ! lp.at_end (); ++lp, ++ilayer) {
 
       //  because accessing the LayerPropertiesNode with lp->... is not quite efficient, we get the pointer here:
       const lay::LayerPropertiesNode *l = &*lp;
@@ -4543,7 +4372,7 @@ LayoutViewBase::set_view_ops ()
         }
 
         if (l->animation (true /*real*/) == 1) {
-          // scrolling 
+          // scrolling
           di_off += m_phase;
         } else if (l->animation (true /*real*/) == 2) {
           // blinking
@@ -4552,7 +4381,6 @@ LayoutViewBase::set_view_ops ()
           // inversely blinking
           animate_visible = ((m_phase & 1) != 0);
         }
-
       }
 
       if (l->visible (true /*real*/) && animate_visible) {
@@ -4618,13 +4446,12 @@ LayoutViewBase::set_view_ops ()
           } else {
             text_color = frame_color;
           }
-
         }
 
-        //  fill 
+        //  fill
         view_ops.push_back (lay::ViewOp (fill_color, mode, 0, dp, di_off)); // fill
 
-        //  frame 
+        //  frame
         int lw = l->width (true /*real*/);
         if (lw < 0) {
           //  default line width is 0 for parents and 1 for leafs
@@ -4632,13 +4459,13 @@ LayoutViewBase::set_view_ops ()
         }
         view_ops.push_back (lay::ViewOp (frame_color, mode, ls, 0, 0, lay::ViewOp::Rect, lw));
 
-        //  text 
+        //  text
         if (m_text_visible) {
           view_ops.push_back (lay::ViewOp (text_color, mode, 0, 0, 0));
         } else {
           view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
         }
-        // vertex 
+        // vertex
         view_ops.push_back (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, l->marked (true /*real*/) ? mark_size : 0)); // vertex
 
       } else {
@@ -4646,9 +4473,7 @@ LayoutViewBase::set_view_ops ()
           view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
         }
       }
-
     }
-
   }
 
   if (! animated) {
@@ -4659,8 +4484,7 @@ LayoutViewBase::set_view_ops ()
   mp_canvas->set_view_ops (view_ops);
 }
 
-void
-LayoutViewBase::guiding_shapes_visible (bool v)
+void LayoutViewBase::guiding_shapes_visible (bool v)
 {
   if (v != m_guiding_shape_visible) {
     m_guiding_shape_visible = v;
@@ -4668,8 +4492,7 @@ LayoutViewBase::guiding_shapes_visible (bool v)
   }
 }
 
-void
-LayoutViewBase::guiding_shapes_color (tl::Color c)
+void LayoutViewBase::guiding_shapes_color (tl::Color c)
 {
   if (c != m_guiding_shape_color) {
     m_guiding_shape_color = c;
@@ -4677,8 +4500,7 @@ LayoutViewBase::guiding_shapes_color (tl::Color c)
   }
 }
 
-void
-LayoutViewBase::guiding_shapes_line_width (int v)
+void LayoutViewBase::guiding_shapes_line_width (int v)
 {
   if (v != m_guiding_shape_line_width) {
     m_guiding_shape_line_width = v;
@@ -4686,8 +4508,7 @@ LayoutViewBase::guiding_shapes_line_width (int v)
   }
 }
 
-void
-LayoutViewBase::guiding_shapes_vertex_size (int v)
+void LayoutViewBase::guiding_shapes_vertex_size (int v)
 {
   if (v != m_guiding_shape_vertex_size) {
     m_guiding_shape_vertex_size = v;
@@ -4695,8 +4516,7 @@ LayoutViewBase::guiding_shapes_vertex_size (int v)
   }
 }
 
-void 
-LayoutViewBase::draw_array_border_instances (bool m)
+void LayoutViewBase::draw_array_border_instances (bool m)
 {
   if (m != m_draw_array_border_instances) {
     m_draw_array_border_instances = m;
@@ -4704,8 +4524,7 @@ LayoutViewBase::draw_array_border_instances (bool m)
   }
 }
 
-void 
-LayoutViewBase::drop_small_cells (bool m)
+void LayoutViewBase::drop_small_cells (bool m)
 {
   if (m != m_drop_small_cells) {
     m_drop_small_cells = m;
@@ -4713,8 +4532,7 @@ LayoutViewBase::drop_small_cells (bool m)
   }
 }
 
-void 
-LayoutViewBase::drop_small_cells_value (unsigned int s)
+void LayoutViewBase::drop_small_cells_value (unsigned int s)
 {
   if (s != m_drop_small_cells_value) {
     m_drop_small_cells_value = s;
@@ -4722,8 +4540,7 @@ LayoutViewBase::drop_small_cells_value (unsigned int s)
   }
 }
 
-void 
-LayoutViewBase::drop_small_cells_cond (drop_small_cells_cond_type t)
+void LayoutViewBase::drop_small_cells_cond (drop_small_cells_cond_type t)
 {
   if (t != m_drop_small_cells_cond) {
     m_drop_small_cells_cond = t;
@@ -4731,8 +4548,7 @@ LayoutViewBase::drop_small_cells_cond (drop_small_cells_cond_type t)
   }
 }
 
-void 
-LayoutViewBase::cell_box_color (tl::Color c)
+void LayoutViewBase::cell_box_color (tl::Color c)
 {
   if (c != m_box_color) {
     m_box_color = c;
@@ -4740,26 +4556,23 @@ LayoutViewBase::cell_box_color (tl::Color c)
   }
 }
 
-void 
-LayoutViewBase::cell_box_text_transform (bool xform)
+void LayoutViewBase::cell_box_text_transform (bool xform)
 {
   if (xform != m_box_text_transform) {
     m_box_text_transform = xform;
     redraw ();
-  } 
+  }
 }
 
-void 
-LayoutViewBase::cell_box_text_font (unsigned int f)
+void LayoutViewBase::cell_box_text_font (unsigned int f)
 {
   if (f != m_box_font) {
     m_box_font = f;
     redraw ();
-  } 
+  }
 }
 
-bool
-LayoutViewBase::set_hier_levels_basic (std::pair<int, int> l)
+bool LayoutViewBase::set_hier_levels_basic (std::pair<int, int> l)
 {
   if (l != get_hier_levels ()) {
 
@@ -4778,15 +4591,14 @@ LayoutViewBase::set_hier_levels_basic (std::pair<int, int> l)
   }
 }
 
-void 
-LayoutViewBase::set_hier_levels (std::pair<int, int> l)
+void LayoutViewBase::set_hier_levels (std::pair<int, int> l)
 {
   if (set_hier_levels_basic (l)) {
     store_state ();
-  } 
+  }
 }
 
-std::pair<int, int> 
+std::pair<int, int>
 LayoutViewBase::get_hier_levels () const
 {
   return std::make_pair (m_from_level, m_to_level);
@@ -4795,8 +4607,7 @@ LayoutViewBase::get_hier_levels () const
 /**
  *  @brief set the maximum hierarchy level to the number of levels available
  */
-void 
-LayoutViewBase::max_hier ()
+void LayoutViewBase::max_hier ()
 {
   //  determine the maximum level of hierarchies
   int max_level = max_hier_level ();
@@ -4810,11 +4621,10 @@ LayoutViewBase::max_hier ()
 /**
  *  @brief determine the maximum hierarchy level
  */
-int
-LayoutViewBase::max_hier_level () const
+int LayoutViewBase::max_hier_level () const
 {
   int max_level = 0;
-  for (std::list <CellView>::const_iterator cv = m_cellviews.begin (); cv != m_cellviews.end (); ++cv) {
+  for (std::list<CellView>::const_iterator cv = m_cellviews.begin (); cv != m_cellviews.end (); ++cv) {
     if (cv->is_valid ()) {
       int nl = cv->ctx_cell ()->hierarchy_levels () + 1;
       if (nl > max_level) {
@@ -4828,33 +4638,28 @@ LayoutViewBase::max_hier_level () const
 /**
  *  @brief Returns a value indicating whether the maximum level is shown
  */
-bool 
-LayoutViewBase::has_max_hier () const
+bool LayoutViewBase::has_max_hier () const
 {
   int ml = max_hier_level ();
   return ml > 0 && m_to_level >= ml;
 }
 
-void
-LayoutViewBase::set_palette (const lay::ColorPalette &p)
+void LayoutViewBase::set_palette (const lay::ColorPalette &p)
 {
   m_palette = p;
 }
 
-void
-LayoutViewBase::set_palette (const lay::StipplePalette &p)
+void LayoutViewBase::set_palette (const lay::StipplePalette &p)
 {
   m_stipple_palette = p;
 }
 
-void
-LayoutViewBase::set_palette (const lay::LineStylePalette &p)
+void LayoutViewBase::set_palette (const lay::LineStylePalette &p)
 {
   m_line_style_palette = p;
 }
 
-void
-LayoutViewBase::ctx_color (tl::Color c)
+void LayoutViewBase::ctx_color (tl::Color c)
 {
   if (c != m_ctx_color) {
     m_ctx_color = c;
@@ -4862,8 +4667,7 @@ LayoutViewBase::ctx_color (tl::Color c)
   }
 }
 
-void
-LayoutViewBase::ctx_dimming (int d)
+void LayoutViewBase::ctx_dimming (int d)
 {
   if (d != m_ctx_dimming) {
     m_ctx_dimming = d;
@@ -4871,8 +4675,7 @@ LayoutViewBase::ctx_dimming (int d)
   }
 }
 
-void
-LayoutViewBase::ctx_hollow (bool h)
+void LayoutViewBase::ctx_hollow (bool h)
 {
   if (h != m_ctx_hollow) {
     m_ctx_hollow = h;
@@ -4880,8 +4683,7 @@ LayoutViewBase::ctx_hollow (bool h)
   }
 }
 
-void
-LayoutViewBase::child_ctx_color (tl::Color c)
+void LayoutViewBase::child_ctx_color (tl::Color c)
 {
   if (c != m_child_ctx_color) {
     m_child_ctx_color = c;
@@ -4889,8 +4691,7 @@ LayoutViewBase::child_ctx_color (tl::Color c)
   }
 }
 
-void
-LayoutViewBase::child_ctx_dimming (int d)
+void LayoutViewBase::child_ctx_dimming (int d)
 {
   if (d != m_child_ctx_dimming) {
     m_child_ctx_dimming = d;
@@ -4898,8 +4699,7 @@ LayoutViewBase::child_ctx_dimming (int d)
   }
 }
 
-void
-LayoutViewBase::child_ctx_hollow (bool h)
+void LayoutViewBase::child_ctx_hollow (bool h)
 {
   if (h != m_child_ctx_hollow) {
     m_child_ctx_hollow = h;
@@ -4907,8 +4707,7 @@ LayoutViewBase::child_ctx_hollow (bool h)
   }
 }
 
-void
-LayoutViewBase::child_ctx_enabled (bool f)
+void LayoutViewBase::child_ctx_enabled (bool f)
 {
   if (f != m_child_ctx_enabled) {
     m_child_ctx_enabled = f;
@@ -4917,8 +4716,7 @@ LayoutViewBase::child_ctx_enabled (bool f)
   }
 }
 
-void
-LayoutViewBase::abstract_mode_width (double w)
+void LayoutViewBase::abstract_mode_width (double w)
 {
   if (fabs (w - m_abstract_mode_width) > 1e-6) {
     m_abstract_mode_width = w;
@@ -4928,8 +4726,7 @@ LayoutViewBase::abstract_mode_width (double w)
   }
 }
 
-void
-LayoutViewBase::abstract_mode_enabled (bool e)
+void LayoutViewBase::abstract_mode_enabled (bool e)
 {
   if (e != m_abstract_mode_enabled) {
     m_abstract_mode_enabled = e;
@@ -4940,17 +4737,15 @@ LayoutViewBase::abstract_mode_enabled (bool e)
 tl::Color
 LayoutViewBase::default_background_color ()
 {
-  return tl::Color (0, 0, 0);  // black.
+  return tl::Color (0, 0, 0); // black.
 }
 
-void
-LayoutViewBase::do_set_background_color (tl::Color /*color*/, tl::Color /*contrast*/)
+void LayoutViewBase::do_set_background_color (tl::Color /*color*/, tl::Color /*contrast*/)
 {
   //  .. nothing yet ..
 }
 
-void 
-LayoutViewBase::background_color (tl::Color c)
+void LayoutViewBase::background_color (tl::Color c)
 {
   if (c == mp_canvas->background_color ()) {
     return;
@@ -4985,26 +4780,22 @@ LayoutViewBase::background_color (tl::Color c)
   background_color_changed_event ();
 }
 
-void 
-LayoutViewBase::dbu_coordinates (bool f)
+void LayoutViewBase::dbu_coordinates (bool f)
 {
   m_dbu_coordinates = f;
 }
 
-void 
-LayoutViewBase::absolute_coordinates (bool f)
+void LayoutViewBase::absolute_coordinates (bool f)
 {
   m_absolute_coordinates = f;
 }
 
-void
-LayoutViewBase::auto_create_new_layers (bool f)
+void LayoutViewBase::auto_create_new_layers (bool f)
 {
   m_auto_create_new_layers = f;
 }
 
-void
-LayoutViewBase::select_cellviews_fit (const std::list <CellView> &cvs)
+void LayoutViewBase::select_cellviews_fit (const std::list<CellView> &cvs)
 {
   if (m_cellviews != cvs) {
 
@@ -5031,8 +4822,7 @@ LayoutViewBase::select_cellviews_fit (const std::list <CellView> &cvs)
   }
 }
 
-void
-LayoutViewBase::cellview_changed (unsigned int index)
+void LayoutViewBase::cellview_changed (unsigned int index)
 {
   update_content_for_cv (index);
 
@@ -5053,14 +4843,12 @@ LayoutViewBase::active_cellview_ref ()
   return cellview_ref ((unsigned int) active_cellview_index ());
 }
 
-int
-LayoutViewBase::active_cellview_index () const
+int LayoutViewBase::active_cellview_index () const
 {
   return m_active_cellview_index;
 }
 
-void
-LayoutViewBase::set_active_cellview_index_silent (int index)
+void LayoutViewBase::set_active_cellview_index_silent (int index)
 {
   enable_active_cellview_changed_event (false);
   try {
@@ -5072,8 +4860,7 @@ LayoutViewBase::set_active_cellview_index_silent (int index)
   }
 }
 
-void
-LayoutViewBase::set_active_cellview_index (int index)
+void LayoutViewBase::set_active_cellview_index (int index)
 {
   if (index >= 0 && index < int (cellviews ())) {
     if (m_active_cellview_index != index) {
@@ -5085,15 +4872,13 @@ LayoutViewBase::set_active_cellview_index (int index)
   }
 }
 
-void
-LayoutViewBase::selected_cells_paths (int /*cv_index*/, std::vector<cell_path_type> & /*paths*/) const
+void LayoutViewBase::selected_cells_paths (int /*cv_index*/, std::vector<cell_path_type> & /*paths*/) const
 {
   //  TODO: not implemented yet as there is no setter so far.
   //  (but it is implemented in the UI version where it is bound to the hierarchy control panel)
 }
 
-void
-LayoutViewBase::current_cell_path (int cv_index, cell_path_type &path) const
+void LayoutViewBase::current_cell_path (int cv_index, cell_path_type &path) const
 {
   if (cv_index >= 0 && cv_index < int (m_current_cell_per_cellview.size ())) {
     path = m_current_cell_per_cellview [cv_index];
@@ -5102,8 +4887,7 @@ LayoutViewBase::current_cell_path (int cv_index, cell_path_type &path) const
   }
 }
 
-void
-LayoutViewBase::set_current_cell_path (int cv_index, const cell_path_type &path)
+void LayoutViewBase::set_current_cell_path (int cv_index, const cell_path_type &path)
 {
   if (cv_index >= 0) {
     while (cv_index <= int (m_current_cell_per_cellview.size ())) {
@@ -5113,14 +4897,12 @@ LayoutViewBase::set_current_cell_path (int cv_index, const cell_path_type &path)
   }
 }
 
-void
-LayoutViewBase::do_change_active_cellview ()
+void LayoutViewBase::do_change_active_cellview ()
 {
   //  .. nothing yet ..
 }
 
-void
-LayoutViewBase::enable_active_cellview_changed_event (bool enable, bool silent)
+void LayoutViewBase::enable_active_cellview_changed_event (bool enable, bool silent)
 {
   if (m_active_cellview_changed_event_enabled == enable) {
     return;
@@ -5129,7 +4911,7 @@ LayoutViewBase::enable_active_cellview_changed_event (bool enable, bool silent)
   m_active_cellview_changed_event_enabled = enable;
   if (enable) {
 
-    if (!silent && ! m_active_cellview_changed_events.empty ()) {
+    if (! silent && ! m_active_cellview_changed_events.empty ()) {
 
       //  deliver stored events
 
@@ -5146,16 +4928,13 @@ LayoutViewBase::enable_active_cellview_changed_event (bool enable, bool silent)
 
       //  Because the title reflects the active cell, emit a title changed event
       update_title ();
-
     }
-
   }
 
   m_active_cellview_changed_events.clear ();
 }
 
-void
-LayoutViewBase::active_cellview_changed (int index)
+void LayoutViewBase::active_cellview_changed (int index)
 {
   if (m_active_cellview_changed_event_enabled) {
 
@@ -5176,19 +4955,17 @@ LayoutViewBase::active_cellview_changed (int index)
   }
 }
 
-void
-LayoutViewBase::select_cell_dispatch (const cell_path_type &path, int cellview_index)
+void LayoutViewBase::select_cell_dispatch (const cell_path_type &path, int cellview_index)
 {
   bool set_max_hier = (m_full_hier_new_cell || has_max_hier ());
   if (m_clear_ruler_new_cell) {
 
-    //  This is a HACK, but the clean solution would be to provide a new editable 
+    //  This is a HACK, but the clean solution would be to provide a new editable
     //  method like "clear_annotations":
     lay::Plugin *antPlugin = get_plugin_by_name ("ant::Plugin");
     if (antPlugin) {
       antPlugin->menu_activated ("ant::clear_all_rulers_internal");
     }
-
   }
 
   if (m_fit_new_cell) {
@@ -5202,15 +4979,14 @@ LayoutViewBase::select_cell_dispatch (const cell_path_type &path, int cellview_i
   }
 }
 
-void 
-LayoutViewBase::select_cell_fit (const cell_path_type &path, int index)
-{ 
+void LayoutViewBase::select_cell_fit (const cell_path_type &path, int index)
+{
   if (index >= 0 && int (m_cellviews.size ()) > index && (cellview_iter (index)->specific_path ().size () > 0 || cellview_iter (index)->unspecific_path () != path)) {
 
     cellview_about_to_change_event (index);
 
     set_min_hier_levels (0);
-    cancel (); 
+    cancel ();
     cellview_iter (index)->set_specific_path (lay::CellView::specific_cell_path_type ());
     cellview_iter (index)->set_unspecific_path (path);
     set_active_cellview_index (index);
@@ -5220,19 +4996,17 @@ LayoutViewBase::select_cell_fit (const cell_path_type &path, int index)
     cellview_changed (index);
 
     update_content ();
-
   }
 }
 
-void 
-LayoutViewBase::select_cell_fit (cell_index_type cell_index, int index)
-{ 
+void LayoutViewBase::select_cell_fit (cell_index_type cell_index, int index)
+{
   if (index >= 0 && int (m_cellviews.size ()) > index && cellview_iter (index)->cell_index () != cell_index) {
 
     cellview_about_to_change_event (index);
 
     set_min_hier_levels (0);
-    cancel (); 
+    cancel ();
     cellview_iter (index)->set_cell (cell_index);
     set_active_cellview_index (index);
     redraw ();
@@ -5241,12 +5015,10 @@ LayoutViewBase::select_cell_fit (cell_index_type cell_index, int index)
     cellview_changed (index);
 
     update_content ();
-
   }
 }
 
-void 
-LayoutViewBase::select_cellviews (const std::list <CellView> &cvs)
+void LayoutViewBase::select_cellviews (const std::list<CellView> &cvs)
 {
   if (m_cellviews != cvs) {
 
@@ -5266,12 +5038,10 @@ LayoutViewBase::select_cellviews (const std::list <CellView> &cvs)
     }
 
     update_content ();
-
   }
 }
 
-void
-LayoutViewBase::select_cellview (int index, const CellView &cv)
+void LayoutViewBase::select_cellview (int index, const CellView &cv)
 {
   if (index < 0 || index >= int (m_cellviews.size ())) {
     return;
@@ -5288,19 +5058,17 @@ LayoutViewBase::select_cellview (int index, const CellView &cv)
     cellview_changed (index);
 
     update_content ();
-
   }
 }
 
-void
-LayoutViewBase::select_cell (const cell_path_type &path, int index)
-{ 
+void LayoutViewBase::select_cell (const cell_path_type &path, int index)
+{
   if (index >= 0 && int (m_cellviews.size ()) > index && (cellview_iter (index)->specific_path ().size () > 0 || cellview_iter (index)->unspecific_path () != path)) {
 
     cellview_about_to_change_event (index);
 
     set_min_hier_levels (0);
-    cancel (); 
+    cancel ();
     cellview_iter (index)->set_specific_path (lay::CellView::specific_cell_path_type ());
     cellview_iter (index)->set_unspecific_path (path);
     set_active_cellview_index (index);
@@ -5309,19 +5077,17 @@ LayoutViewBase::select_cell (const cell_path_type &path, int index)
     cellview_changed (index);
 
     update_content ();
-
   }
 }
 
-void 
-LayoutViewBase::select_cell (cell_index_type cell_index, int index)
-{ 
+void LayoutViewBase::select_cell (cell_index_type cell_index, int index)
+{
   if (index >= 0 && int (m_cellviews.size ()) > index && (! cellview_iter (index)->is_valid () || cellview_iter (index)->cell_index () != cell_index)) {
 
     cellview_about_to_change_event (index);
 
     set_min_hier_levels (0);
-    cancel (); 
+    cancel ();
     cellview_iter (index)->set_cell (cell_index);
     set_active_cellview_index (index);
     redraw ();
@@ -5329,12 +5095,10 @@ LayoutViewBase::select_cell (cell_index_type cell_index, int index)
     cellview_changed (index);
 
     update_content ();
-
   }
 }
 
-bool
-LayoutViewBase::is_cell_hidden (cell_index_type ci, int cellview_index) const
+bool LayoutViewBase::is_cell_hidden (cell_index_type ci, int cellview_index) const
 {
   if (int (m_hidden_cells.size ()) > cellview_index && cellview_index >= 0) {
     return m_hidden_cells [cellview_index].find (ci) != m_hidden_cells [cellview_index].end ();
@@ -5347,21 +5111,20 @@ const std::set<LayoutViewBase::cell_index_type> &
 LayoutViewBase::hidden_cells (int cellview_index) const
 {
   if (int (m_hidden_cells.size ()) > cellview_index && cellview_index >= 0) {
-    return m_hidden_cells[cellview_index];
+    return m_hidden_cells [cellview_index];
   } else {
     static std::set<cell_index_type> empty_set;
     return empty_set;
   }
 }
 
-void 
-LayoutViewBase::hide_cell (cell_index_type ci, int cellview_index)
+void LayoutViewBase::hide_cell (cell_index_type ci, int cellview_index)
 {
   if (cellview_index < 0) {
     return;
   }
   while (int (m_hidden_cells.size ()) <= cellview_index) {
-    m_hidden_cells.push_back (std::set <cell_index_type> ());
+    m_hidden_cells.push_back (std::set<cell_index_type> ());
   }
   if (m_hidden_cells [cellview_index].insert (ci).second) {
     if (transacting ()) {
@@ -5370,12 +5133,11 @@ LayoutViewBase::hide_cell (cell_index_type ci, int cellview_index)
       manager ()->clear ();
     }
     cell_visibility_changed_event ();
-    redraw ();  //  needs redraw
+    redraw (); //  needs redraw
   }
 }
 
-void 
-LayoutViewBase::show_cell (cell_index_type ci, int cellview_index)
+void LayoutViewBase::show_cell (cell_index_type ci, int cellview_index)
 {
   if (cellview_index < 0) {
     return;
@@ -5388,13 +5150,12 @@ LayoutViewBase::show_cell (cell_index_type ci, int cellview_index)
         manager ()->clear ();
       }
       cell_visibility_changed_event ();
-      redraw ();  //  needs redraw
+      redraw (); //  needs redraw
     }
   }
 }
 
-void
-LayoutViewBase::show_all_cells (int cv_index)
+void LayoutViewBase::show_all_cells (int cv_index)
 {
   if (cv_index < 0 || cv_index >= int (m_hidden_cells.size ())) {
     return;
@@ -5410,12 +5171,11 @@ LayoutViewBase::show_all_cells (int cv_index)
     }
     m_hidden_cells [cv_index].clear ();
     cell_visibility_changed_event ();
-    redraw ();  //  needs redraw
+    redraw (); //  needs redraw
   }
 }
 
-void
-LayoutViewBase::show_all_cells ()
+void LayoutViewBase::show_all_cells ()
 {
   bool any = false;
 
@@ -5435,13 +5195,12 @@ LayoutViewBase::show_all_cells ()
 
   if (any) {
     cell_visibility_changed_event ();
-    redraw ();  //  needs redraw
+    redraw (); //  needs redraw
     return;
   }
 }
 
-void 
-LayoutViewBase::min_inst_label_size (int px)
+void LayoutViewBase::min_inst_label_size (int px)
 {
   if (m_min_size_for_label != px) {
     m_min_size_for_label = px;
@@ -5449,8 +5208,7 @@ LayoutViewBase::min_inst_label_size (int px)
   }
 }
 
-void
-LayoutViewBase::empty_cell_dimension (double um)
+void LayoutViewBase::empty_cell_dimension (double um)
 {
   if (m_empty_cell_dimension != um) {
     m_empty_cell_dimension = um;
@@ -5458,8 +5216,7 @@ LayoutViewBase::empty_cell_dimension (double um)
   }
 }
 
-void
-LayoutViewBase::text_visible (bool vis)
+void LayoutViewBase::text_visible (bool vis)
 {
   if (m_text_visible != vis) {
     m_text_visible = vis;
@@ -5468,8 +5225,7 @@ LayoutViewBase::text_visible (bool vis)
   }
 }
 
-void 
-LayoutViewBase::show_properties_as_text (bool sp)
+void LayoutViewBase::show_properties_as_text (bool sp)
 {
   if (m_show_properties != sp) {
     m_show_properties = sp;
@@ -5477,8 +5233,7 @@ LayoutViewBase::show_properties_as_text (bool sp)
   }
 }
 
-void 
-LayoutViewBase::bitmap_caching (bool l)
+void LayoutViewBase::bitmap_caching (bool l)
 {
   if (m_bitmap_caching != l) {
     m_bitmap_caching = l;
@@ -5486,8 +5241,7 @@ LayoutViewBase::bitmap_caching (bool l)
   }
 }
 
-void 
-LayoutViewBase::text_lazy_rendering (bool l)
+void LayoutViewBase::text_lazy_rendering (bool l)
 {
   if (m_text_lazy_rendering != l) {
     m_text_lazy_rendering = l;
@@ -5495,8 +5249,7 @@ LayoutViewBase::text_lazy_rendering (bool l)
   }
 }
 
-void 
-LayoutViewBase::cell_box_visible (bool vis)
+void LayoutViewBase::cell_box_visible (bool vis)
 {
   if (m_cell_box_visible != vis) {
     m_cell_box_visible = vis;
@@ -5504,8 +5257,7 @@ LayoutViewBase::cell_box_visible (bool vis)
   }
 }
 
-void
-LayoutViewBase::ghost_cells_visible (bool vis)
+void LayoutViewBase::ghost_cells_visible (bool vis)
 {
   if (m_ghost_cells_visible != vis) {
     m_ghost_cells_visible = vis;
@@ -5513,8 +5265,7 @@ LayoutViewBase::ghost_cells_visible (bool vis)
   }
 }
 
-void
-LayoutViewBase::text_font (unsigned int f)
+void LayoutViewBase::text_font (unsigned int f)
 {
   if (m_text_font != f) {
     m_text_font = f;
@@ -5522,8 +5273,7 @@ LayoutViewBase::text_font (unsigned int f)
   }
 }
 
-void 
-LayoutViewBase::default_text_size (double fs)
+void LayoutViewBase::default_text_size (double fs)
 {
   if (m_default_text_size != fs) {
     m_default_text_size = fs;
@@ -5531,8 +5281,7 @@ LayoutViewBase::default_text_size (double fs)
   }
 }
 
-void
-LayoutViewBase::text_point_mode (bool pm)
+void LayoutViewBase::text_point_mode (bool pm)
 {
   if (m_text_point_mode != pm) {
     m_text_point_mode = pm;
@@ -5540,14 +5289,12 @@ LayoutViewBase::text_point_mode (bool pm)
   }
 }
 
-void
-LayoutViewBase::clear_ruler_new_cell (bool f)
+void LayoutViewBase::clear_ruler_new_cell (bool f)
 {
   m_clear_ruler_new_cell = f;
 }
-  
-void 
-LayoutViewBase::full_hier_new_cell (bool f)
+
+void LayoutViewBase::full_hier_new_cell (bool f)
 {
   m_full_hier_new_cell = f;
 }
@@ -5558,29 +5305,25 @@ LayoutViewBase::pan_distance () const
   return m_pan_distance;
 }
 
-void
-LayoutViewBase::pan_distance (double pd)
+void LayoutViewBase::pan_distance (double pd)
 {
   m_pan_distance = pd;
 }
 
-void 
-LayoutViewBase::fit_new_cell (bool f)
+void LayoutViewBase::fit_new_cell (bool f)
 {
   m_fit_new_cell = f;
 }
-  
-void 
-LayoutViewBase::apply_text_trans (bool f)
+
+void LayoutViewBase::apply_text_trans (bool f)
 {
   if (m_apply_text_trans != f) {
     m_apply_text_trans = f;
     redraw ();
   }
 }
-  
-void
-LayoutViewBase::apply_text_trans_mode (unsigned int m)
+
+void LayoutViewBase::apply_text_trans_mode (unsigned int m)
 {
   if (m_apply_text_trans_mode != m) {
     m_apply_text_trans_mode = m;
@@ -5588,17 +5331,15 @@ LayoutViewBase::apply_text_trans_mode (unsigned int m)
   }
 }
 
-void
-LayoutViewBase::offset_stipples (bool f)
+void LayoutViewBase::offset_stipples (bool f)
 {
   if (m_stipple_offset != f) {
     m_stipple_offset = f;
     update_content ();
   }
 }
-  
-void 
-LayoutViewBase::no_stipples (bool f)
+
+void LayoutViewBase::no_stipples (bool f)
 {
   if (m_no_stipples != f) {
     m_no_stipples = f;
@@ -5606,9 +5347,8 @@ LayoutViewBase::no_stipples (bool f)
     update_content ();
   }
 }
-  
-void
-LayoutViewBase::show_markers (bool f)
+
+void LayoutViewBase::show_markers (bool f)
 {
   if (m_show_markers != f) {
     m_show_markers = f;
@@ -5616,8 +5356,7 @@ LayoutViewBase::show_markers (bool f)
   }
 }
 
-void
-LayoutViewBase::text_color (tl::Color c)
+void LayoutViewBase::text_color (tl::Color c)
 {
   if (m_text_color != c) {
     m_text_color = c;
@@ -5625,20 +5364,17 @@ LayoutViewBase::text_color (tl::Color c)
   }
 }
 
-bool
-LayoutViewBase::has_selection ()
+bool LayoutViewBase::has_selection ()
 {
   return lay::Editables::has_selection ();
 }
 
-void
-LayoutViewBase::do_paste ()
+void LayoutViewBase::do_paste ()
 {
   //  .. nothing yet ..
 }
 
-void
-LayoutViewBase::paste ()
+void LayoutViewBase::paste ()
 {
   clear_selection ();
 
@@ -5665,8 +5401,7 @@ LayoutViewBase::paste ()
   }
 }
 
-void
-LayoutViewBase::paste_interactive (bool transient_mode)
+void LayoutViewBase::paste_interactive (bool transient_mode)
 {
   clear_selection ();
 
@@ -5679,18 +5414,16 @@ LayoutViewBase::paste_interactive (bool transient_mode)
   trans->close ();
 
   if (mp_move_service && mp_move_service->start_move (trans.release (), transient_mode)) {
-    switch_mode (-1);  //  move mode
+    switch_mode (-1); //  move mode
   }
 }
 
-void
-LayoutViewBase::copy ()
+void LayoutViewBase::copy ()
 {
   copy_view_objects ();
 }
 
-void
-LayoutViewBase::copy_view_objects ()
+void LayoutViewBase::copy_view_objects ()
 {
   cancel_edits ();
   if (! lay::Editables::has_selection ()) {
@@ -5701,8 +5434,7 @@ LayoutViewBase::copy_view_objects ()
   lay::Editables::copy ();
 }
 
-void
-LayoutViewBase::cut ()
+void LayoutViewBase::cut ()
 {
   cancel_edits ();
   if (! lay::Editables::has_selection ()) {
@@ -5714,13 +5446,12 @@ LayoutViewBase::cut ()
   lay::Editables::cut ();
 }
 
-void
-LayoutViewBase::remove_unused_layers ()
+void LayoutViewBase::remove_unused_layers ()
 {
   bool any_deleted;
   do {
 
-    std::vector <lay::LayerPropertiesConstIterator> sel;
+    std::vector<lay::LayerPropertiesConstIterator> sel;
 
     lay::LayerPropertiesConstIterator l = begin_layers ();
     while (! l.at_end ()) {
@@ -5742,10 +5473,9 @@ LayoutViewBase::remove_unused_layers ()
   emit_layer_order_changed ();
 }
 
-void 
-LayoutViewBase::add_missing_layers ()
+void LayoutViewBase::add_missing_layers ()
 {
-  std::set <lay::ParsedLayerSource> present;
+  std::set<lay::ParsedLayerSource> present;
   LayerPropertiesConstIterator l = begin_layers ();
   while (! l.at_end ()) {
     if (! l->has_children ()) {
@@ -5754,7 +5484,7 @@ LayoutViewBase::add_missing_layers ()
     ++l;
   }
 
-  std::vector <lay::ParsedLayerSource> actual;
+  std::vector<lay::ParsedLayerSource> actual;
   for (unsigned int cv = 0; cv < cellviews (); ++cv) {
     const db::Layout &layout = cellview (cv)->layout ();
     for (unsigned int l = 0; l < layout.layers (); ++l) {
@@ -5766,7 +5496,7 @@ LayoutViewBase::add_missing_layers ()
 
   std::sort (actual.begin (), actual.end ());
 
-  for (std::vector <lay::ParsedLayerSource>::const_iterator a = actual.begin (); a != actual.end (); ++a) {
+  for (std::vector<lay::ParsedLayerSource>::const_iterator a = actual.begin (); a != actual.end (); ++a) {
     if (present.find (*a) == present.end ()) {
       lay::LayerPropertiesNode node;
       node.attach_view (this, current_layer_list ());
@@ -5779,7 +5509,7 @@ LayoutViewBase::add_missing_layers ()
   emit_layer_order_changed ();
 }
 
-LayerState 
+LayerState
 LayoutViewBase::layer_snapshot () const
 {
   LayerState state;
@@ -5793,22 +5523,19 @@ LayoutViewBase::layer_snapshot () const
   return state;
 }
 
-void
-LayoutViewBase::current_layer_changed_slot (const lay::LayerPropertiesConstIterator &iter)
+void LayoutViewBase::current_layer_changed_slot (const lay::LayerPropertiesConstIterator &iter)
 {
   current_layer_changed_event (iter);
 }
 
-void
-LayoutViewBase::selected_layers_changed_slot ()
+void LayoutViewBase::selected_layers_changed_slot ()
 {
   selected_layers_changed_event ();
 }
 
-void
-LayoutViewBase::add_new_layers (const LayerState &state)
+void LayoutViewBase::add_new_layers (const LayerState &state)
 {
-  std::vector <lay::ParsedLayerSource> actual;
+  std::vector<lay::ParsedLayerSource> actual;
   for (unsigned int cv = 0; cv < cellviews (); ++cv) {
     const db::Layout &layout = cellview (cv)->layout ();
     for (unsigned int l = 0; l < layout.layers (); ++l) {
@@ -5822,7 +5549,7 @@ LayoutViewBase::add_new_layers (const LayerState &state)
 
   bool needs_update = false;
 
-  for (std::vector <lay::ParsedLayerSource>::const_iterator a = actual.begin (); a != actual.end (); ++a) {
+  for (std::vector<lay::ParsedLayerSource>::const_iterator a = actual.begin (); a != actual.end (); ++a) {
     if (state.present.find (*a) == state.present.end ()) {
       needs_update = true;
       lay::LayerPropertiesNode node;
@@ -5842,8 +5569,7 @@ LayoutViewBase::add_new_layers (const LayerState &state)
   }
 }
 
-void 
-LayoutViewBase::prev_display_state ()
+void LayoutViewBase::prev_display_state ()
 {
   if (m_display_state_ptr > 0) {
     m_display_state_ptr--;
@@ -5851,14 +5577,12 @@ LayoutViewBase::prev_display_state ()
   }
 }
 
-bool 
-LayoutViewBase::has_prev_display_state ()
+bool LayoutViewBase::has_prev_display_state ()
 {
   return m_display_state_ptr > 0;
 }
 
-void 
-LayoutViewBase::next_display_state ()
+void LayoutViewBase::next_display_state ()
 {
   if (m_display_state_ptr + 1 < m_display_states.size ()) {
     m_display_state_ptr++;
@@ -5866,52 +5590,44 @@ LayoutViewBase::next_display_state ()
   }
 }
 
-bool 
-LayoutViewBase::has_next_display_state ()
+bool LayoutViewBase::has_next_display_state ()
 {
   return m_display_state_ptr + 1 < m_display_states.size ();
 }
 
-void
-LayoutViewBase::current_pos (double /*x*/, double /*y*/)
+void LayoutViewBase::current_pos (double /*x*/, double /*y*/)
 {
   //  .. nothing yet ..
 }
 
-void
-LayoutViewBase::stop_redraw ()
+void LayoutViewBase::stop_redraw ()
 {
   dm_redraw.cancel ();
   mp_canvas->stop_redraw ();
 }
 
-void
-LayoutViewBase::free_resources ()
+void LayoutViewBase::free_resources ()
 {
   mp_canvas->free_resources ();
 }
 
-void
-LayoutViewBase::stop ()
+void LayoutViewBase::stop ()
 {
   stop_redraw ();
   deactivate_all_browsers ();
 }
 
-void
-LayoutViewBase::begin_layer_updates ()
+void LayoutViewBase::begin_layer_updates ()
 {
   //  .. nothing yet ..
 }
 
-void
-LayoutViewBase::end_layer_updates ()
+void LayoutViewBase::end_layer_updates ()
 {
   //  .. nothing yet ..
 }
 
-void
-LayoutViewBase::ensure_layer_selected ()
+void LayoutViewBase::ensure_layer_selected ()
 {
   if (current_layer () == lay::LayerPropertiesConstIterator ()) {
     const lay::LayerPropertiesList &lp = get_properties ();
@@ -5925,38 +5641,32 @@ LayoutViewBase::ensure_layer_selected ()
   }
 }
 
-void
-LayoutViewBase::do_set_no_stipples (bool /*no_stipples*/)
+void LayoutViewBase::do_set_no_stipples (bool /*no_stipples*/)
 {
   //  .. nothing yet ..
 }
 
-void
-LayoutViewBase::do_set_phase (int /*phase*/)
+void LayoutViewBase::do_set_phase (int /*phase*/)
 {
   //  .. nothing yet ..
 }
 
-void
-LayoutViewBase::deactivate_all_browsers ()
+void LayoutViewBase::deactivate_all_browsers ()
 {
   //  .. nothing yet ..
 }
 
-bool
-LayoutViewBase::is_activated () const
+bool LayoutViewBase::is_activated () const
 {
   return true;
 }
 
-void
-LayoutViewBase::switch_mode (int m)
+void LayoutViewBase::switch_mode (int m)
 {
   mode (m);
 }
 
-void 
-LayoutViewBase::mode (int m)
+void LayoutViewBase::mode (int m)
 {
   if (m != m_mode) {
 
@@ -5970,23 +5680,20 @@ LayoutViewBase::mode (int m)
         break;
       }
     }
-
   }
 }
 
-bool 
-LayoutViewBase::is_move_mode () const
+bool LayoutViewBase::is_move_mode () const
 {
   return m_mode == -1;
 }
 
-bool 
-LayoutViewBase::is_selection_mode () const
+bool LayoutViewBase::is_selection_mode () const
 {
   return m_mode == 0;
 }
-  
-unsigned int 
+
+unsigned int
 LayoutViewBase::intrinsic_mouse_modes (std::vector<std::string> *descriptions)
 {
   if (descriptions) {
@@ -5996,8 +5703,7 @@ LayoutViewBase::intrinsic_mouse_modes (std::vector<std::string> *descriptions)
   return 2;
 }
 
-int
-LayoutViewBase::default_mode ()
+int LayoutViewBase::default_mode ()
 {
   return 0; // TODO: any generic scheme? is select, should be ruler..
 }
@@ -6048,7 +5754,7 @@ LayoutViewBase::mode_names () const
   for (auto i = mp_plugins.begin (); i != mp_plugins.end (); ++i) {
     std::string title;
     if ((*i) && (*i)->plugin_declaration () && (*i)->plugin_declaration ()->implements_mouse_mode (title)) {
-      if (is_editable () || !edit_mode_from_title (title)) {
+      if (is_editable () || ! edit_mode_from_title (title)) {
         names.push_back (name_from_title (title));
       }
     }
@@ -6077,14 +5783,12 @@ LayoutViewBase::mode_name () const
         return name_from_title (title);
       }
     }
-
   }
 
   return std::string ();
 }
 
-void
-LayoutViewBase::switch_mode (const std::string &name)
+void LayoutViewBase::switch_mode (const std::string &name)
 {
   std::vector<std::string> intrinsic_modes;
   intrinsic_mouse_modes (&intrinsic_modes);
@@ -6113,8 +5817,7 @@ LayoutViewBase::menu_symbols ()
   return lay::PluginDeclaration::menu_symbols ();
 }
 
-void
-LayoutViewBase::menu_activated (const std::string &symbol)
+void LayoutViewBase::menu_activated (const std::string &symbol)
 {
   //  Try the plugin declarations if the view is the top-level dispatcher
   if (dispatcher () == this) {
@@ -6131,17 +5834,15 @@ LayoutViewBase::menu_activated (const std::string &symbol)
   }
 }
 
-void
-LayoutViewBase::update_content_for_cv (int /*cellview_index*/)
+void LayoutViewBase::update_content_for_cv (int /*cellview_index*/)
 {
   //  .. nothing yet ..
 }
 
-void
-LayoutViewBase::rename_cellview (const std::string &name, int cellview_index)
+void LayoutViewBase::rename_cellview (const std::string &name, int cellview_index)
 {
   if (cellview_index >= 0 && cellview_index < int (m_cellviews.size ()) &&
-    (*cellview_iter (cellview_index))->name () != name) {
+      (*cellview_iter (cellview_index))->name () != name) {
     (*cellview_iter (cellview_index))->rename (name);
     update_content_for_cv (cellview_index);
     update_title ();
@@ -6152,7 +5853,7 @@ std::vector<db::DCplxTrans>
 LayoutViewBase::cv_transform_variants (int cv_index) const
 {
   std::set<db::DCplxTrans> trns_variants;
-  for (lay::LayerPropertiesConstIterator l = begin_layers (); !l.at_end (); ++l) {
+  for (lay::LayerPropertiesConstIterator l = begin_layers (); ! l.at_end (); ++l) {
     if (! l->has_children ()) {
       int cvi = l->cellview_index () >= 0 ? l->cellview_index () : 0;
       if (cv_index < int (cellviews ()) && cvi == cv_index) {
@@ -6178,7 +5879,7 @@ LayoutViewBase::cv_transform_variants (int cv_index, unsigned int layer) const
 {
   if (cellview (cv_index)->layout ().is_valid_layer (layer)) {
     std::set<db::DCplxTrans> trns_variants;
-    for (lay::LayerPropertiesConstIterator l = begin_layers (); !l.at_end (); ++l) {
+    for (lay::LayerPropertiesConstIterator l = begin_layers (); ! l.at_end (); ++l) {
       if (! l->has_children () && l->layer_index () == int (layer)) {
         int cvi = l->cellview_index () >= 0 ? l->cellview_index () : 0;
         if (cv_index < int (cellviews ()) && cvi == cv_index) {
@@ -6193,12 +5894,12 @@ LayoutViewBase::cv_transform_variants (int cv_index, unsigned int layer) const
   }
 }
 
-std::map<unsigned int, std::vector<db::DCplxTrans> >
+std::map<unsigned int, std::vector<db::DCplxTrans>>
 LayoutViewBase::cv_transform_variants_by_layer (int cv_index) const
 {
-  std::map<unsigned int, std::vector<db::DCplxTrans> > tv_map;
+  std::map<unsigned int, std::vector<db::DCplxTrans>> tv_map;
 
-  for (lay::LayerPropertiesConstIterator l = begin_layers (); !l.at_end (); ++l) {
+  for (lay::LayerPropertiesConstIterator l = begin_layers (); ! l.at_end (); ++l) {
     if (! l->has_children () && l->layer_index () >= 0) {
       int cvi = l->cellview_index () >= 0 ? l->cellview_index () : 0;
       if (cv_index < int (cellviews ()) && cvi == cv_index) {
@@ -6208,7 +5909,7 @@ LayoutViewBase::cv_transform_variants_by_layer (int cv_index) const
     }
   }
 
-  for (std::map<unsigned int, std::vector<db::DCplxTrans> >::iterator m = tv_map.begin (); m != tv_map.end (); ++m) {
+  for (std::map<unsigned int, std::vector<db::DCplxTrans>>::iterator m = tv_map.begin (); m != tv_map.end (); ++m) {
     std::sort (m->second.begin (), m->second.end ());
     m->second.erase (std::unique (m->second.begin (), m->second.end ()), m->second.end ());
   }
@@ -6216,11 +5917,11 @@ LayoutViewBase::cv_transform_variants_by_layer (int cv_index) const
   return tv_map;
 }
 
-std::set< std::pair<db::DCplxTrans, int> >
+std::set<std::pair<db::DCplxTrans, int>>
 LayoutViewBase::cv_transform_variants () const
 {
-  std::set< std::pair<db::DCplxTrans, int> > box_variants;
-  for (lay::LayerPropertiesConstIterator l = begin_layers (); !l.at_end (); ++l) {
+  std::set<std::pair<db::DCplxTrans, int>> box_variants;
+  for (lay::LayerPropertiesConstIterator l = begin_layers (); ! l.at_end (); ++l) {
     if (! l->has_children ()) {
       unsigned int cv_index = l->cellview_index () >= 0 ? (unsigned int) l->cellview_index () : 0;
       if (cv_index < cellviews ()) {
@@ -6233,10 +5934,10 @@ LayoutViewBase::cv_transform_variants () const
   return box_variants;
 }
 
-std::set< std::pair<db::DCplxTrans, int> >
+std::set<std::pair<db::DCplxTrans, int>>
 LayoutViewBase::cv_transform_variants_with_empty () const
 {
-  std::set< std::pair<db::DCplxTrans, int> > box_variants = cv_transform_variants ();
+  std::set<std::pair<db::DCplxTrans, int>> box_variants = cv_transform_variants ();
 
   //  add a default box variant for the CVs not present in the layer list to
   //  draw boxes at least.
@@ -6245,12 +5946,12 @@ LayoutViewBase::cv_transform_variants_with_empty () const
   cv_present.resize (m_cellviews.size ());
   for (auto bv = box_variants.begin (); bv != box_variants.end (); ++bv) {
     if (bv->second >= 0 && bv->second < int (cv_present.size ())) {
-      cv_present[bv->second] = true;
+      cv_present [bv->second] = true;
     }
   }
 
   for (auto i = cv_present.begin (); i != cv_present.end (); ++i) {
-    if (!*i) {
+    if (! *i) {
       box_variants.insert (std::make_pair (db::DCplxTrans (), int (i - cv_present.begin ())));
     }
   }
@@ -6286,14 +5987,13 @@ LayoutViewBase::ascend (int index)
         select_cell_dispatch (upath, index);
         return db::InstElement (*i);
       }
-
     }
 
     return db::InstElement ();
 
   } else {
 
-    cancel (); 
+    cancel ();
     db::InstElement ret = spath.back ();
     spath.pop_back ();
     cv.set_specific_path (spath);
@@ -6306,18 +6006,16 @@ LayoutViewBase::ascend (int index)
     update_content ();
 
     return ret;
-
   }
 }
 
-void 
-LayoutViewBase::descend (const std::vector<db::InstElement> &path, int index)
+void LayoutViewBase::descend (const std::vector<db::InstElement> &path, int index)
 {
   if (! path.empty () && index >= 0 && int (m_cellviews.size ()) > index && cellview_iter (index)->is_valid ()) {
 
     cellview_about_to_change_event (index);
 
-    cancel (); 
+    cancel ();
 
     lay::CellView::specific_cell_path_type spath (cellview_iter (index)->specific_path ());
     spath.insert (spath.end (), path.begin (), path.end ());
@@ -6329,12 +6027,10 @@ LayoutViewBase::descend (const std::vector<db::InstElement> &path, int index)
     cellview_changed (index);
 
     update_content ();
-
   }
 }
 
-bool 
-LayoutViewBase::is_editable () const
+bool LayoutViewBase::is_editable () const
 {
   return m_editable;
 }
@@ -6345,8 +6041,7 @@ LayoutViewBase::search_range ()
   return m_search_range;
 }
 
-void
-LayoutViewBase::set_search_range (unsigned int sr)
+void LayoutViewBase::set_search_range (unsigned int sr)
 {
   m_search_range = sr;
 }
@@ -6357,8 +6052,7 @@ LayoutViewBase::search_range_box ()
   return m_search_range_box;
 }
 
-void
-LayoutViewBase::set_search_range_box (unsigned int sr)
+void LayoutViewBase::set_search_range_box (unsigned int sr)
 {
   m_search_range_box = sr;
 }
@@ -6378,7 +6072,6 @@ LayoutViewBase::new_cell (int cv_index, const std::string &cell_name)
     transaction (tl::to_string (tr ("New cell")));
     new_ci = layout.add_cell (cell_name.empty () ? 0 : cell_name.c_str ());
     commit ();
-
   }
 
   return new_ci;
@@ -6393,7 +6086,7 @@ static void make_unique_name (T *object, Iter from, Iter to)
   do {
 
     bool found = n.empty ();
-    for (Iter i = from; i != to && !found; ++i) {
+    for (Iter i = from; i != to && ! found; ++i) {
       if ((*i)->name () == n) {
         found = true;
       }
@@ -6410,7 +6103,7 @@ static void make_unique_name (T *object, Iter from, Iter to)
   object->set_name (n);
 }
 
-unsigned int 
+unsigned int
 LayoutViewBase::add_l2ndb (db::LayoutToNetlist *l2ndb)
 {
   make_unique_name (l2ndb, m_l2ndbs.begin (), m_l2ndbs.end ());
@@ -6421,7 +6114,7 @@ LayoutViewBase::add_l2ndb (db::LayoutToNetlist *l2ndb)
 
   l2ndb_list_changed_event ();
 
-  return (unsigned int)(m_l2ndbs.size () - 1);
+  return (unsigned int) (m_l2ndbs.size () - 1);
 }
 
 unsigned int
@@ -6470,8 +6163,7 @@ LayoutViewBase::get_l2ndb (int index) const
   }
 }
 
-void 
-LayoutViewBase::remove_l2ndb (unsigned int index)
+void LayoutViewBase::remove_l2ndb (unsigned int index)
 {
   if (index < (unsigned int) (m_l2ndbs.size ())) {
     delete m_l2ndbs [index];
@@ -6491,7 +6183,7 @@ LayoutViewBase::add_rdb (rdb::Database *rdb)
 
   rdb_list_changed_event ();
 
-  return (unsigned int)(m_rdbs.size () - 1);
+  return (unsigned int) (m_rdbs.size () - 1);
 }
 
 unsigned int
@@ -6540,8 +6232,7 @@ LayoutViewBase::get_rdb (int index) const
   }
 }
 
-void
-LayoutViewBase::remove_rdb (unsigned int index)
+void LayoutViewBase::remove_rdb (unsigned int index)
 {
   if (index < (unsigned int) (m_rdbs.size ())) {
     delete m_rdbs [index];

@@ -39,8 +39,7 @@ namespace lay
 {
 
 struct CurrentStyleOp
-  : public db::Op
-{
+  : public db::Op {
   CurrentStyleOp (int pi, int ni)
     : db::Op (), prev_index (pi), new_index (ni)
   {
@@ -62,15 +61,15 @@ EditLineStylesForm::EditLineStylesForm (QWidget *parent, lay::LayoutViewBase *vi
 
   mp_ui->w_spin_box->setValue (32);
 
-  manager (& m_manager);
-  mp_ui->editor->manager (& m_manager);
-  m_styles.manager (& m_manager);
+  manager (&m_manager);
+  mp_ui->editor->manager (&m_manager);
+  m_styles.manager (&m_manager);
 
   update ();
 
-  connect (mp_ui->style_items, SIGNAL (currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
+  connect (mp_ui->style_items, SIGNAL (currentItemChanged (QListWidgetItem *, QListWidgetItem *)),
            this, SLOT (sel_changed (QListWidgetItem *, QListWidgetItem *)));
-  connect (mp_ui->style_items, SIGNAL (itemDoubleClicked(QListWidgetItem*)),
+  connect (mp_ui->style_items, SIGNAL (itemDoubleClicked (QListWidgetItem *)),
            this, SLOT (double_clicked (QListWidgetItem *)));
   connect (mp_ui->new_button, SIGNAL (clicked ()), this, SLOT (new_button_clicked ()));
   connect (mp_ui->delete_button, SIGNAL (clicked ()), this, SLOT (delete_button_clicked ()));
@@ -106,8 +105,7 @@ EditLineStylesForm::~EditLineStylesForm ()
   mp_ui = 0;
 }
 
-static 
-QIcon icon_from_data (const LineStyleInfo &info)
+static QIcon icon_from_data (const LineStyleInfo &info)
 {
   QBitmap bitmap = info.get_bitmap (36, 26);
   QIcon icon (bitmap);
@@ -118,18 +116,17 @@ QIcon icon_from_data (const LineStyleInfo &info)
   return icon;
 }
 
-namespace {
-  struct display_order
+namespace
+{
+struct display_order {
+  bool operator() (lay::LineStyles::iterator a, lay::LineStyles::iterator b)
   {
-    bool operator () (lay::LineStyles::iterator a, lay::LineStyles::iterator b)
-    {
-      return a->order_index () < b->order_index ();
-    }
-  };
+    return a->order_index () < b->order_index ();
+  }
+};
 }
 
-void 
-EditLineStylesForm::update ()
+void EditLineStylesForm::update ()
 {
   bool en = m_selection_changed_enabled;
   m_selection_changed_enabled = false;
@@ -138,7 +135,7 @@ EditLineStylesForm::update ()
 
   mp_ui->style_items->clear ();
 
-  std::vector <lay::LineStyles::iterator> iters;
+  std::vector<lay::LineStyles::iterator> iters;
   for (lay::LineStyles::iterator i = m_styles.begin_custom (); i != m_styles.end (); ++i) {
     iters.push_back (i);
   }
@@ -146,8 +143,8 @@ EditLineStylesForm::update ()
 
   QColor c0 = palette ().color (QPalette::Base);
   QColor c1 = palette ().color (QPalette::Text);
-  QColor cdis ((c0.red () + c1.red ()) / 2, 
-               (c0.green () + c1.green ()) / 2, 
+  QColor cdis ((c0.red () + c1.red ()) / 2,
+               (c0.green () + c1.green ()) / 2,
                (c0.blue () + c1.blue ()) / 2);
 
   //  fill the list of stipple items
@@ -159,7 +156,7 @@ EditLineStylesForm::update ()
     QListWidgetItem *item = new QListWidgetItem (icon_from_data (*i), tl::to_qstring (name), mp_ui->style_items);
     item->setForeground (cdis);
   }
-  for (std::vector <lay::LineStyles::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
+  for (std::vector<lay::LineStyles::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
     if ((*i)->order_index () > 0) {
       std::string name ((*i)->name ());
       if (name.empty ()) {
@@ -177,13 +174,12 @@ EditLineStylesForm::update ()
   m_selection_changed_enabled = en;
 }
 
-void
-EditLineStylesForm::double_clicked (QListWidgetItem *citem)
+void EditLineStylesForm::double_clicked (QListWidgetItem *citem)
 {
   lay::LineStyles::iterator i = index_of (citem);
   if (i != m_styles.end () && i >= m_styles.begin_custom ()) {
     bool ok = false;
-    QString new_name = QInputDialog::getText (this, 
+    QString new_name = QInputDialog::getText (this,
                                               QObject::tr ("Edit Style Description"),
                                               QObject::tr ("Enter new description of style"),
                                               QLineEdit::Normal, tl::to_qstring (i->name ()), &ok);
@@ -196,8 +192,7 @@ EditLineStylesForm::double_clicked (QListWidgetItem *citem)
   }
 }
 
-void 
-EditLineStylesForm::sel_changed (QListWidgetItem *, QListWidgetItem *)
+void EditLineStylesForm::sel_changed (QListWidgetItem *, QListWidgetItem *)
 {
   if (! m_selection_changed_enabled) {
     return;
@@ -212,8 +207,7 @@ EditLineStylesForm::sel_changed (QListWidgetItem *, QListWidgetItem *)
   update_current_item ();
 }
 
-void
-EditLineStylesForm::update_current_item ()
+void EditLineStylesForm::update_current_item ()
 {
   mp_ui->w_spin_box->blockSignals (true);
 
@@ -231,18 +225,16 @@ EditLineStylesForm::update_current_item ()
     mp_ui->editor->set_style (*i->pattern (), i->width ());
     bool readonly = (i < m_styles.begin_custom ());
     mp_ui->editor->set_readonly (readonly);
-    mp_ui->toolbar->setEnabled (!readonly);
+    mp_ui->toolbar->setEnabled (! readonly);
     mp_ui->w_spin_box->setValue (i->width ());
 
     m_selected = std::distance (m_styles.begin (), i);
-
   }
 
   mp_ui->w_spin_box->blockSignals (false);
 }
 
-void
-EditLineStylesForm::select_item (int index)
+void EditLineStylesForm::select_item (int index)
 {
   bool en = m_selection_changed_enabled;
   m_selection_changed_enabled = false;
@@ -256,8 +248,7 @@ EditLineStylesForm::select_item (int index)
   m_selection_changed_enabled = en;
 }
 
-void
-EditLineStylesForm::new_button_clicked ()
+void EditLineStylesForm::new_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("New style")));
@@ -265,7 +256,7 @@ EditLineStylesForm::new_button_clicked ()
 
   lay::LineStyleInfo s;
   s.set_pattern (0x55555555, 32);
-  unsigned int oi = m_styles.begin ()[m_styles.add_style (s)].order_index () - 1;
+  unsigned int oi = m_styles.begin () [m_styles.add_style (s)].order_index () - 1;
 
   update ();
   select_item (oi + std::distance (m_styles.begin (), m_styles.begin_custom ()));
@@ -275,8 +266,7 @@ EditLineStylesForm::new_button_clicked ()
   }
 }
 
-void 
-EditLineStylesForm::clone_button_clicked ()
+void EditLineStylesForm::clone_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Clone style")));
@@ -291,7 +281,7 @@ EditLineStylesForm::clone_button_clicked ()
       iempty = i;
     } else if (i->order_index () > oi) {
       oi = i->order_index ();
-    } 
+    }
   }
 
   lay::LineStyleInfo s;
@@ -310,8 +300,7 @@ EditLineStylesForm::clone_button_clicked ()
   }
 }
 
-void 
-EditLineStylesForm::delete_button_clicked ()
+void EditLineStylesForm::delete_button_clicked ()
 {
   BEGIN_PROTECTED
 
@@ -342,14 +331,12 @@ EditLineStylesForm::delete_button_clicked ()
     if (manager ()) {
       manager ()->commit ();
     }
-
   }
 
   END_PROTECTED
 }
 
-void 
-EditLineStylesForm::up_button_clicked ()
+void EditLineStylesForm::up_button_clicked ()
 {
   lay::LineStyles::iterator c = current ();
 
@@ -382,17 +369,13 @@ EditLineStylesForm::up_button_clicked ()
           }
 
           return;
-
         }
       }
-
     }
-
   }
 }
 
-void 
-EditLineStylesForm::down_button_clicked ()
+void EditLineStylesForm::down_button_clicked ()
 {
   lay::LineStyles::iterator c = current ();
 
@@ -424,23 +407,19 @@ EditLineStylesForm::down_button_clicked ()
         }
 
         return;
-
       }
     }
-
   }
 }
 
-void
-EditLineStylesForm::editor_size_changed ()
+void EditLineStylesForm::editor_size_changed ()
 {
   mp_ui->w_spin_box->blockSignals (true);
   mp_ui->w_spin_box->setValue (mp_ui->editor->sx ());
   mp_ui->w_spin_box->blockSignals (false);
 }
 
-void
-EditLineStylesForm::size_changed ()
+void EditLineStylesForm::size_changed ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Change style size")));
@@ -451,8 +430,7 @@ EditLineStylesForm::size_changed ()
   }
 }
 
-void 
-EditLineStylesForm::invert_button_clicked ()
+void EditLineStylesForm::invert_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Invert style")));
@@ -463,8 +441,7 @@ EditLineStylesForm::invert_button_clicked ()
   }
 }
 
-void 
-EditLineStylesForm::clear_button_clicked ()
+void EditLineStylesForm::clear_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Clear style")));
@@ -475,8 +452,7 @@ EditLineStylesForm::clear_button_clicked ()
   }
 }
 
-void 
-EditLineStylesForm::fliph_button_clicked ()
+void EditLineStylesForm::fliph_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Flip style")));
@@ -487,8 +463,7 @@ EditLineStylesForm::fliph_button_clicked ()
   }
 }
 
-void 
-EditLineStylesForm::sleft_button_clicked ()
+void EditLineStylesForm::sleft_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Shift left")));
@@ -499,8 +474,7 @@ EditLineStylesForm::sleft_button_clicked ()
   }
 }
 
-void 
-EditLineStylesForm::sright_button_clicked ()
+void EditLineStylesForm::sright_button_clicked ()
 {
   if (manager ()) {
     manager ()->transaction (tl::to_string (QObject::tr ("Shift right")));
@@ -511,15 +485,13 @@ EditLineStylesForm::sright_button_clicked ()
   }
 }
 
-void 
-EditLineStylesForm::undo_button_clicked ()
+void EditLineStylesForm::undo_button_clicked ()
 {
   m_manager.undo ();
   update ();
 }
 
-void 
-EditLineStylesForm::redo_button_clicked ()
+void EditLineStylesForm::redo_button_clicked ()
 {
   m_manager.redo ();
   update ();
@@ -546,12 +518,11 @@ EditLineStylesForm::index_of (QListWidgetItem *item)
   } else if (row >= 0) {
     return m_styles.begin () + row;
   }
-  
+
   return m_styles.end ();
 }
 
-void
-EditLineStylesForm::edited ()
+void EditLineStylesForm::edited ()
 {
   if (mp_ui->style_items->currentItem ()) {
 
@@ -564,14 +535,11 @@ EditLineStylesForm::edited ()
       m_styles.replace_style (std::distance (m_styles.begin (), i), info);
 
       mp_ui->style_items->currentItem ()->setIcon (icon_from_data (info));
-
     }
-
   }
 }
 
-void 
-EditLineStylesForm::handle_op (db::Op *op, bool undo)
+void EditLineStylesForm::handle_op (db::Op *op, bool undo)
 {
   CurrentStyleOp *cp_op = dynamic_cast<CurrentStyleOp *> (op);
   if (cp_op) {
@@ -584,18 +552,15 @@ EditLineStylesForm::handle_op (db::Op *op, bool undo)
     update_current_item ();
 
     m_selection_changed_enabled = true;
-
   }
 }
 
-void
-EditLineStylesForm::undo (db::Op *op)
+void EditLineStylesForm::undo (db::Op *op)
 {
   handle_op (op, true);
 }
 
-void
-EditLineStylesForm::redo (db::Op *op)
+void EditLineStylesForm::redo (db::Op *op)
 {
   handle_op (op, false);
 }

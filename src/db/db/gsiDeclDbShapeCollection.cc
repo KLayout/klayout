@@ -27,11 +27,10 @@ namespace gsi
 {
 
 Class<db::ShapeCollection> decl_dbShapeCollection ("db", "ShapeCollection",
-  gsi::Methods (),
-  "@brief A base class for the shape collections\n"
-  "This class is the common base class of \\Region, \\Edges, \\EdgePairs and \\Texts."
-  "\n"
-  "This class has been introduced in version 0.27."
-);
+                                                   gsi::Methods (),
+                                                   "@brief A base class for the shape collections\n"
+                                                   "This class is the common base class of \\Region, \\Edges, \\EdgePairs and \\Texts."
+                                                   "\n"
+                                                   "This class has been introduced in version 0.27.");
 
 }

@@ -42,7 +42,7 @@ std::string StreamFormatDeclaration::all_formats_string ()
       fmts += " ";
     }
     std::string f = rdr->file_format ();
-    if (!f.empty ()) {
+    if (! f.empty ()) {
       const char *fp = f.c_str ();
       while (*fp && *fp != '(') {
         ++fp;
@@ -57,7 +57,7 @@ std::string StreamFormatDeclaration::all_formats_string ()
   }
   fmts += ")";
   for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end (); ++rdr) {
-    if (!rdr->file_format ().empty ()) {
+    if (! rdr->file_format ().empty ()) {
       fmts += ";;";
       fmts += rdr->file_format ();
     }
@@ -75,7 +75,7 @@ tl::XMLElementList load_options_xml_element_list ()
   tl::XMLElementList elements;
 
   for (tl::Registrar<db::StreamFormatDeclaration>::iterator cls = tl::Registrar<db::StreamFormatDeclaration>::begin (); cls != tl::Registrar<db::StreamFormatDeclaration>::end (); ++cls) {
-    const db::StreamFormatDeclaration *decl = dynamic_cast <const db::StreamFormatDeclaration *> (&*cls);
+    const db::StreamFormatDeclaration *decl = dynamic_cast<const db::StreamFormatDeclaration *> (&*cls);
     if (decl) {
       elements.append (decl->xml_reader_options_element ());
     }
@@ -90,7 +90,7 @@ tl::XMLElementList save_options_xml_element_list ()
   elements.append (tl::make_member (&db::SaveLayoutOptions::format, &db::SaveLayoutOptions::set_format, "format"));
 
   for (tl::Registrar<db::StreamFormatDeclaration>::iterator cls = tl::Registrar<db::StreamFormatDeclaration>::begin (); cls != tl::Registrar<db::StreamFormatDeclaration>::end (); ++cls) {
-    const StreamFormatDeclaration *decl = dynamic_cast <const StreamFormatDeclaration *> (&*cls);
+    const StreamFormatDeclaration *decl = dynamic_cast<const StreamFormatDeclaration *> (&*cls);
     if (decl) {
       elements.append (decl->xml_writer_options_element ());
     }
@@ -100,5 +100,3 @@ tl::XMLElementList save_options_xml_element_list ()
 }
 
 }
-
-

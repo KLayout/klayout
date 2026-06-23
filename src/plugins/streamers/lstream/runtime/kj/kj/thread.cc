@@ -30,108 +30,117 @@
 #include <signal.h>
 #endif
 
-namespace kj {
+namespace kj
+{
 
 #if _WIN32
 
-Thread::Thread(Function<void()> func): state(new ThreadState(kj::mv(func))) {
-  threadHandle = CreateThread(nullptr, 0, &runThread, state, 0, nullptr);
+Thread::Thread (Function<void ()> func) : state (new ThreadState (kj::mv (func)))
+{
+  threadHandle = CreateThread (nullptr, 0, &runThread, state, 0, nullptr);
   if (threadHandle == nullptr) {
-    state->unref();
-    KJ_FAIL_ASSERT("CreateThread failed.");
+    state->unref ();
+    KJ_FAIL_ASSERT ("CreateThread failed.");
   }
 }
 
-Thread::~Thread() noexcept(false) {
-  if (!detached) {
-    KJ_DEFER(state->unref());
+Thread::~Thread () noexcept (false)
+{
+  if (! detached) {
+    KJ_DEFER (state->unref ());
 
-    KJ_ASSERT(WaitForSingleObject(threadHandle, INFINITE) != WAIT_FAILED);
+    KJ_ASSERT (WaitForSingleObject (threadHandle, INFINITE) != WAIT_FAILED);
 
-    KJ_IF_MAYBE(e, state->exception) {
-      Exception ecopy = kj::mv(*e);
-      state->exception = nullptr;  // don't complain of uncaught exception when deleting
-      kj::throwRecoverableException(kj::mv(ecopy));
+    KJ_IF_MAYBE (e, state->exception) {
+      Exception ecopy = kj::mv (*e);
+      state->exception = nullptr; // don't complain of uncaught exception when deleting
+      kj::throwRecoverableException (kj::mv (ecopy));
     }
   }
 }
 
-void Thread::detach() {
-  KJ_ASSERT(CloseHandle(threadHandle));
+void Thread::detach ()
+{
+  KJ_ASSERT (CloseHandle (threadHandle));
   detached = true;
 }
 
-#else  // _WIN32
+#else // _WIN32
 
-Thread::Thread(Function<void()> func): state(new ThreadState(kj::mv(func))) {
-  static_assert(sizeof(threadId) >= sizeof(pthread_t),
-                "pthread_t is larger than a long long on your platform.  Please port.");
+Thread::Thread (Function<void ()> func) : state (new ThreadState (kj::mv (func)))
+{
+  static_assert (sizeof (threadId) >= sizeof (pthread_t),
+                 "pthread_t is larger than a long long on your platform.  Please port.");
 
-  int pthreadResult = pthread_create(reinterpret_cast<pthread_t*>(&threadId),
-                                     nullptr, &runThread, state);
+  int pthreadResult = pthread_create (reinterpret_cast<pthread_t *> (&threadId),
+                                      nullptr, &runThread, state);
   if (pthreadResult != 0) {
-    state->unref();
-    KJ_FAIL_SYSCALL("pthread_create", pthreadResult);
+    state->unref ();
+    KJ_FAIL_SYSCALL ("pthread_create", pthreadResult);
   }
 }
 
-Thread::~Thread() noexcept(false) {
-  if (!detached) {
-    KJ_DEFER(state->unref());
+Thread::~Thread () noexcept (false)
+{
+  if (! detached) {
+    KJ_DEFER (state->unref ());
 
-    int pthreadResult = pthread_join(*reinterpret_cast<pthread_t*>(&threadId), nullptr);
+    int pthreadResult = pthread_join (*reinterpret_cast<pthread_t *> (&threadId), nullptr);
     if (pthreadResult != 0) {
-      KJ_FAIL_SYSCALL("pthread_join", pthreadResult) { break; }
+      KJ_FAIL_SYSCALL ("pthread_join", pthreadResult) { break; }
     }
 
-    KJ_IF_MAYBE(e, state->exception) {
-      Exception ecopy = kj::mv(*e);
-      state->exception = nullptr;  // don't complain of uncaught exception when deleting
-      kj::throwRecoverableException(kj::mv(ecopy));
+    KJ_IF_MAYBE (e, state->exception) {
+      Exception ecopy = kj::mv (*e);
+      state->exception = nullptr; // don't complain of uncaught exception when deleting
+      kj::throwRecoverableException (kj::mv (ecopy));
     }
   }
 }
 
-void Thread::sendSignal(int signo) {
-  int pthreadResult = pthread_kill(*reinterpret_cast<pthread_t*>(&threadId), signo);
+void Thread::sendSignal (int signo)
+{
+  int pthreadResult = pthread_kill (*reinterpret_cast<pthread_t *> (&threadId), signo);
   if (pthreadResult != 0) {
-    KJ_FAIL_SYSCALL("pthread_kill", pthreadResult) { break; }
+    KJ_FAIL_SYSCALL ("pthread_kill", pthreadResult) { break; }
   }
 }
 
-void Thread::detach() {
-  int pthreadResult = pthread_detach(*reinterpret_cast<pthread_t*>(&threadId));
+void Thread::detach ()
+{
+  int pthreadResult = pthread_detach (*reinterpret_cast<pthread_t *> (&threadId));
   if (pthreadResult != 0) {
-    KJ_FAIL_SYSCALL("pthread_detach", pthreadResult) { break; }
+    KJ_FAIL_SYSCALL ("pthread_detach", pthreadResult) { break; }
   }
   detached = true;
-  state->unref();
+  state->unref ();
 }
 
-#endif  // _WIN32, else
+#endif // _WIN32, else
 
-Thread::ThreadState::ThreadState(Function<void()> func)
-    : func(kj::mv(func)),
-      initializer(getExceptionCallback().getThreadInitializer()),
-      exception(nullptr),
-      refcount(2) {}
+Thread::ThreadState::ThreadState (Function<void ()> func)
+  : func (kj::mv (func)),
+    initializer (getExceptionCallback ().getThreadInitializer ()),
+    exception (nullptr),
+    refcount (2) {}
 
-void Thread::ThreadState::unref() {
-#if _MSC_VER && !defined(__clang__)
-  if (_InterlockedDecrement(&refcount) == 0) {
+void Thread::ThreadState::unref ()
+{
+#if _MSC_VER && ! defined(__clang__)
+  if (_InterlockedDecrement (&refcount) == 0) {
 #else
-  if (__atomic_sub_fetch(&refcount, 1, __ATOMIC_RELEASE) == 0) {
-    __atomic_thread_fence(__ATOMIC_ACQUIRE);
+  if (__atomic_sub_fetch (&refcount, 1, __ATOMIC_RELEASE) == 0) {
+    __atomic_thread_fence (__ATOMIC_ACQUIRE);
 #endif
 
-    KJ_IF_MAYBE(e, exception) {
+    KJ_IF_MAYBE (e, exception) {
       // If the exception is still present in ThreadState, this must be a detached thread, so
       // the exception will never be rethrown. We should at least log it.
       //
       // We need to run the thread initializer again before we log anything because the main
       // purpose of the thread initializer is to set up a logging callback.
-      initializer([&]() {
-        KJ_LOG(ERROR, "uncaught exception thrown by detached thread", *e);
+      initializer ([&] () {
+        KJ_LOG (ERROR, "uncaught exception thrown by detached thread", *e);
       });
     }
 
@@ -140,18 +149,20 @@ void Thread::ThreadState::unref() {
 }
 
 #if _WIN32
-DWORD Thread::runThread(void* ptr) {
+DWORD Thread::runThread (void *ptr)
+{
 #else
-void* Thread::runThread(void* ptr) {
+void *Thread::runThread (void *ptr)
+{
 #endif
-  ThreadState* state = reinterpret_cast<ThreadState*>(ptr);
-  KJ_IF_MAYBE(exception, kj::runCatchingExceptions([&]() {
-    state->initializer(kj::mv(state->func));
-  })) {
-    state->exception = kj::mv(*exception);
+  ThreadState *state = reinterpret_cast<ThreadState *> (ptr);
+  KJ_IF_MAYBE (exception, kj::runCatchingExceptions ([&] () {
+                 state->initializer (kj::mv (state->func));
+               })) {
+    state->exception = kj::mv (*exception);
   }
-  state->unref();
+  state->unref ();
   return 0;
 }
 
-}  // namespace kj
+} // namespace kj

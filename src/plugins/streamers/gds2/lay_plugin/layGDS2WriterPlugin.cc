@@ -51,8 +51,7 @@ GDS2WriterOptionPage::~GDS2WriterOptionPage ()
   mp_ui = 0;
 }
 
-void 
-GDS2WriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
+void GDS2WriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
 {
   const db::GDS2WriterOptions *options = dynamic_cast<const db::GDS2WriterOptions *> (o);
   if (options) {
@@ -69,8 +68,7 @@ GDS2WriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db:
   }
 }
 
-void 
-GDS2WriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool /*gzip*/)
+void GDS2WriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool /*gzip*/)
 {
   db::GDS2WriterOptions *options = dynamic_cast<db::GDS2WriterOptions *> (o);
   if (options) {
@@ -116,12 +114,10 @@ GDS2WriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Tech
       throw tl::Exception (tl::to_string (QObject::tr ("Maximum cell name length must be 8 at least")));
     }
     options->max_cellname_length = n;
-
   }
 }
 
-void 
-GDS2WriterOptionPage::multi_xy_clicked ()
+void GDS2WriterOptionPage::multi_xy_clicked ()
 {
   mp_ui->max_vertex_le->setEnabled (! mp_ui->multi_xy_cbx->isChecked ());
 }
@@ -129,7 +125,8 @@ GDS2WriterOptionPage::multi_xy_clicked ()
 // ---------------------------------------------------------------
 //  GDS2WriterPluginDeclaration definition and implementation
 
-namespace {
+namespace
+{
 
 class GDS2WriterPluginDeclarationBase
   : public StreamWriterPluginDeclaration

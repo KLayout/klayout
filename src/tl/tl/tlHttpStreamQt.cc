@@ -20,7 +20,7 @@
 
 */
 
-#if defined(HAVE_QT) && !defined(HAVE_CURL)
+#if defined(HAVE_QT) && ! defined(HAVE_CURL)
 
 #include "tlHttpStream.h"
 #include "tlHttpStreamQt.h"
@@ -57,15 +57,13 @@ AuthenticationHandler::AuthenticationHandler ()
   //  .. nothing yet ..
 }
 
-void
-AuthenticationHandler::reset ()
+void AuthenticationHandler::reset ()
 {
   m_retry = 0;
   m_proxy_retry = 0;
 }
 
-void
-AuthenticationHandler::authenticationRequired (QNetworkReply *reply, QAuthenticator *auth)
+void AuthenticationHandler::authenticationRequired (QNetworkReply *reply, QAuthenticator *auth)
 {
   if (sp_credential_provider.get ()) {
 
@@ -89,14 +87,11 @@ AuthenticationHandler::authenticationRequired (QNetworkReply *reply, QAuthentica
         auth->setPassword (tl::to_qstring (passwd));
         auth->setUser (tl::to_qstring (user));
       }
-
     }
-
   }
 }
 
-void
-AuthenticationHandler::proxyAuthenticationRequired (const QNetworkProxy &proxy, QAuthenticator *auth)
+void AuthenticationHandler::proxyAuthenticationRequired (const QNetworkProxy &proxy, QAuthenticator *auth)
 {
   if (sp_credential_provider.get ()) {
 
@@ -120,9 +115,7 @@ AuthenticationHandler::proxyAuthenticationRequired (const QNetworkProxy &proxy, 
         auth->setPassword (tl::to_qstring (passwd));
         auth->setUser (tl::to_qstring (user));
       }
-
     }
-
   }
 }
 
@@ -141,44 +134,37 @@ InputHttpStream::~InputHttpStream ()
   mp_data = 0;
 }
 
-void
-InputHttpStream::set_credential_provider (HttpCredentialProvider *cp)
+void InputHttpStream::set_credential_provider (HttpCredentialProvider *cp)
 {
   sp_credential_provider.reset (cp);
 }
 
-void
-InputHttpStream::send ()
+void InputHttpStream::send ()
 {
   mp_data->send ();
 }
 
-void
-InputHttpStream::close ()
+void InputHttpStream::close ()
 {
   mp_data->close ();
 }
 
-void
-InputHttpStream::set_request (const char *r)
+void InputHttpStream::set_request (const char *r)
 {
   mp_data->set_request (r);
 }
 
-void
-InputHttpStream::set_data (const char *data)
+void InputHttpStream::set_data (const char *data)
 {
   mp_data->set_data (data);
 }
 
-void
-InputHttpStream::set_data (const char *data, size_t n)
+void InputHttpStream::set_data (const char *data, size_t n)
 {
   mp_data->set_data (data, n);
 }
 
-void
-InputHttpStream::add_header (const std::string &name, const std::string &value)
+void InputHttpStream::add_header (const std::string &name, const std::string &value)
 {
   mp_data->add_header (name, value);
 }
@@ -189,8 +175,7 @@ InputHttpStream::ready ()
   return mp_data->ready ();
 }
 
-bool
-InputHttpStream::data_available ()
+bool InputHttpStream::data_available ()
 {
   return mp_data->data_available ();
 }
@@ -201,8 +186,7 @@ InputHttpStream::read (char *b, size_t n)
   return mp_data->read (b, n);
 }
 
-void
-InputHttpStream::reset ()
+void InputHttpStream::reset ()
 {
   mp_data->reset ();
 }
@@ -225,14 +209,12 @@ InputHttpStream::filename () const
   return mp_data->filename ();
 }
 
-bool
-InputHttpStream::is_available ()
+bool InputHttpStream::is_available ()
 {
   return true;
 }
 
-void
-InputHttpStream::tick ()
+void InputHttpStream::tick ()
 {
   if (mp_callback) {
     mp_callback->wait_for_input ();
@@ -240,8 +222,7 @@ InputHttpStream::tick ()
   QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
 }
 
-void
-InputHttpStream::set_timeout (double to)
+void InputHttpStream::set_timeout (double to)
 {
   mp_data->set_timeout (to);
 }
@@ -267,13 +248,12 @@ InputHttpStreamPrivateData::InputHttpStreamPrivateData (InputHttpStream *stream,
     s_auth_handler = new AuthenticationHandler ();
     connect (s_network_manager, SIGNAL (authenticationRequired (QNetworkReply *, QAuthenticator *)), s_auth_handler, SLOT (authenticationRequired (QNetworkReply *, QAuthenticator *)));
     connect (s_network_manager, SIGNAL (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)), s_auth_handler, SLOT (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)));
-#if !defined(QT_NO_SSL)
+#if ! defined(QT_NO_SSL)
     connect (s_network_manager, SIGNAL (sslErrors (QNetworkReply *, const QList<QSslError> &)), this, SLOT (sslErrors (QNetworkReply *, const QList<QSslError> &)));
 #endif
 
     tl::StaticObjects::reg (&s_network_manager);
     tl::StaticObjects::reg (&s_auth_handler);
-
   }
 
   connect (s_network_manager, SIGNAL (finished (QNetworkReply *)), this, SLOT (finished (QNetworkReply *)));
@@ -285,8 +265,7 @@ InputHttpStreamPrivateData::~InputHttpStreamPrivateData ()
   close ();
 }
 
-void
-InputHttpStreamPrivateData::set_timeout (double to)
+void InputHttpStreamPrivateData::set_timeout (double to)
 {
   m_timeout = to;
 }
@@ -297,8 +276,7 @@ InputHttpStreamPrivateData::timeout () const
   return m_timeout;
 }
 
-void
-InputHttpStreamPrivateData::close ()
+void InputHttpStreamPrivateData::close ()
 {
   if (mp_active_reply.get ()) {
     QNetworkReply *reply = mp_active_reply.release ();
@@ -308,44 +286,38 @@ InputHttpStreamPrivateData::close ()
   mp_reply = 0;
 }
 
-void
-InputHttpStreamPrivateData::set_request (const char *r)
+void InputHttpStreamPrivateData::set_request (const char *r)
 {
   m_request = QByteArray (r);
 }
 
-void
-InputHttpStreamPrivateData::set_data (const char *data)
+void InputHttpStreamPrivateData::set_data (const char *data)
 {
   m_data = QByteArray (data);
 }
 
-void
-InputHttpStreamPrivateData::set_data (const char *data, size_t n)
+void InputHttpStreamPrivateData::set_data (const char *data, size_t n)
 {
   m_data = QByteArray (data, int (n));
 }
 
-void
-InputHttpStreamPrivateData::add_header (const std::string &name, const std::string &value)
+void InputHttpStreamPrivateData::add_header (const std::string &name, const std::string &value)
 {
   m_headers.insert (std::make_pair (name, value));
 }
 
-void
-InputHttpStreamPrivateData::resend ()
+void InputHttpStreamPrivateData::resend ()
 {
   issue_request (QUrl (tl::to_qstring (m_url)));
 }
 
-void
-InputHttpStreamPrivateData::finished (QNetworkReply *reply)
+void InputHttpStreamPrivateData::finished (QNetworkReply *reply)
 {
   if (reply != mp_active_reply.get ()) {
     return;
   }
 
-  if (tl::verbosity() >= 40) {
+  if (tl::verbosity () >= 40) {
 #if QT_VERSION >= 0x40800
     const QList<QNetworkReply::RawHeaderPair> &raw_headers = reply->rawHeaderPairs ();
     for (QList<QNetworkReply::RawHeaderPair>::const_iterator h = raw_headers.begin (); h != raw_headers.end (); ++h) {
@@ -358,7 +330,7 @@ InputHttpStreamPrivateData::finished (QNetworkReply *reply)
   if (reply->error () == QNetworkReply::NoError && ! redirect_target.isNull ()) {
 
     m_url = tl::to_string (redirect_target.toString ());
-    if (tl::verbosity() >= 30) {
+    if (tl::verbosity () >= 30) {
       tl::info << "HTTP redirect to: " << m_url;
     }
 
@@ -372,12 +344,10 @@ InputHttpStreamPrivateData::finished (QNetworkReply *reply)
 
     mp_reply = reply;
     m_ready ();
-
   }
 }
 
-void
-InputHttpStreamPrivateData::issue_request (const QUrl &url)
+void InputHttpStreamPrivateData::issue_request (const QUrl &url)
 {
   delete mp_buffer;
   mp_buffer = 0;
@@ -391,7 +361,7 @@ InputHttpStreamPrivateData::issue_request (const QUrl &url)
   s_auth_handler->reset ();
 
   QNetworkRequest request (url);
-  if (tl::verbosity() >= 30) {
+  if (tl::verbosity () >= 30) {
     tl::info << "HTTP request URL: " << url.toString ().toUtf8 ().constData ();
   }
   for (std::map<std::string, std::string>::const_iterator h = m_headers.begin (); h != m_headers.end (); ++h) {
@@ -406,7 +376,7 @@ InputHttpStreamPrivateData::issue_request (const QUrl &url)
 #endif
 #endif
 
-  if (tl::verbosity() >= 40) {
+  if (tl::verbosity () >= 40) {
     tl::info << "HTTP request: " << m_request.constData ();
     const QList<QByteArray> &raw_headers = request.rawHeaderList ();
     for (QList<QByteArray>::const_iterator h = raw_headers.begin (); h != raw_headers.end (); ++h) {
@@ -424,7 +394,7 @@ InputHttpStreamPrivateData::issue_request (const QUrl &url)
   if (m_data.isEmpty ()) {
     mp_active_reply.reset (s_network_manager->sendCustomRequest (request, m_request));
   } else {
-    if (tl::verbosity() >= 40) {
+    if (tl::verbosity () >= 40) {
       tl::info << "HTTP request data: " << m_data.constData ();
     }
     mp_buffer = new QBuffer (&m_data);
@@ -433,8 +403,7 @@ InputHttpStreamPrivateData::issue_request (const QUrl &url)
 #endif
 }
 
-void
-InputHttpStreamPrivateData::send ()
+void InputHttpStreamPrivateData::send ()
 {
   if (mp_reply == 0) {
     issue_request (QUrl (tl::to_qstring (m_url)));
@@ -462,7 +431,6 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
     //  the time spent there.
     tl::msleep (tick_ms);
     time_waited += tick_ms * 1e-3;
-
   }
 
   if (! mp_reply) {
@@ -470,7 +438,7 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
     //  Reason for this may be HTTPS initialization failure (OpenSSL)
 
     std::string em = tl::sprintf (tl::to_string (QObject::tr ("Request creation failed (timeout is %.1fs)")), m_timeout);
-    if (tl::verbosity() >= 30) {
+    if (tl::verbosity () >= 30) {
       tl::info << "HTTP request creation failed";
     }
 
@@ -480,7 +448,7 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
 
     //  throw an error
     std::string em = tl::to_string (mp_reply->attribute (QNetworkRequest::HttpReasonPhraseAttribute).toString ());
-    if (tl::verbosity() >= 30) {
+    if (tl::verbosity () >= 30) {
       tl::info << "HTTP response error: " << em;
     }
 
@@ -519,20 +487,18 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
     QByteArray data = mp_reply->readAll ();
 
     throw HttpErrorException (em, ec, tl::to_string (mp_reply->url ().toString ()), tl::to_string (data.constData (), (int) data.size ()));
-
   }
 
   QByteArray data = mp_reply->read (n);
   memcpy (b, data.constData (), data.size ());
-  if (tl::verbosity() >= 40) {
+  if (tl::verbosity () >= 40) {
     tl::info << "HTTP response data read: " << data.constData ();
   }
   return data.size ();
 }
 
-#if !defined(QT_NO_SSL)
-void
-InputHttpStreamPrivateData::sslErrors (QNetworkReply *, const QList<QSslError> &errors)
+#if ! defined(QT_NO_SSL)
+void InputHttpStreamPrivateData::sslErrors (QNetworkReply *, const QList<QSslError> &errors)
 {
   //  log SSL errors
   for (QList<QSslError>::const_iterator e = errors.begin (); e != errors.end (); ++e) {
@@ -546,8 +512,7 @@ InputHttpStreamPrivateData::sslErrors (QNetworkReply *, const QList<QSslError> &
 }
 #endif
 
-void
-InputHttpStreamPrivateData::reset ()
+void InputHttpStreamPrivateData::reset ()
 {
   throw tl::Exception (tl::to_string (QObject::tr ("'reset' is not supported on HTTP input streams")));
 }
@@ -561,4 +526,3 @@ InputHttpStreamPrivateData::filename () const
 }
 
 #endif
-

@@ -38,7 +38,8 @@
 
 #include <algorithm>
 
-namespace lay {
+namespace lay
+{
 
 // --------------------------------------------------------------------
 //  EmptyWithinViewCache implementation
@@ -48,16 +49,14 @@ EmptyWithinViewCache::EmptyWithinViewCache ()
   //  .. nothing yet ..
 }
 
-void
-EmptyWithinViewCache::clear ()
+void EmptyWithinViewCache::clear ()
 {
-  m_cache.clear();
+  m_cache.clear ();
 }
 
-bool
-EmptyWithinViewCache::is_empty_within_view (const db::Layout *layout, unsigned int cell_index, const db::Box &box, unsigned int layer)
+bool EmptyWithinViewCache::is_empty_within_view (const db::Layout *layout, unsigned int cell_index, const db::Box &box, unsigned int layer)
 {
-  std::pair<cache_t::iterator, bool> c = m_cache.insert (std::make_pair(std::make_pair(std::make_pair(layout, cell_index), box), std::set<unsigned int> ()));
+  std::pair<cache_t::iterator, bool> c = m_cache.insert (std::make_pair (std::make_pair (std::make_pair (layout, cell_index), box), std::set<unsigned int> ()));
   if (c.second) {
 
     tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (QObject::tr ("Recomputing layers with shapes in view")));
@@ -65,7 +64,7 @@ EmptyWithinViewCache::is_empty_within_view (const db::Layout *layout, unsigned i
     const db::Cell &cell (layout->cell (cell_index));
 
     //  determine layers with shapes on the given layout and within the given box
-    std::vector <unsigned int> ll;
+    std::vector<unsigned int> ll;
     for (db::Layout::layer_iterator l = layout->begin_layers (); l != layout->end_layers (); ++l) {
       if (cell.bbox ((*l).first).empty ()) {
         c.first->second.insert ((*l).first);
@@ -77,18 +76,16 @@ EmptyWithinViewCache::is_empty_within_view (const db::Layout *layout, unsigned i
     }
 
     m_cells_done.resize (layout->cells (), false);
-    determine_empty_layers(layout, cell_index, box, ll);
+    determine_empty_layers (layout, cell_index, box, ll);
     m_cells_done = std::vector<bool> ();
 
     c.first->second.insert (ll.begin (), ll.end ());
-
   }
 
-  return c.first->second.find(layer) != c.first->second.end();
+  return c.first->second.find (layer) != c.first->second.end ();
 }
 
-void 
-EmptyWithinViewCache::determine_empty_layers (const db::Layout *layout, unsigned int cell_index, const db::Box &box, std::vector<unsigned int> &layers)
+void EmptyWithinViewCache::determine_empty_layers (const db::Layout *layout, unsigned int cell_index, const db::Box &box, std::vector<unsigned int> &layers)
 {
   if (layers.empty ()) {
     return;
@@ -108,7 +105,7 @@ EmptyWithinViewCache::determine_empty_layers (const db::Layout *layout, unsigned
 
       if (inst->bbox (bc).inside (box)) {
 
-        //  The instance is fully inside the search box: remove the non-empty layers from the 
+        //  The instance is fully inside the search box: remove the non-empty layers from the
         //  list and mark the cell as "done".
         std::vector<unsigned int>::iterator lw = layers.begin ();
         for (std::vector<unsigned int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
@@ -141,7 +138,7 @@ EmptyWithinViewCache::determine_empty_layers (const db::Layout *layout, unsigned
 
         if (! ll.empty ()) {
 
-          db::CellInstArray::iterator inst_array = inst->cell_inst ().begin_touching (box, bc); 
+          db::CellInstArray::iterator inst_array = inst->cell_inst ().begin_touching (box, bc);
           while (! inst_array.at_end () && ! ll.empty ()) {
 
             db::Box new_box = db::Box (inst->complex_trans (*inst_array).inverted () * box);
@@ -158,20 +155,15 @@ EmptyWithinViewCache::determine_empty_layers (const db::Layout *layout, unsigned
             determine_empty_layers (layout, inst->cell_index (), new_box, ll);
 
             ++inst_array;
-
           }
 
           //  Join the lists of remaining layers
           layers.insert (layers.end (), ll.begin (), ll.end ());
-
         }
-
       }
-
     }
 
     ++inst;
-
   }
 }
 
@@ -179,7 +171,7 @@ EmptyWithinViewCache::determine_empty_layers (const db::Layout *layout, unsigned
 //  LayerTreeModel implementation
 
 LayerTreeModel::LayerTreeModel (QWidget *parent, lay::LayoutViewBase *view)
-  : QAbstractItemModel (parent), 
+  : QAbstractItemModel (parent),
     mp_parent (parent), mp_view (view), m_filter_mode (false), m_id_start (0), m_id_end (0),
     m_phase ((unsigned int) -1),
     m_test_shapes_in_view (false), m_hide_empty_layers (false)
@@ -192,34 +184,29 @@ LayerTreeModel::~LayerTreeModel ()
   // .. nothing yet ..
 }
 
-void
-LayerTreeModel::set_phase (unsigned int ph)
+void LayerTreeModel::set_phase (unsigned int ph)
 {
   m_phase = ph;
 }
 
-void 
-LayerTreeModel::set_font (const QFont &font)
+void LayerTreeModel::set_font (const QFont &font)
 {
   m_font = font;
   signal_data_changed ();
 }
 
-void
-LayerTreeModel::set_font_no_signal (const QFont &font)
+void LayerTreeModel::set_font_no_signal (const QFont &font)
 {
   m_font = font;
 }
 
-void
-LayerTreeModel::set_text_color (QColor color)
+void LayerTreeModel::set_text_color (QColor color)
 {
   m_text_color = color;
   signal_data_changed ();
 }
 
-void
-LayerTreeModel::set_test_shapes_in_view (bool f)
+void LayerTreeModel::set_test_shapes_in_view (bool f)
 {
   if (m_test_shapes_in_view != f) {
     m_test_shapes_in_view = f;
@@ -230,8 +217,7 @@ LayerTreeModel::set_test_shapes_in_view (bool f)
   }
 }
 
-void
-LayerTreeModel::set_hide_empty_layers (bool f)
+void LayerTreeModel::set_hide_empty_layers (bool f)
 {
   if (m_hide_empty_layers != f) {
     m_hide_empty_layers = f;
@@ -240,8 +226,7 @@ LayerTreeModel::set_hide_empty_layers (bool f)
   }
 }
 
-void
-LayerTreeModel::set_filter_mode (bool f)
+void LayerTreeModel::set_filter_mode (bool f)
 {
   if (f != m_filter_mode) {
     m_filter_mode = f;
@@ -249,33 +234,30 @@ LayerTreeModel::set_filter_mode (bool f)
   }
 }
 
-void 
-LayerTreeModel::set_background_color (QColor background)
+void LayerTreeModel::set_background_color (QColor background)
 {
   m_background_color = background;
   signal_data_changed ();
 }
 
-Qt::ItemFlags 
+Qt::ItemFlags
 LayerTreeModel::flags (const QModelIndex &index) const
 {
   return QAbstractItemModel::flags (index);
 }
 
-int 
-LayerTreeModel::columnCount (const QModelIndex &) const 
+int LayerTreeModel::columnCount (const QModelIndex &) const
 {
   return 2;
 }
 
-QVariant 
+QVariant
 LayerTreeModel::headerData (int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const
 {
   return QVariant ();
 }
 
-int 
-LayerTreeModel::rowCount (const QModelIndex &parent) const 
+int LayerTreeModel::rowCount (const QModelIndex &parent) const
 {
   if (mp_view->layer_model_updated ()) {
 
@@ -296,8 +278,8 @@ LayerTreeModel::rowCount (const QModelIndex &parent) const
   }
 }
 
-QModelIndex 
-LayerTreeModel::index (int row, int column, const QModelIndex &parent) const 
+QModelIndex
+LayerTreeModel::index (int row, int column, const QModelIndex &parent) const
 {
   if (row >= 0 && row < rowCount (parent)) {
     if (parent.isValid ()) {
@@ -319,8 +301,7 @@ LayerTreeModel::index (int row, int column, const QModelIndex &parent) const
   }
 }
 
-void
-LayerTreeModel::clear_locate ()
+void LayerTreeModel::clear_locate ()
 {
   m_selected_indexes.clear ();
   m_current_index = m_selected_indexes.begin ();
@@ -361,8 +342,7 @@ LayerTreeModel::locate_prev ()
   }
 }
 
-void
-LayerTreeModel::search_children (const tl::GlobPattern &pattern, const QModelIndex &parent, bool recurse)
+void LayerTreeModel::search_children (const tl::GlobPattern &pattern, const QModelIndex &parent, bool recurse)
 {
   int children = rowCount (parent);
   for (int i = 0; i < children; ++i) {
@@ -370,7 +350,7 @@ LayerTreeModel::search_children (const tl::GlobPattern &pattern, const QModelInd
     QModelIndex child = index (i, 0, parent);
 
     lay::LayerPropertiesConstIterator iter (iterator (child));
-    if (!iter.is_null () && !iter.at_end () &&
+    if (! iter.is_null () && ! iter.at_end () &&
         pattern.match (iter->display_string (mp_view, true /*real*/))) {
       m_selected_indexes.push_back (child);
     }
@@ -378,7 +358,6 @@ LayerTreeModel::search_children (const tl::GlobPattern &pattern, const QModelInd
     if (recurse && iter->has_children ()) {
       search_children (pattern, child, recurse);
     }
-
   }
 }
 
@@ -389,10 +368,10 @@ LayerTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive
 
   tl::GlobPattern p = tl::GlobPattern (std::string (name));
   p.set_case_sensitive (case_sensitive);
-  p.set_exact (!glob_pattern);
+  p.set_exact (! glob_pattern);
   p.set_header_match (true);
 
-  search_children (p, QModelIndex (), !top_only);
+  search_children (p, QModelIndex (), ! top_only);
 
   m_selected_ids.clear ();
   for (std::vector<QModelIndex>::const_iterator i = m_selected_indexes.begin (); i != m_selected_indexes.end (); ++i) {
@@ -413,30 +392,27 @@ LayerTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive
   }
 }
 
-void 
-LayerTreeModel::signal_data_changed () 
+void LayerTreeModel::signal_data_changed ()
 {
   m_test_shapes_cache.clear ();
   emit dataChanged (upperLeft (), bottomRight ());
 }
 
-void 
-LayerTreeModel::signal_begin_layer_changed () 
+void LayerTreeModel::signal_begin_layer_changed ()
 {
   m_id_start = m_id_end; // means: model is invalid
   m_test_shapes_cache.clear ();
   emit layoutAboutToBeChanged ();
 }
 
-void 
-LayerTreeModel::signal_layers_changed ()
+void LayerTreeModel::signal_layers_changed ()
 {
   //  establish a new range of valid iterator indices
-  m_id_start = m_id_end; 
+  m_id_start = m_id_end;
 
   //  TODO: is there a more efficient way to compute that?
   size_t max_id = 0;
-  for (lay::LayerPropertiesConstIterator iter = mp_view->get_properties(); ! iter.at_end (); ++iter) {
+  for (lay::LayerPropertiesConstIterator iter = mp_view->get_properties (); ! iter.at_end (); ++iter) {
     max_id = std::max (iter.uint (), max_id);
   }
   m_id_end += max_id + 1;
@@ -482,7 +458,7 @@ LayerTreeModel::bottomRight () const
     int n = int (mp_view->get_properties ().end_const () - mp_view->get_properties ().begin_const ()) - 1;
     iter.next_sibling (n);
 
-    //  navigate to the last child 
+    //  navigate to the last child
     QModelIndex p = createIndex (n, 1, (void *) (iter.uint () + m_id_start));
     int nr = 0;
     while (p.isValid () && (nr = rowCount (p)) > 0) {
@@ -495,8 +471,8 @@ LayerTreeModel::bottomRight () const
   }
 }
 
-QModelIndex 
-LayerTreeModel::parent (const QModelIndex &index) const 
+QModelIndex
+LayerTreeModel::parent (const QModelIndex &index) const
 {
   try {
 
@@ -519,15 +495,14 @@ LayerTreeModel::parent (const QModelIndex &index) const
     }
 
   } catch (tl::Exception &ex) {
-    //  this can happen because some internal indices might not be in place properly - in particular the 
+    //  this can happen because some internal indices might not be in place properly - in particular the
     //  element the mouse was over (hover index)
     tl::warn << ex.msg ();
     return QModelIndex ();
   }
 }
 
-bool
-LayerTreeModel::is_hidden (const QModelIndex &index) const
+bool LayerTreeModel::is_hidden (const QModelIndex &index) const
 {
   if (m_filter_mode && ! m_selected_ids.empty () && m_selected_ids.find (size_t (index.internalPointer ())) == m_selected_ids.end ()) {
     return true;
@@ -542,8 +517,7 @@ LayerTreeModel::is_hidden (const QModelIndex &index) const
   }
 }
 
-bool 
-LayerTreeModel::empty_predicate (const QModelIndex &index) const
+bool LayerTreeModel::empty_predicate (const QModelIndex &index) const
 {
   lay::LayerPropertiesConstIterator iter (iterator (index));
   if (iter.is_null () || iter.at_end ()) {
@@ -556,8 +530,7 @@ LayerTreeModel::empty_predicate (const QModelIndex &index) const
   }
 }
 
-bool 
-LayerTreeModel::empty_within_view_predicate (const QModelIndex &index) const
+bool LayerTreeModel::empty_within_view_predicate (const QModelIndex &index) const
 {
   lay::LayerPropertiesConstIterator iter (iterator (index));
   if (iter.is_null () || iter.at_end ()) {
@@ -591,18 +564,17 @@ LayerTreeModel::empty_within_view_predicate (const QModelIndex &index) const
 
     for (std::vector<db::DCplxTrans>::const_iterator t = trans.begin (); t != trans.end (); ++t) {
 
-      db::CplxTrans ct = vp_trans * *t * db::CplxTrans(layout.dbu ()) * ctx_trans;
+      db::CplxTrans ct = vp_trans * *t * db::CplxTrans (layout.dbu ()) * ctx_trans;
 
       // the following scheme to compute the region avoids problems with accessing designs through very large viewports:
       db::Coord lim = std::numeric_limits<db::Coord>::max ();
       db::DBox world (ct * db::Box (db::Point (-lim, -lim), db::Point (lim, lim)));
       db::Box region = ct.inverted () * (world & db::DBox (db::DPoint (0.0, 0.0), db::DPoint (width, height)));
-      region &= cell.bbox (); 
+      region &= cell.bbox ();
 
       if (! m_test_shapes_cache.is_empty_within_view (&layout, ci, region, layer_id)) {
         return false;
       }
-
     }
 
     return true;
@@ -616,12 +588,10 @@ LayerTreeModel::empty_within_view_predicate (const QModelIndex &index) const
 
     //  Other special purpose layers are always visible
     return false;
-
   }
 }
 
-QIcon
-LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutViewBase *view, unsigned int w, unsigned int h, double dpr, unsigned int di_off, bool no_state)
+QIcon LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutViewBase *view, unsigned int w, unsigned int h, double dpr, unsigned int di_off, bool no_state)
 {
   QImage img = view->icon_for_layer (iter, w, h, dpr, di_off, no_state).to_image_copy ();
   QPixmap pixmap = QPixmap::fromImage (std::move (img));
@@ -631,15 +601,14 @@ LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, l
   return QIcon (pixmap);
 }
 
-QSize
-LayerTreeModel::icon_size () const
+QSize LayerTreeModel::icon_size () const
 {
   unsigned int is = ((QFontInfo (m_font).pixelSize () + 15) / 16) * 16;
   return QSize (is * 2, is);
 }
 
-QVariant 
-LayerTreeModel::data (const QModelIndex &index, int role) const 
+QVariant
+LayerTreeModel::data (const QModelIndex &index, int role) const
 {
   if (mp_view->layer_model_updated ()) {
 
@@ -672,7 +641,7 @@ LayerTreeModel::data (const QModelIndex &index, int role) const
         unsigned int di_off = 0;
         if (iter->animation (true)) {
           if (iter->animation (true) == 1) {
-            // scrolling 
+            // scrolling
             di_off += m_phase;
           } else if (iter->animation (true) == 2) {
             // blinking
@@ -695,7 +664,6 @@ LayerTreeModel::data (const QModelIndex &index, int role) const
         } else {
           return QVariant (QIcon ());
         }
-
       }
 
     } else if (role == Qt::BackgroundRole) {
@@ -733,17 +701,14 @@ LayerTreeModel::data (const QModelIndex &index, int role) const
         } else {
           return QVariant (empty ? c0 : c1);
         }
-
       }
-
-    } 
-
+    }
   }
 
   return QVariant ();
 }
 
-lay::LayerPropertiesConstIterator 
+lay::LayerPropertiesConstIterator
 LayerTreeModel::iterator (const QModelIndex &index) const
 {
   if (index.isValid ()) {
@@ -775,7 +740,7 @@ LayerTreeModel::index (lay::LayerPropertiesConstIterator iter, int column) const
   try {
 
     std::vector<int> rows;
-    
+
     while (! iter.is_null ()) {
       rows.push_back (int (iter.child_index ()));
       iter = iter.parent ();

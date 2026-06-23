@@ -32,12 +32,14 @@ namespace tl
 /**
  *  @brief A general "true" tag
  */
-struct true_tag { };
+struct true_tag {
+};
 
 /**
  *  @brief A general "false" tag
  */
-struct false_tag { };
+struct false_tag {
+};
 
 /**
  *  @brief Convert a boolean value to a type
@@ -46,14 +48,12 @@ template <bool>
 struct boolean_value;
 
 template <>
-struct boolean_value<true>
-{
+struct boolean_value<true> {
   typedef true_tag value;
 };
 
 template <>
-struct boolean_value<false>
-{
+struct boolean_value<false> {
   typedef false_tag value;
 };
 
@@ -78,8 +78,7 @@ template <typename T> static __yes_type &__test_to_variant_func (decltype (&T::t
 template <typename> static __no_type &__test_to_variant_func (...);
 
 template <typename T>
-struct has_to_variant
-{
+struct has_to_variant {
   static constexpr bool value = sizeof (__test_to_variant_func<T> (nullptr)) == sizeof (__yes_type);
 };
 
@@ -90,8 +89,7 @@ template <typename T> static __yes_type &__test_to_string_func (decltype (&T::to
 template <typename> static __no_type &__test_to_string_func (...);
 
 template <typename T>
-struct has_to_string
-{
+struct has_to_string {
   static constexpr bool value = sizeof (__test_to_string_func<T> (nullptr)) == sizeof (__yes_type);
 };
 
@@ -102,8 +100,7 @@ template <typename T> static __yes_type &__test_to_int_func (decltype (&T::to_in
 template <typename> static __no_type &__test_to_int_func (...);
 
 template <typename T>
-struct has_to_int
-{
+struct has_to_int {
   static constexpr bool value = sizeof (__test_to_int_func<T> (nullptr)) == sizeof (__yes_type);
 };
 
@@ -114,8 +111,7 @@ template <typename T> static __yes_type &__test_to_double_func (decltype (&T::to
 template <typename> static __no_type &__test_to_double_func (...);
 
 template <typename T>
-struct has_to_double
-{
+struct has_to_double {
   static constexpr bool value = sizeof (__test_to_double_func<T> (nullptr)) == sizeof (__yes_type);
 };
 
@@ -126,8 +122,7 @@ template <typename T> static __yes_type &__test_equal_func (decltype (&T::operat
 template <typename> static __no_type &__test_equal_func (...);
 
 template <typename T>
-struct has_equal_operator
-{
+struct has_equal_operator {
   static constexpr bool value = sizeof (__test_equal_func<T> (nullptr)) == sizeof (__yes_type);
 };
 
@@ -138,8 +133,7 @@ template <typename T> static __yes_type &__test_less_func (decltype (&T::operato
 template <typename> static __no_type &__test_less_func (...);
 
 template <typename T>
-struct has_less_operator
-{
+struct has_less_operator {
   static constexpr bool value = sizeof (__test_less_func<T> (nullptr)) == sizeof (__yes_type);
 };
 
@@ -150,8 +144,7 @@ template <typename T> static __yes_type &__test_swap_func (decltype (&T::swap));
 template <typename> static __no_type &__test_swap_func (...);
 
 template <typename T>
-struct has_swap
-{
+struct has_swap {
   static constexpr bool value = sizeof (__test_swap_func<T> (nullptr)) == sizeof (__yes_type);
 };
 
@@ -169,31 +162,25 @@ template <class R>
 struct result_of_method;
 
 template <class R, class Obj, class A1>
-struct result_of_method<R (Obj::*) (A1) const>
-{
+struct result_of_method<R (Obj::*) (A1) const> {
   typedef R type;
 };
 
 template <class R, class Obj, class A1, class A2>
-struct result_of_method<R (Obj::*) (A1, A2) const>
-{
+struct result_of_method<R (Obj::*) (A1, A2) const> {
   typedef R type;
 };
 
 template <class R, class Obj, class A1, class A2, class A3>
-struct result_of_method<R (Obj::*) (A1, A2, A3) const>
-{
+struct result_of_method<R (Obj::*) (A1, A2, A3) const> {
   typedef R type;
 };
 
 template <class R, class Obj, class A1, class A2, class A3, class A4>
-struct result_of_method<R (Obj::*) (A1, A2, A3, A4) const>
-{
+struct result_of_method<R (Obj::*) (A1, A2, A3, A4) const> {
   typedef R type;
 };
 
 }
 
 #endif
-
-

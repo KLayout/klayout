@@ -33,7 +33,7 @@ namespace edt
 MoveTrackerService::MoveTrackerService (lay::LayoutViewBase *view)
   : lay::EditorServiceBase (view),
     mp_view (view)
-{ 
+{
   //  .. nothing yet ..
 }
 
@@ -42,8 +42,7 @@ MoveTrackerService::~MoveTrackerService ()
   //  .. nothing yet ..
 }
 
-bool  
-MoveTrackerService::begin_move (lay::Editable::MoveMode mode, const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
+bool MoveTrackerService::begin_move (lay::Editable::MoveMode mode, const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
 {
   if (view ()->is_editable () && mode == lay::Editable::Selected) {
     open_editor_hooks ();
@@ -51,8 +50,7 @@ MoveTrackerService::begin_move (lay::Editable::MoveMode mode, const db::DPoint &
   return false;
 }
 
-void
-MoveTrackerService::issue_edit_events ()
+void MoveTrackerService::issue_edit_events ()
 {
   if (m_editor_hooks.empty ()) {
     return;
@@ -96,9 +94,7 @@ MoveTrackerService::issue_edit_events ()
       db::ICplxTrans applied = gt.inverted () * db::DCplxTrans (svc->move_trans ()) * gt;
 
       call_editor_hooks<const lay::ObjectInstPath &, const db::ICplxTrans &, const db::CplxTrans &> (m_editor_hooks, &edt::EditorHooks::transformed, *r, applied, gt);
-
     }
-
   }
 
   //  make the Partial Edit Service issue "modify" events
@@ -112,49 +108,42 @@ MoveTrackerService::issue_edit_events ()
   call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_edits);
 }
 
-void  
-MoveTrackerService::move (const db::DPoint & /*pu*/, lay::angle_constraint_type /*ac*/)
+void MoveTrackerService::move (const db::DPoint & /*pu*/, lay::angle_constraint_type /*ac*/)
 {
   //  we don't interpret this event, but use it to request status from the editor services
   issue_edit_events ();
 }
 
-void  
-MoveTrackerService::move_transform (const db::DPoint & /*pu*/, db::DFTrans /*tr*/, lay::angle_constraint_type /*ac*/)
+void MoveTrackerService::move_transform (const db::DPoint & /*pu*/, db::DFTrans /*tr*/, lay::angle_constraint_type /*ac*/)
 {
   //  we don't interpret this event, but use it to request status from the editor services
   issue_edit_events ();
 }
 
-void  
-MoveTrackerService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
+void MoveTrackerService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
 {
   call_editor_hooks (m_editor_hooks, &edt::EditorHooks::commit_edit);
   move_cancel (); // formally this functionality fits here
 }
 
-void
-MoveTrackerService::end_move (const db::DVector & /*v*/)
+void MoveTrackerService::end_move (const db::DVector & /*v*/)
 {
   call_editor_hooks (m_editor_hooks, &edt::EditorHooks::commit_edit);
   move_cancel (); // formally this functionality fits here
 }
 
-void
-MoveTrackerService::edit_cancel ()
+void MoveTrackerService::edit_cancel ()
 {
   move_cancel ();
 }
 
-void
-MoveTrackerService::move_cancel ()
+void MoveTrackerService::move_cancel ()
 {
   call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_edit);
   m_editor_hooks.clear ();
 }
 
-void
-MoveTrackerService::open_editor_hooks ()
+void MoveTrackerService::open_editor_hooks ()
 {
   lay::CellViewRef cv_ref (view ()->cellview_ref (view ()->active_cellview_index ()));
   if (! cv_ref.is_valid ()) {
@@ -171,5 +160,3 @@ MoveTrackerService::open_editor_hooks ()
 }
 
 } // namespace edt
-
-

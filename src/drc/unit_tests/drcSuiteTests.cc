@@ -46,12 +46,11 @@ void runtest (tl::TestBase *_this, int mode)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = %s\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-        "$drc_test_mode = %d\n"
-      , force_gc, input, output, mode)
-    );
+      "$drc_force_gc = %s\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n"
+      "$drc_test_mode = %d\n",
+      force_gc, input, output, mode));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -75,35 +74,35 @@ void runtest (tl::TestBase *_this, int mode)
   db::compare_layouts (_this, layout, au, db::WriteOAS);
 }
 
-TEST(1_Flat)
+TEST (1_Flat)
 {
   runtest (_this, 1);
 }
 
-TEST(2_BigFlat)
+TEST (2_BigFlat)
 {
   test_is_long_runner ();
   runtest (_this, 2);
 }
 
-TEST(3_Tiled)
+TEST (3_Tiled)
 {
   test_is_long_runner ();
   runtest (_this, 3);
 }
 
-TEST(4_BigTiled)
+TEST (4_BigTiled)
 {
   test_is_long_runner ();
   runtest (_this, 4);
 }
 
-TEST(5_Hier)
+TEST (5_Hier)
 {
   runtest (_this, 5);
 }
 
-TEST(6_BigHier)
+TEST (6_BigHier)
 {
   test_is_long_runner ();
   runtest (_this, 6);

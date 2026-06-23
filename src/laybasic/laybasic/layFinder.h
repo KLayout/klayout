@@ -38,7 +38,7 @@
 
 namespace tl
 {
-  class AbsoluteProgress;
+class AbsoluteProgress;
 }
 
 namespace lay
@@ -59,7 +59,7 @@ public:
    *  @brief Constructor
    *
    *  The point_mode is true, if the finder is supposed to operate in "point mode".
-   *  In point mode, the center of the search region is the reference point. In 
+   *  In point mode, the center of the search region is the reference point. In
    *  non-point mode, every relevant found inside the search region will be
    *  recorded (also see point_mode method).
    *  The base class implementation just stores this flag and provides a read
@@ -130,7 +130,7 @@ public:
   {
     return m_distance;
   }
-  
+
 protected:
   const std::vector<unsigned int> &layers () const
   {
@@ -164,13 +164,13 @@ protected:
 
   bool closer (double d);
 
-  /** 
+  /**
    *  @brief Start the scan with the given parameters
    *
    *  Starts the cell scan on the given layout object, with the given region,
-   *  starting at the given cell, with the given range of hierarchy levels to 
+   *  starting at the given cell, with the given range of hierarchy levels to
    *  consider and using just the given layer or layers (unless the vector is empty, in which case all layers
-   *  are used). For each matching cell, the "visit_cell" method is called. A 
+   *  are used). For each matching cell, the "visit_cell" method is called. A
    *  path of instantiations up to the top cell is maintained and accessible by
    *  the path() accessor.
    *
@@ -190,7 +190,7 @@ protected:
    *
    *  This method computes a "distance" of the edge to the reference point (the
    *  center of the search region). It updates "distance" if the computed distance
-   *  is less than the one stored in "distance" or "match" is false. If the 
+   *  is less than the one stored in "distance" or "match" is false. If the
    *  distance is updated, match is set to true.
    *
    *  "trans" is the transformation to be applied to the edge before the test.
@@ -243,8 +243,8 @@ private:
   bool m_catch_all;
   bool m_consider_viewport;
   bool m_top_level_sel;
-  db::box_convert <db::CellInst, false> m_box_convert;
-  db::box_convert <db::Cell, false> m_cell_box_convert;
+  db::box_convert<db::CellInst, false> m_box_convert;
+  db::box_convert<db::Cell, false> m_cell_box_convert;
 };
 
 /**
@@ -256,7 +256,8 @@ class LAYBASIC_PUBLIC ShapeFinder
   : public Finder
 {
 public:
-  struct StopException { };
+  struct StopException {
+  };
 
   typedef std::vector<lay::ObjectInstPath> founds_vector_type;
   typedef founds_vector_type::const_iterator iterator;
@@ -286,7 +287,7 @@ public:
   }
 
 protected:
-  db::ShapeIterator::flags_type flags () const 
+  db::ShapeIterator::flags_type flags () const
   {
     return m_flags;
   }
@@ -301,12 +302,12 @@ protected:
     return m_cv_index;
   }
 
-  const std::set<db::properties_id_type> *prop_sel () const 
+  const std::set<db::properties_id_type> *prop_sel () const
   {
     return mp_prop_sel;
   }
 
-  bool inv_prop_sel () const 
+  bool inv_prop_sel () const
   {
     return m_inv_prop_sel;
   }
@@ -360,7 +361,8 @@ class LAYBASIC_PUBLIC InstFinder
   : public lay::Finder
 {
 public:
-  struct StopException { };
+  struct StopException {
+  };
 
   typedef std::vector<lay::ObjectInstPath> founds_vector_type;
   typedef founds_vector_type::const_iterator iterator;
@@ -374,7 +376,7 @@ public:
   {
     m_consider_ghost_cells = f;
   }
- 
+
   void consider_normal_cells (bool f)
   {
     m_consider_normal_cells = f;
@@ -417,4 +419,3 @@ private:
 }
 
 #endif
-

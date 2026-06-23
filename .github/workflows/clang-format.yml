@@ -1,0 +1,30 @@
+---
+name: clang-format
+
+# Verifies that all C/C++ sources are formatted according to .clang-format.
+# Fails if any tracked source would be changed by clang-format.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clang-format-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  formatting-check:
+    name: Check C++ formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run clang-format style check
+        uses: jidicula/clang-format-action@v4.18.0
+        with:
+          clang-format-version: '21'
+          exclude-regex: "(testdata|gsiqt)/"

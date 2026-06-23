@@ -134,9 +134,7 @@ public:
         if (tv_list != 0 && ! tv_list->empty ()) {
           tv_trans = tv_list->front ();
         }
-
       }
-
     }
 
     db::DCplxTrans vp_trans = db::DCplxTrans (double (mp_view->canvas ()->oversampling ())) * mp_view->viewport ().trans () * tv_trans;
@@ -159,103 +157,96 @@ gsi::TextInfo *new_textinfo (lay::LayoutViewBase *view)
 }
 
 Class<gsi::TextInfo> decl_TextInfo ("lay", "TextInfo",
-  gsi::constructor ("new", &new_textinfo, gsi::arg ("view"),
-    "@brief Creates a TextInfo object for a given layout view\n"
-  ) +
-  gsi::method ("border=", &gsi::TextInfo::set_border, gsi::arg ("pixels"),
-    "@brief Sets the border in pixels\n"
-    "This attribute adds a border between the bounding box edges and the character polygons "
-    "for better readability of the text when a box is drawn around them. The value is given in "
-    "screen pixels. The default value is the one used for the markers in the application."
-  ) +
-  gsi::method ("border", &gsi::TextInfo::get_border,
-    "@brief Gets the border in pixels\n"
-    "See \\border= for details about this attribute."
-  ) +
-  gsi::method ("bbox", &gsi::TextInfo::bbox_from_shape, gsi::arg ("shape"),
-    "@brief Obtains the bounding box for the given text-type shape\n"
-    "\n"
-    "If the shape is not a text object or it is not part of a layout shown in the layout view, this "
-    "method will return an empty box. Otherwise, it will return a \\Box object, representing the bounding box "
-    "of the text object, including the label's character representation.\n"
-    "\n"
-    "The bounding box is given as an equivalent integer-unit \\Box object, when placed in the same cell and on the same layer as the original text object."
-  ) +
-  gsi::method ("bbox", &gsi::TextInfo::bbox_from_text, gsi::arg ("text"), gsi::arg ("cv_index"), gsi::arg ("layer_index", -1),
-    "@brief Obtains the bounding box for the given text object\n"
-    "\n"
-    "This method returns a \\Box object, representing the bounding box of the integer-unit \\Text object.\n"
-    "The cellview index needs to be specified, while the layer index is optional. The layer index is the layer where the text object "
-    "lives in the layout, given by the cellview index. Without a layer, the bounding box computation will not take into account potential "
-    "additional transformations implied by transformations present the layer view specification.\n"
-    "\n"
-    "The bounding box is given as an equivalent integer-unit \\Box object, when placed in the same cell and on the same layer as the original text object."
-  ) +
-  gsi::method ("bbox", &gsi::TextInfo::bbox_from_dtext, gsi::arg ("dtext"), gsi::arg ("cv_index", -1), gsi::arg ("layer_index", -1),
-    "@brief Obtains the bounding box for the given micrometer-unit text object\n"
-    "\n"
-    "This method returns a \\DBox object, representing the bounding box of the micrometer-unit \\DText object.\n"
-    "The cellview and layer index is optional. Without a layer and cellview index, the bounding box computation will not take into account potential "
-    "additional transformations implied by transformations present the layer view specification.\n"
-    "\n"
-    "The bounding box is given as an equivalent micrometer-unit \\DBox object, when placed in the same cell and on the same layer as the original text object."
-  ),
-  "@brief A utility class for generating text bounding boxes including the glyph polygons\n"
-  "\n"
-  "The geometry database regards text objects as point-like, hence the natural bounding box of a "
-  "text object is a single point. To obtain the visual bounding box, you can use the \\TextInfo object. "
-  "It is created from a layout view and allows computing bounding boxes from \\Text, \\DText or \\Shape objects which "
-  "include the visual representation of the text.\n"
-  "\n"
-  "That bounding box is given in the equivalent space of the original text object - i.e. when it is placed into the same cell "
-  "and on the same layer than the original text.\n"
-  "\n"
-  "This computation is not trivial, because there are fonts that do not scale with zoom level. Hence, the equivalent bounding "
-  "bounding box depends on the zoom factor and other transformations that control the rendering of the text. Also, a number of "
-  "settings from the layout view - specifically default font or default text height influence the appearance of the characters "
-  "and need to be considered. The TextInfo object takes care of these things.\n"
-  "\n"
-  "It does not take care however of transformations applied inside the hierarchy. Specifically, when a text object is not "
-  "in the current top cell, different instantiation paths may exist that render different bounding boxes. Hence there not a single "
-  "equivalent bounding box for a text object not inside the top cell. It is recommended to first transform the texts into the top "
-  "cell before computing the bounding boxes.\n"
-  "\n"
-  "Here is some sample code that places boxes over each selected text object. These boxes are identical to the selection markers "
-  "of the texts, but this identity quickly vanishes if you zoom in or out:\n"
-  "\n"
-  "@code\n"
-  "begin\n"
-  "\n"
-  "  view = RBA::LayoutView.current\n"
-  "  # Provide undo support, so it is more convenient to try out\n"
-  "  view.transaction(\"Generate true label bounding boxes\")\n"
-  "\n"
-  "  textinfo = RBA::TextInfo::new(view)\n"
-  "  \n"
-  "  view.each_object_selected do |sel|\n"
-  "  \n"
-  "    # Ignore selected objects which are not texts\n"
-  "    sel.shape.is_text? || next\n"
-  "    \n"
-  "    # Transform the text to top level  \n"
-  "    tl_text = sel.trans * sel.shape.text\n"
-  "    \n"
-  "    # Compute the bounding box\n"
-  "    bbox = textinfo.bbox(tl_text, sel.cv_index, sel.layer)\n"
-  "    \n"
-  "    # Place boxes over the original texts\n"
-  "    # Note that 'ctx_cell' is the true origin of the selection path, hence the one that 'sel.trans' applies to\n"
-  "    view.cellview(sel.cv_index).ctx_cell.shapes(sel.layer).insert(bbox)\n"
-  "    \n"
-  "  end\n"
-  "\n"
-  "ensure\n"
-  "  view.commit\n"
-  "\n"
-  "end\n"
-  "@/code\n"
-  "\n"
-  "This class has been introduced in version 0.30.5."
-);
+                                    gsi::constructor ("new", &new_textinfo, gsi::arg ("view"),
+                                                      "@brief Creates a TextInfo object for a given layout view\n") +
+                                      gsi::method ("border=", &gsi::TextInfo::set_border, gsi::arg ("pixels"),
+                                                   "@brief Sets the border in pixels\n"
+                                                   "This attribute adds a border between the bounding box edges and the character polygons "
+                                                   "for better readability of the text when a box is drawn around them. The value is given in "
+                                                   "screen pixels. The default value is the one used for the markers in the application.") +
+                                      gsi::method ("border", &gsi::TextInfo::get_border,
+                                                   "@brief Gets the border in pixels\n"
+                                                   "See \\border= for details about this attribute.") +
+                                      gsi::method ("bbox", &gsi::TextInfo::bbox_from_shape, gsi::arg ("shape"),
+                                                   "@brief Obtains the bounding box for the given text-type shape\n"
+                                                   "\n"
+                                                   "If the shape is not a text object or it is not part of a layout shown in the layout view, this "
+                                                   "method will return an empty box. Otherwise, it will return a \\Box object, representing the bounding box "
+                                                   "of the text object, including the label's character representation.\n"
+                                                   "\n"
+                                                   "The bounding box is given as an equivalent integer-unit \\Box object, when placed in the same cell and on the same layer as the original text object.") +
+                                      gsi::method ("bbox", &gsi::TextInfo::bbox_from_text, gsi::arg ("text"), gsi::arg ("cv_index"), gsi::arg ("layer_index", -1),
+                                                   "@brief Obtains the bounding box for the given text object\n"
+                                                   "\n"
+                                                   "This method returns a \\Box object, representing the bounding box of the integer-unit \\Text object.\n"
+                                                   "The cellview index needs to be specified, while the layer index is optional. The layer index is the layer where the text object "
+                                                   "lives in the layout, given by the cellview index. Without a layer, the bounding box computation will not take into account potential "
+                                                   "additional transformations implied by transformations present the layer view specification.\n"
+                                                   "\n"
+                                                   "The bounding box is given as an equivalent integer-unit \\Box object, when placed in the same cell and on the same layer as the original text object.") +
+                                      gsi::method ("bbox", &gsi::TextInfo::bbox_from_dtext, gsi::arg ("dtext"), gsi::arg ("cv_index", -1), gsi::arg ("layer_index", -1),
+                                                   "@brief Obtains the bounding box for the given micrometer-unit text object\n"
+                                                   "\n"
+                                                   "This method returns a \\DBox object, representing the bounding box of the micrometer-unit \\DText object.\n"
+                                                   "The cellview and layer index is optional. Without a layer and cellview index, the bounding box computation will not take into account potential "
+                                                   "additional transformations implied by transformations present the layer view specification.\n"
+                                                   "\n"
+                                                   "The bounding box is given as an equivalent micrometer-unit \\DBox object, when placed in the same cell and on the same layer as the original text object."),
+                                    "@brief A utility class for generating text bounding boxes including the glyph polygons\n"
+                                    "\n"
+                                    "The geometry database regards text objects as point-like, hence the natural bounding box of a "
+                                    "text object is a single point. To obtain the visual bounding box, you can use the \\TextInfo object. "
+                                    "It is created from a layout view and allows computing bounding boxes from \\Text, \\DText or \\Shape objects which "
+                                    "include the visual representation of the text.\n"
+                                    "\n"
+                                    "That bounding box is given in the equivalent space of the original text object - i.e. when it is placed into the same cell "
+                                    "and on the same layer than the original text.\n"
+                                    "\n"
+                                    "This computation is not trivial, because there are fonts that do not scale with zoom level. Hence, the equivalent bounding "
+                                    "bounding box depends on the zoom factor and other transformations that control the rendering of the text. Also, a number of "
+                                    "settings from the layout view - specifically default font or default text height influence the appearance of the characters "
+                                    "and need to be considered. The TextInfo object takes care of these things.\n"
+                                    "\n"
+                                    "It does not take care however of transformations applied inside the hierarchy. Specifically, when a text object is not "
+                                    "in the current top cell, different instantiation paths may exist that render different bounding boxes. Hence there not a single "
+                                    "equivalent bounding box for a text object not inside the top cell. It is recommended to first transform the texts into the top "
+                                    "cell before computing the bounding boxes.\n"
+                                    "\n"
+                                    "Here is some sample code that places boxes over each selected text object. These boxes are identical to the selection markers "
+                                    "of the texts, but this identity quickly vanishes if you zoom in or out:\n"
+                                    "\n"
+                                    "@code\n"
+                                    "begin\n"
+                                    "\n"
+                                    "  view = RBA::LayoutView.current\n"
+                                    "  # Provide undo support, so it is more convenient to try out\n"
+                                    "  view.transaction(\"Generate true label bounding boxes\")\n"
+                                    "\n"
+                                    "  textinfo = RBA::TextInfo::new(view)\n"
+                                    "  \n"
+                                    "  view.each_object_selected do |sel|\n"
+                                    "  \n"
+                                    "    # Ignore selected objects which are not texts\n"
+                                    "    sel.shape.is_text? || next\n"
+                                    "    \n"
+                                    "    # Transform the text to top level  \n"
+                                    "    tl_text = sel.trans * sel.shape.text\n"
+                                    "    \n"
+                                    "    # Compute the bounding box\n"
+                                    "    bbox = textinfo.bbox(tl_text, sel.cv_index, sel.layer)\n"
+                                    "    \n"
+                                    "    # Place boxes over the original texts\n"
+                                    "    # Note that 'ctx_cell' is the true origin of the selection path, hence the one that 'sel.trans' applies to\n"
+                                    "    view.cellview(sel.cv_index).ctx_cell.shapes(sel.layer).insert(bbox)\n"
+                                    "    \n"
+                                    "  end\n"
+                                    "\n"
+                                    "ensure\n"
+                                    "  view.commit\n"
+                                    "\n"
+                                    "end\n"
+                                    "@/code\n"
+                                    "\n"
+                                    "This class has been introduced in version 0.30.5.");
 
 }

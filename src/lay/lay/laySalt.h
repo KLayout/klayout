@@ -42,7 +42,7 @@ namespace lay
 class LAY_PUBLIC Salt
   : public QObject
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   typedef SaltGrains::collection_iterator iterator;

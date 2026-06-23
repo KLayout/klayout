@@ -56,7 +56,7 @@ public:
    */
   UniqueId ();
 
-  UniqueId (const UniqueId &) { }
+  UniqueId (const UniqueId &) {}
   UniqueId &operator= (const UniqueId &) { return *this; }
 
 private:
@@ -78,9 +78,8 @@ inline id_type id_of (const UniqueId *o)
 /**
  *  @brief A sorting operator of pointers by ID
  */
-struct sort_by_id
-{
-  bool operator () (const UniqueId *a, const UniqueId *b) const
+struct sort_by_id {
+  bool operator() (const UniqueId *a, const UniqueId *b) const
   {
     return id_of (a) < id_of (b);
   }
@@ -89,4 +88,3 @@ struct sort_by_id
 } // namespace tl
 
 #endif
-

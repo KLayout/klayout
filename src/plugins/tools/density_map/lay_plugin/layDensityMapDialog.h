@@ -32,7 +32,7 @@
 
 namespace img
 {
-  class Object;
+class Object;
 }
 
 namespace lay
@@ -42,7 +42,7 @@ class DensityMapDialog
   : public lay::Browser,
     private Ui::DensityMapDialog
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   DensityMapDialog (lay::Dispatcher *root, lay::LayoutViewBase *view);
@@ -55,14 +55,14 @@ public slots:
   void apply ();
 
 private:
-  struct DensityMapParameters
-  {
+  struct DensityMapParameters {
     DensityMapParameters ()
       : pixel_size (100.0), threads (1)
-    { }
+    {
+    }
 
     //  Collects all cv_index/layer index pairs used for input
-    std::vector<std::pair<unsigned int, unsigned int> > input_layers;
+    std::vector<std::pair<unsigned int, unsigned int>> input_layers;
 
     //  The region to compute the density map from
     db::DBox region;
@@ -92,10 +92,8 @@ private:
   void make_density_map ();
   void compute_density_map (const DensityMapParameters &par);
   void average_window (img::Object &img_object, const std::string boundary_mode, int wh, const std::vector<double> &weights);
-
 };
 
 }
 
 #endif
-

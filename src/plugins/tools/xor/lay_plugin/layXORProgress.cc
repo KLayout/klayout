@@ -43,14 +43,14 @@ static inline void merge (size_t &a, size_t b)
   }
 }
 
-static void merge (std::vector<std::vector<size_t> > &a, const std::vector<std::vector<size_t> > &b)
+static void merge (std::vector<std::vector<size_t>> &a, const std::vector<std::vector<size_t>> &b)
 {
   if (a.size () < b.size ()) {
     a.resize (b.size (), std::vector<size_t> ());
   }
 
-  std::vector<std::vector<size_t> >::iterator ia = a.begin ();
-  for (std::vector<std::vector<size_t> >::const_iterator ib = b.begin (); ib != b.end (); ++ib, ++ia) {
+  std::vector<std::vector<size_t>>::iterator ia = a.begin ();
+  for (std::vector<std::vector<size_t>>::const_iterator ib = b.begin (); ib != b.end (); ++ib, ++ia) {
     if (ia->size () < ib->size ()) {
       ia->resize (ib->size (), 0);
     }
@@ -61,10 +61,10 @@ static void merge (std::vector<std::vector<size_t> > &a, const std::vector<std::
   }
 }
 
-static size_t sum (const std::vector<std::vector<size_t> > &b)
+static size_t sum (const std::vector<std::vector<size_t>> &b)
 {
   size_t n = 0;
-  for (std::vector<std::vector<size_t> >::const_iterator i = b.begin (); i != b.end (); ++i) {
+  for (std::vector<std::vector<size_t>>::const_iterator i = b.begin (); i != b.end (); ++i) {
     for (std::vector<size_t>::const_iterator j = i->begin (); j != i->end (); ++j) {
       merge (n, *j);
     }
@@ -78,8 +78,7 @@ static size_t sum (const std::vector<std::vector<size_t> > &b)
 // --------------------------------------------------------------------------------------------------
 //  The progress widget class
 
-struct CounterCompare
-{
+struct CounterCompare {
   typedef std::pair<db::LayerProperties, size_t> value_type;
   bool operator() (const value_type &a, const value_type &b) const
   {
@@ -109,7 +108,7 @@ public:
     QFontMetrics fm (font ());
     m_line_height = std::max (fm.height (), m_pixmap_size + 4);
     m_font_height = fm.height () * 3 / 2;
- #if QT_VERSION >= 0x60000
+#if QT_VERSION >= 0x60000
     m_first_column_width = fm.horizontalAdvance (QString::fromUtf8 ("LAYERNAME"));
     m_column_width = m_pixmap_size + 4 + m_spacing + fm.horizontalAdvance (QString::fromUtf8 ("1.00G "));
 #else
@@ -125,7 +124,7 @@ public:
     return QSize (w * std::min (int (m_layer_labels.size ()), col), (m_line_height + m_spacing) * ((int (m_layer_labels.size ()) + col - 1) / col) + m_font_height * 2 + m_spacing);
   }
 
-  void set_results (double dbu, int nx, int ny, const std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > &results, const std::map<db::LayerProperties, size_t> &count_per_layer, const std::vector<db::Coord> &tolerances)
+  void set_results (double dbu, int nx, int ny, const std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t>>> &results, const std::map<db::LayerProperties, size_t> &count_per_layer, const std::vector<db::Coord> &tolerances)
   {
     m_labels.clear ();
     m_layer_labels.clear ();
@@ -142,11 +141,11 @@ public:
       m_tolerance_labels << tl::to_qstring (tl::sprintf ("%.12g µm", *t * dbu));
     }
 
-    std::vector<std::pair<db::LayerProperties, size_t> > counters;
+    std::vector<std::pair<db::LayerProperties, size_t>> counters;
     counters.insert (counters.end (), count_per_layer.begin (), count_per_layer.end ());
     std::sort (counters.begin (), counters.end (), CounterCompare ());
 
-    for (std::vector<std::pair<db::LayerProperties, size_t> >::const_iterator c = counters.begin (); c != counters.end (); ++c) {
+    for (std::vector<std::pair<db::LayerProperties, size_t>>::const_iterator c = counters.begin (); c != counters.end (); ++c) {
 
       m_layer_labels << tl::to_qstring (c->first.to_string ());
 
@@ -171,14 +170,14 @@ public:
 
         size_t tot_count = 0;
 
-        std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > >::const_iterator rm = results.find (std::make_pair (c->first, *t));
+        std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t>>>::const_iterator rm = results.find (std::make_pair (c->first, *t));
         if (rm != results.end ()) {
 
-          const std::vector<std::vector<size_t> > &counts = rm->second;
+          const std::vector<std::vector<size_t>> &counts = rm->second;
           tot_count = sum (counts);
 
           int ix = 0;
-          for (std::vector<std::vector<size_t> >::const_iterator c = counts.begin (); c != counts.end (); ++c, ++ix) {
+          for (std::vector<std::vector<size_t>>::const_iterator c = counts.begin (); c != counts.end (); ++c, ++ix) {
 
             int iy = 0;
             for (std::vector<size_t>::const_iterator cc = c->begin (); cc != c->end (); ++cc, ++iy) {
@@ -211,15 +210,10 @@ public:
                   for (int y = y1; y <= y2; ++y) {
                     *((uint32_t *) img->scanLine (y)) &= (((1 << x1) - 1) | ~((1 << (x2 + 1)) - 1));
                   }
-
                 }
-
               }
-
             }
-
           }
-
         }
 
         QString text;
@@ -245,9 +239,7 @@ public:
           text = QString::fromUtf8 ("%1").arg (tot_count);
         }
         m_labels.back ().back () = text;
-
       }
-
     }
 
     if (szh != sizeHint ()) {
@@ -282,7 +274,6 @@ public:
                           m_tolerance_labels [t],
                           QTextOption (Qt::AlignLeft | Qt::AlignTop));
       }
-
     }
 
     int c = 0;
@@ -332,7 +323,6 @@ public:
         painter.setPen (QColor (255, 255, 128));
         painter.drawPixmap (x + 2, y, QBitmap::fromImage (m_yellow_images [l][t]));
         painter.restore ();
-
       }
 
       if (l == 0 && int (m_tolerance_labels.size ()) > visible_columns) {
@@ -343,9 +333,7 @@ public:
         painter.drawText (QRect (QPoint (x - m_column_width, y), QSize (m_column_width, m_line_height)),
                           QString::fromUtf8 ("..."),
                           QTextOption (Qt::AlignRight | Qt::AlignVCenter));
-
       }
-
     }
 
     if (ellipsis) {
@@ -353,7 +341,6 @@ public:
                         QString::fromUtf8 ("..."),
                         QTextOption (Qt::AlignRight | Qt::AlignTop));
     }
-
   }
 
 private:
@@ -366,10 +353,10 @@ private:
   QStringList m_tolerance_labels;
   QStringList m_layer_labels;
   std::vector<QStringList> m_labels;
-  std::vector<std::vector<QImage> > m_green_images;
-  std::vector<std::vector<QImage> > m_red_images;
-  std::vector<std::vector<QImage> > m_yellow_images;
-  std::vector<std::vector<QImage> > m_blue_images;
+  std::vector<std::vector<QImage>> m_green_images;
+  std::vector<std::vector<QImage>> m_red_images;
+  std::vector<std::vector<QImage>> m_yellow_images;
+  std::vector<std::vector<QImage>> m_blue_images;
 };
 
 // --------------------------------------------------------------------------------------------------
@@ -405,9 +392,9 @@ void XORProgress::configure (double dbu, int nx, int ny, const std::vector<db::C
   }
 }
 
-void XORProgress::merge_results (std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > &results)
+void XORProgress::merge_results (std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t>>> &results)
 {
-  for (std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > >::const_iterator r = results.begin (); r != results.end (); ++r) {
+  for (std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t>>>::const_iterator r = results.begin (); r != results.end (); ++r) {
     m_needs_update = true;
     merge (m_results [r->first], r->second);
     merge (m_count_per_layer [r->first.first], sum (r->second));

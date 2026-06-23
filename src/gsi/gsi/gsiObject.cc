@@ -69,8 +69,7 @@ Proxy::~Proxy ()
   }
 }
 
-void
-Proxy::destroy ()
+void Proxy::destroy ()
 {
   tl::MutexLocker locker (&m_lock);
 
@@ -79,7 +78,7 @@ Proxy::destroy ()
     return;
   }
 
-  if (!m_can_destroy && m_obj) {
+  if (! m_can_destroy && m_obj) {
     throw tl::Exception (tl::to_string (tr ("Object cannot be destroyed explicitly")));
   }
 
@@ -104,15 +103,13 @@ Proxy::destroy ()
   }
 }
 
-void
-Proxy::detach ()
+void Proxy::detach ()
 {
   tl::MutexLocker locker (&m_lock);
   detach_internal ();
 }
 
-void
-Proxy::release ()
+void Proxy::release ()
 {
   tl::MutexLocker locker (&m_lock);
 
@@ -130,8 +127,7 @@ Proxy::release ()
   m_owned = true;
 }
 
-void
-Proxy::keep ()
+void Proxy::keep ()
 {
   tl::MutexLocker locker (&m_lock);
 
@@ -150,8 +146,7 @@ Proxy::keep ()
   }
 }
 
-void
-Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy)
+void Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy)
 {
   void *prev_obj;
 
@@ -189,12 +184,11 @@ Proxy::obj_internal ()
   return m_obj;
 }
 
-void
-Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
+void Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
 {
   if (type == gsi::ObjectBase::ObjectDestroyed) {
     tl::MutexLocker locker (&m_lock);
-    m_destroyed = true;  //  NOTE: must be set before detach and indicates that the object was destroyed externally.
+    m_destroyed = true; //  NOTE: must be set before detach and indicates that the object was destroyed externally.
     detach_internal ();
   } else if (type == gsi::ObjectBase::ObjectKeep) {
     //  NOTE: don't lock this as this will cause a deadlock from keep()
@@ -238,7 +232,6 @@ Proxy::set_internal (void *obj, bool owned, bool const_ref, bool can_destroy)
         prev_object = m_obj;
         m_obj = 0;
       }
-
     }
 
     m_obj = obj;
@@ -253,9 +246,7 @@ Proxy::set_internal (void *obj, bool owned, bool const_ref, bool can_destroy)
         }
         gsi_object->status_changed_event ().add (this, &Proxy::object_status_changed);
       }
-
     }
-
   }
 
   //  now we have a valid object (or nil) - we can reset "destroyed" state. Note: this has to be done
@@ -265,8 +256,7 @@ Proxy::set_internal (void *obj, bool owned, bool const_ref, bool can_destroy)
   return prev_object;
 }
 
-void
-Proxy::detach_internal()
+void Proxy::detach_internal ()
 {
   if (! m_destroyed && m_cls_decl && m_cls_decl->is_managed ()) {
     gsi::ObjectBase *gsi_object = m_cls_decl->gsi_object (m_obj, false);
@@ -283,4 +273,3 @@ Proxy::detach_internal()
 }
 
 }
-

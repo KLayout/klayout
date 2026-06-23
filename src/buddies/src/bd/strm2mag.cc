@@ -23,7 +23,7 @@
 #include "bdConverterMain.h"
 #include "bdWriterOptions.h"
 
-BD_PUBLIC int strm2mag (int argc, char *argv[])
+BD_PUBLIC int strm2mag (int argc, char *argv [])
 {
   return bd::converter_main (argc, argv, bd::GenericWriterOptions::mag_format_name);
 }

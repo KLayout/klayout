@@ -21,31 +21,31 @@
 */
 
 
-#if !defined(HDR_laybasicCommon_h)
-# define HDR_laybasicCommon_h
+#if ! defined(HDR_laybasicCommon_h)
+#define HDR_laybasicCommon_h
 
-# if defined _WIN32 || defined __CYGWIN__
+#if defined _WIN32 || defined __CYGWIN__
 
-#   ifdef MAKE_LAYBASIC_LIBRARY
-#     define LAYBASIC_PUBLIC __declspec(dllexport)
-#   else
-#     define LAYBASIC_PUBLIC __declspec(dllimport)
-#   endif
-#   define LAYBASIC_LOCAL
-#   define LAYBASIC_PUBLIC_TEMPLATE
+#ifdef MAKE_LAYBASIC_LIBRARY
+#define LAYBASIC_PUBLIC __declspec (dllexport)
+#else
+#define LAYBASIC_PUBLIC __declspec (dllimport)
+#endif
+#define LAYBASIC_LOCAL
+#define LAYBASIC_PUBLIC_TEMPLATE
 
-# else
+#else
 
-#   if __GNUC__ >= 4 || defined(__clang__)
-#     define LAYBASIC_PUBLIC __attribute__ ((visibility ("default")))
-#     define LAYBASIC_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
-#     define LAYBASIC_LOCAL  __attribute__ ((visibility ("hidden")))
-#   else
-#     define LAYBASIC_PUBLIC
-#     define LAYBASIC_PUBLIC_TEMPLATE
-#     define LAYBASIC_LOCAL
-#   endif
+#if __GNUC__ >= 4 || defined(__clang__)
+#define LAYBASIC_PUBLIC __attribute__ ((visibility ("default")))
+#define LAYBASIC_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
+#define LAYBASIC_LOCAL __attribute__ ((visibility ("hidden")))
+#else
+#define LAYBASIC_PUBLIC
+#define LAYBASIC_PUBLIC_TEMPLATE
+#define LAYBASIC_LOCAL
+#endif
 
-# endif
+#endif
 
 #endif

@@ -68,37 +68,37 @@ static size_t shapes_size (const db::Shapes *shapes)
   return n;
 }
 
-template<class Sh>
+template <class Sh>
 static db::Shape insert (db::Shapes *s, const Sh &p)
 {
   return s->insert (p);
 }
 
-template<class Sh>
+template <class Sh>
 static db::Shape dinsert (db::Shapes *s, const Sh &p)
 {
   return s->insert (db::CplxTrans (shapes_dbu (s)).inverted () * p);
 }
 
-template<class Sh>
+template <class Sh>
 static db::Shape replace (db::Shapes *s, const db::Shape &sh, const Sh &p)
 {
   return s->replace (sh, p);
 }
 
-template<class Sh>
+template <class Sh>
 static db::Shape dreplace (db::Shapes *s, const db::Shape &sh, const Sh &p)
 {
   return s->replace (sh, db::CplxTrans (shapes_dbu (s)).inverted () * p);
 }
 
-template<class Sh>
+template <class Sh>
 static db::Shape insert_with_properties (db::Shapes *s, const Sh &p, db::properties_id_type id)
 {
   return s->insert (db::object_with_properties<Sh> (p, id));
 }
 
-template<class Sh, class ISh>
+template <class Sh, class ISh>
 static db::Shape dinsert_with_properties (db::Shapes *s, const Sh &p, db::properties_id_type id)
 {
   return s->insert (db::object_with_properties<ISh> (db::CplxTrans (shapes_dbu (s)).inverted () * p, id));
@@ -223,7 +223,8 @@ static db::Shape insert_shape_with_dcplx_trans (db::Shapes *s, const db::Shape &
   return s->insert (shape, dbu_trans.inverted () * trans * dbu_trans, pm);
 }
 
-namespace {
+namespace
+{
 
 /**
  *  @brief Provides protection against inserting shapes into a target that is also source
@@ -292,7 +293,7 @@ public:
     }
   }
 
-  db::Shapes *operator-> () const
+  db::Shapes *operator->() const
   {
     if (mp_tmp_shapes.get ()) {
       return mp_tmp_shapes.get ();
@@ -311,7 +312,7 @@ private:
 static void insert_iter (db::Shapes *sh, const db::RecursiveShapeIterator &r)
 {
   ProtectedShapes ps (sh, r);
-  for (db::RecursiveShapeIterator i = r; !i.at_end (); ++i) {
+  for (db::RecursiveShapeIterator i = r; ! i.at_end (); ++i) {
     tl::ident_map<db::properties_id_type> pm;
     ps->insert (*i, i.trans (), pm);
   }
@@ -320,7 +321,7 @@ static void insert_iter (db::Shapes *sh, const db::RecursiveShapeIterator &r)
 static void insert_iter_with_trans (db::Shapes *sh, const db::RecursiveShapeIterator &r, const db::ICplxTrans &trans)
 {
   ProtectedShapes ps (sh, r);
-  for (db::RecursiveShapeIterator i = r; !i.at_end (); ++i) {
+  for (db::RecursiveShapeIterator i = r; ! i.at_end (); ++i) {
     tl::ident_map<db::properties_id_type> pm;
     ps->insert (*i, trans * i.trans (), pm);
   }
@@ -341,7 +342,7 @@ static void insert_shapes_with_flags (db::Shapes *sh, const db::Shapes &s, unsig
 static void insert_shapes_with_trans (db::Shapes *sh, const db::Shapes &s, const db::ICplxTrans &trans)
 {
   ProtectedShapes ps (sh, s);
-  for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::All); !i.at_end(); ++i) {
+  for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::All); ! i.at_end (); ++i) {
     tl::ident_map<db::properties_id_type> pm;
     ps->insert (*i, trans, pm);
   }
@@ -350,7 +351,7 @@ static void insert_shapes_with_trans (db::Shapes *sh, const db::Shapes &s, const
 static void insert_shapes_with_flag_and_trans (db::Shapes *sh, const db::Shapes &s, unsigned int flags, const db::ICplxTrans &trans)
 {
   ProtectedShapes ps (sh, s);
-  for (db::Shapes::shape_iterator i = s.begin (flags); !i.at_end(); ++i) {
+  for (db::Shapes::shape_iterator i = s.begin (flags); ! i.at_end (); ++i) {
     tl::ident_map<db::properties_id_type> pm;
     ps->insert (*i, trans, pm);
   }
@@ -618,1053 +619,920 @@ static void break_polygons (db::Shapes *sh, size_t max_vertex_count, double max_
   db::break_polygons (*sh, max_vertex_count, max_area_ratio);
 }
 
-static unsigned int s_all ()                 { return db::ShapeIterator::All; }
+static unsigned int s_all () { return db::ShapeIterator::All; }
 static unsigned int s_all_with_properties () { return db::ShapeIterator::AllWithProperties; }
-static unsigned int s_properties ()          { return db::ShapeIterator::Properties; }
-static unsigned int s_polygons ()            { return db::ShapeIterator::Polygons; }
-static unsigned int s_regions ()             { return db::ShapeIterator::Regions; }
-static unsigned int s_boxes ()               { return db::ShapeIterator::Boxes; }
-static unsigned int s_edges ()               { return db::ShapeIterator::Edges; }
-static unsigned int s_edge_pairs ()          { return db::ShapeIterator::EdgePairs; }
-static unsigned int s_points ()              { return db::ShapeIterator::Points; }
-static unsigned int s_paths ()               { return db::ShapeIterator::Paths; }
-static unsigned int s_texts ()               { return db::ShapeIterator::Texts; }
-static unsigned int s_user_objects ()        { return db::ShapeIterator::UserObjects; }
+static unsigned int s_properties () { return db::ShapeIterator::Properties; }
+static unsigned int s_polygons () { return db::ShapeIterator::Polygons; }
+static unsigned int s_regions () { return db::ShapeIterator::Regions; }
+static unsigned int s_boxes () { return db::ShapeIterator::Boxes; }
+static unsigned int s_edges () { return db::ShapeIterator::Edges; }
+static unsigned int s_edge_pairs () { return db::ShapeIterator::EdgePairs; }
+static unsigned int s_points () { return db::ShapeIterator::Points; }
+static unsigned int s_paths () { return db::ShapeIterator::Paths; }
+static unsigned int s_texts () { return db::ShapeIterator::Texts; }
+static unsigned int s_user_objects () { return db::ShapeIterator::UserObjects; }
 
 Class<db::Shapes> decl_Shapes ("db", "Shapes",
-  gsi::method ("insert", (db::Shape (db::Shapes::*)(const db::Shape &)) &db::Shapes::insert, gsi::arg ("shape"),
-    "@brief Inserts a shape from a shape reference into the shapes list\n"
-    "@return A reference (a \\Shape object) to the newly created shape\n"
-    "This method has been introduced in version 0.16.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_shape_with_trans, gsi::arg ("shape"), gsi::arg ("trans"),
-    "@brief Inserts a shape from a shape reference into the shapes list with a transformation\n"
-    "@param shape The shape to insert\n"
-    "@param trans The transformation to apply before the shape is inserted\n"
-    "@return A reference (a \\Shape object) to the newly created shape\n"
-    "This method has been introduced in version 0.22.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_shape_with_dtrans, gsi::arg ("shape"), gsi::arg ("trans"),
-    "@brief Inserts a shape from a shape reference into the shapes list with a transformation (given in micrometer units)\n"
-    "@param shape The shape to insert\n"
-    "@param trans The transformation to apply before the shape is inserted (displacement in micrometers)\n"
-    "@return A reference (a \\Shape object) to the newly created shape\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_shape_with_icplx_trans, gsi::arg ("shape"), gsi::arg ("trans"),
-    "@brief Inserts a shape from a shape reference into the shapes list with a complex integer transformation\n"
-    "@param shape The shape to insert\n"
-    "@param trans The transformation to apply before the shape is inserted\n"
-    "@return A reference (a \\Shape object) to the newly created shape\n"
-    "This method has been introduced in version 0.22.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_shape_with_dcplx_trans, gsi::arg ("shape"), gsi::arg ("trans"),
-    "@brief Inserts a shape from a shape reference into the shapes list with a complex integer transformation (given in micrometer units)\n"
-    "@param shape The shape to insert\n"
-    "@param trans The transformation to apply before the shape is inserted (displacement in micrometer units)\n"
-    "@return A reference (a \\Shape object) to the newly created shape\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_iter, gsi::arg ("iter"),
-    "@brief Inserts the shapes taken from a recursive shape iterator\n"
-    "@param iter The iterator from which to take the shapes from\n"
-    "\n"
-    "This method iterates over all shapes from the iterator and inserts them into the container.\n"
-    "\n"
-    "This method has been introduced in version 0.25.3.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_iter_with_trans, gsi::arg ("iter"), gsi::arg ("trans"),
-    "@brief Inserts the shapes taken from a recursive shape iterator with a transformation\n"
-    "@param iter The iterator from which to take the shapes from\n"
-    "@param trans The transformation to apply\n"
-    "\n"
-    "This method iterates over all shapes from the iterator and inserts them into the container.\n"
-    "The given transformation is applied before the shapes are inserted.\n"
-    "\n"
-    "This method has been introduced in version 0.25.3.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_shapes, gsi::arg ("shapes"),
-    "@brief Inserts the shapes taken from another shape container\n"
-    "@param shapes The other container from which to take the shapes from\n"
-    "\n"
-    "This method takes all shapes from the given container and inserts them into this one.\n"
-    "\n"
-    "This method has been introduced in version 0.25.3.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_shapes_with_trans, gsi::arg ("shapes"), gsi::arg ("trans"),
-    "@brief Inserts the shapes taken from another shape container with a transformation\n"
-    "@param shapes The other container from which to take the shapes from\n"
-    "@param trans The transformation to apply\n"
-    "\n"
-    "This method takes all shapes from the given container and inserts them into this one "
-    "after applying the given transformation.\n"
-    "\n"
-    "This method has been introduced in version 0.25.3.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_shapes_with_flags, gsi::arg ("shapes"), gsi::arg ("flags"),
-    "@brief Inserts the shapes taken from another shape container\n"
-    "@param shapes The other container from which to take the shapes from\n"
-    "@param flags The filter flags for taking the shapes from the input container (see S... constants)\n"
-    "\n"
-    "This method takes all selected shapes from the given container and inserts them into this one.\n"
-    "\n"
-    "This method has been introduced in version 0.25.3.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_shapes_with_flag_and_trans, gsi::arg ("shapes"), gsi::arg ("flags"), gsi::arg ("trans"),
-    "@brief Inserts the shapes taken from another shape container with a transformation\n"
-    "@param shapes The other container from which to take the shapes from\n"
-    "@param flags The filter flags for taking the shapes from the input container (see S... constants)\n"
-    "@param trans The transformation to apply\n"
-    "\n"
-    "This method takes all selected shapes from the given container and inserts them into this one "
-    "after applying the given transformation.\n"
-    "\n"
-    "This method has been introduced in version 0.25.3.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_region, gsi::arg ("region"),
-    "@brief Inserts the polygons from the region into this shape container\n"
-    "@param region The region to insert\n"
-    "\n"
-    "This method inserts all polygons from the region into this shape container.\n"
-    "\n"
-    "This method has been introduced in version 0.23.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_region_with_trans, gsi::arg ("region"), gsi::arg ("trans"),
-    "@brief Inserts the polygons from the region into this shape container with a transformation\n"
-    "@param region The region to insert\n"
-    "@param trans The transformation to apply\n"
-    "\n"
-    "This method inserts all polygons from the region into this shape container.\n"
-    "Before a polygon is inserted, the given transformation is applied.\n"
-    "\n"
-    "This method has been introduced in version 0.23.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_region_with_dtrans, gsi::arg ("region"), gsi::arg ("trans"),
-    "@brief Inserts the polygons from the region into this shape container with a transformation (given in micrometer units)\n"
-    "@param region The region to insert\n"
-    "@param trans The transformation to apply (displacement in micrometer units)\n"
-    "\n"
-    "This method inserts all polygons from the region into this shape container.\n"
-    "Before a polygon is inserted, the given transformation is applied.\n"
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_edges, gsi::arg ("edges"),
-    "@brief Inserts the edges from the edge collection into this shape container\n"
-    "@param edges The edges to insert\n"
-    "\n"
-    "This method inserts all edges from the edge collection into this shape container.\n"
-    "\n"
-    "This method has been introduced in version 0.23.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_edges_with_trans, gsi::arg ("edges"), gsi::arg ("trans"),
-    "@brief Inserts the edges from the edge collection into this shape container with a transformation\n"
-    "@param edges The edges to insert\n"
-    "@param trans The transformation to apply\n"
-    "\n"
-    "This method inserts all edges from the edge collection into this shape container.\n"
-    "Before an edge is inserted, the given transformation is applied.\n"
-    "\n"
-    "This method has been introduced in version 0.23.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_edges_with_dtrans, gsi::arg ("edges"), gsi::arg ("trans"),
-    "@brief Inserts the edges from the edge collection into this shape container with a transformation (given in micrometer units)\n"
-    "@param edges The edges to insert\n"
-    "@param trans The transformation to apply (displacement in micrometer units)\n"
-    "\n"
-    "This method inserts all edges from the edge collection into this shape container.\n"
-    "Before an edge is inserted, the given transformation is applied.\n"
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_edge_pairs, gsi::arg ("edge_pairs"),
-    "@brief Inserts the edges from the edge pair collection into this shape container\n"
-    "@param edges The edge pairs to insert\n"
-    "\n"
-    "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
-    "\n"
-    "This method has been introduced in version 0.26.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_edge_pairs_with_trans, gsi::arg ("edge_pairs"), gsi::arg ("trans"),
-    "@brief Inserts the edge pairs from the edge pair collection into this shape container with a transformation\n"
-    "@param edges The edge pairs to insert\n"
-    "@param trans The transformation to apply\n"
-    "\n"
-    "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
-    "Before an edge pair is inserted, the given transformation is applied.\n"
-    "\n"
-    "This method has been introduced in version 0.26.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_edge_pairs_with_dtrans, gsi::arg ("edge_pairs"), gsi::arg ("trans"),
-    "@brief Inserts the edge pairs from the edge pair collection into this shape container with a transformation (given in micrometer units)\n"
-    "@param edges The edge pairs to insert\n"
-    "@param trans The transformation to apply (displacement in micrometer units)\n"
-    "\n"
-    "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
-    "Before an edge pair is inserted, the given transformation is applied.\n"
-    "\n"
-    "This method has been introduced in version 0.26.\n"
-  ) +
-  gsi::method_ext ("insert_as_polygons", &insert_edge_pairs_as_polygons, gsi::arg ("edge_pairs"), gsi::arg ("e"),
-    "@brief Inserts the edge pairs from the edge pair collection as polygons into this shape container\n"
-    "@param edge_pairs The edge pairs to insert\n"
-    "@param e The extension to apply when converting the edges to polygons (in database units)\n"
-    "\n"
-    "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
-    "The edge pairs are converted to polygons covering the area between the edges.\n"
-    "The extension parameter specifies a sizing which is applied when converting the edge pairs to polygons. This way, "
-    "degenerated edge pairs (i.e. two point-like edges) do not vanish.\n"
-    "\n"
-    "This method has been introduced in version 0.23.\n"
-  ) +
-  gsi::method_ext ("insert_as_polygons", &insert_edge_pairs_as_polygons_d, gsi::arg ("edge_pairs"), gsi::arg ("e"),
-    "@brief Inserts the edge pairs from the edge pair collection as polygons into this shape container\n"
-    "@param edge_pairs The edge pairs to insert\n"
-    "@param e The extension to apply when converting the edges to polygons (in micrometer units)\n"
-    "\n"
-    "This method is identical to the version with a integer-type \\e parameter, but for this version the \\e parameter "
-    "is given in micrometer units.\n"
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("insert_as_polygons", &insert_edge_pairs_as_polygons_with_trans, gsi::arg ("edge_pairs"), gsi::arg ("e"), gsi::arg ("trans"),
-    "@brief Inserts the edge pairs from the edge pair collection as polygons into this shape container with a transformation\n"
-    "@param edges The edge pairs to insert\n"
-    "@param e The extension to apply when converting the edges to polygons (in database units)\n"
-    "@param trans The transformation to apply\n"
-    "\n"
-    "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
-    "The edge pairs are converted to polygons covering the area between the edges.\n"
-    "The extension parameter specifies a sizing which is applied when converting the edge pairs to polygons. This way, "
-    "degenerated edge pairs (i.e. two point-like edges) do not vanish.\n"
-    "Before a polygon is inserted into the shape collection, the given transformation is applied.\n"
-    "\n"
-    "This method has been introduced in version 0.23.\n"
-  ) +
-  gsi::method_ext ("insert_as_polygons", &insert_edge_pairs_as_polygons_with_dtrans, gsi::arg ("edge_pairs"), gsi::arg ("e"), gsi::arg ("trans"),
-    "@brief Inserts the edge pairs from the edge pair collection as polygons into this shape container with a transformation\n"
-    "@param edges The edge pairs to insert\n"
-    "@param e The extension to apply when converting the edges to polygons (in micrometer units)\n"
-    "@param trans The transformation to apply (displacement in micrometer units)\n"
-    "\n"
-    "This method is identical to the version with a integer-type \\e and \\trans parameter, but for this version the \\e parameter "
-    "is given in micrometer units and the \\trans parameter is a micrometer-unit transformation.\n"
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("insert_as_edges", &insert_edge_pairs_as_edges, gsi::arg ("edge_pairs"),
-    "@brief Inserts the edge pairs from the edge pair collection as individual edges into this shape container\n"
-    "@param edge_pairs The edge pairs to insert\n"
-    "\n"
-    "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
-    "Each edge from the edge pair is inserted individually into the shape container.\n"
-    "\n"
-    "This method has been introduced in version 0.23.\n"
-  ) +
-  gsi::method_ext ("insert_as_edges", &insert_edge_pairs_as_edges_with_trans, gsi::arg ("edge_pairs"), gsi::arg ("trans"),
-    "@brief Inserts the edge pairs from the edge pair collection as individual into this shape container with a transformation\n"
-    "@param edges The edge pairs to insert\n"
-    "@param trans The transformation to apply\n"
-    "\n"
-    "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
-    "Each edge from the edge pair is inserted individually into the shape container.\n"
-    "Before each edge is inserted into the shape collection, the given transformation is applied.\n"
-    "\n"
-    "This method has been introduced in version 0.23.\n"
-  ) +
-  gsi::method_ext ("insert_as_edges", &insert_edge_pairs_as_edges_with_dtrans, gsi::arg ("edge_pairs"), gsi::arg ("trans"),
-    "@brief Inserts the edge pairs from the edge pair collection as individual into this shape container with a transformation (given in micrometer units)\n"
-    "@param edges The edge pairs to insert\n"
-    "@param trans The transformation to apply (displacement in micrometer units)\n"
-    "\n"
-    "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
-    "Each edge from the edge pair is inserted individually into the shape container.\n"
-    "Before each edge is inserted into the shape collection, the given transformation is applied.\n"
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_texts, gsi::arg ("texts"),
-    "@brief Inserts the texts from the text collection into this shape container\n"
-    "@param texts The texts to insert\n"
-    "\n"
-    "This method inserts all texts from the text collection into this shape container.\n"
-    "\n"
-    "This method has been introduced in version 0.27.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_texts_with_trans, gsi::arg ("texts"), gsi::arg ("trans"),
-    "@brief Inserts the texts from the text collection into this shape container with a transformation\n"
-    "@param edges The texts to insert\n"
-    "@param trans The transformation to apply\n"
-    "\n"
-    "This method inserts all texts from the text collection into this shape container.\n"
-    "Before an text is inserted, the given transformation is applied.\n"
-    "\n"
-    "This method has been introduced in version 0.27.\n"
-  ) +
-  gsi::method_ext ("insert", &insert_texts_with_dtrans, gsi::arg ("texts"), gsi::arg ("trans"),
-    "@brief Inserts the texts from the text collection into this shape container with a transformation (given in micrometer units)\n"
-    "@param edges The text to insert\n"
-    "@param trans The transformation to apply (displacement in micrometer units)\n"
-    "\n"
-    "This method inserts all texts from the text collection into this shape container.\n"
-    "Before an text is inserted, the given transformation is applied.\n"
-    "\n"
-    "This method has been introduced in version 0.27.\n"
-  ) +
-  gsi::method_ext ("transform", &transform_shapes, gsi::arg ("trans"),
-    "@brief Transforms all shapes with the given transformation\n"
-    "This method will invalidate all references to shapes inside this collection.\n\n"
-    "It has been introduced in version 0.23.\n"
-  ) +
-  gsi::method_ext ("transform", &transform_shapes_dtrans, gsi::arg ("trans"),
-    "@brief Transforms all shapes with the given transformation (given in micrometer units)\n"
-    "This method will invalidate all references to shapes inside this collection.\n"
-    "The displacement of the transformation is given in micrometer units.\n"
-    "\n"
-    "It has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("transform", &transform_shapes_icplx, gsi::arg ("trans"),
-    "@brief Transforms all shapes with the given complex integer transformation\n"
-    "This method will invalidate all references to shapes inside this collection.\n\n"
-    "It has been introduced in version 0.23.\n"
-  ) +
-  gsi::method_ext ("transform", &transform_shapes_dcplx, gsi::arg ("trans"),
-    "@brief Transforms all shapes with the given transformation (given in micrometer units)\n"
-    "This method will invalidate all references to shapes inside this collection.\n"
-    "The displacement of the transformation is given in micrometer units.\n"
-    "\n"
-    "It has been introduced in version 0.25.\n"
-  ) +
-  gsi::method ("transform", (db::Shape (db::Shapes::*)(const db::Shape &, const db::Trans &)) &db::Shapes::transform, gsi::arg ("shape"), gsi::arg ("trans"),
-    "@brief Transforms the shape given by the reference with the given transformation\n"
-    "@return A reference (a \\Shape object) to the new shape\n"
-    "The original shape may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
-    "It is permitted in editable mode only.\n"
-    "\n"
-    "This method has been introduced in version 0.16.\n"
-  ) +
-  gsi::method_ext ("transform", &transform_shape_dtrans, gsi::arg ("shape"), gsi::arg ("trans"),
-    "@brief Transforms the shape given by the reference with the given transformation, where the transformation is given in micrometer units\n"
-    "@param trans The transformation to apply (displacement in micrometer units)\n"
-    "@return A reference (a \\Shape object) to the new shape\n"
-    "The original shape may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
-    "It is permitted in editable mode only."
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("transform", &transform_shape_icplx, gsi::arg ("shape"), gsi::arg ("trans"),
-    "@brief Transforms the shape given by the reference with the given complex integer space transformation\n"
-    "@return A reference (a \\Shape object) to the new shape\n"
-    "This method has been introduced in version 0.22.\n"
-    "The original shape may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
-    "It is permitted in editable mode only."
-  ) +
-  gsi::method_ext ("transform", &transform_shape_dcplx, gsi::arg ("shape"), gsi::arg ("trans"),
-    "@brief Transforms the shape given by the reference with the given complex transformation, where the transformation is given in micrometer units\n"
-    "@param trans The transformation to apply (displacement in micrometer units)\n"
-    "@return A reference (a \\Shape object) to the new shape\n"
-    "The original shape may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
-    "It is permitted in editable mode only."
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("break_polygons", &break_polygons, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
-    "@brief Breaks the polygons of the shape container into smaller ones\n"
-    "\n"
-    "There are two criteria for splitting a polygon: a polygon is split into parts with less then "
-    "'max_vertex_count' points and an bounding box-to-polygon area ratio less than 'max_area_ratio'. "
-    "The area ratio is supposed to render polygons whose bounding box is a better approximation. "
-    "This applies for example to 'L' shape polygons.\n"
-    "\n"
-    "Using a value of 0 for either limit means that the respective limit isn't checked. "
-    "Breaking happens by cutting the polygons into parts at 'good' locations. The "
-    "algorithm does not have a specific goal to minimize the number of parts for example. "
-    "The only goal is to achieve parts within the given limits.\n"
-    "\n"
-    "Breaking also applies to paths if their polygon representation satisfies the breaking criterion. "
-    "In that case, paths are converted to polygons and broken into smaller parts.\n"
-    "\n"
-    "This method has been introduced in version 0.29.5."
-  ) +
-  gsi::method_ext ("replace", &replace<db::Box>, gsi::arg ("shape"), gsi::arg ("box"),
-    "@brief Replaces the given shape with a box\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method has been introduced with version 0.16. It replaces the given shape with the "
-    "object specified. It does not change the property Id. To change the property Id, "
-    "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
-    "shape and insert a new shape."
-    "\n"
-    "This method is permitted in editable mode only."
-  ) +
-  gsi::method_ext ("replace", &dreplace<db::DBox>, gsi::arg ("shape"), gsi::arg ("box"),
-    "@brief Replaces the given shape with a box given in micrometer units\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method behaves like the \\replace version with a \\Box argument, except that it will "
-    "internally translate the box from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("replace", &replace<db::Path>, gsi::arg ("shape"), gsi::arg ("path"),
-    "@brief Replaces the given shape with a path\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method has been introduced with version 0.16. It replaces the given shape with the "
-    "object specified. It does not change the property Id. To change the property Id, "
-    "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
-    "shape and insert a new shape."
-    "\n"
-    "This method is permitted in editable mode only."
-  ) +
-  gsi::method_ext ("replace", &dreplace<db::DPath>, gsi::arg ("shape"), gsi::arg ("path"),
-    "@brief Replaces the given shape with a path given in micrometer units\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method behaves like the \\replace version with a \\Path argument, except that it will "
-    "internally translate the path from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("replace", &replace<db::Edge>, gsi::arg ("shape"), gsi::arg ("edge"),
-    "@brief Replaces the given shape with an edge object\n"
-    "\n"
-    "This method has been introduced with version 0.16. It replaces the given shape with the "
-    "object specified. It does not change the property Id. To change the property Id, "
-    "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
-    "shape and insert a new shape."
-    "\n"
-    "This method is permitted in editable mode only."
-  ) +
-  gsi::method_ext ("replace", &dreplace<db::DEdge>, gsi::arg ("shape"), gsi::arg ("edge"),
-    "@brief Replaces the given shape with an edge given in micrometer units\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method behaves like the \\replace version with an \\Edge argument, except that it will "
-    "internally translate the edge from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("replace", &replace<db::EdgePair>, gsi::arg ("shape"), gsi::arg ("edge_pair"),
-    "@brief Replaces the given shape with an edge pair object\n"
-    "\n"
-    "It replaces the given shape with the "
-    "object specified. It does not change the property Id. To change the property Id, "
-    "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
-    "shape and insert a new shape."
-    "\n"
-    "This method is permitted in editable mode only.\n"
-    "\n"
-    "This method has been introduced in version 0.26.\n"
-  ) +
-  gsi::method_ext ("replace", &dreplace<db::DEdgePair>, gsi::arg ("shape"), gsi::arg ("edge_pair"),
-    "@brief Replaces the given shape with an edge pair given in micrometer units\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method behaves like the \\replace version with an \\EdgePair argument, except that it will "
-    "internally translate the edge pair from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.26.\n"
-  ) +
-  gsi::method_ext ("replace", &replace<db::Point>, gsi::arg ("shape"), gsi::arg ("point"),
-    "@brief Replaces the given shape with an point object\n"
-    "\n"
-    "This method replaces the given shape with the "
-    "object specified. It does not change the property Id. To change the property Id, "
-    "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
-    "shape and insert a new shape."
-    "\n"
-    "This variant has been introduced in version 0.28."
-  ) +
-  gsi::method_ext ("replace", &dreplace<db::DPoint>, gsi::arg ("shape"), gsi::arg ("point"),
-    "@brief Replaces the given shape with an point given in micrometer units\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method behaves like the \\replace version with an \\Point argument, except that it will "
-    "internally translate the point from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.28."
-  ) +
-  gsi::method_ext ("replace", &replace<db::Text>, gsi::arg ("shape"), gsi::arg ("text"),
-    "@brief Replaces the given shape with a text object\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method has been introduced with version 0.16. It replaces the given shape with the "
-    "object specified. It does not change the property Id. To change the property Id, "
-    "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
-    "shape and insert a new shape."
-    "\n"
-    "This method is permitted in editable mode only."
-  ) +
-  gsi::method_ext ("replace", &dreplace<db::DText>, gsi::arg ("shape"), gsi::arg ("text"),
-    "@brief Replaces the given shape with a text given in micrometer units\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method behaves like the \\replace version with a \\Text argument, except that it will "
-    "internally translate the text from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("replace", &replace<db::SimplePolygon>, gsi::arg ("shape"), gsi::arg ("simple_polygon"),
-    "@brief Replaces the given shape with a simple polygon\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method has been introduced with version 0.16. It replaces the given shape with the "
-    "object specified. It does not change the property Id. To change the property Id, "
-    "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
-    "shape and insert a new shape."
-    "\n"
-    "This method is permitted in editable mode only."
-  ) +
-  gsi::method_ext ("replace", &dreplace<db::DSimplePolygon>, gsi::arg ("shape"), gsi::arg ("simple_polygon"),
-    "@brief Replaces the given shape with a simple polygon given in micrometer units\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method behaves like the \\replace version with a \\SimplePolygon argument, except that it will "
-    "internally translate the simple polygon from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("replace", &replace<db::Polygon>, gsi::arg ("shape"), gsi::arg ("polygon"),
-    "@brief Replaces the given shape with a polygon\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method has been introduced with version 0.16. It replaces the given shape with the "
-    "object specified. It does not change the property Id. To change the property Id, "
-    "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
-    "shape and insert a new shape."
-    "\n"
-    "This method is permitted in editable mode only."
-  ) +
-  gsi::method_ext ("replace", &dreplace<db::DPolygon>, gsi::arg ("shape"), gsi::arg ("polygon"),
-    "@brief Replaces the given shape with a polygon given in micrometer units\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "This method behaves like the \\replace version with a \\Polygon argument, except that it will "
-    "internally translate the polygon from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert|#insert_box", &insert<db::Box>, gsi::arg ("box"),
-    "@brief Inserts a box into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DBox>, gsi::arg ("box"),
-    "@brief Inserts a micrometer-unit box into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\Box argument, except that it will "
-    "internally translate the box from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert|#insert_path", &insert<db::Path>, gsi::arg ("path"),
-    "@brief Inserts a path into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DPath>, gsi::arg ("path"),
-    "@brief Inserts a micrometer-unit path into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\Path argument, except that it will "
-    "internally translate the path from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert|#insert_edge", &insert<db::Edge>, gsi::arg ("edge"),
-    "@brief Inserts an edge into the shapes list\n"
-    "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DEdge>, gsi::arg ("edge"),
-    "@brief Inserts a micrometer-unit edge into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\Edge argument, except that it will "
-    "internally translate the edge from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert", &insert<db::EdgePair>, gsi::arg ("edge_pair"),
-    "@brief Inserts an edge pair into the shapes list\n"
-    "\n"
-    "This method has been introduced in version 0.26.\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DEdgePair>, gsi::arg ("edge_pair"),
-    "@brief Inserts a micrometer-unit edge pair into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\EdgePair argument, except that it will "
-    "internally translate the edge pair from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.26."
-  ) +
-  gsi::method_ext ("insert|#insert_point", &insert<db::Point>, gsi::arg ("point"),
-    "@brief Inserts an point into the shapes list\n"
-    "\n"
-    "This variant has been introduced in version 0.28.\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DPoint>, gsi::arg ("point"),
-    "@brief Inserts a micrometer-unit point into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\Point argument, except that it will "
-    "internally translate the point from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.28.\n"
-  ) +
-  gsi::method_ext ("insert|#insert_text", &insert<db::Text>, gsi::arg ("text"),
-    "@brief Inserts a text into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DText>, gsi::arg ("text"),
-    "@brief Inserts a micrometer-unit text into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\Text argument, except that it will "
-    "internally translate the text from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert|#insert_simple_polygon", &insert<db::SimplePolygon>, gsi::arg ("simple_polygon"),
-    "@brief Inserts a simple polygon into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DSimplePolygon>, gsi::arg ("simple_polygon"),
-    "@brief Inserts a micrometer-unit simple polygon into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\SimplePolygon argument, except that it will "
-    "internally translate the polygon from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert|#insert_polygon", &insert<db::Polygon>, gsi::arg ("polygon"),
-    "@brief Inserts a polygon into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DPolygon>, gsi::arg ("polygon"),
-    "@brief Inserts a micrometer-unit polygon into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\Polygon argument, except that it will "
-    "internally translate the polygon from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert|#insert_box_with_properties", &insert_with_properties<db::Box>, gsi::arg ("box"), gsi::arg ("property_id"),
-    "@brief Inserts a box with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert_with_properties<db::DBox, db::Box>, gsi::arg ("box"), gsi::arg ("property_id"),
-    "@brief Inserts a micrometer-unit box with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\Box argument and a property ID, except that it will "
-    "internally translate the box from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert|#insert_path_with_properties", &insert_with_properties<db::Path>, gsi::arg ("path"), gsi::arg ("property_id"),
-    "@brief Inserts a path with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert_with_properties<db::DPath, db::Path>, gsi::arg ("path"), gsi::arg ("property_id"),
-    "@brief Inserts a micrometer-unit path with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\Path argument and a property ID, except that it will "
-    "internally translate the path from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert|#insert_edge_with_properties", &insert_with_properties<db::Edge>, gsi::arg ("edge"), gsi::arg ("property_id"),
-    "@brief Inserts an edge with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape.\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert_with_properties<db::DEdge, db::Edge>, gsi::arg ("edge"), gsi::arg ("property_id"),
-    "@brief Inserts a micrometer-unit edge with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\Edge argument and a property ID, except that it will "
-    "internally translate the edge from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert", &insert_with_properties<db::EdgePair>, gsi::arg ("edge_pair"), gsi::arg ("property_id"),
-    "@brief Inserts an edge pair with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "This method has been introduced in version 0.26.\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert_with_properties<db::DEdgePair, db::EdgePair>, gsi::arg ("edge_pair"), gsi::arg ("property_id"),
-    "@brief Inserts a micrometer-unit edge pair with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\EdgePair argument and a property ID, except that it will "
-    "internally translate the edge pair from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.26."
-  ) +
-  gsi::method_ext ("insert|#insert_text_with_properties", &insert_with_properties<db::Text>, gsi::arg ("text"), gsi::arg ("property_id"),
-    "@brief Inserts a text with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert_with_properties<db::DText, db::Text>, gsi::arg ("text"), gsi::arg ("property_id"),
-    "@brief Inserts a micrometer-unit text with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\Text argument and a property ID, except that it will "
-    "internally translate the text from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert|#insert_simple_polygon_with_properties", &insert_with_properties<db::SimplePolygon>, gsi::arg ("simple_polygon"), gsi::arg ("property_id"),
-    "@brief Inserts a simple polygon with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert_with_properties<db::DSimplePolygon, db::SimplePolygon>, gsi::arg ("simple_polygon"), gsi::arg ("property_id"),
-    "@brief Inserts a micrometer-unit simple polygon with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\SimplePolygon argument and a property ID, except that it will "
-    "internally translate the simple polygon from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert|#insert_polygon_with_properties", &insert_with_properties<db::Polygon>, gsi::arg ("polygon"), gsi::arg ("property_id"),
-    "@brief Inserts a polygon with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape\n"
-  ) +
-  gsi::method_ext ("insert", &dinsert_with_properties<db::DPolygon, db::Polygon>, gsi::arg ("polygon"), gsi::arg ("property_id"),
-    "@brief Inserts a micrometer-unit polygon with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\Polygon argument and a property ID, except that it will "
-    "internally translate the polygon from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("insert", &insert<db::BoxWithProperties>, gsi::arg ("box"),
-    "@brief Inserts a box with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DBoxWithProperties>, gsi::arg ("box"),
-    "@brief Inserts a micrometer-unit box with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\BoxWithProperties argument, except that it will "
-    "internally translate the box from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &insert<db::PathWithProperties>, gsi::arg ("path"),
-    "@brief Inserts a path with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DPathWithProperties>, gsi::arg ("path"),
-    "@brief Inserts a micrometer-unit path with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\PathWithProperties argument, except that it will "
-    "internally translate the path from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &insert<db::EdgeWithProperties>, gsi::arg ("edge"),
-    "@brief Inserts an edge with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DEdgeWithProperties>, gsi::arg ("edge"),
-    "@brief Inserts a micrometer-unit edge with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\EdgeWithProperties argument, except that it will "
-    "internally translate the edge from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &insert<db::EdgePairWithProperties>, gsi::arg ("edge_pair"),
-    "@brief Inserts an edge pair with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DEdgePairWithProperties>, gsi::arg ("edge_pair"),
-    "@brief Inserts a micrometer-unit edge pair with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\EdgePairWithProperties argument, except that it will "
-    "internally translate the edge pair from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &insert<db::TextWithProperties>, gsi::arg ("text"),
-    "@brief Inserts a text with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DTextWithProperties>, gsi::arg ("text"),
-    "@brief Inserts a micrometer-unit text with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\TextWithProperties argument, except that it will "
-    "internally translate the text from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &insert<db::SimplePolygonWithProperties>, gsi::arg ("simple_polygon"),
-    "@brief Inserts a simple polygon with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DSimplePolygonWithProperties>, gsi::arg ("simple_polygon"),
-    "@brief Inserts a micrometer-unit simple polygon with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\SimplePolygonWithProperties argument, except that it will "
-    "internally translate the simple polygon from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &insert<db::PolygonWithProperties>, gsi::arg ("polygon"),
-    "@brief Inserts a polygon with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id."
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::method_ext ("insert", &dinsert<db::DPolygonWithProperties>, gsi::arg ("polygon"),
-    "@brief Inserts a micrometer-unit polygon with properties into the shapes list\n"
-    "@return A reference to the new shape (a \\Shape object)\n"
-    "This method behaves like the \\insert version with a \\PolygonWithProperties argument, except that it will "
-    "internally translate the polygon from micrometer to database units.\n"
-    "\n"
-    "This variant has been introduced in version 0.30."
-  ) +
-  gsi::iterator_ext ("each", &begin, gsi::arg ("flags"),
-    "@brief Gets all shapes\n"
-    "\n"
-    "@param flags An \"or\"-ed combination of the S... constants\n"
-  ) +
-  gsi::iterator_ext ("each", &begin_all, 
-    "@brief Gets all shapes\n"
-    "\n"
-    "This call is equivalent to each(SAll). This convenience method has been introduced in version 0.16\n"
-  ) +
-  gsi::iterator_ext ("each_touching", &begin_touching, gsi::arg ("flags"), gsi::arg ("region"),
-    "@brief Gets all shapes that touch the search box (region)\n"
-    "This method was introduced in version 0.16\n"
-    "\n"
-    "@param flags An \"or\"-ed combination of the S... constants\n"
-    "@param region The rectangular search region\n"
-  ) +
-  gsi::iterator_ext ("each_touching", &begin_dtouching, gsi::arg ("flags"), gsi::arg ("region"),
-    "@brief Gets all shapes that touch the search box (region) where the search box is given in micrometer units\n"
-    "@param flags An \"or\"-ed combination of the S... constants\n"
-    "@param region The rectangular search region as a \\DBox object in micrometer units\n"
-    "\n"
-    "This method was introduced in version 0.25\n"
-  ) +
-  gsi::iterator_ext ("each_touching", &begin_touching_all, gsi::arg ("region"),
-    "@brief Gets all shapes that touch the search box (region)\n"
-    "@param region The rectangular search region\n"
-    "\n"
-    "This call is equivalent to each_touching(SAll,region). This convenience method has been introduced in version 0.16\n"
-  ) +
-  gsi::iterator_ext ("each_touching", &begin_dtouching_all, gsi::arg ("region"),
-    "@brief Gets all shapes that touch the search box (region) where the search box is given in micrometer units\n"
-    "@param region The rectangular search region as a \\DBox object in micrometer units\n"
-    "This call is equivalent to each_touching(SAll,region).\n"
-    "\n"
-    "This method was introduced in version 0.25\n"
-  ) +
-  gsi::iterator_ext ("each_overlapping", &begin_overlapping, gsi::arg ("flags"), gsi::arg ("region"),
-    "@brief Gets all shapes that overlap the search box (region)\n"
-    "This method was introduced in version 0.16\n"
-    "\n"
-    "@param flags An \"or\"-ed combination of the S... constants\n"
-    "@param region The rectangular search region\n"
-  ) +
-  gsi::iterator_ext ("each_overlapping", &begin_doverlapping, gsi::arg ("flags"), gsi::arg ("region"),
-    "@brief Gets all shapes that overlap the search box (region) where the search box is given in micrometer units\n"
-    "@param flags An \"or\"-ed combination of the S... constants\n"
-    "@param region The rectangular search region as a \\DBox object in micrometer units\n"
-    "\n"
-    "This method was introduced in version 0.25\n"
-  ) +
-  gsi::iterator_ext ("each_overlapping", &begin_overlapping_all, gsi::arg ("region"),
-    "@brief Gets all shapes that overlap the search box (region)\n"
-    "@param region The rectangular search region\n"
-    "\n"
-    "This call is equivalent to each_overlapping(SAll,region). This convenience method has been introduced in version 0.16\n"
-  ) +
-  gsi::iterator_ext ("each_overlapping", &begin_doverlapping_all, gsi::arg ("region"),
-    "@brief Gets all shapes that overlap the search box (region) where the search box is given in micrometer units\n"
-    "@param region The rectangular search region as a \\DBox object in micrometer units\n"
-    "This call is equivalent to each_touching(SAll,region).\n"
-    "\n"
-    "This method was introduced in version 0.25\n"
-  ) +
-  gsi::method ("erase", &db::Shapes::erase_shape, gsi::arg ("shape"),
-    "@brief Erases the shape pointed to by the given \\Shape object\n"
-    "This method has been introduced in version 0.16. It can only be used in editable mode.\n"
-    "Erasing a shape will invalidate the shape reference. Access to this reference may then render invalid results.\n"
-    "\n"
-    "@param shape The shape which to destroy"
-  ) +
-  gsi::method ("find", (db::Shape (db::Shapes::*)(const db::Shape &) const) &db::Shapes::find, gsi::arg ("shape"),
-    "@brief Finds a shape inside this collected\n"
-    "This method has been introduced in version 0.21.\n"
-    "This method tries to find the given shape in this collection. The original shape may be located in another collection. "
-    "If the shape is found, this method returns a reference to the shape in this collection, otherwise a null reference is returned."
-  ) +
-  gsi::method ("is_valid?", &db::Shapes::is_valid, gsi::arg ("shape"),
-    "@brief Tests if the given \\Shape object is still pointing to a valid object\n"
-    "This method has been introduced in version 0.16.\n"
-    "If the shape represented by the given reference has been deleted, this method returns false. "
-    "If however, another shape has been inserted already that occupies the original shape's position, "
-    "this method will return true again.\n"
-  ) +
-  gsi::method ("is_empty?", &db::Shapes::empty, 
-    "@brief Returns a value indicating whether the shapes container is empty\n"
-    "This method has been introduced in version 0.20.\n"
-  ) +
-  gsi::method ("clear", static_cast<void (db::Shapes::*) ()> (&db::Shapes::clear),
-    "@brief Clears the shape container\n"
-    "This method has been introduced in version 0.16."
-  ) +
-  gsi::method ("clear", static_cast<void (db::Shapes::*) (unsigned int)> (&db::Shapes::clear), gsi::arg ("flags"),
-    "@brief Clears certain shape types from the shape container\n"
-    "Only shapes matching the shape types from 'flags' are removed. 'flags' is a combination of the S... constants.\n"
-    "\n"
-    "This method has been introduced in version 0.28.9."
-  ) +
-  gsi::method_ext ("size", &shapes_size,
-    "@brief Gets the number of shapes in this container\n"
-    "This method was introduced in version 0.16\n"
-    "@return The number of shapes in this container\n"
-  ) +
-  gsi::method ("cell", &db::Shapes::cell,
-    "@brief Gets the cell the shape container belongs to\n"
-    "This method returns nil if the shape container does not belong to a cell.\n"
-    "\n"
-    "This method has been added in version 0.28."
-  ) +
-  gsi::method_ext ("layout", &layout,
-    "@brief Gets the layout object the shape container belongs to\n"
-    "This method returns nil if the shape container does not belong to a layout.\n"
-    "\n"
-    "This method has been added in version 0.28."
-  ) +
-  gsi::method ("replace_prop_id", (db::Shape (db::Shapes::*) (const db::Shape &, db::properties_id_type)) &db::Shapes::replace_prop_id, gsi::arg ("shape"), gsi::arg ("property_id"),
-    "@brief Replaces (or install) the properties of a shape\n"
-    "@return A \\Shape object representing the new shape\n"
-    "This method has been introduced in version 0.16. It can only be used in editable mode.\n"
-    "Changes the properties Id of the given shape or install a properties Id on that shape if it does not have one yet.\n"
-    "The property Id must be obtained from the \\Layout object's property_id method which "
-    "associates a property set with a property Id.\n"
-    "This method will potentially invalidate the shape reference passed to it. Use the reference "
-    "returned for future references."
-  ) +
-  gsi::method ("SAll|#s_all", &s_all,
-    "@brief Indicates that all shapes shall be retrieved\n"
-    "You can use this constant to construct 'except' classes - e.g. "
-    "to specify 'all shape types except boxes' use\n"
-    "\n"
-    "@code SAll - SBoxes @/code\n"
-  ) +
-  gsi::method ("SAllWithProperties|#s_all_with_properties", &s_all_with_properties,
-    "@brief Indicates that all shapes with properties shall be retrieved\n"
-    "Using this selector means to retrieve only shapes with properties."
-    "You can use this constant to construct 'except' classes - e.g. "
-    "to specify 'all shape types with properties except boxes' use\n"
-    "\n"
-    "@code SAllWithProperties - SBoxes @/code\n"
-  ) +
-  gsi::method ("SPolygons|#s_polygons", &s_polygons,
-    "@brief Indicates that polygons shall be retrieved"
-  ) +
-  gsi::method ("SRegions|#s_regions", &s_regions,
-    "@brief Indicates that objects which can be polygonized shall be retrieved (paths, boxes, polygons etc.)\n"
-    "\n"
-    "This constant has been added in version 0.27."
-  ) +
-  gsi::method ("SBoxes|#s_boxes", &s_boxes,
-    "@brief Indicates that boxes shall be retrieved"
-  ) +
-  gsi::method ("SEdges|#s_edges", &s_edges,
-    "@brief Indicates that edges shall be retrieved"
-  ) +
-  gsi::method ("SEdgePairs|#s_edge_pairs", &s_edge_pairs,
-    "@brief Indicates that edge pairs shall be retrieved"
-  ) +
-  gsi::method ("SPoints|#s_points", &s_points,
-    "@brief Indicates that points shall be retrieved"
-    "\n"
-    "This constant has been added in version 0.28."
-  ) +
-  gsi::method ("SPaths|#s_paths", &s_paths,
-    "@brief Indicates that paths shall be retrieved"
-  ) +
-  gsi::method ("STexts|#s_texts", &s_texts,
-    "@brief Indicates that texts be retrieved"
-  ) +
-  gsi::method ("SUserObjects|#s_user_objects", &s_user_objects,
-    "@brief Indicates that user objects shall be retrieved"
-  ) +
-  gsi::method ("SProperties|#s_properties", &s_properties,
-    "@brief Indicates that only shapes with properties shall be retrieved\n"
-    "You can or-combine this flag with the plain shape types to select a "
-    "certain shape type, but only those shapes with properties. For example to "
-    "select boxes with properties, use 'SProperties | SBoxes'."
-  ) +
-  gsi::method_ext ("dump_mem_statistics", &dump_mem_statistics, gsi::arg<bool> ("detailed", false),
-    "@hide"
-  ),
-  "@brief A collection of shapes\n"
-  "\n"
-  "A shapes collection is a collection of geometrical objects, such as "
-  "polygons, boxes, paths, edges, edge pairs or text objects.\n"
-  "\n"
-  "Shapes objects are the basic containers for geometrical objects of a cell. Inside a cell, there is "
-  "one Shapes object per layer.\n"
-);
+                               gsi::method ("insert", (db::Shape (db::Shapes::*) (const db::Shape &)) &db::Shapes::insert, gsi::arg ("shape"),
+                                            "@brief Inserts a shape from a shape reference into the shapes list\n"
+                                            "@return A reference (a \\Shape object) to the newly created shape\n"
+                                            "This method has been introduced in version 0.16.\n") +
+                                 gsi::method_ext ("insert", &insert_shape_with_trans, gsi::arg ("shape"), gsi::arg ("trans"),
+                                                  "@brief Inserts a shape from a shape reference into the shapes list with a transformation\n"
+                                                  "@param shape The shape to insert\n"
+                                                  "@param trans The transformation to apply before the shape is inserted\n"
+                                                  "@return A reference (a \\Shape object) to the newly created shape\n"
+                                                  "This method has been introduced in version 0.22.\n") +
+                                 gsi::method_ext ("insert", &insert_shape_with_dtrans, gsi::arg ("shape"), gsi::arg ("trans"),
+                                                  "@brief Inserts a shape from a shape reference into the shapes list with a transformation (given in micrometer units)\n"
+                                                  "@param shape The shape to insert\n"
+                                                  "@param trans The transformation to apply before the shape is inserted (displacement in micrometers)\n"
+                                                  "@return A reference (a \\Shape object) to the newly created shape\n"
+                                                  "This method has been introduced in version 0.25.\n") +
+                                 gsi::method_ext ("insert", &insert_shape_with_icplx_trans, gsi::arg ("shape"), gsi::arg ("trans"),
+                                                  "@brief Inserts a shape from a shape reference into the shapes list with a complex integer transformation\n"
+                                                  "@param shape The shape to insert\n"
+                                                  "@param trans The transformation to apply before the shape is inserted\n"
+                                                  "@return A reference (a \\Shape object) to the newly created shape\n"
+                                                  "This method has been introduced in version 0.22.\n") +
+                                 gsi::method_ext ("insert", &insert_shape_with_dcplx_trans, gsi::arg ("shape"), gsi::arg ("trans"),
+                                                  "@brief Inserts a shape from a shape reference into the shapes list with a complex integer transformation (given in micrometer units)\n"
+                                                  "@param shape The shape to insert\n"
+                                                  "@param trans The transformation to apply before the shape is inserted (displacement in micrometer units)\n"
+                                                  "@return A reference (a \\Shape object) to the newly created shape\n"
+                                                  "This method has been introduced in version 0.25.\n") +
+                                 gsi::method_ext ("insert", &insert_iter, gsi::arg ("iter"),
+                                                  "@brief Inserts the shapes taken from a recursive shape iterator\n"
+                                                  "@param iter The iterator from which to take the shapes from\n"
+                                                  "\n"
+                                                  "This method iterates over all shapes from the iterator and inserts them into the container.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.3.\n") +
+                                 gsi::method_ext ("insert", &insert_iter_with_trans, gsi::arg ("iter"), gsi::arg ("trans"),
+                                                  "@brief Inserts the shapes taken from a recursive shape iterator with a transformation\n"
+                                                  "@param iter The iterator from which to take the shapes from\n"
+                                                  "@param trans The transformation to apply\n"
+                                                  "\n"
+                                                  "This method iterates over all shapes from the iterator and inserts them into the container.\n"
+                                                  "The given transformation is applied before the shapes are inserted.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.3.\n") +
+                                 gsi::method_ext ("insert", &insert_shapes, gsi::arg ("shapes"),
+                                                  "@brief Inserts the shapes taken from another shape container\n"
+                                                  "@param shapes The other container from which to take the shapes from\n"
+                                                  "\n"
+                                                  "This method takes all shapes from the given container and inserts them into this one.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.3.\n") +
+                                 gsi::method_ext ("insert", &insert_shapes_with_trans, gsi::arg ("shapes"), gsi::arg ("trans"),
+                                                  "@brief Inserts the shapes taken from another shape container with a transformation\n"
+                                                  "@param shapes The other container from which to take the shapes from\n"
+                                                  "@param trans The transformation to apply\n"
+                                                  "\n"
+                                                  "This method takes all shapes from the given container and inserts them into this one "
+                                                  "after applying the given transformation.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.3.\n") +
+                                 gsi::method_ext ("insert", &insert_shapes_with_flags, gsi::arg ("shapes"), gsi::arg ("flags"),
+                                                  "@brief Inserts the shapes taken from another shape container\n"
+                                                  "@param shapes The other container from which to take the shapes from\n"
+                                                  "@param flags The filter flags for taking the shapes from the input container (see S... constants)\n"
+                                                  "\n"
+                                                  "This method takes all selected shapes from the given container and inserts them into this one.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.3.\n") +
+                                 gsi::method_ext ("insert", &insert_shapes_with_flag_and_trans, gsi::arg ("shapes"), gsi::arg ("flags"), gsi::arg ("trans"),
+                                                  "@brief Inserts the shapes taken from another shape container with a transformation\n"
+                                                  "@param shapes The other container from which to take the shapes from\n"
+                                                  "@param flags The filter flags for taking the shapes from the input container (see S... constants)\n"
+                                                  "@param trans The transformation to apply\n"
+                                                  "\n"
+                                                  "This method takes all selected shapes from the given container and inserts them into this one "
+                                                  "after applying the given transformation.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.3.\n") +
+                                 gsi::method_ext ("insert", &insert_region, gsi::arg ("region"),
+                                                  "@brief Inserts the polygons from the region into this shape container\n"
+                                                  "@param region The region to insert\n"
+                                                  "\n"
+                                                  "This method inserts all polygons from the region into this shape container.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.23.\n") +
+                                 gsi::method_ext ("insert", &insert_region_with_trans, gsi::arg ("region"), gsi::arg ("trans"),
+                                                  "@brief Inserts the polygons from the region into this shape container with a transformation\n"
+                                                  "@param region The region to insert\n"
+                                                  "@param trans The transformation to apply\n"
+                                                  "\n"
+                                                  "This method inserts all polygons from the region into this shape container.\n"
+                                                  "Before a polygon is inserted, the given transformation is applied.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.23.\n") +
+                                 gsi::method_ext ("insert", &insert_region_with_dtrans, gsi::arg ("region"), gsi::arg ("trans"),
+                                                  "@brief Inserts the polygons from the region into this shape container with a transformation (given in micrometer units)\n"
+                                                  "@param region The region to insert\n"
+                                                  "@param trans The transformation to apply (displacement in micrometer units)\n"
+                                                  "\n"
+                                                  "This method inserts all polygons from the region into this shape container.\n"
+                                                  "Before a polygon is inserted, the given transformation is applied.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.\n") +
+                                 gsi::method_ext ("insert", &insert_edges, gsi::arg ("edges"),
+                                                  "@brief Inserts the edges from the edge collection into this shape container\n"
+                                                  "@param edges The edges to insert\n"
+                                                  "\n"
+                                                  "This method inserts all edges from the edge collection into this shape container.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.23.\n") +
+                                 gsi::method_ext ("insert", &insert_edges_with_trans, gsi::arg ("edges"), gsi::arg ("trans"),
+                                                  "@brief Inserts the edges from the edge collection into this shape container with a transformation\n"
+                                                  "@param edges The edges to insert\n"
+                                                  "@param trans The transformation to apply\n"
+                                                  "\n"
+                                                  "This method inserts all edges from the edge collection into this shape container.\n"
+                                                  "Before an edge is inserted, the given transformation is applied.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.23.\n") +
+                                 gsi::method_ext ("insert", &insert_edges_with_dtrans, gsi::arg ("edges"), gsi::arg ("trans"),
+                                                  "@brief Inserts the edges from the edge collection into this shape container with a transformation (given in micrometer units)\n"
+                                                  "@param edges The edges to insert\n"
+                                                  "@param trans The transformation to apply (displacement in micrometer units)\n"
+                                                  "\n"
+                                                  "This method inserts all edges from the edge collection into this shape container.\n"
+                                                  "Before an edge is inserted, the given transformation is applied.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.\n") +
+                                 gsi::method_ext ("insert", &insert_edge_pairs, gsi::arg ("edge_pairs"),
+                                                  "@brief Inserts the edges from the edge pair collection into this shape container\n"
+                                                  "@param edges The edge pairs to insert\n"
+                                                  "\n"
+                                                  "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.26.\n") +
+                                 gsi::method_ext ("insert", &insert_edge_pairs_with_trans, gsi::arg ("edge_pairs"), gsi::arg ("trans"),
+                                                  "@brief Inserts the edge pairs from the edge pair collection into this shape container with a transformation\n"
+                                                  "@param edges The edge pairs to insert\n"
+                                                  "@param trans The transformation to apply\n"
+                                                  "\n"
+                                                  "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
+                                                  "Before an edge pair is inserted, the given transformation is applied.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.26.\n") +
+                                 gsi::method_ext ("insert", &insert_edge_pairs_with_dtrans, gsi::arg ("edge_pairs"), gsi::arg ("trans"),
+                                                  "@brief Inserts the edge pairs from the edge pair collection into this shape container with a transformation (given in micrometer units)\n"
+                                                  "@param edges The edge pairs to insert\n"
+                                                  "@param trans The transformation to apply (displacement in micrometer units)\n"
+                                                  "\n"
+                                                  "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
+                                                  "Before an edge pair is inserted, the given transformation is applied.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.26.\n") +
+                                 gsi::method_ext ("insert_as_polygons", &insert_edge_pairs_as_polygons, gsi::arg ("edge_pairs"), gsi::arg ("e"),
+                                                  "@brief Inserts the edge pairs from the edge pair collection as polygons into this shape container\n"
+                                                  "@param edge_pairs The edge pairs to insert\n"
+                                                  "@param e The extension to apply when converting the edges to polygons (in database units)\n"
+                                                  "\n"
+                                                  "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
+                                                  "The edge pairs are converted to polygons covering the area between the edges.\n"
+                                                  "The extension parameter specifies a sizing which is applied when converting the edge pairs to polygons. This way, "
+                                                  "degenerated edge pairs (i.e. two point-like edges) do not vanish.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.23.\n") +
+                                 gsi::method_ext ("insert_as_polygons", &insert_edge_pairs_as_polygons_d, gsi::arg ("edge_pairs"), gsi::arg ("e"),
+                                                  "@brief Inserts the edge pairs from the edge pair collection as polygons into this shape container\n"
+                                                  "@param edge_pairs The edge pairs to insert\n"
+                                                  "@param e The extension to apply when converting the edges to polygons (in micrometer units)\n"
+                                                  "\n"
+                                                  "This method is identical to the version with a integer-type \\e parameter, but for this version the \\e parameter "
+                                                  "is given in micrometer units.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.\n") +
+                                 gsi::method_ext ("insert_as_polygons", &insert_edge_pairs_as_polygons_with_trans, gsi::arg ("edge_pairs"), gsi::arg ("e"), gsi::arg ("trans"),
+                                                  "@brief Inserts the edge pairs from the edge pair collection as polygons into this shape container with a transformation\n"
+                                                  "@param edges The edge pairs to insert\n"
+                                                  "@param e The extension to apply when converting the edges to polygons (in database units)\n"
+                                                  "@param trans The transformation to apply\n"
+                                                  "\n"
+                                                  "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
+                                                  "The edge pairs are converted to polygons covering the area between the edges.\n"
+                                                  "The extension parameter specifies a sizing which is applied when converting the edge pairs to polygons. This way, "
+                                                  "degenerated edge pairs (i.e. two point-like edges) do not vanish.\n"
+                                                  "Before a polygon is inserted into the shape collection, the given transformation is applied.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.23.\n") +
+                                 gsi::method_ext ("insert_as_polygons", &insert_edge_pairs_as_polygons_with_dtrans, gsi::arg ("edge_pairs"), gsi::arg ("e"), gsi::arg ("trans"),
+                                                  "@brief Inserts the edge pairs from the edge pair collection as polygons into this shape container with a transformation\n"
+                                                  "@param edges The edge pairs to insert\n"
+                                                  "@param e The extension to apply when converting the edges to polygons (in micrometer units)\n"
+                                                  "@param trans The transformation to apply (displacement in micrometer units)\n"
+                                                  "\n"
+                                                  "This method is identical to the version with a integer-type \\e and \\trans parameter, but for this version the \\e parameter "
+                                                  "is given in micrometer units and the \\trans parameter is a micrometer-unit transformation.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.\n") +
+                                 gsi::method_ext ("insert_as_edges", &insert_edge_pairs_as_edges, gsi::arg ("edge_pairs"),
+                                                  "@brief Inserts the edge pairs from the edge pair collection as individual edges into this shape container\n"
+                                                  "@param edge_pairs The edge pairs to insert\n"
+                                                  "\n"
+                                                  "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
+                                                  "Each edge from the edge pair is inserted individually into the shape container.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.23.\n") +
+                                 gsi::method_ext ("insert_as_edges", &insert_edge_pairs_as_edges_with_trans, gsi::arg ("edge_pairs"), gsi::arg ("trans"),
+                                                  "@brief Inserts the edge pairs from the edge pair collection as individual into this shape container with a transformation\n"
+                                                  "@param edges The edge pairs to insert\n"
+                                                  "@param trans The transformation to apply\n"
+                                                  "\n"
+                                                  "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
+                                                  "Each edge from the edge pair is inserted individually into the shape container.\n"
+                                                  "Before each edge is inserted into the shape collection, the given transformation is applied.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.23.\n") +
+                                 gsi::method_ext ("insert_as_edges", &insert_edge_pairs_as_edges_with_dtrans, gsi::arg ("edge_pairs"), gsi::arg ("trans"),
+                                                  "@brief Inserts the edge pairs from the edge pair collection as individual into this shape container with a transformation (given in micrometer units)\n"
+                                                  "@param edges The edge pairs to insert\n"
+                                                  "@param trans The transformation to apply (displacement in micrometer units)\n"
+                                                  "\n"
+                                                  "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
+                                                  "Each edge from the edge pair is inserted individually into the shape container.\n"
+                                                  "Before each edge is inserted into the shape collection, the given transformation is applied.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.\n") +
+                                 gsi::method_ext ("insert", &insert_texts, gsi::arg ("texts"),
+                                                  "@brief Inserts the texts from the text collection into this shape container\n"
+                                                  "@param texts The texts to insert\n"
+                                                  "\n"
+                                                  "This method inserts all texts from the text collection into this shape container.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.27.\n") +
+                                 gsi::method_ext ("insert", &insert_texts_with_trans, gsi::arg ("texts"), gsi::arg ("trans"),
+                                                  "@brief Inserts the texts from the text collection into this shape container with a transformation\n"
+                                                  "@param edges The texts to insert\n"
+                                                  "@param trans The transformation to apply\n"
+                                                  "\n"
+                                                  "This method inserts all texts from the text collection into this shape container.\n"
+                                                  "Before an text is inserted, the given transformation is applied.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.27.\n") +
+                                 gsi::method_ext ("insert", &insert_texts_with_dtrans, gsi::arg ("texts"), gsi::arg ("trans"),
+                                                  "@brief Inserts the texts from the text collection into this shape container with a transformation (given in micrometer units)\n"
+                                                  "@param edges The text to insert\n"
+                                                  "@param trans The transformation to apply (displacement in micrometer units)\n"
+                                                  "\n"
+                                                  "This method inserts all texts from the text collection into this shape container.\n"
+                                                  "Before an text is inserted, the given transformation is applied.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.27.\n") +
+                                 gsi::method_ext ("transform", &transform_shapes, gsi::arg ("trans"),
+                                                  "@brief Transforms all shapes with the given transformation\n"
+                                                  "This method will invalidate all references to shapes inside this collection.\n\n"
+                                                  "It has been introduced in version 0.23.\n") +
+                                 gsi::method_ext ("transform", &transform_shapes_dtrans, gsi::arg ("trans"),
+                                                  "@brief Transforms all shapes with the given transformation (given in micrometer units)\n"
+                                                  "This method will invalidate all references to shapes inside this collection.\n"
+                                                  "The displacement of the transformation is given in micrometer units.\n"
+                                                  "\n"
+                                                  "It has been introduced in version 0.25.\n") +
+                                 gsi::method_ext ("transform", &transform_shapes_icplx, gsi::arg ("trans"),
+                                                  "@brief Transforms all shapes with the given complex integer transformation\n"
+                                                  "This method will invalidate all references to shapes inside this collection.\n\n"
+                                                  "It has been introduced in version 0.23.\n") +
+                                 gsi::method_ext ("transform", &transform_shapes_dcplx, gsi::arg ("trans"),
+                                                  "@brief Transforms all shapes with the given transformation (given in micrometer units)\n"
+                                                  "This method will invalidate all references to shapes inside this collection.\n"
+                                                  "The displacement of the transformation is given in micrometer units.\n"
+                                                  "\n"
+                                                  "It has been introduced in version 0.25.\n") +
+                                 gsi::method ("transform", (db::Shape (db::Shapes::*) (const db::Shape &, const db::Trans &)) &db::Shapes::transform, gsi::arg ("shape"), gsi::arg ("trans"),
+                                              "@brief Transforms the shape given by the reference with the given transformation\n"
+                                              "@return A reference (a \\Shape object) to the new shape\n"
+                                              "The original shape may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
+                                              "It is permitted in editable mode only.\n"
+                                              "\n"
+                                              "This method has been introduced in version 0.16.\n") +
+                                 gsi::method_ext ("transform", &transform_shape_dtrans, gsi::arg ("shape"), gsi::arg ("trans"),
+                                                  "@brief Transforms the shape given by the reference with the given transformation, where the transformation is given in micrometer units\n"
+                                                  "@param trans The transformation to apply (displacement in micrometer units)\n"
+                                                  "@return A reference (a \\Shape object) to the new shape\n"
+                                                  "The original shape may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
+                                                  "It is permitted in editable mode only."
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.\n") +
+                                 gsi::method_ext ("transform", &transform_shape_icplx, gsi::arg ("shape"), gsi::arg ("trans"),
+                                                  "@brief Transforms the shape given by the reference with the given complex integer space transformation\n"
+                                                  "@return A reference (a \\Shape object) to the new shape\n"
+                                                  "This method has been introduced in version 0.22.\n"
+                                                  "The original shape may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
+                                                  "It is permitted in editable mode only.") +
+                                 gsi::method_ext ("transform", &transform_shape_dcplx, gsi::arg ("shape"), gsi::arg ("trans"),
+                                                  "@brief Transforms the shape given by the reference with the given complex transformation, where the transformation is given in micrometer units\n"
+                                                  "@param trans The transformation to apply (displacement in micrometer units)\n"
+                                                  "@return A reference (a \\Shape object) to the new shape\n"
+                                                  "The original shape may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
+                                                  "It is permitted in editable mode only."
+                                                  "\n"
+                                                  "This method has been introduced in version 0.25.\n") +
+                                 gsi::method_ext ("break_polygons", &break_polygons, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
+                                                  "@brief Breaks the polygons of the shape container into smaller ones\n"
+                                                  "\n"
+                                                  "There are two criteria for splitting a polygon: a polygon is split into parts with less then "
+                                                  "'max_vertex_count' points and an bounding box-to-polygon area ratio less than 'max_area_ratio'. "
+                                                  "The area ratio is supposed to render polygons whose bounding box is a better approximation. "
+                                                  "This applies for example to 'L' shape polygons.\n"
+                                                  "\n"
+                                                  "Using a value of 0 for either limit means that the respective limit isn't checked. "
+                                                  "Breaking happens by cutting the polygons into parts at 'good' locations. The "
+                                                  "algorithm does not have a specific goal to minimize the number of parts for example. "
+                                                  "The only goal is to achieve parts within the given limits.\n"
+                                                  "\n"
+                                                  "Breaking also applies to paths if their polygon representation satisfies the breaking criterion. "
+                                                  "In that case, paths are converted to polygons and broken into smaller parts.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.29.5.") +
+                                 gsi::method_ext ("replace", &replace<db::Box>, gsi::arg ("shape"), gsi::arg ("box"),
+                                                  "@brief Replaces the given shape with a box\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method has been introduced with version 0.16. It replaces the given shape with the "
+                                                  "object specified. It does not change the property Id. To change the property Id, "
+                                                  "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
+                                                  "shape and insert a new shape."
+                                                  "\n"
+                                                  "This method is permitted in editable mode only.") +
+                                 gsi::method_ext ("replace", &dreplace<db::DBox>, gsi::arg ("shape"), gsi::arg ("box"),
+                                                  "@brief Replaces the given shape with a box given in micrometer units\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method behaves like the \\replace version with a \\Box argument, except that it will "
+                                                  "internally translate the box from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("replace", &replace<db::Path>, gsi::arg ("shape"), gsi::arg ("path"),
+                                                  "@brief Replaces the given shape with a path\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method has been introduced with version 0.16. It replaces the given shape with the "
+                                                  "object specified. It does not change the property Id. To change the property Id, "
+                                                  "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
+                                                  "shape and insert a new shape."
+                                                  "\n"
+                                                  "This method is permitted in editable mode only.") +
+                                 gsi::method_ext ("replace", &dreplace<db::DPath>, gsi::arg ("shape"), gsi::arg ("path"),
+                                                  "@brief Replaces the given shape with a path given in micrometer units\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method behaves like the \\replace version with a \\Path argument, except that it will "
+                                                  "internally translate the path from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("replace", &replace<db::Edge>, gsi::arg ("shape"), gsi::arg ("edge"),
+                                                  "@brief Replaces the given shape with an edge object\n"
+                                                  "\n"
+                                                  "This method has been introduced with version 0.16. It replaces the given shape with the "
+                                                  "object specified. It does not change the property Id. To change the property Id, "
+                                                  "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
+                                                  "shape and insert a new shape."
+                                                  "\n"
+                                                  "This method is permitted in editable mode only.") +
+                                 gsi::method_ext ("replace", &dreplace<db::DEdge>, gsi::arg ("shape"), gsi::arg ("edge"),
+                                                  "@brief Replaces the given shape with an edge given in micrometer units\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method behaves like the \\replace version with an \\Edge argument, except that it will "
+                                                  "internally translate the edge from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("replace", &replace<db::EdgePair>, gsi::arg ("shape"), gsi::arg ("edge_pair"),
+                                                  "@brief Replaces the given shape with an edge pair object\n"
+                                                  "\n"
+                                                  "It replaces the given shape with the "
+                                                  "object specified. It does not change the property Id. To change the property Id, "
+                                                  "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
+                                                  "shape and insert a new shape."
+                                                  "\n"
+                                                  "This method is permitted in editable mode only.\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.26.\n") +
+                                 gsi::method_ext ("replace", &dreplace<db::DEdgePair>, gsi::arg ("shape"), gsi::arg ("edge_pair"),
+                                                  "@brief Replaces the given shape with an edge pair given in micrometer units\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method behaves like the \\replace version with an \\EdgePair argument, except that it will "
+                                                  "internally translate the edge pair from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.26.\n") +
+                                 gsi::method_ext ("replace", &replace<db::Point>, gsi::arg ("shape"), gsi::arg ("point"),
+                                                  "@brief Replaces the given shape with an point object\n"
+                                                  "\n"
+                                                  "This method replaces the given shape with the "
+                                                  "object specified. It does not change the property Id. To change the property Id, "
+                                                  "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
+                                                  "shape and insert a new shape."
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.28.") +
+                                 gsi::method_ext ("replace", &dreplace<db::DPoint>, gsi::arg ("shape"), gsi::arg ("point"),
+                                                  "@brief Replaces the given shape with an point given in micrometer units\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method behaves like the \\replace version with an \\Point argument, except that it will "
+                                                  "internally translate the point from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.28.") +
+                                 gsi::method_ext ("replace", &replace<db::Text>, gsi::arg ("shape"), gsi::arg ("text"),
+                                                  "@brief Replaces the given shape with a text object\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method has been introduced with version 0.16. It replaces the given shape with the "
+                                                  "object specified. It does not change the property Id. To change the property Id, "
+                                                  "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
+                                                  "shape and insert a new shape."
+                                                  "\n"
+                                                  "This method is permitted in editable mode only.") +
+                                 gsi::method_ext ("replace", &dreplace<db::DText>, gsi::arg ("shape"), gsi::arg ("text"),
+                                                  "@brief Replaces the given shape with a text given in micrometer units\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method behaves like the \\replace version with a \\Text argument, except that it will "
+                                                  "internally translate the text from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("replace", &replace<db::SimplePolygon>, gsi::arg ("shape"), gsi::arg ("simple_polygon"),
+                                                  "@brief Replaces the given shape with a simple polygon\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method has been introduced with version 0.16. It replaces the given shape with the "
+                                                  "object specified. It does not change the property Id. To change the property Id, "
+                                                  "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
+                                                  "shape and insert a new shape."
+                                                  "\n"
+                                                  "This method is permitted in editable mode only.") +
+                                 gsi::method_ext ("replace", &dreplace<db::DSimplePolygon>, gsi::arg ("shape"), gsi::arg ("simple_polygon"),
+                                                  "@brief Replaces the given shape with a simple polygon given in micrometer units\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method behaves like the \\replace version with a \\SimplePolygon argument, except that it will "
+                                                  "internally translate the simple polygon from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("replace", &replace<db::Polygon>, gsi::arg ("shape"), gsi::arg ("polygon"),
+                                                  "@brief Replaces the given shape with a polygon\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method has been introduced with version 0.16. It replaces the given shape with the "
+                                                  "object specified. It does not change the property Id. To change the property Id, "
+                                                  "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
+                                                  "shape and insert a new shape."
+                                                  "\n"
+                                                  "This method is permitted in editable mode only.") +
+                                 gsi::method_ext ("replace", &dreplace<db::DPolygon>, gsi::arg ("shape"), gsi::arg ("polygon"),
+                                                  "@brief Replaces the given shape with a polygon given in micrometer units\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "This method behaves like the \\replace version with a \\Polygon argument, except that it will "
+                                                  "internally translate the polygon from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert|#insert_box", &insert<db::Box>, gsi::arg ("box"),
+                                                  "@brief Inserts a box into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "Starting with version 0.16, this method returns a reference to the newly created shape\n") +
+                                 gsi::method_ext ("insert", &dinsert<db::DBox>, gsi::arg ("box"),
+                                                  "@brief Inserts a micrometer-unit box into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\Box argument, except that it will "
+                                                  "internally translate the box from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert|#insert_path", &insert<db::Path>, gsi::arg ("path"),
+                                                  "@brief Inserts a path into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "Starting with version 0.16, this method returns a reference to the newly created shape\n") +
+                                 gsi::method_ext ("insert", &dinsert<db::DPath>, gsi::arg ("path"),
+                                                  "@brief Inserts a micrometer-unit path into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\Path argument, except that it will "
+                                                  "internally translate the path from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert|#insert_edge", &insert<db::Edge>, gsi::arg ("edge"),
+                                                  "@brief Inserts an edge into the shapes list\n"
+                                                  "\n"
+                                                  "Starting with version 0.16, this method returns a reference to the newly created shape\n") +
+                                 gsi::method_ext ("insert", &dinsert<db::DEdge>, gsi::arg ("edge"),
+                                                  "@brief Inserts a micrometer-unit edge into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\Edge argument, except that it will "
+                                                  "internally translate the edge from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert", &insert<db::EdgePair>, gsi::arg ("edge_pair"),
+                                                  "@brief Inserts an edge pair into the shapes list\n"
+                                                  "\n"
+                                                  "This method has been introduced in version 0.26.\n") +
+                                 gsi::method_ext ("insert", &dinsert<db::DEdgePair>, gsi::arg ("edge_pair"),
+                                                  "@brief Inserts a micrometer-unit edge pair into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\EdgePair argument, except that it will "
+                                                  "internally translate the edge pair from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.26.") +
+                                 gsi::method_ext ("insert|#insert_point", &insert<db::Point>, gsi::arg ("point"),
+                                                  "@brief Inserts an point into the shapes list\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.28.\n") +
+                                 gsi::method_ext ("insert", &dinsert<db::DPoint>, gsi::arg ("point"),
+                                                  "@brief Inserts a micrometer-unit point into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\Point argument, except that it will "
+                                                  "internally translate the point from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.28.\n") +
+                                 gsi::method_ext ("insert|#insert_text", &insert<db::Text>, gsi::arg ("text"),
+                                                  "@brief Inserts a text into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "Starting with version 0.16, this method returns a reference to the newly created shape\n") +
+                                 gsi::method_ext ("insert", &dinsert<db::DText>, gsi::arg ("text"),
+                                                  "@brief Inserts a micrometer-unit text into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\Text argument, except that it will "
+                                                  "internally translate the text from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert|#insert_simple_polygon", &insert<db::SimplePolygon>, gsi::arg ("simple_polygon"),
+                                                  "@brief Inserts a simple polygon into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "Starting with version 0.16, this method returns a reference to the newly created shape\n") +
+                                 gsi::method_ext ("insert", &dinsert<db::DSimplePolygon>, gsi::arg ("simple_polygon"),
+                                                  "@brief Inserts a micrometer-unit simple polygon into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\SimplePolygon argument, except that it will "
+                                                  "internally translate the polygon from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert|#insert_polygon", &insert<db::Polygon>, gsi::arg ("polygon"),
+                                                  "@brief Inserts a polygon into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "\n"
+                                                  "Starting with version 0.16, this method returns a reference to the newly created shape\n") +
+                                 gsi::method_ext ("insert", &dinsert<db::DPolygon>, gsi::arg ("polygon"),
+                                                  "@brief Inserts a micrometer-unit polygon into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\Polygon argument, except that it will "
+                                                  "internally translate the polygon from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert|#insert_box_with_properties", &insert_with_properties<db::Box>, gsi::arg ("box"), gsi::arg ("property_id"),
+                                                  "@brief Inserts a box with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "Starting with version 0.16, this method returns a reference to the newly created shape\n") +
+                                 gsi::method_ext ("insert", &dinsert_with_properties<db::DBox, db::Box>, gsi::arg ("box"), gsi::arg ("property_id"),
+                                                  "@brief Inserts a micrometer-unit box with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\Box argument and a property ID, except that it will "
+                                                  "internally translate the box from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert|#insert_path_with_properties", &insert_with_properties<db::Path>, gsi::arg ("path"), gsi::arg ("property_id"),
+                                                  "@brief Inserts a path with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "Starting with version 0.16, this method returns a reference to the newly created shape\n") +
+                                 gsi::method_ext ("insert", &dinsert_with_properties<db::DPath, db::Path>, gsi::arg ("path"), gsi::arg ("property_id"),
+                                                  "@brief Inserts a micrometer-unit path with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\Path argument and a property ID, except that it will "
+                                                  "internally translate the path from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert|#insert_edge_with_properties", &insert_with_properties<db::Edge>, gsi::arg ("edge"), gsi::arg ("property_id"),
+                                                  "@brief Inserts an edge with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "Starting with version 0.16, this method returns a reference to the newly created shape.\n") +
+                                 gsi::method_ext ("insert", &dinsert_with_properties<db::DEdge, db::Edge>, gsi::arg ("edge"), gsi::arg ("property_id"),
+                                                  "@brief Inserts a micrometer-unit edge with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\Edge argument and a property ID, except that it will "
+                                                  "internally translate the edge from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert", &insert_with_properties<db::EdgePair>, gsi::arg ("edge_pair"), gsi::arg ("property_id"),
+                                                  "@brief Inserts an edge pair with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "This method has been introduced in version 0.26.\n") +
+                                 gsi::method_ext ("insert", &dinsert_with_properties<db::DEdgePair, db::EdgePair>, gsi::arg ("edge_pair"), gsi::arg ("property_id"),
+                                                  "@brief Inserts a micrometer-unit edge pair with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\EdgePair argument and a property ID, except that it will "
+                                                  "internally translate the edge pair from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.26.") +
+                                 gsi::method_ext ("insert|#insert_text_with_properties", &insert_with_properties<db::Text>, gsi::arg ("text"), gsi::arg ("property_id"),
+                                                  "@brief Inserts a text with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "Starting with version 0.16, this method returns a reference to the newly created shape\n") +
+                                 gsi::method_ext ("insert", &dinsert_with_properties<db::DText, db::Text>, gsi::arg ("text"), gsi::arg ("property_id"),
+                                                  "@brief Inserts a micrometer-unit text with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\Text argument and a property ID, except that it will "
+                                                  "internally translate the text from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert|#insert_simple_polygon_with_properties", &insert_with_properties<db::SimplePolygon>, gsi::arg ("simple_polygon"), gsi::arg ("property_id"),
+                                                  "@brief Inserts a simple polygon with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "Starting with version 0.16, this method returns a reference to the newly created shape\n") +
+                                 gsi::method_ext ("insert", &dinsert_with_properties<db::DSimplePolygon, db::SimplePolygon>, gsi::arg ("simple_polygon"), gsi::arg ("property_id"),
+                                                  "@brief Inserts a micrometer-unit simple polygon with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\SimplePolygon argument and a property ID, except that it will "
+                                                  "internally translate the simple polygon from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert|#insert_polygon_with_properties", &insert_with_properties<db::Polygon>, gsi::arg ("polygon"), gsi::arg ("property_id"),
+                                                  "@brief Inserts a polygon with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "Starting with version 0.16, this method returns a reference to the newly created shape\n") +
+                                 gsi::method_ext ("insert", &dinsert_with_properties<db::DPolygon, db::Polygon>, gsi::arg ("polygon"), gsi::arg ("property_id"),
+                                                  "@brief Inserts a micrometer-unit polygon with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\Polygon argument and a property ID, except that it will "
+                                                  "internally translate the polygon from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.25.") +
+                                 gsi::method_ext ("insert", &insert<db::BoxWithProperties>, gsi::arg ("box"),
+                                                  "@brief Inserts a box with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &dinsert<db::DBoxWithProperties>, gsi::arg ("box"),
+                                                  "@brief Inserts a micrometer-unit box with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\BoxWithProperties argument, except that it will "
+                                                  "internally translate the box from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &insert<db::PathWithProperties>, gsi::arg ("path"),
+                                                  "@brief Inserts a path with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &dinsert<db::DPathWithProperties>, gsi::arg ("path"),
+                                                  "@brief Inserts a micrometer-unit path with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\PathWithProperties argument, except that it will "
+                                                  "internally translate the path from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &insert<db::EdgeWithProperties>, gsi::arg ("edge"),
+                                                  "@brief Inserts an edge with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &dinsert<db::DEdgeWithProperties>, gsi::arg ("edge"),
+                                                  "@brief Inserts a micrometer-unit edge with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\EdgeWithProperties argument, except that it will "
+                                                  "internally translate the edge from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &insert<db::EdgePairWithProperties>, gsi::arg ("edge_pair"),
+                                                  "@brief Inserts an edge pair with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &dinsert<db::DEdgePairWithProperties>, gsi::arg ("edge_pair"),
+                                                  "@brief Inserts a micrometer-unit edge pair with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\EdgePairWithProperties argument, except that it will "
+                                                  "internally translate the edge pair from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &insert<db::TextWithProperties>, gsi::arg ("text"),
+                                                  "@brief Inserts a text with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &dinsert<db::DTextWithProperties>, gsi::arg ("text"),
+                                                  "@brief Inserts a micrometer-unit text with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\TextWithProperties argument, except that it will "
+                                                  "internally translate the text from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &insert<db::SimplePolygonWithProperties>, gsi::arg ("simple_polygon"),
+                                                  "@brief Inserts a simple polygon with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &dinsert<db::DSimplePolygonWithProperties>, gsi::arg ("simple_polygon"),
+                                                  "@brief Inserts a micrometer-unit simple polygon with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\SimplePolygonWithProperties argument, except that it will "
+                                                  "internally translate the simple polygon from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &insert<db::PolygonWithProperties>, gsi::arg ("polygon"),
+                                                  "@brief Inserts a polygon with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "The property Id must be obtained from the \\Layout object's property_id method which "
+                                                  "associates a property set with a property Id."
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::method_ext ("insert", &dinsert<db::DPolygonWithProperties>, gsi::arg ("polygon"),
+                                                  "@brief Inserts a micrometer-unit polygon with properties into the shapes list\n"
+                                                  "@return A reference to the new shape (a \\Shape object)\n"
+                                                  "This method behaves like the \\insert version with a \\PolygonWithProperties argument, except that it will "
+                                                  "internally translate the polygon from micrometer to database units.\n"
+                                                  "\n"
+                                                  "This variant has been introduced in version 0.30.") +
+                                 gsi::iterator_ext ("each", &begin, gsi::arg ("flags"),
+                                                    "@brief Gets all shapes\n"
+                                                    "\n"
+                                                    "@param flags An \"or\"-ed combination of the S... constants\n") +
+                                 gsi::iterator_ext ("each", &begin_all,
+                                                    "@brief Gets all shapes\n"
+                                                    "\n"
+                                                    "This call is equivalent to each(SAll). This convenience method has been introduced in version 0.16\n") +
+                                 gsi::iterator_ext ("each_touching", &begin_touching, gsi::arg ("flags"), gsi::arg ("region"),
+                                                    "@brief Gets all shapes that touch the search box (region)\n"
+                                                    "This method was introduced in version 0.16\n"
+                                                    "\n"
+                                                    "@param flags An \"or\"-ed combination of the S... constants\n"
+                                                    "@param region The rectangular search region\n") +
+                                 gsi::iterator_ext ("each_touching", &begin_dtouching, gsi::arg ("flags"), gsi::arg ("region"),
+                                                    "@brief Gets all shapes that touch the search box (region) where the search box is given in micrometer units\n"
+                                                    "@param flags An \"or\"-ed combination of the S... constants\n"
+                                                    "@param region The rectangular search region as a \\DBox object in micrometer units\n"
+                                                    "\n"
+                                                    "This method was introduced in version 0.25\n") +
+                                 gsi::iterator_ext ("each_touching", &begin_touching_all, gsi::arg ("region"),
+                                                    "@brief Gets all shapes that touch the search box (region)\n"
+                                                    "@param region The rectangular search region\n"
+                                                    "\n"
+                                                    "This call is equivalent to each_touching(SAll,region). This convenience method has been introduced in version 0.16\n") +
+                                 gsi::iterator_ext ("each_touching", &begin_dtouching_all, gsi::arg ("region"),
+                                                    "@brief Gets all shapes that touch the search box (region) where the search box is given in micrometer units\n"
+                                                    "@param region The rectangular search region as a \\DBox object in micrometer units\n"
+                                                    "This call is equivalent to each_touching(SAll,region).\n"
+                                                    "\n"
+                                                    "This method was introduced in version 0.25\n") +
+                                 gsi::iterator_ext ("each_overlapping", &begin_overlapping, gsi::arg ("flags"), gsi::arg ("region"),
+                                                    "@brief Gets all shapes that overlap the search box (region)\n"
+                                                    "This method was introduced in version 0.16\n"
+                                                    "\n"
+                                                    "@param flags An \"or\"-ed combination of the S... constants\n"
+                                                    "@param region The rectangular search region\n") +
+                                 gsi::iterator_ext ("each_overlapping", &begin_doverlapping, gsi::arg ("flags"), gsi::arg ("region"),
+                                                    "@brief Gets all shapes that overlap the search box (region) where the search box is given in micrometer units\n"
+                                                    "@param flags An \"or\"-ed combination of the S... constants\n"
+                                                    "@param region The rectangular search region as a \\DBox object in micrometer units\n"
+                                                    "\n"
+                                                    "This method was introduced in version 0.25\n") +
+                                 gsi::iterator_ext ("each_overlapping", &begin_overlapping_all, gsi::arg ("region"),
+                                                    "@brief Gets all shapes that overlap the search box (region)\n"
+                                                    "@param region The rectangular search region\n"
+                                                    "\n"
+                                                    "This call is equivalent to each_overlapping(SAll,region). This convenience method has been introduced in version 0.16\n") +
+                                 gsi::iterator_ext ("each_overlapping", &begin_doverlapping_all, gsi::arg ("region"),
+                                                    "@brief Gets all shapes that overlap the search box (region) where the search box is given in micrometer units\n"
+                                                    "@param region The rectangular search region as a \\DBox object in micrometer units\n"
+                                                    "This call is equivalent to each_touching(SAll,region).\n"
+                                                    "\n"
+                                                    "This method was introduced in version 0.25\n") +
+                                 gsi::method ("erase", &db::Shapes::erase_shape, gsi::arg ("shape"),
+                                              "@brief Erases the shape pointed to by the given \\Shape object\n"
+                                              "This method has been introduced in version 0.16. It can only be used in editable mode.\n"
+                                              "Erasing a shape will invalidate the shape reference. Access to this reference may then render invalid results.\n"
+                                              "\n"
+                                              "@param shape The shape which to destroy") +
+                                 gsi::method ("find", (db::Shape (db::Shapes::*) (const db::Shape &) const) & db::Shapes::find, gsi::arg ("shape"),
+                                              "@brief Finds a shape inside this collected\n"
+                                              "This method has been introduced in version 0.21.\n"
+                                              "This method tries to find the given shape in this collection. The original shape may be located in another collection. "
+                                              "If the shape is found, this method returns a reference to the shape in this collection, otherwise a null reference is returned.") +
+                                 gsi::method ("is_valid?", &db::Shapes::is_valid, gsi::arg ("shape"),
+                                              "@brief Tests if the given \\Shape object is still pointing to a valid object\n"
+                                              "This method has been introduced in version 0.16.\n"
+                                              "If the shape represented by the given reference has been deleted, this method returns false. "
+                                              "If however, another shape has been inserted already that occupies the original shape's position, "
+                                              "this method will return true again.\n") +
+                                 gsi::method ("is_empty?", &db::Shapes::empty,
+                                              "@brief Returns a value indicating whether the shapes container is empty\n"
+                                              "This method has been introduced in version 0.20.\n") +
+                                 gsi::method ("clear", static_cast<void (db::Shapes::*) ()> (&db::Shapes::clear),
+                                              "@brief Clears the shape container\n"
+                                              "This method has been introduced in version 0.16.") +
+                                 gsi::method ("clear", static_cast<void (db::Shapes::*) (unsigned int)> (&db::Shapes::clear), gsi::arg ("flags"),
+                                              "@brief Clears certain shape types from the shape container\n"
+                                              "Only shapes matching the shape types from 'flags' are removed. 'flags' is a combination of the S... constants.\n"
+                                              "\n"
+                                              "This method has been introduced in version 0.28.9.") +
+                                 gsi::method_ext ("size", &shapes_size,
+                                                  "@brief Gets the number of shapes in this container\n"
+                                                  "This method was introduced in version 0.16\n"
+                                                  "@return The number of shapes in this container\n") +
+                                 gsi::method ("cell", &db::Shapes::cell,
+                                              "@brief Gets the cell the shape container belongs to\n"
+                                              "This method returns nil if the shape container does not belong to a cell.\n"
+                                              "\n"
+                                              "This method has been added in version 0.28.") +
+                                 gsi::method_ext ("layout", &layout,
+                                                  "@brief Gets the layout object the shape container belongs to\n"
+                                                  "This method returns nil if the shape container does not belong to a layout.\n"
+                                                  "\n"
+                                                  "This method has been added in version 0.28.") +
+                                 gsi::method ("replace_prop_id", (db::Shape (db::Shapes::*) (const db::Shape &, db::properties_id_type)) &db::Shapes::replace_prop_id, gsi::arg ("shape"), gsi::arg ("property_id"),
+                                              "@brief Replaces (or install) the properties of a shape\n"
+                                              "@return A \\Shape object representing the new shape\n"
+                                              "This method has been introduced in version 0.16. It can only be used in editable mode.\n"
+                                              "Changes the properties Id of the given shape or install a properties Id on that shape if it does not have one yet.\n"
+                                              "The property Id must be obtained from the \\Layout object's property_id method which "
+                                              "associates a property set with a property Id.\n"
+                                              "This method will potentially invalidate the shape reference passed to it. Use the reference "
+                                              "returned for future references.") +
+                                 gsi::method ("SAll|#s_all", &s_all,
+                                              "@brief Indicates that all shapes shall be retrieved\n"
+                                              "You can use this constant to construct 'except' classes - e.g. "
+                                              "to specify 'all shape types except boxes' use\n"
+                                              "\n"
+                                              "@code SAll - SBoxes @/code\n") +
+                                 gsi::method ("SAllWithProperties|#s_all_with_properties", &s_all_with_properties,
+                                              "@brief Indicates that all shapes with properties shall be retrieved\n"
+                                              "Using this selector means to retrieve only shapes with properties."
+                                              "You can use this constant to construct 'except' classes - e.g. "
+                                              "to specify 'all shape types with properties except boxes' use\n"
+                                              "\n"
+                                              "@code SAllWithProperties - SBoxes @/code\n") +
+                                 gsi::method ("SPolygons|#s_polygons", &s_polygons,
+                                              "@brief Indicates that polygons shall be retrieved") +
+                                 gsi::method ("SRegions|#s_regions", &s_regions,
+                                              "@brief Indicates that objects which can be polygonized shall be retrieved (paths, boxes, polygons etc.)\n"
+                                              "\n"
+                                              "This constant has been added in version 0.27.") +
+                                 gsi::method ("SBoxes|#s_boxes", &s_boxes,
+                                              "@brief Indicates that boxes shall be retrieved") +
+                                 gsi::method ("SEdges|#s_edges", &s_edges,
+                                              "@brief Indicates that edges shall be retrieved") +
+                                 gsi::method ("SEdgePairs|#s_edge_pairs", &s_edge_pairs,
+                                              "@brief Indicates that edge pairs shall be retrieved") +
+                                 gsi::method ("SPoints|#s_points", &s_points,
+                                              "@brief Indicates that points shall be retrieved"
+                                              "\n"
+                                              "This constant has been added in version 0.28.") +
+                                 gsi::method ("SPaths|#s_paths", &s_paths,
+                                              "@brief Indicates that paths shall be retrieved") +
+                                 gsi::method ("STexts|#s_texts", &s_texts,
+                                              "@brief Indicates that texts be retrieved") +
+                                 gsi::method ("SUserObjects|#s_user_objects", &s_user_objects,
+                                              "@brief Indicates that user objects shall be retrieved") +
+                                 gsi::method ("SProperties|#s_properties", &s_properties,
+                                              "@brief Indicates that only shapes with properties shall be retrieved\n"
+                                              "You can or-combine this flag with the plain shape types to select a "
+                                              "certain shape type, but only those shapes with properties. For example to "
+                                              "select boxes with properties, use 'SProperties | SBoxes'.") +
+                                 gsi::method_ext ("dump_mem_statistics", &dump_mem_statistics, gsi::arg<bool> ("detailed", false),
+                                                  "@hide"),
+                               "@brief A collection of shapes\n"
+                               "\n"
+                               "A shapes collection is a collection of geometrical objects, such as "
+                               "polygons, boxes, paths, edges, edge pairs or text objects.\n"
+                               "\n"
+                               "Shapes objects are the basic containers for geometrical objects of a cell. Inside a cell, there is "
+                               "one Shapes object per layer.\n");
 
 }

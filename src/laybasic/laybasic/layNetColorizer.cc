@@ -37,8 +37,7 @@ NetColorizer::NetColorizer ()
   m_signals_enabled = true;
 }
 
-void
-NetColorizer::configure (const tl::Color &marker_color, const lay::ColorPalette *auto_colors)
+void NetColorizer::configure (const tl::Color &marker_color, const lay::ColorPalette *auto_colors)
 {
   m_marker_color = marker_color;
   if (auto_colors) {
@@ -51,36 +50,31 @@ NetColorizer::configure (const tl::Color &marker_color, const lay::ColorPalette 
   emit_colors_changed ();
 }
 
-bool
-NetColorizer::has_color_for_net (const db::Net *net)
+bool NetColorizer::has_color_for_net (const db::Net *net)
 {
   return net != 0 && (m_auto_colors_enabled || m_custom_color.find (net) != m_custom_color.end ());
 }
 
-void
-NetColorizer::set_color_of_net (const db::Net *net, const tl::Color &color)
+void NetColorizer::set_color_of_net (const db::Net *net, const tl::Color &color)
 {
-  m_custom_color[net] = color;
+  m_custom_color [net] = color;
   emit_colors_changed ();
 }
 
-void
-NetColorizer::reset_color_of_net (const db::Net *net)
+void NetColorizer::reset_color_of_net (const db::Net *net)
 {
   m_custom_color.erase (net);
   emit_colors_changed ();
 }
 
-void
-NetColorizer::clear ()
+void NetColorizer::clear ()
 {
   m_net_index_by_object.clear ();
   m_custom_color.clear ();
   emit_colors_changed ();
 }
 
-void
-NetColorizer::begin_changes ()
+void NetColorizer::begin_changes ()
 {
   if (m_signals_enabled) {
     m_update_needed = false;
@@ -88,8 +82,7 @@ NetColorizer::begin_changes ()
   }
 }
 
-void
-NetColorizer::end_changes ()
+void NetColorizer::end_changes ()
 {
   if (! m_signals_enabled) {
     m_signals_enabled = true;
@@ -100,8 +93,7 @@ NetColorizer::end_changes ()
   }
 }
 
-void
-NetColorizer::emit_colors_changed ()
+void NetColorizer::emit_colors_changed ()
 {
   if (! m_signals_enabled) {
     m_update_needed = true;
@@ -133,8 +125,8 @@ NetColorizer::color_of_net (const db::Net *net) const
 
       size_t i = 0;
       for (db::Circuit::const_net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n, ++i) {
-        m_net_index_by_object.insert (std::make_pair (n.operator-> (), i));
-        if (n.operator-> () == net) {
+        m_net_index_by_object.insert (std::make_pair (n.operator->(), i));
+        if (n.operator->() == net) {
           index = i;
         }
       }

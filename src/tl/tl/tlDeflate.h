@@ -86,7 +86,7 @@ public:
     if (m_mask == 0) {
       m_byte = get_byte ();
       m_mask = 0x01;
-    } 
+    }
     bool b = ((m_byte & m_mask) != 0);
     m_mask <<= 1;
     return b;
@@ -144,7 +144,7 @@ public:
   /**
    *  @brief Destructor
    *
-   *  Note that this method will not flush the stream since that may 
+   *  Note that this method will not flush the stream since that may
    *  throw an exception. flush() has to be called explicitly.
    */
   ~DeflateFilter ();
@@ -157,7 +157,7 @@ public:
   /**
    *  @brief Flushes the buffer and writes all remaining bytes
    *
-   *  Note: this method must be called always before the stream 
+   *  Note: this method must be called always before the stream
    *  is closed and the filter is destroyed. Otherwise, the last bytes may be lost.
    */
   void flush ();
@@ -180,7 +180,7 @@ public:
 
 private:
   bool m_finished;
-  char m_buffer[65536];
+  char m_buffer [65536];
   tl::OutputStream *mp_output;
   z_stream_s *mp_stream;
   size_t m_uc, m_cc;
@@ -190,7 +190,7 @@ private:
  *  @brief The DEFLATE decompression (inflating) filter
  *
  *  This class is the main DEFLATE decoder. It is called "filter", since it takes bytes from
- *  the input (from the "input" stream) and delivers bytes on the output ("get" method). 
+ *  the input (from the "input" stream) and delivers bytes on the output ("get" method).
  */
 class TL_PUBLIC InflateFilter
 {
@@ -209,7 +209,7 @@ public:
 
   /**
    *  @brief Get the next byte(s)
-   *  
+   *
    *  This method returns a contiguous block of decoded bytes with the given length.
    *  The maximum size of the block available is half the buffer size.
    */
@@ -222,7 +222,7 @@ public:
    *  the size to unget must match the last get's size.
    */
   void unget (size_t n);
-  
+
 
   /**
    *  @brief Report true, if no more bytes can be delivered
@@ -246,10 +246,8 @@ private:
   void put_byte (char b);
   void put_byte_dist (unsigned int d);
   bool process ();
-
 };
 
 }
 
 #endif
-

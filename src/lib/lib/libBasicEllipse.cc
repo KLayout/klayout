@@ -46,8 +46,7 @@ BasicEllipse::BasicEllipse ()
   //  .. nothing yet ..
 }
 
-bool 
-BasicEllipse::can_create_from_shape (const db::Layout & /*layout*/, const db::Shape &shape, unsigned int /*layer*/) const
+bool BasicEllipse::can_create_from_shape (const db::Layout & /*layout*/, const db::Shape &shape, unsigned int /*layer*/) const
 {
   return (shape.is_polygon () || shape.is_box () || shape.is_path ());
 }
@@ -72,7 +71,7 @@ BasicEllipse::parameters_from_shape (const db::Layout &layout, const db::Shape &
   return map_parameters (nm);
 }
 
-std::vector<db::PCellLayerDeclaration> 
+std::vector<db::PCellLayerDeclaration>
 BasicEllipse::get_layer_declarations (const db::pcell_parameters_type &parameters) const
 {
   std::vector<db::PCellLayerDeclaration> layers;
@@ -85,8 +84,7 @@ BasicEllipse::get_layer_declarations (const db::pcell_parameters_type &parameter
   return layers;
 }
 
-void 
-BasicEllipse::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters_type &parameters) const
+void BasicEllipse::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters_type &parameters) const
 {
   if (parameters.size () < p_total) {
     return;
@@ -96,9 +94,9 @@ BasicEllipse::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parame
   double r_x = parameters [p_actual_radius_x].to_double ();
 
   double rs_x = ru_x;
-  if (parameters [p_handle_x].is_user <db::DPoint> ()) {
-    rs_x = fabs(parameters [p_handle_x].to_user <db::DPoint> ().x ());
-  } 
+  if (parameters [p_handle_x].is_user<db::DPoint> ()) {
+    rs_x = fabs (parameters [p_handle_x].to_user<db::DPoint> ().x ());
+  }
 
   if (fabs (ru_x - r_x) > 1e-6) {
     //  the explicit radius has changed: use it
@@ -120,9 +118,9 @@ BasicEllipse::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parame
   double r_y = parameters [p_actual_radius_y].to_double ();
 
   double rs_y = ru_y;
-  if (parameters [p_handle_y].is_user <db::DPoint> ()) {
-    rs_y = fabs (parameters [p_handle_y].to_user <db::DPoint> ().y ());
-  } 
+  if (parameters [p_handle_y].is_user<db::DPoint> ()) {
+    rs_y = fabs (parameters [p_handle_y].to_user<db::DPoint> ().y ());
+  }
 
   if (fabs (ru_y - r_y) > 1e-6) {
     //  the explicit radius has changed: use it
@@ -140,8 +138,7 @@ BasicEllipse::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parame
   parameters [p_radius_y] = ru_y;
 }
 
-void 
-BasicEllipse::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
+void BasicEllipse::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
 {
   if (parameters.size () < p_total || layer_ids.size () < 1) {
     return;
@@ -151,11 +148,11 @@ BasicEllipse::produce (const db::Layout &layout, const std::vector<unsigned int>
   double r_y = parameters [p_radius_y].to_double () / layout.dbu ();
   int n = std::max (3, parameters [p_npoints].to_int ());
 
-  std::vector <db::Point> points;
+  std::vector<db::Point> points;
   points.reserve (n);
 
-  //  Produce an outer circle approximation. This 
-  //  one looks slightly better in the case of few points. 
+  //  Produce an outer circle approximation. This
+  //  one looks slightly better in the case of few points.
   double rr_x = r_x / cos (M_PI / n);
   double rr_y = r_y / cos (M_PI / n);
   double da = 2.0 * M_PI / n;
@@ -170,41 +167,41 @@ BasicEllipse::produce (const db::Layout &layout, const std::vector<unsigned int>
   cell.shapes (layer_ids [p_layer]).insert (poly);
 }
 
-std::string 
+std::string
 BasicEllipse::get_display_name (const db::pcell_parameters_type &parameters) const
 {
   return "ELLIPSE(l=" + std::string (parameters [p_layer].to_string ()) +
-               ",rx=" + tl::to_string (parameters [p_radius_x].to_double ()) +
-               ",ry=" + tl::to_string (parameters [p_radius_y].to_double ()) +
-                ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
-                  ")";
+         ",rx=" + tl::to_string (parameters [p_radius_x].to_double ()) +
+         ",ry=" + tl::to_string (parameters [p_radius_y].to_double ()) +
+         ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
+         ")";
 }
 
-std::vector<db::PCellParameterDeclaration> 
+std::vector<db::PCellParameterDeclaration>
 BasicEllipse::get_parameter_declarations () const
 {
   std::vector<db::PCellParameterDeclaration> parameters;
 
-  //  parameter #0: layer 
+  //  parameter #0: layer
   tl_assert (parameters.size () == p_layer);
   parameters.push_back (db::PCellParameterDeclaration ("layer"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_layer);
   parameters.back ().set_description (tl::to_string (tr ("Layer")));
 
-  //  parameter #1: x radius 
+  //  parameter #1: x radius
   tl_assert (parameters.size () == p_radius_x);
   parameters.push_back (db::PCellParameterDeclaration ("radius_x"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
   parameters.back ().set_hidden (true);
 
-  //  parameter #2: y radius 
+  //  parameter #2: y radius
   //  This is a shadow parameter to receive the used y radius
   tl_assert (parameters.size () == p_radius_y);
   parameters.push_back (db::PCellParameterDeclaration ("radius_y"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
   parameters.back ().set_hidden (true);
 
-  //  parameter #3: x handle 
+  //  parameter #3: x handle
   //  This is a shadow parameter to receive the used x radius
   tl_assert (parameters.size () == p_handle_x);
   parameters.push_back (db::PCellParameterDeclaration ("handle_x"));
@@ -212,14 +209,14 @@ BasicEllipse::get_parameter_declarations () const
   parameters.back ().set_default (db::DPoint (-1.0, 0));
   parameters.back ().set_description (tl::to_string (tr ("Rx")));
 
-  //  parameter #4: x handle 
+  //  parameter #4: x handle
   tl_assert (parameters.size () == p_handle_y);
   parameters.push_back (db::PCellParameterDeclaration ("handle_y"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
   parameters.back ().set_default (db::DPoint (0, 0.5));
   parameters.back ().set_description (tl::to_string (tr ("Ry")));
 
-  //  parameter #5: number of points 
+  //  parameter #5: number of points
   tl_assert (parameters.size () == p_npoints);
   parameters.push_back (db::PCellParameterDeclaration ("npoints"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_int);
@@ -246,5 +243,3 @@ BasicEllipse::get_parameter_declarations () const
 }
 
 }
-
-

@@ -79,7 +79,6 @@ static bool include_zero_flag (zero_distance_mode zd_mode, const db::Edge &a, co
     }
 
     return false;
-
   }
 }
 
@@ -114,7 +113,7 @@ bool euclidian_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<d
 
   //  keep only part of other which is on the "inside" side of e
   if (s1 > thr && s2 > thr) {
-    return false; 
+    return false;
   } else if (s2 > thr) {
     g = db::Edge (g.p1 (), g.cut_point (e).second);
   } else if (s1 > thr) {
@@ -162,9 +161,7 @@ bool euclidian_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<d
       }
 
       return false;
-
     }
-
   }
 
   //  Determine body interactions (projected mode)
@@ -206,15 +203,13 @@ bool euclidian_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<d
         std::swap (lt1, lt2);
       }
 
-      double ll1 = std::max(lp1, lt1);
-      double ll2 = std::min(lp2, lt2);
+      double ll1 = std::max (lp1, lt1);
+      double ll2 = std::min (lp2, lt2);
       if (ll1 <= ll2) {
         l1 = ll1;
         l2 = ll2;
       }
-
     }
-
   }
 
   //  Compute a solution for the circles and the ends if there is one
@@ -232,7 +227,6 @@ bool euclidian_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<d
       l1 = std::min (l1, -b - sqrt (s));
       l2 = std::max (l2, -b + sqrt (s));
     }
-
   }
 
   l1 = std::max (0.0, l1);
@@ -279,7 +273,7 @@ static bool var_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<
 
   //  keep only part of other which is on the "inside" side of e
   if (s1 > thr && s2 > thr) {
-    return false; 
+    return false;
   } else if (s2 > thr) {
     g = db::Edge (g.p1 (), g.cut_point (e).second);
   } else if (s1 > thr) {
@@ -314,7 +308,6 @@ static bool var_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<
       *output = g;
     }
     return true;
-
   }
 
   //  Determine body interactions (projected mode)
@@ -350,7 +343,6 @@ static bool var_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<
 
     l1 = lp1;
     l2 = lp2;
-
   }
 
   bool allow_zero_projection = false;
@@ -370,7 +362,6 @@ static bool var_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<
       l2 = l + dl;
 
       allow_zero_projection = true;
-
     }
 
   } else {
@@ -382,9 +373,8 @@ static bool var_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<
       std::swap (lt1, lt2);
     }
 
-    l1 = std::max(l1, lt1);
-    l2 = std::min(l2, lt2);
-
+    l1 = std::max (l1, lt1);
+    l2 = std::min (l2, lt2);
   }
 
   //  Return the solution if one is found
@@ -439,15 +429,13 @@ EdgeRelationFilter::EdgeRelationFilter (edge_relation_type r, distance_type d, c
   set_ignore_angle (options.ignore_angle);
 }
 
-void
-EdgeRelationFilter::set_ignore_angle (double a)
+void EdgeRelationFilter::set_ignore_angle (double a)
 {
   m_ignore_angle = a;
   m_ignore_angle_cos = cos (m_ignore_angle * M_PI / 180.0);
 }
 
-bool 
-EdgeRelationFilter::check (const db::Edge &a, const db::Edge &b, db::EdgePair *output) const
+bool EdgeRelationFilter::check (const db::Edge &a, const db::Edge &b, db::EdgePair *output) const
 {
   //  check projection criterion
 
@@ -460,7 +448,6 @@ EdgeRelationFilter::check (const db::Edge &a, const db::Edge &b, db::EdgePair *o
         return false;
       }
     }
-
   }
 
   //  Check angle relation
@@ -533,7 +520,6 @@ EdgeRelationFilter::check (const db::Edge &a, const db::Edge &b, db::EdgePair *o
           output->second ().swap_points ();
         }
       }
-
     }
 
     return true;
@@ -544,4 +530,3 @@ EdgeRelationFilter::check (const db::Edge &a, const db::Edge &b, db::EdgePair *o
 }
 
 }
-

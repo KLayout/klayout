@@ -35,9 +35,9 @@
 
 namespace db
 {
-  class EdgeProcessor;
+class EdgeProcessor;
 }
- 
+
 namespace db
 {
 
@@ -47,7 +47,7 @@ class RS274XApertureBase
 {
 public:
   RS274XApertureBase ();
-  virtual ~RS274XApertureBase () { }
+  virtual ~RS274XApertureBase () {}
 
   void produce_flash (const db::DCplxTrans &d, RS274XReader &reader, db::EdgeProcessor &ep, bool clear);
   void produce_linear (const db::DCplxTrans &d, const db::DVector &dist, RS274XReader &reader, db::EdgeProcessor &ep, bool clear);
@@ -61,7 +61,7 @@ protected:
   void produce_polygon (bool clear);
   void produce_line ();
 
-  RS274XReader &reader () 
+  RS274XReader &reader ()
   {
     return *mp_reader;
   }
@@ -175,4 +175,3 @@ private:
 }
 
 #endif
-

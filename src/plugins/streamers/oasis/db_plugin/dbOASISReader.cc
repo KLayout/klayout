@@ -68,7 +68,7 @@ OASISReader::OASISReader (tl::InputStream &s)
     mm_circle_radius (this, "circle-radius"),
     mm_last_property_name (this, "last-property-name"),
     mm_last_property_is_sprop (this, "last-property-is-stdprop"),
-    mm_last_value_list(this, "last-value-list"),
+    mm_last_value_list (this, "last-value-list"),
     m_read_texts (true),
     m_read_properties (true),
     m_read_all_properties (false),
@@ -96,8 +96,7 @@ OASISReader::~OASISReader ()
   //  .. nothing yet ..
 }
 
-void
-OASISReader::init (const db::LoadLayoutOptions &options)
+void OASISReader::init (const db::LoadLayoutOptions &options)
 {
   CommonReader::init (options);
 
@@ -135,8 +134,8 @@ OASISReader::get_uint64 ()
       return 0;
     }
     c = *b;
-    if (vm > std::numeric_limits <uint64_t>::max () / 128 &&
-        (uint64_t) (c & 0x7f) > (std::numeric_limits <uint64_t>::max () / vm)) {
+    if (vm > std::numeric_limits<uint64_t>::max () / 128 &&
+        (uint64_t) (c & 0x7f) > (std::numeric_limits<uint64_t>::max () / vm)) {
       error (tl::to_string (tr ("uint64 value overflow")));
     }
     v += (uint64_t) (c & 0x7f) * vm;
@@ -181,8 +180,8 @@ OASISReader::get_uint32 ()
       return 0;
     }
     c = *b;
-    if (vm > std::numeric_limits <uint32_t>::max () / 128 &&
-        (uint32_t) (c & 0x7f) > (std::numeric_limits <uint32_t>::max () / vm)) {
+    if (vm > std::numeric_limits<uint32_t>::max () / 128 &&
+        (uint32_t) (c & 0x7f) > (std::numeric_limits<uint32_t>::max () / vm)) {
       error (tl::to_string (tr ("uin32 value overflow")));
     }
     v += (uint32_t) (c & 0x7f) * vm;
@@ -200,8 +199,7 @@ OASISReader::get_str ()
   return s;
 }
 
-void
-OASISReader::get_str (std::string &s)
+void OASISReader::get_str (std::string &s)
 {
   size_t l = 0;
   get_size (l);
@@ -295,7 +293,7 @@ OASISReader::get_ucoord (uint64_t grid)
   uint64_t lx = 0;
   get (lx);
   lx *= grid;
-  if (lx > (uint64_t) (std::numeric_limits <db::Coord>::max ())) {
+  if (lx > (uint64_t) (std::numeric_limits<db::Coord>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   return db::Coord (lx);
@@ -307,7 +305,7 @@ OASISReader::get_ucoord_as_distance (uint64_t grid)
   uint64_t lx = 0;
   get (lx);
   lx *= grid;
-  if (lx > (uint64_t) (std::numeric_limits <distance_type>::max ())) {
+  if (lx > (uint64_t) (std::numeric_limits<distance_type>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   return distance_type (lx);
@@ -319,8 +317,8 @@ OASISReader::get_coord (int64_t grid)
   int64_t lx = 0;
   get (lx);
   lx *= grid;
-  if (lx < (int64_t) (std::numeric_limits <db::Coord>::min ()) ||
-      lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
+  if (lx < (int64_t) (std::numeric_limits<db::Coord>::min ()) ||
+      lx > (int64_t) (std::numeric_limits<db::Coord>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   return db::Coord (lx);
@@ -334,7 +332,7 @@ OASISReader::get_2delta (int64_t grid)
 
   int64_t lx = l1 >> 2;
   lx *= grid;
-  if (lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
+  if (lx > (int64_t) (std::numeric_limits<db::Coord>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   db::Coord x = lx;
@@ -360,7 +358,7 @@ OASISReader::get_3delta (int64_t grid)
 
   int64_t lx = l1 >> 3;
   lx *= grid;
-  if (lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
+  if (lx > (int64_t) (std::numeric_limits<db::Coord>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   db::Coord x = lx;
@@ -396,16 +394,16 @@ OASISReader::get_gdelta (int64_t grid)
 
     int64_t lx = ((l1 & 2) == 0 ? (int64_t) (l1 >> 2) : -(int64_t) (l1 >> 2));
     lx *= grid;
-    if (lx < (int64_t) (std::numeric_limits <db::Coord>::min ()) ||
-        lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
+    if (lx < (int64_t) (std::numeric_limits<db::Coord>::min ()) ||
+        lx > (int64_t) (std::numeric_limits<db::Coord>::max ())) {
       error (tl::to_string (tr ("Coordinate value overflow")));
     }
 
     int64_t ly;
     get (ly);
     ly *= grid;
-    if (ly < (int64_t) (std::numeric_limits <db::Coord>::min ()) ||
-        ly > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
+    if (ly < (int64_t) (std::numeric_limits<db::Coord>::min ()) ||
+        ly > (int64_t) (std::numeric_limits<db::Coord>::max ())) {
       error (tl::to_string (tr ("Coordinate value overflow")));
     }
 
@@ -415,7 +413,7 @@ OASISReader::get_gdelta (int64_t grid)
 
     int64_t lx = l1 >> 4;
     lx *= grid;
-    if (lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
+    if (lx > (int64_t) (std::numeric_limits<db::Coord>::max ())) {
       error (tl::to_string (tr ("Coordinate value overflow")));
     }
     db::Coord x = lx;
@@ -439,18 +437,15 @@ OASISReader::get_gdelta (int64_t grid)
     default:
       return db::Vector (x, -x);
     }
-
   }
 }
 
-void
-OASISReader::error (const std::string &msg)
+void OASISReader::error (const std::string &msg)
 {
   throw OASISReaderException (msg, m_stream.pos (), m_cellname.c_str (), m_stream.source ());
 }
 
-void
-OASISReader::warn (const std::string &msg, int wl)
+void OASISReader::warn (const std::string &msg, int wl)
 {
   if (warn_level () < wl) {
     return;
@@ -475,15 +470,13 @@ OASISReader::warn (const std::string &msg, int wl)
     } else if (ws == 0) {
       tl::warn << tl::to_string (tr ("... further warnings of this kind are not shown"));
     }
-
   }
 }
 
 /**
  *  @brief A helper class to join two datatype layer name map members
  */
-struct LNameJoinOp1
-{
+struct LNameJoinOp1 {
   void operator() (std::string &a, const std::string &b)
   {
     join_layer_names (a, b);
@@ -494,8 +487,7 @@ struct LNameJoinOp1
  *  @brief A helper class to join two layer map members
  *  This implementation basically merged the datatype maps.
  */
-struct LNameJoinOp2
-{
+struct LNameJoinOp2 {
   void operator() (tl::interval_map<db::ld_type, std::string> &a, const tl::interval_map<db::ld_type, std::string> &b)
   {
     LNameJoinOp1 op1;
@@ -517,8 +509,7 @@ struct LNameJoinOp2
  *  is right after any preceding PAD records and exactly at the location
  *  of the first name record after PADs.
  */
-void
-OASISReader::mark_start_table ()
+void OASISReader::mark_start_table ()
 {
   //  we need to this this to really finish a CBLOCK - this is a flaw
   //  in the inflating reader, but it's hard to fix.
@@ -529,8 +520,7 @@ OASISReader::mark_start_table ()
   m_table_start = m_stream.pos ();
 }
 
-void
-OASISReader::read_offset_table ()
+void OASISReader::read_offset_table ()
 {
   uint64_t of = 0;
 
@@ -570,7 +560,7 @@ OASISReader::read_offset_table ()
   get_size (dummy);
 }
 
-static const char magic_bytes[] = { "%SEMI-OASIS\015\012" };
+static const char magic_bytes [] = {"%SEMI-OASIS\015\012"};
 
 static const char *klayout_context_propname = "KLAYOUT_CONTEXT";
 static const char *s_gds_property_propname = "S_GDS_PROPERTY";
@@ -586,8 +576,7 @@ make_context_info (const std::vector<tl::Variant> &context_properties)
   return LayoutOrCellContextInfo::deserialize (context_strings.begin (), context_strings.end ());
 }
 
-void
-OASISReader::do_read (db::Layout &layout)
+void OASISReader::do_read (db::Layout &layout)
 {
   unsigned char r;
   char *mb;
@@ -653,7 +642,9 @@ OASISReader::do_read (db::Layout &layout)
   uint64_t propname_id = 0;
 
   //  id mode (explicit or implicit)
-  enum id_mode { any, expl, impl };
+  enum id_mode { any,
+                 expl,
+                 impl };
   id_mode cellname_id_mode = any;
   id_mode textstring_id_mode = any;
   id_mode propstring_id_mode = any;
@@ -678,7 +669,7 @@ OASISReader::do_read (db::Layout &layout)
   m_text_forward_references.clear ();
 
   db::PropertiesSet layout_properties;
-  std::vector <tl::Variant> context_strings;
+  std::vector<tl::Variant> context_strings;
 
   mark_start_table ();
 
@@ -907,7 +898,7 @@ OASISReader::do_read (db::Layout &layout)
       }
 
       //  add to the layer name map
-      tl::interval_map <db::ld_type, std::string> dt_map;
+      tl::interval_map<db::ld_type, std::string> dt_map;
       LNameJoinOp1 op1;
       dt_map.add (dt1, dt2 + 1, name, op1);
       LNameJoinOp2 op2;
@@ -990,7 +981,6 @@ OASISReader::do_read (db::Layout &layout)
         cell_index = make_cell (layout, name);
 
         m_cellname = name;
-
       }
 
       reset_modal_variables ();
@@ -1006,8 +996,8 @@ OASISReader::do_read (db::Layout &layout)
       }
 
       uint64_t dummy = 0;
-      get (dummy);  // uncomp-byte-count - not needed
-      get (dummy);  // comp-byte-count - not needed
+      get (dummy); // uncomp-byte-count - not needed
+      get (dummy); // comp-byte-count - not needed
 
       //  put the stream into deflating mode
       m_stream.inflate ();
@@ -1015,7 +1005,6 @@ OASISReader::do_read (db::Layout &layout)
     } else {
       error (tl::sprintf (tl::to_string (tr ("Invalid record type on global level %d")), int (r)));
     }
-
   }
 
   size_t pt = m_stream.pos ();
@@ -1036,7 +1025,7 @@ OASISReader::do_read (db::Layout &layout)
     error (tl::to_string (tr ("Format error (too many bytes after END record)")));
   }
 
-  for (std::map <uint64_t, const db::StringRef *>::const_iterator fw = m_text_forward_references.begin (); fw != m_text_forward_references.end (); ++fw) {
+  for (std::map<uint64_t, const db::StringRef *>::const_iterator fw = m_text_forward_references.begin (); fw != m_text_forward_references.end (); ++fw) {
     auto ts = m_textstrings.find (fw->first);
     if (ts == m_textstrings.end ()) {
       error (tl::sprintf (tl::to_string (tr ("No text string defined for text string id %ld")), fw->first));
@@ -1046,7 +1035,7 @@ OASISReader::do_read (db::Layout &layout)
   }
 
   //  all forward references to property names must be resolved
-  for (std::map <uint64_t, db::property_names_id_type>::const_iterator fw = m_propname_forward_references.begin (); fw != m_propname_forward_references.end (); ++fw) {
+  for (std::map<uint64_t, db::property_names_id_type>::const_iterator fw = m_propname_forward_references.begin (); fw != m_propname_forward_references.end (); ++fw) {
     if (fw->second == 0) {
       error (tl::sprintf (tl::to_string (tr ("No property name defined for property name id %ld")), fw->first));
     }
@@ -1056,8 +1045,8 @@ OASISReader::do_read (db::Layout &layout)
   //  This makes these shape and instance property IDs valid
 
   {
-    std::map <db::properties_id_type, db::properties_id_type> replaced_prop_ids;
-    std::set <db::Instances *> instances_set;
+    std::map<db::properties_id_type, db::properties_id_type> replaced_prop_ids;
+    std::set<db::Instances *> instances_set;
 
     for (auto p = m_forward_properties_for_instances.begin (); p != m_forward_properties_for_instances.end (); ++p) {
 
@@ -1067,7 +1056,6 @@ OASISReader::do_read (db::Layout &layout)
       replaced_prop_ids.insert (std::make_pair (p->first, db::properties_id (props)));
 
       instances_set.insert (p->second.begin (), p->second.end ());
-
     }
 
     for (auto i = instances_set.begin (); i != instances_set.end (); ++i) {
@@ -1078,13 +1066,12 @@ OASISReader::do_read (db::Layout &layout)
           (*i)->replace_prop_id (*ii, pm->second);
         }
       }
-
     }
   }
 
   {
-    std::map <db::properties_id_type, db::properties_id_type> replaced_prop_ids;
-    std::set <db::Shapes *> shapes_set;
+    std::map<db::properties_id_type, db::properties_id_type> replaced_prop_ids;
+    std::set<db::Shapes *> shapes_set;
 
     for (auto p = m_forward_properties_for_shapes.begin (); p != m_forward_properties_for_shapes.end (); ++p) {
 
@@ -1094,12 +1081,11 @@ OASISReader::do_read (db::Layout &layout)
       replaced_prop_ids.insert (std::make_pair (p->first, db::properties_id (props)));
 
       shapes_set.insert (p->second.begin (), p->second.end ());
-
     }
 
     for (auto i = shapes_set.begin (); i != shapes_set.end (); ++i) {
 
-      for (auto ii = (*i)->begin (db::ShapeIterator::All); ! ii.at_end (); ) {
+      for (auto ii = (*i)->begin (db::ShapeIterator::All); ! ii.at_end ();) {
         auto pm = replaced_prop_ids.find (ii->prop_id ());
         if (ii.in_array ()) {
           if (pm != replaced_prop_ids.end ()) {
@@ -1113,7 +1099,6 @@ OASISReader::do_read (db::Layout &layout)
           ++ii;
         }
       }
-
     }
   }
 
@@ -1124,14 +1109,13 @@ OASISReader::do_read (db::Layout &layout)
     db::PropertiesSet props = p->second;
     resolve_forward_references (props);
 
-    std::vector <tl::Variant> context_strings;
+    std::vector<tl::Variant> context_strings;
     extract_context_strings (props, context_strings);
     if (! context_strings.empty ()) {
       m_context_strings_per_cell [p->first].swap (context_strings);
     }
 
     layout.cell (p->first).prop_id (db::properties_id (props));
-
   }
 
   //  store file (layout) level properties
@@ -1143,7 +1127,6 @@ OASISReader::do_read (db::Layout &layout)
     db::properties_id_type prop_id = db::properties_id (layout_properties);
     layout.prop_id (prop_id);
     layout_properties.clear ();
-
   }
 
   //  attach the properties found in CELLNAME to the cells (which may have other properties)
@@ -1170,9 +1153,7 @@ OASISReader::do_read (db::Layout &layout)
 
       db::properties_id_type prop_id = db::properties_id (cnp);
       cell.prop_id (prop_id);
-
     }
-
   }
 
   //  Restore layout meta info
@@ -1211,8 +1192,7 @@ OASISReader::do_read (db::Layout &layout)
   }
 }
 
-bool
-OASISReader::has_forward_refs (const db::PropertiesSet &properties)
+bool OASISReader::has_forward_refs (const db::PropertiesSet &properties)
 {
   //  A properties set is a forward referenced set if one of the components is an ID
   //  NOTE: we assume there is a single level of lists max.
@@ -1234,7 +1214,6 @@ OASISReader::has_forward_refs (const db::PropertiesSet &properties)
     } else if (value.is_id ()) {
       return true;
     }
-
   }
 
   return false;
@@ -1247,11 +1226,10 @@ properties_id_type OASISReader::make_forward_properties_id (const db::Properties
   //  for true properties IDs.
 
   m_fwd_properties.push_back (properties);
-  return db::properties_id_type (& m_fwd_properties.back ()) + 1;
+  return db::properties_id_type (&m_fwd_properties.back ()) + 1;
 }
 
-bool
-OASISReader::is_forward_properties_id (properties_id_type id) const
+bool OASISReader::is_forward_properties_id (properties_id_type id) const
 {
   return (id & 1) != 0;
 }
@@ -1263,20 +1241,17 @@ OASISReader::forward_properties (properties_id_type id) const
   return *reinterpret_cast<const db::PropertiesSet *> (id);
 }
 
-void
-OASISReader::register_forward_property_for_shape (const db::Shape &shape)
+void OASISReader::register_forward_property_for_shape (const db::Shape &shape)
 {
   m_forward_properties_for_shapes [shape.prop_id ()].insert (shape.shapes ());
 }
 
-void
-OASISReader::register_forward_property_for_instance (const db::Instance &instance)
+void OASISReader::register_forward_property_for_instance (const db::Instance &instance)
 {
   m_forward_properties_for_instances [instance.prop_id ()].insert (instance.instances ());
 }
 
-void
-OASISReader::extract_context_strings (db::PropertiesSet &properties, std::vector<tl::Variant> &context_strings)
+void OASISReader::extract_context_strings (db::PropertiesSet &properties, std::vector<tl::Variant> &context_strings)
 {
   db::PropertiesSet new_set;
 
@@ -1297,14 +1272,12 @@ OASISReader::extract_context_strings (db::PropertiesSet &properties, std::vector
     } else {
       new_set.insert (p->first, value);
     }
-
   }
 
   properties.swap (new_set);
 }
 
-void
-OASISReader::resolve_forward_references (db::PropertiesSet &properties)
+void OASISReader::resolve_forward_references (db::PropertiesSet &properties)
 {
   db::PropertiesSet new_props;
 
@@ -1326,7 +1299,7 @@ OASISReader::resolve_forward_references (db::PropertiesSet &properties)
       bool is_sprop = (name_id & 1) != 0;
       name_id >>= 1;
 
-      std::map <uint64_t, db::property_names_id_type>::iterator pf = m_propname_forward_references.find (name_id);
+      std::map<uint64_t, db::property_names_id_type>::iterator pf = m_propname_forward_references.find (name_id);
       if (pf != m_propname_forward_references.end ()) {
 
         if (pf->second == m_klayout_context_property_name_id) {
@@ -1352,9 +1325,7 @@ OASISReader::resolve_forward_references (db::PropertiesSet &properties)
         } else {
 
           new_props.insert (pf->second, value);
-
         }
-
       }
 
     } else {
@@ -1365,13 +1336,12 @@ OASISReader::resolve_forward_references (db::PropertiesSet &properties)
   properties.swap (new_props);
 }
 
-void
-OASISReader::replace_forward_references_in_variant (tl::Variant &v)
+void OASISReader::replace_forward_references_in_variant (tl::Variant &v)
 {
   if (v.is_id ()) {
 
     uint64_t id = (uint64_t) v.to_id ();
-    std::map <uint64_t, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
+    std::map<uint64_t, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
     if (fw != m_propvalue_forward_references.end ()) {
       v = tl::Variant (fw->second);
     } else {
@@ -1395,7 +1365,7 @@ OASISReader::replace_forward_references_in_variant (tl::Variant &v)
       for (std::vector<tl::Variant>::iterator ll = new_list.begin (); ll != new_list.end (); ++ll) {
         if (ll->is_id ()) {
           uint64_t id = (uint64_t) ll->to_id ();
-          std::map <uint64_t, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
+          std::map<uint64_t, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
           if (fw != m_propvalue_forward_references.end ()) {
             *ll = tl::Variant (fw->second);
           } else {
@@ -1405,9 +1375,7 @@ OASISReader::replace_forward_references_in_variant (tl::Variant &v)
       }
 
       v = tl::Variant (new_list.begin (), new_list.end ());
-
     }
-
   }
 }
 
@@ -1423,8 +1391,7 @@ store_properties (db::PropertiesSet &properties, db::property_names_id_type name
   }
 }
 
-void
-OASISReader::store_last_properties (db::PropertiesSet &properties, bool ignore_special, bool with_context_props)
+void OASISReader::store_last_properties (db::PropertiesSet &properties, bool ignore_special, bool with_context_props)
 {
   const tl::Variant &name = db::property_name (mm_last_property_name.get ());
   if (name.is_id ()) {
@@ -1458,11 +1425,10 @@ OASISReader::store_last_properties (db::PropertiesSet &properties, bool ignore_s
   } else {
 
     store_properties (properties, mm_last_property_name.get (), mm_last_value_list.get ());
-
   }
 }
 
-std::pair <bool, db::properties_id_type>
+std::pair<bool, db::properties_id_type>
 OASISReader::read_element_properties (bool ignore_special)
 {
   db::PropertiesSet properties;
@@ -1486,8 +1452,8 @@ OASISReader::read_element_properties (bool ignore_special)
       }
 
       uint64_t dummy = 0;
-      get (dummy);  // uncomp-byte-count - not needed
-      get (dummy);  // comp-byte-count - not needed
+      get (dummy); // uncomp-byte-count - not needed
+      get (dummy); // comp-byte-count - not needed
 
       //  put the stream into deflating mode
       m_stream.inflate ();
@@ -1509,9 +1475,7 @@ OASISReader::read_element_properties (bool ignore_special)
 
       m_stream.unget (1);
       break;
-
     }
-
   }
 
   if (! properties.empty ()) {
@@ -1525,8 +1489,7 @@ OASISReader::read_element_properties (bool ignore_special)
   }
 }
 
-void
-OASISReader::read_properties ()
+void OASISReader::read_properties ()
 {
   unsigned char m = get_byte ();
 
@@ -1539,7 +1502,7 @@ OASISReader::read_properties ()
       uint64_t id;
       get (id);
 
-      std::map <uint64_t, std::string>::const_iterator cid = m_propnames.find (id);
+      std::map<uint64_t, std::string>::const_iterator cid = m_propnames.find (id);
       if (cid == m_propnames.end ()) {
         mm_last_property_name = db::property_names_id (tl::Variant ((id << 1) + uint64_t (is_sprop ? 1 : 0), true /*dummy for id type*/));
         m_propname_forward_references.insert (std::make_pair (id, db::property_names_id_type (0)));
@@ -1554,7 +1517,6 @@ OASISReader::read_properties ()
       }
 
       mm_last_property_name = db::property_names_id (tl::Variant (get_str ()));
-
     }
   }
 
@@ -1612,7 +1574,7 @@ OASISReader::read_properties ()
         uint64_t id;
         get (id);
         if (m_read_properties) {
-          std::map <uint64_t, std::string>::const_iterator sid = m_propstrings.find (id);
+          std::map<uint64_t, std::string>::const_iterator sid = m_propstrings.find (id);
           if (sid == m_propstrings.end ()) {
             m_propvalue_forward_references.insert (std::make_pair (id, std::string ()));
             mm_last_value_list.get_non_const ().push_back (tl::Variant (id, true /*dummy for id type*/));
@@ -1626,18 +1588,15 @@ OASISReader::read_properties ()
       }
 
       --n;
-
     }
 
     mm_last_value_list.set_initialized ();
-
   }
 }
 
 
 
-void
-OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlist, bool for_polygon)
+void OASISReader::read_pointlist (modal_variable<std::vector<db::Point>> &pointlist, bool for_polygon)
 {
   uint32_t type = get_uint32 ();
 
@@ -1726,8 +1685,7 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
   pointlist.set_initialized ();
 }
 
-bool
-OASISReader::read_repetition ()
+bool OASISReader::read_repetition ()
 {
   uint32_t type = get_uint32 ();
   if (type == 0) {
@@ -1864,12 +1822,11 @@ OASISReader::read_repetition ()
   return mm_repetition.get ().size () > 1;
 }
 
-void
-OASISReader::do_read_placement (unsigned char r,
-                                bool xy_absolute,
-                                db::Layout &layout,
-                                tl::vector<db::CellInstArray> &instances,
-                                tl::vector<db::CellInstArrayWithProperties> &instances_with_props)
+void OASISReader::do_read_placement (unsigned char r,
+                                     bool xy_absolute,
+                                     db::Layout &layout,
+                                     tl::vector<db::CellInstArray> &instances,
+                                     tl::vector<db::CellInstArrayWithProperties> &instances_with_props)
 {
   unsigned char m = get_byte ();
 
@@ -1891,9 +1848,7 @@ OASISReader::do_read_placement (unsigned char r,
       get_str (name);
 
       mm_placement_cell = cell_for_instance (layout, name);
-
     }
-
   }
 
   double mag = 1.0;
@@ -2010,7 +1965,6 @@ OASISReader::do_read_placement (unsigned char r,
 
         inst = db::CellInstArray (db::CellInst (mm_placement_cell.get ()),
                                   db::Trans (angle, mirror, pos), layout.array_repository ().insert (array));
-
       }
 
       if (pp.first) {
@@ -2039,9 +1993,7 @@ OASISReader::do_read_placement (unsigned char r,
         }
 
         ++p;
-
       }
-
     }
 
   } else {
@@ -2061,14 +2013,12 @@ OASISReader::do_read_placement (unsigned char r,
     } else {
       instances.push_back (inst);
     }
-
   }
 }
 
-void
-OASISReader::do_read_text (bool xy_absolute,
-                           db::cell_index_type cell_index,
-                           db::Layout &layout)
+void OASISReader::do_read_text (bool xy_absolute,
+                                db::cell_index_type cell_index,
+                                db::Layout &layout)
 {
   unsigned char m = get_byte ();
 
@@ -2085,7 +2035,7 @@ OASISReader::do_read_text (bool xy_absolute,
 
       } else {
 
-        std::map <uint64_t, std::string>::const_iterator tid = m_textstrings.find (id);
+        std::map<uint64_t, std::string>::const_iterator tid = m_textstrings.find (id);
         if (tid == m_textstrings.end ()) {
 
           mm_text_string.reset ();
@@ -2097,9 +2047,7 @@ OASISReader::do_read_text (bool xy_absolute,
         } else {
 
           mm_text_string = tid->second;
-
         }
-
       }
 
     } else {
@@ -2109,7 +2057,6 @@ OASISReader::do_read_text (bool xy_absolute,
       }
 
       mm_text_string = get_str ();
-
     }
   }
 
@@ -2218,9 +2165,7 @@ OASISReader::do_read_text (bool xy_absolute,
           }
           ++p;
         }
-
       }
-
     }
 
   } else {
@@ -2244,16 +2189,13 @@ OASISReader::do_read_text (bool xy_absolute,
       } else {
         layout.cell (cell_index).shapes (ll.second).insert (db::TextRef (text, layout.shape_repository ()));
       }
-
     }
-
   }
 }
 
-void
-OASISReader::do_read_rectangle (bool xy_absolute,
-                                db::cell_index_type cell_index,
-                                db::Layout &layout)
+void OASISReader::do_read_rectangle (bool xy_absolute,
+                                     db::cell_index_type cell_index,
+                                     db::Layout &layout)
 {
   unsigned char m = get_byte ();
 
@@ -2360,9 +2302,7 @@ OASISReader::do_read_rectangle (bool xy_absolute,
           }
           ++p;
         }
-
       }
-
     }
 
   } else {
@@ -2380,14 +2320,11 @@ OASISReader::do_read_rectangle (bool xy_absolute,
       } else {
         cell.shapes (ll.second).insert (box);
       }
-
     }
-
   }
 }
 
-void
-OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout)
+void OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout)
 {
   unsigned char m = get_byte ();
 
@@ -2457,7 +2394,7 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
           db::SimplePolygonPtr poly_ptr (poly, layout.shape_repository ());
 
           if (pp.first) {
-            auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp>> (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
             if (is_forward_properties_id (pp.second)) {
               register_forward_property_for_shape (shape);
             }
@@ -2503,11 +2440,8 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
             }
             ++p;
           }
-
         }
-
       }
-
     }
 
   } else {
@@ -2533,16 +2467,12 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
         } else {
           layout.cell (cell_index).shapes (ll.second).insert (poly_ref.transformed (db::Disp (pos)));
         }
-
       }
-
     }
-
   }
 }
 
-void
-OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout)
+void OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout)
 {
   unsigned char m = get_byte ();
 
@@ -2575,7 +2505,6 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
     } else if ((e & 0x03) == 0x02) {
       mm_path_end_extension = mm_path_halfwidth.get (); //  TODO: is setting the start extension modal variable correct here?
     }
-
   }
 
   if (m & 0x20) {
@@ -2638,7 +2567,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
           db::PathPtr path_ptr (path, layout.shape_repository ());
 
           if (pp.first) {
-            auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp>> (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
             if (is_forward_properties_id (pp.second)) {
               register_forward_property_for_shape (shape);
             }
@@ -2684,11 +2613,8 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
             }
             ++p;
           }
-
         }
-
       }
-
     }
 
   } else {
@@ -2716,16 +2642,12 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
         } else {
           layout.cell (cell_index).shapes (ll.second).insert (path_ref.transformed (db::Disp (pos)));
         }
-
       }
-
     }
-
   }
 }
 
-void
-OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout)
+void OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout)
 {
   unsigned char m = get_byte ();
 
@@ -2819,7 +2741,7 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
         db::SimplePolygonPtr poly_ptr (poly, layout.shape_repository ());
 
         if (pp.first) {
-          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp>> (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
           if (is_forward_properties_id (pp.second)) {
             register_forward_property_for_shape (shape);
           }
@@ -2865,9 +2787,7 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
           }
           ++p;
         }
-
       }
-
     }
 
   } else {
@@ -2889,14 +2809,11 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
       } else {
         layout.cell (cell_index).shapes (ll.second).insert (poly_ref.transformed (db::Disp (pos)));
       }
-
     }
-
   }
 }
 
-void
-OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout)
+void OASISReader::do_read_ctrapezoid (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout)
 {
   unsigned char m = get_byte ();
 
@@ -2946,189 +2863,163 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
 
   db::Point pts [4];
 
-  static db::Coord ctraps_table[][4][4] = {
+  static db::Coord ctraps_table [][4][4] = {
     //  type 0
     {
-      { 0, 0, 0, 0 },  // x=0*w+0*h, y=0*w+0*h ...
-      { 0, 0, 0, 1 },
-      { 1, -1, 0, 1 },
-      { 1, 0, 0, 0 }
-    },
+      {0, 0, 0, 0}, // x=0*w+0*h, y=0*w+0*h ...
+      {0, 0, 0, 1},
+      {1, -1, 0, 1},
+      {1, 0, 0, 0}},
     //  type 1
     {
-      { 0, 0, 0, 0 },
-      { 0, 0, 0, 1 },
-      { 1, 0, 0, 1 },
-      { 1, -1, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 0, 0, 1},
+      {1, 0, 0, 1},
+      {1, -1, 0, 0}},
     //  type 2
     {
-      { 0, 0, 0, 0 },
-      { 0, 1, 0, 1 },
-      { 1, 0, 0, 1 },
-      { 1, 0, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 1, 0, 1},
+      {1, 0, 0, 1},
+      {1, 0, 0, 0}},
     //  type 3
     {
-      { 0, 1, 0, 0 },
-      { 0, 0, 0, 1 },
-      { 1, 0, 0, 1 },
-      { 1, 0, 0, 0 }
-    },
+      {0, 1, 0, 0},
+      {0, 0, 0, 1},
+      {1, 0, 0, 1},
+      {1, 0, 0, 0}},
     //  type 4
     {
-      { 0, 0, 0, 0 },
-      { 0, 1, 0, 1 },
-      { 1, -1, 0, 1 },
-      { 1, 0, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 1, 0, 1},
+      {1, -1, 0, 1},
+      {1, 0, 0, 0}},
     //  type 5
     {
-      { 0, 1, 0, 0 },
-      { 0, 0, 0, 1 },
-      { 1, 0, 0, 1 },
-      { 1, -1, 0, 0 }
-    },
+      {0, 1, 0, 0},
+      {0, 0, 0, 1},
+      {1, 0, 0, 1},
+      {1, -1, 0, 0}},
     //  type 6
     {
-      { 0, 0, 0, 0 },
-      { 0, 1, 0, 1 },
-      { 1, 0, 0, 1 },
-      { 1, -1, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 1, 0, 1},
+      {1, 0, 0, 1},
+      {1, -1, 0, 0}},
     //  type 7
     {
-      { 0, 1, 0, 0 },
-      { 0, 0, 0, 1 },
-      { 1, -1, 0, 1 },
-      { 1, 0, 0, 0 }
-    },
+      {0, 1, 0, 0},
+      {0, 0, 0, 1},
+      {1, -1, 0, 1},
+      {1, 0, 0, 0}},
     //  type 8
     {
-      { 0, 0, 0, 0 },
-      { 0, 0, 0, 1 },
-      { 1, 0, -1, 1 },
-      { 1, 0, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 0, 0, 1},
+      {1, 0, -1, 1},
+      {1, 0, 0, 0}},
     //  type 9
     {
-      { 0, 0, 0, 0 },
-      { 0, 0, -1, 1 },
-      { 1, 0, 0, 1 },
-      { 1, 0, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 0, -1, 1},
+      {1, 0, 0, 1},
+      {1, 0, 0, 0}},
     //  type 10
     {
-      { 0, 0, 0, 0 },
-      { 0, 0, 0, 1 },
-      { 1, 0, 0, 1 },
-      { 1, 0, 1, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 0, 0, 1},
+      {1, 0, 0, 1},
+      {1, 0, 1, 0}},
     //  type 11
     {
-      { 0, 0, 1, 0 },
-      { 0, 0, 0, 1 },
-      { 1, 0, 0, 1 },
-      { 1, 0, 0, 0 }
-    },
+      {0, 0, 1, 0},
+      {0, 0, 0, 1},
+      {1, 0, 0, 1},
+      {1, 0, 0, 0}},
     //  type 12
     {
-      { 0, 0, 0, 0 },
-      { 0, 0, 0, 1 },
-      { 1, 0, -1, 1 },
-      { 1, 0, 1, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 0, 0, 1},
+      {1, 0, -1, 1},
+      {1, 0, 1, 0}},
     //  type 13
     {
-      { 0, 0, 1, 0 },
-      { 0, 0, -1, 1 },
-      { 1, 0, 0, 1 },
-      { 1, 0, 0, 0 }
-    },
+      {0, 0, 1, 0},
+      {0, 0, -1, 1},
+      {1, 0, 0, 1},
+      {1, 0, 0, 0}},
     //  type 14
     {
-      { 0, 0, 0, 0 },
-      { 0, 0, -1, 1 },
-      { 1, 0, 0, 1 },
-      { 1, 0, 1, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 0, -1, 1},
+      {1, 0, 0, 1},
+      {1, 0, 1, 0}},
     //  type 15
     {
-      { 0, 0, 1, 0 },
-      { 0, 0, 0, 1 },
-      { 1, 0, -1, 1 },
-      { 1, 0, 0, 0 }
-    },
+      {0, 0, 1, 0},
+      {0, 0, 0, 1},
+      {1, 0, -1, 1},
+      {1, 0, 0, 0}},
     //  type 16
     {
-      { 0, 0, 0, 0 },
-      { 0, 0, 1, 0 },
-      { 1, 0, 0, 0 },
-      { 0, 0, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 0, 1, 0},
+      {1, 0, 0, 0},
+      {0, 0, 0, 0}},
     //  type 17
     {
-      { 0, 0, 0, 0 },
-      { 0, 0, 1, 0 },
-      { 1, 0, 1, 0 },
-      { 0, 0, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 0, 1, 0},
+      {1, 0, 1, 0},
+      {0, 0, 0, 0}},
     //  type 18
     {
-      { 0, 0, 0, 0 },
-      { 1, 0, 1, 0 },
-      { 1, 0, 0, 0 },
-      { 0, 0, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {1, 0, 1, 0},
+      {1, 0, 0, 0},
+      {0, 0, 0, 0}},
     //  type 19
     {
-      { 0, 0, 1, 0 },
-      { 1, 0, 1, 0 },
-      { 1, 0, 0, 0 },
-      { 0, 0, 1, 0 }
-    },
+      {0, 0, 1, 0},
+      {1, 0, 1, 0},
+      {1, 0, 0, 0},
+      {0, 0, 1, 0}},
     //  type 20
     {
-      { 0, 0, 0, 0 },
-      { 0, 1, 0, 1 },
-      { 0, 2, 0, 0 },
-      { 0, 0, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 1, 0, 1},
+      {0, 2, 0, 0},
+      {0, 0, 0, 0}},
     //  type 21
     {
-      { 0, 0, 0, 1 },
-      { 0, 2, 0, 1 },
-      { 0, 1, 0, 0 },
-      { 0, 0, 0, 1 }
-    },
+      {0, 0, 0, 1},
+      {0, 2, 0, 1},
+      {0, 1, 0, 0},
+      {0, 0, 0, 1}},
     //  type 22
     {
-      { 0, 0, 0, 0 },
-      { 0, 0, 2, 0 },
-      { 1, 0, 1, 0 },
-      { 0, 0, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 0, 2, 0},
+      {1, 0, 1, 0},
+      {0, 0, 0, 0}},
     //  type 23
     {
-      { 1, 0, 0, 0 },
-      { 0, 0, 1, 0 },
-      { 1, 0, 2, 0 },
-      { 1, 0, 0, 0 }
-    },
+      {1, 0, 0, 0},
+      {0, 0, 1, 0},
+      {1, 0, 2, 0},
+      {1, 0, 0, 0}},
     //  type 24
     {
-      { 0, 0, 0, 0 },
-      { 0, 0, 0, 1 },
-      { 1, 0, 0, 1 },
-      { 1, 0, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 0, 0, 1},
+      {1, 0, 0, 1},
+      {1, 0, 0, 0}},
     //  type 25
     {
-      { 0, 0, 0, 0 },
-      { 0, 0, 1, 0 },
-      { 1, 0, 1, 0 },
-      { 1, 0, 0, 0 }
-    },
+      {0, 0, 0, 0},
+      {0, 0, 1, 0},
+      {1, 0, 1, 0},
+      {1, 0, 0, 0}},
   };
 
   if (mm_ctrapezoid_type.get () >= sizeof (ctraps_table) / sizeof (ctraps_table [0])) {
@@ -3142,18 +3033,23 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
     db::Coord *m = ctraps_table [mm_ctrapezoid_type.get ()][i];
 
     db::Coord x = 0;
-    if (m[0] != 0) x += m[0] * mm_geometry_w.get ();
-    if (m[1] != 0) x += m[1] * mm_geometry_h.get ();
+    if (m [0] != 0)
+      x += m [0] * mm_geometry_w.get ();
+    if (m [1] != 0)
+      x += m [1] * mm_geometry_h.get ();
 
     db::Coord y = 0;
-    if (m[2] != 0) y += m[2] * mm_geometry_w.get ();
-    if (m[3] != 0) y += m[3] * mm_geometry_h.get ();
+    if (m [2] != 0)
+      y += m [2] * mm_geometry_w.get ();
+    if (m [3] != 0)
+      y += m [3] * mm_geometry_h.get ();
 
     pts [i] = db::Point (x, y);
 
-    if (x > w) w = x;
-    if (y > h) h = y;
-
+    if (x > w)
+      w = x;
+    if (y > h)
+      h = y;
   }
 
   //  set modal variables to the bbox of the shape
@@ -3190,7 +3086,7 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
         db::SimplePolygonPtr poly_ptr (poly, layout.shape_repository ());
 
         if (pp.first) {
-          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp>> (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
           if (is_forward_properties_id (pp.second)) {
             register_forward_property_for_shape (shape);
           }
@@ -3236,9 +3132,7 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
           }
           ++p;
         }
-
       }
-
     }
 
   } else {
@@ -3260,14 +3154,11 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
       } else {
         layout.cell (cell_index).shapes (ll.second).insert (poly_ref.transformed (db::Disp (pos)));
       }
-
     }
-
   }
 }
 
-void
-OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout)
+void OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout)
 {
   unsigned char m = get_byte ();
 
@@ -3340,7 +3231,7 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
         db::PathPtr path_ptr (path, layout.shape_repository ());
 
         if (pp.first) {
-          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp>> (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
           if (is_forward_properties_id (pp.second)) {
             register_forward_property_for_shape (shape);
           }
@@ -3384,9 +3275,7 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
           }
           ++p;
         }
-
       }
-
     }
 
   } else {
@@ -3412,14 +3301,11 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
       } else {
         layout.cell (cell_index).shapes (ll.second).insert (path_ref.transformed (db::Disp (pos)));
       }
-
     }
-
   }
 }
 
-void
-OASISReader::reset_modal_variables ()
+void OASISReader::reset_modal_variables ()
 {
   //  reset modal variables
   mm_repetition.reset ();
@@ -3450,8 +3336,7 @@ OASISReader::reset_modal_variables ()
   mm_last_value_list.reset ();
 }
 
-void
-OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
+void OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
 {
   //  clears current instance list
   m_instances.clear ();
@@ -3591,8 +3476,8 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
       }
 
       uint64_t dummy = 0;
-      get (dummy);  // uncomp-byte-count - not needed
-      get (dummy);  // comp-byte-count - not needed
+      get (dummy); // uncomp-byte-count - not needed
+      get (dummy); // comp-byte-count - not needed
 
       //  put the stream into deflating mode
       m_stream.inflate ();
@@ -3602,7 +3487,6 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
       m_stream.unget (1);
       break;
     }
-
   }
 
   if (! cell_properties.empty ()) {
@@ -3613,7 +3497,7 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
 
     } else {
 
-      std::vector <tl::Variant> context_strings;
+      std::vector<tl::Variant> context_strings;
       extract_context_strings (cell_properties, context_strings);
       //  store the context strings for later
       if (! context_strings.empty ()) {
@@ -3621,7 +3505,6 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
       }
 
       layout.cell (cell_index).prop_id (db::properties_id (cell_properties));
-
     }
   }
 
@@ -3634,7 +3517,6 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
     //  clear immediately, because if the cell is cleared before the instances are deleted, the
     //  array pointers (living in the repository) may no longer be valid
     m_instances.clear ();
-
   }
 
   if (! m_instances_with_props.empty ()) {
@@ -3648,11 +3530,9 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
 
     //  see above.
     m_instances_with_props.clear ();
-
   }
 
   m_cellname = "";
 }
 
 }
-

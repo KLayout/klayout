@@ -30,12 +30,12 @@ namespace img
 {
 
 // ---------------------------------------------------------------------------------------------
-//  A landmark marker 
+//  A landmark marker
 
 class IMG_PUBLIC LandmarkMarker
   : public lay::ViewObject
 {
-public: 
+public:
   /**
    *  @brief Constructor attaching to a certain object
    */
@@ -107,12 +107,12 @@ private:
       return;
     }
 
-    int basic_width = int(0.5 + 1.0 / canvas.resolution ());
+    int basic_width = int (0.5 + 1.0 / canvas.resolution ());
 
     //  obtain bitmap to render on
     lay::CanvasPlane *plane_frame = 0, *plane_fill = 0;
 
-    std::vector <lay::ViewOp> vops;
+    std::vector<lay::ViewOp> vops;
     vops.reserve (2);
     vops.push_back (lay::ViewOp (canvas.background_color ().rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, 3 * basic_width, 1));
     vops.push_back (lay::ViewOp (canvas.foreground_color ().rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, 1, 2));
@@ -146,7 +146,7 @@ class LandmarkEditorService
 {
 public:
   LandmarkEditorService (lay::LayoutViewBase *view, img::Object *img)
-    : lay::ViewService (view->canvas ()), 
+    : lay::ViewService (view->canvas ()),
       mp_image (img), m_selected (-1), m_dragging (false),
       m_mode (LandmarksDialog::None)
   {
@@ -159,8 +159,8 @@ public:
     clear ();
   }
 
-  bool mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) 
-  { 
+  bool mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
+  {
     // ...
     return false;
   }
@@ -173,7 +173,7 @@ public:
       drag_cancel ();
 
       if (m_mode == LandmarksDialog::Move) {
-        
+
         // ..
 
       } else if (m_mode == LandmarksDialog::Add) {
@@ -181,21 +181,19 @@ public:
         m_selected = int (mp_image->landmarks ().size ());
 
         update ();
-        
+
         ui ()->grab_mouse (this, false);
         m_dragging = true;
 
       } else if (m_mode == LandmarksDialog::Delete) {
 
         // ..
-
       }
-
     }
   }
 
-  bool mouse_click_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio) 
-  { 
+  bool mouse_click_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio)
+  {
     if (prio) {
 
       if (m_dragging) {
@@ -214,7 +212,7 @@ public:
           m_selected = int (lm.size ());
 
           update ();
-          
+
         } else if (m_mode == LandmarksDialog::Move) {
 
           img::Object::landmarks_type lm = mp_image->landmarks ();
@@ -229,7 +227,6 @@ public:
 
           ui ()->grab_mouse (this, false);
           m_dragging = false;
-
         }
 
       } else {
@@ -267,11 +264,8 @@ public:
 
             m_selected = -1;
             update ();
-
           }
-
         }
-
       }
 
       return true;
@@ -287,14 +281,14 @@ public:
     update_internal ();
   }
 
-  bool mouse_press_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) 
-  { 
+  bool mouse_press_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
+  {
     // ..
     return false;
   }
 
-  bool mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio) 
-  { 
+  bool mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio)
+  {
     if (prio) {
 
       if (m_dragging) {
@@ -328,7 +322,6 @@ public:
             set_cursor (lay::Cursor::pointing_hand);
           }
         }
-
       }
 
       return true;
@@ -432,8 +425,7 @@ LandmarksDialog::~LandmarksDialog ()
   }
 }
 
-void
-LandmarksDialog::update_mode ()
+void LandmarksDialog::update_mode ()
 {
   mode_t new_mode = None;
 
@@ -448,16 +440,16 @@ LandmarksDialog::update_mode ()
   QList<QListWidgetItem *> sel = landmark_list->selectedItems ();
   if (new_mode == Delete && sel.size () > 0) {
 
-    std::set <int> selected;
+    std::set<int> selected;
     for (QList<QListWidgetItem *>::const_iterator s = sel.begin (); s != sel.end (); ++s) {
       selected.insert (landmark_list->row (*s));
     }
 
     img::Object::landmarks_type lm = mp_image->landmarks ();
 
-    std::vector <db::DPoint>::iterator w = lm.begin ();
+    std::vector<db::DPoint>::iterator w = lm.begin ();
     int i = 0;
-    for (std::vector <db::DPoint>::const_iterator r = lm.begin (); r != lm.end (); ++r, ++i) {
+    for (std::vector<db::DPoint>::const_iterator r = lm.begin (); r != lm.end (); ++r, ++i) {
       if (selected.find (i) == selected.end ()) {
         *w++ = *r;
       }
@@ -468,21 +460,18 @@ LandmarksDialog::update_mode ()
 
     mp_service->update_landmarks ();
     landmarks_updated ();
-
-  } 
+  }
 
   mp_service->set_mode (new_mode);
 }
 
-void 
-LandmarksDialog::accept ()
+void LandmarksDialog::accept ()
 {
   mp_original_image->set_landmarks (mp_image->landmarks ());
   QDialog::accept ();
 }
 
-void
-LandmarksDialog::landmarks_updated ()
+void LandmarksDialog::landmarks_updated ()
 {
   landmark_list->clear ();
   for (std::vector<db::DPoint>::const_iterator l = mp_image->landmarks ().begin (); l != mp_image->landmarks ().end (); ++l) {

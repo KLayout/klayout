@@ -52,15 +52,17 @@
 
 CAPNP_BEGIN_HEADER
 
-namespace capnp {
+namespace capnp
+{
 
-class MembranePolicy {
+class MembranePolicy
+{
   // Applications may implement this interface to define a membrane policy, which allows some
   // calls crossing the membrane to be blocked or redirected.
 
 public:
-  virtual kj::Maybe<Capability::Client> inboundCall(
-      uint64_t interfaceId, uint16_t methodId, Capability::Client target) = 0;
+  virtual kj::Maybe<Capability::Client> inboundCall (
+    uint64_t interfaceId, uint16_t methodId, Capability::Client target) = 0;
   // Given an inbound call (a call originating "outside" the membrane destined for an object
   // "inside" the membrane), decides what to do with it. The policy may:
   //
@@ -83,8 +85,8 @@ public:
   // proceed directly and any new capabilities introduced through it would not be membraned. You
   // generally should not do that.
 
-  virtual kj::Maybe<Capability::Client> outboundCall(
-      uint64_t interfaceId, uint16_t methodId, Capability::Client target) = 0;
+  virtual kj::Maybe<Capability::Client> outboundCall (
+    uint64_t interfaceId, uint16_t methodId, Capability::Client target) = 0;
   // Like `inboundCall()`, but applies to calls originating *inside* the membrane and terminating
   // outside.
   //
@@ -96,7 +98,7 @@ public:
   //   will enter and then exit the membrane, but calls on the eventual resolution will not cross
   //   the membrane at all, so it is important that these two cases behave the same.
 
-  virtual kj::Own<MembranePolicy> addRef() = 0;
+  virtual kj::Own<MembranePolicy> addRef () = 0;
   // Return a new owned pointer to the same policy.
   //
   // Typically an implementation of MembranePolicy should also inherit kj::Refcounted and implement
@@ -107,7 +109,7 @@ public:
   // membrane and then back out (or out and then back in): instead of double-wrapping the object,
   // the wrapping will be removed.
 
-  virtual kj::Maybe<kj::Promise<void>> onRevoked() { return nullptr; }
+  virtual kj::Maybe<kj::Promise<void>> onRevoked () { return nullptr; }
   // If this returns non-null, then it is a promise that will reject (throw an exception) when the
   // membrane should be revoked. On revocation, all capabilities pointing across the membrane will
   // be dropped and all outstanding calls canceled. The exception thrown by the promise will be
@@ -117,7 +119,7 @@ public:
   // invoked for new calls, but the `target` passed to them will be a capability that always
   // rethrows the revocation exception.
 
-  virtual bool shouldResolveBeforeRedirecting() { return false; }
+  virtual bool shouldResolveBeforeRedirecting () { return false; }
   // If this returns true, then when inboundCall() or outboundCall() returns a redirect, but the
   // original target is a promise, then the membrane will discard the redirect and instead wait
   // for the promise to become more resolved and try again.
@@ -135,7 +137,7 @@ public:
   //   better design here. Maybe we should more carefully distinguish between MembranePolicies
   //   which are reversible vs. those which are one-way?
 
-  virtual bool allowFdPassthrough() { return false; }
+  virtual bool allowFdPassthrough () { return false; }
   // Should file descriptors be allowed to pass through this membrane?
   //
   // A MembranePolicy obviously cannot mediate nor revoke access to a file descriptor once it has
@@ -150,7 +152,7 @@ public:
   // that crosses the membrane is wrapped in it, and if the wrapped version crosses back the other
   // way, it is unwrapped.
 
-  virtual Capability::Client importExternal(Capability::Client external);
+  virtual Capability::Client importExternal (Capability::Client external);
   // An external capability is crossing into the membrane. Returns the capability that should
   // substitute for it when called from the inside.
   //
@@ -161,7 +163,7 @@ public:
   // `cap` itself was originally returned by the default implementation of exportInternal(), in
   // which case importInternal() is called instead.
 
-  virtual Capability::Client exportInternal(Capability::Client internal);
+  virtual Capability::Client exportInternal (Capability::Client internal);
   // An internal capability is crossing out of the membrane. Returns the capability that should
   // substitute for it when called from the outside.
   //
@@ -172,30 +174,30 @@ public:
   // itself was originally returned by the default implementation of exportInternal(), in which
   // case importInternal() is called instead.
 
-  virtual MembranePolicy& rootPolicy() { return *this; }
+  virtual MembranePolicy &rootPolicy () { return *this; }
   // If two policies return the same value for rootPolicy(), then a capability imported through
   // one can be exported through the other, and vice versa. `importInternal()` and
   // `exportExternal()` will always be called on the root policy, passing the two child policies
   // as parameters. If you don't override rootPolicy(), then the policy references passed to
   // importInternal() and exportExternal() will always be references to *this.
 
-  virtual Capability::Client importInternal(
-      Capability::Client internal, MembranePolicy& exportPolicy, MembranePolicy& importPolicy);
+  virtual Capability::Client importInternal (
+    Capability::Client internal, MembranePolicy &exportPolicy, MembranePolicy &importPolicy);
   // An internal capability which was previously exported is now being re-imported, i.e. a
   // capability passed out of the membrane and then back in.
   //
   // The default implementation simply returns `internal`.
 
-  virtual Capability::Client exportExternal(
-      Capability::Client external, MembranePolicy& importPolicy, MembranePolicy& exportPolicy);
+  virtual Capability::Client exportExternal (
+    Capability::Client external, MembranePolicy &importPolicy, MembranePolicy &exportPolicy);
   // An external capability which was previously imported is now being re-exported, i.e. a
   // capability passed into the membrane and then back out.
   //
   // The default implementation simply returns `external`.
 
 private:
-  kj::HashMap<ClientHook*, ClientHook*> wrappers;
-  kj::HashMap<ClientHook*, ClientHook*> reverseWrappers;
+  kj::HashMap<ClientHook *, ClientHook *> wrappers;
+  kj::HashMap<ClientHook *, ClientHook *> reverseWrappers;
   // Tracks capabilities that already have wrappers instantiated. The maps map from pointer to
   // inner capability to pointer to wrapper. When a wrapper is destroyed it removes itself from
   // the map.
@@ -203,11 +205,11 @@ private:
   friend class MembraneHook;
 };
 
-Capability::Client membrane(Capability::Client inner, kj::Own<MembranePolicy> policy);
+Capability::Client membrane (Capability::Client inner, kj::Own<MembranePolicy> policy);
 // Wrap `inner` in a membrane specified by `policy`. `inner` is considered "inside" the membrane,
 // while the returned capability should only be called from outside the membrane.
 
-Capability::Client reverseMembrane(Capability::Client outer, kj::Own<MembranePolicy> policy);
+Capability::Client reverseMembrane (Capability::Client outer, kj::Own<MembranePolicy> policy);
 // Like `membrane` but treat the input capability as "outside" the membrane, and return a
 // capability appropriate for use inside.
 //
@@ -215,83 +217,90 @@ Capability::Client reverseMembrane(Capability::Client outer, kj::Own<MembranePol
 // reverse membranes where needed.
 
 template <typename ClientType>
-ClientType membrane(ClientType inner, kj::Own<MembranePolicy> policy);
+ClientType membrane (ClientType inner, kj::Own<MembranePolicy> policy);
 template <typename ClientType>
-ClientType reverseMembrane(ClientType inner, kj::Own<MembranePolicy> policy);
+ClientType reverseMembrane (ClientType inner, kj::Own<MembranePolicy> policy);
 // Convenience templates which return the same interface type as the input.
 
 template <typename ServerType>
-typename ServerType::Serves::Client membrane(
-    kj::Own<ServerType> inner, kj::Own<MembranePolicy> policy);
+typename ServerType::Serves::Client membrane (
+  kj::Own<ServerType> inner, kj::Own<MembranePolicy> policy);
 template <typename ServerType>
-typename ServerType::Serves::Client reverseMembrane(
-    kj::Own<ServerType> inner, kj::Own<MembranePolicy> policy);
+typename ServerType::Serves::Client reverseMembrane (
+  kj::Own<ServerType> inner, kj::Own<MembranePolicy> policy);
 // Convenience templates which input a capability server type and return the appropriate client
 // type.
 
 template <typename Reader>
-Orphan<typename kj::Decay<Reader>::Reads> copyIntoMembrane(
-    Reader&& from, Orphanage to, kj::Own<MembranePolicy> policy);
+Orphan<typename kj::Decay<Reader>::Reads> copyIntoMembrane (
+  Reader &&from, Orphanage to, kj::Own<MembranePolicy> policy);
 // Copy a Cap'n Proto object (e.g. struct or list), adding the given membrane to any capabilities
 // found within it. `from` is interpreted as "outside" the membrane while `to` is "inside".
 
 template <typename Reader>
-Orphan<typename kj::Decay<Reader>::Reads> copyOutOfMembrane(
-    Reader&& from, Orphanage to, kj::Own<MembranePolicy> policy);
+Orphan<typename kj::Decay<Reader>::Reads> copyOutOfMembrane (
+  Reader &&from, Orphanage to, kj::Own<MembranePolicy> policy);
 // Like copyIntoMembrane() except that `from` is "inside" the membrane and `to` is "outside".
 
 // =======================================================================================
 // inline implementation details
 
 template <typename ClientType>
-ClientType membrane(ClientType inner, kj::Own<MembranePolicy> policy) {
-  return membrane(Capability::Client(kj::mv(inner)), kj::mv(policy))
-      .castAs<typename ClientType::Calls>();
+ClientType membrane (ClientType inner, kj::Own<MembranePolicy> policy)
+{
+  return membrane (Capability::Client (kj::mv (inner)), kj::mv (policy))
+    .castAs<typename ClientType::Calls> ();
 }
 template <typename ClientType>
-ClientType reverseMembrane(ClientType inner, kj::Own<MembranePolicy> policy) {
-  return reverseMembrane(Capability::Client(kj::mv(inner)), kj::mv(policy))
-      .castAs<typename ClientType::Calls>();
+ClientType reverseMembrane (ClientType inner, kj::Own<MembranePolicy> policy)
+{
+  return reverseMembrane (Capability::Client (kj::mv (inner)), kj::mv (policy))
+    .castAs<typename ClientType::Calls> ();
 }
 
 template <typename ServerType>
-typename ServerType::Serves::Client membrane(
-    kj::Own<ServerType> inner, kj::Own<MembranePolicy> policy) {
-  return membrane(Capability::Client(kj::mv(inner)), kj::mv(policy))
-      .castAs<typename ServerType::Serves>();
+typename ServerType::Serves::Client membrane (
+  kj::Own<ServerType> inner, kj::Own<MembranePolicy> policy)
+{
+  return membrane (Capability::Client (kj::mv (inner)), kj::mv (policy))
+    .castAs<typename ServerType::Serves> ();
 }
 template <typename ServerType>
-typename ServerType::Serves::Client reverseMembrane(
-    kj::Own<ServerType> inner, kj::Own<MembranePolicy> policy) {
-  return reverseMembrane(Capability::Client(kj::mv(inner)), kj::mv(policy))
-      .castAs<typename ServerType::Serves>();
+typename ServerType::Serves::Client reverseMembrane (
+  kj::Own<ServerType> inner, kj::Own<MembranePolicy> policy)
+{
+  return reverseMembrane (Capability::Client (kj::mv (inner)), kj::mv (policy))
+    .castAs<typename ServerType::Serves> ();
 }
 
-namespace _ {  // private
+namespace _
+{ // private
 
-OrphanBuilder copyOutOfMembrane(PointerReader from, Orphanage to,
-                                kj::Own<MembranePolicy> policy, bool reverse);
-OrphanBuilder copyOutOfMembrane(StructReader from, Orphanage to,
-                                kj::Own<MembranePolicy> policy, bool reverse);
-OrphanBuilder copyOutOfMembrane(ListReader from, Orphanage to,
-                                kj::Own<MembranePolicy> policy, bool reverse);
+OrphanBuilder copyOutOfMembrane (PointerReader from, Orphanage to,
+                                 kj::Own<MembranePolicy> policy, bool reverse);
+OrphanBuilder copyOutOfMembrane (StructReader from, Orphanage to,
+                                 kj::Own<MembranePolicy> policy, bool reverse);
+OrphanBuilder copyOutOfMembrane (ListReader from, Orphanage to,
+                                 kj::Own<MembranePolicy> policy, bool reverse);
 
-}  // namespace _ (private)
+} // namespace _ (private)
 
 template <typename Reader>
-Orphan<typename kj::Decay<Reader>::Reads> copyIntoMembrane(
-    Reader&& from, Orphanage to, kj::Own<MembranePolicy> policy) {
-  return _::copyOutOfMembrane(
-      _::PointerHelpers<typename kj::Decay<Reader>::Reads>::getInternalReader(from),
-      to, kj::mv(policy), true);
+Orphan<typename kj::Decay<Reader>::Reads> copyIntoMembrane (
+  Reader &&from, Orphanage to, kj::Own<MembranePolicy> policy)
+{
+  return _::copyOutOfMembrane (
+    _::PointerHelpers<typename kj::Decay<Reader>::Reads>::getInternalReader (from),
+    to, kj::mv (policy), true);
 }
 
 template <typename Reader>
-Orphan<typename kj::Decay<Reader>::Reads> copyOutOfMembrane(
-    Reader&& from, Orphanage to, kj::Own<MembranePolicy> policy) {
-  return _::copyOutOfMembrane(
-      _::PointerHelpers<typename kj::Decay<Reader>::Reads>::getInternalReader(from),
-      to, kj::mv(policy), false);
+Orphan<typename kj::Decay<Reader>::Reads> copyOutOfMembrane (
+  Reader &&from, Orphanage to, kj::Own<MembranePolicy> policy)
+{
+  return _::copyOutOfMembrane (
+    _::PointerHelpers<typename kj::Decay<Reader>::Reads>::getInternalReader (from),
+    to, kj::mv (policy), false);
 }
 
 } // namespace capnp

@@ -36,7 +36,7 @@ namespace rba
 
 static int push_map_i (VALUE key, VALUE value, VALUE arg)
 {
-  std::vector<std::pair<VALUE, VALUE> > *v = (std::vector<std::pair<VALUE, VALUE> > *) arg;
+  std::vector<std::pair<VALUE, VALUE>> *v = (std::vector<std::pair<VALUE, VALUE>> *) arg;
   v->push_back (std::make_pair (key, value));
   return ST_CONTINUE;
 }
@@ -58,23 +58,23 @@ tl::Variant ruby2c<tl::Variant> (VALUE rval)
     return tl::Variant (ruby2c<double> (rval));
   } else if (TYPE (rval) == T_HASH) {
 
-    std::vector<std::pair<VALUE, VALUE> > kv;
+    std::vector<std::pair<VALUE, VALUE>> kv;
     kv.reserve (RHASH_SIZE (rval));
     //  Note: we use this scheme rather than directly inserting into the variant because
     //  the rb_hash_foreach is not exception-safe.
-    rb_hash_foreach (rval, (int (*)(...)) &push_map_i, (VALUE) &kv);
+    rb_hash_foreach (rval, (int (*) (...)) &push_map_i, (VALUE) &kv);
 
     tl::Variant r;
     r.set_array ();
-    for (std::vector<std::pair<VALUE, VALUE> >::const_iterator i = kv.begin (); i != kv.end (); ++i) {
+    for (std::vector<std::pair<VALUE, VALUE>>::const_iterator i = kv.begin (); i != kv.end (); ++i) {
       r.insert (ruby2c<tl::Variant> (i->first), ruby2c<tl::Variant> (i->second));
     }
     return r;
 
   } else if (TYPE (rval) == T_ARRAY) {
 
-    unsigned int len = RARRAY_LEN(rval);
-    VALUE *el = RARRAY_PTR(rval);
+    unsigned int len = RARRAY_LEN (rval);
+    VALUE *el = RARRAY_PTR (rval);
 
     static std::vector<tl::Variant> empty;
     tl::Variant r (empty.begin (), empty.end ());
@@ -106,7 +106,7 @@ tl::Variant ruby2c<tl::Variant> (VALUE rval)
       tl_assert (var_cls != 0);
 
       gsi::Proxy *gsi_proxy = cls->gsi_object (obj)->find_client<gsi::Proxy> ();
-      if (!gsi_proxy) {
+      if (! gsi_proxy) {
         //  establish a new proxy
         gsi_proxy = new gsi::Proxy (cls);
         gsi_proxy->set (obj, false, p->const_ref (), false);
@@ -128,7 +128,7 @@ tl::Variant ruby2c<tl::Variant> (VALUE rval)
     if (rb_enc_from_index (rb_enc_get_index (rval)) == rb_utf8_encoding ()) {
       return tl::Variant (ruby2c<std::string> (rval));
     } else {
-      return tl::Variant (ruby2c<std::vector<char> > (rval));
+      return tl::Variant (ruby2c<std::vector<char>> (rval));
     }
 
   } else {
@@ -138,11 +138,11 @@ tl::Variant ruby2c<tl::Variant> (VALUE rval)
 
 VALUE object_to_ruby (void *obj, Proxy *self, const gsi::ArgType &atype)
 {
-  const gsi::ClassBase *cls = atype.cls()->subclass_decl (obj);
+  const gsi::ClassBase *cls = atype.cls ()->subclass_decl (obj);
 
-  bool is_direct   = !(atype.is_ptr () || atype.is_ref () || atype.is_cptr () || atype.is_cref ());
-  bool pass_obj    = atype.pass_obj () || is_direct;
-  bool is_const    = atype.is_cptr () || atype.is_cref ();
+  bool is_direct = ! (atype.is_ptr () || atype.is_ref () || atype.is_cptr () || atype.is_cref ());
+  bool pass_obj = atype.pass_obj () || is_direct;
+  bool is_const = atype.is_cptr () || atype.is_cref ();
   bool prefer_copy = atype.prefer_copy ();
   bool can_destroy = prefer_copy || atype.is_ptr ();
 
@@ -197,7 +197,6 @@ object_to_ruby (void *obj, Proxy *self, const gsi::ClassBase *cls, bool pass_obj
         //  must be the last and only Proxy for this object
         tl_assert (clsact->gsi_object (obj)->find_client<Proxy> () == 0);
       }
-
     }
 
   } else if (clsact->adapted_type_info ()) {
@@ -211,7 +210,6 @@ object_to_ruby (void *obj, Proxy *self, const gsi::ClassBase *cls, bool pass_obj
 
     //  we wil own the new object
     pass_obj = true;
-
   }
 
   if (! pass_obj && prefer_copy && ! clsact->adapted_type_info () && ! clsact->is_managed () && clsact->can_copy () && clsact->can_default_create ()) {
@@ -257,7 +255,6 @@ object_to_ruby (void *obj, Proxy *self, const gsi::ClassBase *cls, bool pass_obj
     Proxy *p = 0;
     Data_Get_Struct (ret, Proxy, p);
     p->set (obj, pass_obj, is_const /*const*/, can_destroy /*can_destroy*/, ret);
-
   }
 
   return ret;
@@ -273,7 +270,7 @@ VALUE c2ruby<tl::Variant> (const tl::Variant &c)
   } else if (c.is_a_string ()) {
     return c2ruby<std::string> (c.to_stdstring ());
   } else if (c.is_a_bytearray ()) {
-    return c2ruby<std::vector<char> > (c.to_bytearray ());
+    return c2ruby<std::vector<char>> (c.to_bytearray ());
   } else if (c.is_long () || c.is_char ()) {
     return c2ruby<long> (c.to_long ());
   } else if (c.is_ulong ()) {

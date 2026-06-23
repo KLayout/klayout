@@ -1,0 +1,10 @@
+# Files clang-format should skip (clang-format >= 18 honours this file).
+# Paths are glob patterns relative to this file.
+
+# Test fixtures and golden reference data: byte-exact content matters.
+testdata/
+
+# Qt binding declarations under src/gsiqt are largely machine-emitted from the
+# Qt headers (~2000 files). If/when they are confirmed generated they should
+# stay out of formatting churn; remove this line if they are hand-maintained.
+src/gsiqt/

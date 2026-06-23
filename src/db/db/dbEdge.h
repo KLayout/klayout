@@ -36,7 +36,8 @@
 
 #include <string>
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief A helper function for dividing integers with exact rounding
@@ -69,13 +70,13 @@ public:
   typedef db::point<C> point_type;
   typedef db::vector<C> vector_type;
   typedef db::coord_traits<C> coord_traits;
-  typedef typename coord_traits::distance_type distance_type; 
-  typedef typename coord_traits::area_type area_type; 
-  typedef db::object_tag< edge<C> > tag;
+  typedef typename coord_traits::distance_type distance_type;
+  typedef typename coord_traits::area_type area_type;
+  typedef db::object_tag<edge<C>> tag;
 
   /**
    *  @brief The default constructor.
-   *  
+   *
    *  The default constructor creates a degenerated edge
    *  with two points (0, 0).
    */
@@ -168,7 +169,7 @@ public:
     return m_p1 < b.m_p1 || (m_p1 == b.m_p1 && m_p2 < b.m_p2);
   }
 
-  /** 
+  /**
    *  @brief Equality test
    */
   bool operator== (const edge<C> &b) const
@@ -176,12 +177,12 @@ public:
     return m_p1 == b.m_p1 && m_p2 == b.m_p2;
   }
 
-  /** 
+  /**
    *  @brief Inequality test
    */
   bool operator!= (const edge<C> &b) const
   {
-    return !operator== (b);
+    return ! operator== (b);
   }
 
   /**
@@ -205,7 +206,7 @@ public:
    */
   bool not_equal (const edge<C> &b) const
   {
-    return !equal (b);
+    return ! equal (b);
   }
 
   /**
@@ -219,11 +220,11 @@ public:
   /**
    *  @brief Returns the moved edge
    *
-   *  Moves the edge by the given offset and returns the 
+   *  Moves the edge by the given offset and returns the
    *  moved edge. The edge is not modified.
    *
    *  @param p The distance to move the edge.
-   * 
+   *
    *  @return The moved edge.
    */
   edge<C> moved (const vector<C> &p) const
@@ -236,12 +237,12 @@ public:
   /**
    *  @brief Returns the enlarged edge
    *
-   *  Enlarges the edge by the given offset and returns the 
+   *  Enlarges the edge by the given offset and returns the
    *  moved edge. The edge is not modified. Enlargement means
    *  that the first point is shifted by -p, the second by p.
    *
    *  @param p The distance to move the edge.
-   * 
+   *
    *  @return The moved edge.
    */
   edge<C> enlarged (const vector<C> &p) const
@@ -254,11 +255,11 @@ public:
   /**
    *  @brief Extends the edge
    *
-   *  The extension is applied parallel to the edge at the 
+   *  The extension is applied parallel to the edge at the
    *  start and end point.
    *  Degenerated edges become horizontal edges.
    */
-  edge<C> &extend (C e) 
+  edge<C> &extend (C e)
   {
     vector<double> dp;
     if (is_degenerate ()) {
@@ -273,7 +274,7 @@ public:
   /**
    *  @brief Returns the extended edge
    *
-   *  The extension is applied parallel to the edge at the 
+   *  The extension is applied parallel to the edge at the
    *  start and end point.
    *  Degenerated edges become horizontal edges.
    */
@@ -291,7 +292,7 @@ public:
   /**
    *  @brief Returns the shifted edge
    *
-   *  The shift is applied perpendicular to the edge to the left of the edge 
+   *  The shift is applied perpendicular to the edge to the left of the edge
    *  if the shift is positive and to the right if negative.
    *  Degenerated edges are not shifted.
    */
@@ -309,11 +310,11 @@ public:
   /**
    *  @brief Shifts the edge
    *
-   *  The shift is applied perpendicular to the edge to the left of the edge 
+   *  The shift is applied perpendicular to the edge to the left of the edge
    *  if the shift is positive and to the right if negative.
    *  Degenerated edges are not shifted.
    */
-  edge<C> &shift (C e) 
+  edge<C> &shift (C e)
   {
     if (! is_degenerate ()) {
       vector<double> dp = d () * (double (e) / double_length ());
@@ -328,7 +329,7 @@ public:
    *
    *  Transforms the edge with the given transformation.
    *  Modifies the edge with the transformed edge.
-   *  
+   *
    *  @param t The transformation to apply.
    *
    *  @return The transformed edge.
@@ -352,7 +353,7 @@ public:
    *
    *  Transforms the edge with the given transformation.
    *  Does not modify the edge but returns the transformed edge.
-   *  
+   *
    *  @param t The transformation to apply.
    *
    *  @return The transformed edge.
@@ -373,11 +374,11 @@ public:
   /**
    *  @brief Moves the edge.
    *
-   *  Moves the edge by the given offset and returns the 
+   *  Moves the edge by the given offset and returns the
    *  moved edge. The edge is overwritten.
    *
    *  @param p The distance to move the edge.
-   * 
+   *
    *  @return The moved edge.
    */
   edge<C> &move (const vector<C> &p)
@@ -390,11 +391,11 @@ public:
   /**
    *  @brief Enlarges the edge.
    *
-   *  Enlarges the edge by the given distance and returns the 
+   *  Enlarges the edge by the given distance and returns the
    *  enlarged edge. The edge is overwritten.
    *
    *  @param p The distance to move the edge points.
-   * 
+   *
    *  @return The enlarged edge.
    */
   edge<C> &enlarge (const vector<C> &p)
@@ -407,7 +408,7 @@ public:
   /**
    *  @brief Set the first point.
    */
-  void set_p1 (const point<C> &p) 
+  void set_p1 (const point<C> &p)
   {
     m_p1 = p;
   }
@@ -415,7 +416,7 @@ public:
   /**
    *  @brief Set the second point.
    */
-  void set_p2 (const point<C> &p) 
+  void set_p2 (const point<C> &p)
   {
     m_p2 = p;
   }
@@ -533,7 +534,7 @@ public:
   /**
    *  @brief Test for degenerated edge
    */
-  bool is_degenerate () const 
+  bool is_degenerate () const
   {
     return m_p1 == m_p2;
   }
@@ -596,7 +597,7 @@ public:
   {
     return "(" + m_p1.to_string (dbu) + ";" + m_p2.to_string (dbu) + ")";
   }
-  
+
   /**
    *  @brief Reduce the edge
    *
@@ -660,7 +661,7 @@ public:
   /**
    *  @brief Test whether a point is on an edge.
    *
-   *  A point is on a edge if it is on (at least closer 
+   *  A point is on a edge if it is on (at least closer
    *  than a grid point) the edge.
    *
    *  @param The point to test with the edge.
@@ -681,7 +682,7 @@ public:
   /**
    *  @brief Test whether a point is on an edge excluding the endpoints.
    *
-   *  A point is on a edge if it is on (at least closer 
+   *  A point is on a edge if it is on (at least closer
    *  than a grid point) the edge.
    *
    *  @param The point to test with the edge.
@@ -702,8 +703,8 @@ public:
   /**
    *  @brief Coincidence check.
    *
-   *  Checks whether a edge is coincident with another edge. 
-   *  Coincidence is defined by being parallel, oriented the same way and that 
+   *  Checks whether a edge is coincident with another edge.
+   *  Coincidence is defined by being parallel, oriented the same way and that
    *  both edges share more than one point.
    *
    *  @param e the edge to test with
@@ -713,19 +714,18 @@ public:
   bool coincident (const db::edge<C> &e) const
   {
     return ! is_degenerate () && ! e.is_degenerate () &&
-           distance_abs (e.p1 ()) < coord_traits::prec_distance () && 
-           distance_abs (e.p2 ()) < coord_traits::prec_distance () && 
-           (sprod_sign (*this, e) < 0 ? 
-            (coord_traits::sprod_sign (e.p2 ().x (), e.p2 ().y (), p1 ().x (), p1 ().y (), p2 ().x (), p2 ().y ()) > 0 && 
-             coord_traits::sprod_sign (e.p1 ().x (), e.p1 ().y (), p2 ().x (), p2 ().y (), p1 ().x (), p1 ().y ()) > 0) :
-            (coord_traits::sprod_sign (e.p1 ().x (), e.p1 ().y (), p1 ().x (), p1 ().y (), p2 ().x (), p2 ().y ()) > 0 && 
-             coord_traits::sprod_sign (e.p2 ().x (), e.p2 ().y (), p2 ().x (), p2 ().y (), p1 ().x (), p1 ().y ()) > 0));
+           distance_abs (e.p1 ()) < coord_traits::prec_distance () &&
+           distance_abs (e.p2 ()) < coord_traits::prec_distance () &&
+           (sprod_sign (*this, e) < 0 ? (coord_traits::sprod_sign (e.p2 ().x (), e.p2 ().y (), p1 ().x (), p1 ().y (), p2 ().x (), p2 ().y ()) > 0 &&
+                                         coord_traits::sprod_sign (e.p1 ().x (), e.p1 ().y (), p2 ().x (), p2 ().y (), p1 ().x (), p1 ().y ()) > 0)
+                                      : (coord_traits::sprod_sign (e.p1 ().x (), e.p1 ().y (), p1 ().x (), p1 ().y (), p2 ().x (), p2 ().y ()) > 0 &&
+                                         coord_traits::sprod_sign (e.p2 ().x (), e.p2 ().y (), p2 ().x (), p2 ().y (), p1 ().x (), p1 ().y ()) > 0));
   }
 
   /**
-   *  @brief Intersection test. 
+   *  @brief Intersection test.
    *
-   *  Returns true if the edges intersect. 
+   *  Returns true if the edges intersect.
    *  If the edges coincide, they also intersect.
    *  For degenerated edges, the intersection is mapped to
    *  point containment tests.
@@ -748,7 +748,7 @@ public:
   }
 
   /**
-   *  @brief Intersection test with intersect point. 
+   *  @brief Intersection test with intersect point.
    *
    *  Returns true if the edges intersect and returns the
    *  intersection point if true. For coinciding edges one
@@ -760,7 +760,7 @@ public:
    *  if the edges intersect and the intersection point as the second.
    *  If the edges do not intersect, returns <false,undef.>.
    */
-  std::pair <bool, db::point<C> > intersect_point (const db::edge<C> &e) const
+  std::pair<bool, db::point<C>> intersect_point (const db::edge<C> &e) const
   {
     if (is_degenerate ()) {
       if (e.contains (p1 ())) {
@@ -798,7 +798,7 @@ public:
       std::pair<area_type, int> vsb = coord_traits::vprod_with_sign (e.p2 ().x (), e.p2 ().y (), m_p2.x (), m_p2.y (), e.p1 ().x (), e.p1 ().y ());
       area_type vxb = -vsb.first;
       if (vsb.second > 0) {
-        res = !res;
+        res = ! res;
       } else if (vsb.second == 0) {
         ends_on_edge = true;
       }
@@ -834,14 +834,13 @@ public:
       } else {
         return std::make_pair (false, db::point<C> (0, 0));
       }
-
     }
   }
 
   /**
    *  @brief Distance between the edge and a point.
    *
-   *  Returns the distance between the edge and the point. The 
+   *  Returns the distance between the edge and the point. The
    *  distance is signed which is negative if the point is to the
    *  "right" of the edge and positive if the point is to the "left".
    *  The distance is measured by projecting the point onto the
@@ -857,15 +856,15 @@ public:
    */
   coord_type distance (const db::point<C> &p) const
   {
-    //  the distance is computed from 
+    //  the distance is computed from
     //    d = (a x b) / |a|
     //  where b = p - p1, a = p2 - p1
     if (is_degenerate ()) {
       //  for safety handle this case - without a reasonable result
       return 0;
     } else {
-      //  compute the distance as described above 
-      area_type axb = coord_traits::vprod (m_p2.x (), m_p2.y (), p.x (), p.y (), m_p1.x (), m_p1.y ()); 
+      //  compute the distance as described above
+      area_type axb = coord_traits::vprod (m_p2.x (), m_p2.y (), p.x (), p.y (), m_p1.x (), m_p1.y ());
       double d = double (axb) / double_length ();
       //  and round
       return coord_traits::rounded (d);
@@ -905,7 +904,7 @@ public:
    */
   int side_of (const db::point<C> &p) const
   {
-    //  the distance is computed from 
+    //  the distance is computed from
     //    d = (a x b) / sqrt (a * a)
     //  where b = p - p1, a = p2 - p1
     if (is_degenerate ()) {
@@ -920,7 +919,7 @@ public:
   /**
    *  @brief Absolute distance between the edge and a point.
    *
-   *  Returns the distance between the edge and the point. 
+   *  Returns the distance between the edge and the point.
    *
    *  @param p The point to test.
    *
@@ -928,15 +927,15 @@ public:
    */
   distance_type distance_abs (const db::point<C> &p) const
   {
-    //  the distance is computed from 
+    //  the distance is computed from
     //    d = (a x b) / |a|
     //  where b = p - p1, a = p2 - p1
     if (is_degenerate ()) {
       //  for safety handle this case - without a reasonable result
       return 0;
     } else {
-      //  compute the distance as described above 
-      area_type axb = coord_traits::vprod (m_p2.x (), m_p2.y (), p.x (), p.y (), m_p1.x (), m_p1.y ()); 
+      //  compute the distance as described above
+      area_type axb = coord_traits::vprod (m_p2.x (), m_p2.y (), p.x (), p.y (), m_p1.x (), m_p1.y ());
       double d = fabs (double (axb)) / double_length ();
       //  and round
       return coord_traits::rounded_distance (d);
@@ -946,7 +945,7 @@ public:
   /**
    *  @brief Swaps the points of the edge
    */
-  edge<C> &swap_points () 
+  edge<C> &swap_points ()
   {
     std::swap (m_p1, m_p2);
     return *this;
@@ -966,7 +965,7 @@ public:
    *  @brief Clip the line given by the edge at the given box
    *
    *  Determines the part of the line (given by the edge) that runs through the given box.
-   *  If the line does not hit the box, false is returned in the first member of the 
+   *  If the line does not hit the box, false is returned in the first member of the
    *  return value.
    *
    *  @return first: false if the line does not hit the box, second: the part of the line inside the box
@@ -977,7 +976,7 @@ public:
       return std::make_pair (false, db::edge<C> ());
     }
 
-    std::pair <bool, db::point<C> > pc1 (false, db::point<C> ()), pc2 (false, db::point<C> ());
+    std::pair<bool, db::point<C>> pc1 (false, db::point<C> ()), pc2 (false, db::point<C> ());
 
     pc1 = cut_point (db::edge<C> (box.p1 (), db::point<C> (box.p1 ().x (), box.p2 ().y ())));
     if (pc1.first) {
@@ -1018,34 +1017,34 @@ public:
 
     if (p1.x () > p2.x ()) {
       std::swap (p1, p2);
-      swapped = !swapped;
+      swapped = ! swapped;
     }
 
     if (p2.x () < box.left ()) {
-      return std::make_pair (false, db::edge<C>());
+      return std::make_pair (false, db::edge<C> ());
     } else if (p1.x () < box.left ()) {
-      p1 = db::point<C> (box.left (), m_p1.y () + db::coord_traits<C>::rounded((double)(box.left () - m_p1.x ()) * double (dy ()) / double (dx ())));
+      p1 = db::point<C> (box.left (), m_p1.y () + db::coord_traits<C>::rounded ((double) (box.left () - m_p1.x ()) * double (dy ()) / double (dx ())));
     }
     if (p1.x () > box.right ()) {
       return std::make_pair (false, db::edge<C> ());
     } else if (p2.x () > box.right ()) {
-      p2 = db::point<C> (box.right (), m_p1.y () + db::coord_traits<C>::rounded((double)(box.right () - m_p1.x ()) * double (dy ()) / double (dx ())));
+      p2 = db::point<C> (box.right (), m_p1.y () + db::coord_traits<C>::rounded ((double) (box.right () - m_p1.x ()) * double (dy ()) / double (dx ())));
     }
-    
+
     if (p1.y () > p2.y ()) {
       std::swap (p1, p2);
-      swapped = !swapped;
+      swapped = ! swapped;
     }
 
     if (p2.y () < box.bottom ()) {
       return std::make_pair (false, db::edge<C> ());
     } else if (p1.y () < box.bottom ()) {
-      p1 = db::point<C> (std::max (box.left (), std::min (box.right (), m_p1.x () + db::coord_traits<C>::rounded((double)(box.bottom () - m_p1.y ()) * double (dx ()) / double (dy ())))), box.bottom ());
+      p1 = db::point<C> (std::max (box.left (), std::min (box.right (), m_p1.x () + db::coord_traits<C>::rounded ((double) (box.bottom () - m_p1.y ()) * double (dx ()) / double (dy ())))), box.bottom ());
     }
     if (p1.y () > box.top ()) {
       return std::make_pair (false, db::edge<C> ());
     } else if (p2.y () > box.top ()) {
-      p2 = db::point<C> (std::max (box.left (), std::min (box.right (), m_p1.x () + db::coord_traits<C>::rounded((double)(box.top () - m_p1.y ()) * double (dx ()) / double (dy ())))), box.top ());
+      p2 = db::point<C> (std::max (box.left (), std::min (box.right (), m_p1.x () + db::coord_traits<C>::rounded ((double) (box.top () - m_p1.y ()) * double (dx ()) / double (dy ())))), box.top ());
     }
 
     if (swapped) {
@@ -1055,14 +1054,14 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Check, if an edge is cut by a line (given by an edge)
    *
-   *  This method returns true if p1 is in one semispace 
+   *  This method returns true if p1 is in one semispace
    *  while p2 is in the other or one of them is on the line
    *  through the edge
    */
-  bool crossed_by (const db::edge <C> &e) const
+  bool crossed_by (const db::edge<C> &e) const
   {
     //  this is basically this algorithm:
     //  res = true;
@@ -1070,7 +1069,7 @@ public:
     //    res = false
     //  } else if (side_of (e.p1 ()) == 0) {
     //    return true;
-    //  } 
+    //  }
     //  if (side_of (e.p2 ()) > 0) {
     //    res = !res
     //  } else if (side_of (e.p2 ()) == 0) {
@@ -1089,7 +1088,7 @@ public:
 
     int vsb = coord_traits::vprod_sign (m_p2.x (), m_p2.y (), e.p2 ().x (), e.p2 ().y (), m_p1.x (), m_p1.y ());
     if (vsb > 0) {
-      res = !res;
+      res = ! res;
     } else if (vsb == 0) {
       return true;
     }
@@ -1097,15 +1096,15 @@ public:
     return res;
   }
 
-  /** 
+  /**
    *  @brief Check, if an edge is cut by a line (given by an edge)
    *
-   *  This method returns true if p1 is in one semispace 
+   *  This method returns true if p1 is in one semispace
    *  while p2 is in the other or one of them is on the line
    *  through the edge. In addition to "crossed_by", also returns
    *  the point at which the edge is crossed.
    */
-  std::pair <bool, db::point<C> > crossed_by_point (const db::edge <C> &e) const
+  std::pair<bool, db::point<C>> crossed_by_point (const db::edge<C> &e) const
   {
     bool res = true;
 
@@ -1120,7 +1119,7 @@ public:
     std::pair<area_type, int> vsb = coord_traits::vprod_with_sign (m_p2.x (), m_p2.y (), e.p2 ().x (), e.p2 ().y (), m_p1.x (), m_p1.y ());
     area_type vxb = -vsb.first;
     if (vsb.second > 0) {
-      res = !res;
+      res = ! res;
     } else if (vsb.second == 0) {
       return std::make_pair (true, e.p2 ());
     }
@@ -1144,7 +1143,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Compute the projection of a point on the edge
    *
    *  This method returns true in the first member of the return
@@ -1153,9 +1152,9 @@ public:
    *
    *  @param point The point to be projected
    */
-  std::pair <bool, db::point<C> > projected (const db::point<C> &pt) const
+  std::pair<bool, db::point<C>> projected (const db::point<C> &pt) const
   {
-    return db::edge <C> (pt, pt + db::vector<C> (dy (), -dx ())).crossed_by_point (*this);
+    return db::edge<C> (pt, pt + db::vector<C> (dy (), -dx ())).crossed_by_point (*this);
   }
 
   /**
@@ -1163,10 +1162,10 @@ public:
    *
    *  This method returns true in the first member if both edges cut.
    *  If this is the case, the second member of the returned pair is
-   *  the point at which the edges would intersect, given they are 
+   *  the point at which the edges would intersect, given they are
    *  extended beyond their ends.
    */
-  std::pair <bool, db::point<C> > cut_point (const db::edge<C> &e2) const
+  std::pair<bool, db::point<C>> cut_point (const db::edge<C> &e2) const
   {
     std::pair<typename coord_traits::area_type, int> vps = coord_traits::vprod_with_sign (e2.dx (), e2.dy (), this->dx (), this->dy (), 0, 0);
     if (vps.second != 0) {
@@ -1187,8 +1186,7 @@ private:
  *  @brief "intersect" binary predicate
  */
 template <class Edge>
-struct edges_intersect
-{
+struct edges_intersect {
   bool operator() (const Edge &e1, const Edge &e2) const
   {
     return e1.intersect (e2);
@@ -1202,7 +1200,7 @@ struct edges_intersect
  *  @param s The scaling factor
  *
  *  @return The scaled edge
- */ 
+ */
 template <class C>
 inline edge<db::DCoord>
 operator* (const edge<C> &e, double s)
@@ -1213,7 +1211,7 @@ operator* (const edge<C> &e, double s)
 /**
  *  @brief Binary * operator (transformation)
  *
- *  Transforms the edge with the given transformation and 
+ *  Transforms the edge with the given transformation and
  *  returns the result.
  *
  *  @param t The transformation to apply
@@ -1221,7 +1219,7 @@ operator* (const edge<C> &e, double s)
  *  @return t * e
  */
 template <class Tr>
-inline edge<typename Tr::target_coord_type> 
+inline edge<typename Tr::target_coord_type>
 operator* (const Tr &t, const edge<typename Tr::coord_type> &e)
 {
   return e.transformed (t);
@@ -1240,7 +1238,7 @@ operator<< (std::ostream &os, const edge<C> &e)
 /**
  *  @brief The standard edge typedef
  */
-typedef edge<db::Coord>  Edge;
+typedef edge<db::Coord> Edge;
 
 /**
  *  @brief The double coordinate edge typedef
@@ -1287,7 +1285,7 @@ int sprod_sign (const db::edge<C> &p, const db::edge<C> &q)
  *  @brief Determines the lower bound of the edge
  */
 template <class C>
-inline C edge_ymin (const db::edge<C> &e) 
+inline C edge_ymin (const db::edge<C> &e)
 {
   return std::min (e.p1 ().y (), e.p2 ().y ());
 }
@@ -1296,7 +1294,7 @@ inline C edge_ymin (const db::edge<C> &e)
  *  @brief Determines the upper bound of the edge
  */
 template <class C>
-inline C edge_ymax (const db::edge<C> &e) 
+inline C edge_ymax (const db::edge<C> &e)
 {
   return std::max (e.p1 ().y (), e.p2 ().y ());
 }
@@ -1305,7 +1303,7 @@ inline C edge_ymax (const db::edge<C> &e)
  *  @brief Determines the left bound of the edge
  */
 template <class C>
-inline C edge_xmin (const db::edge<C> &e) 
+inline C edge_xmin (const db::edge<C> &e)
 {
   return std::min (e.p1 ().x (), e.p2 ().x ());
 }
@@ -1314,7 +1312,7 @@ inline C edge_xmin (const db::edge<C> &e)
  *  @brief Determines the right bound of the edge
  */
 template <class C>
-inline C edge_xmax (const db::edge<C> &e) 
+inline C edge_xmax (const db::edge<C> &e)
 {
   return std::max (e.p1 ().x (), e.p2 ().x ());
 }
@@ -1322,8 +1320,8 @@ inline C edge_xmax (const db::edge<C> &e)
 /**
  *  @brief Computes the x value of an edge at the given y value
  *
- *  HINT: for application in the scanline algorithm 
- *  it is important that this method delivers exactly (!) the same x for the same edge 
+ *  HINT: for application in the scanline algorithm
+ *  it is important that this method delivers exactly (!) the same x for the same edge
  *  (after normalization to dy()>0) and same y!
  */
 template <class C>
@@ -1422,7 +1420,7 @@ public:
  *  @brief Computes the left bound of the edge geometry for a given band [y1..y2].
  */
 template <class C>
-inline C edge_xmin_at_yinterval (const db::edge<C> &e, C y1, C y2) 
+inline C edge_xmin_at_yinterval (const db::edge<C> &e, C y1, C y2)
 {
   if (e.dx () == 0) {
     return e.p1 ().x ();
@@ -1437,7 +1435,7 @@ inline C edge_xmin_at_yinterval (const db::edge<C> &e, C y1, C y2)
  *  @brief Computes the right bound of the edge geometry for a given band [y1..y2].
  */
 template <class C>
-inline C edge_xmax_at_yinterval (const db::edge<C> &e, C y1, C y2) 
+inline C edge_xmax_at_yinterval (const db::edge<C> &e, C y1, C y2)
 {
   if (e.dx () == 0) {
     return e.p1 ().x ();
@@ -1451,12 +1449,11 @@ inline C edge_xmax_at_yinterval (const db::edge<C> &e, C y1, C y2)
 /**
  *  @brief Functor that compares two edges by their left bound for a given interval [y1..y2].
  *
- *  This function is intended for use in scanline scenarios to determine what edges are 
+ *  This function is intended for use in scanline scenarios to determine what edges are
  *  interacting in a certain y interval.
  */
 template <class C>
-struct edge_xmin_at_yinterval_compare
-{
+struct edge_xmin_at_yinterval_compare {
   edge_xmin_at_yinterval_compare (C y1, C y2)
     : m_y1 (y1), m_y2 (y2)
   {
@@ -1490,15 +1487,14 @@ public:
  *  @brief Special extractors for the edges
  */
 
-namespace tl 
+namespace tl
 {
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Edge &b);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DEdge &b);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Edge &b);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DEdge &b);
 
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Edge &b);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DEdge &b);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Edge &b);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DEdge &b);
 
 } // namespace tl
 
 #endif
-

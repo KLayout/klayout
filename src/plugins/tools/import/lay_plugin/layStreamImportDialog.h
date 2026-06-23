@@ -46,17 +46,17 @@ class QLineEdit;
 
 namespace Ui
 {
-  class StreamImportDialog;
+class StreamImportDialog;
 }
 
 namespace tl
 {
-  class InputStream;
+class InputStream;
 }
 
 namespace lay
 {
-  class Dispatcher;
+class Dispatcher;
 }
 
 namespace lay
@@ -64,18 +64,21 @@ namespace lay
 
 class StreamImporter;
 
-struct StreamImportData
-{
+struct StreamImportData {
 public:
   StreamImportData ();
 
-  enum mode_type { Simple = 0, Instantiate = 1, Extra = 2, Merge = 3 };
-  enum layer_mode_type { Original = 0, Offset = 1 };
+  enum mode_type { Simple = 0,
+                   Instantiate = 1,
+                   Extra = 2,
+                   Merge = 3 };
+  enum layer_mode_type { Original = 0,
+                         Offset = 1 };
 
   mode_type mode;
   std::vector<std::string> files;
   std::string topcell;
-  std::vector <std::pair <db::DPoint, db::DPoint> > reference_points;
+  std::vector<std::pair<db::DPoint, db::DPoint>> reference_points;
   db::DCplxTrans explicit_trans;
   layer_mode_type layer_mode;
   db::LayerOffset layer_offset;
@@ -89,7 +92,7 @@ public:
 class StreamImportDialog
   : public QDialog
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   StreamImportDialog (QWidget *parent, StreamImportData *data);
@@ -120,4 +123,3 @@ private:
 }
 
 #endif
-

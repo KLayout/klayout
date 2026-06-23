@@ -53,13 +53,13 @@ static int s_next_id = 0;
 PluginDeclaration::PluginDeclaration ()
   : m_id (++s_next_id), m_editable_enabled (true)
 {
-    // .. nothing yet ..
+  // .. nothing yet ..
 }
 
 PluginDeclaration::PluginDeclaration (int id)
   : m_id (id), m_editable_enabled (true)
 {
-    // .. nothing yet ..
+  // .. nothing yet ..
 }
 
 PluginDeclaration::~PluginDeclaration ()
@@ -70,8 +70,7 @@ PluginDeclaration::~PluginDeclaration ()
 }
 
 #if defined(HAVE_QT)
-void 
-PluginDeclaration::toggle_editable_enabled ()
+void PluginDeclaration::toggle_editable_enabled ()
 {
   BEGIN_PROTECTED
   set_editable_enabled (! editable_enabled ());
@@ -94,7 +93,6 @@ PluginDeclaration::menu_symbols ()
         symbols.push_back (m->symbol);
       }
     }
-
   }
 
   std::sort (symbols.begin (), symbols.end ());
@@ -103,7 +101,8 @@ PluginDeclaration::menu_symbols ()
   return symbols;
 }
 
-namespace {
+namespace
+{
 
 class GenericMenuAction
   : public Action
@@ -111,7 +110,8 @@ class GenericMenuAction
 public:
   GenericMenuAction (Dispatcher *dispatcher, const std::string &title, const std::string &symbol)
     : Action (title), mp_dispatcher (dispatcher), m_symbol (symbol)
-  { }
+  {
+  }
 
   void triggered ()
   {
@@ -131,7 +131,8 @@ class ModeAction
 public:
   ModeAction (Dispatcher *dispatcher, const std::string &title, int mode)
     : Action (title), mp_dispatcher (dispatcher), m_mode (mode)
-  { }
+  {
+  }
 
   void triggered ()
   {
@@ -153,8 +154,7 @@ private:
 
 }
 
-void
-PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
+void PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
 {
   lay::AbstractMenu &menu = *dispatcher->menu ();
 
@@ -175,7 +175,7 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
     if (tab) {
       name = std::string (t, 0, tab - t.c_str ());
       title = tab + 1;
-    } 
+    }
 
     mp_editable_mode_action.reset (new Action (title));
 #if defined(HAVE_QT)
@@ -187,7 +187,6 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
     mp_editable_mode_action->set_checked (m_editable_enabled);
 
     menu.insert_item ("edit_menu.select_menu.end", name, mp_editable_mode_action.get ());
-
   }
 
   //  add all the custom menus from the plugins
@@ -234,14 +233,12 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
       if (m->checkable) {
         action->set_checkable (true);
       }
-
     }
-
   }
 
   //  Fill the mode menu file items from the mouse modes
 
-  std::vector<std::pair<std::string, std::pair<std::string, int> > > modes;
+  std::vector<std::pair<std::string, std::pair<std::string, int>>> modes;
 
   title = std::string ();
   if (implements_mouse_mode (title)) {
@@ -251,7 +248,7 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
   //  the primary mouse modes (special for LayoutView)
   implements_primary_mouse_modes (modes);
 
-  for (std::vector<std::pair<std::string, std::pair<std::string, int> > >::const_iterator m = modes.begin (); m != modes.end (); ++m) {
+  for (std::vector<std::pair<std::string, std::pair<std::string, int>>>::const_iterator m = modes.begin (); m != modes.end (); ++m) {
 
     //  extract first part, which is the name, separated by a tab from the title.
     std::string name;
@@ -266,28 +263,26 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
     if (tab) {
       name = std::string (title, 0, tab - title.c_str ());
       title = std::string (tab + 1);
-    } 
+    }
 
     mp_mouse_mode_action.reset (new ModeAction (dispatcher, title, m->second.second));
     mp_mouse_mode_action->add_to_exclusive_group (&menu, "mouse_mode_exclusive_group");
     mp_mouse_mode_action->set_checkable (true);
 
     menu.insert_item (m->second.first, name + ":mode_group", mp_mouse_mode_action.get ());
-
   }
 }
 
-void
-PluginDeclaration::remove_menu_items (Dispatcher *dispatcher)
+void PluginDeclaration::remove_menu_items (Dispatcher *dispatcher)
 {
   lay::AbstractMenu *menu = dispatcher->menu ();
   menu->delete_items (mp_editable_mode_action.get ());
   menu->delete_items (mp_mouse_mode_action.get ());
 
   std::vector<lay::Action *> actions;
-  for (tl::weak_collection <lay::Action>::iterator a = m_menu_actions.begin (); a != m_menu_actions.end (); ++a) {
-    if (a.operator-> ()) {
-      actions.push_back (a.operator-> ());
+  for (tl::weak_collection<lay::Action>::iterator a = m_menu_actions.begin (); a != m_menu_actions.end (); ++a) {
+    if (a.operator->()) {
+      actions.push_back (a.operator->());
     }
   }
   for (std::vector<lay::Action *>::const_iterator a = actions.begin (); a != actions.end (); ++a) {
@@ -296,8 +291,7 @@ PluginDeclaration::remove_menu_items (Dispatcher *dispatcher)
   m_menu_actions.clear ();
 }
 
-void 
-PluginDeclaration::set_editable_enabled (bool f)
+void PluginDeclaration::set_editable_enabled (bool f)
 {
   if (f != m_editable_enabled) {
     m_editable_enabled = f;
@@ -308,8 +302,7 @@ PluginDeclaration::set_editable_enabled (bool f)
   }
 }
 
-void  
-PluginDeclaration::register_plugin ()
+void PluginDeclaration::register_plugin ()
 {
   if (Dispatcher::instance ()) {
     Dispatcher::instance ()->plugin_registered (this);
@@ -323,7 +316,7 @@ PluginDeclaration::name () const
 {
   auto plugin_reg = tl::Registrar<lay::PluginDeclaration>::get_instance ();
   for (auto i = plugin_reg->begin (); i != plugin_reg->end (); ++i) {
-    if (i.operator-> () == this) {
+    if (i.operator->() == this) {
       return i.current_name ();
     }
   }
@@ -331,8 +324,7 @@ PluginDeclaration::name () const
   return std::string ();
 }
 
-void
-PluginDeclaration::get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const
+void PluginDeclaration::get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const
 {
   std::string n = name ();
   if (n.empty ()) {
@@ -354,8 +346,7 @@ PluginDeclaration::get_editor_options_pages (std::vector<lay::EditorOptionsPage 
   }
 }
 
-void
-PluginDeclaration::get_additional_editor_options_pages (std::vector<EditorOptionsPage *> &pages, LayoutViewBase *view, Dispatcher *dispatcher, const std::map<std::string, std::vector<const lay::PluginDeclaration *> > &names)
+void PluginDeclaration::get_additional_editor_options_pages (std::vector<EditorOptionsPage *> &pages, LayoutViewBase *view, Dispatcher *dispatcher, const std::map<std::string, std::vector<const lay::PluginDeclaration *>> &names)
 {
   std::set<std::string> names_seen;
 
@@ -394,8 +385,7 @@ Plugin::Plugin ()
   //  .. nothing yet (waiting for init) ..
 }
 
-void
-Plugin::init (Plugin *parent, bool standalone)
+void Plugin::init (Plugin *parent, bool standalone)
 {
   mp_parent = parent;
   m_standalone = standalone;
@@ -404,7 +394,7 @@ Plugin::init (Plugin *parent, bool standalone)
     if (! standalone) {
       //  load the root with the default configuration
       for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-        std::vector< std::pair<std::string, std::string> > pairs;
+        std::vector<std::pair<std::string, std::string>> pairs;
         cls->get_options (pairs);
         m_repository.insert (pairs.begin (), pairs.end ());
       }
@@ -426,33 +416,30 @@ Plugin::~Plugin ()
   }
 }
 
-void 
-Plugin::config_setup ()
+void Plugin::config_setup ()
 {
   do_config_setup (this);
   do_config_end ();
 }
-  
-void 
-Plugin::config_set (const std::string &name, const char *value)
+
+void Plugin::config_set (const std::string &name, const char *value)
 {
   config_set (name, std::string (value));
 }
 
-void 
-Plugin::config_set (const std::string &name, const std::string &value)
+void Plugin::config_set (const std::string &name, const std::string &value)
 {
-  std::map <std::string, std::string>::iterator m = m_repository.find (name);
+  std::map<std::string, std::string>::iterator m = m_repository.find (name);
   if (m != m_repository.end ()) {
-    //  if the value did not change, do nothing 
+    //  if the value did not change, do nothing
     if (m->second == value) {
       return;
-    } 
+    }
     m->second = value;
   } else {
     //  install the value in the repository
     m_repository.insert (std::make_pair (name, value));
-  } 
+  }
 
   //  look for plugins that receive that configuration statically if the root is addressed
   if (! mp_parent && ! m_standalone) {
@@ -473,8 +460,7 @@ Plugin::config_set (const std::string &name, const std::string &value)
   dm_finalize_config ();
 }
 
-void 
-Plugin::config_end ()
+void Plugin::config_end ()
 {
   //  finish static configurations for plugins if the root is addressed
   if (! mp_parent && ! m_standalone) {
@@ -486,14 +472,13 @@ Plugin::config_end ()
   do_config_end ();
 }
 
-void
-Plugin::clear_config ()
+void Plugin::clear_config ()
 {
   m_repository.clear ();
   if (! mp_parent && ! m_standalone) {
     //  load the root with the default configuration
     for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-      std::vector< std::pair<std::string, std::string> > pairs;
+      std::vector<std::pair<std::string, std::string>> pairs;
       cls->get_options (pairs);
       m_repository.insert (pairs.begin (), pairs.end ());
     }
@@ -501,8 +486,7 @@ Plugin::clear_config ()
   config_setup ();
 }
 
-bool 
-Plugin::config_get (const std::string &name, std::string &value) const
+bool Plugin::config_get (const std::string &name, std::string &value) const
 {
   std::map<std::string, std::string>::const_iterator p = m_repository.find (name);
   if (p != m_repository.end ()) {
@@ -516,8 +500,7 @@ Plugin::config_get (const std::string &name, std::string &value) const
   }
 }
 
-void 
-Plugin::get_config_names (std::vector<std::string> &names) const
+void Plugin::get_config_names (std::vector<std::string> &names) const
 {
   names.reserve (m_repository.size ());
 
@@ -538,20 +521,18 @@ Plugin::dispatcher ()
   return dynamic_cast<Dispatcher *> (p);
 }
 
-void 
-Plugin::do_config_setup (Plugin *target)
+void Plugin::do_config_setup (Plugin *target)
 {
   if (mp_parent) {
     mp_parent->do_config_setup (target);
-  } 
+  }
   //  local configurations override the parent's configuration, i.e. are applied after the parents settings
   for (std::map<std::string, std::string>::const_iterator p = m_repository.begin (); p != m_repository.end (); ++p) {
     target->do_config_set (p->first, p->second, false);
   }
 }
 
-void 
-Plugin::do_config_end ()
+void Plugin::do_config_end ()
 {
   config_finalize ();
   for (tl::weak_collection<Plugin>::iterator c = m_children.begin (); c != m_children.end (); ++c) {
@@ -559,8 +540,7 @@ Plugin::do_config_end ()
   }
 }
 
-bool 
-Plugin::do_config_set (const std::string &name, const std::string &value, bool for_child)
+bool Plugin::do_config_set (const std::string &name, const std::string &value, bool for_child)
 {
   if (for_child) {
     //  this is the case when we impose a configuration from the parent: in this case we
@@ -585,8 +565,7 @@ Plugin::do_config_set (const std::string &name, const std::string &value, bool f
   return false;
 }
 
-void
-Plugin::call_function (const std::string &symbol, const std::string &args)
+void Plugin::call_function (const std::string &symbol, const std::string &args)
 {
   function (symbol, args);
   for (tl::weak_collection<Plugin>::iterator c = m_children.begin (); c != m_children.end (); ++c) {

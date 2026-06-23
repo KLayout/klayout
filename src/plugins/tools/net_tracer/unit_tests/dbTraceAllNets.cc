@@ -88,7 +88,7 @@ void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracer
   db::compare_layouts (_this, layout_nets, fn, db::NormalizationMode (db::WriteOAS | db::AsPolygons));
 }
 
-TEST(1) 
+TEST (1)
 {
   std::string file = "t1.oas.gz";
   std::string file_au = "t1_all_nets.oas.gz";
@@ -99,7 +99,7 @@ TEST(1)
   run_test (_this, file, tc, file_au);
 }
 
-TEST(1c) 
+TEST (1c)
 {
   std::string file = "t1.oas.gz";
   std::string file_au = "t1_all_nets.oas.gz";
@@ -113,7 +113,7 @@ TEST(1c)
   run_test (_this, file, tc, file_au);
 }
 
-TEST(1d) 
+TEST (1d)
 {
   std::string file = "t1.oas.gz";
   std::string file_au = "t1d_all_nets.oas.gz";
@@ -125,7 +125,7 @@ TEST(1d)
   run_test (_this, file, tc, file_au);
 }
 
-TEST(4) 
+TEST (4)
 {
   std::string file = "t4.oas.gz";
   std::string file_au = "t4_all_nets.oas.gz";
@@ -136,7 +136,7 @@ TEST(4)
   run_test (_this, file, tc, file_au);
 }
 
-TEST(4b) 
+TEST (4b)
 {
   std::string file = "t4.oas.gz";
   std::string file_au = "t4b_all_nets.oas.gz";
@@ -147,7 +147,7 @@ TEST(4b)
   run_test (_this, file, tc, file_au);
 }
 
-TEST(5) 
+TEST (5)
 {
   std::string file = "t5.oas.gz";
   std::string file_au = "t5_all_nets.oas.gz";
@@ -158,7 +158,7 @@ TEST(5)
   run_test (_this, file, tc, file_au);
 }
 
-TEST(5b) 
+TEST (5b)
 {
   std::string file = "t5.oas.gz";
   std::string file_au = "t5b_all_nets.oas.gz";
@@ -169,7 +169,7 @@ TEST(5b)
   run_test (_this, file, tc, file_au);
 }
 
-TEST(5c) 
+TEST (5c)
 {
   std::string file = "t5.oas.gz";
   std::string file_au = "t5c_all_nets.oas.gz";
@@ -180,7 +180,7 @@ TEST(5c)
   run_test (_this, file, tc, file_au);
 }
 
-TEST(5d) 
+TEST (5d)
 {
   std::string file = "t5.oas.gz";
   std::string file_au = "t5d_all_nets.oas.gz";
@@ -191,7 +191,7 @@ TEST(5d)
   run_test (_this, file, tc, file_au);
 }
 
-TEST(5f) 
+TEST (5f)
 {
   std::string file = "t5.oas.gz";
   std::string file_au = "t5f_all_nets.oas.gz";
@@ -204,7 +204,7 @@ TEST(5f)
   run_test (_this, file, tc, file_au);
 }
 
-TEST(6) 
+TEST (6)
 {
   std::string file = "t6.oas.gz";
   std::string file_au = "t6_all_nets.oas.gz";
@@ -216,7 +216,7 @@ TEST(6)
   run_test (_this, file, tc, file_au);
 }
 
-TEST(7) 
+TEST (7)
 {
   std::string file = "t7.oas.gz";
   std::string file_au = "t7_all_nets.oas.gz";
@@ -227,4 +227,3 @@ TEST(7)
 
   run_test (_this, file, tc, file_au);
 }
-

@@ -41,8 +41,8 @@ public:
   {
     //  .. nothing yet ..
   }
-  
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > & /*options*/) const
+
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> & /*options*/) const
   {
     //  .. nothing yet ..
   }
@@ -81,4 +81,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::D25PluginDeclaration (), 3100, "lay::D25Plugin");
 
 }
-

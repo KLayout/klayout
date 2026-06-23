@@ -33,9 +33,9 @@
 #include <map>
 
 #if defined(HAVE_QT)
-#  include <QPoint>
-#  include <QByteArray>
-#  include <QColor>
+#include <QPoint>
+#include <QByteArray>
+#include <QColor>
 #endif
 
 #include "tlObjectCollection.h"
@@ -59,17 +59,18 @@ class QMimeData;
 
 namespace db
 {
-  class Library;
-  class Layout;
+class Library;
+class Layout;
 }
 
 namespace tl
 {
-  class PixelBuffer;
-  class BitmapBuffer;
+class PixelBuffer;
+class BitmapBuffer;
 }
 
-namespace lay {
+namespace lay
+{
 
 class Viewport;
 class ViewObjectUI;
@@ -84,10 +85,10 @@ class DragDropDataBase;
 class ViewObjectQWidget;
 
 /**
- *  @brief A view service 
+ *  @brief A view service
  *
  *  A view service is providing editing or informational services
- *  on the canvas. 
+ *  on the canvas.
  *  A service can be "active" by requesting mouse
  *  events through a trigger by "select" or "activate" after
  *  which a "grab_mouse" redirects all mouse events to the
@@ -98,7 +99,7 @@ class ViewObjectQWidget;
 
 class LAYBASIC_PUBLIC ViewService
 {
-public: 
+public:
   /**
    *  @brief Constructor
    */
@@ -114,11 +115,11 @@ public:
    */
   virtual ~ViewService ();
 
-  /** 
+  /**
    *  @brief Key press event handler
    *
    *  This method will be called by the ViewObjectWidget object to
-   *  dispatch key press events. 
+   *  dispatch key press events.
    *
    *  The active service will receive that call and should return true
    *  if the event is taken. Otherwise the event will be passed further.
@@ -155,7 +156,7 @@ public:
   /**
    *  @brief The drag leave event
    */
-  virtual void drag_leave_event () { }
+  virtual void drag_leave_event () {}
 
   /**
    *  @brief The drop event
@@ -172,7 +173,7 @@ public:
    *  The implementation of this event should cancel this timer and
    *  not raise a hover condition.
    */
-  virtual void hover_reset () { }
+  virtual void hover_reset () {}
 
   /**
    *  @brief Mouse press event handler
@@ -181,7 +182,7 @@ public:
    *  dispatch mouse press events. First, the objects that grabbed
    *  the mouse will receive the events with prio "true" in the reverse order they
    *  grabbed the mouse (last one first). This loop will terminate
-   *  if one of the objects has returned "true". 
+   *  if one of the objects has returned "true".
    *  If no service has grabbed the mouse or none of them was taking the
    *  event, the active service receives the event with prio set to "true".
    *  If this is not the case, then all objects will receive
@@ -196,10 +197,10 @@ public:
    *  @param p The point at which the button was pressed
    *  @param buttons A ored combination of ShiftButton etc.
    *  @return True to terminate dispatcher
-   */ 
+   */
   virtual bool mouse_press_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) { return false; }
 
-  /** 
+  /**
    *  @brief Mouse single-click event handler
    *
    *  Analogous to mouse_press_event (see above), but sent if the mouse was not moved.
@@ -207,38 +208,38 @@ public:
    */
   virtual bool mouse_click_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) { return false; }
 
-  /** 
+  /**
    *  @brief Mouse double-click event handler
    *
    *  Analogous to mouse_press_event (see above), but sent if a double-click was detected.
    */
   virtual bool mouse_double_click_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) { return false; }
 
-  /** 
+  /**
    *  @brief Mouse leave event handler
    */
   virtual bool leave_event (bool /*prio*/) { return false; }
 
-  /** 
+  /**
    *  @brief Mouse enter event handler
    */
   virtual bool enter_event (bool /*prio*/) { return false; }
 
-  /** 
+  /**
    *  @brief Mouse move event handler
    *
    *  Analogous to mouse_press_event (see above).
    */
   virtual bool mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) { return false; }
 
-  /** 
+  /**
    *  @brief Mouse release event handler
    *
    *  Analogous to mouse_press_event (see above).
    */
   virtual bool mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) { return false; }
 
-  /** 
+  /**
    *  @brief Wheel event handler
    *
    *  Analogous to mouse_press_event (see above).
@@ -265,36 +266,36 @@ public:
    */
   virtual void update ()
   {
-    //  The default implementation does nothing 
+    //  The default implementation does nothing
   }
- 
+
   /**
    *  @brief Accessor to the widget pointer
    */
   ViewObjectUI *ui () const
-  {  
+  {
     return mp_widget;
   }
 
   /**
    *  @brief This method is called on the service that got activated
-   */  
-  virtual void activated () { }
+   */
+  virtual void activated () {}
 
   /**
    *  @brief This method is called on the service that got deactivated
-   */  
-  virtual void deactivated () { }
+   */
+  virtual void deactivated () {}
 
   /**
    *  @brief This method is called to set the background and text (foreground) color
    */
-  virtual void set_colors (tl::Color /*background*/, tl::Color /*text*/) { }
+  virtual void set_colors (tl::Color /*background*/, tl::Color /*text*/) {}
 
   /**
    *  @brief This method is called when a mouse tracking operation should be cancelled
    */
-  virtual void drag_cancel () { }
+  virtual void drag_cancel () {}
 
   /**
    *  @brief Gets a value indicating whether the mouse receiver claims the view message bar
@@ -315,9 +316,9 @@ public:
   virtual db::DPoint tracking_position () const { return db::DPoint (); }
 
   /**
-   *  @brief Enable or disable a service 
+   *  @brief Enable or disable a service
    *
-   *  If a service is disabled, it will not receive mouse events 
+   *  If a service is disabled, it will not receive mouse events
    */
   void enable (bool en);
 
@@ -338,10 +339,10 @@ private:
 };
 
 /**
- *  @brief The background view object 
+ *  @brief The background view object
  *
  *  A background view object is an object that is painted onto the
- *  canvas background and is contained by the view object widget. 
+ *  canvas background and is contained by the view object widget.
  *  This is an interface that should/must be implemented
  *  by the super class.
  */
@@ -349,7 +350,7 @@ private:
 class LAYBASIC_PUBLIC BackgroundViewObject
   : virtual public tl::Object
 {
-public: 
+public:
   /**
    *  @brief The constructor
    *
@@ -364,9 +365,9 @@ public:
   virtual ~BackgroundViewObject ();
 
   /**
-   *  @brief Render the object on the background 
+   *  @brief Render the object on the background
    *
-   *  This method is supposed to repaint the background part of the object 
+   *  This method is supposed to repaint the background part of the object
    *  on the QImage provided in the canvas.
    */
   virtual void render_bg (const Viewport &vp, ViewObjectCanvas &canvas) = 0;
@@ -375,17 +376,17 @@ public:
    *  @brief Accessor to the widget object pointer
    */
   ViewObjectUI *widget () const
-  {  
-    return const_cast<ViewObjectUI *> (mp_widget.get());
+  {
+    return const_cast<ViewObjectUI *> (mp_widget.get ());
   }
 
   /**
    *  @brief Set the visibility state of the view object
-   *  
+   *
    *  Invisible objects are not drawn
    */
   void visible (bool vis);
-     
+
   /**
    *  @brief Tell the visibility state of the view object
    */
@@ -393,10 +394,10 @@ public:
   {
     return m_visible;
   }
-     
+
   /**
    *  @brief This method tells the widget to update the object on next repaint
-   *  
+   *
    *  If the object is static, a "touch" is issued on the widget. Otherwise
    *  just a update is issued, resulting in a repaint
    *  This is the preferred method to tell that an object needs repainting.
@@ -407,8 +408,8 @@ public:
   /**
    *  @brief Z-Order property
    *
-   *  This property controls in which order the background objects are drawn: 
-   *  those with a lower z-order value are drawn first. Thus, ones with the 
+   *  This property controls in which order the background objects are drawn:
+   *  those with a lower z-order value are drawn first. Thus, ones with the
    *  higher value overwrite them.
    */
   int z_order () const
@@ -433,12 +434,12 @@ private:
 };
 
 /**
- *  @brief The view object 
+ *  @brief The view object
  *
  *  A view object is an object that is painted onto the
- *  canvas and is contained by the view object widget. 
+ *  canvas and is contained by the view object widget.
  *  View objects can be static or non-static. Changing a
- *  view object in the non-static case is somewhat more 
+ *  view object in the non-static case is somewhat more
  *  efficient and is recommended for dynamic objects.
  *  Static mode is entered with "freeze", non-static mode
  *  with "thaw".
@@ -449,7 +450,7 @@ private:
 class LAYBASIC_PUBLIC ViewObject
   : public tl::Object
 {
-public: 
+public:
   /**
    *  @brief The constructor
    *
@@ -483,8 +484,8 @@ public:
    *  @brief Accessor to the widget object pointer
    */
   ViewObjectUI *widget () const
-  {  
-    return const_cast<ViewObjectUI *> (mp_widget.get());
+  {
+    return const_cast<ViewObjectUI *> (mp_widget.get ());
   }
 
   /**
@@ -506,11 +507,11 @@ public:
 
   /**
    *  @brief Set the visibility state of the view object
-   *  
+   *
    *  Invisible objects are not drawn
    */
   void visible (bool vis);
-     
+
   /**
    *  @brief Tell the visibility state of the view object
    */
@@ -518,10 +519,10 @@ public:
   {
     return m_visible;
   }
-     
+
   /**
    *  @brief This method tells the widget to update the object on next repaint
-   *  
+   *
    *  If the object is static, a "touch" is issued on the widget. Otherwise
    *  just a update is issued, resulting in a repaint
    *  This is the preferred method to tell that an object needs repainting.
@@ -534,7 +535,7 @@ public:
    *
    *  This is a convenience function that avoids having to store a widget pointer
    */
-  void thaw (); 
+  void thaw ();
 
   /**
    *  @brief freeze this object
@@ -559,14 +560,14 @@ private:
  *  @brief Describes the button state (supposed to be ored)
  */
 enum ButtonState {
-  ShiftButton     = 0x01,
-  ControlButton   = 0x02,
-  AltButton       = 0x04,
-  ModifierMask    = 0x07,  //  all keyboard modifiers
-  LeftButton      = 0x08,
-  MidButton       = 0x10,
-  RightButton     = 0x20,
-  MouseButtonMask = 0x38   //  all mouse buttons
+  ShiftButton = 0x01,
+  ControlButton = 0x02,
+  AltButton = 0x04,
+  ModifierMask = 0x07, //  all keyboard modifiers
+  LeftButton = 0x08,
+  MidButton = 0x10,
+  RightButton = 0x20,
+  MouseButtonMask = 0x38 //  all mouse buttons
 };
 
 /**
@@ -574,52 +575,51 @@ enum ButtonState {
  */
 enum KeyCodes {
 #if defined(HAVE_QT)
-  KeyEscape    = int(Qt::Key_Escape),
-  KeyTab       = int(Qt::Key_Tab),
-  KeyBacktab   = int(Qt::Key_Backtab),
-  KeyBackspace = int(Qt::Key_Backspace),
-  KeyReturn    = int(Qt::Key_Return),
-  KeyEnter     = int(Qt::Key_Enter),
-  KeyInsert    = int(Qt::Key_Insert),
-  KeyDelete    = int(Qt::Key_Delete),
-  KeyHome      = int(Qt::Key_Home),
-  KeyEnd       = int(Qt::Key_End),
-  KeyDown      = int(Qt::Key_Down),
-  KeyUp        = int(Qt::Key_Up),
-  KeyLeft      = int(Qt::Key_Left),
-  KeyRight     = int(Qt::Key_Right),
-  KeyPageUp    = int(Qt::Key_PageUp),
-  KeyPageDown  = int(Qt::Key_PageDown)
+  KeyEscape = int (Qt::Key_Escape),
+  KeyTab = int (Qt::Key_Tab),
+  KeyBacktab = int (Qt::Key_Backtab),
+  KeyBackspace = int (Qt::Key_Backspace),
+  KeyReturn = int (Qt::Key_Return),
+  KeyEnter = int (Qt::Key_Enter),
+  KeyInsert = int (Qt::Key_Insert),
+  KeyDelete = int (Qt::Key_Delete),
+  KeyHome = int (Qt::Key_Home),
+  KeyEnd = int (Qt::Key_End),
+  KeyDown = int (Qt::Key_Down),
+  KeyUp = int (Qt::Key_Up),
+  KeyLeft = int (Qt::Key_Left),
+  KeyRight = int (Qt::Key_Right),
+  KeyPageUp = int (Qt::Key_PageUp),
+  KeyPageDown = int (Qt::Key_PageDown)
 #else
-  KeyEscape    = 0x01000000,
-  KeyTab       = 0x01000001,
-  KeyBacktab   = 0x01000002,
+  KeyEscape = 0x01000000,
+  KeyTab = 0x01000001,
+  KeyBacktab = 0x01000002,
   KeyBackspace = 0x01000003,
-  KeyReturn    = 0x01000004,
-  KeyEnter     = 0x01000005,
-  KeyInsert    = 0x01000006,
-  KeyDelete    = 0x01000007,
-  KeyHome      = 0x01000010,
-  KeyEnd       = 0x01000011,
-  KeyLeft      = 0x01000012,
-  KeyUp        = 0x01000013,
-  KeyRight     = 0x01000014,
-  KeyDown      = 0x01000015,
-  KeyPageUp    = 0x01000016,
-  KeyPageDown  = 0x01000017
+  KeyReturn = 0x01000004,
+  KeyEnter = 0x01000005,
+  KeyInsert = 0x01000006,
+  KeyDelete = 0x01000007,
+  KeyHome = 0x01000010,
+  KeyEnd = 0x01000011,
+  KeyLeft = 0x01000012,
+  KeyUp = 0x01000013,
+  KeyRight = 0x01000014,
+  KeyDown = 0x01000015,
+  KeyPageUp = 0x01000016,
+  KeyPageDown = 0x01000017
 #endif
 };
 
 /**
  *  @brief The view object container
  *
- *  The container holds the view objects and 
- *  manages the the mouse event distribution and 
+ *  The container holds the view objects and
+ *  manages the the mouse event distribution and
  *  painting.
  */
 
-class LAYBASIC_PUBLIC ViewObjectUI :
-    public tl::Object
+class LAYBASIC_PUBLIC ViewObjectUI : public tl::Object
 {
 public:
   typedef tl::weak_collection<ViewObject>::iterator object_iterator;
@@ -655,12 +655,12 @@ public:
   void hover_reset ();
 
   /**
-   *  @brief CanvasPlane rendering 
+   *  @brief CanvasPlane rendering
    *
    *  This method is supposed to render the object on the planes provided
-   *  by the planes() method. 
+   *  by the planes() method.
    *
-   *  @param vp The viewport 
+   *  @param vp The viewport
    *  @param st True, if only static (frozen) objects are to be redrawn
    */
   void do_render (const Viewport &vp, ViewObjectCanvas &canvas, bool st);
@@ -670,8 +670,8 @@ public:
    *
    *  Objects on the background must provide a paint method that paints
    *  them on the canvas directly.
-   *  
-   *  @param vp The viewport 
+   *
+   *  @param vp The viewport
    *  @param canvas The canvas where to paint on
    */
   void do_render_bg (const Viewport &vp, ViewObjectCanvas &canvas);
@@ -689,7 +689,7 @@ public:
   /**
    *  @brief Query if the background needs to be redrawn
    *
-   *  To reset this flag, call do_render_bg 
+   *  To reset this flag, call do_render_bg
    */
   bool needs_update_bg () const
   {
@@ -762,9 +762,9 @@ public:
   /**
    *  @brief Activate a service
    *
-   *  The active service will be the first to receive mouse events  
+   *  The active service will be the first to receive mouse events
    *  with prio==true, unless the mouse is grabbed and the event is
-   *  taken by the grabber. 
+   *  taken by the grabber.
    *  Passing 0 deactivates all services. The service currently active
    *  will get a "deactivated" signal.
    */
@@ -773,7 +773,7 @@ public:
   /**
    *  @brief Services iterator: begin
    */
-  service_iterator begin_services () 
+  service_iterator begin_services ()
   {
     return m_services.begin ();
   }
@@ -781,7 +781,7 @@ public:
   /**
    *  @brief Services iterator: end
    */
-  service_iterator end_services () 
+  service_iterator end_services ()
   {
     return m_services.end ();
   }
@@ -789,7 +789,7 @@ public:
   /**
    *  @brief Background objects iterator: begin
    */
-  background_object_iterator begin_background_objects () 
+  background_object_iterator begin_background_objects ()
   {
     return m_background_objects.begin ();
   }
@@ -797,7 +797,7 @@ public:
   /**
    *  @brief Background objects iterator: end
    */
-  background_object_iterator end_background_objects () 
+  background_object_iterator end_background_objects ()
   {
     return m_background_objects.end ();
   }
@@ -805,7 +805,7 @@ public:
   /**
    *  @brief Objects iterator: begin
    */
-  object_iterator begin_objects () 
+  object_iterator begin_objects ()
   {
     return m_objects.begin ();
   }
@@ -813,7 +813,7 @@ public:
   /**
    *  @brief Objects iterator: end
    */
-  object_iterator end_objects () 
+  object_iterator end_objects ()
   {
     return m_objects.end ();
   }
@@ -828,29 +828,29 @@ public:
    */
   void clear_objects ();
 
-  /** 
+  /**
    *  @brief Remaining leave event handler
    *
    *  This event handler is called if no ViewObject requested handling
    *  of this event.
    */
-  virtual void leave_event () { }
+  virtual void leave_event () {}
 
-  /** 
+  /**
    *  @brief Remaining enter event handler
    *
    *  This event handler is called if no ViewObject requested handling
    *  of this event.
    */
-  virtual void enter_event () { }
+  virtual void enter_event () {}
 
-  /** 
+  /**
    *  @brief Remaining key event handler
    *
    *  This event handler is called if no ViewObject requested handling
    *  of this event.
    */
-  virtual void key_event (unsigned int /*key*/, unsigned int /*buttons*/) { }
+  virtual void key_event (unsigned int /*key*/, unsigned int /*buttons*/) {}
 
   /**
    *  @brief Handler for remaining shortcut override events
@@ -879,7 +879,7 @@ public:
   /**
    *  @brief The drag leave event
    */
-  virtual void drag_leave_event () { }
+  virtual void drag_leave_event () {}
 
   /**
    *  @brief The drop event
@@ -887,53 +887,53 @@ public:
   virtual bool drop_event (const db::DPoint & /*p*/, const DragDropDataBase * /*data*/) { return false; }
 #endif
 
-  /** 
+  /**
    *  @brief Remaining mouse double click event handler
    *
    *  This event handler is called if no ViewObject requested handling
    *  of this event.
    */
-  virtual void mouse_double_click_event (const db::DPoint & /*p*/, unsigned int /*buttons*/) { }
+  virtual void mouse_double_click_event (const db::DPoint & /*p*/, unsigned int /*buttons*/) {}
 
-  /** 
+  /**
    *  @brief Remaining single mouse click event handler
    *
    *  This event handler is called if no ViewObject requested handling
    *  of this event.
    */
-  virtual void mouse_click_event (const db::DPoint & /*p*/, unsigned int /*buttons*/) { }
+  virtual void mouse_click_event (const db::DPoint & /*p*/, unsigned int /*buttons*/) {}
 
-  /** 
+  /**
    *  @brief Remaining mouse press event handler
    *
    *  This event handler is called if no ViewObject requested handling
    *  of this event.
    */
-  virtual void mouse_press_event (const db::DPoint & /*p*/, unsigned int /*buttons*/) { }
+  virtual void mouse_press_event (const db::DPoint & /*p*/, unsigned int /*buttons*/) {}
 
-  /** 
+  /**
    *  @brief Remaining mouse release event handler
    *
    *  This event handler is called if no ViewObject requested handling
    *  of this event.
    */
-  virtual void mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/) { }
+  virtual void mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/) {}
 
-  /** 
+  /**
    *  @brief Remaining mouse move event handler
    *
    *  This event handler is called if no ViewObject requested handling
    *  of this event.
    */
-  virtual void mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/) { }
+  virtual void mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/) {}
 
-  /** 
+  /**
    *  @brief Remaining wheel event handler
    *
    *  This event handler is called if no ViewObject requested handling
    *  of this event.
    */
-  virtual void wheel_event (int /*delta*/, bool /*horizontal*/, const db::DPoint & /*p*/, unsigned int /*buttons*/) { }
+  virtual void wheel_event (int /*delta*/, bool /*horizontal*/, const db::DPoint & /*p*/, unsigned int /*buttons*/) {}
 
   /**
    *  @brief Get the transformation for mouse events
@@ -943,7 +943,7 @@ public:
     return m_trans;
   }
 
-  /** 
+  /**
    *  @brief Deliver an iterator for the mouse receivers (begin)
    */
   mouse_receivers_iterator begin_mouse_receivers () const
@@ -951,7 +951,7 @@ public:
     return m_grabbed.begin ();
   }
 
-  /** 
+  /**
    *  @brief Deliver an iterator for the mouse receivers (end)
    */
   mouse_receivers_iterator end_mouse_receivers () const
@@ -1020,7 +1020,7 @@ public:
     return m_mouse_inside;
   }
 
-#if !defined(HAVE_QT)
+#if ! defined(HAVE_QT)
   /**
    *  @brief Gets a value indicating that the image data has been updated
    *
@@ -1042,7 +1042,7 @@ public:
   /**
    *  @brief External entry point for key press event generation
    */
-  bool send_key_press_event(unsigned int key, unsigned int buttons);
+  bool send_key_press_event (unsigned int key, unsigned int buttons);
 
   /**
    *  @brief External entry point for ShortcutOverride event handling
@@ -1050,7 +1050,7 @@ public:
    *  Editables may return true to indicate that they want to consume the given key
    *  sequence through "key_pressed" instead of being handled by Qt's shortcut system.
    */
-  bool send_shortcut_override_event(unsigned int key, unsigned int buttons);
+  bool send_shortcut_override_event (unsigned int key, unsigned int buttons);
 
   /**
    *  @brief External entry point for mouse move event generation
@@ -1180,16 +1180,17 @@ private:
  *
  *  The canvas provides ways and attributes that allow the view objects to render
  *  themselves. The basic functionality of this interface is to provide planes
- *  for painting. 
+ *  for painting.
  */
 class LAYBASIC_PUBLIC ViewObjectCanvas
 {
 public:
   /**
-   *  The destructor 
+   *  The destructor
    */
-  virtual ~ViewObjectCanvas () 
-  { }
+  virtual ~ViewObjectCanvas ()
+  {
+  }
 
   /**
    *  @brief Background color property: background color of the canvas
@@ -1210,7 +1211,7 @@ public:
    *  @brief Get the resolution
    *
    *  The resolution describes the size of one pixel in relation to "one line width". "One line width" is the unit
-   *  of the drawing and describes the width of a "one unit" wide line. In that sense, the resolution is the reciprocal 
+   *  of the drawing and describes the width of a "one unit" wide line. In that sense, the resolution is the reciprocal
    *  of a "one unit" line's width in pixels.
    */
   virtual double resolution () const = 0;
@@ -1226,10 +1227,10 @@ public:
    *  @brief CanvasPlane provider
    *
    *  This method is used by the view objects to obtain the planes
-   *  they should paint themselves on. 
+   *  they should paint themselves on.
    *  A style can be specified that determines how the plane will
    *  be displayed. CanvasPlanes may be shared if the style is identical.
-   *  The plane index of the ViewOp is not used. 
+   *  The plane index of the ViewOp is not used.
    */
   virtual lay::CanvasPlane *plane (const lay::ViewOp &style) = 0;
 
@@ -1237,11 +1238,11 @@ public:
    *  @brief CanvasPlane provider for a sequence of operations on the same plane
    *
    *  This method is used by the view objects to obtain the planes
-   *  they should paint themselves on. 
+   *  they should paint themselves on.
    *  A operator vector can be specified that determines how the plane will
    *  be displayed. The operators are executed in the order given on the same plane.
    *  CanvasPlanes may be shared if the styles are identical.
-   *  The plane index of the ViewOp is not used. 
+   *  The plane index of the ViewOp is not used.
    */
   virtual lay::CanvasPlane *plane (const std::vector<lay::ViewOp> &style) = 0;
 
@@ -1261,7 +1262,7 @@ public:
  *
  *  The canvas provides ways and attributes that allow the view objects to render
  *  themselves. The basic functionality of this interface is to provide planes
- *  for painting. 
+ *  for painting.
  */
 class LAYBASIC_PUBLIC BitmapViewObjectCanvas
   : public ViewObjectCanvas
@@ -1278,7 +1279,7 @@ public:
   BitmapViewObjectCanvas (unsigned int width, unsigned int height, double resolution, double font_resolution);
 
   /**
-   *  @brief The destructor 
+   *  @brief The destructor
    */
   virtual ~BitmapViewObjectCanvas ();
 
@@ -1286,10 +1287,10 @@ public:
    *  @brief CanvasPlane provider
    *
    *  This method is used by the view objects to obtain the planes
-   *  they should paint themselves on. 
+   *  they should paint themselves on.
    *  A style can be specified that determines how the plane will
    *  be displayed. CanvasPlanes may be shared if the style is identical.
-   *  The plane index of the ViewOp is not used. 
+   *  The plane index of the ViewOp is not used.
    */
   virtual lay::CanvasPlane *plane (const lay::ViewOp &style);
 
@@ -1297,11 +1298,11 @@ public:
    *  @brief CanvasPlane provider for a sequence of operations on the same plane
    *
    *  This method is used by the view objects to obtain the planes
-   *  they should paint themselves on. 
+   *  they should paint themselves on.
    *  A operator vector can be specified that determines how the plane will
    *  be displayed. The operators are executed in the order given on the same plane.
    *  CanvasPlanes may be shared if the styles are identical.
-   *  The plane index of the ViewOp is not used. 
+   *  The plane index of the ViewOp is not used.
    */
   virtual lay::CanvasPlane *plane (const std::vector<lay::ViewOp> &style);
 
@@ -1313,15 +1314,15 @@ public:
   /**
    *  @brief Provide the renderer
    */
-  virtual lay::Renderer &renderer () 
-  { 
-    return m_renderer; 
+  virtual lay::Renderer &renderer ()
+  {
+    return m_renderer;
   }
 
   /**
    *  @brief Get the resolution
    */
-  virtual double resolution () const 
+  virtual double resolution () const
   {
     return m_resolution;
   }
@@ -1357,7 +1358,7 @@ public:
    *  @brief Direct access to the bitmap pointers
    */
 
-  const std::vector <lay::Bitmap *> &fg_bitmap_vector () const
+  const std::vector<lay::Bitmap *> &fg_bitmap_vector () const
   {
     return mp_fg_bitmaps;
   }
@@ -1375,7 +1376,7 @@ public:
   /**
    *  @brief Direct access to the styles vector
    */
-  const std::vector <lay::ViewOp> &fg_view_op_vector () const
+  const std::vector<lay::ViewOp> &fg_view_op_vector () const
   {
     return m_fg_view_ops;
   }
@@ -1403,7 +1404,7 @@ public:
   /**
    *  @brief Get the width
    */
-  unsigned int canvas_width () const 
+  unsigned int canvas_width () const
   {
     return m_width;
   }
@@ -1411,7 +1412,7 @@ public:
   /**
    *  @brief Get the height
    */
-  unsigned int canvas_height () const 
+  unsigned int canvas_height () const
   {
     return m_height;
   }
@@ -1427,11 +1428,11 @@ public:
   virtual tl::BitmapBuffer *bg_bitmap ();
 
 private:
-  std::map <lay::ViewOp, unsigned int> m_fg_bitmap_table;
-  std::map <std::vector <lay::ViewOp>, unsigned int> m_fgv_bitmap_table;
-  std::vector <lay::Bitmap *> mp_fg_bitmaps;
-  std::vector <lay::Bitmap *> mp_alloc_bitmaps;
-  std::vector <lay::ViewOp> m_fg_view_ops;
+  std::map<lay::ViewOp, unsigned int> m_fg_bitmap_table;
+  std::map<std::vector<lay::ViewOp>, unsigned int> m_fgv_bitmap_table;
+  std::vector<lay::Bitmap *> mp_fg_bitmaps;
+  std::vector<lay::Bitmap *> mp_alloc_bitmaps;
+  std::vector<lay::ViewOp> m_fg_view_ops;
   lay::BitmapRenderer m_renderer;
   unsigned int m_width, m_height;
   double m_resolution;
@@ -1441,4 +1442,3 @@ private:
 } // namespace lay
 
 #endif
-

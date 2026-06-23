@@ -24,37 +24,38 @@
 #include "tlObjectCollection.h"
 #include "tlUnitTest.h"
 
-namespace {
+namespace
+{
 
-  class MyClass : public tl::Object
+class MyClass : public tl::Object
+{
+public:
+  MyClass (int attr = 0)
+    : tl::Object (), m_attr (attr)
   {
-  public:
-    MyClass (int attr = 0)
-      : tl::Object (), m_attr (attr)
-    {
-      ++s_myclass_instances;
-    }
+    ++s_myclass_instances;
+  }
 
-    ~MyClass ()
-    {
-      --s_myclass_instances;
-    }
+  ~MyClass ()
+  {
+    --s_myclass_instances;
+  }
 
-    int attr () const { return m_attr; }
-    void set_attr (int a) { m_attr = a; }
-    static int instances () { return s_myclass_instances; }
-    static void reset_instance_counter () { s_myclass_instances = 0; }
+  int attr () const { return m_attr; }
+  void set_attr (int a) { m_attr = a; }
+  static int instances () { return s_myclass_instances; }
+  static void reset_instance_counter () { s_myclass_instances = 0; }
 
-  private:
-    int m_attr;
-    static int s_myclass_instances;
-  };
+private:
+  int m_attr;
+  static int s_myclass_instances;
+};
 
-  int MyClass::s_myclass_instances = 0;
+int MyClass::s_myclass_instances = 0;
 
 }
 
-TEST(1)
+TEST (1)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass ();
@@ -96,13 +97,12 @@ TEST(1)
     sp.reset (oo);
     EXPECT_EQ (MyClass::instances (), 1);
     EXPECT_EQ (sp.get () == oo, true);
-
   }
 
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(2)
+TEST (2)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (1);
@@ -127,7 +127,7 @@ TEST(2)
 }
 
 
-TEST(3)
+TEST (3)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (1);
@@ -166,7 +166,7 @@ TEST(3)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(10)
+TEST (10)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (1);
@@ -185,7 +185,7 @@ TEST(10)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(11)
+TEST (11)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (1);
@@ -216,14 +216,14 @@ TEST(11)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(12)
+TEST (12)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (1);
   EXPECT_EQ (MyClass::instances (), 1);
 
-  tl::weak_ptr<MyClass> wp(o);
-  tl::shared_ptr<MyClass> sp(o);
+  tl::weak_ptr<MyClass> wp (o);
+  tl::shared_ptr<MyClass> sp (o);
   EXPECT_EQ (wp.get () == o, true);
   EXPECT_EQ (wp->attr (), 1);
   EXPECT_EQ (wp ? 1 : 0, 1);
@@ -239,14 +239,14 @@ TEST(12)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(13)
+TEST (13)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (1);
   EXPECT_EQ (MyClass::instances (), 1);
 
-  tl::weak_ptr<MyClass> wp(o);
-  tl::shared_ptr<MyClass> sp(o);
+  tl::weak_ptr<MyClass> wp (o);
+  tl::shared_ptr<MyClass> sp (o);
   EXPECT_EQ (wp.get () == o, true);
   EXPECT_EQ (wp->attr (), 1);
   EXPECT_EQ (wp ? 1 : 0, 1);
@@ -266,7 +266,7 @@ TEST(13)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(14)
+TEST (14)
 {
   MyClass::reset_instance_counter ();
   MyClass *o1 = new MyClass (1);
@@ -274,7 +274,7 @@ TEST(14)
   MyClass *o2 = new MyClass (2);
   EXPECT_EQ (MyClass::instances (), 2);
 
-  std::vector<tl::shared_ptr<MyClass> > vsp;
+  std::vector<tl::shared_ptr<MyClass>> vsp;
   vsp.push_back (tl::shared_ptr<MyClass> ());
   vsp.push_back (tl::shared_ptr<MyClass> (o1));
   vsp.push_back (tl::shared_ptr<MyClass> (o1));
@@ -286,7 +286,7 @@ TEST(14)
   vsp.push_back (tl::shared_ptr<MyClass> ());
   vsp.push_back (tl::shared_ptr<MyClass> (o2));
 
-  std::vector<tl::shared_ptr<MyClass> > vsp2;
+  std::vector<tl::shared_ptr<MyClass>> vsp2;
   vsp2 = vsp;
   vsp.clear ();
   EXPECT_EQ (MyClass::instances (), 2);
@@ -295,7 +295,7 @@ TEST(14)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(15)
+TEST (15)
 {
   MyClass::reset_instance_counter ();
   MyClass *o1 = new MyClass (1);
@@ -303,7 +303,7 @@ TEST(15)
   MyClass *o2 = new MyClass (2);
   EXPECT_EQ (MyClass::instances (), 2);
 
-  std::vector<tl::weak_ptr<MyClass> > vwp;
+  std::vector<tl::weak_ptr<MyClass>> vwp;
   vwp.push_back (tl::weak_ptr<MyClass> ());
   vwp.push_back (tl::weak_ptr<MyClass> (o1));
   vwp.push_back (tl::weak_ptr<MyClass> (o1));
@@ -315,7 +315,7 @@ TEST(15)
   vwp.push_back (tl::weak_ptr<MyClass> ());
   vwp.push_back (tl::weak_ptr<MyClass> (o2));
 
-  std::vector<tl::weak_ptr<MyClass> > vwp2;
+  std::vector<tl::weak_ptr<MyClass>> vwp2;
   vwp2 = vwp;
   vwp.clear ();
   EXPECT_EQ (MyClass::instances (), 2);
@@ -327,7 +327,7 @@ TEST(15)
   delete o2;
 }
 
-TEST(20)
+TEST (20)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (17);
@@ -355,7 +355,7 @@ TEST(20)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(21)
+TEST (21)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (1);
@@ -384,7 +384,7 @@ TEST(21)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(22)
+TEST (22)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (1);
@@ -429,7 +429,7 @@ TEST(22)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(23)
+TEST (23)
 {
   MyClass::reset_instance_counter ();
   MyClass *o1 = new MyClass (1);
@@ -473,7 +473,7 @@ TEST(23)
     ++inc;
     EXPECT_EQ (inc == sc.end (), true);
 
-    tl::shared_ptr<MyClass> o2t ((++sc.begin ()).operator-> ());
+    tl::shared_ptr<MyClass> o2t ((++sc.begin ()).operator->());
     sc.clear ();
     EXPECT_EQ (MyClass::instances (), 1);
     EXPECT_EQ (o2t->attr (), 2);
@@ -482,7 +482,7 @@ TEST(23)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(24)
+TEST (24)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (1);
@@ -522,7 +522,7 @@ TEST(24)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(25)
+TEST (25)
 {
   MyClass::reset_instance_counter ();
   MyClass *o1 = new MyClass (1);
@@ -564,7 +564,7 @@ TEST(25)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(30)
+TEST (30)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (17);
@@ -595,7 +595,7 @@ TEST(30)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(31)
+TEST (31)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (17);
@@ -626,13 +626,13 @@ TEST(31)
     EXPECT_EQ (int (wc.size ()), 3);
     EXPECT_EQ (wc.empty (), false);
     tl::weak_collection<MyClass>::iterator i = wc.begin ();
-    EXPECT_EQ (i.operator-> () == o, true);
+    EXPECT_EQ (i.operator->() == o, true);
     EXPECT_EQ (i->attr (), 17);
     ++i;
-    EXPECT_EQ (i.operator-> () == so2.get (), true);
+    EXPECT_EQ (i.operator->() == so2.get (), true);
     EXPECT_EQ (i->attr (), 42);
     ++i;
-    EXPECT_EQ (i.operator-> () == o, true);
+    EXPECT_EQ (i.operator->() == o, true);
     EXPECT_EQ (i->attr (), 17);
 
     so.reset (0);
@@ -655,7 +655,8 @@ class WCMonitor : public tl::Object
 public:
   WCMonitor ()
     : changed_count (0), about_to_change_count (0)
-  { }
+  {
+  }
 
   void changed () { ++changed_count; }
   void about_to_change () { ++about_to_change_count; }
@@ -670,7 +671,7 @@ public:
   int about_to_change_count;
 };
 
-TEST(40)
+TEST (40)
 {
   MyClass::reset_instance_counter ();
   MyClass *o = new MyClass (17);
@@ -720,7 +721,7 @@ TEST(40)
   EXPECT_EQ (MyClass::instances (), 0);
 }
 
-TEST(41)
+TEST (41)
 {
   tl::weak_collection<MyClass> wc;
 

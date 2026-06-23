@@ -25,7 +25,7 @@
 
 #include <memory>
 
-TEST(1_FloatMono)
+TEST (1_FloatMono)
 {
   img::Object image (12, 8, db::DCplxTrans (1.5, 90.0, true, db::DVector (17, -42)), false, false);
 
@@ -72,7 +72,7 @@ TEST(1_FloatMono)
   EXPECT_EQ (image.to_string (), read->to_string ());
 }
 
-TEST(2_FloatMonoWithMask)
+TEST (2_FloatMonoWithMask)
 {
   img::Object image (12, 8, db::DCplxTrans (1.5, 90.0, true, db::DVector (17, -42)), false, false);
 
@@ -105,7 +105,7 @@ TEST(2_FloatMonoWithMask)
   EXPECT_EQ (image.to_string (), read->to_string ());
 }
 
-TEST(3_ByteMono)
+TEST (3_ByteMono)
 {
   img::Object image (12, 8, db::Matrix3d (db::DCplxTrans (1.5, 90.0, true, db::DVector (17, -42))), false, true);
 
@@ -134,7 +134,7 @@ TEST(3_ByteMono)
   EXPECT_EQ (image.to_string (), read->to_string ());
 }
 
-TEST(4_ByteMonoWithMask)
+TEST (4_ByteMonoWithMask)
 {
   img::Object image (12, 8, db::DCplxTrans (1.5, 90.0, true, db::DVector (17, -42)), false, true);
 
@@ -167,7 +167,7 @@ TEST(4_ByteMonoWithMask)
   EXPECT_EQ (image.to_string (), read->to_string ());
 }
 
-TEST(5_FloatColor)
+TEST (5_FloatColor)
 {
   img::Object image (12, 8, db::DCplxTrans (1.5, 90.0, true, db::DVector (17, -42)), true, false);
 
@@ -196,7 +196,7 @@ TEST(5_FloatColor)
   EXPECT_EQ (image.to_string (), read->to_string ());
 }
 
-TEST(6_FloatColorWithMask)
+TEST (6_FloatColorWithMask)
 {
   img::Object image (12, 8, db::DCplxTrans (1.5, 90.0, true, db::DVector (17, -42)), true, false);
 
@@ -229,7 +229,7 @@ TEST(6_FloatColorWithMask)
   EXPECT_EQ (image.to_string (), read->to_string ());
 }
 
-TEST(7_ByteColor)
+TEST (7_ByteColor)
 {
   img::Object image (12, 8, db::DCplxTrans (1.5, 90.0, true, db::DVector (17, -42)), true, true);
 
@@ -258,7 +258,7 @@ TEST(7_ByteColor)
   EXPECT_EQ (image.to_string (), read->to_string ());
 }
 
-TEST(8_ByteColorWithMask)
+TEST (8_ByteColorWithMask)
 {
   img::Object image (12, 8, db::DCplxTrans (1.5, 90.0, true, db::DVector (17, -42)), true, true);
 

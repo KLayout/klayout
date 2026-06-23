@@ -6,6 +6,6 @@
 #include <QtPrintSupport/QPrinterInfo>
 #include <QtPrintSupport/QPrintPreviewDialog>
 #include <QtPrintSupport/QPrintPreviewWidget>
-//#include <QtPrintSupport/QtPrintSupport>
-//#include <QtPrintSupport/QtPrintSupportDepends>
+// #include <QtPrintSupport/QtPrintSupport>
+// #include <QtPrintSupport/QtPrintSupportDepends>
 #include <QtPrintSupport/QtPrintSupportVersion>

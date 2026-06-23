@@ -187,8 +187,8 @@ public:
   virtual void inc ();
 
 private:
-  std::vector<std::pair<VALUE, VALUE> > m_kv;
-  std::vector<std::pair<VALUE, VALUE> >::const_iterator m_b, m_e;
+  std::vector<std::pair<VALUE, VALUE>> m_kv;
+  std::vector<std::pair<VALUE, VALUE>>::const_iterator m_b, m_e;
   const gsi::ArgType *mp_ainner, *mp_ainner_k;
 };
 
@@ -217,8 +217,7 @@ private:
 //  Return the boxed value pointer for a given basic type from the reference
 
 template <class R>
-struct get_boxed_value_func
-{
+struct get_boxed_value_func {
   void operator() (void **value, VALUE arg, tl::Heap *heap)
   {
     if (TYPE (arg) != T_DATA) {
@@ -229,11 +228,11 @@ struct get_boxed_value_func
 
     } else {
 
-      const gsi::ClassBase *bt = gsi::cls_decl <gsi::Value> ();
+      const gsi::ClassBase *bt = gsi::cls_decl<gsi::Value> ();
 
       Proxy *p = 0;
       Data_Get_Struct (arg, Proxy, p);
-      if (!p->cls_decl ()->is_derived_from (bt)) {
+      if (! p->cls_decl ()->is_derived_from (bt)) {
         throw tl::Exception (tl::sprintf (tl::to_string (tr ("Passing an object to pointer or reference requires a boxed type (RBA::%s)")), bt->name ()));
       }
 
@@ -241,26 +240,31 @@ struct get_boxed_value_func
       if (bo) {
         *value = bo->value ().template morph<R> ().native_ptr ();
       }
-
     }
   }
 };
 
-struct get_boxed_value_func_error
-{
+struct get_boxed_value_func_error {
   void operator() (void ** /*value*/, VALUE /*arg*/, tl::Heap * /*heap*/)
   {
     tl_assert (false);
   }
 };
 
-template <> struct get_boxed_value_func<gsi::VariantType> : get_boxed_value_func_error { };
-template <> struct get_boxed_value_func<gsi::StringType> : get_boxed_value_func_error { };
-template <> struct get_boxed_value_func<gsi::ByteArrayType> : get_boxed_value_func_error { };
-template <> struct get_boxed_value_func<gsi::ObjectType> : get_boxed_value_func_error { };
-template <> struct get_boxed_value_func<gsi::VectorType> : get_boxed_value_func_error { };
-template <> struct get_boxed_value_func<gsi::MapType> : get_boxed_value_func_error { };
-template <> struct get_boxed_value_func<gsi::VoidType> : get_boxed_value_func_error { };
+template <> struct get_boxed_value_func<gsi::VariantType> : get_boxed_value_func_error {
+};
+template <> struct get_boxed_value_func<gsi::StringType> : get_boxed_value_func_error {
+};
+template <> struct get_boxed_value_func<gsi::ByteArrayType> : get_boxed_value_func_error {
+};
+template <> struct get_boxed_value_func<gsi::ObjectType> : get_boxed_value_func_error {
+};
+template <> struct get_boxed_value_func<gsi::VectorType> : get_boxed_value_func_error {
+};
+template <> struct get_boxed_value_func<gsi::MapType> : get_boxed_value_func_error {
+};
+template <> struct get_boxed_value_func<gsi::VoidType> : get_boxed_value_func_error {
+};
 
 void *boxed_value_ptr (gsi::BasicType type, VALUE arg, tl::Heap &heap)
 {
@@ -277,8 +281,7 @@ void *boxed_value_ptr (gsi::BasicType type, VALUE arg, tl::Heap &heap)
  *  The generic class is for POD objects.
  */
 template <class R>
-struct writer
-{
+struct writer {
   void operator() (gsi::SerialArgs *aa, VALUE arg, const gsi::ArgType &atype, tl::Heap *heap)
   {
     if (arg == Qnil) {
@@ -286,11 +289,11 @@ struct writer
       if (atype.is_ref () || atype.is_cref ()) {
         throw tl::Exception (tl::to_string (tr ("Arguments or return values of reference type cannot be passed nil")));
       } else if (atype.is_ptr ()) {
-        aa->write<R *> ((R *)0);
+        aa->write<R *> ((R *) 0);
       } else if (atype.is_cptr ()) {
-        aa->write<const R *> ((const R *)0);
+        aa->write<const R *> ((const R *) 0);
       } else {
-        aa->write<R> ((R)0);
+        aa->write<R> ((R) 0);
       }
 
     } else {
@@ -310,7 +313,6 @@ struct writer
       } else {
         aa->write<R> (ruby2c<R> (arg));
       }
-
     }
   }
 };
@@ -319,20 +321,19 @@ struct writer
  *  @brief Serialization for strings
  */
 template <>
-struct writer<gsi::StringType>
-{
+struct writer<gsi::StringType> {
   void operator() (gsi::SerialArgs *aa, VALUE arg, const gsi::ArgType &atype, tl::Heap *heap)
   {
     //  Cannot pass ownership currently
-    tl_assert (!atype.pass_obj ());
+    tl_assert (! atype.pass_obj ());
 
     if (arg == Qnil) {
 
       if (! (atype.is_ptr () || atype.is_cptr ())) {
         //  nil is treated as an empty string for references
-        aa->write<void *> ((void *)new gsi::StringAdaptorImpl<std::string> (std::string ()));
+        aa->write<void *> ((void *) new gsi::StringAdaptorImpl<std::string> (std::string ()));
       } else {
-        aa->write<void *> ((void *)0);
+        aa->write<void *> ((void *) 0);
       }
 
     } else {
@@ -350,16 +351,14 @@ struct writer<gsi::StringType>
         if (! vc) {
           aa->write<void *> (0);
         } else {
-          aa->write<void *> ((void *)new gsi::StringAdaptorImpl<std::string> ((std::string *) vc));
+          aa->write<void *> ((void *) new gsi::StringAdaptorImpl<std::string> ((std::string *) vc));
         }
 
       } else {
 
         //  NOTE: by convention we pass the ownership to the receiver for adaptors.
-        aa->write<void *> ((void *)new RubyBasedStringAdaptor (arg));
-
+        aa->write<void *> ((void *) new RubyBasedStringAdaptor (arg));
       }
-
     }
   }
 };
@@ -368,20 +367,19 @@ struct writer<gsi::StringType>
  *  @brief Serialization for strings
  */
 template <>
-struct writer<gsi::ByteArrayType>
-{
+struct writer<gsi::ByteArrayType> {
   void operator() (gsi::SerialArgs *aa, VALUE arg, const gsi::ArgType &atype, tl::Heap *heap)
   {
     //  Cannot pass ownership currently
-    tl_assert (!atype.pass_obj ());
+    tl_assert (! atype.pass_obj ());
 
     if (arg == Qnil) {
 
       if (! (atype.is_ptr () || atype.is_cptr ())) {
         //  nil is treated as an empty string for references
-        aa->write<void *> ((void *)new gsi::ByteArrayAdaptorImpl<std::vector<char> > (std::vector<char> ()));
+        aa->write<void *> ((void *) new gsi::ByteArrayAdaptorImpl<std::vector<char>> (std::vector<char> ()));
       } else {
-        aa->write<void *> ((void *)0);
+        aa->write<void *> ((void *) 0);
       }
 
     } else {
@@ -390,7 +388,7 @@ struct writer<gsi::ByteArrayType>
 
         // references or pointers require a boxed object. Pointers also allow nil.
         void *vc = 0;
-        get_boxed_value_func<std::vector<char> > () (&vc, arg, heap);
+        get_boxed_value_func<std::vector<char>> () (&vc, arg, heap);
         if (! vc && atype.is_ref ()) {
           throw tl::Exception (tl::to_string (tr ("Arguments or return values of reference or direct type cannot be passed nil or an empty boxed value object")));
         }
@@ -399,16 +397,14 @@ struct writer<gsi::ByteArrayType>
         if (! vc) {
           aa->write<void *> (0);
         } else {
-          aa->write<void *> ((void *)new gsi::ByteArrayAdaptorImpl<std::vector<char> > ((std::vector<char> *) vc));
+          aa->write<void *> ((void *) new gsi::ByteArrayAdaptorImpl<std::vector<char>> ((std::vector<char> *) vc));
         }
 
       } else {
 
         //  NOTE: by convention we pass the ownership to the receiver for adaptors.
-        aa->write<void *> ((void *)new RubyBasedByteArrayAdaptor (arg));
-
+        aa->write<void *> ((void *) new RubyBasedByteArrayAdaptor (arg));
       }
-
     }
   }
 };
@@ -417,13 +413,12 @@ struct writer<gsi::ByteArrayType>
  *  @brief Specialization for Variant
  */
 template <>
-struct writer<gsi::VariantType>
-{
+struct writer<gsi::VariantType> {
   void operator() (gsi::SerialArgs *aa, VALUE arg, const gsi::ArgType &, tl::Heap *)
   {
     //  TODO: clarify: is nil a zero-pointer to a variant or a pointer to a "nil" variant?
     // NOTE: by convention we pass the ownership to the receiver for adaptors.
-    aa->write<void *> ((void *)new RubyBasedVariantAdaptor (arg));
+    aa->write<void *> ((void *) new RubyBasedVariantAdaptor (arg));
   }
 };
 
@@ -431,15 +426,14 @@ struct writer<gsi::VariantType>
  *  @brief Specialization for Vectors
  */
 template <>
-struct writer<gsi::VectorType>
-{
+struct writer<gsi::VectorType> {
   void operator() (gsi::SerialArgs *aa, VALUE arg, const gsi::ArgType &atype, tl::Heap *)
   {
     if (arg == Qnil) {
       if (! (atype.is_ptr () || atype.is_cptr ())) {
         throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else {
-        aa->write<void *> ((void *)0);
+        aa->write<void *> ((void *) 0);
       }
     } else {
 
@@ -448,8 +442,7 @@ struct writer<gsi::VectorType>
       }
 
       tl_assert (atype.inner () != 0);
-      aa->write<void *> ((void *)new RubyBasedVectorAdaptor (arg, atype.inner ()));
-
+      aa->write<void *> ((void *) new RubyBasedVectorAdaptor (arg, atype.inner ()));
     }
   }
 };
@@ -458,15 +451,14 @@ struct writer<gsi::VectorType>
  *  @brief Specialization for Maps
  */
 template <>
-struct writer<gsi::MapType>
-{
+struct writer<gsi::MapType> {
   void operator() (gsi::SerialArgs *aa, VALUE arg, const gsi::ArgType &atype, tl::Heap *)
   {
     if (arg == Qnil) {
       if (! (atype.is_ptr () || atype.is_cptr ())) {
         throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else {
-        aa->write<void *> ((void *)0);
+        aa->write<void *> ((void *) 0);
       }
 
     } else {
@@ -477,8 +469,7 @@ struct writer<gsi::MapType>
 
       tl_assert (atype.inner () != 0);
       tl_assert (atype.inner_k () != 0);
-      aa->write<void *> ((void *)new RubyBasedMapAdaptor (arg, atype.inner (), atype.inner_k ()));
-
+      aa->write<void *> ((void *) new RubyBasedMapAdaptor (arg, atype.inner (), atype.inner_k ()));
     }
   }
 };
@@ -487,8 +478,7 @@ struct writer<gsi::MapType>
  *  @brief A specialization of the write function for vector types
  */
 template <>
-struct writer <gsi::ObjectType>
-{
+struct writer<gsi::ObjectType> {
   void operator() (gsi::SerialArgs *aa, VALUE arg, const gsi::ArgType &atype, tl::Heap *heap)
   {
     if (arg == Qnil) {
@@ -513,7 +503,7 @@ struct writer <gsi::ObjectType>
         }
       }
 
-      if (!meth) {
+      if (! meth) {
         throw tl::Exception (tl::to_string (tr ("No constructor of %s available that takes %d arguments (implicit call from tuple)")), atype.cls ()->name (), n);
       }
 
@@ -585,11 +575,8 @@ struct writer <gsi::ObjectType>
         } else {
           throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), rba_class_name (arg).c_str ()));
         }
-
       }
-
     }
-
   }
 };
 
@@ -597,8 +584,7 @@ struct writer <gsi::ObjectType>
  *  @brief T_void is ignored on writing
  */
 template <>
-struct writer <gsi::VoidType>
-{
+struct writer<gsi::VoidType> {
   void operator() (gsi::SerialArgs * /*aa*/, VALUE /*arg*/, const gsi::ArgType & /*atype*/, tl::Heap * /*heap*/)
   {
     //  .. nothing: void is not serialized
@@ -608,8 +594,7 @@ struct writer <gsi::VoidType>
 // -------------------------------------------------------------------
 //  Push an argument on the call or return stack
 
-void
-push_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, VALUE arg, tl::Heap &heap)
+void push_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, VALUE arg, tl::Heap &heap)
 {
   gsi::do_on_type<writer> () (atype.type (), &aserial, arg, atype, &heap);
 }
@@ -620,8 +605,7 @@ push_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, VALUE arg, tl::He
  *  The default implementation is for POD types, strings and variants
  */
 template <class R>
-struct reader
-{
+struct reader {
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &arg, tl::Heap *heap)
   {
     if (arg.is_ref ()) {
@@ -655,8 +639,7 @@ struct reader
  *  TODO: right now these types are not supported.
  */
 template <>
-struct reader<void *>
-{
+struct reader<void *> {
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &arg, tl::Heap *heap)
   {
     tl_assert (! arg.is_cref ());
@@ -671,12 +654,11 @@ struct reader<void *>
  *  @brief Deserialization wrapper: specialization for strings
  */
 template <>
-struct reader<gsi::StringType>
-{
+struct reader<gsi::StringType> {
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &, tl::Heap *heap)
   {
-    std::unique_ptr<gsi::StringAdaptor> a ((gsi::StringAdaptor *) rr->read<void *>(*heap));
-    if (!a.get ()) {
+    std::unique_ptr<gsi::StringAdaptor> a ((gsi::StringAdaptor *) rr->read<void *> (*heap));
+    if (! a.get ()) {
       *ret = Qnil;
     } else {
       *ret = rb_utf8_str_new (a->c_str (), long (a->size ()));
@@ -688,12 +670,11 @@ struct reader<gsi::StringType>
  *  @brief Deserialization wrapper: specialization for strings
  */
 template <>
-struct reader<gsi::ByteArrayType>
-{
+struct reader<gsi::ByteArrayType> {
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &, tl::Heap *heap)
   {
-    std::unique_ptr<gsi::ByteArrayAdaptor> a ((gsi::ByteArrayAdaptor *) rr->read<void *>(*heap));
-    if (!a.get ()) {
+    std::unique_ptr<gsi::ByteArrayAdaptor> a ((gsi::ByteArrayAdaptor *) rr->read<void *> (*heap));
+    if (! a.get ()) {
       *ret = Qnil;
     } else {
       *ret = rb_str_new (a->c_str (), long (a->size ()));
@@ -703,16 +684,16 @@ struct reader<gsi::ByteArrayType>
 
 static VALUE object_from_variant (tl::Variant &var, Proxy *self, const gsi::ArgType &atype, bool transfer = false)
 {
-  if (var.is_user()) {
+  if (var.is_user ()) {
 
-    bool is_direct = (! atype.is_cptr() && ! atype.is_ptr () && ! atype.is_cref () && ! atype.is_ref ());
-    bool pass_obj = atype.pass_obj() || is_direct;
-    bool is_const = atype.is_cptr() || atype.is_cref();
+    bool is_direct = (! atype.is_cptr () && ! atype.is_ptr () && ! atype.is_cref () && ! atype.is_ref ());
+    bool pass_obj = atype.pass_obj () || is_direct;
+    bool is_const = atype.is_cptr () || atype.is_cref ();
     bool prefer_copy = false;
     bool can_destroy = false;
 
     //  TODO: ugly const_cast, but there is no "const shared reference" ...
-    gsi::Proxy *holder = dynamic_cast<gsi::Proxy *>(const_cast<tl::Object *>(var.to_object ()));
+    gsi::Proxy *holder = dynamic_cast<gsi::Proxy *> (const_cast<tl::Object *> (var.to_object ()));
 
     void *obj = var.to_user ();
     const gsi::ClassBase *cls = var.user_cls ()->gsi_cls ();
@@ -727,9 +708,9 @@ static VALUE object_from_variant (tl::Variant &var, Proxy *self, const gsi::ArgT
         //  holder and another variant) is actually held otherwise. In that case, we leave the ownership where it is
         //  (case 1, pass by reference).
         if (var.user_is_ref ()) {
-          pass_obj = false;   // case 1
+          pass_obj = false; // case 1
         } else if (holder->owned ()) {
-          holder->keep ();   // case 2
+          holder->keep (); // case 2
           can_destroy = true;
         }
 
@@ -740,20 +721,18 @@ static VALUE object_from_variant (tl::Variant &var, Proxy *self, const gsi::ArgT
         //  between the ownership spaces.
         //  If the variant holds the user object, we can take it from it and claim ownership.
         if (var.user_is_ref ()) {
-          prefer_copy = false;   // unsafe
+          prefer_copy = false; // unsafe
           pass_obj = false;
         } else {
           obj = var.user_take ();
           can_destroy = true;
         }
-
       }
 
     } else {
 
       //  This is the case for return values that prefer to be copied (e.g. from const &)
       prefer_copy = atype.prefer_copy ();
-
     }
 
     return object_to_ruby (obj, self, cls, pass_obj, is_const, prefer_copy, can_destroy);
@@ -767,12 +746,11 @@ static VALUE object_from_variant (tl::Variant &var, Proxy *self, const gsi::ArgT
  *  @brief Deserialization wrapper: specialization for variants
  */
 template <>
-struct reader<gsi::VariantType>
-{
+struct reader<gsi::VariantType> {
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy *self, const gsi::ArgType &atype, tl::Heap *heap)
   {
-    std::unique_ptr<gsi::VariantAdaptor> a ((gsi::VariantAdaptor *) rr->read<void *>(*heap));
-    if (!a.get ()) {
+    std::unique_ptr<gsi::VariantAdaptor> a ((gsi::VariantAdaptor *) rr->read<void *> (*heap));
+    if (! a.get ()) {
       *ret = Qnil;
     } else {
       gsi::VariantAdaptorImpl<tl::Variant> *aa = dynamic_cast<gsi::VariantAdaptorImpl<tl::Variant> *> (a.get ());
@@ -796,12 +774,11 @@ struct reader<gsi::VariantType>
  *  @brief Deserialization wrapper: specialization for vectors
  */
 template <>
-struct reader<gsi::VectorType>
-{
+struct reader<gsi::VectorType> {
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
   {
-    std::unique_ptr<gsi::VectorAdaptor> a ((gsi::VectorAdaptor *) rr->read<void *>(*heap));
-    if (!a.get ()) {
+    std::unique_ptr<gsi::VectorAdaptor> a ((gsi::VectorAdaptor *) rr->read<void *> (*heap));
+    if (! a.get ()) {
       *ret = Qnil;
     } else {
       *ret = rb_ary_new ();
@@ -816,12 +793,11 @@ struct reader<gsi::VectorType>
  *  @brief Deserialization wrapper: specialization for maps
  */
 template <>
-struct reader<gsi::MapType>
-{
+struct reader<gsi::MapType> {
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
   {
-    std::unique_ptr<gsi::MapAdaptor> a ((gsi::MapAdaptor *) rr->read<void *>(*heap));
-    if (!a.get ()) {
+    std::unique_ptr<gsi::MapAdaptor> a ((gsi::MapAdaptor *) rr->read<void *> (*heap));
+    if (! a.get ()) {
       *ret = Qnil;
     } else {
       *ret = rb_hash_new ();
@@ -837,8 +813,7 @@ struct reader<gsi::MapType>
  *  @brief Deserialization wrapper: specialization for objects
  */
 template <>
-struct reader<gsi::ObjectType>
-{
+struct reader<gsi::ObjectType> {
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy *self, const gsi::ArgType &atype, tl::Heap *heap)
   {
     void *obj = rr->read<void *> (*heap);
@@ -851,8 +826,7 @@ struct reader<gsi::ObjectType>
 };
 
 template <>
-struct reader<gsi::VoidType>
-{
+struct reader<gsi::VoidType> {
   void operator() (gsi::SerialArgs * /*rr*/, VALUE * /*ret*/, Proxy * /*self*/, const gsi::ArgType & /*atype*/, tl::Heap * /*heap*/)
   {
     //  .. nothing: void is not serialized
@@ -953,7 +927,7 @@ size_t RubyBasedVectorAdaptor::serial_size () const
 
 static int push_map_i (VALUE key, VALUE value, VALUE arg)
 {
-  std::vector<std::pair<VALUE, VALUE> > *v = (std::vector<std::pair<VALUE, VALUE> > *) arg;
+  std::vector<std::pair<VALUE, VALUE>> *v = (std::vector<std::pair<VALUE, VALUE>> *) arg;
   v->push_back (std::make_pair (key, value));
   return ST_CONTINUE;
 }
@@ -962,7 +936,7 @@ RubyBasedMapAdaptorIterator::RubyBasedMapAdaptorIterator (VALUE hash, const gsi:
   : mp_ainner (ainner), mp_ainner_k (ainner_k)
 {
   m_kv.reserve (RHASH_SIZE (hash));
-  rb_hash_foreach (hash, (int (*)(...)) &push_map_i, (VALUE) &m_kv);
+  rb_hash_foreach (hash, (int (*) (...)) &push_map_i, (VALUE) &m_kv);
   m_b = m_kv.begin ();
   m_e = m_kv.end ();
 }
@@ -992,7 +966,7 @@ RubyBasedMapAdaptor::RubyBasedMapAdaptor (VALUE hash, const gsi::ArgType *ainner
   gc_lock_object (m_hash);
 }
 
-RubyBasedMapAdaptor::~RubyBasedMapAdaptor()
+RubyBasedMapAdaptor::~RubyBasedMapAdaptor ()
 {
   gc_unlock_object (m_hash);
 }
@@ -1051,9 +1025,8 @@ pull_arg (const gsi::ArgType &atype, Proxy *self, gsi::SerialArgs &aserial, tl::
 //      argument must be of the requested type
 
 template <class R>
-struct test_arg_func
-{
-  void operator () (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
+struct test_arg_func {
+  void operator() (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Qnil) {
 
@@ -1068,14 +1041,13 @@ struct test_arg_func
 
         //  check if we have a boxed type
         if (TYPE (arg) == T_DATA) {
-          const gsi::ClassBase *bc = gsi::cls_decl <gsi::Value> ();
+          const gsi::ClassBase *bc = gsi::cls_decl<gsi::Value> ();
           Proxy *p = 0;
           Data_Get_Struct (arg, Proxy, p);
           if (p->cls_decl ()->is_derived_from (bc)) {
             *ret = true;
           }
         }
-
       }
 
       if (! *ret) {
@@ -1083,7 +1055,6 @@ struct test_arg_func
         //  a good error message.
         *ret = test_type<R> (arg, loose);
       }
-
     }
   }
 };
@@ -1092,14 +1063,13 @@ struct test_arg_func
  *  @brief Test a VALUE for compatibility with a vector of the given type R
  */
 template <class R>
-struct test_vector
-{
+struct test_vector {
   void operator() (bool *ret, VALUE arr, const gsi::ArgType &ainner, bool loose)
   {
     *ret = true;
 
-    unsigned int len = RARRAY_LEN(arr);
-    VALUE *el = RARRAY_PTR(arr);
+    unsigned int len = RARRAY_LEN (arr);
+    VALUE *el = RARRAY_PTR (arr);
     while (len-- > 0) {
       if (! test_arg (ainner, *el++, loose, true /*issue-1651*/)) {
         *ret = false;
@@ -1110,9 +1080,8 @@ struct test_vector
 };
 
 template <>
-struct test_arg_func<gsi::VectorType>
-{
-  void operator () (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
+struct test_arg_func<gsi::VectorType> {
+  void operator() (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Qnil) {
       //  for pointers to vectors, nil is a valid value
@@ -1125,13 +1094,11 @@ struct test_arg_func<gsi::VectorType>
       const gsi::ArgType &ainner = *atype.inner ();
 
       gsi::do_on_type<test_vector> () (ainner.type (), ret, arg, ainner, loose);
-
     }
   }
 };
 
-struct HashTestKeyValueData
-{
+struct HashTestKeyValueData {
   const gsi::ArgType *ainner_k;
   const gsi::ArgType *ainner;
   bool *ret;
@@ -1140,7 +1107,7 @@ struct HashTestKeyValueData
 
 static int hash_test_value_key (VALUE key, VALUE value, VALUE a)
 {
-  HashTestKeyValueData *args = (HashTestKeyValueData *)a;
+  HashTestKeyValueData *args = (HashTestKeyValueData *) a;
   if (! test_arg (*args->ainner_k, key, args->loose, true /*issue-1651*/)) {
     *(args->ret) = false;
     return ST_STOP;
@@ -1153,9 +1120,8 @@ static int hash_test_value_key (VALUE key, VALUE value, VALUE a)
 }
 
 template <>
-struct test_arg_func<gsi::MapType>
-{
-  void operator () (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
+struct test_arg_func<gsi::MapType> {
+  void operator() (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Qnil) {
       //  for pointers to maps, nil is a valid value
@@ -1174,16 +1140,14 @@ struct test_arg_func<gsi::MapType>
       args.loose = loose;
 
       *ret = true;
-      rb_hash_foreach (arg, (int (*)(...)) &hash_test_value_key, (VALUE) &args);
-
+      rb_hash_foreach (arg, (int (*) (...)) &hash_test_value_key, (VALUE) &args);
     }
   }
 };
 
 template <>
-struct test_arg_func<gsi::ObjectType>
-{
-  void operator () (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose, bool object_substitution)
+struct test_arg_func<gsi::ObjectType> {
+  void operator() (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose, bool object_substitution)
   {
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Qnil) {
 
@@ -1225,16 +1189,12 @@ struct test_arg_func<gsi::ObjectType>
         } else {
           *ret = false;
         }
-
       }
-
     }
-
   }
 };
 
-bool
-test_arg (const gsi::ArgType &atype, VALUE arg, bool loose, bool object_substitution)
+bool test_arg (const gsi::ArgType &atype, VALUE arg, bool loose, bool object_substitution)
 {
   bool ret = false;
   gsi::do_on_type<test_arg_func> () (atype.type (), &ret, arg, atype, loose, object_substitution);
@@ -1244,4 +1204,3 @@ test_arg (const gsi::ArgType &atype, VALUE arg, bool loose, bool object_substitu
 }
 
 #endif
-

@@ -115,7 +115,7 @@ public:
   /**
    *  @brief Performs the comparison
    */
-  bool compare_netlists(NetlistComparer *compare);
+  bool compare_netlists (NetlistComparer *compare);
 
   /**
    *  @brief Gets the cross-reference object

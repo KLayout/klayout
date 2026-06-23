@@ -27,20 +27,18 @@
 #include <QOpenGLFunctions>
 
 #include "tlObject.h"
-#include <string.h>  //  for memcpy
+#include <string.h> //  for memcpy
 
 namespace lay
 {
 
 template <class Obj>
-struct gl_type2enum
-{
+struct gl_type2enum {
   GLenum operator() () const;
 };
 
 template <>
-struct gl_type2enum<float>
-{
+struct gl_type2enum<float> {
   GLenum operator() () const { return GL_FLOAT; }
 };
 
@@ -59,7 +57,6 @@ template <class Obj, size_t ChunkLen = 1024>
 class mem_chunks
 {
 public:
-
   struct chunk {
   public:
     chunk ()
@@ -119,7 +116,7 @@ public:
       return *mp_chunk;
     }
 
-    const chunk *operator-> () const
+    const chunk *operator->() const
     {
       return mp_chunk;
     }
@@ -262,4 +259,3 @@ private:
 }
 
 #endif
-

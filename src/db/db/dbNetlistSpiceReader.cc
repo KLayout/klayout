@@ -46,8 +46,7 @@ static const char *allowed_name_chars = "_.:,!+$/&\\#[]|<>";
 
 // ------------------------------------------------------------------------------------------------------
 
-void
-read_param_card (tl::Extractor &ex, const db::Netlist *netlist, std::map<std::string, tl::Variant> &variables)
+void read_param_card (tl::Extractor &ex, const db::Netlist *netlist, std::map<std::string, tl::Variant> &variables)
 {
   //  Syntax is:
   //    .param <name> = <value> [ <name> = <value> ... ]
@@ -65,7 +64,6 @@ read_param_card (tl::Extractor &ex, const db::Netlist *netlist, std::map<std::st
 
     tl::Variant value = NetlistSpiceReaderExpressionParser (&variables).read (ex);
     variables [name] = value;
-
   }
 }
 
@@ -82,7 +80,7 @@ public:
   void set_stream (tl::InputStream *stream);
   void close ();
 
-  std::pair<std::string, bool> get_line();
+  std::pair<std::string, bool> get_line ();
   int line_number () const;
   std::string source () const;
   bool at_end () const;
@@ -127,8 +125,7 @@ SpiceReaderStream::~SpiceReaderStream ()
   close ();
 }
 
-void
-SpiceReaderStream::close ()
+void SpiceReaderStream::close ()
 {
   delete mp_text_stream;
   mp_text_stream = 0;
@@ -168,14 +165,12 @@ SpiceReaderStream::get_line ()
       l += " ";
       l += ex.get ();
     }
-
   }
 
   return std::make_pair (l, true);
 }
 
-int
-SpiceReaderStream::line_number () const
+int SpiceReaderStream::line_number () const
 {
   return m_line_number;
 }
@@ -186,14 +181,12 @@ SpiceReaderStream::source () const
   return mp_stream->absolute_file_path ();
 }
 
-bool
-SpiceReaderStream::at_end () const
+bool SpiceReaderStream::at_end () const
 {
-  return !m_has_stored_line && mp_text_stream->at_end ();
+  return ! m_has_stored_line && mp_text_stream->at_end ();
 }
 
-void
-SpiceReaderStream::set_stream (tl::InputStream &stream)
+void SpiceReaderStream::set_stream (tl::InputStream &stream)
 {
   close ();
   mp_stream = &stream;
@@ -203,8 +196,7 @@ SpiceReaderStream::set_stream (tl::InputStream &stream)
   m_line_number = 0;
 }
 
-void
-SpiceReaderStream::set_stream (tl::InputStream *stream)
+void SpiceReaderStream::set_stream (tl::InputStream *stream)
 {
   close ();
   mp_stream = stream;
@@ -216,11 +208,11 @@ SpiceReaderStream::set_stream (tl::InputStream *stream)
 
 // ------------------------------------------------------------------------------------------------------
 
-struct SpiceCard
-{
+struct SpiceCard {
   SpiceCard (int _file_id, int _line, const std::string &_text)
     : file_id (_file_id), line (_line), text (_text)
-  { }
+  {
+  }
 
   int file_id;
   int line;
@@ -447,8 +439,7 @@ SpiceCircuitDict::file_path (int file_id) const
   }
 }
 
-int
-SpiceCircuitDict::file_id (const std::string &path)
+int SpiceCircuitDict::file_id (const std::string &path)
 {
   auto ip = m_file_id_per_path.find (path);
   if (ip != m_file_id_per_path.end ()) {
@@ -481,8 +472,7 @@ SpiceCircuitDict::create_cached_circuit (const std::string &name)
   return cc;
 }
 
-void
-SpiceCircuitDict::read (tl::InputStream &stream)
+void SpiceCircuitDict::read (tl::InputStream &stream)
 {
   try {
 
@@ -506,12 +496,10 @@ SpiceCircuitDict::read (tl::InputStream &stream)
     //  Add a location to the exception
     std::string fmt_msg = ex.msg () + tl::sprintf (tl::to_string (tr (" in %s, line %d")), m_stream.source (), m_stream.line_number ());
     throw tl::Exception (fmt_msg);
-
   }
 }
 
-void
-SpiceCircuitDict::push_stream (const std::string &path, const std::string &lib)
+void SpiceCircuitDict::push_stream (const std::string &path, const std::string &lib)
 {
   tl::URI current_uri (m_stream.source ());
   tl::URI new_uri (path);
@@ -534,8 +522,7 @@ SpiceCircuitDict::push_stream (const std::string &path, const std::string &lib)
   m_file_id = file_id (m_stream.source ());
 }
 
-void
-SpiceCircuitDict::pop_stream ()
+void SpiceCircuitDict::pop_stream ()
 {
   if (! m_streams.empty ()) {
 
@@ -543,24 +530,20 @@ SpiceCircuitDict::pop_stream ()
     m_streams.pop_back ();
 
     m_file_id = file_id (m_stream.source ());
-
   }
 }
 
-bool
-SpiceCircuitDict::at_end ()
+bool SpiceCircuitDict::at_end ()
 {
   return m_stream.at_end () && m_streams.empty ();
 }
 
-void
-SpiceCircuitDict::error (const std::string &msg)
+void SpiceCircuitDict::error (const std::string &msg)
 {
   throw tl::Exception (msg);
 }
 
-void
-SpiceCircuitDict::warn (const std::string &msg)
+void SpiceCircuitDict::warn (const std::string &msg)
 {
   std::string fmt_msg = tl::sprintf ("%s in %s, line %d", msg, m_stream.source (), m_stream.line_number ());
   tl::warn << fmt_msg;
@@ -628,7 +611,6 @@ SpiceCircuitDict::get_line ()
           std::string libname = mp_netlist->normalize_name (path_or_libname);
           m_in_lib.push_back (libname);
           ex.expect_end ();
-
         }
 
       } else if (ex.test_without_case (".endl")) {
@@ -655,16 +637,13 @@ SpiceCircuitDict::get_line ()
       } else if (consider_line) {
         break;
       }
-
     }
-
   }
 
   return lp.first;
 }
 
-bool
-SpiceCircuitDict::read_card ()
+bool SpiceCircuitDict::read_card ()
 {
   std::string l = get_line ();
   if (l.empty ()) {
@@ -720,7 +699,6 @@ SpiceCircuitDict::read_card ()
       ex.read_word (s);
       s = tl::to_lower_case (s);
       warn (tl::to_string (tr ("Control statement ignored: ")) + s);
-
     }
 
   } else if (ex.try_read_word (name)) {
@@ -736,7 +714,7 @@ SpiceCircuitDict::read_card ()
 
       mp_circuit->make_parameter (name, value);
 
-    } else if (name[0] == 'X') {
+    } else if (name [0] == 'X') {
 
       //  register circuit calls so we can figure out the top level circuits
 
@@ -751,7 +729,6 @@ SpiceCircuitDict::read_card ()
       if (! nn.empty ()) {
         m_called_circuits.insert (nn.back ());
       }
-
     }
 
     mp_circuit->add_card (SpiceCard (m_file_id, m_stream.line_number (), l));
@@ -763,8 +740,7 @@ SpiceCircuitDict::read_card ()
   return false;
 }
 
-void
-SpiceCircuitDict::read_options (tl::Extractor &ex)
+void SpiceCircuitDict::read_options (tl::Extractor &ex)
 {
   while (! NetlistSpiceReader::at_eol (ex)) {
 
@@ -809,12 +785,10 @@ SpiceCircuitDict::read_options (tl::Extractor &ex)
         mp_delegate->options ().defw = v;
       }
     }
-
   }
 }
 
-void
-SpiceCircuitDict::ensure_circuit ()
+void SpiceCircuitDict::ensure_circuit ()
 {
   if (! mp_circuit) {
 
@@ -823,12 +797,10 @@ SpiceCircuitDict::ensure_circuit ()
     m_cached_circuits.insert (std::make_pair (mp_circuit->name (), mp_circuit));
 
     mp_anonymous_top_level_circuit = mp_circuit;
-
   }
 }
 
-void
-SpiceCircuitDict::read_circuit (tl::Extractor &ex, const std::string &nc)
+void SpiceCircuitDict::read_circuit (tl::Extractor &ex, const std::string &nc)
 {
   std::vector<std::string> nn;
   NetlistSpiceReader::parameters_type pv;
@@ -856,8 +828,7 @@ SpiceCircuitDict::read_circuit (tl::Extractor &ex, const std::string &nc)
   m_variables.swap (vars);
 }
 
-void
-SpiceCircuitDict::finish ()
+void SpiceCircuitDict::finish ()
 {
   m_streams.clear ();
   m_stream.close ();
@@ -885,10 +856,10 @@ private:
   Netlist *mp_netlist;
   bool m_strict;
   const SpiceCachedCircuit *mp_circuit;
-  std::map<const SpiceCachedCircuit *, std::map<parameters_type, db::Circuit *> > m_circuits;
+  std::map<const SpiceCachedCircuit *, std::map<parameters_type, db::Circuit *>> m_circuits;
   db::Circuit *mp_netlist_circuit;
   db::Circuit *mp_anonymous_top_level_netlist_circuit;
-  std::unique_ptr<std::map<std::string, db::Net *> > mp_nets_by_name;
+  std::unique_ptr<std::map<std::string, db::Net *>> mp_nets_by_name;
   std::map<std::string, bool> m_captured;
   NetlistSpiceReader::parameters_type m_variables;
   const SpiceCard *mp_current_card;
@@ -899,7 +870,7 @@ private:
   std::string get_line ();
   void error (const std::string &msg);
   void warn (const std::string &msg);
-  Net *make_net(const std::string &name);
+  Net *make_net (const std::string &name);
   void process_card (const SpiceCard &card);
   bool subcircuit_captured (const std::string &nc_name);
   bool process_element (tl::Extractor &ex, const std::string &prefix, const std::string &name);
@@ -915,14 +886,12 @@ SpiceNetlistBuilder::SpiceNetlistBuilder (SpiceCircuitDict *dict, Netlist *netli
   mp_current_card = 0;
 }
 
-void
-SpiceNetlistBuilder::error (const std::string &msg)
+void SpiceNetlistBuilder::error (const std::string &msg)
 {
   throw tl::Exception (msg);
 }
 
-void
-SpiceNetlistBuilder::warn (const std::string &msg)
+void SpiceNetlistBuilder::warn (const std::string &msg)
 {
   if (mp_current_card) {
     std::string fmt_msg = tl::sprintf ("%s in %s, line %d", msg, mp_dict->file_path (mp_current_card->file_id), mp_current_card->line);
@@ -952,8 +921,7 @@ SpiceNetlistBuilder::circuit_for (const SpiceCachedCircuit *cc, const parameters
   return cp->second;
 }
 
-void
-SpiceNetlistBuilder::register_circuit_for (const SpiceCachedCircuit *cc, const parameters_type &pv, db::Circuit *circuit, bool anonymous_top_level)
+void SpiceNetlistBuilder::register_circuit_for (const SpiceCachedCircuit *cc, const parameters_type &pv, db::Circuit *circuit, bool anonymous_top_level)
 {
   m_circuits [cc][pv] = circuit;
   if (anonymous_top_level) {
@@ -961,8 +929,7 @@ SpiceNetlistBuilder::register_circuit_for (const SpiceCachedCircuit *cc, const p
   }
 }
 
-void
-SpiceNetlistBuilder::build ()
+void SpiceNetlistBuilder::build ()
 {
   try {
 
@@ -994,7 +961,6 @@ SpiceNetlistBuilder::build ()
     } else {
       throw;
     }
-
   }
 }
 
@@ -1010,7 +976,7 @@ make_circuit_name (const std::string &name, const NetlistSpiceReader::parameters
     }
     res += p->first;
     res += "=";
-    if (p->second.can_convert_to_double()) {
+    if (p->second.can_convert_to_double ()) {
       double v = p->second.to_double ();
       double va = fabs (v);
       if (va < 1e-15) {
@@ -1023,7 +989,7 @@ make_circuit_name (const std::string &name, const NetlistSpiceReader::parameters
         res += tl::sprintf ("%gN", v * 1e9);
       } else if (va < 0.1e-3) {
         res += tl::sprintf ("%gU", v * 1e6);
-      } else if (va< 0.1) {
+      } else if (va < 0.1) {
         res += tl::sprintf ("%gM", v * 1e3);
       } else if (va < 0.1e3) {
         res += tl::sprintf ("%g", v);
@@ -1064,7 +1030,7 @@ SpiceNetlistBuilder::build_circuit (const SpiceCachedCircuit *cc, const paramete
   //  pre-register the circuit - allows detecting recursive calls
   register_circuit_for (cc, pv, 0, false);
 
-  std::unique_ptr<std::map<std::string, db::Net *> > n2n (mp_nets_by_name.release ());
+  std::unique_ptr<std::map<std::string, db::Net *>> n2n (mp_nets_by_name.release ());
   mp_nets_by_name.reset (0);
 
   NetlistSpiceReader::parameters_type vars = cc->parameters ();
@@ -1091,7 +1057,7 @@ SpiceNetlistBuilder::build_circuit (const SpiceCachedCircuit *cc, const paramete
   }
 
   for (auto card = mp_circuit->begin_cards (); card != mp_circuit->end_cards (); ++card) {
-    mp_current_card = card.operator-> ();
+    mp_current_card = card.operator->();
     process_card (*card);
   }
 
@@ -1138,8 +1104,7 @@ SpiceNetlistBuilder::make_net (const std::string &name)
   return net;
 }
 
-void
-SpiceNetlistBuilder::process_card (const SpiceCard &card)
+void SpiceNetlistBuilder::process_card (const SpiceCard &card)
 {
   tl::Extractor ex (card.text.c_str ());
 
@@ -1172,12 +1137,10 @@ SpiceNetlistBuilder::process_card (const SpiceCard &card)
     } else {
       warn (tl::to_string (tr ("Line ignored")));
     }
-
   }
 }
 
-bool
-SpiceNetlistBuilder::subcircuit_captured (const std::string &nc_name)
+bool SpiceNetlistBuilder::subcircuit_captured (const std::string &nc_name)
 {
   std::map<std::string, bool>::const_iterator c = m_captured.find (nc_name);
   if (c != m_captured.end ()) {
@@ -1189,8 +1152,7 @@ SpiceNetlistBuilder::subcircuit_captured (const std::string &nc_name)
   }
 }
 
-bool
-SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &prefix, const std::string &name)
+bool SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &prefix, const std::string &name)
 {
   //  generic parse
   std::vector<std::string> nn;
@@ -1255,14 +1217,13 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
   }
 }
 
-void
-SpiceNetlistBuilder::build_global_nets ()
+void SpiceNetlistBuilder::build_global_nets ()
 {
   for (auto gn = mp_dict->begin_global_nets (); gn != mp_dict->end_global_nets (); ++gn) {
 
     for (auto c = mp_netlist->begin_bottom_up (); c != mp_netlist->end_bottom_up (); ++c) {
 
-      if (c.operator-> () == mp_anonymous_top_level_netlist_circuit) {
+      if (c.operator->() == mp_anonymous_top_level_netlist_circuit) {
         //  no pins for the anonymous top circuit
         continue;
       }
@@ -1289,11 +1250,8 @@ SpiceNetlistBuilder::build_global_nets ()
         }
 
         sc.connect_pin (pin.id (), pnet);
-
       }
-
     }
-
   }
 }
 
@@ -1381,9 +1339,9 @@ std::string NetlistSpiceReader::unescape_name (const std::string &n)
 
       quote = *cp++;
 
-    } else if (*cp == '\\' && cp[1]) {
+    } else if (*cp == '\\' && cp [1]) {
 
-      if (tolower (cp[1]) == 'x') {
+      if (tolower (cp [1]) == 'x') {
 
         cp += 2;
 
@@ -1408,7 +1366,6 @@ std::string NetlistSpiceReader::unescape_name (const std::string &n)
     } else {
       nn += *cp++;
     }
-
   }
 
   return nn;
@@ -1426,7 +1383,7 @@ std::string NetlistSpiceReader::parse_component (tl::Extractor &ex)
     if (quote) {
       if (*cp == quote) {
         quote = 0;
-      } else if (*cp == '\\' && cp[1]) {
+      } else if (*cp == '\\' && cp [1]) {
         ++cp;
       }
     } else if ((isspace (*cp) || *cp == '=') && ! brackets) {

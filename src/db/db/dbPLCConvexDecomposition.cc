@@ -45,15 +45,13 @@ ConvexDecomposition::ConvexDecomposition (Graph *graph)
   clear ();
 }
 
-void
-ConvexDecomposition::clear ()
+void ConvexDecomposition::clear ()
 {
   mp_graph->clear ();
 }
 
-struct SortAngleAndEdgesByEdgeLength
-{
-  typedef std::list<std::pair<double, const Edge *> > angle_and_edges_list;
+struct SortAngleAndEdgesByEdgeLength {
+  typedef std::list<std::pair<double, const Edge *>> angle_and_edges_list;
 
   bool operator() (const angle_and_edges_list::iterator &a, const angle_and_edges_list::iterator &b) const
   {
@@ -69,8 +67,7 @@ struct SortAngleAndEdgesByEdgeLength
 
 //  TODO: move to some generic header
 template <class T>
-struct less_compare_func
-{
+struct less_compare_func {
   bool operator() (const T &a, const T &b) const
   {
     return a.less (b);
@@ -79,8 +76,7 @@ struct less_compare_func
 
 //  TODO: move to some generic header
 template <class T>
-struct equal_compare_func
-{
+struct equal_compare_func {
   bool operator() (const T &a, const T &b) const
   {
     return a.equal (b);
@@ -116,17 +112,14 @@ Edge *find_outgoing_segment (Vertex *vertex, Edge *incoming, int &vp_max_sign)
         vp_max = vp;
         outgoing = en;
       }
-
     }
-
   }
 
   tl_assert (outgoing != 0);
   return outgoing;
 }
 
-void
-ConvexDecomposition::collect_concave_vertexes (std::vector<ConcaveCorner> &concave_vertexes)
+void ConvexDecomposition::collect_concave_vertexes (std::vector<ConcaveCorner> &concave_vertexes)
 {
   concave_vertexes.clear ();
 
@@ -134,7 +127,7 @@ ConvexDecomposition::collect_concave_vertexes (std::vector<ConcaveCorner> &conca
 
   for (auto e = mp_graph->edges ().begin (); e != mp_graph->edges ().end (); ++e) {
     if (e->is_segment () && (e->left () != 0 || e->right () != 0)) {
-      left.insert (e.operator-> ());
+      left.insert (e.operator->());
     }
   }
 
@@ -166,14 +159,13 @@ ConvexDecomposition::collect_concave_vertexes (std::vector<ConcaveCorner> &conca
       vto = segment->other (vto);
 
     } while (segment != start_segment);
-
   }
 }
 
 std::pair<bool, db::DPoint>
 ConvexDecomposition::search_crossing_with_next_segment (const Vertex *v0, const db::DVector &direction)
 {
-  auto vtri = v0->polygons ();  //  TODO: slow?
+  auto vtri = v0->polygons (); //  TODO: slow?
   std::vector<const Vertex *> nvv, nvv_next;
 
   for (auto it = vtri.begin (); it != vtri.end (); ++it) {
@@ -212,22 +204,17 @@ ConvexDecomposition::search_crossing_with_next_segment (const Vertex *v0, const 
           }
 
           break;
-
         }
-
       }
 
       nvv.swap (nvv_next);
-
     }
-
   }
 
   return std::make_pair (false, db::DPoint ());
 }
 
-void
-ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const ConvexDecompositionParameters &param)
+void ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const ConvexDecompositionParameters &param)
 {
   bool with_segments = param.with_segments;
   bool split_edges = param.split_edges;
@@ -258,11 +245,8 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
         if (cp.first) {
           new_points.push_back (cp.second);
         }
-
       }
-
     }
-
   }
 
   //  eliminate duplicates and put the new points in some order
@@ -279,7 +263,6 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
 
     //  As the insertion invalidates the edges, we need to collect the concave vertexes again
     collect_concave_vertexes (concave_vertexes);
-
   }
 
   //  Collect essential edges
@@ -292,7 +275,7 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
 
   while (! concave_vertexes.empty ()) {
 
-    typedef std::list<std::pair<double, const Edge *> > angles_and_edges_list;
+    typedef std::list<std::pair<double, const Edge *>> angles_and_edges_list;
     angles_and_edges_list angles_and_edges;
     std::vector<angles_and_edges_list::iterator> sorted_edges;
 
@@ -321,7 +304,6 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
 
         e = (en == cc->outgoing) ? 0 : en;
         angles_and_edges.push_back (std::make_pair (angle, e));
-
       }
 
       sorted_edges.clear ();
@@ -334,7 +316,7 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
 
       std::sort (sorted_edges.begin (), sorted_edges.end (), SortAngleAndEdgesByEdgeLength ());
 
-      for (auto i = sorted_edges.end (); i != sorted_edges.begin (); ) {
+      for (auto i = sorted_edges.end (); i != sorted_edges.begin ();) {
         --i;
         angles_and_edges_list::iterator ii = *i;
         angles_and_edges_list::iterator iin = ii;
@@ -360,7 +342,6 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
           }
         }
       }
-
     }
 
     //  new inner vertexes (i.e. endpoints of essential edges inside the polygon) are treated as new convex vertexes
@@ -371,7 +352,7 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
 
       const Vertex *v0 = *i;
       auto ie = v0->begin_edges ();
-      for ( ; ie != v0->end_edges () && essential_edges.find (*ie) == essential_edges.end (); ++ie)
+      for (; ie != v0->end_edges () && essential_edges.find (*ie) == essential_edges.end (); ++ie)
         ;
       tl_assert (ie != v0->end_edges ());
       const Edge *e = *ie;
@@ -403,7 +384,6 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
 
       } while (en != e);
     }
-
   }
 
 #if defined(DEBUG_DUMP_ESSENTIAL_EDGES)
@@ -421,12 +401,12 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
   std::unordered_set<const Polygon *> left_triangles;
   for (auto it = mp_graph->begin (); it != mp_graph->end (); ++it) {
     if (! it->is_outside ()) {
-      left_triangles.insert (it.operator-> ());
+      left_triangles.insert (it.operator->());
     }
   }
 
-  std::list<std::unordered_set<Edge *> > polygons;
-  std::list<std::unordered_set<Vertex *> > internal_vertexes;
+  std::list<std::unordered_set<Edge *>> polygons;
+  std::list<std::unordered_set<Vertex *>> internal_vertexes;
 
   while (! left_triangles.empty ()) {
 
@@ -461,24 +441,21 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
           }
 
           if (! qq || qq->is_outside () || essential_edges.find (e) != essential_edges.end ()) {
-            edges.insert (const_cast<Edge *> (e));  //  TODO: ugly const_cast
+            edges.insert (const_cast<Edge *> (e)); //  TODO: ugly const_cast
           } else if (left_triangles.find (qq) != left_triangles.end ()) {
             next_queue.push_back (qq);
           }
         }
-
       }
 
       queue.swap (next_queue);
-
     }
-
   }
 
   //  remove the triangles
 
   while (mp_graph->begin () != mp_graph->end ()) {
-    delete mp_graph->begin ().operator-> ();
+    delete mp_graph->begin ().operator->();
   }
 
   //  create the polygons
@@ -494,14 +471,12 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
   }
 }
 
-void
-ConvexDecomposition::decompose (const db::Polygon &poly, const ConvexDecompositionParameters &parameters, double dbu)
+void ConvexDecomposition::decompose (const db::Polygon &poly, const ConvexDecompositionParameters &parameters, double dbu)
 {
   decompose (poly, parameters, db::CplxTrans (dbu));
 }
 
-void
-ConvexDecomposition::decompose (const db::Polygon &poly, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans)
+void ConvexDecomposition::decompose (const db::Polygon &poly, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans)
 {
   Triangulation tri (mp_graph);
   tri.triangulate (poly, parameters.tri_param, trans);
@@ -509,8 +484,7 @@ ConvexDecomposition::decompose (const db::Polygon &poly, const ConvexDecompositi
   hertel_mehlhorn_decomposition (tri, parameters);
 }
 
-void
-ConvexDecomposition::decompose (const db::DPolygon &poly, const ConvexDecompositionParameters &parameters, const db::DCplxTrans &trans)
+void ConvexDecomposition::decompose (const db::DPolygon &poly, const ConvexDecompositionParameters &parameters, const db::DCplxTrans &trans)
 {
   Triangulation tri (mp_graph);
   tri.triangulate (poly, parameters.tri_param, trans);
@@ -518,14 +492,12 @@ ConvexDecomposition::decompose (const db::DPolygon &poly, const ConvexDecomposit
   hertel_mehlhorn_decomposition (tri, parameters);
 }
 
-void
-ConvexDecomposition::decompose (const db::Region &region, const ConvexDecompositionParameters &parameters, double dbu)
+void ConvexDecomposition::decompose (const db::Region &region, const ConvexDecompositionParameters &parameters, double dbu)
 {
   decompose (region, parameters, db::CplxTrans (dbu));
 }
 
-void
-ConvexDecomposition::decompose (const db::Region &region, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans)
+void ConvexDecomposition::decompose (const db::Region &region, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans)
 {
   Triangulation tri (mp_graph);
   tri.triangulate (region, parameters.tri_param, trans);
@@ -533,6 +505,6 @@ ConvexDecomposition::decompose (const db::Region &region, const ConvexDecomposit
   hertel_mehlhorn_decomposition (tri, parameters);
 }
 
-}  //  namespace plc
+} //  namespace plc
 
-}  //  namespace db
+} //  namespace db

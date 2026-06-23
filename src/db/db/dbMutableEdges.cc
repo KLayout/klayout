@@ -46,8 +46,7 @@ MutableEdges::~MutableEdges ()
   //  .. nothing yet ..
 }
 
-void
-MutableEdges::insert (const db::Box &box)
+void MutableEdges::insert (const db::Box &box)
 {
   if (! box.empty () && box.width () > 0 && box.height () > 0) {
     do_insert (db::Edge (box.lower_left (), box.upper_left ()), 0);
@@ -57,8 +56,7 @@ MutableEdges::insert (const db::Box &box)
   }
 }
 
-void
-MutableEdges::insert (const db::BoxWithProperties &box)
+void MutableEdges::insert (const db::BoxWithProperties &box)
 {
   if (! box.empty () && box.width () > 0 && box.height () > 0) {
     do_insert (db::Edge (box.lower_left (), box.upper_left ()), box.properties_id ());
@@ -68,24 +66,21 @@ MutableEdges::insert (const db::BoxWithProperties &box)
   }
 }
 
-void
-MutableEdges::insert (const db::Path &path)
+void MutableEdges::insert (const db::Path &path)
 {
   if (path.points () > 0) {
     insert (path.polygon ());
   }
 }
 
-void
-MutableEdges::insert (const db::PathWithProperties &path)
+void MutableEdges::insert (const db::PathWithProperties &path)
 {
   if (path.points () > 0) {
     insert (db::PolygonWithProperties (path.polygon (), path.properties_id ()));
   }
 }
 
-void
-MutableEdges::insert (const db::Polygon &polygon)
+void MutableEdges::insert (const db::Polygon &polygon)
 {
   if (polygon.holes () > 0 || polygon.vertices () > 0) {
     for (db::Polygon::polygon_edge_iterator e = polygon.begin_edge (); ! e.at_end (); ++e) {
@@ -94,8 +89,7 @@ MutableEdges::insert (const db::Polygon &polygon)
   }
 }
 
-void
-MutableEdges::insert (const db::PolygonWithProperties &polygon)
+void MutableEdges::insert (const db::PolygonWithProperties &polygon)
 {
   if (polygon.holes () > 0 || polygon.vertices () > 0) {
     for (db::Polygon::polygon_edge_iterator e = polygon.begin_edge (); ! e.at_end (); ++e) {
@@ -104,8 +98,7 @@ MutableEdges::insert (const db::PolygonWithProperties &polygon)
   }
 }
 
-void
-MutableEdges::insert (const db::SimplePolygon &polygon)
+void MutableEdges::insert (const db::SimplePolygon &polygon)
 {
   if (polygon.vertices () > 0) {
     for (db::SimplePolygon::polygon_edge_iterator e = polygon.begin_edge (); ! e.at_end (); ++e) {
@@ -114,8 +107,7 @@ MutableEdges::insert (const db::SimplePolygon &polygon)
   }
 }
 
-void
-MutableEdges::insert (const db::SimplePolygonWithProperties &polygon)
+void MutableEdges::insert (const db::SimplePolygonWithProperties &polygon)
 {
   if (polygon.vertices () > 0) {
     for (db::SimplePolygon::polygon_edge_iterator e = polygon.begin_edge (); ! e.at_end (); ++e) {
@@ -124,8 +116,7 @@ MutableEdges::insert (const db::SimplePolygonWithProperties &polygon)
   }
 }
 
-void
-MutableEdges::insert (const db::Shape &shape)
+void MutableEdges::insert (const db::Shape &shape)
 {
   db::properties_id_type prop_id = shape.prop_id ();
 
@@ -142,9 +133,7 @@ MutableEdges::insert (const db::Shape &shape)
     db::Edge edge;
     shape.edge (edge);
     do_insert (edge, prop_id);
-
   }
 }
 
 }
-

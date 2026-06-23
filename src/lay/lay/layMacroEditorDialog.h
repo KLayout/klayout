@@ -81,10 +81,9 @@ class MacroEditorDialog
     public gsi::ExecutionHandler,
     private Ui::MacroEditorDialog
 {
-  Q_OBJECT 
+  Q_OBJECT
 
-  struct EditTrace
-  {
+  struct EditTrace {
     EditTrace ()
       : path (), line (0), pos (0)
     {
@@ -272,7 +271,7 @@ protected:
 
 private:
   lay::MacroEditorTree *current_macro_tree ();
-  lym::Macro *create_macro_here(const char *name = 0);
+  lym::Macro *create_macro_here (const char *name = 0);
   void move_subfolder (lym::MacroCollection *source, lym::MacroCollection *target);
   lay::MacroEditorPage *create_page (lym::Macro *macro);
   void open_macro (lym::Macro *macro);
@@ -324,7 +323,7 @@ private:
   std::vector<lym::Macro *> m_macro_templates;
   tl::DeferredMethod<MacroEditorDialog> md_update_console_text;
   TextEditWidget *mp_console_text;
-  std::map <lym::Macro *, MacroEditorPage *> m_tab_widgets;
+  std::map<lym::Macro *, MacroEditorPage *> m_tab_widgets;
   int m_history_index;
   bool m_in_event_handler;
   QString m_edit_text;
@@ -334,10 +333,10 @@ private:
   QTextCharFormat m_echo_format;
   QTextCharFormat m_stderr_format;
   MacroEditorHighlighters m_highlighters;
-  std::vector<std::pair<lym::Macro *, MacroEditorPage *> > m_file_to_widget;
+  std::vector<std::pair<lym::Macro *, MacroEditorPage *>> m_file_to_widget;
   std::vector<tl::IncludeExpander> m_include_expanders;
   std::map<std::string, size_t> m_include_paths_to_ids;
-  std::map<std::pair<size_t, int>, std::pair<size_t, int> > m_include_file_id_cache;
+  std::map<std::pair<size_t, int>, std::pair<size_t, int>> m_include_file_id_cache;
   std::vector<lay::MacroEditorTree *> m_macro_trees;
   bool m_in_exec, m_in_breakpoint, m_ignore_exec_events;
   gsi::Interpreter *mp_exec_controller, *mp_current_interpreter;
@@ -360,7 +359,7 @@ private:
   std::string m_font_family;
   int m_font_size;
   std::vector<lay::MacroController::MacroCategory> m_categories;
-  std::vector<std::pair<gsi::Interpreter *, std::string> > m_watch_expressions;
+  std::vector<std::pair<gsi::Interpreter *, std::string>> m_watch_expressions;
   std::vector<EditTrace> m_edit_trace;
   size_t m_edit_trace_index;
   bool m_add_edit_trace_enabled;
@@ -376,4 +375,3 @@ private:
 }
 
 #endif
-

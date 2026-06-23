@@ -33,7 +33,8 @@
 #include <string>
 #include <vector>
 
-namespace ant {
+namespace ant
+{
 
 /**
  *  @brief The template that is used for creating new rulers from
@@ -47,8 +48,7 @@ public:
   typedef ant::Object::alignment_type alignment_type;
   typedef lay::angle_constraint_type angle_constraint_type;
 
-  enum ruler_mode_type
-  {
+  enum ruler_mode_type {
     /**
      *  @brief The rulers acts normal and a start and end point need to be defined
      */
@@ -90,19 +90,19 @@ public:
 
   /**
    *  @brief Default constructor
-   * 
+   *
    *  Creates a template with the default settings
    */
   Template ();
 
   /**
    *  @brief Constructor
-   * 
+   *
    *  Creates a template with the given format strings and styles
    */
   Template (const std::string &title, const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt, style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraints, const std::string &cat);
 
-  /** 
+  /**
    *  @brief Copy constructor
    */
   Template (const ant::Template &d);
@@ -174,15 +174,15 @@ public:
   {
     return m_title;
   }
-  
+
   /**
    *  @brief Title write accessor
    */
-  void title (const std::string &t) 
+  void title (const std::string &t)
   {
     m_title = t;
   }
-  
+
   /**
    *  @brief Main format string read accessor
    */
@@ -361,7 +361,7 @@ public:
 
   /**
    *  @brief Style read accessor
-   */ 
+   */
   style_type style () const
   {
     return m_style;
@@ -370,18 +370,18 @@ public:
   /**
    *  @brief Outline mode write accessor
    *
-   *  The outline mode controls how the ruler or marker is drawn. 
-   *  The style is either "ruler" (with tick marks), "arrow" in different 
+   *  The outline mode controls how the ruler or marker is drawn.
+   *  The style is either "ruler" (with tick marks), "arrow" in different
    *  flavours or "plain line".
-   */ 
-  void style (style_type s) 
+   */
+  void style (style_type s)
   {
     m_style = s;
   }
 
   /**
    *  @brief Outline mode read accessor
-   */ 
+   */
   outline_type outline () const
   {
     return m_outline;
@@ -390,27 +390,27 @@ public:
   /**
    *  @brief Outline mode write accessor
    *
-   *  The outline mode controls how the ruler or marker appears. 
-   *  As a ruler it may appear as a diagonal connection between two points, 
-   *  as a set of horizonal and vertical lines or as a set of horizontal, vertical 
+   *  The outline mode controls how the ruler or marker appears.
+   *  As a ruler it may appear as a diagonal connection between two points,
+   *  as a set of horizonal and vertical lines or as a set of horizontal, vertical
    *  and diagonal lines. As a marker it may appear as a box.
-   */ 
-  void outline (outline_type s) 
+   */
+  void outline (outline_type s)
   {
     m_outline = s;
   }
-  
+
   /**
    *  @brief Angle constraint flag read accessor
-   */ 
+   */
   bool snap () const
   {
     return m_snap;
   }
-  
+
   /**
    *  @brief Snap flag write accessor
-   * 
+   *
    *  The snap flag controls whether snapping to objects (edges and vertices)
    *  is active when this template is selected.
    */
@@ -421,16 +421,16 @@ public:
 
   /**
    *  @brief Angle constraint read accessor
-   */ 
+   */
   lay::angle_constraint_type angle_constraint () const
   {
     return m_angle_constraint;
   }
-  
+
   /**
    *  @brief Angle constraint write accessor
-   * 
-   *  The angle constraint flag controls which angle constraint is to be used 
+   *
+   *  The angle constraint flag controls which angle constraint is to be used
    *  for the rulers derived from this template or if the global setting is to be used
    *  (if ant::Service::Global is used for the angle constraint).
    */
@@ -438,7 +438,7 @@ public:
   {
     m_angle_constraint = a;
   }
-  
+
   /**
    *  @brief Get a list of templates from a string
    */
@@ -470,4 +470,3 @@ private:
 }
 
 #endif
-

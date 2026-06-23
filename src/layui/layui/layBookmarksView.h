@@ -47,7 +47,7 @@ class AbstractMenu;
 class LAYUI_PUBLIC BookmarksView
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   BookmarksView (lay::LayoutViewBase *view, QWidget *parent, const char *name);
@@ -76,4 +76,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

@@ -48,8 +48,7 @@ BacktraceElement::BacktraceElement ()
   // .. nothing yet ..
 }
 
-void
-BacktraceElement::translate_includes ()
+void BacktraceElement::translate_includes ()
 {
   if (line < 1) {
     return;
@@ -62,8 +61,8 @@ BacktraceElement::translate_includes ()
   }
 }
 
-std::string 
-BacktraceElement::to_string() const
+std::string
+BacktraceElement::to_string () const
 {
   if (line > 0) {
     if (! more_info.empty ()) {
@@ -130,8 +129,7 @@ ScriptError::msg () const
   return m;
 }
 
-void
-ScriptError::translate_includes ()
+void ScriptError::translate_includes ()
 {
   if (m_line < 1) {
     return;
@@ -145,5 +143,3 @@ ScriptError::translate_includes ()
 }
 
 }
-
-

@@ -28,14 +28,16 @@
 
 #include <algorithm>
 
-struct AddOp 
-{
+struct AddOp {
   void operator() (std::string &a, const std::string &b) { a += b; }
 };
 
-struct MaxOp 
-{
-  void operator() (std::string &a, const std::string &b) { if (b > a) a = b; }
+struct MaxOp {
+  void operator() (std::string &a, const std::string &b)
+  {
+    if (b > a)
+      a = b;
+  }
 };
 
 typedef tl::interval_map<int, std::string> im_t;
@@ -45,8 +47,8 @@ std::string to_string (const im_t &im)
   bool f = true;
   std::string s;
   for (im_t::const_iterator i = im.begin (); i != im.end (); ++i) {
-    if (!f) { 
-      s += ","; 
+    if (! f) {
+      s += ",";
     }
     f = 0;
     s += tl::to_string (i->first.first) + ".." + tl::to_string (i->first.second) + ":" + i->second;
@@ -54,7 +56,7 @@ std::string to_string (const im_t &im)
   return s;
 }
 
-TEST(1) 
+TEST (1)
 {
   im_t im;
 
@@ -82,11 +84,10 @@ TEST(1)
   EXPECT_EQ (im.check (), true);
   im.erase (2, 99);
   EXPECT_EQ (to_string (im), "0..1:a,1..2:aa,99..100:a");
-
 }
 
 
-TEST(2) 
+TEST (2)
 {
   im_t im;
 
@@ -109,10 +110,9 @@ TEST(2)
   EXPECT_EQ (*im.mapped (5), "b");
   EXPECT_NE (im.mapped (7), 0);
   EXPECT_EQ (*im.mapped (7), "c");
-
 }
 
-TEST(3) 
+TEST (3)
 {
   im_t im;
 
@@ -135,10 +135,9 @@ TEST(3)
   EXPECT_EQ (*im.mapped (6), "ac");
   EXPECT_NE (im.mapped (9), 0);
   EXPECT_EQ (*im.mapped (9), "ac");
-
 }
 
-TEST(4) 
+TEST (4)
 {
   im_t im;
 
@@ -174,4 +173,3 @@ TEST(4)
   im.add (2, 6, "c", aop);
   EXPECT_EQ (to_string (im), "0..10:c");
 }
-

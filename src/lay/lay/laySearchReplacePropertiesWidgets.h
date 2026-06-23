@@ -31,7 +31,7 @@
 
 namespace db
 {
-  class Layout;
+class Layout;
 }
 
 namespace lay
@@ -48,7 +48,8 @@ class SearchReplacePropertiesWidget
 public:
   SearchReplacePropertiesWidget (QWidget *parent)
     : QWidget (parent)
-  { }
+  {
+  }
 
   virtual void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const = 0;
   virtual void save_state (const std::string &pfx, lay::Dispatcher *config_root) const = 0;
@@ -63,7 +64,8 @@ class SearchPropertiesWidget
 public:
   SearchPropertiesWidget (QWidget *parent)
     : SearchReplacePropertiesWidget (parent)
-  { }
+  {
+  }
 
   virtual std::string search_expression (const std::string &cell_expr) const = 0;
   virtual std::string description () const = 0;
@@ -78,7 +80,8 @@ class ReplacePropertiesWidget
 public:
   ReplacePropertiesWidget (QWidget *parent)
     : SearchReplacePropertiesWidget (parent)
-  { }
+  {
+  }
 
   virtual std::string replace_expression () const = 0;
 };
@@ -110,4 +113,3 @@ int index_from_find_object_id (const std::string &id);
 }
 
 #endif
-

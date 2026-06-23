@@ -48,51 +48,49 @@ template <class Inst, class ET> class InstOp;
 /**
  *  @brief A standard typedef for a cell instance array
  */
-typedef db::array <db::CellInst, db::Trans> CellInstArray;
+typedef db::array<db::CellInst, db::Trans> CellInstArray;
 
 /**
  *  @brief A standard typedef for a cell instance array in micron units
  */
-typedef db::array <db::CellInst, db::DTrans> DCellInstArray;
+typedef db::array<db::CellInst, db::DTrans> DCellInstArray;
 
 /**
  *  @brief A classification type for editable mode types and concepts
  */
-struct InstancesEditableTag { };
+struct InstancesEditableTag {
+};
 
 /**
  *  @brief A classification type for non-editable mode types and concepts
  */
-struct InstancesNonEditableTag { };
+struct InstancesNonEditableTag {
+};
 
 /**
  *  @brief A traits type for editable mode types and concepts
  */
-template <class ET> 
+template <class ET>
 struct instances_editable_traits;
 
 template <>
-struct instances_editable_traits<InstancesEditableTag> 
-{ 
+struct instances_editable_traits<InstancesEditableTag> {
   typedef tl::true_tag is_editable;
 
-  template <class Tag> 
-  struct tree_traits
-  {
-    typedef db::box_tree<typename Tag::object_type::box_type, typename Tag::object_type, db::box_convert<typename Tag::object_type, false> > tree_type;
+  template <class Tag>
+  struct tree_traits {
+    typedef db::box_tree<typename Tag::object_type::box_type, typename Tag::object_type, db::box_convert<typename Tag::object_type, false>> tree_type;
     typedef typename tree_type::iterator tree_iter;
   };
 };
 
 template <>
-struct instances_editable_traits<InstancesNonEditableTag> 
-{
+struct instances_editable_traits<InstancesNonEditableTag> {
   typedef tl::false_tag is_editable;
 
-  template <class Tag> 
-  struct tree_traits
-  {
-    typedef db::unstable_box_tree<typename Tag::object_type::box_type, typename Tag::object_type, db::box_convert<typename Tag::object_type, false> > tree_type;
+  template <class Tag>
+  struct tree_traits {
+    typedef db::unstable_box_tree<typename Tag::object_type::box_type, typename Tag::object_type, db::box_convert<typename Tag::object_type, false>> tree_type;
     typedef typename tree_type::iterator tree_iter;
   };
 };
@@ -130,19 +128,19 @@ public:
    *  @brief Destructor
    */
   ~Instance ();
-  
+
   /**
    *  @brief Initialize a reference with an instance pointer
    *
    *  Hint: there is no const Instance, hence we use the const_cast hack.
    */
   Instance (const db::Instances *instances, const cell_inst_array_type &inst);
-  
+
   /**
    *  @brief Initialize a reference with an instance pointer
    */
   Instance (db::Instances *instances, const cell_inst_array_type &inst);
-  
+
   /**
    *  @brief Initialize a reference with an pointer to an instance with properties
    *
@@ -156,14 +154,14 @@ public:
   Instance (db::Instances *instances, const cell_inst_wp_array_type &inst);
 
   /**
-   *  @brief Initialize a reference with an iterator to an instance 
+   *  @brief Initialize a reference with an iterator to an instance
    *
    *  Hint: there is no const Instance, hence we use the const_cast hack.
    */
   Instance (const db::Instances *instances, const cell_inst_array_iterator_type &iter);
 
   /**
-   *  @brief Initialize a reference with an iterator to an instance 
+   *  @brief Initialize a reference with an iterator to an instance
    */
   Instance (db::Instances *instances, const cell_inst_array_iterator_type &iter);
 
@@ -320,7 +318,7 @@ public:
   }
 
   /**
-   *  @brief Return the bounding box of this array 
+   *  @brief Return the bounding box of this array
    *
    *  This method is basically provided for convenience
    *  and is equivalent to ->cell_inst ().bbox (bc)
@@ -353,7 +351,7 @@ public:
    *  This method is basically provided for convenience
    *  and is equivalent to ->cell_inst ().begin ().
    */
-  cell_inst_array_type::iterator begin () const 
+  cell_inst_array_type::iterator begin () const
   {
     return cell_inst ().begin ();
   }
@@ -391,7 +389,7 @@ public:
    */
   bool operator!= (const Instance &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
@@ -401,7 +399,7 @@ public:
    *  order of the pointers.
    *  Since pointers are volatile objects, the ordering is not strictly reproducible!
    *  The order is designed such that different types of instances are separated in
-   *  an order sequence of instance proxies. This is an important fact for the 
+   *  an order sequence of instance proxies. This is an important fact for the
    *  "erase" functionality of the instances container when erasing a set of objects.
    */
   bool operator< (const Instance &d) const;
@@ -432,7 +430,7 @@ public:
     if (m_type != TInstance || ! m_with_props) {
       return 0;
     } else if (m_stable) {
-      return ((cell_inst_wp_array_iterator_type *) (m_generic.piter))->operator-> ();
+      return ((cell_inst_wp_array_iterator_type *) (m_generic.piter))->operator->();
     } else {
       return m_generic.pinst;
     }
@@ -448,7 +446,7 @@ public:
     if (m_type != TInstance || m_with_props) {
       return 0;
     } else if (m_stable) {
-      return ((cell_inst_array_iterator_type *) (m_generic.iter))->operator-> ();
+      return ((cell_inst_array_iterator_type *) (m_generic.iter))->operator->();
     } else {
       return m_generic.inst;
     }
@@ -501,8 +499,8 @@ private:
   union generic {
     const cell_inst_array_type *inst;
     const cell_inst_wp_array_type *pinst;
-    char iter[sizeof (cell_inst_array_iterator_type)];
-    char piter[sizeof (cell_inst_wp_array_iterator_type)];
+    char iter [sizeof (cell_inst_array_iterator_type)];
+    char piter [sizeof (cell_inst_wp_array_iterator_type)];
   } m_generic;
 
   db::Instances *mp_instances;
@@ -512,7 +510,7 @@ private:
 };
 
 /**
- *  @brief A generic iterator for the instances 
+ *  @brief A generic iterator for the instances
  *
  *  This generic iterator is specialized with the Traits object, which
  *  determines how to initialize the iterators and what types to use.
@@ -539,7 +537,7 @@ public:
   typedef typename IterTraits::stable_unsorted_iter_type stable_unsorted_iter_type;
   typedef typename IterTraits::stable_unsorted_iter_wp_type stable_unsorted_iter_wp_type;
   typedef const value_type *pointer;
-  typedef value_type reference;   //  operator* returns a value
+  typedef value_type reference; //  operator* returns a value
   typedef std::forward_iterator_tag iterator_category;
   typedef void difference_type;
 
@@ -553,7 +551,8 @@ public:
    */
   instance_iterator ()
     : m_type (TNull), m_with_props (false), m_stable (false), m_unsorted (false), m_traits ()
-  { }
+  {
+  }
 
   /**
    *  @brief Destructor
@@ -568,7 +567,7 @@ public:
    */
   instance_iterator (const IterTraits &traits)
     : m_type (TInstance), m_with_props (false), m_stable (traits.instances ()->is_editable ()), m_unsorted (traits.instances ()->instance_tree_needs_sort ()), m_traits (traits)
-  { 
+  {
     make_iter ();
     make_next ();
     update_ref ();
@@ -598,13 +597,13 @@ public:
    */
   bool operator!= (const instance_iterator &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
    *  @brief Access to the actual instance
-   *  
-   *  HINT: this method returns a value, not a "const value &" because this way, 
+   *
+   *  HINT: this method returns a value, not a "const value &" because this way,
    *  we do not loose much (it is not a expensive object) but gain more stability in the
    *  GSI interface, in which we need to be careful not to return references to temporary objects.
    */
@@ -616,7 +615,7 @@ public:
   /**
    *  @brief Access to the actual instance (pointer)
    */
-  const value_type *operator-> () const
+  const value_type *operator->() const
   {
     return &m_ref;
   }
@@ -624,7 +623,7 @@ public:
   /**
    *  @brief Increment operator
    */
-  instance_iterator &operator++();
+  instance_iterator &operator++ ();
 
   /**
    *  @brief Skip the current quad
@@ -763,12 +762,12 @@ private:
   friend struct TouchingInstanceIteratorTraits;
 
   union generic {
-    char iter[sizeof (iter_type)];
-    char piter[sizeof (iter_wp_type)];
-    char stable_iter[sizeof (stable_iter_type)];
-    char pstable_iter[sizeof (stable_iter_wp_type)];
-    char stable_unsorted_iter[sizeof (stable_unsorted_iter_type)];
-    char pstable_unsorted_iter[sizeof (stable_unsorted_iter_wp_type)];
+    char iter [sizeof (iter_type)];
+    char piter [sizeof (iter_wp_type)];
+    char stable_iter [sizeof (stable_iter_type)];
+    char pstable_iter [sizeof (stable_iter_wp_type)];
+    char stable_unsorted_iter [sizeof (stable_unsorted_iter_type)];
+    char pstable_unsorted_iter [sizeof (stable_unsorted_iter_wp_type)];
   } m_generic;
 
   object_type m_type : 16;
@@ -788,8 +787,7 @@ private:
  *  @brief IterTraits for the normal iterator
  */
 
-struct DB_PUBLIC NormalInstanceIteratorTraits
-{
+struct DB_PUBLIC NormalInstanceIteratorTraits {
   typedef db::Layout layout_type;
   typedef db::Box box_type;
   typedef box_type::coord_type coord_type;
@@ -817,8 +815,8 @@ struct DB_PUBLIC NormalInstanceIteratorTraits
   void init (instance_iterator<NormalInstanceIteratorTraits> *iter) const;
 
   template <class Iter> instance_type instance_from_stable_iter (const Iter &iter) const;
- 
-  template <class Iter> void skip_quad (Iter & /*iter*/) const { }
+
+  template <class Iter> void skip_quad (Iter & /*iter*/) const {}
   template <class Iter> size_t quad_id (const Iter & /*iter*/) const { return 0; }
   template <class Iter> box_type quad_box (const Iter & /*iter*/) const { return db::Box (); }
 
@@ -835,8 +833,7 @@ public:
  *  @brief IterTraits for the touching iterator
  */
 
-struct DB_PUBLIC TouchingInstanceIteratorTraits
-{
+struct DB_PUBLIC TouchingInstanceIteratorTraits {
   typedef db::Layout layout_type;
   typedef db::Box box_type;
   typedef box_type::coord_type coord_type;
@@ -865,7 +862,7 @@ struct DB_PUBLIC TouchingInstanceIteratorTraits
 
   template <class Iter>
   instance_type instance_from_stable_iter (const Iter &iter) const;
- 
+
   template <class Iter> void skip_quad (Iter &iter) const { iter.skip_quad (); }
   template <class Iter> size_t quad_id (const Iter &iter) const { return iter.quad_id (); }
   template <class Iter> box_type quad_box (const Iter &iter) const { return iter.quad_box (); }
@@ -888,8 +885,7 @@ private:
  *  @brief IterTraits for the overlapping iterator
  */
 
-struct DB_PUBLIC OverlappingInstanceIteratorTraits
-{
+struct DB_PUBLIC OverlappingInstanceIteratorTraits {
   typedef db::Layout layout_type;
   typedef db::Box box_type;
   typedef box_type::coord_type coord_type;
@@ -918,7 +914,7 @@ struct DB_PUBLIC OverlappingInstanceIteratorTraits
 
   template <class Iter>
   instance_type instance_from_stable_iter (const Iter &iter) const;
- 
+
   template <class Iter> void skip_quad (Iter &iter) const { iter.skip_quad (); }
   template <class Iter> size_t quad_id (const Iter &iter) const { return iter.quad_id (); }
   template <class Iter> box_type quad_box (const Iter &iter) const { return iter.quad_box (); }
@@ -945,15 +941,15 @@ private:
 
 class DB_PUBLIC ChildCellIterator
 {
-public: 
+public:
   typedef db::Layout layout_type;
   typedef db::CellInst cell_inst_type;
   typedef cell_index_type value_type;
   typedef db::Instances instances_type;
   typedef db::CellInstArray basic_inst_type;
   typedef tl::vector<const basic_inst_type *>::const_iterator inst_iterator_type;
-  typedef void pointer;                //  no operator->
-  typedef cell_index_type reference;   //  operator* returns a value
+  typedef void pointer;              //  no operator->
+  typedef cell_index_type reference; //  operator* returns a value
   typedef std::forward_iterator_tag iterator_category;
   typedef void difference_type;
 
@@ -979,7 +975,7 @@ public:
   /**
    *  @brief Increment operator
    */
-  ChildCellIterator &operator++();
+  ChildCellIterator &operator++ ();
 
   /**
    *  @brief Report the end of the iterator (in non-STL schemes)
@@ -1019,7 +1015,7 @@ private:
 
 class DB_PUBLIC ParentInst
 {
-public: 
+public:
   /**
    *  @brief The default ctor
    *
@@ -1041,7 +1037,7 @@ public:
   }
 
   /**
-   *  @brief Retrieve the reference to the parent cell 
+   *  @brief Retrieve the reference to the parent cell
    */
   cell_index_type parent_cell_index () const
   {
@@ -1081,7 +1077,7 @@ protected:
 class DB_PUBLIC ParentInstRep
   : public ParentInst
 {
-public: 
+public:
   typedef db::Layout layout_type;
   typedef db::Cell cell_type;
   typedef db::Box box_type;
@@ -1149,13 +1145,13 @@ private:
 
 class DB_PUBLIC ParentInstIterator
 {
-public: 
+public:
   typedef db::Layout layout_type;
   typedef ParentInst parent_inst_type;
   typedef db::Cell cell_type;
   typedef ParentInstRep value_type;
-  typedef const value_type *pointer; 
-  typedef value_type reference;   //  operator* returns a value
+  typedef const value_type *pointer;
+  typedef value_type reference; //  operator* returns a value
   typedef std::forward_iterator_tag iterator_category;
   typedef void difference_type;
 
@@ -1164,7 +1160,8 @@ public:
    */
   ParentInstIterator ()
     : mp_layout (0), m_iter (), m_end ()
-  { }
+  {
+  }
 
   /**
    *  @brief Constructor
@@ -1181,7 +1178,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Equality operator
    */
   bool operator== (const ParentInstIterator &b) const
@@ -1189,18 +1186,18 @@ public:
     return m_iter == b.m_iter && m_rep == b.m_rep;
   }
 
-  /** 
+  /**
    *  @brief Inequality operator
    */
   bool operator!= (const ParentInstIterator &b) const
   {
-    return !operator==(b);
+    return ! operator== (b);
   }
 
   /**
    *  @brief Increment operator
    */
-  ParentInstIterator &operator++();
+  ParentInstIterator &operator++ ();
 
   /**
    *  @brief Access to the parent instance
@@ -1216,10 +1213,10 @@ public:
 
   /**
    *  @brief Access to the parent instance
-   * 
+   *
    *  See above.
    */
-  const value_type *operator-> () const
+  const value_type *operator->() const
   {
     return &m_rep;
   }
@@ -1231,7 +1228,7 @@ public:
   {
     return m_iter == m_end;
   }
-  
+
 private:
   const layout_type *mp_layout;
   tl::vector<parent_inst_type>::const_iterator m_iter, m_end;
@@ -1246,12 +1243,12 @@ private:
 
 class DB_PUBLIC ParentCellIterator
 {
-public: 
+public:
   typedef db::Layout layout_type;
   typedef ParentInst parent_inst_type;
   typedef cell_index_type value_type;
-  typedef void pointer;           //  no operator->
-  typedef value_type reference;   //  operator* returns a value
+  typedef void pointer;         //  no operator->
+  typedef value_type reference; //  operator* returns a value
   typedef std::forward_iterator_tag iterator_category;
   typedef void difference_type;
 
@@ -1260,16 +1257,18 @@ public:
    */
   ParentCellIterator ()
     : m_iter ()
-  { }
+  {
+  }
 
   /**
    *  @brief Constructor
    */
   ParentCellIterator (tl::vector<parent_inst_type>::const_iterator iter)
     : m_iter (iter)
-  { }
+  {
+  }
 
-  /** 
+  /**
    *  @brief Equality operator
    */
   bool operator== (const ParentCellIterator &b) const
@@ -1277,7 +1276,7 @@ public:
     return m_iter == b.m_iter;
   }
 
-  /** 
+  /**
    *  @brief Inequality operator
    */
   bool operator!= (const ParentCellIterator &b) const
@@ -1300,7 +1299,7 @@ public:
   /**
    *  @brief Increment operator
    */
-  ParentCellIterator &operator++() 
+  ParentCellIterator &operator++ ()
   {
     ++m_iter;
     return *this;
@@ -1320,7 +1319,7 @@ private:
  *  That allows retrieving such instances with a search.
  */
 
-class DB_PUBLIC Instances 
+class DB_PUBLIC Instances
 {
 public:
   typedef db::Layout layout_type;
@@ -1361,11 +1360,11 @@ public:
   ~Instances ();
 
   /**
-   *  @brief The assignment operator 
+   *  @brief The assignment operator
    *
    *  Hint: the current implementation does not translate to other array repositories.
    *  This implies, that cell instance arrays must not be based on array repositories currently.
-   *  The current implementation does not translate property Id's. 
+   *  The current implementation does not translate property Id's.
    *  It is mainly intended for 1-to-1 copies of layouts where the whole
    *  property repository is copied.
    */
@@ -1391,22 +1390,22 @@ public:
    */
   bool empty () const;
 
-  /** 
+  /**
    *  @brief Erase a cell instance given by a instance proxy
    *
    *  Erasing a cell instance will destroy the sorting order and invalidate
    *  other instance proxies.
    *  sort() must be called before a region query can be done
-   *  on the cell instances. 
+   *  on the cell instances.
    */
   void erase (const instance_type &ref);
 
   /**
    *  @brief Erase a cell instance
-   *  
+   *
    *  Erasing a cell instance will destroy the sorting order.
    *  sort() must be called before a region query can be done
-   *  on the cell instances. 
+   *  on the cell instances.
    */
   void erase (const const_iterator &e);
 
@@ -1440,8 +1439,8 @@ public:
   void erase_positions (Tag tag, ET et, I first, I last);
 
   /**
-   *  @brief Insert a cell instance 
-   *  
+   *  @brief Insert a cell instance
+   *
    *  Inserting a cell instance will destroy the sorting order.
    *  sort() must be called before a region query can be done
    *  on the cell instances.
@@ -1453,7 +1452,7 @@ public:
 
   /**
    *  @brief Insert a sequence [from,to) of cell instances in a "editable safe" way
-   *  
+   *
    *  @param from The start of the sequence
    *  @param to The past-the-end pointer of the sequence
    */
@@ -1461,10 +1460,10 @@ public:
   void insert (I from, I to);
 
   /**
-   *  @brief Insert an instance given by a instance reference 
+   *  @brief Insert an instance given by a instance reference
    *
    *  This member may be used to copy an instance from one cell to another.
-   *  Because of the inherent instability of the instance pointer it must not be 
+   *  Because of the inherent instability of the instance pointer it must not be
    *  used to copy instances within one cell.
    *  Only in editable mode, this method will return a stable reference - that is
    *  one that will not be invalidated potentially on further insert operations.
@@ -1480,7 +1479,7 @@ public:
   /**
    *  @brief Insert an instance given by a instance reference with a different cell index and property ID
    *
-   *  This member may be used to map an instance to another layout object. 
+   *  This member may be used to map an instance to another layout object.
    *  Only in editable mode, this method will return a stable reference - that is
    *  one that will not be invalidated potentially on further insert operations.
    *
@@ -1491,11 +1490,11 @@ public:
   template <class IndexMap>
   instance_type insert (const instance_type &ref, IndexMap &im)
   {
-    tl::func_delegate <IndexMap, db::cell_index_type> im_delegate (im);
+    tl::func_delegate<IndexMap, db::cell_index_type> im_delegate (im);
     return do_insert (ref, im_delegate);
   }
 
-  /** 
+  /**
    *  @brief Replace the properties ID of an element (pointed to by the iterator) with the given one
    *
    *  This method will delete the former object if it does not have a property and needs to get one.
@@ -1531,10 +1530,10 @@ public:
 
   /**
    *  @brief Test if the given reference is valid
-   *  
-   *  Returns true, if the given instance is valid. It is not valid, if it has been 
-   *  deleted already. However, it may happen, that the instance memory has been 
-   *  reused already. Therefore this method can safely be used only if nothing 
+   *
+   *  Returns true, if the given instance is valid. It is not valid, if it has been
+   *  deleted already. However, it may happen, that the instance memory has been
+   *  reused already. Therefore this method can safely be used only if nothing
    *  has been inserted into this container in between.
    *  This method can only be used in editable mode.
    *
@@ -1569,7 +1568,7 @@ public:
   }
 
   /**
-   *  @brief Transform all instances 
+   *  @brief Transform all instances
    *
    *  @param t The transformation to apply
    */
@@ -1599,12 +1598,12 @@ public:
 
   /**
    *  @brief Count the number of parent instances
-   * 
+   *
    *  This will accumulate the number of parent instances in the vector
    *  provided. Later, this count is used to resize the parent instance
    *  vector.
    */
-  void count_parent_insts (std::vector <size_t> &count) const;
+  void count_parent_insts (std::vector<size_t> &count) const;
 
   /**
    *  @brief Establish the instance index list giving the instances by cell index
@@ -1623,7 +1622,7 @@ public:
 
   /**
    *  @brief Update the child-parent relationships
-   * 
+   *
    *  This will update the child-parent relationships. Basically
    *  this means entering the cell as a parent into all it's child
    *  cells.
@@ -1634,7 +1633,7 @@ public:
    *  @brief Region query for the instances in "overlapping" mode
    *
    *  This will return the region query iterator for the child cell
-   *  instances overlapping with the given region b. 
+   *  instances overlapping with the given region b.
    *
    *  @param b The region to query
    *
@@ -1649,7 +1648,7 @@ public:
    *  @brief Region query for the instances in "touching" mode
    *
    *  This will return the region query iterator for the child cell
-   *  instances touching the given region b. 
+   *  instances touching the given region b.
    *
    *  @param b The region to query
    *
@@ -1671,7 +1670,7 @@ public:
     return ChildCellIterator (this);
   }
 
-  /** 
+  /**
    *  @brief Report the number of child cells
    *
    *  Just the number of child cells with distinct cell indices are
@@ -1681,7 +1680,7 @@ public:
   size_t child_cells () const;
 
   /**
-   *  @brief The number of cell instances 
+   *  @brief The number of cell instances
    */
   size_t cell_instances () const;
 
@@ -1725,7 +1724,7 @@ public:
   }
 
   /**
-   *  @brief Report the number of parent cells 
+   *  @brief Report the number of parent cells
    *
    *  Since the m_parent_insts vector just stores references to those cells
    *  that have distinct cell indices, we can simply report their length.
@@ -1737,7 +1736,7 @@ public:
 
   /**
    *  @brief The parent cell iterator
-   * 
+   *
    *  This iterator will iterate over the parent cells, just returning their
    *  cell index.
    */
@@ -1907,7 +1906,7 @@ private:
   /**
    *  @brief Gets the non-editable, non-const instance tree by instance type
    */
-  cell_inst_wp_tree_type &inst_tree (cell_inst_wp_array_type::tag, InstancesNonEditableTag) 
+  cell_inst_wp_tree_type &inst_tree (cell_inst_wp_array_type::tag, InstancesNonEditableTag)
   {
     tl_assert (! is_editable ());
     if (! m_generic_wp.unstable_tree) {
@@ -1919,7 +1918,7 @@ private:
   /**
    *  @brief Gets the non-editable, non-const instance tree by instance type
    */
-  cell_inst_tree_type &inst_tree (cell_inst_array_type::tag, InstancesNonEditableTag) 
+  cell_inst_tree_type &inst_tree (cell_inst_array_type::tag, InstancesNonEditableTag)
   {
     tl_assert (! is_editable ());
     if (! m_generic.unstable_tree) {
@@ -1931,7 +1930,7 @@ private:
   /**
    *  @brief Gets the editable, non-const instance tree by instance type
    */
-  stable_cell_inst_wp_tree_type &inst_tree (cell_inst_wp_array_type::tag, InstancesEditableTag) 
+  stable_cell_inst_wp_tree_type &inst_tree (cell_inst_wp_array_type::tag, InstancesEditableTag)
   {
     tl_assert (is_editable ());
     if (! m_generic_wp.stable_tree) {
@@ -1943,7 +1942,7 @@ private:
   /**
    *  @brief Gets the editable, non-const instance tree by instance type
    */
-  stable_cell_inst_tree_type &inst_tree (cell_inst_array_type::tag, InstancesEditableTag) 
+  stable_cell_inst_tree_type &inst_tree (cell_inst_array_type::tag, InstancesEditableTag)
   {
     tl_assert (is_editable ());
     if (! m_generic.stable_tree) {
@@ -1955,8 +1954,8 @@ private:
   //  no copy ctor
   Instances (const Instances &d);
 
-  instance_type do_insert (const instance_type &ref, 
-                           tl::func_delegate_base <db::cell_index_type> &im);
+  instance_type do_insert (const instance_type &ref,
+                           tl::func_delegate_base<db::cell_index_type> &im);
 
   void do_clear_insts ();
 
@@ -2021,23 +2020,23 @@ mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const 
 }
 
 template <class Iter>
-inline NormalInstanceIteratorTraits::instance_type 
+inline NormalInstanceIteratorTraits::instance_type
 NormalInstanceIteratorTraits::instance_from_stable_iter (const Iter &iter) const
 {
   //  box tree flat iterators deliver pointers, not iterators. Use instance_from_pointer to do this conversion.
   return mp_insts->instance_from_pointer (&*iter);
 }
- 
+
 template <class Iter>
-inline TouchingInstanceIteratorTraits::instance_type 
+inline TouchingInstanceIteratorTraits::instance_type
 TouchingInstanceIteratorTraits::instance_from_stable_iter (const Iter &iter) const
 {
   //  box tree iterators deliver pointers, not iterators. Use instance_from_pointer to do this conversion.
   return mp_insts->instance_from_pointer (&*iter);
 }
- 
+
 template <class Iter>
-inline OverlappingInstanceIteratorTraits::instance_type 
+inline OverlappingInstanceIteratorTraits::instance_type
 OverlappingInstanceIteratorTraits::instance_from_stable_iter (const Iter &iter) const
 {
   //  box tree iterators deliver pointers, not iterators. Use instance_from_pointer to do this conversion.
@@ -2049,8 +2048,7 @@ OverlappingInstanceIteratorTraits::instance_from_stable_iter (const Iter &iter) 
  *
  *  In contrast, "operator<" will compare the instance reference, not value.
  */
-struct InstanceCompareFunction
-{
+struct InstanceCompareFunction {
   bool operator() (const db::Instance &a, const db::Instance &b) const
   {
     return a.less (b);
@@ -2060,4 +2058,3 @@ struct InstanceCompareFunction
 }
 
 #endif
-

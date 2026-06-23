@@ -53,8 +53,8 @@ int DB_PUBLIC compare_iterators_with_respect_to_target_hierarchy (const db::Recu
 class DB_PUBLIC HierarchyBuilderShapeReceiver
 {
 public:
-  HierarchyBuilderShapeReceiver () { }
-  virtual ~HierarchyBuilderShapeReceiver () { }
+  HierarchyBuilderShapeReceiver () {}
+  virtual ~HierarchyBuilderShapeReceiver () {}
 
   virtual void push (const db::Shape &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target) = 0;
   virtual void push (const db::Box &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target) = 0;
@@ -68,7 +68,7 @@ class DB_PUBLIC HierarchyBuilderShapeInserter
   : public HierarchyBuilderShapeReceiver
 {
 public:
-  HierarchyBuilderShapeInserter () { }
+  HierarchyBuilderShapeInserter () {}
 
   virtual void push (const db::Shape &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
   {
@@ -206,8 +206,8 @@ public:
   EdgePairBuildingHierarchyBuilderShapeReceiver ();
 
   virtual void push (const db::Shape &shape, properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
-  virtual void push (const db::Box &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
-  virtual void push (const db::Polygon &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
+  virtual void push (const db::Box &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) {}
+  virtual void push (const db::Polygon &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) {}
 };
 
 /**
@@ -220,8 +220,8 @@ public:
   TextBuildingHierarchyBuilderShapeReceiver (db::Layout *layout);
 
   virtual void push (const db::Shape &shape, properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
-  virtual void push (const db::Box &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
-  virtual void push (const db::Polygon &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
+  virtual void push (const db::Box &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) {}
+  virtual void push (const db::Polygon &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) {}
 
 private:
   db::Layout *mp_layout;
@@ -246,15 +246,16 @@ class DB_PUBLIC HierarchyBuilder
   : public db::RecursiveShapeReceiver
 {
 public:
-  struct CellMapKey
-  {
+  struct CellMapKey {
     CellMapKey ()
       : original_cell (0), inactive (false)
-    { }
+    {
+    }
 
     CellMapKey (db::cell_index_type _original_cell, bool _inactive, const std::set<db::Box> &_clip_region)
       : original_cell (_original_cell), inactive (_inactive), clip_region (_clip_region)
-    { }
+    {
+    }
 
     bool operator== (const CellMapKey &other) const
     {
@@ -263,9 +264,15 @@ public:
 
     bool operator< (const CellMapKey &other) const
     {
-      if (original_cell != other.original_cell) { return original_cell < other.original_cell; }
-      if (inactive != other.inactive) { return inactive < other.inactive; }
-      if (clip_region != other.clip_region) { return clip_region < other.clip_region; }
+      if (original_cell != other.original_cell) {
+        return original_cell < other.original_cell;
+      }
+      if (inactive != other.inactive) {
+        return inactive < other.inactive;
+      }
+      if (clip_region != other.clip_region) {
+        return clip_region < other.clip_region;
+      }
       return false;
     }
 
@@ -276,7 +283,7 @@ public:
 
 
   typedef std::map<CellMapKey, db::cell_index_type> cell_map_type;
-  typedef std::map<db::cell_index_type, std::vector<db::cell_index_type> > original_target_to_variants_map_type;
+  typedef std::map<db::cell_index_type, std::vector<db::cell_index_type>> original_target_to_variants_map_type;
   typedef std::map<db::cell_index_type, db::cell_index_type> variant_to_original_target_map_type;
 
   HierarchyBuilder (db::Layout *target, unsigned int target_layer, const db::ICplxTrans &trans = db::ICplxTrans (), HierarchyBuilderShapeReceiver *pipe = 0);
@@ -447,7 +454,7 @@ private:
   cell_map_type m_cell_map;
   original_target_to_variants_map_type m_original_targets_to_variants_map;
   variant_to_original_target_map_type m_variants_to_original_target_map;
-  std::map<db::cell_index_type, std::pair<db::cell_index_type, std::string> > m_variants_of_sources_map;
+  std::map<db::cell_index_type, std::pair<db::cell_index_type, std::string>> m_variants_of_sources_map;
 
   std::set<cell_map_type::key_type> m_cells_seen;
   std::set<db::cell_index_type> m_cells_to_be_filled;
@@ -455,7 +462,7 @@ private:
   bool m_cm_new_entry;
   unsigned int m_target_layer;
   bool m_wants_all_cells;
-  std::vector<std::pair<bool, std::vector<db::Cell *> > > m_cell_stack;
+  std::vector<std::pair<bool, std::vector<db::Cell *>>> m_cell_stack;
   db::Cell *mp_initial_cell;
 
   db::ICplxTrans m_trans;

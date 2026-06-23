@@ -28,7 +28,8 @@
 #include "dbEdgesDelegate.h"
 #include "dbRecursiveShapeIterator.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief An empty Edges
@@ -124,18 +125,17 @@ public:
   virtual bool has_valid_merged_edges () const { return true; }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
-  virtual void apply_property_translator (const db::PropertiesTranslator &) { }
+  virtual void apply_property_translator (const db::PropertiesTranslator &) {}
 
   virtual bool equals (const Edges &other) const;
   virtual bool less (const Edges &other) const;
 
-  virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const { }
+  virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const {}
 
 private:
   EmptyEdges &operator= (const EmptyEdges &other);
 };
 
-}  // namespace db
+} // namespace db
 
 #endif
-

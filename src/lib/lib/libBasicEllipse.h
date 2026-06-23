@@ -34,7 +34,7 @@ namespace lib
 /**
  *  @brief Implements the "ELLIPSE" PCell of the basic library
  */
-class BasicEllipse 
+class BasicEllipse
   : public db::PCellDeclaration
 {
 public:
@@ -87,4 +87,3 @@ public:
 }
 
 #endif
-

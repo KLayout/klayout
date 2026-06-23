@@ -47,7 +47,8 @@
 #include <iterator>
 #include <algorithm>
 
-namespace db {
+namespace db
+{
 
 template <class Coord> class generic_repository;
 class ArrayRepository;
@@ -57,29 +58,29 @@ template <class Contour, class Tr> class polygon_contour_iterator;
 // define the default compression mode:
 // double coordinate polygons are not compressed - this is not beneficial
 
-template<class X> 
-inline bool default_compression () 
+template <class X>
+inline bool default_compression ()
 {
   return true;
 }
 
-template<> 
-inline bool default_compression<db::Coord> () 
+template <>
+inline bool default_compression<db::Coord> ()
 {
   return true;
 }
 
-template<> 
-inline bool default_compression<db::DCoord> () 
+template <>
+inline bool default_compression<db::DCoord> ()
 {
   return false;
 }
 
 /**
- *  @brief A "closed" contour type 
+ *  @brief A "closed" contour type
  *
  *  A contour is a set of points that form a closed loop.
- *  Contours are stored "normalized", that is with the 
+ *  Contours are stored "normalized", that is with the
  *  "smallest" point (as determined by the operator<) first
  *  and a clockwise or counter-clockwise orientation for
  *  hull and holes respectively.
@@ -94,9 +95,9 @@ public:
   typedef C coord_type;
   typedef size_t size_type;
   typedef db::coord_traits<coord_type> coord_traits;
-  typedef typename coord_traits::distance_type distance_type; 
-  typedef typename coord_traits::perimeter_type perimeter_type; 
-  typedef typename coord_traits::area_type area_type; 
+  typedef typename coord_traits::distance_type distance_type;
+  typedef typename coord_traits::perimeter_type perimeter_type;
+  typedef typename coord_traits::area_type area_type;
   typedef db::point<C> point_type;
   typedef db::vector<C> vector_type;
   typedef point_type value_type;
@@ -104,14 +105,13 @@ public:
   typedef db::simple_trans<C> trans_type;
   typedef tl::vector<point_type> container_type;
   typedef typename container_type::const_iterator const_iterator;
-  typedef polygon_contour_iterator<polygon_contour, db::unit_trans<C> > simple_iterator;
+  typedef polygon_contour_iterator<polygon_contour, db::unit_trans<C>> simple_iterator;
 
 private:
   /**
    *  @brief A helper predicate function that returns true if p1-p2 is colinear with p2-p3
    */
-  static 
-  bool is_colinear (const point_type &p1, const point_type &p2, const point_type &p3, bool remove_reflected)
+  static bool is_colinear (const point_type &p1, const point_type &p2, const point_type &p3, bool remove_reflected)
   {
     if (db::coord_traits<C>::vprod_sign (p1.x (), p1.y (), p3.x (), p3.y (), p2.x (), p2.y ()) == 0) {
       return remove_reflected || (db::coord_traits<C>::sprod_sign (p1.x (), p1.y (), p3.x (), p3.y (), p2.x (), p2.y ()) < 0);
@@ -143,9 +143,9 @@ public:
     } else {
       point_type *p = new point_type [m_size];
       point_type *pp = (point_type *) ((size_t) d.mp_points & ~3);
-      mp_points = (point_type *)((size_t) p | ((size_t) d.mp_points & 3));
+      mp_points = (point_type *) ((size_t) p | ((size_t) d.mp_points & 3));
       for (unsigned int i = 0; i < m_size; ++i) {
-        p[i] = pp[i];
+        p [i] = pp [i];
       }
     }
   }
@@ -174,7 +174,7 @@ public:
    *  @brief Contour created from a sequence
    *
    *  This ctor creates a contour from a given sequence (from,to].
-   *  The contour is stored "normalized". 
+   *  The contour is stored "normalized".
    *
    *  @param from Begin of the sequence
    *  @param to End of the sequence
@@ -194,7 +194,7 @@ public:
    *
    *  This ctor creates a contour from a given sequence (from,to], each point.
    *  transformed with the transformation "tr".
-   *  The contour is stored "normalized". 
+   *  The contour is stored "normalized".
    *
    *  @param from Begin of the sequence
    *  @param to End of the sequence
@@ -211,10 +211,10 @@ public:
   }
 
   /**
-   *  @brief Fill the contour from a sequence 
+   *  @brief Fill the contour from a sequence
    *
    *  This ctor fills the contour with a given sequence (from,to].
-   *  The contour is stored "normalized". 
+   *  The contour is stored "normalized".
    *
    *  @param from Begin of the sequence
    *  @param to End of the sequence
@@ -233,7 +233,7 @@ public:
    *
    *  This ctor fills the contour with a given sequence (from,to], each point.
    *  transformed with the transformation "tr".
-   *  The contour is stored "normalized". 
+   *  The contour is stored "normalized".
    *
    *  @param from Begin of the sequence
    *  @param to End of the sequence
@@ -254,7 +254,7 @@ public:
         return;
       }
 
-      //  the remove_reflected case is somewhat more complicated: it may happen that bends vanish because the 
+      //  the remove_reflected case is somewhat more complicated: it may happen that bends vanish because the
       //  next edge is member of a spike edge pair. Thus the simple single-pass approach no longer holds.
       //  We therefore need to create an intermediate buffer that is used to eliminate redundant points successively.
 
@@ -295,7 +295,7 @@ public:
           }
 
           pcurr = pnext;
-         
+
         } while (p != points.begin ());
 
         points.erase (w, points.end ());
@@ -305,8 +305,7 @@ public:
           release ();
           return;
         }
-
-      } 
+      }
 
       //  Do the normal assignment now.
       assign (points.begin (), points.end (), db::unit_trans<C> (), hole, compress, normalize, false);
@@ -333,7 +332,7 @@ public:
       while (p != to) {
 
         //  we have a point to consider
-        ++n; 
+        ++n;
 
         point_type pcurr = point_type (tr (*p));
 
@@ -345,7 +344,6 @@ public:
         }
 
         ++p;
-
       }
 
       point_type *pts;
@@ -360,14 +358,14 @@ public:
         if (++p == to) {
           p = from;
         }
-      } 
+      }
 
       //  normalize the orientation if required
       if (normalize) {
 
         area_type a = 0;
 
-        point_type pl = pts[m_size - 1];
+        point_type pl = pts [m_size - 1];
         const point_type *p = pts;
         for (size_type i = 0; i < m_size; ++i, ++p) {
           a += vprod (pl - point_type (), *p - point_type ());
@@ -379,12 +377,11 @@ public:
         if ((! clockwise) != hole) {
           std::reverse (pts + 1, pts + n);
         }
-
       }
 
       //  and store the pointer along with the hole flag
       tl_assert (((size_t) pts & 3) == 0);
-      mp_points = (point_type *) ((size_t) pts | (hole ? 2 : 0)); 
+      mp_points = (point_type *) ((size_t) pts | (hole ? 2 : 0));
 
     } else {
 
@@ -396,7 +393,7 @@ public:
       }
 
       //  count distinct points, determine minimum and if the contour is manhattan
-      bool ortho = normalize; // don't compress manhattan sequences if not normalizing - normalisation is a prerequisite for compression! 
+      bool ortho = normalize; // don't compress manhattan sequences if not normalizing - normalisation is a prerequisite for compression!
       size_type n = 0;
 
       //  count distinct points and determine minimum
@@ -443,19 +440,19 @@ public:
           }
 
           //  we have a point to consider
-          ++n; 
+          ++n;
 
           //  test, if the contour is manhattan
-          //  there is a strict criterion what is "manhattan": only such segment pairs 
+          //  there is a strict criterion what is "manhattan": only such segment pairs
           //  that really bend by 90 degree are recognized as manhattan.
-          if (ortho && !((  coord_traits::equals (plast.x (), pcurr.x ()) && ! coord_traits::equals (plast.y (), pcurr.y ()) && 
-                          ! coord_traits::equals (pcurr.x (), pnext.x ()) &&   coord_traits::equals (pcurr.y (), pnext.y ())) ||
-                         (! coord_traits::equals (plast.x (), pcurr.x ()) &&   coord_traits::equals (plast.y (), pcurr.y ()) && 
-                            coord_traits::equals (pcurr.x (), pnext.x ()) && ! coord_traits::equals (pcurr.y (), pnext.y ())))) {
+          if (ortho && ! ((coord_traits::equals (plast.x (), pcurr.x ()) && ! coord_traits::equals (plast.y (), pcurr.y ()) &&
+                           ! coord_traits::equals (pcurr.x (), pnext.x ()) && coord_traits::equals (pcurr.y (), pnext.y ())) ||
+                          (! coord_traits::equals (plast.x (), pcurr.x ()) && coord_traits::equals (plast.y (), pcurr.y ()) &&
+                           coord_traits::equals (pcurr.x (), pnext.x ()) && ! coord_traits::equals (pcurr.y (), pnext.y ())))) {
             //  non-manhattan
             ortho = false;
           }
-          
+
           //  determine min point and corresponding iterator
           if (! min_set || pcurr < pmin) {
             pmin = pcurr;
@@ -464,11 +461,10 @@ public:
           }
 
           plast = pcurr;
-
         }
 
         pcurr = pnext;
-       
+
         pp = p;
         if (++p == to) {
           p = from;
@@ -477,7 +473,7 @@ public:
         if (pp == from) {
           if (one_round) {
             //  stop on second round
-            return; 
+            return;
           }
           one_round = true;
         }
@@ -501,7 +497,7 @@ public:
         pts = new point_type [m_size];
 
         //  determine orientation:
-        //  it is that simple since we know that the segments attached to 
+        //  it is that simple since we know that the segments attached to
         //  the min point can only point to positive x or y direction:
         p = min;
         pcurr = pmin;
@@ -528,7 +524,7 @@ public:
               p = from;
             }
             pnext = point_type (tr (*p));
-          } while (coord_traits::equals (plast.x (), pcurr.x ()) || coord_traits::equals (plast.y (), pcurr.y ()) || 
+          } while (coord_traits::equals (plast.x (), pcurr.x ()) || coord_traits::equals (plast.y (), pcurr.y ()) ||
                    coord_traits::equals (pnext.x (), pcurr.x ()) != eqx || coord_traits::equals (pnext.y (), pcurr.y ()) != eqy);
           plast = pts [n++] = pcurr;
         }
@@ -565,21 +561,19 @@ public:
             break;
           } else {
             //  remember this point
-            pts [n++] = pcurr; 
+            pts [n++] = pcurr;
             a += vprod (plast - point_type (), pcurr - point_type ());
             plast = pcurr;
           }
 
           pcurr = pnext;
-         
+
           if (++p == to) {
             p = from;
           }
-
-        } 
+        }
 
         clockwise = (a < 0);
-
       }
 
       //  normalize the orientation
@@ -589,8 +583,7 @@ public:
 
       //  and store the pointer along with two flags: ortho mode and hole flag
       tl_assert (((size_t) pts & 3) == 0);
-      mp_points = (point_type *) ((size_t) pts | (hole ? 2 : 0) | (ortho ? 1 : 0)); 
-
+      mp_points = (point_type *) ((size_t) pts | (hole ? 2 : 0) | (ortho ? 1 : 0));
     }
   }
 
@@ -600,7 +593,7 @@ public:
    *  Moves the contour by the given displacement.
    *  Modifies the polygon with the moved contour.
    *  Moving a contour is a fast operation since no renormalization is required.
-   *  
+   *
    *  @param d The displacement to apply.
    *
    *  @return The moved contour.
@@ -619,7 +612,7 @@ public:
    *
    *  Moves the contour by the given displacement and returns a new object.
    *  Does not modify the contour.
-   *  
+   *
    *  @param d The displacement to apply.
    *
    *  @return The moved contour.
@@ -636,7 +629,7 @@ public:
    *
    *  Transforms the contour with the given transformation.
    *  Modifies the polygon with the transformed contour.
-   *  
+   *
    *  @param t The transformation to apply.
    *  @param compress true, if the sequence shall be compressed (colinear segments joined)
    *  @param remove_reflected true, to remove reflecting spikes if compress is true
@@ -662,7 +655,7 @@ public:
    *
    *  Transforms the contour with the given transformation.
    *  Modifies the polygon with the transformed contour.
-   *  
+   *
    *  @param t The transformation to apply.
    *  @param compress true, if the sequence shall be compressed (colinear segments joined)
    *  @param remove_reflected true, to remove reflecting spikes if compress is true
@@ -671,7 +664,7 @@ public:
    */
   polygon_contour<C> &transform (const trans_type &tr, bool compress = default_compression<C> (), bool remove_reflected = false)
   {
-    if (tr.rot () == trans_type::r0 && !compress) {
+    if (tr.rot () == trans_type::r0 && ! compress) {
       move (tr.disp ());
     } else {
       //  does the transformation the hard way: extract and insert again
@@ -691,7 +684,7 @@ public:
    *
    *  Transforms the contour with the given transformation.
    *  Does not modify the contour but returns the transformed contour.
-   *  
+   *
    *  @param t The transformation to apply.
    *  @param compress true, if the sequence shall be compressed (colinear segments joined)
    *  @param remove_reflected true, to remove reflecting spikes if compress is true
@@ -702,11 +695,11 @@ public:
   polygon_contour<typename Tr::target_coord_type> transformed (const Tr &t, bool compress = default_compression<typename Tr::target_coord_type> (), bool remove_reflected = false) const
   {
     //  construct the transformed polygon
-    typedef polygon_contour_iterator<polygon_contour<C>, db::unit_trans<C> > iter;
+    typedef polygon_contour_iterator<polygon_contour<C>, db::unit_trans<C>> iter;
     return polygon_contour<typename Tr::target_coord_type> (iter (this, 0), iter (this, size ()), t, is_hole (), compress, true, remove_reflected);
   }
 
-  /** 
+  /**
    *  @brief begin iterator for the points of this contour
    */
   simple_iterator begin () const
@@ -714,7 +707,7 @@ public:
     return simple_iterator (this, 0);
   }
 
-  /** 
+  /**
    *  @brief end iterator for the points of this contour
    */
   simple_iterator end () const
@@ -722,7 +715,7 @@ public:
     return simple_iterator (this, size ());
   }
 
-  /** 
+  /**
    *  @brief returns true if the contour is a rectilinear (manhattan) contour
    */
   bool is_rectilinear () const
@@ -743,7 +736,7 @@ public:
     }
     return true;
   }
-  
+
   /**
    *  @brief returns true if the contour is a half-manhattan contour (multiples of 45 degree)
    */
@@ -776,11 +769,11 @@ public:
   {
     return ((size_t) mp_points & 2) != 0;
   }
-  
-  /** 
+
+  /**
    *  @brief The area of the contour
    */
-  area_type area () const 
+  area_type area () const
   {
     return area2 () / 2;
   }
@@ -852,11 +845,9 @@ public:
       } else {
 
         a += db::vprod (pp - point_type (), pl - point_type ());
-
       }
 
       pl = pp;
-
     }
     return a;
   }
@@ -864,7 +855,7 @@ public:
   /**
    *  @brief The perimeter of the contour
    */
-  perimeter_type perimeter () const 
+  perimeter_type perimeter () const
   {
     size_type n = size ();
     if (n < 2) {
@@ -910,7 +901,7 @@ public:
    *  @brief Sizing
    *
    *  Shifts the contour outwards (dx,dy>0) or inwards (dx,dy<0).
-   *  May create invalid (self-overlapping, reverse oriented) contours. 
+   *  May create invalid (self-overlapping, reverse oriented) contours.
    *  The sign of dx and dy should be identical.
    *
    *  The mode defines at which bending angle cutoff occurs
@@ -928,7 +919,7 @@ public:
    *
    *  The time for the size operation is guaranteed to be constant.
    */
-  size_type size () const 
+  size_type size () const
   {
     if ((size_t) mp_points & 1) {
       return m_size * 2;
@@ -942,7 +933,7 @@ public:
    *
    *  The bounding box is computed on-the-fly and is not stored.
    *  Computing the bbox is not a cheap operation.
-   *  It is somewhat simplified in the manhattan case since it 
+   *  It is somewhat simplified in the manhattan case since it
    *  can be computed from the reduced point set.
    */
   box_type bbox () const
@@ -955,7 +946,7 @@ public:
     return box;
   }
 
-  /** 
+  /**
    *  @brief Clear the contour
    */
   void clear ()
@@ -979,7 +970,8 @@ public:
       if (*p1 != *p2) {
         return false;
       }
-      ++p1; ++p2;
+      ++p1;
+      ++p2;
     }
     return true;
   }
@@ -989,7 +981,7 @@ public:
    */
   bool operator!= (const polygon_contour<C> &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
@@ -1008,7 +1000,8 @@ public:
       if (*p1 != *p2) {
         return *p1 < *p2;
       }
-      ++p1; ++p2;
+      ++p1;
+      ++p2;
     }
     return false;
   }
@@ -1029,7 +1022,8 @@ public:
       if (! (*p1).equal (*p2)) {
         return false;
       }
-      ++p1; ++p2;
+      ++p1;
+      ++p2;
     }
     return true;
   }
@@ -1058,7 +1052,8 @@ public:
       if (! (*p1).equal (*p2)) {
         return (*p1).less (*p2);
       }
-      ++p1; ++p2;
+      ++p1;
+      ++p2;
     }
     return false;
   }
@@ -1122,7 +1117,7 @@ namespace db
  *  The point iterator delivers all points of a contour.
  *  It is based on the random access operator of the contour
  */
- 
+
 template <class Contour, class Tr>
 class polygon_contour_iterator
 {
@@ -1131,40 +1126,40 @@ public:
   typedef typename contour_type::value_type point_type;
   typedef typename contour_type::value_type value_type;
   typedef void pointer;
-  typedef value_type reference; 
+  typedef value_type reference;
   typedef typename point_type::coord_type coord_type;
   typedef std::bidirectional_iterator_tag iterator_category;
   typedef Tr trans_type;
   typedef ptrdiff_t difference_type;
 
-  /** 
-   *  @brief The default constructor 
+  /**
+   *  @brief The default constructor
    */
   polygon_contour_iterator ()
     : mp_contour (0), m_index (0), m_reverse (false)
   {
-    //  .. nothing yet .. 
+    //  .. nothing yet ..
   }
-  
-  /** 
-   *  @brief The standard constructor 
+
+  /**
+   *  @brief The standard constructor
    */
   polygon_contour_iterator (const Contour *contour, size_t n, bool reverse = false)
     : mp_contour (contour), m_index (n), m_reverse (reverse)
   {
-    //  .. nothing yet .. 
+    //  .. nothing yet ..
   }
-  
-  /** 
+
+  /**
    *  @brief The standard constructor with a transformation
    */
-  template <class T> 
-  polygon_contour_iterator (const polygon_contour_iterator<Contour, T> &d, const trans_type &trans, bool reverse = false) 
+  template <class T>
+  polygon_contour_iterator (const polygon_contour_iterator<Contour, T> &d, const trans_type &trans, bool reverse = false)
     : mp_contour (d.mp_contour), m_index (d.m_index), m_trans (trans), m_reverse (reverse)
   {
-    //  .. nothing yet .. 
+    //  .. nothing yet ..
   }
-  
+
   /**
    *  @brief Sorting order
    */
@@ -1192,7 +1187,7 @@ public:
   /**
    *  @brief Point access
    */
-  point_type operator* () const 
+  point_type operator* () const
   {
     return m_trans ((*mp_contour) [m_index]);
   }
@@ -1212,7 +1207,7 @@ public:
   /**
    *  @brief Addition of distances
    */
-  polygon_contour_iterator &operator+= (difference_type d) 
+  polygon_contour_iterator &operator+= (difference_type d)
   {
     if (m_reverse) {
       m_index -= d;
@@ -1233,7 +1228,7 @@ public:
   /**
    *  @brief Subtraction of distances
    */
-  polygon_contour_iterator &operator-= (difference_type d) 
+  polygon_contour_iterator &operator-= (difference_type d)
   {
     return operator+= (-d);
   }
@@ -1253,7 +1248,7 @@ public:
   /**
    *  @brief Increment operator
    */
-  polygon_contour_iterator &operator++ () 
+  polygon_contour_iterator &operator++ ()
   {
     return operator+= (1);
   }
@@ -1261,7 +1256,7 @@ public:
   /**
    *  @brief Postfix increment operator
    */
-  polygon_contour_iterator operator++ (int) 
+  polygon_contour_iterator operator++ (int)
   {
     polygon_contour_iterator i (*this);
     operator+= (1);
@@ -1271,7 +1266,7 @@ public:
   /**
    *  @brief Decrement operator
    */
-  polygon_contour_iterator &operator-- () 
+  polygon_contour_iterator &operator-- ()
   {
     return operator-= (1);
   }
@@ -1279,7 +1274,7 @@ public:
   /**
    *  @brief Postfix decrement operator
    */
-  polygon_contour_iterator operator-- (int) 
+  polygon_contour_iterator operator-- (int)
   {
     polygon_contour_iterator i (*this);
     operator-= (1);
@@ -1298,10 +1293,10 @@ private:
 /**
  *  @brief The polygon edge iterator
  *
- *  The edge iterator delivers all edges of the polygon with a 
+ *  The edge iterator delivers all edges of the polygon with a
  *  distinct orientation (inside is 'right', outside is 'left).
  */
- 
+
 template <class P, class Tr>
 class polygon_edge_iterator
 {
@@ -1313,22 +1308,22 @@ public:
   typedef edge_type value_type;
   typedef db::point<coord_type> point_type;
   typedef Tr trans_type;
-  typedef void pointer;           //  no operator->
-  typedef edge_type reference;    //  operator* returns a value
+  typedef void pointer;        //  no operator->
+  typedef edge_type reference; //  operator* returns a value
   typedef std::bidirectional_iterator_tag iterator_category;
   typedef void difference_type;
 
-  /** 
-   *  @brief The default constructor 
+  /**
+   *  @brief The default constructor
    */
   polygon_edge_iterator ()
     : mp_polygon (0), m_ctr (0), m_num_ctr (0), m_pt (0), m_trans ()
   {
-    //  .. nothing yet .. 
+    //  .. nothing yet ..
   }
-  
-  /** 
-   *  @brief The standard constructor 
+
+  /**
+   *  @brief The standard constructor
    */
   polygon_edge_iterator (const polygon_type &polygon)
     : mp_polygon (&polygon), m_ctr (0), m_num_ctr (polygon.holes () + 1), m_pt (0), m_trans ()
@@ -1338,11 +1333,11 @@ public:
       m_num_ctr = 0;
     }
   }
-  
-  /** 
+
+  /**
    *  @brief The standard constructor with a transformation
    */
-  polygon_edge_iterator (const polygon_type &polygon, const trans_type &trans) 
+  polygon_edge_iterator (const polygon_type &polygon, const trans_type &trans)
     : mp_polygon (&polygon), m_ctr (0), m_num_ctr (polygon.holes () + 1), m_pt (0), m_trans (trans)
   {
     //  A polygon may be "empty": then it does not even have a hull ..
@@ -1350,8 +1345,8 @@ public:
       m_num_ctr = 0;
     }
   }
-  
-  /** 
+
+  /**
    *  @brief The standard constructor for one specific contour
    */
   polygon_edge_iterator (const polygon_type &polygon, unsigned int ctr)
@@ -1362,11 +1357,11 @@ public:
       ++m_ctr;
     }
   }
-  
-  /** 
+
+  /**
    *  @brief The standard constructor for one specific contour with a transformation
    */
-  polygon_edge_iterator (const polygon_type &polygon, unsigned int ctr, const trans_type &trans) 
+  polygon_edge_iterator (const polygon_type &polygon, unsigned int ctr, const trans_type &trans)
     : mp_polygon (&polygon), m_ctr (ctr), m_num_ctr (std::min (polygon.holes (), ctr) + 1), m_pt (0), m_trans (trans)
   {
     //  The contour may be "empty"
@@ -1374,7 +1369,7 @@ public:
       ++m_ctr;
     }
   }
-  
+
   /**
    *  @brief at_end predicate
    */
@@ -1394,10 +1389,10 @@ public:
   /**
    *  @brief Edge access
    */
-  edge_type operator* () const 
+  edge_type operator* () const
   {
     const contour_type *c = get_ctr ();
-    
+
     point_type p1 (m_trans ((*c) [m_pt]));
     point_type p2 (m_trans ((*c) [m_pt + 1 >= c->size () ? 0 : m_pt + 1]));
 
@@ -1413,13 +1408,13 @@ public:
   /**
    *  @brief Increment operator
    */
-  polygon_edge_iterator &operator++ () 
+  polygon_edge_iterator &operator++ ()
   {
     const contour_type *c = get_ctr ();
     if (++m_pt == c->size ()) {
       m_pt = 0;
       //  polygons may contain empty contours (holes): skip those
-      do { 
+      do {
         ++m_ctr;
       } while (! at_end () && get_ctr ()->size () == 0);
     }
@@ -1429,7 +1424,7 @@ public:
   /**
    *  @brief Decrement operator
    */
-  polygon_edge_iterator &operator-- () 
+  polygon_edge_iterator &operator-- ()
   {
     if (m_pt == 0) {
       //  polygons may contain empty contours (holes): skip those
@@ -1456,12 +1451,12 @@ private:
   }
 };
 
-/** 
+/**
  *  @brief A polygon class
  *
  *  A polygon consists of an outer hull and zero to many
  *  holes. Each contour consists of several points. The point
- *  list is normalized such that the leftmost, lowest point is 
+ *  list is normalized such that the leftmost, lowest point is
  *  the first one. The orientation is normalized such that
  *  the orientation of the hull contour is clockwise, while
  *  the orientation of the holes is counterclockwise.
@@ -1482,19 +1477,19 @@ public:
   typedef db::vector<coord_type> vector_type;
   typedef db::box<coord_type> box_type;
   typedef db::coord_traits<coord_type> coord_traits;
-  typedef typename coord_traits::distance_type distance_type; 
-  typedef typename coord_traits::perimeter_type perimeter_type; 
-  typedef typename coord_traits::area_type area_type; 
+  typedef typename coord_traits::distance_type distance_type;
+  typedef typename coord_traits::perimeter_type perimeter_type;
+  typedef typename coord_traits::area_type area_type;
   typedef polygon_contour<C> contour_type;
   typedef tl::vector<contour_type> contour_list_type;
-  typedef db::polygon_edge_iterator< polygon<C>, db::unit_trans<C> > polygon_edge_iterator;
-  typedef db::polygon_contour_iterator< contour_type, db::unit_trans<C> > polygon_contour_iterator;
-  typedef db::object_tag< polygon<C> > tag;
+  typedef db::polygon_edge_iterator<polygon<C>, db::unit_trans<C>> polygon_edge_iterator;
+  typedef db::polygon_contour_iterator<contour_type, db::unit_trans<C>> polygon_contour_iterator;
+  typedef db::object_tag<polygon<C>> tag;
 
 
   /**
    *  @brief The default constructor.
-   *  
+   *
    *  The default constructor creates a empty polygon.
    */
   polygon ()
@@ -1549,7 +1544,7 @@ public:
 
   /**
    *  @brief The box constructor.
-   *  
+   *
    *  Creates a polygon from a box
    */
   explicit polygon (const db::box<C> &b)
@@ -1557,11 +1552,11 @@ public:
     //  create an entry for the hull contour
     m_ctrs.push_back (contour_type ());
 
-    point_type p[4];
-    p[0] = point_type (b.left (), b.bottom ());
-    p[1] = point_type (b.left (), b.top ());
-    p[2] = point_type (b.right (), b.top ());
-    p[3] = point_type (b.right (), b.bottom ());
+    point_type p [4];
+    p [0] = point_type (b.left (), b.bottom ());
+    p [1] = point_type (b.left (), b.top ());
+    p [2] = point_type (b.right (), b.top ());
+    p [3] = point_type (b.right (), b.bottom ());
     m_ctrs.back ().assign (p, p + 4, false, false /*don't compress*/);
     m_bbox = b;
   }
@@ -1604,8 +1599,8 @@ public:
 
     //  since the list of holes is maintained sorted, we can just
     //  compare by comparing the holes contours (all must be equal)
-    typename contour_list_type::const_iterator hh = b.m_ctrs.begin (); 
-    typename contour_list_type::const_iterator h = m_ctrs.begin (); 
+    typename contour_list_type::const_iterator hh = b.m_ctrs.begin ();
+    typename contour_list_type::const_iterator h = m_ctrs.begin ();
     while (h != m_ctrs.end ()) {
       if (*h < *hh) {
         return true;
@@ -1619,7 +1614,7 @@ public:
     return false;
   }
 
-  /** 
+  /**
    *  @brief Equality test
    */
   bool operator== (const polygon<C> &b) const
@@ -1628,8 +1623,8 @@ public:
 
       //  since the list of holes is maintained sorted, we can just
       //  compare by comparing the holes contours (all must be equal)
-      typename contour_list_type::const_iterator hh = b.m_ctrs.begin (); 
-      typename contour_list_type::const_iterator h = m_ctrs.begin (); 
+      typename contour_list_type::const_iterator hh = b.m_ctrs.begin ();
+      typename contour_list_type::const_iterator h = m_ctrs.begin ();
       while (h != m_ctrs.end ()) {
         if (*h != *hh) {
           return false;
@@ -1645,12 +1640,12 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Inequality test
    */
   bool operator!= (const polygon<C> &b) const
   {
-    return !operator== (b);
+    return ! operator== (b);
   }
 
   /**
@@ -1719,7 +1714,7 @@ public:
    */
   bool not_equal (const polygon<C> &b) const
   {
-    return !equal (b);
+    return ! equal (b);
   }
 
   /**
@@ -1777,7 +1772,7 @@ public:
    */
   bool is_empty () const
   {
-    return m_ctrs.size () == size_t (1) && m_ctrs[0].size () == 0;
+    return m_ctrs.size () == size_t (1) && m_ctrs [0].size () == 0;
   }
 
   /**
@@ -1838,7 +1833,7 @@ public:
    */
   polygon_contour_iterator begin_hull () const
   {
-    return polygon_contour_iterator (& hull (), 0);
+    return polygon_contour_iterator (&hull (), 0);
   }
 
   /**
@@ -1849,7 +1844,7 @@ public:
    */
   polygon_contour_iterator end_hull () const
   {
-    return polygon_contour_iterator (& hull (), hull ().size ());
+    return polygon_contour_iterator (&hull (), hull ().size ());
   }
 
   /**
@@ -1860,7 +1855,7 @@ public:
    */
   polygon_contour_iterator begin_hole (unsigned int h) const
   {
-    return polygon_contour_iterator (& begin_holes () [h], 0);
+    return polygon_contour_iterator (&begin_holes () [h], 0);
   }
 
   /**
@@ -1871,7 +1866,7 @@ public:
    */
   polygon_contour_iterator end_hole (unsigned int h) const
   {
-    return polygon_contour_iterator (& begin_holes () [h], begin_holes () [h].size ());
+    return polygon_contour_iterator (&begin_holes () [h], begin_holes () [h].size ());
   }
 
   /**
@@ -1897,7 +1892,7 @@ public:
    *
    *  Transforms the polygon with the given transformation.
    *  Modifies the polygon with the transformed polygon.
-   *  
+   *
    *  @param t The transformation to apply.
    *  @param compress true, if the sequence shall be compressed (colinear segments joined)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
@@ -1930,7 +1925,7 @@ public:
    *
    *  Transforms the polygon with the given transformation.
    *  Does not modify the polygon but returns the transformed polygon.
-   *  
+   *
    *  @param t The transformation to apply.
    *  @param compress true, if the sequence shall be compressed (colinear segments joined)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
@@ -1981,11 +1976,11 @@ public:
   /**
    *  @brief Returns the moved polyon
    *
-   *  Moves the polygon by the given offset and returns the 
+   *  Moves the polygon by the given offset and returns the
    *  moved polygon. The polygon is not modified.
    *
    *  @param p The distance to move the polygon.
-   * 
+   *
    *  @return The moved polygon.
    */
   polygon<C> moved (const vector<C> &p) const
@@ -1998,11 +1993,11 @@ public:
   /**
    *  @brief Moves the polygon.
    *
-   *  Moves the polygon by the given offset and returns the 
+   *  Moves the polygon by the given offset and returns the
    *  moved polygon. The polygon is overwritten.
    *
    *  @param p The distance to move the polygon.
-   * 
+   *
    *  @return The moved polygon.
    */
   polygon<C> &move (const vector<C> &d)
@@ -2028,7 +2023,7 @@ public:
    *
    *  @param n The number of holes to reserve memory for
    */
-  void clear (unsigned int n = 0) 
+  void clear (unsigned int n = 0)
   {
     m_bbox = db::box<C> ();
     m_ctrs.clear ();
@@ -2041,12 +2036,12 @@ public:
    *
    *  @param n The number of holes to reserve memory for
    */
-  void reserve_holes (unsigned int n) 
+  void reserve_holes (unsigned int n)
   {
     m_ctrs.reserve (n + 1);
   }
 
-  /** 
+  /**
    *  @brief Assign the contour from another contour
    *
    *  Replaces the outer contour by the given other contour
@@ -2061,7 +2056,7 @@ public:
     m_bbox = m_ctrs [0].bbox ();
   }
 
-  /** 
+  /**
    *  @brief Set the outer contour
    *
    *  Replaces the outer contour by the points given by
@@ -2075,19 +2070,19 @@ public:
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
    *  @param normalize If true, the orientation is normalized
    */
-  template <class I> 
+  template <class I>
   void assign_hull (I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
     m_ctrs [0].assign (start, end, false, compress, normalize, remove_reflected);
     m_bbox = m_ctrs [0].bbox ();
   }
 
-  /** 
+  /**
    *  @brief Set the outer contour by a transformed set of points
    *
    *  Replaces the outer contour by the points given by
-   *  the sequence [start,end), transformed with the operator op. 
-   *  This method will update the bounding box and normalize the hull, 
+   *  the sequence [start,end), transformed with the operator op.
+   *  This method will update the bounding box and normalize the hull,
    *  so it is oriented properly.
    *  @param compress true, if the sequence shall be compressed (colinear points removed)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
@@ -2096,14 +2091,14 @@ public:
    *  @param start The start of the sequence of points for the contour
    *  @param end The end of the sequence of points for the contour
    */
-  template <class I, class T> 
+  template <class I, class T>
   void assign_hull (I start, I end, T op, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
     m_ctrs [0].assign (start, end, op, false, compress, normalize, remove_reflected);
     m_bbox = m_ctrs [0].bbox ();
   }
 
-  /** 
+  /**
    *  @brief Assigns a hole from another contour
    *
    *  Replaced a hole with a copy of the given contour.
@@ -2118,7 +2113,7 @@ public:
     m_ctrs [h + 1] = other;
   }
 
-  /** 
+  /**
    *  @brief Set a hole contour
    *
    *  Replaces a hole contour by the points given by
@@ -2133,18 +2128,18 @@ public:
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
    *  @param normalize If true, the orientation is normalized
    */
-  template <class I> 
+  template <class I>
   void assign_hole (unsigned int h, I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
     m_ctrs [h + 1].assign (start, end, true, compress, normalize, remove_reflected);
   }
 
-  /** 
+  /**
    *  @brief Set a hole by a transformed set of points
    *
    *  Replaces a hole contour by the points given by
-   *  the sequence [start,end), transformed with the operator op. 
-   *  This method will update the bounding box and normalize the contour, 
+   *  the sequence [start,end), transformed with the operator op.
+   *  This method will update the bounding box and normalize the contour,
    *  so it is oriented properly.
    *  @param compress true, if the sequence shall be compressed (colinear points removed)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
@@ -2153,13 +2148,13 @@ public:
    *  @param start The start of the sequence of points for the contour
    *  @param end The end of the sequence of points for the contour
    */
-  template <class I, class T> 
+  template <class I, class T>
   void assign_hole (unsigned int h, I start, I end, T op, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
     m_ctrs [h + 1].assign (start, end, op, true, compress, normalize, remove_reflected);
   }
 
-  /** 
+  /**
    *  @brief Add a hole from another contour
    *
    *  Add a contour hole as a copy of the given contour.
@@ -2174,7 +2169,7 @@ public:
     h = other;
   }
 
-  /** 
+  /**
    *  @brief Add a hole
    *
    *  Adds a hole contour with the points given by
@@ -2190,18 +2185,18 @@ public:
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
    *  @param normalize If true, the orientation is normalized
    */
-  template <class I> 
+  template <class I>
   void insert_hole (I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
     insert_hole (start, end, db::unit_trans<C> (), compress, remove_reflected, normalize);
   }
 
-  /** 
+  /**
    *  @brief Add a hole of transformed points
    *
    *  Adds a hole contour with the points given by
-   *  the sequence [start,end), transformed with the given 
-   *  function. This method will update the bounding box and 
+   *  the sequence [start,end), transformed with the given
+   *  function. This method will update the bounding box and
    *  normalize the hull, so it is oriented properly.
    *  It is not checked, whether the hole really is inside
    *  the hull.
@@ -2212,7 +2207,7 @@ public:
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
    *  @param normalize If true, the orientation is normalized
    */
-  template <class I, class T> 
+  template <class I, class T>
   void insert_hole (I start, I end, T op, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
     //  add the hole
@@ -2259,7 +2254,7 @@ public:
   /**
    *  @brief Hole iterator: start
    */
-  typename contour_list_type::const_iterator begin_holes () const 
+  typename contour_list_type::const_iterator begin_holes () const
   {
     return m_ctrs.begin () + 1;
   }
@@ -2267,24 +2262,24 @@ public:
   /**
    *  @brief Hole iterator: end
    */
-  typename contour_list_type::const_iterator end_holes () const 
+  typename contour_list_type::const_iterator end_holes () const
   {
     return m_ctrs.end ();
   }
 
-  /** 
+  /**
    *  @brief The edge iterator begin function
    *
    *  The edge iterator delivers all edges of the polygon.
    *
    *  @return the begin value of the iterator
    */
-  polygon_edge_iterator begin_edge () const 
-  { 
+  polygon_edge_iterator begin_edge () const
+  {
     return polygon_edge_iterator (*this);
   }
-  
-  /** 
+
+  /**
    *  @brief The edge iterator begin function for a specific contour
    *
    *  The edge iterator delivers all edges of the polygon for the given contour.
@@ -2292,12 +2287,12 @@ public:
    *
    *  @return the begin value of the iterator
    */
-  polygon_edge_iterator begin_edge (unsigned int ctr) const 
-  { 
+  polygon_edge_iterator begin_edge (unsigned int ctr) const
+  {
     return polygon_edge_iterator (*this, ctr);
   }
-  
-  /** 
+
+  /**
    *  @brief The area of the polygon
    */
   area_type area () const
@@ -2356,7 +2351,7 @@ public:
   /**
    *  @brief The perimeter of the polygon
    */
-  perimeter_type perimeter () const 
+  perimeter_type perimeter () const
   {
     perimeter_type p = 0;
     for (typename contour_list_type::const_iterator h = m_ctrs.begin (); h != m_ctrs.end (); ++h) {
@@ -2397,7 +2392,7 @@ public:
 
   /**
    *  @brief Swap the polygon with another one
-   * 
+   *
    *  The global std::swap function injected into the std namespace
    *  is redirected to this implementation.
    */
@@ -2481,7 +2476,7 @@ public:
    *  may grow larger than the hull (in which case the bbox is not correct because it is computed
    *  from the hull only) and contours do not vanish if shrinked below their own size but are reversed.
    *  This method is intended to be used in simple cases or as preparation step for a full-blown sizing
-   *  algorithm using a merge step. 
+   *  algorithm using a merge step.
    *  The sign of dx and dy should be identical.
    *
    *  The mode defines at which bending angle cutoff occurs
@@ -2541,33 +2536,31 @@ private:
   {
     if (m_ctrs.size () == m_ctrs.capacity ()) {
 
-      //  if the capacity is less than expected, create 
+      //  if the capacity is less than expected, create
       //  a new vector with twice as much elements and swap the elements
       contour_list_type new_holes;
       new_holes.reserve (m_ctrs.size () * 2);
       for (typename contour_list_type::iterator h = m_ctrs.begin (); h != m_ctrs.end (); ++h) {
         new_holes.push_back (contour_type ());
-        h->swap (new_holes.back ()); 
+        h->swap (new_holes.back ());
       }
-       
+
       //  swap the old and new holes list
       m_ctrs.swap (new_holes);
-
-    } 
+    }
 
     //  add a new hole contour and return a reference to it
     m_ctrs.push_back (contour_type ());
     return m_ctrs.back ();
   }
-
 };
 
-/** 
+/**
  *  @brief A simple polygon class
  *
  *  A simple polygon consists of an outer hull only.
  *  The contour consists of several points. The point
- *  list is normalized such that the leftmost, lowest point is 
+ *  list is normalized such that the leftmost, lowest point is
  *  the first one. The orientation is normalized such that
  *  the orientation of the hull contour is clockwise.
  *
@@ -2587,18 +2580,18 @@ public:
   typedef db::vector<coord_type> vector_type;
   typedef db::box<coord_type> box_type;
   typedef db::coord_traits<coord_type> coord_traits;
-  typedef typename coord_traits::distance_type distance_type; 
-  typedef typename coord_traits::perimeter_type perimeter_type; 
-  typedef typename coord_traits::area_type area_type; 
+  typedef typename coord_traits::distance_type distance_type;
+  typedef typename coord_traits::perimeter_type perimeter_type;
+  typedef typename coord_traits::area_type area_type;
   typedef polygon_contour<C> contour_type;
   typedef tl::vector<contour_type> contour_list_type;
-  typedef db::polygon_edge_iterator< simple_polygon<C>, db::unit_trans<C> > polygon_edge_iterator;
-  typedef db::polygon_contour_iterator< contour_type, db::unit_trans<C> > polygon_contour_iterator;
-  typedef db::object_tag< simple_polygon<C> > tag;
+  typedef db::polygon_edge_iterator<simple_polygon<C>, db::unit_trans<C>> polygon_edge_iterator;
+  typedef db::polygon_contour_iterator<contour_type, db::unit_trans<C>> polygon_contour_iterator;
+  typedef db::object_tag<simple_polygon<C>> tag;
 
   /**
    *  @brief The default constructor.
-   *  
+   *
    *  The default constructor creates a empty polygon.
    */
   simple_polygon ()
@@ -2608,24 +2601,24 @@ public:
 
   /**
    *  @brief The box constructor.
-   *  
+   *
    *  Creates a polygon from a box
    */
   explicit simple_polygon (const db::box<C> &b)
   {
     //  fill the contour
-    point_type p[4];
-    p[0] = point_type (b.left (), b.bottom ());
-    p[1] = point_type (b.left (), b.top ());
-    p[2] = point_type (b.right (), b.top ());
-    p[3] = point_type (b.right (), b.bottom ());
+    point_type p [4];
+    p [0] = point_type (b.left (), b.bottom ());
+    p [1] = point_type (b.left (), b.top ());
+    p [2] = point_type (b.right (), b.top ());
+    p [3] = point_type (b.right (), b.bottom ());
     m_hull.assign (p, p + 4, false, false /*don't compress*/);
     m_bbox = b;
   }
 
   /**
    *  @brief The constructor from a polygon
-   *  
+   *
    *  Creates a simple polygon from a polygon
    *  TODO: currently there is no treatment of holes!
    */
@@ -2720,7 +2713,7 @@ public:
     return m_hull < b.m_hull;
   }
 
-  /** 
+  /**
    *  @brief Equality test
    */
   bool operator== (const simple_polygon<C> &b) const
@@ -2728,12 +2721,12 @@ public:
     return m_hull == b.m_hull;
   }
 
-  /** 
+  /**
    *  @brief Inequality test
    */
   bool operator!= (const simple_polygon<C> &b) const
   {
-    return !operator== (b);
+    return ! operator== (b);
   }
 
   /**
@@ -2774,7 +2767,7 @@ public:
    */
   polygon_contour_iterator begin_hull () const
   {
-    return polygon_contour_iterator (& hull (), 0);
+    return polygon_contour_iterator (&hull (), 0);
   }
 
   /**
@@ -2785,7 +2778,7 @@ public:
    */
   polygon_contour_iterator end_hull () const
   {
-    return polygon_contour_iterator (& hull (), hull ().size ());
+    return polygon_contour_iterator (&hull (), hull ().size ());
   }
 
   /**
@@ -2796,7 +2789,7 @@ public:
    */
   polygon_contour_iterator begin_hole (unsigned int h) const
   {
-    return polygon_contour_iterator (& begin_holes () [h], 0);
+    return polygon_contour_iterator (&begin_holes () [h], 0);
   }
 
   /**
@@ -2807,7 +2800,7 @@ public:
    */
   polygon_contour_iterator end_hole (unsigned int h) const
   {
-    return polygon_contour_iterator (& begin_holes () [h], begin_holes () [h].size ());
+    return polygon_contour_iterator (&begin_holes () [h], begin_holes () [h].size ());
   }
 
   /**
@@ -2820,7 +2813,7 @@ public:
    */
   simple_polygon<C> &compress (bool remove_reflected = false)
   {
-    //  compress the polygon by employing the transform method 
+    //  compress the polygon by employing the transform method
     m_hull.transform (db::unit_trans<C> (), true, remove_reflected);
     m_bbox = m_hull.bbox ();
     return *this;
@@ -2831,7 +2824,7 @@ public:
    *
    *  Transforms the polygon with the given transformation.
    *  Modifies the polygon with the transformed polygon.
-   *  
+   *
    *  @param t The transformation to apply.
    *  @param compress true, if the sequence shall be compressed (colinear segments joined)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
@@ -2858,7 +2851,7 @@ public:
    *
    *  Transforms the polygon with the given transformation.
    *  Does not modify the polygon but returns the transformed polygon.
-   *  
+   *
    *  @param t The transformation to apply.
    *  @param compress true, if the sequence shall be compressed (colinear segments joined)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
@@ -2906,11 +2899,11 @@ public:
   /**
    *  @brief Returns the moved polyon
    *
-   *  Moves the polygon by the given offset and returns the 
+   *  Moves the polygon by the given offset and returns the
    *  moved polygon. The polygon is not modified.
    *
    *  @param p The distance to move the polygon.
-   * 
+   *
    *  @return The moved polygon.
    */
   simple_polygon<C> moved (const vector<C> &p) const
@@ -2923,11 +2916,11 @@ public:
   /**
    *  @brief Moves the polygon.
    *
-   *  Moves the polygon by the given offset and returns the 
+   *  Moves the polygon by the given offset and returns the
    *  moved polygon. The polygon is overwritten.
    *
    *  @param p The distance to move the polygon.
-   * 
+   *
    *  @return The moved polygon.
    */
   simple_polygon<C> &move (const vector<C> &d)
@@ -2948,13 +2941,13 @@ public:
   /**
    *  @brief Clears the polygon
    */
-  void clear (unsigned int /*n*/ = 0) 
+  void clear (unsigned int /*n*/ = 0)
   {
     m_bbox = db::box<C> ();
     m_hull.clear ();
   }
 
-  /** 
+  /**
    *  @brief Set the outer contour from another contour
    *
    *  Replaces the outer contour by the given other contour
@@ -2969,7 +2962,7 @@ public:
     m_bbox = m_hull.bbox ();
   }
 
-  /** 
+  /**
    *  @brief Set the outer contour
    *
    *  Replaces the outer contour by the points given by
@@ -2982,19 +2975,19 @@ public:
    *  @param compress true, if the sequence shall be compressed (colinear segments joined)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
    */
-  template <class I> 
-  void assign_hull (I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false) 
+  template <class I>
+  void assign_hull (I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false)
   {
     m_hull.assign (start, end, false, compress, true /*normalize*/, remove_reflected);
     m_bbox = m_hull.bbox ();
   }
 
-  /** 
+  /**
    *  @brief Set the outer contour by a transformed set of points
    *
    *  Replaces the outer contour by the points given by
-   *  the sequence [start,end), transformed with the operator op. 
-   *  This method will update the bounding box and normalize the hull, 
+   *  the sequence [start,end), transformed with the operator op.
+   *  This method will update the bounding box and normalize the hull,
    *  so it is oriented properly.
    *
    *  @param start The start of the sequence of points for the contour
@@ -3003,7 +2996,7 @@ public:
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
    *  @param normalize If true, the orientation is normalized
    */
-  template <class I, class T> 
+  template <class I, class T>
   void assign_hull (I start, I end, T op, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
     m_hull.assign (start, end, op, false, compress, normalize, remove_reflected);
@@ -3067,7 +3060,7 @@ public:
    *  This method is provided for compatibility with the standard polygon but does
    *  always return the begin iterator of an empty list.
    */
-  typename contour_list_type::const_iterator begin_holes () const 
+  typename contour_list_type::const_iterator begin_holes () const
   {
     //  we exploit here the fact that the iterator of an empty vector is always 0
     contour_list_type ctrs;
@@ -3080,31 +3073,31 @@ public:
    *  This method is provided for compatibility with the standard polygon but does
    *  always return the end iterator of an empty list.
    */
-  typename contour_list_type::const_iterator end_holes () const 
+  typename contour_list_type::const_iterator end_holes () const
   {
     //  we exploit here the fact that the iterator of an empty vector is always 0
     contour_list_type ctrs;
     return ctrs.end ();
   }
 
-  /** 
+  /**
    *  @brief A dummy implementation of "insert_hole" provided for template instantiation
    *
    *  Asserts, if begin called.
    */
-  template <class I> 
-  void insert_hole (I, I, bool /*compress*/ = default_compression<C> ()) 
+  template <class I>
+  void insert_hole (I, I, bool /*compress*/ = default_compression<C> ())
   {
     tl_assert (false);
   }
 
-  /** 
+  /**
    *  @brief A dummy implementation of "insert_hole" provided for template instantiation
    *
    *  Asserts, if begin called.
    */
-  template <class I, class T> 
-  void insert_hole (I, I, const T &, bool /*compress*/ = default_compression<C> ()) 
+  template <class I, class T>
+  void insert_hole (I, I, const T &, bool /*compress*/ = default_compression<C> ())
   {
     tl_assert (false);
   }
@@ -3130,22 +3123,22 @@ public:
     return hull (); // to please the compiler
   }
 
-  /** 
+  /**
    *  @brief The edge iterator begin function
    *
    *  The edge iterator delivers all edges of the polygon.
    *
    *  @return the begin value of the iterator
    */
-  polygon_edge_iterator begin_edge () const 
-  { 
+  polygon_edge_iterator begin_edge () const
+  {
     return polygon_edge_iterator (*this);
   }
-  
-  /** 
+
+  /**
    *  @brief The area of the polygon
    */
-  area_type area () const 
+  area_type area () const
   {
     return m_hull.area ();
   }
@@ -3185,7 +3178,7 @@ public:
   /**
    *  @brief The perimeter of the polygon
    */
-  perimeter_type perimeter () const 
+  perimeter_type perimeter () const
   {
     return m_hull.perimeter ();
   }
@@ -3211,7 +3204,7 @@ public:
 
   /**
    *  @brief Swap the polygon with another one
-   * 
+   *
    *  The global std::swap function injected into the std namespace
    *  is redirected to this implementation.
    */
@@ -3338,7 +3331,7 @@ private:
   db::box<C> m_bbox;
 };
 
-/** 
+/**
  *  @brief A polygon reference
  *
  *  A polygon reference is basically a proxy to a polygon and
@@ -3360,13 +3353,13 @@ public:
   typedef db::polygon_contour_iterator<typename polygon_type::contour_type, trans_type> polygon_contour_iterator;
   typedef db::generic_repository<coord_type> repository_type;
   typedef typename Poly::distance_type distance_type;
-  typedef typename Poly::perimeter_type perimeter_type; 
+  typedef typename Poly::perimeter_type perimeter_type;
   typedef typename Poly::area_type area_type;
-  typedef db::object_tag< polygon_ref<Poly, Trans> > tag;
+  typedef db::object_tag<polygon_ref<Poly, Trans>> tag;
 
   /**
    *  @brief The default constructor.
-   *  
+   *
    *  The default constructor creates a invalid polygon reference
    */
   polygon_ref ()
@@ -3397,7 +3390,7 @@ public:
 
   /**
    *  @brief The translation constructor.
-   *  
+   *
    *  This constructor allows one to copy a polygon reference from one
    *  repository to another
    */
@@ -3408,18 +3401,18 @@ public:
   }
 
   /**
-   *  @brief The edge iterator 
+   *  @brief The edge iterator
    *
    *  The edge iterator delivers all edges of the polygon.
    *
    *  @return the begin value of the iterator
    */
-  polygon_edge_iterator begin_edge () const 
-  { 
+  polygon_edge_iterator begin_edge () const
+  {
     return polygon_edge_iterator (this->obj (), this->trans ());
   }
-  
-  /** 
+
+  /**
    *  @brief The edge iterator for a given contour
    *
    *  The edge iterator delivers all edges of the polygon for the given contour.
@@ -3427,59 +3420,59 @@ public:
    *
    *  @return the begin value of the iterator
    */
-  polygon_edge_iterator begin_edge (unsigned int ctr) const 
-  { 
+  polygon_edge_iterator begin_edge (unsigned int ctr) const
+  {
     return polygon_edge_iterator (this->obj (), ctr, this->trans ());
   }
-  
-  /** 
+
+  /**
    *  @brief The hull iterator begin function
    */
-  polygon_contour_iterator begin_hull () const 
-  { 
+  polygon_contour_iterator begin_hull () const
+  {
     if (this->trans ().is_mirror ()) {
       return polygon_contour_iterator (--(this->obj ().end_hull ()), this->trans (), true);
     } else {
       return polygon_contour_iterator (this->obj ().begin_hull (), this->trans (), false);
     }
   }
-  
-  /** 
+
+  /**
    *  @brief The hull iterator end function
    */
-  polygon_contour_iterator end_hull () const 
-  { 
+  polygon_contour_iterator end_hull () const
+  {
     if (this->trans ().is_mirror ()) {
       return polygon_contour_iterator (--(this->obj ().begin_hull ()), this->trans (), true);
     } else {
       return polygon_contour_iterator (this->obj ().end_hull (), this->trans (), false);
     }
   }
-  
-  /** 
+
+  /**
    *  @brief The hole iterator begin function
    */
-  polygon_contour_iterator begin_hole (unsigned int h) const 
-  { 
+  polygon_contour_iterator begin_hole (unsigned int h) const
+  {
     if (this->trans ().is_mirror ()) {
       return polygon_contour_iterator (--(this->obj ().end_hole (h)), this->trans (), true);
     } else {
       return polygon_contour_iterator (this->obj ().begin_hole (h), this->trans (), false);
     }
   }
-  
-  /** 
+
+  /**
    *  @brief The hull iterator end function
    */
-  polygon_contour_iterator end_hole (unsigned int h) const 
-  { 
+  polygon_contour_iterator end_hole (unsigned int h) const
+  {
     if (this->trans ().is_mirror ()) {
       return polygon_contour_iterator (--(this->obj ().begin_hole (h)), this->trans (), true);
     } else {
       return polygon_contour_iterator (this->obj ().end_hole (h), this->trans (), false);
     }
   }
-  
+
   /**
    *  @brief The area ratio of the polygon
    */
@@ -3491,7 +3484,7 @@ public:
   /**
    *  @brief The area of the polygon
    */
-  area_type area () const 
+  area_type area () const
   {
     return this->obj ().area ();
   }
@@ -3509,7 +3502,7 @@ public:
   /**
    *  @brief The perimeter of the polygon
    */
-  perimeter_type perimeter () const 
+  perimeter_type perimeter () const
   {
     return this->obj ().perimeter ();
   }
@@ -3538,9 +3531,9 @@ public:
     return this->obj ().vertices ();
   }
 
-  /** 
+  /**
    *  @brief Return the transformed object
-   * 
+   *
    *  This version does not change the object and is const.
    */
   template <class TargetTrans>
@@ -3564,7 +3557,7 @@ public:
 /**
  *  @brief Binary * operator (transformation)
  *
- *  Transforms the polygon reference with the given transformation and 
+ *  Transforms the polygon reference with the given transformation and
  *  returns the result.
  *
  *  @param t The transformation to apply
@@ -3581,7 +3574,7 @@ operator* (const TargetTr &t, const polygon_ref<Poly, Tr> &p)
 /**
  *  @brief Binary * operator (transformation)
  *
- *  Transforms the polygon with the given transformation and 
+ *  Transforms the polygon with the given transformation and
  *  returns the result.
  *
  *  @param t The transformation to apply
@@ -3589,7 +3582,7 @@ operator* (const TargetTr &t, const polygon_ref<Poly, Tr> &p)
  *  @return t * p
  */
 template <class Tr>
-inline polygon<typename Tr::target_coord_type> 
+inline polygon<typename Tr::target_coord_type>
 operator* (const Tr &t, const polygon<typename Tr::coord_type> &p)
 {
   return p.transformed (t);
@@ -3598,7 +3591,7 @@ operator* (const Tr &t, const polygon<typename Tr::coord_type> &p)
 /**
  *  @brief Binary * operator (transformation)
  *
- *  Transforms the simple polygon with the given transformation and 
+ *  Transforms the simple polygon with the given transformation and
  *  returns the result.
  *
  *  @param t The transformation to apply
@@ -3606,7 +3599,7 @@ operator* (const Tr &t, const polygon<typename Tr::coord_type> &p)
  *  @return t * p
  */
 template <class Tr>
-inline simple_polygon<typename Tr::target_coord_type> 
+inline simple_polygon<typename Tr::target_coord_type>
 operator* (const Tr &t, const simple_polygon<typename Tr::coord_type> &p)
 {
   return p.transformed (t);
@@ -3643,7 +3636,7 @@ operator* (const simple_polygon<C> &p, double s)
 }
 
 /**
- *  @brief Inside predicate 
+ *  @brief Inside predicate
  *
  *  This template function returns 1, if the point is inside (not on)
  *  the polygon. It returns 0, if the point is on the polygon and -1
@@ -3654,7 +3647,7 @@ operator* (const simple_polygon<C> &p, double s)
  *  @param pt The point to test
  */
 
-template<class Iter, class Point>
+template <class Iter, class Point>
 int inside_poly (Iter edge, const Point &pt)
 {
   int wrapcount_left = 0;
@@ -3662,7 +3655,7 @@ int inside_poly (Iter edge, const Point &pt)
   while (! edge.at_end ()) {
     if ((*edge).p1 ().y () <= pt.y () && (*edge).p2 ().y () > pt.y ()) {
       int side = (*edge).side_of (pt);
-      if (side < 0) { 
+      if (side < 0) {
         ++wrapcount_left;
       } else if (side == 0) {
         //  "on" the line is excluded in the predicate
@@ -3670,7 +3663,7 @@ int inside_poly (Iter edge, const Point &pt)
       }
     } else if ((*edge).p2 ().y () <= pt.y () && (*edge).p1 ().y () > pt.y ()) {
       int side = (*edge).side_of (pt);
-      if (side > 0) { 
+      if (side > 0) {
         --wrapcount_left;
       } else if (side == 0) {
         //  "on" the line is excluded in the predicate
@@ -3808,7 +3801,7 @@ void swap (db::polygon<C> &a, db::polygon<C> &b)
   a.swap (b);
 }
 
-//  injecting a global std::swap for polygons into the 
+//  injecting a global std::swap for polygons into the
 //  std namespace
 template <class C>
 void swap (db::simple_polygon<C> &a, db::simple_polygon<C> &b)
@@ -3818,23 +3811,22 @@ void swap (db::simple_polygon<C> &a, db::simple_polygon<C> &b)
 
 } // namespace std
 
-namespace tl 
+namespace tl
 {
-  /**
-   *  @brief Special extractors for the polygons
-   */
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Polygon &p);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPolygon &p);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::SimplePolygon &p);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DSimplePolygon &p);
+/**
+ *  @brief Special extractors for the polygons
+ */
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Polygon &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPolygon &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::SimplePolygon &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DSimplePolygon &p);
 
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Polygon &p);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DPolygon &p);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::SimplePolygon &p);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DSimplePolygon &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Polygon &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DPolygon &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::SimplePolygon &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DSimplePolygon &p);
 
 } // namespace tl
 
 
 #endif
-

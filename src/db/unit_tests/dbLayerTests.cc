@@ -25,7 +25,7 @@
 #include "tlUnitTest.h"
 
 
-TEST(1) 
+TEST (1)
 {
   db::layer<db::Box, db::stable_layer_tag> bl;
   db::Box b_empty;
@@ -39,7 +39,7 @@ TEST(1)
   EXPECT_EQ (bl.bbox (), b);
 }
 
-TEST(2) 
+TEST (2)
 {
   db::layer<db::Box, db::unstable_layer_tag> bl;
   db::Box b_empty;
@@ -52,4 +52,3 @@ TEST(2)
   bl.update_bbox ();
   EXPECT_EQ (bl.bbox (), b);
 }
-

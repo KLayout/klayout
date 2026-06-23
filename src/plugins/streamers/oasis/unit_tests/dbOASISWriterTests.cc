@@ -82,7 +82,6 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
     if (! equal) {
       _this->raise (tl::sprintf ("Compare failed - see %s vs %s\n", fn, tmp_file));
     }
-
   }
 
   {
@@ -139,7 +138,6 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
     if (! equal) {
       _this->raise (tl::sprintf ("Compare failed - see %s vs %s\n", fn, tmp_file));
     }
-
   }
 
   {
@@ -190,7 +188,6 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
     if (! equal) {
       _this->raise (tl::sprintf ("Compare failed - see %s vs %s\n", fn, tmp_file));
     }
-
   }
 
   {
@@ -241,7 +238,6 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
     if (! equal) {
       _this->raise (tl::sprintf ("Compare failed - see %s vs %s\n", fn, tmp_file));
     }
-
   }
 
   if (scaling_test) {
@@ -313,7 +309,6 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
     if (! equal) {
       _this->raise (tl::sprintf ("Compare failed - see %s vs %s\n", tmp1_file, tmp2_file));
     }
-
   }
 }
 
@@ -330,208 +325,208 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test = true)
   run_test (_this, file, scaling_test, 2, false, true);
 }
 
-TEST(1)
+TEST (1)
 {
   run_test (_this, "t10.1.oas");
 }
 
-TEST(2)
+TEST (2)
 {
   run_test (_this, "t11.1.oas");
 }
 
-TEST(3)
+TEST (3)
 {
   run_test (_this, "t11.2.oas");
 }
 
-TEST(4)
+TEST (4)
 {
   run_test (_this, "t11.3.oas");
 }
 
-TEST(4A)
+TEST (4A)
 {
   run_test (_this, "t11.4.oas");
 }
 
-TEST(5)
+TEST (5)
 {
   run_test (_this, "t1.1.oas");
 }
 
-TEST(6)
+TEST (6)
 {
   run_test (_this, "t12.1.oas");
 }
 
-TEST(7)
+TEST (7)
 {
   run_test (_this, "t1.2.oas");
 }
 
-TEST(8)
+TEST (8)
 {
   run_test (_this, "t13.1.oas");
 }
 
-TEST(9)
+TEST (9)
 {
   run_test (_this, "t13.2.oas");
 }
 
-TEST(10)
+TEST (10)
 {
   run_test (_this, "t13.3.oas");
 }
 
-TEST(11)
+TEST (11)
 {
   run_test (_this, "t1.3.oas");
 }
 
-TEST(12)
+TEST (12)
 {
   run_test (_this, "t14.1.oas");
 }
 
-TEST(13)
+TEST (13)
 {
   run_test (_this, "t1.4.oas");
 }
 
-TEST(14)
+TEST (14)
 {
   run_test (_this, "t1.5.oas");
 }
 
-TEST(15)
+TEST (15)
 {
   run_test (_this, "t2.1.oas");
 }
 
-TEST(16)
+TEST (16)
 {
   run_test (_this, "t2.2.oas");
 }
 
-TEST(17)
+TEST (17)
 {
   run_test (_this, "t2.4.oas");
 }
 
-TEST(19)
+TEST (19)
 {
   run_test (_this, "t3.10.oas");
 }
 
-TEST(20)
+TEST (20)
 {
   run_test (_this, "t3.1.oas");
 }
 
-TEST(21)
+TEST (21)
 {
   run_test (_this, "t3.2.oas");
 }
 
-TEST(22)
+TEST (22)
 {
   run_test (_this, "t3.5.oas");
 }
 
-TEST(23)
+TEST (23)
 {
   run_test (_this, "t3.9.oas");
 }
 
-TEST(24)
+TEST (24)
 {
   run_test (_this, "t4.1.oas");
 }
 
-TEST(25)
+TEST (25)
 {
   run_test (_this, "t4.2.oas");
 }
 
-TEST(26)
+TEST (26)
 {
   run_test (_this, "t5.1.oas");
 }
 
-TEST(27)
+TEST (27)
 {
   //  no scaling test, since this test contains polygons with >8000 points that cannot be written to GDS
   run_test (_this, "t5.2.oas", false);
 }
 
-TEST(28)
+TEST (28)
 {
   run_test (_this, "t5.3.oas");
 }
 
-TEST(29)
+TEST (29)
 {
   run_test (_this, "t6.1.oas");
 }
 
-TEST(30)
+TEST (30)
 {
   run_test (_this, "t7.1.oas");
 }
 
-TEST(31)
+TEST (31)
 {
   run_test (_this, "t8.1.oas");
 }
 
-TEST(32)
+TEST (32)
 {
   run_test (_this, "t8.2.oas");
 }
 
-TEST(33)
+TEST (33)
 {
   run_test (_this, "t8.3.oas");
 }
 
-TEST(34)
+TEST (34)
 {
   run_test (_this, "t8.4.oas");
 }
 
-TEST(35)
+TEST (35)
 {
   run_test (_this, "t8.5.oas");
 }
 
-TEST(36)
+TEST (36)
 {
   run_test (_this, "t8.6.oas");
 }
 
-TEST(37)
+TEST (37)
 {
   run_test (_this, "t8.7.oas");
 }
 
-TEST(38)
+TEST (38)
 {
   run_test (_this, "t8.8.oas");
 }
 
-TEST(39)
+TEST (39)
 {
   run_test (_this, "t9.1.oas");
 }
 
-TEST(40)
+TEST (40)
 {
   run_test (_this, "t9.2.oas");
 }
 
-TEST(100)
+TEST (100)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -567,10 +562,10 @@ TEST(100)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter100.gds"));
 
@@ -589,7 +584,7 @@ TEST(100)
   reader.set_warnings_as_errors (true);
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$4}\n"
     "end_cell\n"
@@ -605,8 +600,7 @@ TEST(100)
     "sref {$3} 90 1 1 {-10 20}\n"
     "box 2 0 {0 -100} {2000 2200}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -615,7 +609,7 @@ TEST(100)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(101)
+TEST (101)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -651,10 +645,10 @@ TEST(101)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter101.gds"));
 
@@ -674,12 +668,11 @@ TEST(101)
   reader.set_warnings_as_errors (true);
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$2}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -688,7 +681,7 @@ TEST(101)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(102)
+TEST (102)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -724,10 +717,10 @@ TEST(102)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter102.gds"));
 
@@ -747,7 +740,7 @@ TEST(102)
   reader.set_warnings_as_errors (true);
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$1}\n"
     "box 1 0 {0 100} {1000 1200}\n"
@@ -759,8 +752,7 @@ TEST(102)
     "sref {$1} 90 1 1 {-10 20}\n"
     "sref {$3} 90 1 1 {-10 20}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -769,7 +761,7 @@ TEST(102)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(103)
+TEST (103)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -805,10 +797,10 @@ TEST(103)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter103.gds"));
 
@@ -828,13 +820,12 @@ TEST(103)
   reader.set_warnings_as_errors (true);
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$2}\n"
     "box 2 0 {0 -100} {2000 2200}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -843,7 +834,7 @@ TEST(103)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(110)
+TEST (110)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -879,10 +870,10 @@ TEST(110)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter110.gds"));
 
@@ -902,7 +893,7 @@ TEST(110)
   reader.set_warnings_as_errors (true);
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$1}\n"
     "box 1 0 {0 100} {1000 1200}\n"
@@ -910,8 +901,7 @@ TEST(110)
     "begin_cell {$3}\n"
     "sref {$1} 90 1 1 {-10 20}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -920,7 +910,7 @@ TEST(110)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(111)
+TEST (111)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -956,10 +946,10 @@ TEST(111)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter111.gds"));
 
@@ -980,12 +970,11 @@ TEST(111)
   reader.set_warnings_as_errors (true);
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$3}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -994,7 +983,7 @@ TEST(111)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(112)
+TEST (112)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -1030,10 +1019,10 @@ TEST(112)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter112.gds"));
 
@@ -1054,7 +1043,7 @@ TEST(112)
   reader.set_warnings_as_errors (true);
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$1}\n"
     "box 1 0 {0 100} {1000 1200}\n"
@@ -1062,8 +1051,7 @@ TEST(112)
     "begin_cell {$3}\n"
     "sref {$1} 90 1 1 {-10 20}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -1072,7 +1060,7 @@ TEST(112)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(113)
+TEST (113)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -1108,10 +1096,10 @@ TEST(113)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter113.gds"));
 
@@ -1132,12 +1120,11 @@ TEST(113)
   reader.set_warnings_as_errors (true);
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$3}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -1146,7 +1133,7 @@ TEST(113)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(114)
+TEST (114)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -1184,15 +1171,14 @@ TEST(114)
   reader.set_warnings_as_errors (true);
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$1}\n"
     "path 1 0 0 0 0 {0 100} {0 1200}\n"
     "path 1 0 0 0 0 {0 100} {1000 1200}\n"
     "path 1 0 0 0 0 {0 1200} {1000 1200}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -1201,7 +1187,7 @@ TEST(114)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(115)
+TEST (115)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -1258,7 +1244,7 @@ TEST(115)
   reader.set_warnings_as_errors (true);
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "set props {\n"
     "  {17 {17value}}\n"
     "  {{name} {117}}\n"
@@ -1272,8 +1258,7 @@ TEST(115)
     "path 1 0 0 0 0 {0 100} {1000 1200}\n"
     "path 1 0 0 0 0 {0 1200} {1000 1200}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -1282,7 +1267,7 @@ TEST(115)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(116)
+TEST (116)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -1340,7 +1325,7 @@ TEST(116)
     reader.set_warnings_as_errors (true);
     reader.read (gg, options);
 
-    const char *expected = 
+    const char *expected =
       "set props {\n"
       "  {17 {17value}}\n"
 #if defined(HAVE_64BIT_COORD)
@@ -1363,8 +1348,7 @@ TEST(116)
       "begin_cellp $props {$1}\n"
       "path 1 0 0 0 0 {0 100} {1000 1200}\n"
       "end_cell\n"
-      "end_lib\n"
-    ;
+      "end_lib\n";
 
     tl::OutputStringStream os;
     tl::OutputStream stream (os);
@@ -1399,7 +1383,7 @@ TEST(116)
     reader.set_warnings_as_errors (true);
     reader.read (gg, options);
 
-    const char *expected = 
+    const char *expected =
       "set props {\n"
       "  {17 {17value}}\n"
       "  {{name} {117}}\n"
@@ -1413,8 +1397,7 @@ TEST(116)
       "begin_cellp $props {$1}\n"
       "path 1 0 0 0 0 {0 100} {1000 1200}\n"
       "end_cell\n"
-      "end_lib\n"
-    ;
+      "end_lib\n";
 
     tl::OutputStringStream os;
     tl::OutputStream stream (os);
@@ -1449,7 +1432,7 @@ TEST(116)
     reader.set_warnings_as_errors (true);
     reader.read (gg, options);
 
-    const char *expected = 
+    const char *expected =
       "set props {\n"
       "  {17 {17value}}\n"
       "  {{S_BOUNDING_BOXES_AVAILABLE} {2}}\n"
@@ -1477,8 +1460,7 @@ TEST(116)
       "begin_cellp $props {$1}\n"
       "path 1 0 0 0 0 {0 100} {1000 1200}\n"
       "end_cell\n"
-      "end_lib\n"
-    ;
+      "end_lib\n";
 
     tl::OutputStringStream os;
     tl::OutputStream stream (os);
@@ -1514,7 +1496,7 @@ TEST(116)
     reader.set_warnings_as_errors (true);
     reader.read (gg, options);
 
-    const char *expected = 
+    const char *expected =
       "set props {\n"
       "  {17 {17value}}\n"
       "  {{S_BOUNDING_BOXES_AVAILABLE} {2}}\n"
@@ -1544,8 +1526,7 @@ TEST(116)
       "}\n"
       "begin_cellp $props {$2}\n"
       "end_cell\n"
-      "end_lib\n"
-    ;
+      "end_lib\n";
 
     tl::OutputStringStream os;
     tl::OutputStream stream (os);
@@ -1608,8 +1589,7 @@ TEST(116)
       "}\n"
       "begin_cellp $props {$2}\n"
       "end_cell\n"
-      "end_lib\n"
-    ;
+      "end_lib\n";
 
     tl::OutputStringStream os;
     tl::OutputStream stream (os);
@@ -1642,7 +1622,7 @@ TEST(116)
     reader.set_warnings_as_errors (true);
     reader.read (gg, options);
 
-    const char *expected = 
+    const char *expected =
       "set props {\n"
       "  {17 {17value}}\n"
 #if defined(HAVE_64BIT_COORD)
@@ -1665,8 +1645,7 @@ TEST(116)
       "sref {$2} 0 0 1 {0 0}\n"
       "path 1 0 0 0 0 {0 100} {1000 1200}\n"
       "end_cell\n"
-      "end_lib\n"
-    ;
+      "end_lib\n";
 
     tl::OutputStringStream os;
     tl::OutputStream stream (os);
@@ -1698,7 +1677,7 @@ TEST(116)
     reader.set_warnings_as_errors (true);
     reader.read (gg, options);
 
-    const char *expected = 
+    const char *expected =
       "set props {\n"
       "  {17 {17value}}\n"
 #if defined(HAVE_64BIT_COORD)
@@ -1714,8 +1693,7 @@ TEST(116)
       "begin_libp $props 0.001\n"
       "begin_cell {$2}\n"
       "end_cell\n"
-      "end_lib\n"
-    ;
+      "end_lib\n";
 
     tl::OutputStringStream os;
     tl::OutputStream stream (os);
@@ -1725,10 +1703,10 @@ TEST(116)
   }
 }
 
-TEST(117)
+TEST (117)
 {
   //  polygons and boxes without area
-  
+
   db::Manager m (false);
   db::Layout g (&m);
 
@@ -1743,18 +1721,17 @@ TEST(117)
   c1.shapes (0).insert (db::Box (100, 0, 100, 200));
   c1.shapes (0).insert (db::Box (100, -20, 100, -20));
 
-  db::Point pts[] = {
+  db::Point pts [] = {
     db::Point (100, 15),
     db::Point (150, 15),
-    db::Point (120, 15)
-  };
+    db::Point (120, 15)};
 
   db::Polygon p;
-  p.assign_hull (&pts[0], &pts[sizeof (pts) / sizeof(pts[0])], false);
+  p.assign_hull (&pts [0], &pts [sizeof (pts) / sizeof (pts [0])], false);
   c1.shapes (0).insert (p);
 
   db::SimplePolygon ps;
-  ps.assign_hull (&pts[0], &pts[sizeof (pts) / sizeof(pts[0])], false);
+  ps.assign_hull (&pts [0], &pts [sizeof (pts) / sizeof (pts [0])], false);
   ps.transform (db::FTrans (db::FTrans::r90), false);
   c1.shapes (0).insert (ps);
 
@@ -1774,7 +1751,7 @@ TEST(117)
   reader.set_warnings_as_errors (true);
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$1}\n"
     "boundary 1 0 {-15 100} {-15 120} {-15 150} {-15 100}\n"
@@ -1782,8 +1759,7 @@ TEST(117)
     "box 1 0 {100 -20} {100 -20}\n"
     "box 1 0 {100 0} {100 200}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -1792,7 +1768,7 @@ TEST(117)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(118)
+TEST (118)
 {
   //  1x1 arrays (#902)
 
@@ -1809,8 +1785,8 @@ TEST(118)
   c1.shapes (0).insert (db::Box (100, 0, 100, 200));
 
   db::Cell &c2 (g.cell (g.add_cell ()));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), db::Trans (), db::Vector (0, 1), db::Vector (1, 0), 1, 1));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (17, -42)), db::Vector (0, 1), db::Vector (1, 0), 1, 1));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), db::Trans (), db::Vector (0, 1), db::Vector (1, 0), 1, 1));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (17, -42)), db::Vector (0, 1), db::Vector (1, 0), 1, 1));
 
   std::string tmp_file = tl::TestBase::tmp_file ("tmp.oas");
 
@@ -1837,8 +1813,7 @@ TEST(118)
     "sref {$1} 0 0 1 {0 0}\n"
     "sref {$1} 0 0 1 {17 -42}\n"
     "end_cell\n"
-    "end_lib\n"
-    ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -1847,7 +1822,7 @@ TEST(118)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(119_WithAndWithoutContext)
+TEST (119_WithAndWithoutContext)
 {
   //  PCells with context and without
 
@@ -1920,10 +1895,9 @@ TEST(119_WithAndWithoutContext)
     CHECKPOINT ();
     db::compare_layouts (_this, gg, tl::testdata () + "/oasis/dbOASISWriter119_au.gds", db::NoNormalization);
   }
-
 }
 
-TEST(120_IrregularInstRepetitions)
+TEST (120_IrregularInstRepetitions)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -1931,7 +1905,7 @@ TEST(120_IrregularInstRepetitions)
   db::cell_index_type top = g.add_cell ("TOP");
   db::cell_index_type c1 = g.add_cell ("C1");
 
-  db::Vector pts[3] = { db::Vector (0, 10), db::Vector (0, 20), db::Vector (0, 30) };
+  db::Vector pts [3] = {db::Vector (0, 10), db::Vector (0, 20), db::Vector (0, 30)};
 
   unsigned int l1 = g.insert_layer (db::LayerProperties (1, 0));
   g.cell (c1).shapes (l1).insert (db::Box (-5, -5, 5, 5));
@@ -1962,7 +1936,6 @@ TEST(120_IrregularInstRepetitions)
     CHECKPOINT ();
     db::compare_layouts (_this, gg, tl::testdata () + "/oasis/dbOASISWriter120_au.gds", db::NoNormalization);
   }
-
 }
 
 //  Meta info
@@ -2052,28 +2025,28 @@ run_test130 (tl::TestBase *_this, bool strict, bool tables_at_end)
 
 //  Meta info
 
-TEST(130a)
+TEST (130a)
 {
   run_test130 (_this, false, false);
 }
 
-TEST(130b)
+TEST (130b)
 {
   run_test130 (_this, true, false);
 }
 
-TEST(130c)
+TEST (130c)
 {
   run_test130 (_this, false, true);
 }
 
-TEST(130d)
+TEST (130d)
 {
   run_test130 (_this, true, true);
 }
 
 //  Issue #2088 (name duplication)
-TEST(140)
+TEST (140)
 {
   db::Layout layout_org;
 

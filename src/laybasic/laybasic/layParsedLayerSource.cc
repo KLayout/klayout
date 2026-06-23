@@ -42,8 +42,8 @@ static PropertySelectorBase *extract_top (tl::Extractor &ex);
 class PropertySelectorBase
 {
 public:
-  PropertySelectorBase () { }
-  virtual ~PropertySelectorBase () { }
+  PropertySelectorBase () {}
+  virtual ~PropertySelectorBase () {}
 
   virtual std::string to_string (bool inner, size_t max_len) const = 0;
   virtual PropertySelectorBase *clone () const = 0;
@@ -56,11 +56,12 @@ public:
 /**
  *  @brief A expression graph node combining n arguments with either a "and" or "or" operation
  */
-class PropertySelectorOp 
+class PropertySelectorOp
   : public PropertySelectorBase
 {
 public:
-  enum op_type_enum { And, Or };
+  enum op_type_enum { And,
+                      Or };
 
   PropertySelectorOp (op_type_enum op, const PropertySelectorBase *arg)
     : m_op (op)
@@ -97,7 +98,7 @@ public:
       if (s.size () > max_len) {
         s += "...";
         break;
-      } 
+      }
       s += (*b)->to_string (true, max_len);
     }
     if (inner) {
@@ -111,7 +112,7 @@ public:
     m_args.push_back (arg);
   }
 
-  PropertySelectorBase *clone () const 
+  PropertySelectorBase *clone () const
   {
     return new PropertySelectorOp (*this);
   }
@@ -161,25 +162,25 @@ public:
     std::vector<const PropertySelectorBase *>::const_iterator b = m_args.begin ();
     bool inv = (*b)->selection (ids);
     if (m_op == Or) {
-      inv = !inv;
+      inv = ! inv;
     }
 
-    for (++b; b != m_args.end () && !(ids.empty () && !inv); ++b) {
+    for (++b; b != m_args.end () && ! (ids.empty () && ! inv); ++b) {
 
       //  get the selection of the next operand into ids2
       std::set<db::properties_id_type> ids2;
       bool inv2 = (*b)->selection (ids2);
       if (m_op == Or) {
-        inv2 = !inv2;
+        inv2 = ! inv2;
       }
 
       //  compute the intersection of ids and ids2 in place int ids
-      if (ids2.empty () && !inv2) {
+      if (ids2.empty () && ! inv2) {
         //  shortcut: if the second operand is empty, just clear and terminate the loop then
         ids.clear ();
         inv = false;
-      } else if (!inv && !inv2) {
-        for (std::set<db::properties_id_type>::iterator id = ids.begin (); id != ids.end (); ) {
+      } else if (! inv && ! inv2) {
+        for (std::set<db::properties_id_type>::iterator id = ids.begin (); id != ids.end ();) {
           std::set<db::properties_id_type>::iterator i = id;
           ++id;
           if (ids2.find (*i) == ids2.end ()) {
@@ -197,7 +198,7 @@ public:
           ids.swap (ids2);
         }
         //  from ids subtract all ids that are in ids2 (inv2==true!)
-        for (std::set<db::properties_id_type>::iterator id = ids.begin (); id != ids.end (); ) {
+        for (std::set<db::properties_id_type>::iterator id = ids.begin (); id != ids.end ();) {
           std::set<db::properties_id_type>::iterator i = id;
           ++id;
           if (ids2.find (*i) != ids2.end ()) {
@@ -205,18 +206,17 @@ public:
           }
         }
       }
-
     }
 
-    return m_op == Or ? !inv : inv;
+    return m_op == Or ? ! inv : inv;
   }
 
-  unsigned int type_id () const 
+  unsigned int type_id () const
   {
-    return m_op == And ? 1 : 2; 
+    return m_op == And ? 1 : 2;
   }
 
-  int compare (const PropertySelectorBase *b) const 
+  int compare (const PropertySelectorBase *b) const
   {
     if (type_id () != b->type_id ()) {
       return type_id () < b->type_id () ? -1 : 1;
@@ -227,7 +227,7 @@ public:
         return (m_args.size () < bb->m_args.size ()) ? -1 : 1;
       }
       for (size_t n = 0; n < m_args.size (); ++n) {
-        int cmp = m_args[n]->compare (bb->m_args[n]);
+        int cmp = m_args [n]->compare (bb->m_args [n]);
         if (cmp != 0) {
           return cmp;
         }
@@ -244,7 +244,7 @@ private:
 /**
  *  @brief A expression graph node forming the inverse of one argument
  */
-class PropertySelectorNot 
+class PropertySelectorNot
   : public PropertySelectorBase
 {
 public:
@@ -265,7 +265,7 @@ public:
     return "!(" + mp_arg->to_string (false, max_len) + ")";
   }
 
-  PropertySelectorBase *clone () const 
+  PropertySelectorBase *clone () const
   {
     return new PropertySelectorNot (mp_arg->clone ());
   }
@@ -280,12 +280,12 @@ public:
     return ! mp_arg->selection (ids);
   }
 
-  unsigned int type_id () const 
+  unsigned int type_id () const
   {
     return 10;
   }
 
-  int compare (const PropertySelectorBase *b) const 
+  int compare (const PropertySelectorBase *b) const
   {
     if (type_id () != b->type_id ()) {
       return type_id () < b->type_id () ? -1 : 1;
@@ -301,7 +301,7 @@ private:
 /**
  *  @brief A expression graph leaf node: a comparison operation
  */
-class PropertySelectorEqual 
+class PropertySelectorEqual
   : public PropertySelectorBase
 {
 public:
@@ -328,7 +328,7 @@ public:
     return s;
   }
 
-  PropertySelectorBase *clone () const 
+  PropertySelectorBase *clone () const
   {
     return new PropertySelectorEqual (m_name, m_value, m_equal);
   }
@@ -359,12 +359,12 @@ public:
     return ! m_equal;
   }
 
-  unsigned int type_id () const 
+  unsigned int type_id () const
   {
     return m_equal ? 20 : 21;
   }
 
-  int compare (const PropertySelectorBase *b) const 
+  int compare (const PropertySelectorBase *b) const
   {
     if (type_id () != b->type_id ()) {
       return type_id () < b->type_id () ? -1 : 1;
@@ -508,8 +508,7 @@ PropertySelector::operator= (const PropertySelector &sel)
   return *this;
 }
 
-bool 
-PropertySelector::operator== (const PropertySelector &sel) const
+bool PropertySelector::operator== (const PropertySelector &sel) const
 {
   if (mp_base == 0 && sel.mp_base == 0) {
     return true;
@@ -520,8 +519,7 @@ PropertySelector::operator== (const PropertySelector &sel) const
   }
 }
 
-bool 
-PropertySelector::operator< (const PropertySelector &sel) const
+bool PropertySelector::operator< (const PropertySelector &sel) const
 {
   if (mp_base == 0 && sel.mp_base == 0) {
     return false;
@@ -540,8 +538,7 @@ PropertySelector::~PropertySelector ()
   mp_base = 0;
 }
 
-void 
-PropertySelector::extract (tl::Extractor &ex)
+void PropertySelector::extract (tl::Extractor &ex)
 {
   if (mp_base) {
     delete mp_base;
@@ -549,7 +546,7 @@ PropertySelector::extract (tl::Extractor &ex)
   mp_base = extract_top (ex);
 }
 
-std::string 
+std::string
 PropertySelector::to_string (size_t max_len) const
 {
   if (mp_base) {
@@ -559,8 +556,7 @@ PropertySelector::to_string (size_t max_len) const
   }
 }
 
-void
-PropertySelector::join (const PropertySelector &d)
+void PropertySelector::join (const PropertySelector &d)
 {
   //  Create a combined "and" operator of both property selectors
   if (d.mp_base) {
@@ -579,8 +575,7 @@ PropertySelector::join (const PropertySelector &d)
   }
 }
 
-bool 
-PropertySelector::check (db::properties_id_type id) const
+bool PropertySelector::check (db::properties_id_type id) const
 {
   if (is_null ()) {
     return true;
@@ -589,8 +584,7 @@ PropertySelector::check (db::properties_id_type id) const
   }
 }
 
-bool 
-PropertySelector::matching (std::set<db::properties_id_type> &ids) const
+bool PropertySelector::matching (std::set<db::properties_id_type> &ids) const
 {
   if (is_null ()) {
     return true;
@@ -615,7 +609,7 @@ PartialTreeSelector::PartialTreeSelector (const db::Layout &layout, bool initial
 }
 
 PartialTreeSelector::PartialTreeSelector (const PartialTreeSelector &d)
-  : mp_layout (d.mp_layout), 
+  : mp_layout (d.mp_layout),
     m_state (d.m_state),
     m_selected (d.m_selected),
     m_state_stack (d.m_state_stack),
@@ -642,9 +636,9 @@ int PartialTreeSelector::is_child_selected (db::cell_index_type child) const
 {
   if (m_state >= 0 && m_state < int (m_state_machine.size ())) {
 
-    const std::map <db::cell_index_type, std::pair<int, int> > &m = m_state_machine [m_state];
+    const std::map<db::cell_index_type, std::pair<int, int>> &m = m_state_machine [m_state];
 
-    std::map <db::cell_index_type, std::pair<int, int> >::const_iterator i = m.find (child);
+    std::map<db::cell_index_type, std::pair<int, int>>::const_iterator i = m.find (child);
     if (i == m.end ()) {
       i = m.find (db::cell_index_type (-1));
     }
@@ -657,7 +651,6 @@ int PartialTreeSelector::is_child_selected (db::cell_index_type child) const
         return sel ? 1 : -1;
       }
     }
-
   }
 
   return m_selected ? 1 : 0;
@@ -674,9 +667,9 @@ void PartialTreeSelector::descend (db::cell_index_type child)
 
   if (m_state >= 0 && m_state < int (m_state_machine.size ())) {
 
-    const std::map <db::cell_index_type, std::pair<int, int> > &m = m_state_machine [m_state];
+    const std::map<db::cell_index_type, std::pair<int, int>> &m = m_state_machine [m_state];
 
-    std::map <db::cell_index_type, std::pair<int, int> >::const_iterator i = m.find (child);
+    std::map<db::cell_index_type, std::pair<int, int>>::const_iterator i = m.find (child);
     if (i == m.end ()) {
       i = m.find (db::cell_index_type (-1));
     }
@@ -687,7 +680,6 @@ void PartialTreeSelector::descend (db::cell_index_type child)
         m_selected = i->second.second;
       }
     }
-
   }
 }
 
@@ -709,7 +701,7 @@ void PartialTreeSelector::add_state_transition (int initial_state, db::cell_inde
 {
   if (initial_state >= 0) {
     while (int (m_state_machine.size ()) <= initial_state) {
-      m_state_machine.push_back (std::map <db::cell_index_type, std::pair<int, int> > ());
+      m_state_machine.push_back (std::map<db::cell_index_type, std::pair<int, int>> ());
     }
     m_state_machine [initial_state][cell_index] = std::make_pair (target_state, selected);
   }
@@ -719,7 +711,7 @@ void PartialTreeSelector::add_state_transition (int initial_state, int target_st
 {
   if (initial_state >= 0) {
     while (int (m_state_machine.size ()) <= initial_state) {
-      m_state_machine.push_back (std::map <db::cell_index_type, std::pair<int, int> > ());
+      m_state_machine.push_back (std::map<db::cell_index_type, std::pair<int, int>> ());
     }
     m_state_machine [initial_state].clear ();
     m_state_machine [initial_state][db::cell_index_type (-1)] = std::make_pair (target_state, selected);
@@ -758,7 +750,7 @@ bool CellSelector::operator< (const CellSelector &d) const
   return m_selectors < d.m_selectors;
 }
 
-static std::pair <bool, std::string> parse_part (tl::Extractor &ex)
+static std::pair<bool, std::string> parse_part (tl::Extractor &ex)
 {
   bool sel = true;
   if (ex.test ("-")) {
@@ -771,19 +763,19 @@ static std::pair <bool, std::string> parse_part (tl::Extractor &ex)
   if (ex.try_read_word_or_quoted (nf, "_.$*?[]")) {
     return std::make_pair (sel, nf);
   } else {
-    return std::pair <bool, std::string> ();
+    return std::pair<bool, std::string> ();
   }
 }
 
-static std::vector <std::pair <bool, std::string> > parse_list (tl::Extractor &ex)
+static std::vector<std::pair<bool, std::string>> parse_list (tl::Extractor &ex)
 {
-  std::vector <std::pair <bool, std::string> > list;
+  std::vector<std::pair<bool, std::string>> list;
 
   if (ex.test ("(")) {
 
     while (! ex.test (")")) {
       list.push_back (parse_part (ex));
-      if (list.back () == std::pair <bool, std::string> ()) {
+      if (list.back () == std::pair<bool, std::string> ()) {
         list.pop_back ();
         ex.expect (")");
         break;
@@ -792,7 +784,7 @@ static std::vector <std::pair <bool, std::string> > parse_list (tl::Extractor &e
 
   } else {
     list.push_back (parse_part (ex));
-    if (list.back () == std::pair <bool, std::string> ()) {
+    if (list.back () == std::pair<bool, std::string> ()) {
       list.pop_back ();
     }
   }
@@ -817,7 +809,7 @@ std::string CellSelector::to_string () const
 {
   std::string r;
 
-  for (std::vector <std::vector <std::pair <bool, std::string> > >::const_iterator i = m_selectors.begin (); i != m_selectors.end (); ++i) {
+  for (std::vector<std::vector<std::pair<bool, std::string>>>::const_iterator i = m_selectors.begin (); i != m_selectors.end (); ++i) {
 
     if (! r.empty ()) {
       r += " ";
@@ -827,7 +819,7 @@ std::string CellSelector::to_string () const
       r += "(";
     }
 
-    for (std::vector <std::pair <bool, std::string> >::const_iterator j = i->begin (); j != i->end (); ++j) {
+    for (std::vector<std::pair<bool, std::string>>::const_iterator j = i->begin (); j != i->end (); ++j) {
       if (j != i->begin ()) {
         r += " ";
       }
@@ -838,9 +830,8 @@ std::string CellSelector::to_string () const
     if (i->size () > 1) {
       r += ")";
     }
-
   }
-  
+
   return r;
 }
 
@@ -855,7 +846,7 @@ PartialTreeSelector CellSelector::create_tree_selector (const db::Layout &layout
   //  if the first level matches the initial cell, use the selection state to enable this cell
   bool consume_first = false;
   if (! m_selectors.empty () && layout.is_valid_cell_index (initial_cell)) {
-    for (std::vector <std::pair <bool, std::string> >::const_iterator j = m_selectors.front ().begin (); j != m_selectors.front ().end (); ++j) {
+    for (std::vector<std::pair<bool, std::string>>::const_iterator j = m_selectors.front ().begin (); j != m_selectors.front ().end (); ++j) {
       tl::GlobPattern pat (j->second);
       if (pat.match (layout.cell_name (initial_cell))) {
         initial_sel = j->first;
@@ -868,7 +859,7 @@ PartialTreeSelector CellSelector::create_tree_selector (const db::Layout &layout
 
   int state = 0;
 
-  for (std::vector <std::vector <std::pair <bool, std::string> > >::const_iterator i = m_selectors.begin (); i != m_selectors.end (); ++i) {
+  for (std::vector<std::vector<std::pair<bool, std::string>>>::const_iterator i = m_selectors.begin (); i != m_selectors.end (); ++i) {
 
     //  The first level is consumed by the initial cell
     if (i == m_selectors.begin () && consume_first) {
@@ -878,7 +869,7 @@ PartialTreeSelector CellSelector::create_tree_selector (const db::Layout &layout
     //  default loop for any other cell
     pts.add_state_transition (state, state, -1);
 
-    for (std::vector <std::pair <bool, std::string> >::const_iterator j = i->begin (); j != i->end (); ++j) {
+    for (std::vector<std::pair<bool, std::string>>::const_iterator j = i->begin (); j != i->end (); ++j) {
 
       if (j->second == "*") {
 
@@ -894,13 +885,10 @@ PartialTreeSelector CellSelector::create_tree_selector (const db::Layout &layout
             pts.add_state_transition (state, ci, state + 1, j->first ? 1 : 0);
           }
         }
-
       }
-
     }
 
     ++state;
-
   }
 
   return pts;
@@ -955,17 +943,17 @@ ParsedLayerSource &
 ParsedLayerSource::operator= (const ParsedLayerSource &d)
 {
   if (this != &d) {
-    m_has_name          = d.m_has_name;
-    m_special_purpose   = d.m_special_purpose;
-    m_layer_index       = d.m_layer_index;
-    m_layer             = d.m_layer;
-    m_datatype          = d.m_datatype;
-    m_name              = d.m_name;
-    m_cv_index          = d.m_cv_index;
-    m_trans             = d.m_trans;
-    m_property_sel      = d.m_property_sel;
-    m_cell_sel          = d.m_cell_sel;
-    m_hier_levels       = d.m_hier_levels;
+    m_has_name = d.m_has_name;
+    m_special_purpose = d.m_special_purpose;
+    m_layer_index = d.m_layer_index;
+    m_layer = d.m_layer;
+    m_datatype = d.m_datatype;
+    m_name = d.m_name;
+    m_cv_index = d.m_cv_index;
+    m_trans = d.m_trans;
+    m_property_sel = d.m_property_sel;
+    m_cell_sel = d.m_cell_sel;
+    m_hier_levels = d.m_hier_levels;
   }
   return *this;
 }
@@ -1017,7 +1005,7 @@ ParsedLayerSource::operator+= (const ParsedLayerSource &d)
   return *this;
 }
 
-static std::string 
+static std::string
 hier_levels_to_string (const HierarchyLevelSelection &hier_levels)
 {
   std::string r;
@@ -1055,11 +1043,11 @@ hier_levels_to_string (const HierarchyLevelSelection &hier_levels)
   return r;
 }
 
-std::string 
+std::string
 ParsedLayerSource::to_string () const
 {
   std::string r;
-  
+
   if (m_layer_index >= 0) {
     if (! r.empty ()) {
       r += " ";
@@ -1120,7 +1108,7 @@ ParsedLayerSource::to_string () const
     r += "}";
   }
 
-  if (! m_trans.empty () && (m_trans.size () > 1 || m_trans[0] != db::DCplxTrans ())) {
+  if (! m_trans.empty () && (m_trans.size () > 1 || m_trans [0] != db::DCplxTrans ())) {
     for (std::vector<db::DCplxTrans>::const_iterator t = m_trans.begin (); t != m_trans.end (); ++t) {
       if (! r.empty ()) {
         r += " ";
@@ -1155,7 +1143,7 @@ ParsedLayerSource::display_string (const lay::LayoutViewBase *view) const
 
   if (m_layer_index >= 0) {
 
-    if (!view || m_cv_index < 0 || m_cv_index >= int (view->cellviews ()) || ! view->cellview (m_cv_index)->layout ().is_valid_layer (m_layer_index)) {
+    if (! view || m_cv_index < 0 || m_cv_index >= int (view->cellviews ()) || ! view->cellview (m_cv_index)->layout ().is_valid_layer (m_layer_index)) {
       r = tl::sprintf ("%%%d", m_layer_index);
     } else {
       const db::LayerProperties &lp = view->cellview (m_cv_index)->layout ().get_properties (m_layer_index);
@@ -1179,7 +1167,7 @@ ParsedLayerSource::display_string (const lay::LayoutViewBase *view) const
 
   } else if (m_has_name) {
     r = m_name;
-    if (m_layer >= 0 && m_datatype >= 0 && (!view || view->always_show_ld ())) {
+    if (m_layer >= 0 && m_datatype >= 0 && (! view || view->always_show_ld ())) {
       r += tl::sprintf (" %d/%d", m_layer, m_datatype);
     }
   } else {
@@ -1194,7 +1182,7 @@ ParsedLayerSource::display_string (const lay::LayoutViewBase *view) const
     }
   }
 
-  if (m_cv_index >= 0 && (!view || view->always_show_layout_index () || m_cv_index > 0 || view->cellviews () > 1)) {
+  if (m_cv_index >= 0 && (! view || view->always_show_layout_index () || m_cv_index > 0 || view->cellviews () > 1)) {
     r += tl::sprintf ("@%d", m_cv_index + 1);
   }
 
@@ -1216,7 +1204,7 @@ ParsedLayerSource::display_string (const lay::LayoutViewBase *view) const
     r += m_cell_sel.to_string ();
   }
 
-  if (! m_trans.empty () && (m_trans.size () > 1 || m_trans[0] != db::DCplxTrans ())) {
+  if (! m_trans.empty () && (m_trans.size () > 1 || m_trans [0] != db::DCplxTrans ())) {
     for (std::vector<db::DCplxTrans>::const_iterator t = m_trans.begin (); t != m_trans.end (); ++t) {
       if (! r.empty ()) {
         r += " ";
@@ -1244,8 +1232,7 @@ ParsedLayerSource::display_string (const lay::LayoutViewBase *view) const
   return r;
 }
 
-bool 
-ParsedLayerSource::operator== (const ParsedLayerSource &d) const
+bool ParsedLayerSource::operator== (const ParsedLayerSource &d) const
 {
   if (m_trans != d.m_trans) {
     return false;
@@ -1285,12 +1272,11 @@ ParsedLayerSource::operator== (const ParsedLayerSource &d) const
   }
   if (m_has_name && m_name != d.m_name) {
     return false;
-  } 
+  }
   return true;
 }
 
-bool 
-ParsedLayerSource::operator< (const ParsedLayerSource &d) const
+bool ParsedLayerSource::operator< (const ParsedLayerSource &d) const
 {
   if (m_trans != d.m_trans) {
     return m_trans < d.m_trans;
@@ -1335,8 +1321,7 @@ ParsedLayerSource::operator< (const ParsedLayerSource &d) const
   }
 }
 
-void 
-ParsedLayerSource::parse_from_string (const char *cp) 
+void ParsedLayerSource::parse_from_string (const char *cp)
 {
   m_layer_index = -1;
   m_special_purpose = SP_None;
@@ -1432,7 +1417,7 @@ ParsedLayerSource::parse_from_string (const char *cp)
             m = HierarchyLevelSelection::maximum;
           }
           x.read (f);
-          x.expect(")");
+          x.expect (")");
           m_hier_levels.set_from_level (f, true, m);
         } else {
           if (x.test ("<")) {
@@ -1460,7 +1445,7 @@ ParsedLayerSource::parse_from_string (const char *cp)
               m = HierarchyLevelSelection::maximum;
             }
             x.read (t);
-            x.expect(")");
+            x.expect (")");
             m_hier_levels.set_to_level (t, true, m);
           } else {
             if (x.test ("<")) {
@@ -1481,9 +1466,7 @@ ParsedLayerSource::parse_from_string (const char *cp)
           HierarchyLevelSelection::level_mode_type m = m_hier_levels.from_level_mode ();
           m_hier_levels.set_to_level (f, fr, m);
           m_hier_levels.set_from_level (0, fr, HierarchyLevelSelection::absolute);
-
         }
-
       }
 
     } else if (x.test ("/")) {
@@ -1520,7 +1503,7 @@ ParsedLayerSource::parse_from_string (const char *cp)
       m_cv_index = int (ui) - 1;
 
     } else {
-      
+
       x.skip ();
       if (*x == '\'' || *x == '"') {
         x.read_quoted (m_name);
@@ -1529,16 +1512,15 @@ ParsedLayerSource::parse_from_string (const char *cp)
       }
 
       m_has_name = true;
-
     }
   }
-  
+
   if (m_trans.empty ()) {
     m_trans.push_back (db::DCplxTrans ());
   }
 }
 
-db::LayerProperties 
+db::LayerProperties
 ParsedLayerSource::layer_props () const
 {
   db::LayerProperties lp;
@@ -1554,7 +1536,7 @@ ParsedLayerSource::layer_props () const
   return lp;
 }
 
-unsigned int 
+unsigned int
 ParsedLayerSource::color_index () const
 {
   if (layer () >= 0) {
@@ -1568,7 +1550,7 @@ ParsedLayerSource::color_index () const
     unsigned int ln = 0;
     const std::string &n = name ();
     for (const char *cp = n.c_str (); *cp; ++cp) {
-      ln = ln * 37 + (unsigned int)*cp;
+      ln = ln * 37 + (unsigned int) *cp;
     }
 
     return ln;
@@ -1577,21 +1559,17 @@ ParsedLayerSource::color_index () const
 
     //  no specific ordering: no ordering
     return 0;
-
   }
 }
 
-bool 
-ParsedLayerSource::is_wildcard_layer () const
+bool ParsedLayerSource::is_wildcard_layer () const
 {
   return (m_special_purpose == SP_None && ! has_name () && m_layer < 0 && m_datatype < 0 && m_layer_index < 0);
 }
 
-bool
-ParsedLayerSource::match (const db::LayerProperties &lp) const
+bool ParsedLayerSource::match (const db::LayerProperties &lp) const
 {
   return layer_props ().log_equal (lp);
 }
 
 }
-

@@ -133,32 +133,32 @@ static void run_test (tl::TestBase *_this, db::EdgeNeighborhoodVisitor &visitor,
   db::compare_layouts (_this, ly, tl::testdata () + au_name);
 }
 
-TEST(1)
+TEST (1)
 {
   ENPrimaryCopyVisitor visitor;
   run_test (_this, visitor, "/algo/edge_neighborhood_au1.gds");
 }
 
 
-TEST(2)
+TEST (2)
 {
   ENPrimaryCopyIntruderVisitor visitor (0);
   run_test (_this, visitor, "/algo/edge_neighborhood_au2.gds", true, 100, 100, 100, 2000);
 }
 
-TEST(3)
+TEST (3)
 {
   ENPrimaryCopyIntruderVisitor visitor (1);
   run_test (_this, visitor, "/algo/edge_neighborhood_au3.gds", true, 100, 100, 100, 2000);
 }
 
-TEST(4)
+TEST (4)
 {
   ENPrimaryCopyIntruderVisitor visitor (2);
   run_test (_this, visitor, "/algo/edge_neighborhood_au4.gds", true, 100, 100, 100, 2000);
 }
 
-TEST(5)
+TEST (5)
 {
   ENPrimaryCopyIntruderVisitor visitor (3);
   run_test (_this, visitor, "/algo/edge_neighborhood_au5.gds", true, 100, 100, 100, 2000);

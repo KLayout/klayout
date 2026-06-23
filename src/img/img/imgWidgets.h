@@ -50,7 +50,7 @@ namespace img
 class TwoColorWidget
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   TwoColorWidget (QWidget *parent);
@@ -78,7 +78,7 @@ private:
 class ColorBar
   : public QWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -111,14 +111,14 @@ public:
     return m_selected >= 0;
   }
 
-  void set_nodes (const std::vector <std::pair <double, std::pair<tl::Color, tl::Color> > > &nodes);
+  void set_nodes (const std::vector<std::pair<double, std::pair<tl::Color, tl::Color>>> &nodes);
 
-  const std::vector <std::pair <double, std::pair<tl::Color, tl::Color> > > &nodes () const
+  const std::vector<std::pair<double, std::pair<tl::Color, tl::Color>>> &nodes () const
   {
     return m_nodes;
   }
 
-  void set_histogram (const std::vector <size_t> &histogram);
+  void set_histogram (const std::vector<size_t> &histogram);
 
 public slots:
   void set_current_color (std::pair<QColor, QColor> c);
@@ -132,8 +132,8 @@ signals:
 private:
   bool m_dragging;
   int m_selected;
-  std::vector <std::pair <double, std::pair<tl::Color, tl::Color> > > m_nodes;
-  std::vector <size_t> m_histogram;
+  std::vector<std::pair<double, std::pair<tl::Color, tl::Color>>> m_nodes;
+  std::vector<size_t> m_histogram;
 };
 
 } // namespace img

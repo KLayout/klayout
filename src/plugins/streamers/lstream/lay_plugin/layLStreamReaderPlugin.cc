@@ -56,4 +56,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::LStreamReaderPluginDeclaration (), 10000, "LStreamReader");
 
 }
-

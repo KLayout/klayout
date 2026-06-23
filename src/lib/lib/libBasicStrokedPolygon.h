@@ -34,7 +34,7 @@ namespace lib
 /**
  *  @brief Implements the "STROKED_BOX" and "STROKED_POLYGON" PCell of the basic library
  */
-class BasicStrokedPolygon 
+class BasicStrokedPolygon
   : public db::PCellDeclaration
 {
 public:
@@ -80,5 +80,3 @@ private:
 }
 
 #endif
-
-

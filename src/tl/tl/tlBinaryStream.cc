@@ -32,30 +32,29 @@ namespace tl
 //  These type codes are intentionally separated from tl::Variant's
 //  type codes to allow a backward-compatible serialization scheme.
 
-enum VariantTypeCode
-{
-  var_type_nil        = 0,
-  var_type_bool       = 1,
-  var_type_char       = 2,
-  var_type_schar      = 3,
-  var_type_uchar      = 4,
-  var_type_short      = 5,
-  var_type_ushort     = 6,
-  var_type_int        = 7,
-  var_type_uint       = 8,
-  var_type_long       = 9,
-  var_type_ulong      = 10,
-  var_type_longlong   = 11,
-  var_type_ulonglong  = 12,
-  var_type_id         = 13,
-  var_type_float      = 14,
-  var_type_double     = 15,
-  var_type_string     = 16,
-  var_type_bytes      = 17,
-  var_type_list       = 18,
-  var_type_array      = 19,
+enum VariantTypeCode {
+  var_type_nil = 0,
+  var_type_bool = 1,
+  var_type_char = 2,
+  var_type_schar = 3,
+  var_type_uchar = 4,
+  var_type_short = 5,
+  var_type_ushort = 6,
+  var_type_int = 7,
+  var_type_uint = 8,
+  var_type_long = 9,
+  var_type_ulong = 10,
+  var_type_longlong = 11,
+  var_type_ulonglong = 12,
+  var_type_id = 13,
+  var_type_float = 14,
+  var_type_double = 15,
+  var_type_string = 16,
+  var_type_bytes = 17,
+  var_type_list = 18,
+  var_type_array = 19,
 
-  var_type_other      = -1
+  var_type_other = -1
 };
 
 // ---------------------------------------------------------------
@@ -66,7 +65,8 @@ class UnexpectedEndOfFileException
 public:
   UnexpectedEndOfFileException (const std::string &f)
     : tl::Exception (tl::to_string (tr ("Unexpected end of file in: %s")), f)
-  { }
+  {
+  }
 };
 
 class InvalidVariantTypeCode
@@ -75,7 +75,8 @@ class InvalidVariantTypeCode
 public:
   InvalidVariantTypeCode (const std::string &f, int tc)
     : tl::Exception (tl::to_string (tr ("Invalid variant type code %d in file: %s - maybe file is too new for this build?")), tc, f)
-  { }
+  {
+  }
 };
 
 // ---------------------------------------------------------------
@@ -86,8 +87,7 @@ BinaryInputStream::BinaryInputStream (InputStream &stream)
   //  .. nothing yet ..
 }
 
-void
-BinaryInputStream::reset ()
+void BinaryInputStream::reset ()
 {
   m_stream.reset ();
 }
@@ -288,171 +288,131 @@ BinaryInputStream::operator>> (tl::Variant &v)
   case VariantTypeCode::var_type_nil:
     v = tl::Variant ();
     break;
-  case VariantTypeCode::var_type_bool:
-    {
-      bool f = false;
-      *this >> f;
-      v = tl::Variant (f);
-    }
-    break;
-  case VariantTypeCode::var_type_char:
-    {
-      uint8_t vv = 0;
-      *this >> vv;
-      v = tl::Variant ((char) vv);
-    }
-    break;
-  case VariantTypeCode::var_type_schar:
-    {
-      int8_t vv = 0;
-      *this >> vv;
-      v = tl::Variant ((signed char) vv);
-    }
-    break;
-  case VariantTypeCode::var_type_uchar:
-    {
-      uint8_t vv = 0;
-      *this >> vv;
-      v = tl::Variant ((unsigned char) vv);
-    }
-    break;
-  case VariantTypeCode::var_type_short:
-    {
-      int16_t vv = 0;
-      *this >> vv;
-      v = tl::Variant ((short) vv);
-    }
-    break;
-  case VariantTypeCode::var_type_ushort:
-    {
-      uint16_t vv = 0;
-      *this >> vv;
-      v = tl::Variant ((unsigned short) vv);
-    }
-    break;
-  case VariantTypeCode::var_type_int:
-    {
-      int32_t vv = 0;
-      *this >> vv;
-      v = tl::Variant ((int) vv);
-    }
-    break;
-  case VariantTypeCode::var_type_uint:
-    {
-      uint32_t vv = 0;
-      *this >> vv;
-      v = tl::Variant ((unsigned int) vv);
-    }
-    break;
-  case VariantTypeCode::var_type_long:
-    {
-      int64_t vv = 0;
-      *this >> vv;
-      if (vv >= (int64_t) std::numeric_limits<long>::min () && vv <= (int64_t) std::numeric_limits<long>::max ()) {
-        v = tl::Variant ((long) vv);
-      } else {
-        //  Linux to Windows migration
-        v = tl::Variant ((long long) vv);
-      }
-    }
-    break;
-  case VariantTypeCode::var_type_ulong:
-    {
-      uint64_t vv = 0;
-      *this >> vv;
-      if (vv >= (uint64_t) std::numeric_limits<unsigned long>::min () && vv <= (uint64_t) std::numeric_limits<unsigned long>::max ()) {
-        v = tl::Variant ((unsigned long) vv);
-      } else {
-        //  Linux to Windows migration
-        v = tl::Variant ((unsigned long long) vv);
-      }
-    }
-    break;
-    break;
-  case VariantTypeCode::var_type_longlong:
-    {
-      int64_t vv = 0;
-      *this >> vv;
+  case VariantTypeCode::var_type_bool: {
+    bool f = false;
+    *this >> f;
+    v = tl::Variant (f);
+  } break;
+  case VariantTypeCode::var_type_char: {
+    uint8_t vv = 0;
+    *this >> vv;
+    v = tl::Variant ((char) vv);
+  } break;
+  case VariantTypeCode::var_type_schar: {
+    int8_t vv = 0;
+    *this >> vv;
+    v = tl::Variant ((signed char) vv);
+  } break;
+  case VariantTypeCode::var_type_uchar: {
+    uint8_t vv = 0;
+    *this >> vv;
+    v = tl::Variant ((unsigned char) vv);
+  } break;
+  case VariantTypeCode::var_type_short: {
+    int16_t vv = 0;
+    *this >> vv;
+    v = tl::Variant ((short) vv);
+  } break;
+  case VariantTypeCode::var_type_ushort: {
+    uint16_t vv = 0;
+    *this >> vv;
+    v = tl::Variant ((unsigned short) vv);
+  } break;
+  case VariantTypeCode::var_type_int: {
+    int32_t vv = 0;
+    *this >> vv;
+    v = tl::Variant ((int) vv);
+  } break;
+  case VariantTypeCode::var_type_uint: {
+    uint32_t vv = 0;
+    *this >> vv;
+    v = tl::Variant ((unsigned int) vv);
+  } break;
+  case VariantTypeCode::var_type_long: {
+    int64_t vv = 0;
+    *this >> vv;
+    if (vv >= (int64_t) std::numeric_limits<long>::min () && vv <= (int64_t) std::numeric_limits<long>::max ()) {
+      v = tl::Variant ((long) vv);
+    } else {
+      //  Linux to Windows migration
       v = tl::Variant ((long long) vv);
     }
-    break;
-  case VariantTypeCode::var_type_ulonglong:
-    {
-      uint64_t vv = 0;
-      *this >> vv;
+  } break;
+  case VariantTypeCode::var_type_ulong: {
+    uint64_t vv = 0;
+    *this >> vv;
+    if (vv >= (uint64_t) std::numeric_limits<unsigned long>::min () && vv <= (uint64_t) std::numeric_limits<unsigned long>::max ()) {
+      v = tl::Variant ((unsigned long) vv);
+    } else {
+      //  Linux to Windows migration
       v = tl::Variant ((unsigned long long) vv);
     }
+  } break;
     break;
-  case VariantTypeCode::var_type_id:
-    {
-      uint64_t vv = 0;
+  case VariantTypeCode::var_type_longlong: {
+    int64_t vv = 0;
+    *this >> vv;
+    v = tl::Variant ((long long) vv);
+  } break;
+  case VariantTypeCode::var_type_ulonglong: {
+    uint64_t vv = 0;
+    *this >> vv;
+    v = tl::Variant ((unsigned long long) vv);
+  } break;
+  case VariantTypeCode::var_type_id: {
+    uint64_t vv = 0;
+    *this >> vv;
+    v = tl::Variant ((size_t) vv, true /*as id*/);
+  } break;
+  case VariantTypeCode::var_type_float: {
+    float vv = 0;
+    *this >> vv;
+    v = tl::Variant (vv);
+  } break;
+  case VariantTypeCode::var_type_double: {
+    double vv = 0;
+    *this >> vv;
+    v = tl::Variant (vv);
+  } break;
+  case VariantTypeCode::var_type_string: {
+    std::string vv;
+    *this >> vv;
+    v = tl::Variant (std::move (vv));
+  } break;
+  case VariantTypeCode::var_type_bytes: {
+    std::vector<char> vv;
+    *this >> vv;
+    v = tl::Variant (std::move (vv));
+  } break;
+  case VariantTypeCode::var_type_list: {
+    uint64_t n = 0;
+    *this >> n;
+    v = tl::Variant::empty_list ();
+    v.reserve (n);
+    while (n-- > 0) {
+      tl::Variant vv;
       *this >> vv;
-      v = tl::Variant ((size_t) vv, true /*as id*/);
+      v.push (std::move (vv));
     }
-    break;
-  case VariantTypeCode::var_type_float:
-    {
-      float vv = 0;
+  } break;
+  case VariantTypeCode::var_type_array: {
+    uint64_t n = 0;
+    *this >> n;
+    v = tl::Variant::empty_array ();
+    while (n-- > 0) {
+      tl::Variant vk, vv;
+      *this >> vk;
       *this >> vv;
-      v = tl::Variant (vv);
+      v.insert (std::move (vk), std::move (vv));
     }
-    break;
-  case VariantTypeCode::var_type_double:
-    {
-      double vv = 0;
-      *this >> vv;
-      v = tl::Variant (vv);
-    }
-    break;
-  case VariantTypeCode::var_type_string:
-    {
-      std::string vv;
-      *this >> vv;
-      v = tl::Variant (std::move (vv));
-    }
-    break;
-  case VariantTypeCode::var_type_bytes:
-    {
-      std::vector<char> vv;
-      *this >> vv;
-      v = tl::Variant (std::move (vv));
-    }
-    break;
-  case VariantTypeCode::var_type_list:
-    {
-      uint64_t n = 0;
-      *this >> n;
-      v = tl::Variant::empty_list ();
-      v.reserve (n);
-      while (n-- > 0) {
-        tl::Variant vv;
-        *this >> vv;
-        v.push (std::move (vv));
-      }
-    }
-    break;
-  case VariantTypeCode::var_type_array:
-    {
-      uint64_t n = 0;
-      *this >> n;
-      v = tl::Variant::empty_array ();
-      while (n-- > 0) {
-        tl::Variant vk, vv;
-        *this >> vk;
-        *this >> vv;
-        v.insert (std::move (vk), std::move (vv));
-      }
-    }
-    break;
-  case VariantTypeCode::var_type_other:
-    {
-      std::string s;
-      *this >> s;
-      tl::Extractor ex (s.c_str ());
-      v = tl::Variant ();
-      ex.read (v);
-    }
-    break;
+  } break;
+  case VariantTypeCode::var_type_other: {
+    std::string s;
+    *this >> s;
+    tl::Extractor ex (s.c_str ());
+    v = tl::Variant ();
+    ex.read (v);
+  } break;
   default:
     throw InvalidVariantTypeCode (source (), int (var_type));
   }
@@ -481,8 +441,7 @@ BinaryOutputStream::BinaryOutputStream (const std::string &abstract_path, Output
   //  .. nothing yet ..
 }
 
-void
-BinaryOutputStream::put_native (const char *s, size_t n)
+void BinaryOutputStream::put_native (const char *s, size_t n)
 {
   //  the native format for a string is a length field (uint64_t) and the bytes
   //  TODO: for now we assume that the memory layout is the same for all platforms
@@ -491,8 +450,7 @@ BinaryOutputStream::put_native (const char *s, size_t n)
   put_raw (s, n);
 }
 
-void
-BinaryOutputStream::put_native (const std::string &s)
+void BinaryOutputStream::put_native (const std::string &s)
 {
   //  the native format for a string is a length field (uint64_t) and the bytes
   //  TODO: for now we assume that the memory layout is the same for all platforms
@@ -501,83 +459,71 @@ BinaryOutputStream::put_native (const std::string &s)
   put_raw (s.c_str (), s.size ());
 }
 
-void
-BinaryOutputStream::put_native (double v)
+void BinaryOutputStream::put_native (double v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 8);
 }
 
-void
-BinaryOutputStream::put_native (float v)
+void BinaryOutputStream::put_native (float v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 4);
 }
 
-void
-BinaryOutputStream::put_native (bool v)
+void BinaryOutputStream::put_native (bool v)
 {
   char c = v ? 1 : 0;
   put_raw (&c, 1);
 }
 
-void
-BinaryOutputStream::put_native (uint8_t v)
+void BinaryOutputStream::put_native (uint8_t v)
 {
   put_raw ((const char *) &v, 1);
 }
 
-void
-BinaryOutputStream::put_native (int8_t v)
+void BinaryOutputStream::put_native (int8_t v)
 {
   put_raw ((const char *) &v, 1);
 }
 
-void
-BinaryOutputStream::put_native (uint16_t v)
+void BinaryOutputStream::put_native (uint16_t v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 2);
 }
 
-void
-BinaryOutputStream::put_native (int16_t v)
+void BinaryOutputStream::put_native (int16_t v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 2);
 }
 
-void
-BinaryOutputStream::put_native (uint32_t v)
+void BinaryOutputStream::put_native (uint32_t v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 4);
 }
 
-void
-BinaryOutputStream::put_native (int32_t v)
+void BinaryOutputStream::put_native (int32_t v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 4);
 }
 
-void
-BinaryOutputStream::put_native (uint64_t v)
+void BinaryOutputStream::put_native (uint64_t v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 8);
 }
 
-void
-BinaryOutputStream::put_native (int64_t v)
+void BinaryOutputStream::put_native (int64_t v)
 {
   //  TODO: for now we assume that the memory layout is the same for all platforms
   put_raw ((const char *) &v, 8);
 }
 
-void
-BinaryOutputStream::put_native (const tl::Variant &v)
+void BinaryOutputStream::put_native (const tl::Variant &v)
 {
   switch (v.type_code ()) {
   case tl::Variant::t_nil:
@@ -656,31 +602,26 @@ BinaryOutputStream::put_native (const tl::Variant &v)
   case tl::Variant::t_qstring:
   case tl::Variant::t_qbytearray:
 #endif
-    {
-      put_native ((int16_t) VariantTypeCode::var_type_bytes);
-      std::vector<char> bytes = v.to_bytearray ();
-      put_native (bytes.begin ().operator-> (), bytes.size ());
+  {
+    put_native ((int16_t) VariantTypeCode::var_type_bytes);
+    std::vector<char> bytes = v.to_bytearray ();
+    put_native (bytes.begin ().operator->(), bytes.size ());
+  } break;
+  case tl::Variant::t_list: {
+    put_native ((int16_t) VariantTypeCode::var_type_list);
+    put_native ((uint64_t) v.size ());
+    for (auto i = v.begin (); i != v.end (); ++i) {
+      put_native (*i);
     }
-    break;
-  case tl::Variant::t_list:
-    {
-      put_native ((int16_t) VariantTypeCode::var_type_list);
-      put_native ((uint64_t) v.size ());
-      for (auto i = v.begin (); i != v.end (); ++i) {
-        put_native (*i);
-      }
+  } break;
+  case tl::Variant::t_array: {
+    put_native ((int16_t) VariantTypeCode::var_type_array);
+    put_native ((uint64_t) v.array_size ());
+    for (auto i = v.begin_array (); i != v.end_array (); ++i) {
+      put_native (i->first);
+      put_native (i->second);
     }
-    break;
-  case tl::Variant::t_array:
-    {
-      put_native ((int16_t) VariantTypeCode::var_type_array);
-      put_native ((uint64_t) v.array_size ());
-      for (auto i = v.begin_array (); i != v.end_array (); ++i) {
-        put_native (i->first);
-        put_native (i->second);
-      }
-    }
-    break;
+  } break;
   default:
     put_native ((int16_t) VariantTypeCode::var_type_other);
     put_native (v.to_parsable_string ());

@@ -70,8 +70,8 @@ public:
       if (! other.is_leaf ()) {
         init (false);
         for (unsigned int i = 0; i < 4; ++i) {
-          if (other.m_q[i]) {
-            m_q[i] = other.m_q[i]->clone ();
+          if (other.m_q [i]) {
+            m_q [i] = other.m_q [i]->clone ();
           }
         }
       }
@@ -97,7 +97,7 @@ public:
       std::swap (m_center, other.m_center);
       m_objects.swap (other.m_objects);
       for (unsigned int i = 0; i < 4; ++i) {
-        std::swap (m_q[i], other.m_q[i]);
+        std::swap (m_q [i], other.m_q [i]);
       }
     }
   }
@@ -114,10 +114,10 @@ public:
     m_objects.clear ();
     if (! is_leaf ()) {
       for (unsigned int i = 0; i < 4; ++i) {
-        if (m_q[i]) {
-          delete m_q[i];
+        if (m_q [i]) {
+          delete m_q [i];
         }
-        m_q[i] = 0;
+        m_q [i] = 0;
       }
       init (true);
     }
@@ -146,16 +146,15 @@ public:
         }
       }
 
-    } else if (m_q[n]) {
+    } else if (m_q [n]) {
 
-      if (m_q[n]->erase (value, b)) {
-        if (m_q[n]->empty ()) {
-          delete m_q[n];
-          m_q[n] = 0;
+      if (m_q [n]->erase (value, b)) {
+        if (m_q [n]->empty ()) {
+          delete m_q [n];
+          m_q [n] = 0;
         }
         return true;
       }
-
     }
 
     return false;
@@ -168,8 +167,8 @@ public:
 
   box_type q_box (unsigned int n) const
   {
-    if (! is_leaf () && m_q[n]) {
-      return m_q[n]->box (m_center);
+    if (! is_leaf () && m_q [n]) {
+      return m_q [n]->box (m_center);
     } else {
       return box_type ();
     }
@@ -186,7 +185,7 @@ public:
     if (m_objects.empty ()) {
       if (! is_leaf ()) {
         for (unsigned int n = 0; n < 4; ++n) {
-          if (m_q[n] && ! m_q[n]->empty ()) {
+          if (m_q [n] && ! m_q [n]->empty ()) {
             return false;
           }
         }
@@ -202,8 +201,8 @@ public:
     size_t count = m_objects.size ();
     if (! is_leaf ()) {
       for (unsigned int n = 0; n < 4; ++n) {
-        if (m_q[n]) {
-          count += m_q[n]->size ();
+        if (m_q [n]) {
+          count += m_q [n]->size ();
         }
       }
     }
@@ -215,8 +214,8 @@ public:
     size_t l = 1;
     if (! is_leaf ()) {
       for (unsigned int n = 0; n < 4; ++n) {
-        if (m_q[n]) {
-          l = std::max (l, m_q[n]->levels () + 1);
+        if (m_q [n]) {
+          l = std::max (l, m_q [n]->levels () + 1);
         }
       }
     }
@@ -236,16 +235,16 @@ private:
   void init (bool is_leaf)
   {
     for (unsigned int i = 0; i < 4; ++i) {
-      m_q[i] = 0;
+      m_q [i] = 0;
     }
     if (is_leaf) {
-      m_q[0] = reinterpret_cast<quad_tree_node *> (1);
+      m_q [0] = reinterpret_cast<quad_tree_node *> (1);
     }
   }
 
   bool is_leaf () const
   {
-    return m_q[0] == reinterpret_cast<quad_tree_node *> (1);
+    return m_q [0] == reinterpret_cast<quad_tree_node *> (1);
   }
 
   int quad_for (const box_type &box) const
@@ -312,33 +311,31 @@ private:
         if (n < 0) {
           m_objects.push_back (value);
         } else {
-          if (! m_q[n]) {
+          if (! m_q [n]) {
             box_type bq = q (n, ucenter);
-            m_q[n] = new quad_tree_node (bq.center ());
+            m_q [n] = new quad_tree_node (bq.center ());
           }
-          m_q[n]->insert (value, m_center, b);
+          m_q [n]->insert (value, m_center, b);
         }
 
       } else {
 
-        tl_assert (m_q[0] || m_q[1] || m_q[2] || m_q[3]);
+        tl_assert (m_q [0] || m_q [1] || m_q [2] || m_q [3]);
         point_type new_ucenter = m_center - (m_center - ucenter) * 2.0;
         grow (new_ucenter);
         insert (value, new_ucenter, b);
-
       }
-
     }
   }
 
   void grow (const point_type &ucenter)
   {
     for (unsigned int i = 0; i < 4; ++i) {
-      if (m_q[i]) {
-        quad_tree_node *n = m_q[i];
-        m_q[i] = new quad_tree_node (q (i, ucenter).center ());
-        m_q[i]->init (false);
-        m_q[i]->m_q[3 - i] = n;
+      if (m_q [i]) {
+        quad_tree_node *n = m_q [i];
+        m_q [i] = new quad_tree_node (q (i, ucenter).center ());
+        m_q [i]->init (false);
+        m_q [i]->m_q [3 - i] = n;
       }
     }
   }
@@ -347,8 +344,8 @@ private:
   {
     if (! is_leaf ()) {
       for (unsigned int i = 0; i < 4; ++i) {
-        if (m_q[i]) {
-          return m_center - (m_center - m_q[i]->center ()) * 2.0;
+        if (m_q [i]) {
+          return m_center - (m_center - m_q [i]->center ()) * 2.0;
         }
       }
     }
@@ -392,11 +389,11 @@ private:
       }
 
       for (unsigned int n = 0; n < 4; ++n) {
-        if (m_q[n]) {
-          if (! m_q[n]->check (m_center)) {
+        if (m_q [n]) {
+          if (! m_q [n]->check (m_center)) {
             result = false;
           }
-          box_type bbq = m_q[n]->box (m_center);
+          box_type bbq = m_q [n]->box (m_center);
           if (! bbq.equal (q (n, ucenter))) {
             tl::error << "Quad not centered (quad box is " << bbq.to_string () << ", should be " << q (n, ucenter).to_string ();
             result = false;
@@ -410,7 +407,6 @@ private:
         tl::error << "Non-split object count exceeds threshold " << m_objects.size () << " > " << thr;
         result = false;
       }
-
     }
 
     return result;
@@ -467,14 +463,14 @@ public:
     return m_stack.back ().first->objects () [m_i];
   }
 
-  const T *operator-> () const
+  const T *operator->() const
   {
-    return (m_stack.back ().first->objects ().begin () + m_i).operator-> ();
+    return (m_stack.back ().first->objects ().begin () + m_i).operator->();
   }
 
 public:
   S m_s;
-  std::vector<std::pair<const quad_tree_node_type *, int> > m_stack;
+  std::vector<std::pair<const quad_tree_node_type *, int>> m_stack;
   size_t m_i;
 
   void validate ()
@@ -521,7 +517,6 @@ public:
       }
 
       m_stack.pop_back ();
-
     }
   }
 };
@@ -618,8 +613,7 @@ private:
  *  @brief The default compare function
  */
 template <class T>
-struct quad_tree_default_cmp
-{
+struct quad_tree_default_cmp {
   bool operator() (const T &a, const T &b) const
   {
     return a == b;
@@ -646,9 +640,9 @@ class quad_tree
 {
 public:
   typedef quad_tree_node<T, BC, thr, CMP> quad_tree_node_type;
-  typedef quad_tree_iterator<T, BC, thr, CMP, quad_tree_always_sel<T, BC> > quad_tree_flat_iterator;
-  typedef quad_tree_iterator<T, BC, thr, CMP, quad_tree_touching_sel<T, BC> > quad_tree_touching_iterator;
-  typedef quad_tree_iterator<T, BC, thr, CMP, quad_tree_overlapping_sel<T, BC> > quad_tree_overlapping_iterator;
+  typedef quad_tree_iterator<T, BC, thr, CMP, quad_tree_always_sel<T, BC>> quad_tree_flat_iterator;
+  typedef quad_tree_iterator<T, BC, thr, CMP, quad_tree_touching_sel<T, BC>> quad_tree_touching_iterator;
+  typedef quad_tree_iterator<T, BC, thr, CMP, quad_tree_overlapping_sel<T, BC>> quad_tree_overlapping_iterator;
   typedef typename BC::box_type box_type;
   typedef typename box_type::point_type point_type;
   typedef typename box_type::vector_type vector_type;

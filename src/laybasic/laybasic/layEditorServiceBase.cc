@@ -28,7 +28,7 @@
 #include "layConverters.h"
 
 #if defined(HAVE_QT)
-#  include <QMessageBox>
+#include <QMessageBox>
 #endif
 
 namespace lay
@@ -60,7 +60,8 @@ class TrackingCursorBase
 public:
   TrackingCursorBase (lay::EditorServiceBase *service, lay::ViewObjectUI *widget)
     : lay::ViewObject (widget, false), mp_service (service)
-  { }
+  {
+  }
 
   uint32_t cursor_color (lay::ViewObjectCanvas &canvas) const
   {
@@ -94,22 +95,23 @@ class MouseCursorViewObject
 public:
   MouseCursorViewObject (lay::EditorServiceBase *service, lay::ViewObjectUI *widget, const db::DPoint &pt, bool solid)
     : TrackingCursorBase (service, widget), m_pt (pt), m_solid (solid)
-  { }
+  {
+  }
 
 protected:
   virtual void do_render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
   {
-    int dither_pattern = 0; // solid
-    int cross_dither_pattern = 6;  // dotted
+    int dither_pattern = 0;       // solid
+    int cross_dither_pattern = 6; // dotted
 
     int lw = int (0.5 + 1.0 / canvas.resolution ());
 
-    std::vector <lay::ViewOp> ops;
+    std::vector<lay::ViewOp> ops;
     ops.resize (1);
-    ops[0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, 0, (unsigned int) dither_pattern, 0, lay::ViewOp::Rect, lw, 0);
+    ops [0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, 0, (unsigned int) dither_pattern, 0, lay::ViewOp::Rect, lw, 0);
     lay::CanvasPlane *plane = canvas.plane (ops);
 
-    ops[0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, 0, (unsigned int) cross_dither_pattern, 0, lay::ViewOp::Rect, lw, 0);
+    ops [0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, 0, (unsigned int) cross_dither_pattern, 0, lay::ViewOp::Rect, lw, 0);
     lay::CanvasPlane *cross_plane = canvas.plane (ops);
 
     lay::Renderer &r = canvas.renderer ();
@@ -142,7 +144,8 @@ class EdgeMarkerViewObject
 public:
   EdgeMarkerViewObject (lay::EditorServiceBase *service, lay::ViewObjectUI *widget, const db::DEdge &edge, bool solid)
     : TrackingCursorBase (service, widget), m_edge (edge), m_solid (solid)
-  { }
+  {
+  }
 
 protected:
   virtual void do_render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
@@ -156,12 +159,12 @@ protected:
 
     int lw = int (0.5 + 1.0 / canvas.resolution ());
 
-    std::vector <lay::ViewOp> ops;
+    std::vector<lay::ViewOp> ops;
     ops.resize (1);
-    ops[0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, solid_style, 0, 0, lay::ViewOp::Rect, lw, 0);
+    ops [0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, solid_style, 0, 0, lay::ViewOp::Rect, lw, 0);
     lay::CanvasPlane *arrow_plane = canvas.plane (ops);
 
-    ops[0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, m_solid ? solid_style : dashed_style, 0, 0, lay::ViewOp::Rect, lw, 0);
+    ops [0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, m_solid ? solid_style : dashed_style, 0, 0, lay::ViewOp::Rect, lw, 0);
     lay::CanvasPlane *edge_plane = canvas.plane (ops);
 
     lay::Renderer &r = canvas.renderer ();
@@ -180,23 +183,22 @@ protected:
 
     } else {
 
-      db::DPoint pts[3];
+      db::DPoint pts [3];
       db::DPolygon p;
 
-      pts[0] = m_edge.p1 ();
-      pts[1] = m_edge.p1 () + d - n;
-      pts[2] = m_edge.p1 () + d + n;
+      pts [0] = m_edge.p1 ();
+      pts [1] = m_edge.p1 () + d - n;
+      pts [2] = m_edge.p1 () + d + n;
 
       p.assign_hull (pts, pts + 3);
       r.draw (p, vp.trans (), 0, arrow_plane, 0, 0);
 
-      pts[0] = m_edge.p2 ();
-      pts[1] = m_edge.p2 () - d + n;
-      pts[2] = m_edge.p2 () - d - n;
+      pts [0] = m_edge.p2 ();
+      pts [1] = m_edge.p2 () - d + n;
+      pts [2] = m_edge.p2 () - d - n;
 
       p.assign_hull (pts, pts + 3);
       r.draw (p, vp.trans (), 0, arrow_plane, 0, 0);
-
     }
   }
 
@@ -219,8 +221,7 @@ EditorServiceBase::EditorServiceBase (LayoutViewBase *view)
   //  .. nothing yet ..
 }
 
-void
-EditorServiceBase::init (LayoutViewBase *view)
+void EditorServiceBase::init (LayoutViewBase *view)
 {
   mp_view = view;
   lay::Plugin::init (view);
@@ -233,16 +234,14 @@ EditorServiceBase::~EditorServiceBase ()
   clear_mouse_cursors ();
 }
 
-void
-EditorServiceBase::add_mouse_cursor (const db::DPoint &pt, bool emphasize)
+void EditorServiceBase::add_mouse_cursor (const db::DPoint &pt, bool emphasize)
 {
   m_has_tracking_position = true;
   m_tracking_position = pt;
   m_mouse_cursor_markers.push_back (new MouseCursorViewObject (this, ui (), pt, emphasize));
 }
 
-void
-EditorServiceBase::add_mouse_cursor (const db::Point &pt, unsigned int cv_index, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool emphasize)
+void EditorServiceBase::add_mouse_cursor (const db::Point &pt, unsigned int cv_index, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool emphasize)
 {
   double dbu = mp_view->cellview (cv_index)->layout ().dbu ();
   for (auto t = tv.begin (); t != tv.end (); ++t) {
@@ -250,14 +249,12 @@ EditorServiceBase::add_mouse_cursor (const db::Point &pt, unsigned int cv_index,
   }
 }
 
-void
-EditorServiceBase::add_edge_marker (const db::DEdge &e, bool emphasize)
+void EditorServiceBase::add_edge_marker (const db::DEdge &e, bool emphasize)
 {
   m_mouse_cursor_markers.push_back (new EdgeMarkerViewObject (this, ui (), e, emphasize));
 }
 
-void
-EditorServiceBase::add_edge_marker (const db::Edge &e, unsigned int cv_index, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool emphasize)
+void EditorServiceBase::add_edge_marker (const db::Edge &e, unsigned int cv_index, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool emphasize)
 {
   double dbu = mp_view->cellview (cv_index)->layout ().dbu ();
   for (auto t = tv.begin (); t != tv.end (); ++t) {
@@ -265,8 +262,7 @@ EditorServiceBase::add_edge_marker (const db::Edge &e, unsigned int cv_index, co
   }
 }
 
-void
-EditorServiceBase::clear_mouse_cursors ()
+void EditorServiceBase::clear_mouse_cursors ()
 {
   m_has_tracking_position = false;
   for (std::vector<lay::ViewObject *>::iterator r = m_mouse_cursor_markers.begin (); r != m_mouse_cursor_markers.end (); ++r) {
@@ -275,8 +271,7 @@ EditorServiceBase::clear_mouse_cursors ()
   m_mouse_cursor_markers.clear ();
 }
 
-void
-EditorServiceBase::mouse_cursor_from_snap_details (const lay::PointSnapToObjectResult &snap_details, bool noclear)
+void EditorServiceBase::mouse_cursor_from_snap_details (const lay::PointSnapToObjectResult &snap_details, bool noclear)
 {
   if (! noclear) {
     clear_mouse_cursors ();
@@ -284,7 +279,7 @@ EditorServiceBase::mouse_cursor_from_snap_details (const lay::PointSnapToObjectR
 
   add_mouse_cursor (snap_details.snapped_point,
                     snap_details.object_snap == lay::PointSnapToObjectResult::ObjectVertex ||
-                    (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectUnspecific && snap_details.object_ref.is_degenerate ()));
+                      (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectUnspecific && snap_details.object_ref.is_degenerate ()));
 
   if (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectEdge ||
       (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectUnspecific && ! snap_details.object_ref.is_degenerate ())) {
@@ -292,8 +287,7 @@ EditorServiceBase::mouse_cursor_from_snap_details (const lay::PointSnapToObjectR
   }
 }
 
-bool
-EditorServiceBase::configure (const std::string &name, const std::string &value)
+bool EditorServiceBase::configure (const std::string &name, const std::string &value)
 {
   bool needs_update = false;
 
@@ -315,7 +309,6 @@ EditorServiceBase::configure (const std::string &name, const std::string &value)
       m_cursor_enabled = f;
       needs_update = true;
     }
-
   }
 
   if (needs_update) {
@@ -328,8 +321,7 @@ EditorServiceBase::configure (const std::string &name, const std::string &value)
   return false;
 }
 
-void
-EditorServiceBase::deactivated ()
+void EditorServiceBase::deactivated ()
 {
   clear_mouse_cursors ();
   if (ui ()) {
@@ -338,8 +330,7 @@ EditorServiceBase::deactivated ()
   m_active = false;
 }
 
-void
-EditorServiceBase::activated ()
+void EditorServiceBase::activated ()
 {
   m_active = true;
 }
@@ -348,7 +339,7 @@ std::vector<lay::EditorOptionsPage *>
 EditorServiceBase::editor_options_pages ()
 {
   lay::EditorOptionsPageCollection *eo_pages = mp_view->editor_options_pages ();
-  if (!eo_pages) {
+  if (! eo_pages) {
     return std::vector<lay::EditorOptionsPage *> ();
   } else {
     return eo_pages->editor_options_pages (plugin_declaration ());
@@ -368,8 +359,7 @@ EditorServiceBase::focus_page ()
   return 0;
 }
 
-bool
-EditorServiceBase::key_event (unsigned int key, unsigned int /*buttons*/)
+bool EditorServiceBase::key_event (unsigned int key, unsigned int /*buttons*/)
 {
   if (is_active () && (key == lay::KeyTab || key == lay::KeyBacktab)) {
     return focus_page_open () >= 0;
@@ -378,25 +368,19 @@ EditorServiceBase::key_event (unsigned int key, unsigned int /*buttons*/)
   }
 }
 
-bool
-EditorServiceBase::shortcut_override_event (unsigned int key, unsigned int /*buttons*/)
+bool EditorServiceBase::shortcut_override_event (unsigned int key, unsigned int /*buttons*/)
 {
   auto fp = focus_page ();
-  return is_active ()
-      && (key == lay::KeyTab || key == lay::KeyBacktab)
-      && fp
-      && (fp->is_modal_page () || fp->is_visible ());
+  return is_active () && (key == lay::KeyTab || key == lay::KeyBacktab) && fp && (fp->is_modal_page () || fp->is_visible ());
 }
 
-int
-EditorServiceBase::focus_page_open ()
+int EditorServiceBase::focus_page_open ()
 {
   auto fp = focus_page ();
   return fp ? fp->show () : -1;
 }
 
-void
-EditorServiceBase::show_error (tl::Exception &ex)
+void EditorServiceBase::show_error (tl::Exception &ex)
 {
   tl::error << ex.msg ();
 #if defined(HAVE_QT)

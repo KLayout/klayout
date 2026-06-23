@@ -32,47 +32,45 @@
 namespace lay
 {
 
-namespace {
+namespace
+{
 
-  template <class Obj>
-  struct sort_single_by_name
+template <class Obj>
+struct sort_single_by_name {
+  inline bool operator() (const Obj *a, const Obj *b) const
   {
-    inline bool operator() (const Obj *a, const Obj *b) const
-    {
-      if ((a != 0) != (b != 0)) {
-        return (a != 0) < (b != 0);
-      }
-      if (! a) {
-        return false;
-      } else {
-        return a->name () < b->name ();
-      }
+    if ((a != 0) != (b != 0)) {
+      return (a != 0) < (b != 0);
     }
-  };
+    if (! a) {
+      return false;
+    } else {
+      return a->name () < b->name ();
+    }
+  }
+};
 
-  template <class Obj, class SortBy>
-  struct sort_pair
+template <class Obj, class SortBy>
+struct sort_pair {
+  bool operator() (const std::pair<const Obj *, const Obj *> &a, const std::pair<const Obj *, const Obj *> &b) const
   {
-    bool operator() (const std::pair<const Obj *, const Obj *> &a, const std::pair<const Obj *, const Obj *> &b) const
-    {
-      SortBy order;
-      if (order (a.first, b.first)) {
-        return true;
-      } else if (order (b.first, a.first)) {
-        return false;
-      }
-      return order (a.second, b.second);
+    SortBy order;
+    if (order (a.first, b.first)) {
+      return true;
+    } else if (order (b.first, a.first)) {
+      return false;
     }
-  };
+    return order (a.second, b.second);
+  }
+};
 
-  struct CircuitsCompareByName
+struct CircuitsCompareByName {
+  bool operator() (const std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData::log_entries_type *> &a,
+                   const std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData::log_entries_type *> &b) const
   {
-    bool operator() (const std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData::log_entries_type *> &a,
-                     const std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData::log_entries_type *> &b) const
-    {
-      return sort_pair<db::Circuit, sort_single_by_name<db::Circuit> > () (a.first, b.first);
-    }
-  };
+    return sort_pair<db::Circuit, sort_single_by_name<db::Circuit>> () (a.first, b.first);
+  }
+};
 
 }
 
@@ -115,8 +113,7 @@ NetlistLogModel::NetlistLogModel (QWidget *parent, const db::NetlistCrossReferen
   std::sort (m_circuits.begin (), m_circuits.end (), CircuitsCompareByName ());
 }
 
-bool
-NetlistLogModel::hasChildren (const QModelIndex &parent) const
+bool NetlistLogModel::hasChildren (const QModelIndex &parent) const
 {
   if (! parent.isValid ()) {
     return m_global_entries > 0 || ! m_circuits.empty ();
@@ -133,7 +130,7 @@ NetlistLogModel::index (int row, int column, const QModelIndex &parent) const
   if (! parent.isValid ()) {
     return createIndex (row, column, (void *) (0));
   } else {
-    return createIndex (row, column, (void *) (& m_circuits [parent.row () - m_global_entries]));
+    return createIndex (row, column, (void *) (&m_circuits [parent.row () - m_global_entries]));
   }
 }
 
@@ -144,12 +141,11 @@ NetlistLogModel::parent (const QModelIndex &child) const
     return QModelIndex ();
   } else {
     const circuit_entry *ce = (const circuit_entry *) child.internalPointer ();
-    return createIndex (int (ce - & m_circuits.front ()) + m_global_entries, child.column (), (void *) (0));
+    return createIndex (int (ce - &m_circuits.front ()) + m_global_entries, child.column (), (void *) (0));
   }
 }
 
-int
-NetlistLogModel::rowCount (const QModelIndex &parent) const
+int NetlistLogModel::rowCount (const QModelIndex &parent) const
 {
   if (! parent.isValid ()) {
     return int (m_circuits.size ()) + m_global_entries;
@@ -162,14 +158,12 @@ NetlistLogModel::rowCount (const QModelIndex &parent) const
   }
 }
 
-int
-NetlistLogModel::columnCount (const QModelIndex & /*parent*/) const
+int NetlistLogModel::columnCount (const QModelIndex & /*parent*/) const
 {
   return 1;
 }
 
-QIcon
-NetlistLogModel::icon_for_severity (db::Severity severity)
+QIcon NetlistLogModel::icon_for_severity (db::Severity severity)
 {
   if (severity == db::Error) {
     return QIcon (QString::fromUtf8 (":/error_16px.png"));
@@ -190,14 +184,14 @@ NetlistLogModel::log_entry (const QModelIndex &index) const
   if (index.parent ().isValid ()) {
     const circuit_entry *ce = (const circuit_entry *) index.internalPointer ();
     if (ce) {
-      le = (ce->second->begin () + index.row ()).operator-> ();
+      le = (ce->second->begin () + index.row ()).operator->();
     }
   } else if (index.row () < m_global_entries) {
     int n_l2n = int (mp_l2n_messages ? mp_l2n_messages->size () : 0);
     if (index.row () < n_l2n) {
-      le = (mp_l2n_messages->begin () + index.row ()).operator-> ();
+      le = (mp_l2n_messages->begin () + index.row ()).operator->();
     } else {
-      le = (mp_lvsdb_messages->begin () + (index.row () - n_l2n)).operator-> ();
+      le = (mp_lvsdb_messages->begin () + (index.row () - n_l2n)).operator->();
     }
   }
 
@@ -253,7 +247,6 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
     } else if (le->severity () == db::Warning) {
       return QColor (0, 0, 255);
     }
-
   }
 
   return QVariant ();

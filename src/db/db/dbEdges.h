@@ -32,7 +32,8 @@
 
 #include <list>
 
-namespace db {
+namespace db
+{
 
 class EdgeFilterBase;
 class MutableEdges;
@@ -47,11 +48,11 @@ class Edges;
 /**
  *  @brief An edge set
  *
- *  An edge set is basically a collection of edges. They do not necessarily need to form closed contours. 
+ *  An edge set is basically a collection of edges. They do not necessarily need to form closed contours.
  *  Edges can be manipulated in various ways. Edge sets closely cooperate with the Region class which is a
  *  set of polygons.
  *
- *  Edge sets have some methods in common with regions. Edge sets can also be merged, which means that 
+ *  Edge sets have some methods in common with regions. Edge sets can also be merged, which means that
  *  edges which are continuations of other edges are joined.
  *
  *  Edge sets can contain degenerated edges. Such edges are some which have identical start and end points.
@@ -607,7 +608,7 @@ public:
   /**
    *  @brief Applies a width check and returns EdgePairs which correspond to violation markers
    *
-   *  The width check will create a edge pairs if the width of the area between the 
+   *  The width check will create a edge pairs if the width of the area between the
    *  edges is less than the specified threshold d.
    *
    *  "options" specifies various options to configure the check and it's output.
@@ -640,7 +641,7 @@ public:
    *  @brief Applies an enclosing check and returns EdgePairs which correspond to violation markers
    *
    *  The check will return true for edges from this edge set and the other edge set, where the other edge
-   *  is located on the "inside" side of the edge from this edge set, the orientation is parallel 
+   *  is located on the "inside" side of the edge from this edge set, the orientation is parallel
    *  and the distance is less than the specified threshold d.
    *
    *  The first edges of the edge pairs will be the ones from "this", the second edges will be those of "other".
@@ -658,7 +659,7 @@ public:
    *  @brief Applies an overlap check and returns EdgePairs which correspond to violation markers
    *
    *  The check will return true for edges from this edge set and the other edge set, where the other edge
-   *  is located on the "inside" side of the edge from this edge set, the orientation is anti-parallel 
+   *  is located on the "inside" side of the edge from this edge set, the orientation is anti-parallel
    *  and the distance is less than the specified threshold d.
    *
    *  The first edges of the edge pairs will be the ones from "this", the second edges will be those of "other".
@@ -676,7 +677,7 @@ public:
    *  @brief Applies an separation check and returns EdgePairs which correspond to violation markers
    *
    *  The check will return true for edges from this edge set and the other edge set, where the other edge
-   *  is located on the "outside" side of the edge from this edge set, the orientation is anti-parallel 
+   *  is located on the "outside" side of the edge from this edge set, the orientation is anti-parallel
    *  and the distance is less than the specified threshold d.
    *
    *  The first edges of the edge pairs will be the ones from "this", the second edges will be those of "other".
@@ -694,7 +695,7 @@ public:
    *  @brief Applies a inside check and returns EdgePairs which correspond to violation markers
    *
    *  The check will return true for edges from this edge set and the other edge set, where the other edge
-   *  is located on the "outide" side of the edge from this edge set, the orientation is parallel 
+   *  is located on the "outide" side of the edge from this edge set, the orientation is parallel
    *  and the distance is less than the specified threshold d.
    *
    *  The first edges of the edge pairs will be the ones from "this", the second edges will be those of "other".
@@ -995,7 +996,7 @@ public:
 
   /**
    *  @brief Select the edges inside the given region
-   *  
+   *
    *  This method will select the edges inside the given region.
    *  Edges on the border of the region won't be selected.
    *  As a side effect, the edges are made non-intersecting by introducing cut points where
@@ -1019,7 +1020,7 @@ public:
 
   /**
    *  @brief Select the edge parts outside of the given region
-   *  
+   *
    *  This method will select the edge parts outside of the given region.
    *  Edges on the border of the region won't be selected.
    *  As a side effect, the edges are made non-intersecting by introducing cut points where
@@ -1074,7 +1075,7 @@ public:
   /**
    *  @brief Selects all edges of this edge set which overlap or touch with polygons from the region
    *
-   *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be 
+   *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be
    *  selected as a whole.
    */
   Edges &select_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
@@ -1096,7 +1097,7 @@ public:
   /**
    *  @brief Selects all edges of this edge set which do not overlap or touch with polygons from the region
    *
-   *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be 
+   *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be
    *  selected as a whole.
    */
   Edges &select_not_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
@@ -1363,7 +1364,7 @@ public:
   /**
    *  @brief Selects all edges of this edge set which overlap or touch with edges from the other edge set
    *
-   *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be 
+   *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be
    *  selected as a whole.
    */
   Edges &select_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
@@ -1394,7 +1395,7 @@ public:
   /**
    *  @brief Selects all edges of this edge set which do not overlap or touch with edges from the other edge set
    *
-   *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be 
+   *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be
    *  selected as a whole.
    */
   Edges &select_not_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
@@ -1575,15 +1576,15 @@ private:
   EdgesDelegate *mp_delegate;
 
   void set_delegate (EdgesDelegate *delegate, bool keep_attributes = true);
-  MutableEdges *mutable_edges();
+  MutableEdges *mutable_edges ();
 };
 
 } // namespace db
 
 namespace tl
 {
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Edges &b);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Edges &b);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Edges &b);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Edges &b);
 }
 
 #endif

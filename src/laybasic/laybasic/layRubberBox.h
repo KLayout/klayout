@@ -33,7 +33,7 @@ namespace lay
 class LAYBASIC_PUBLIC RubberBox
   : public lay::ViewObject
 {
-public: 
+public:
   RubberBox (lay::ViewObjectUI *canvas, unsigned int color, const db::DPoint &p1, const db::DPoint &p2);
 
   void set_color (unsigned int color);
@@ -51,5 +51,3 @@ private:
 }
 
 #endif
-
-

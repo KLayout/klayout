@@ -29,13 +29,13 @@ namespace tl
 // ----------------------------------------------------------
 //  HeapObject implementation
 
-HeapObject::HeapObject () 
-  : mp_b (0) 
-{ 
+HeapObject::HeapObject ()
+  : mp_b (0)
+{
   //  .. nothing yet ..
 }
 
-HeapObject::~HeapObject () 
+HeapObject::~HeapObject ()
 {
   if (mp_b) {
     delete mp_b;
@@ -60,4 +60,3 @@ Heap::~Heap ()
 }
 
 }
-

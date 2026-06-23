@@ -41,9 +41,9 @@
 
 namespace db
 {
-  class Layout;
-  class Library;
-  struct LayerProperties;
+class Layout;
+class Library;
+struct LayerProperties;
 }
 
 namespace lay
@@ -59,7 +59,7 @@ struct CellViewSelectionComboBoxPrivateData;
 class LAYUI_PUBLIC DitherPatternSelectionButton
   : public QPushButton
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -73,7 +73,7 @@ public:
   ~DitherPatternSelectionButton ();
 
   /**
-   *  @brief Associate with a view 
+   *  @brief Associate with a view
    *
    *  This method is required to select the proper dither pattern
    */
@@ -90,14 +90,14 @@ public:
   int dither_pattern () const;
 
   /**
-   *  @brief Override setText 
+   *  @brief Override setText
    */
-  void setText (const QString &) { }
+  void setText (const QString &) {}
 
   /**
-   *  @brief Override setPixmap 
+   *  @brief Override setPixmap
    */
-  void setPixmap (const QPixmap &) { }
+  void setPixmap (const QPixmap &) {}
 
 signals:
   void dither_pattern_changed (int);
@@ -121,7 +121,7 @@ private:
 class LAYUI_PUBLIC LineStyleSelectionButton
   : public QPushButton
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -154,12 +154,12 @@ public:
   /**
    *  @brief Override setText
    */
-  void setText (const QString &) { }
+  void setText (const QString &) {}
 
   /**
    *  @brief Override setPixmap
    */
-  void setPixmap (const QPixmap &) { }
+  void setPixmap (const QPixmap &) {}
 
 signals:
   void line_style_changed (int);
@@ -185,7 +185,7 @@ private:
 class LAYUI_PUBLIC LibrarySelectionComboBox
   : public QComboBox
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -237,9 +237,10 @@ private:
  *  This combo box allows selecting a (physical) layer from a layout
  */
 class LAYUI_PUBLIC LayerSelectionComboBox
-  : public QComboBox, public tl::Object
+  : public QComboBox,
+    public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -372,7 +373,7 @@ private:
 class LAYUI_PUBLIC CellViewSelectionComboBox
   : public QComboBox
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   CellViewSelectionComboBox (QWidget *parent);
@@ -391,14 +392,14 @@ private:
 /**
  *  @brief Simple color chooser button
  *
- *  This class implements a special button that can replace a 
+ *  This class implements a special button that can replace a
  *  usual push button and supplies a color chooser without the
  *  capability to switch to "auto" color mode.
  */
 class LAYUI_PUBLIC SimpleColorButton
-  : public QPushButton 
+  : public QPushButton
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   SimpleColorButton (QPushButton *&to_replace, const char *name = 0);
@@ -430,7 +431,7 @@ private slots:
 class LAYUI_PUBLIC MarginWidget
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MarginWidget (QWidget *parent, const char *name = 0);
@@ -451,14 +452,14 @@ private:
 /**
  *  @brief Color chooser button
  *
- *  This class implements a special button that can replace a 
+ *  This class implements a special button that can replace a
  *  usual push button and supplies a color chooser with the
  *  capability to switch to "auto" color mode.
  */
 class LAYUI_PUBLIC ColorButton
-  : public QPushButton 
+  : public QPushButton
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   ColorButton (QPushButton *&to_replace, const char *name = 0);
@@ -493,7 +494,7 @@ private slots:
 class LAYUI_PUBLIC DecoratedLineEdit
   : public QLineEdit
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -623,7 +624,7 @@ private:
 class LAYUI_PUBLIC InteractiveListWidget
   : public QListWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -677,4 +678,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

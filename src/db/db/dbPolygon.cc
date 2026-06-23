@@ -27,8 +27,7 @@ namespace db
 {
 
 template <class C>
-static
-db::DEdge compute_shifted (const db::edge<C> &e, C dx, C dy, double ext, int nsign)
+static db::DEdge compute_shifted (const db::edge<C> &e, C dx, C dy, double ext, int nsign)
 {
   tl_assert (! e.is_degenerate ()); // no coincident points allowed
 
@@ -57,7 +56,7 @@ template <>
 inline db::DVector dpx<Coord> (const db::DVector &p, double d)
 {
   //  Note: "up" mode is used for computing the extension. Some bigger value
-  //  is helpful in avoiding the case of too short extensions causing 
+  //  is helpful in avoiding the case of too short extensions causing
   //  a missing intersection even in non-acute angle case
   if (fabs (p.x ()) < db::epsilon || fabs (p.y ()) < db::epsilon) {
     return p * double (coord_traits<Coord>::rounded (d));
@@ -76,7 +75,7 @@ inline db::DVector dpx<DCoord> (const db::DVector &p, double d)
   return p * d;
 }
 
-template <class C> 
+template <class C>
 static void
 compute_normals (const db::vector<C> &d, C dx, C dy, int nsign, db::DVector &ed, db::DVector &nd)
 {
@@ -98,12 +97,11 @@ compute_normals (const db::vector<C> &d, C dx, C dy, int nsign, db::DVector &ed,
 
       //  dpx is a smart multiplication trying to preserve 45 degree edges on grid
       nd = dpx<C> (nd, fabs (double (dx)) * nsign);
-
     }
 
   } else {
 
-    double f = sqrt(double (dx) * double (dx) * double (d.y()) * double (d.y()) + double (dy) * double (dy) * double (d.x()) * double (d.x()));
+    double f = sqrt (double (dx) * double (dx) * double (d.y ()) * double (d.y ()) + double (dy) * double (dy) * double (d.x ()) * double (d.x ()));
     if (f < db::coord_traits<DCoord>::prec_area ()) {
 
       if (dx == 0) {
@@ -114,7 +112,7 @@ compute_normals (const db::vector<C> &d, C dx, C dy, int nsign, db::DVector &ed,
         ed = db::DVector ();
       }
 
-      nd = db::DVector();
+      nd = db::DVector ();
 
     } else {
 
@@ -122,9 +120,7 @@ compute_normals (const db::vector<C> &d, C dx, C dy, int nsign, db::DVector &ed,
 
       nd = db::DVector (double (-d.y ()) * double (dx) * double (dx), double (d.x ()) * double (dy) * double (dy));
       nd *= nsign / f;
-
     }
-
   }
 }
 
@@ -198,11 +194,11 @@ void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
   if (mode == 0) {
     ext = 0.0;
   } else if (mode == 1) {
-    ext = sqrt(2.0) - 1.0;
+    ext = sqrt (2.0) - 1.0;
   } else if (mode == 2) {
-    ext = 1.0; 
+    ext = 1.0;
   } else if (mode == 3) {
-    ext = sqrt(2.0) + 1.0;
+    ext = sqrt (2.0) + 1.0;
   } else if (mode == 4) {
     ext = 10.0;
   }
@@ -226,7 +222,7 @@ void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
   simple_iterator pp = p;
   ++pp;
 
-  std::back_insert_iterator<std::vector<point_type> > pts (new_points);
+  std::back_insert_iterator<std::vector<point_type>> pts (new_points);
 
   tl_assert (*pp != *p); // no coincident points allowed
 
@@ -278,7 +274,6 @@ void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
         *pts++ = *pp + vector<C> (nd);
         *pts++ = *pp;
         *pts++ = *pp + vector<C> (nnd);
-
       }
 
     } else {
@@ -305,14 +300,12 @@ void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
 
       } else {
 
-        //  cut-off corner: produce two points connecting the edges 
+        //  cut-off corner: produce two points connecting the edges
         *pts++ = *pp + vector<C> (nd + ed * std::min (l1max, l1));
         *pts++ = *pp + vector<C> (nnd - eed * std::min (l2max, l2));
-
       }
-
     }
-    
+
     p = pp;
     pp = ppp;
 
@@ -353,24 +346,28 @@ void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
     //  find the first and second valid edge:
     //  lie = last input edge, cie = current input edges
 
-    unsigned int i = 0; 
+    unsigned int i = 0;
 
-    while (i < npts && inverted[i]) { ++i; }
+    while (i < npts && inverted [i]) {
+      ++i;
+    }
 
     tl_assert (i != npts);
-    db::edge<C> lie ((*this)[i], (*this)[(i + 1) % npts]); 
+    db::edge<C> lie ((*this) [i], (*this) [(i + 1) % npts]);
     db::DEdge lie_s (compute_shifted (lie, dx, dy, ext, nsign));
     unsigned int lie_index = i;
 
-    do { ++i; } while (i < npts && inverted[i]);
+    do {
+      ++i;
+    } while (i < npts && inverted [i]);
 
     tl_assert (i != npts);
-    db::edge<C> cie ((*this)[i], (*this)[(i + 1) % npts]);
+    db::edge<C> cie ((*this) [i], (*this) [(i + 1) % npts]);
     db::DEdge cie_s (compute_shifted (cie, dx, dy, ext, nsign));
     unsigned int cie_index = i;
 
     //  Do an intersection test on these lines
-    std::pair <bool, db::DPoint> ip = lie_s.intersect_point (cie_s);
+    std::pair<bool, db::DPoint> ip = lie_s.intersect_point (cie_s);
 
     //  last output point
     db::point<C> lop;
@@ -380,7 +377,7 @@ void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
       lop = point<C>::from_double (ip.second);
     } else {
       //  If the test lines to not cross, we have the case of an acute angle bend.
-      //  This is a normal outer bend: we insert both points to define the contour in a 
+      //  This is a normal outer bend: we insert both points to define the contour in a
       //  confined, cut-off fashion.
       lop = point<C>::from_double (cie_s.p1 ());
     }
@@ -396,7 +393,7 @@ void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
       ii = ((i + 1) >= npts ? 0 : (i + 1));
 
       // ignore inverted edges now.
-      if (inverted[i]) {
+      if (inverted [i]) {
         continue;
       }
 
@@ -406,12 +403,12 @@ void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
       lie_s = cie_s;
       lie_index = cie_index;
 
-      cie = db::edge<C> ((*this)[i], (*this)[ii]);
+      cie = db::edge<C> ((*this) [i], (*this) [ii]);
       cie_s = compute_shifted (cie, dx, dy, ext, nsign);
       cie_index = i;
 
       //  Do an intersection test on these lines
-      std::pair <bool, db::DPoint> ip = lie_s.intersect_point (cie_s);
+      std::pair<bool, db::DPoint> ip = lie_s.intersect_point (cie_s);
 
       //  If the lines intersect, we have a well-formed inner or outer corner
       if (ip.first && ! lie_s.parallel (cie_s)) {
@@ -428,7 +425,7 @@ void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
           new_points.push_back (o.p2 ());
         } else if (s < 0) {
           //  mark this edge as inverted
-          inverted[lie_index] = 1;
+          inverted [lie_index] = 1;
           --nvalid;
         }
 
@@ -447,26 +444,22 @@ void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
           }
         } else if (s < 0) {
           //  mark this edge as inverted
-          inverted[lie_index] = 1;
+          inverted [lie_index] = 1;
           --nvalid;
-        } 
+        }
 
         new_points.push_back (o.p2 ());
 
         lop = point<C>::from_double (cie_s.p1 ());
         new_points.push_back (lop);
-
       }
-
     }
-
   }
 
   //  assign the results
   assign (new_points.begin (), new_points.end (), db::unit_trans (), is_hole (), true /*compress*/, false /*don't normalize*/);
 
 #endif
-
 }
 
 // explicit instantiations for polygon<T> and simple_polygon<T>
@@ -478,28 +471,28 @@ template class polygon_contour<db::DCoord>;
 namespace tl
 {
 
-template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Polygon &p)
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Polygon &p)
 {
   if (! test_extractor_impl (ex, p)) {
     ex.error (tl::to_string (tr ("Expected a polygon specification")));
   }
 }
 
-template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPolygon &p)
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPolygon &p)
 {
   if (! test_extractor_impl (ex, p)) {
     ex.error (tl::to_string (tr ("Expected a polygon specification")));
   }
 }
 
-template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::SimplePolygon &p)
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::SimplePolygon &p)
 {
   if (! test_extractor_impl (ex, p)) {
     ex.error (tl::to_string (tr ("Expected a polygon specification")));
   }
 }
 
-template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DSimplePolygon &p)
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DSimplePolygon &p)
 {
   if (! test_extractor_impl (ex, p)) {
     ex.error (tl::to_string (tr ("Expected a polygon specification")));
@@ -507,10 +500,10 @@ template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DSimplePolygon 
 }
 
 
-template<class C> DB_PUBLIC bool _test_extractor_impl (tl::Extractor &ex, db::polygon<C> &p)
+template <class C> DB_PUBLIC bool _test_extractor_impl (tl::Extractor &ex, db::polygon<C> &p)
 {
   typedef db::point<C> point_type;
-  std::vector <point_type> points;
+  std::vector<point_type> points;
 
   if (ex.test ("(")) {
 
@@ -535,7 +528,6 @@ template<class C> DB_PUBLIC bool _test_extractor_impl (tl::Extractor &ex, db::po
       }
 
       p.insert_hole (points.begin (), points.end (), false, false);
-
     }
 
     ex.expect (")");
@@ -547,20 +539,20 @@ template<class C> DB_PUBLIC bool _test_extractor_impl (tl::Extractor &ex, db::po
   }
 }
 
-template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Polygon &p)
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Polygon &p)
 {
   return _test_extractor_impl (ex, p);
 }
 
-template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DPolygon &p)
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DPolygon &p)
 {
   return _test_extractor_impl (ex, p);
 }
 
-template<class C> DB_PUBLIC bool _test_extractor_impl (tl::Extractor &ex, db::simple_polygon<C> &p)
+template <class C> DB_PUBLIC bool _test_extractor_impl (tl::Extractor &ex, db::simple_polygon<C> &p)
 {
   typedef db::point<C> point_type;
-  std::vector <point_type> points;
+  std::vector<point_type> points;
 
   if (ex.test ("(")) {
 
@@ -581,17 +573,14 @@ template<class C> DB_PUBLIC bool _test_extractor_impl (tl::Extractor &ex, db::si
   }
 }
 
-template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::SimplePolygon &p)
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::SimplePolygon &p)
 {
   return _test_extractor_impl (ex, p);
 }
 
-template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DSimplePolygon &p)
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DSimplePolygon &p)
 {
   return _test_extractor_impl (ex, p);
 }
 
 }
-
-
-

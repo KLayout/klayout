@@ -44,8 +44,7 @@ const unsigned int max_lstreame_compression_level = 10;
 /**
  *  @brief Compare operator for points, distinct x clustered (with same y)
  */
-struct vector_cmp_x
-{
+struct vector_cmp_x {
   bool operator() (const db::Vector &a, const db::Vector &b) const
   {
     if (a.y () != b.y ()) {
@@ -59,8 +58,7 @@ struct vector_cmp_x
 /**
  *  @brief Compare operator for points, distinct y clustered (with same x)
  */
-struct vector_cmp_y
-{
+struct vector_cmp_y {
   bool operator() (const db::Vector &a, const db::Vector &b) const
   {
     if (a.x () != b.x ()) {
@@ -73,11 +71,11 @@ struct vector_cmp_y
 
 /**
  *  @brief Returns the cost value of a coordinate difference (or coordinate)
- *  The cost is used to estimate the size cost of a coordinate difference 
+ *  The cost is used to estimate the size cost of a coordinate difference
  *  in the OASIS output.
- *  The cost is roughly the number of bytes required to represent the 
+ *  The cost is roughly the number of bytes required to represent the
  *  number. It does not consider gdelta compression, actual byte count or similar.
- * 
+ *
  *  TODO: this heuristics is taken from OASIS. I should be adapted to LStream.
  */
 inline double cost_of (double d)
@@ -89,7 +87,7 @@ inline double cost_of (double d)
 
 /**
  *  @brief A predicate describing whether an object is empty
- * 
+ *
  *  An object is "empty", if it does not have at least one reference point.
  *  For example, an empty box is empty. Such objects cannot be written and are
  *  stripped.
@@ -176,9 +174,8 @@ static inline db::Vector reduce_object (db::CellInstArrayWithProperties &ci)
  *  @brief Compare operator for points/abstract repetition pair with configurable point compare operator
  */
 template <class PC>
-struct rep_vector_cmp
-{
-  bool operator () (const std::pair <db::Vector, std::pair <db::Coord, int> > &a, const std::pair <db::Vector, std::pair <db::Coord, int> > &b)
+struct rep_vector_cmp {
+  bool operator() (const std::pair<db::Vector, std::pair<db::Coord, int>> &a, const std::pair<db::Vector, std::pair<db::Coord, int>> &b)
   {
     if (a.second != b.second) {
       return a.second < b.second;
@@ -190,20 +187,20 @@ struct rep_vector_cmp
 
 /**
  *  @brief Represents a regular array
- * 
+ *
  *  A regular array is a set of displacements given by the
  *  formula
- * 
+ *
  *     d = ia*a + ib*b
- * 
+ *
  *  where "ia" is an integer running from 0 to na-1, "ib" is an integer
  *  running from 0 to nb-1 and "a" and "b" are two arbitrary vectors.
- * 
+ *
  *  The axes "a" and "b" do not need to be orthogonal in the general
  *  case, but they should not be collinear.
- * 
+ *
  *  "na" and "nb" are the dimensions of the array.
- * 
+ *
  *  An array can be "null", which means it does not represent any
  *  placements.
  */
@@ -221,7 +218,7 @@ public:
 
   /**
    *  @brief Creates an array with the given axes and dimensions
-   * 
+   *
    *  @param a The "a" axis
    *  @param b The "b" axis
    *  @param na The "a" dimension
@@ -266,15 +263,15 @@ public:
    */
   bool operator== (const RegularArray &other) const
   {
-    return m_a == other.m_a && 
-           m_b == other.m_b && 
-           m_na == other.m_na && 
+    return m_a == other.m_a &&
+           m_b == other.m_b &&
+           m_na == other.m_na &&
            m_nb == other.m_nb;
   }
 
   /**
    *  @brief The less operator
-   * 
+   *
    *  This operator is provided for strict weak ordering
    *  for us of the array as a key in std::map or std::set.
    */
@@ -302,7 +299,7 @@ private:
 
 /**
  *  @brief An interface by which the compressor delivers the results of the compression
- * 
+ *
  *  Note that we're lacking virtual templates, hence the large number of
  *  methods for every object type.
  */
@@ -311,7 +308,7 @@ class CompressorDelivery
 public:
   typedef std::vector<db::Vector> disp_vector;
 
-  virtual ~CompressorDelivery () { }
+  virtual ~CompressorDelivery () {}
 
   virtual void write (const db::Point &obj, const RegularArray &array, const disp_vector &irregular) = 0;
   virtual void write (const db::PointWithProperties &obj, const RegularArray &array, const disp_vector &irregular) = 0;
@@ -335,27 +332,27 @@ public:
 
 /**
  *  @brief The compressor object
- * 
+ *
  *  The task of the compressor object is to accept a serial stream
  *  of individual objects and arranging them into arrays as far as possible.
- * 
+ *
  *  Arrays can be regular (RegularArray) or enumerated (lists of placements).
- * 
+ *
  *  Individual objects are fed using the "add" method. Once all objects
  *  are fed "flush" can be used to deliver the compressed arrays to a
  *  "CompressorDelivery" object.
- * 
+ *
  *  Note that once "flush" is called, "add" should no longer be used.
  *  For compressing new objects, construct a fresh Compressor object.
  */
 template <class Obj>
-class Compressor 
+class Compressor
 {
 public:
-  /** 
+  /**
    *  @brief Constructor
    *
-   *  @param level The compression level 
+   *  @param level The compression level
    *
    *  Allowed levels are:
    *    0   - simple
@@ -370,7 +367,7 @@ public:
 
   /**
    *  @brief Adds a new object with the given displacement
-   * 
+   *
    *  The object is supposed to be reduced (positioned at 0,0)
    *  already and the displacement specifies where the object
    *  was sitting originally.
@@ -384,7 +381,7 @@ public:
 
   /**
    *  @brief Adds an object with reduction
-   * 
+   *
    *  The object added can sit anywhere. Before it is added,
    *  it is reduced (positioned at 0,0) and the displacement
    *  is recorded for array formation.
@@ -400,10 +397,10 @@ public:
 
   /**
    *  @brief Generates arrays and delivers when to the delivery interface
-   * 
+   *
    *  This method will can "deliver->write (Object, ...)" as many times as
    *  needed.
-   * 
+   *
    *  Note that single objects may be delivered as well. These are encoded
    *  as null regular arrays and empty irregular placement lists.
    */
@@ -411,12 +408,11 @@ public:
 
 private:
   typedef std::vector<db::Vector> disp_vector;
-  
-  std::unordered_map <Obj, disp_vector> m_normalized;
+
+  std::unordered_map<Obj, disp_vector> m_normalized;
   unsigned int m_level;
 };
 
 }
 
 #endif
-

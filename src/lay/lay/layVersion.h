@@ -26,7 +26,8 @@
 
 #include "layCommon.h"
 
-namespace lay {
+namespace lay
+{
 
 /**
  *  @brief This class provides the program's version information
@@ -51,4 +52,3 @@ public:
 }
 
 #endif
-

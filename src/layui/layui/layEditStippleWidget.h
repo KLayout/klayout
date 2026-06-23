@@ -34,9 +34,10 @@ namespace lay
 {
 
 class EditStippleWidget
-  : public QFrame, public db::Object
+  : public QFrame,
+    public db::Object
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   EditStippleWidget (QWidget *parent);
@@ -45,7 +46,7 @@ public:
   virtual QSize minimumSize () const;
 
   void set_pattern (const uint32_t *pattern, unsigned int sx, unsigned int sy);
-  void set_pattern (const uint32_t * const *pattern, unsigned int sx, unsigned int sy);
+  void set_pattern (const uint32_t *const *pattern, unsigned int sx, unsigned int sy);
 
   void undo (db::Op *op);
   void redo (db::Op *op);
@@ -110,4 +111,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

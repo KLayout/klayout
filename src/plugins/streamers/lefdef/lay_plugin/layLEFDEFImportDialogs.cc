@@ -43,7 +43,6 @@ LEFDEFImportData::LEFDEFImportData ()
   : mode (0)
 {
   //  .. nothing yet ..
-
 }
 
 void LEFDEFImportData::from_string (const std::string &s)
@@ -76,26 +75,25 @@ void LEFDEFImportData::from_string (const std::string &s)
     } else {
       break;
     }
-
   }
 }
 
-std::string  
+std::string
 LEFDEFImportData::to_string () const
 {
   std::string s;
-  s += "file=" + tl::to_quoted_string(file) + ";";
+  s += "file=" + tl::to_quoted_string (file) + ";";
   if (! lef_files.empty ()) {
     s += "lef-files=";
     for (size_t i = 0; i < lef_files.size (); ++i) {
       if (i > 0) {
         s += ",";
       }
-      s += tl::to_quoted_string(lef_files [i]);
+      s += tl::to_quoted_string (lef_files [i]);
     }
     s += ";";
   }
-  s += "import-mode=" + tl::to_string(mode) + ";";
+  s += "import-mode=" + tl::to_string (mode) + ";";
   return s;
 }
 
@@ -121,18 +119,17 @@ LEFDEFImportOptionsDialog::LEFDEFImportOptionsDialog (QWidget *parent, bool is_l
   setWindowTitle (tl::to_qstring (m_is_lef_dialog ? tl::to_string (QObject::tr ("Import LEF File")) : tl::to_string (QObject::tr ("Import DEF File"))));
 }
 
-int 
-LEFDEFImportOptionsDialog::exec_dialog (LEFDEFImportData &data)
+int LEFDEFImportOptionsDialog::exec_dialog (LEFDEFImportData &data)
 {
   file_le->setText (tl::to_qstring (data.file));
 
-  for (std::vector <std::string>::const_iterator f = data.lef_files.begin (); f != data.lef_files.end (); ++f) {
+  for (std::vector<std::string>::const_iterator f = data.lef_files.begin (); f != data.lef_files.end (); ++f) {
     lef_files->addItem (tl::to_qstring (*f));
   }
   for (int i = 0; i < lef_files->count (); ++i) {
     lef_files->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
   }
-  
+
   replace_rb->setChecked (data.mode == 0);
   import_same_panel_rb->setChecked (data.mode == 2);
   import_new_panel_rb->setChecked (data.mode == 1);
@@ -147,21 +144,19 @@ LEFDEFImportOptionsDialog::exec_dialog (LEFDEFImportData &data)
     for (int i = 0; i < lef_files->count (); ++i) {
       data.lef_files.push_back (tl::to_string (lef_files->item (i)->text ()));
     }
-  
+
     data.mode = 0;
     if (import_same_panel_rb->isChecked ()) {
       data.mode = 2;
     } else if (import_new_panel_rb->isChecked ()) {
       data.mode = 1;
     }
-
   }
 
   return result;
 }
 
-void
-LEFDEFImportOptionsDialog::add_lef_file_clicked ()
+void LEFDEFImportOptionsDialog::add_lef_file_clicked ()
 {
   std::string title, filters;
   title = tl::to_string (QObject::tr ("Add LEF Files"));
@@ -175,8 +170,7 @@ LEFDEFImportOptionsDialog::add_lef_file_clicked ()
   }
 }
 
-void
-LEFDEFImportOptionsDialog::del_lef_files_clicked ()
+void LEFDEFImportOptionsDialog::del_lef_files_clicked ()
 {
   QStringList files;
   for (int i = 0; i < lef_files->count (); ++i) {
@@ -194,8 +188,7 @@ LEFDEFImportOptionsDialog::del_lef_files_clicked ()
   }
 }
 
-void
-LEFDEFImportOptionsDialog::move_lef_files_up_clicked ()
+void LEFDEFImportOptionsDialog::move_lef_files_up_clicked ()
 {
   std::set<QString> selected;
   for (int i = 0; i < lef_files->count (); ++i) {
@@ -232,8 +225,7 @@ LEFDEFImportOptionsDialog::move_lef_files_up_clicked ()
   }
 }
 
-void
-LEFDEFImportOptionsDialog::move_lef_files_down_clicked ()
+void LEFDEFImportOptionsDialog::move_lef_files_down_clicked ()
 {
   std::set<QString> selected;
   for (int i = 0; i < lef_files->count (); ++i) {
@@ -244,7 +236,7 @@ LEFDEFImportOptionsDialog::move_lef_files_down_clicked ()
 
   QStringList files;
   int j = -1;
-  for (int i = lef_files->count (); i > 0; ) {
+  for (int i = lef_files->count (); i > 0;) {
     --i;
     if (lef_files->item (i)->isSelected ()) {
       files.push_back (lef_files->item (i)->text ());
@@ -260,7 +252,7 @@ LEFDEFImportOptionsDialog::move_lef_files_down_clicked ()
   }
 
   lef_files->clear ();
-  for (QStringList::const_iterator f = files.end (); f != files.begin (); ) {
+  for (QStringList::const_iterator f = files.end (); f != files.begin ();) {
     --f;
     lef_files->addItem (*f);
     if (selected.find (*f) != selected.end ()) {
@@ -272,8 +264,7 @@ LEFDEFImportOptionsDialog::move_lef_files_down_clicked ()
   }
 }
 
-void
-LEFDEFImportOptionsDialog::browse_button_clicked ()
+void LEFDEFImportOptionsDialog::browse_button_clicked ()
 {
   QString file = file_le->text ();
   std::string title, filters;
@@ -304,16 +295,13 @@ LEFDEFImportOptionsDialog::browse_button_clicked ()
       for (int i = 0; i < lef_files->count (); ++i) {
         lef_files->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
       }
-
     }
-
   }
 }
 
-void
-LEFDEFImportOptionsDialog::tech_setup_button_clicked ()
+void LEFDEFImportOptionsDialog::tech_setup_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   std::string tech_name;
   tech_name = lay::MainWindow::instance ()->initial_technology ();
@@ -322,7 +310,7 @@ BEGIN_PROTECTED
   }
 
   db::Technology *tech = db::Technologies::instance ()->technology_by_name (tech_name);
-  if (!tech) {
+  if (! tech) {
     return;
   }
 
@@ -334,7 +322,7 @@ BEGIN_PROTECTED
     tech->set_load_layout_options (options);
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
 // -----------------------------------------------------------------------------------------------
@@ -375,8 +363,7 @@ LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
   lay::activate_help_links (help_label2);
 }
 
-void
-LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, const db::Technology * /*tech*/)
+void LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, const db::Technology * /*tech*/)
 {
   db::LEFDEFReaderOptions *data = dynamic_cast<db::LEFDEFReaderOptions *> (options);
   if (! data) {
@@ -537,8 +524,7 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   }
 }
 
-void 
-LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options, const db::Technology *tech)
+void LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options, const db::Technology *tech)
 {
   static db::LEFDEFReaderOptions empty;
   const db::LEFDEFReaderOptions *data = dynamic_cast<const db::LEFDEFReaderOptions *> (options);
@@ -605,7 +591,7 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   checkbox_changed ();
 
   lef_files->clear ();
-  for (std::vector <std::string>::const_iterator f = data->begin_lef_files (); f != data->end_lef_files (); ++f) {
+  for (std::vector<std::string>::const_iterator f = data->begin_lef_files (); f != data->end_lef_files (); ++f) {
     if (mp_tech) {
       lef_files->addItem (tl::to_qstring (mp_tech->correct_path (*f)));
     } else {
@@ -617,7 +603,7 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   }
 
   macro_layout_files->clear ();
-  for (std::vector <std::string>::const_iterator f = data->begin_macro_layout_files (); f != data->end_macro_layout_files (); ++f) {
+  for (std::vector<std::string>::const_iterator f = data->begin_macro_layout_files (); f != data->end_macro_layout_files (); ++f) {
     if (mp_tech) {
       macro_layout_files->addItem (tl::to_qstring (mp_tech->correct_path (*f)));
     } else {
@@ -629,8 +615,7 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   }
 }
 
-void  
-LEFDEFReaderOptionsEditor::checkbox_changed ()
+void LEFDEFReaderOptionsEditor::checkbox_changed ()
 {
   net_prop_name->setEnabled (produce_net_names->isChecked ());
   inst_prop_name->setEnabled (produce_inst_names->isChecked ());
@@ -660,8 +645,7 @@ LEFDEFReaderOptionsEditor::checkbox_changed ()
   datatype_lef_labels->setEnabled (produce_lef_labels->isChecked ());
 }
 
-void
-LEFDEFReaderOptionsEditor::browse_mapfile_clicked ()
+void LEFDEFReaderOptionsEditor::browse_mapfile_clicked ()
 {
   std::string title, filters;
   title = tl::to_string (QObject::tr ("Select Layer Map File"));
@@ -676,8 +660,7 @@ LEFDEFReaderOptionsEditor::browse_mapfile_clicked ()
   }
 }
 
-void
-LEFDEFReaderOptionsEditor::add_lef_file_clicked ()
+void LEFDEFReaderOptionsEditor::add_lef_file_clicked ()
 {
   std::string title, filters;
   title = tl::to_string (QObject::tr ("Add LEF Files"));
@@ -692,26 +675,22 @@ LEFDEFReaderOptionsEditor::add_lef_file_clicked ()
   add_files (lef_files, files, mp_tech.get ());
 }
 
-void
-LEFDEFReaderOptionsEditor::del_lef_files_clicked ()
+void LEFDEFReaderOptionsEditor::del_lef_files_clicked ()
 {
   del_files (lef_files);
 }
 
-void
-LEFDEFReaderOptionsEditor::move_lef_files_up_clicked ()
+void LEFDEFReaderOptionsEditor::move_lef_files_up_clicked ()
 {
   move_files_up (lef_files);
 }
 
-void
-LEFDEFReaderOptionsEditor::move_lef_files_down_clicked ()
+void LEFDEFReaderOptionsEditor::move_lef_files_down_clicked ()
 {
   move_files_down (lef_files);
 }
 
-void
-LEFDEFReaderOptionsEditor::add_macro_layout_file_clicked ()
+void LEFDEFReaderOptionsEditor::add_macro_layout_file_clicked ()
 {
   std::string title, filters;
   title = tl::to_string (QObject::tr ("Add Macro Layout Files"));
@@ -726,26 +705,22 @@ LEFDEFReaderOptionsEditor::add_macro_layout_file_clicked ()
   add_files (macro_layout_files, files, mp_tech.get ());
 }
 
-void
-LEFDEFReaderOptionsEditor::del_macro_layout_files_clicked ()
+void LEFDEFReaderOptionsEditor::del_macro_layout_files_clicked ()
 {
   del_files (macro_layout_files);
 }
 
-void
-LEFDEFReaderOptionsEditor::move_macro_layout_files_up_clicked ()
+void LEFDEFReaderOptionsEditor::move_macro_layout_files_up_clicked ()
 {
   move_files_up (macro_layout_files);
 }
 
-void
-LEFDEFReaderOptionsEditor::move_macro_layout_files_down_clicked ()
+void LEFDEFReaderOptionsEditor::move_macro_layout_files_down_clicked ()
 {
   move_files_down (macro_layout_files);
 }
 
-void
-LEFDEFReaderOptionsEditor::add_files (QListWidget *list, const QStringList &files, const db::Technology *tech)
+void LEFDEFReaderOptionsEditor::add_files (QListWidget *list, const QStringList &files, const db::Technology *tech)
 {
   for (QStringList::const_iterator f = files.begin (); f != files.end (); ++f) {
     if (tech) {
@@ -759,8 +734,7 @@ LEFDEFReaderOptionsEditor::add_files (QListWidget *list, const QStringList &file
   }
 }
 
-void
-LEFDEFReaderOptionsEditor::del_files (QListWidget *list)
+void LEFDEFReaderOptionsEditor::del_files (QListWidget *list)
 {
   QStringList files;
   for (int i = 0; i < list->count (); ++i) {
@@ -778,8 +752,7 @@ LEFDEFReaderOptionsEditor::del_files (QListWidget *list)
   }
 }
 
-void
-LEFDEFReaderOptionsEditor::move_files_up (QListWidget *list)
+void LEFDEFReaderOptionsEditor::move_files_up (QListWidget *list)
 {
   std::set<QString> selected;
   for (int i = 0; i < list->count (); ++i) {
@@ -816,8 +789,7 @@ LEFDEFReaderOptionsEditor::move_files_up (QListWidget *list)
   }
 }
 
-void
-LEFDEFReaderOptionsEditor::move_files_down (QListWidget *list)
+void LEFDEFReaderOptionsEditor::move_files_down (QListWidget *list)
 {
   std::set<QString> selected;
   for (int i = 0; i < list->count (); ++i) {
@@ -828,7 +800,7 @@ LEFDEFReaderOptionsEditor::move_files_down (QListWidget *list)
 
   QStringList files;
   int j = -1;
-  for (int i = list->count (); i > 0; ) {
+  for (int i = list->count (); i > 0;) {
     --i;
     if (list->item (i)->isSelected ()) {
       files.push_back (list->item (i)->text ());
@@ -844,7 +816,7 @@ LEFDEFReaderOptionsEditor::move_files_down (QListWidget *list)
   }
 
   list->clear ();
-  for (QStringList::const_iterator f = files.end (); f != files.begin (); ) {
+  for (QStringList::const_iterator f = files.end (); f != files.begin ();) {
     --f;
     list->addItem (*f);
     if (selected.find (*f) != selected.end ()) {

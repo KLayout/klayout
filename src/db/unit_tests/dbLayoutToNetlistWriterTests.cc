@@ -38,21 +38,21 @@ static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_la
   return lid;
 }
 
-TEST(1_WriterBasic)
+TEST (1_WriterBasic)
 {
   db::Layout ly;
   db::LayerMap lmap;
 
-  unsigned int nwell      = define_layer (ly, lmap, 1);
-  unsigned int active     = define_layer (ly, lmap, 2);
-  unsigned int poly       = define_layer (ly, lmap, 3);
-  unsigned int poly_lbl   = define_layer (ly, lmap, 3, 1);
-  unsigned int diff_cont  = define_layer (ly, lmap, 4);
-  unsigned int poly_cont  = define_layer (ly, lmap, 5);
-  unsigned int metal1     = define_layer (ly, lmap, 6);
+  unsigned int nwell = define_layer (ly, lmap, 1);
+  unsigned int active = define_layer (ly, lmap, 2);
+  unsigned int poly = define_layer (ly, lmap, 3);
+  unsigned int poly_lbl = define_layer (ly, lmap, 3, 1);
+  unsigned int diff_cont = define_layer (ly, lmap, 4);
+  unsigned int poly_cont = define_layer (ly, lmap, 5);
+  unsigned int metal1 = define_layer (ly, lmap, 6);
   unsigned int metal1_lbl = define_layer (ly, lmap, 6, 1);
-  unsigned int via1       = define_layer (ly, lmap, 7);
-  unsigned int metal2     = define_layer (ly, lmap, 8);
+  unsigned int via1 = define_layer (ly, lmap, 7);
+  unsigned int metal2 = define_layer (ly, lmap, 8);
   unsigned int metal2_lbl = define_layer (ly, lmap, 8, 1);
 
   {
@@ -87,18 +87,18 @@ TEST(1_WriterBasic)
   //  derived regions
 
   db::Region rpactive = *ractive & *rnwell;
-  db::Region rpgate   = rpactive & *rpoly;
-  db::Region rpsd     = rpactive - rpgate;
+  db::Region rpgate = rpactive & *rpoly;
+  db::Region rpsd = rpactive - rpgate;
   l2n.register_layer (rpactive, "pactive");
-  l2n.register_layer (rpgate,   "pgate");
-  l2n.register_layer (rpsd,     "psd");
+  l2n.register_layer (rpgate, "pgate");
+  l2n.register_layer (rpsd, "psd");
 
   db::Region rnactive = *ractive - *rnwell;
-  db::Region rngate   = rnactive & *rpoly;
-  db::Region rnsd     = rnactive - rngate;
+  db::Region rngate = rnactive & *rpoly;
+  db::Region rnsd = rnactive - rngate;
   l2n.register_layer (rnactive, "nactive");
-  l2n.register_layer (rngate,   "ngate");
-  l2n.register_layer (rnsd,     "nsd");
+  l2n.register_layer (rngate, "ngate");
+  l2n.register_layer (rnsd, "nsd");
 
   db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
@@ -107,24 +107,24 @@ TEST(1_WriterBasic)
 
   db::NetlistDeviceExtractor::input_layers dl;
 
-  dl["SD"] = &rpsd;
-  dl["G"] = &rpgate;
-  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl ["SD"] = &rpsd;
+  dl ["G"] = &rpgate;
+  dl ["P"] = rpoly.get (); //  not needed for extraction but to return terminal shapes
   l2n.extract_devices (pmos_ex, dl);
 
-  dl["SD"] = &rnsd;
-  dl["G"] = &rngate;
-  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl ["SD"] = &rnsd;
+  dl ["G"] = &rngate;
+  dl ["P"] = rpoly.get (); //  not needed for extraction but to return terminal shapes
   l2n.extract_devices (nmos_ex, dl);
 
   //  return the computed layers into the original layout and write it for debugging purposes
   //  NOTE: this will include the device layers too
 
-  unsigned int lgate  = ly.insert_layer (db::LayerProperties (10, 0));      // 10/0 -> Gate
-  unsigned int lsd    = ly.insert_layer (db::LayerProperties (11, 0));      // 11/0 -> Source/Drain
-  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (12, 0));      // 12/0 -> P Diffusion
-  unsigned int lndiff = ly.insert_layer (db::LayerProperties (13, 0));      // 13/0 -> N Diffusion
-  unsigned int lpoly  = ly.insert_layer (db::LayerProperties (14, 0));      // 14/0 -> Poly with gate terminal
+  unsigned int lgate = ly.insert_layer (db::LayerProperties (10, 0));  // 10/0 -> Gate
+  unsigned int lsd = ly.insert_layer (db::LayerProperties (11, 0));    // 11/0 -> Source/Drain
+  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (12, 0)); // 12/0 -> P Diffusion
+  unsigned int lndiff = ly.insert_layer (db::LayerProperties (13, 0)); // 13/0 -> N Diffusion
+  unsigned int lpoly = ly.insert_layer (db::LayerProperties (14, 0));  // 14/0 -> Poly with gate terminal
 
   rpgate.insert_into (&ly, tc.cell_index (), lgate);
   rngate.insert_into (&ly, tc.cell_index (), lgate);
@@ -146,16 +146,16 @@ TEST(1_WriterBasic)
   l2n.connect (*rvia1);
   l2n.connect (*rmetal2);
   //  Inter-layer
-  l2n.connect (rpsd,        *rdiff_cont);
-  l2n.connect (rnsd,        *rdiff_cont);
-  l2n.connect (*rpoly,      *rpoly_cont);
+  l2n.connect (rpsd, *rdiff_cont);
+  l2n.connect (rnsd, *rdiff_cont);
+  l2n.connect (*rpoly, *rpoly_cont);
   l2n.connect (*rpoly_cont, *rmetal1);
   l2n.connect (*rdiff_cont, *rmetal1);
-  l2n.connect (*rmetal1,    *rvia1);
-  l2n.connect (*rvia1,      *rmetal2);
-  l2n.connect (*rpoly,      *rpoly_lbl);     //  attaches labels
-  l2n.connect (*rmetal1,    *rmetal1_lbl);   //  attaches labels
-  l2n.connect (*rmetal2,    *rmetal2_lbl);   //  attaches labels
+  l2n.connect (*rmetal1, *rvia1);
+  l2n.connect (*rvia1, *rmetal2);
+  l2n.connect (*rpoly, *rpoly_lbl);     //  attaches labels
+  l2n.connect (*rmetal1, *rmetal1_lbl); //  attaches labels
+  l2n.connect (*rmetal2, *rmetal2_lbl); //  attaches labels
 
   //  create some mess - we have to keep references to the layers to make them not disappear
   rmetal1_lbl.reset (0);
@@ -200,12 +200,12 @@ TEST(1_WriterBasic)
     std::map<unsigned int, unsigned int> lmap;
     lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_of (rpsd);
     lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_of (rnsd);
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_of (*rpoly);
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_of (*rdiff_cont);
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_of (*rpoly_cont);
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_of (*rmetal1);
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_of (*rvia1);
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_of (*rmetal2);
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0))] = l2n.layer_of (*rpoly);
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0))] = l2n.layer_of (*rdiff_cont);
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0))] = l2n.layer_of (*rpoly_cont);
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0))] = l2n.layer_of (*rmetal1);
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0))] = l2n.layer_of (*rvia1);
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0))] = l2n.layer_of (*rmetal2);
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_Disconnected, 0, "DEVICE_");
 
@@ -244,23 +244,23 @@ TEST(1_WriterBasic)
   compare_text_files (path, au_path);
 }
 
-TEST(2_WriterWithGlobalNets)
+TEST (2_WriterWithGlobalNets)
 {
   db::Layout ly;
   db::LayerMap lmap;
 
-  unsigned int nwell      = define_layer (ly, lmap, 1);
-  unsigned int active     = define_layer (ly, lmap, 2);
-  unsigned int pplus      = define_layer (ly, lmap, 10);
-  unsigned int nplus      = define_layer (ly, lmap, 11);
-  unsigned int poly       = define_layer (ly, lmap, 3);
-  unsigned int poly_lbl   = define_layer (ly, lmap, 3, 1);
-  unsigned int diff_cont  = define_layer (ly, lmap, 4);
-  unsigned int poly_cont  = define_layer (ly, lmap, 5);
-  unsigned int metal1     = define_layer (ly, lmap, 6);
+  unsigned int nwell = define_layer (ly, lmap, 1);
+  unsigned int active = define_layer (ly, lmap, 2);
+  unsigned int pplus = define_layer (ly, lmap, 10);
+  unsigned int nplus = define_layer (ly, lmap, 11);
+  unsigned int poly = define_layer (ly, lmap, 3);
+  unsigned int poly_lbl = define_layer (ly, lmap, 3, 1);
+  unsigned int diff_cont = define_layer (ly, lmap, 4);
+  unsigned int poly_cont = define_layer (ly, lmap, 5);
+  unsigned int metal1 = define_layer (ly, lmap, 6);
   unsigned int metal1_lbl = define_layer (ly, lmap, 6, 1);
-  unsigned int via1       = define_layer (ly, lmap, 7);
-  unsigned int metal2     = define_layer (ly, lmap, 8);
+  unsigned int via1 = define_layer (ly, lmap, 7);
+  unsigned int metal2 = define_layer (ly, lmap, 8);
   unsigned int metal2_lbl = define_layer (ly, lmap, 8, 1);
 
   {
@@ -299,32 +299,32 @@ TEST(2_WriterWithGlobalNets)
 
   db::Region ractive_in_nwell = *ractive & *rnwell;
   db::Region rpactive = ractive_in_nwell & *rpplus;
-  db::Region rntie    = ractive_in_nwell & *rnplus;
-  db::Region rpgate   = rpactive & *rpoly;
-  db::Region rpsd     = rpactive - rpgate;
+  db::Region rntie = ractive_in_nwell & *rnplus;
+  db::Region rpgate = rpactive & *rpoly;
+  db::Region rpsd = rpactive - rpgate;
   l2n.register_layer (rpactive, "pactive");
-  l2n.register_layer (rntie,    "ntie");
-  l2n.register_layer (rpgate,   "pgate");
-  l2n.register_layer (rpsd,     "psd");
+  l2n.register_layer (rntie, "ntie");
+  l2n.register_layer (rpgate, "pgate");
+  l2n.register_layer (rpsd, "psd");
 
   db::Region ractive_outside_nwell = *ractive - *rnwell;
   db::Region rnactive = ractive_outside_nwell & *rnplus;
-  db::Region rptie    = ractive_outside_nwell & *rpplus;
-  db::Region rngate   = rnactive & *rpoly;
-  db::Region rnsd     = rnactive - rngate;
+  db::Region rptie = ractive_outside_nwell & *rpplus;
+  db::Region rngate = rnactive & *rpoly;
+  db::Region rnsd = rnactive - rngate;
   l2n.register_layer (rnactive, "nactive");
-  l2n.register_layer (rptie,    "ptie");
-  l2n.register_layer (rngate,   "ngate");
-  l2n.register_layer (rnsd,     "nsd");
+  l2n.register_layer (rptie, "ptie");
+  l2n.register_layer (rngate, "ngate");
+  l2n.register_layer (rnsd, "nsd");
 
   //  return the computed layers into the original layout and write it for debugging purposes
 
-  unsigned int lgate  = ly.insert_layer (db::LayerProperties (20, 0));      // 20/0 -> Gate
-  unsigned int lsd    = ly.insert_layer (db::LayerProperties (21, 0));      // 21/0 -> Source/Drain
-  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (22, 0));      // 22/0 -> P Diffusion
-  unsigned int lndiff = ly.insert_layer (db::LayerProperties (23, 0));      // 23/0 -> N Diffusion
-  unsigned int lptie  = ly.insert_layer (db::LayerProperties (24, 0));      // 24/0 -> P Tie
-  unsigned int lntie  = ly.insert_layer (db::LayerProperties (25, 0));      // 25/0 -> N Tie
+  unsigned int lgate = ly.insert_layer (db::LayerProperties (20, 0));  // 20/0 -> Gate
+  unsigned int lsd = ly.insert_layer (db::LayerProperties (21, 0));    // 21/0 -> Source/Drain
+  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (22, 0)); // 22/0 -> P Diffusion
+  unsigned int lndiff = ly.insert_layer (db::LayerProperties (23, 0)); // 23/0 -> N Diffusion
+  unsigned int lptie = ly.insert_layer (db::LayerProperties (24, 0));  // 24/0 -> P Tie
+  unsigned int lntie = ly.insert_layer (db::LayerProperties (25, 0));  // 25/0 -> N Tie
 
   rpgate.insert_into (&ly, tc.cell_index (), lgate);
   rngate.insert_into (&ly, tc.cell_index (), lgate);
@@ -342,16 +342,16 @@ TEST(2_WriterWithGlobalNets)
 
   db::NetlistDeviceExtractor::input_layers dl;
 
-  dl["SD"] = &rpsd;
-  dl["G"] = &rpgate;
-  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
-  dl["W"] = rnwell.get ();
+  dl ["SD"] = &rpsd;
+  dl ["G"] = &rpgate;
+  dl ["P"] = rpoly.get (); //  not needed for extraction but to return terminal shapes
+  dl ["W"] = rnwell.get ();
   l2n.extract_devices (pmos_ex, dl);
 
-  dl["SD"] = &rnsd;
-  dl["G"] = &rngate;
-  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
-  dl["W"] = rbulk.get ();
+  dl ["SD"] = &rnsd;
+  dl ["G"] = &rngate;
+  dl ["P"] = rpoly.get (); //  not needed for extraction but to return terminal shapes
+  dl ["W"] = rbulk.get ();
   l2n.extract_devices (nmos_ex, dl);
 
   //  net extraction
@@ -369,19 +369,19 @@ TEST(2_WriterWithGlobalNets)
   l2n.connect (rptie);
   l2n.connect (rntie);
   //  Inter-layer
-  l2n.connect (rpsd,        *rdiff_cont);
-  l2n.connect (rnsd,        *rdiff_cont);
-  l2n.connect (*rpoly,      *rpoly_cont);
+  l2n.connect (rpsd, *rdiff_cont);
+  l2n.connect (rnsd, *rdiff_cont);
+  l2n.connect (*rpoly, *rpoly_cont);
   l2n.connect (*rpoly_cont, *rmetal1);
   l2n.connect (*rdiff_cont, *rmetal1);
   l2n.connect (*rdiff_cont, rptie);
   l2n.connect (*rdiff_cont, rntie);
-  l2n.connect (*rnwell,     rntie);
-  l2n.connect (*rmetal1,    *rvia1);
-  l2n.connect (*rvia1,      *rmetal2);
-  l2n.connect (*rpoly,      *rpoly_lbl);     //  attaches labels
-  l2n.connect (*rmetal1,    *rmetal1_lbl);   //  attaches labels
-  l2n.connect (*rmetal2,    *rmetal2_lbl);   //  attaches labels
+  l2n.connect (*rnwell, rntie);
+  l2n.connect (*rmetal1, *rvia1);
+  l2n.connect (*rvia1, *rmetal2);
+  l2n.connect (*rpoly, *rpoly_lbl);     //  attaches labels
+  l2n.connect (*rmetal1, *rmetal1_lbl); //  attaches labels
+  l2n.connect (*rmetal2, *rmetal2_lbl); //  attaches labels
   //  Global
   l2n.connect_global (rptie, "BULK");
   l2n.connect_global (*rbulk, "BULK");
@@ -432,13 +432,13 @@ TEST(2_WriterWithGlobalNets)
     lmap [ly2.insert_layer (db::LayerProperties (12, 0))] = l2n.layer_of (*rbulk);
     lmap [ly2.insert_layer (db::LayerProperties (13, 0))] = l2n.layer_of (rptie);
     lmap [ly2.insert_layer (db::LayerProperties (14, 0))] = l2n.layer_of (rntie);
-    lmap [ly2.insert_layer (db::LayerProperties (1, 0)) ] = l2n.layer_of (*rnwell);
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_of (*rpoly);
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_of (*rdiff_cont);
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_of (*rpoly_cont);
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_of (*rmetal1);
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_of (*rvia1);
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_of (*rmetal2);
+    lmap [ly2.insert_layer (db::LayerProperties (1, 0))] = l2n.layer_of (*rnwell);
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0))] = l2n.layer_of (*rpoly);
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0))] = l2n.layer_of (*rdiff_cont);
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0))] = l2n.layer_of (*rpoly_cont);
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0))] = l2n.layer_of (*rmetal1);
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0))] = l2n.layer_of (*rvia1);
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0))] = l2n.layer_of (*rmetal2);
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
@@ -450,7 +450,7 @@ TEST(2_WriterWithGlobalNets)
   }
 }
 
-TEST(3_Messages)
+TEST (3_Messages)
 {
   db::Layout ly;
   db::Cell &tc = ly.cell (ly.add_cell ("TOP"));

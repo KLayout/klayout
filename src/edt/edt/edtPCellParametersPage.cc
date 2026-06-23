@@ -77,85 +77,72 @@ static void set_value (const db::PCellParameterDeclaration &p, QWidget *widget, 
   if (p.get_choices ().empty ()) {
 
     switch (p.get_type ()) {
-      
-    case db::PCellParameterDeclaration::t_int:
-      {
-        QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
-        if (le) {
-          le->blockSignals (true);
-          le->setText (value.cast<int> ().to_qstring ());
-          le->blockSignals (false);
-        }
+
+    case db::PCellParameterDeclaration::t_int: {
+      QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
+      if (le) {
+        le->blockSignals (true);
+        le->setText (value.cast<int> ().to_qstring ());
+        le->blockSignals (false);
       }
-      break;
+    } break;
 
-    case db::PCellParameterDeclaration::t_double:
-      {
-        QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
-        if (le) {
-          le->blockSignals (true);
-          le->setText (value.cast<double> ().to_qstring ());
-          le->blockSignals (false);
-        }
+    case db::PCellParameterDeclaration::t_double: {
+      QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
+      if (le) {
+        le->blockSignals (true);
+        le->setText (value.cast<double> ().to_qstring ());
+        le->blockSignals (false);
       }
-      break;
+    } break;
 
-    case db::PCellParameterDeclaration::t_string:
-      {
-        QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
-        if (le) {
-          le->blockSignals (true);
-          le->setText (value.to_qstring ());
-          le->blockSignals (false);
-        }
+    case db::PCellParameterDeclaration::t_string: {
+      QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
+      if (le) {
+        le->blockSignals (true);
+        le->setText (value.to_qstring ());
+        le->blockSignals (false);
       }
-      break;
+    } break;
 
-    case db::PCellParameterDeclaration::t_list:
-      {
-        QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
-        if (le) {
-          le->blockSignals (true);
-          le->setText (tl::to_qstring (variant_list_to_string (value)));
-          le->blockSignals (false);
-        }
+    case db::PCellParameterDeclaration::t_list: {
+      QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
+      if (le) {
+        le->blockSignals (true);
+        le->setText (tl::to_qstring (variant_list_to_string (value)));
+        le->blockSignals (false);
       }
-      break;
+    } break;
 
-    case db::PCellParameterDeclaration::t_layer:
-      {
-        lay::LayerSelectionComboBox *ly = dynamic_cast<lay::LayerSelectionComboBox *> (widget);
-        if (ly) {
+    case db::PCellParameterDeclaration::t_layer: {
+      lay::LayerSelectionComboBox *ly = dynamic_cast<lay::LayerSelectionComboBox *> (widget);
+      if (ly) {
 
-          db::LayerProperties lp;
-          if (value.is_user<db::LayerProperties> ()) {
-            lp = value.to_user<db::LayerProperties> ();
-          } else if (value.is_nil ()) {
-            //  empty LayerProperties
-          } else {
-            std::string s = value.to_string ();
-            tl::Extractor ex (s.c_str ());
-            lp.read (ex);
-          }
-
-          ly->blockSignals (true);
-          ly->set_current_layer (lp);
-          ly->blockSignals (false);
-
+        db::LayerProperties lp;
+        if (value.is_user<db::LayerProperties> ()) {
+          lp = value.to_user<db::LayerProperties> ();
+        } else if (value.is_nil ()) {
+          //  empty LayerProperties
+        } else {
+          std::string s = value.to_string ();
+          tl::Extractor ex (s.c_str ());
+          lp.read (ex);
         }
-      }
-      break;
 
-    case db::PCellParameterDeclaration::t_boolean:
-      {
-        QCheckBox *cbx = dynamic_cast<QCheckBox *> (widget);
-        if (cbx) {
-          cbx->blockSignals (true);
-          cbx->setChecked (value.to_bool ());
-          cbx->blockSignals (false);
-        }
+        ly->blockSignals (true);
+        ly->set_current_layer (lp);
+        ly->blockSignals (false);
       }
-      break;
+    } break;
+
+    case db::PCellParameterDeclaration::t_boolean: {
+      QCheckBox *cbx = dynamic_cast<QCheckBox *> (widget);
+      if (cbx) {
+        cbx->blockSignals (true);
+        cbx->setChecked (value.to_bool ());
+        cbx->blockSignals (false);
+      }
+    } break;
 
     default:
       break;
@@ -174,7 +161,6 @@ static void set_value (const db::PCellParameterDeclaration &p, QWidget *widget, 
         }
       }
     }
-
   }
 }
 
@@ -189,8 +175,7 @@ PCellParametersPage::PCellParametersPage (QWidget *parent, lay::Dispatcher *disp
   init ();
 }
 
-void
-PCellParametersPage::init ()
+void PCellParametersPage::init ()
 {
   QPalette palette;
   QFont font;
@@ -225,7 +210,7 @@ PCellParametersPage::init ()
 
   mp_update_button = new QToolButton (mp_update_frame);
   mp_update_button->setText (tr ("Update"));
-  connect (mp_update_button, SIGNAL (clicked()), this, SLOT (update_button_pressed ()));
+  connect (mp_update_button, SIGNAL (clicked ()), this, SLOT (update_button_pressed ()));
   update_frame_layout->addWidget (mp_update_button, 0, 1, 1, 1);
 
   mp_changed_label = new QLabel (mp_update_frame);
@@ -315,8 +300,7 @@ PCellParametersPage::init ()
   connect (mp_never_lazy_eval_action, SIGNAL (triggered ()), this, SLOT (lazy_eval_mode_slot ()));
 }
 
-bool
-PCellParametersPage::lazy_evaluation ()
+bool PCellParametersPage::lazy_evaluation ()
 {
   if (m_lazy_evaluation < 0) {
     return mp_pcell_decl.get () && mp_pcell_decl->wants_lazy_evaluation ();
@@ -325,8 +309,7 @@ PCellParametersPage::lazy_evaluation ()
   }
 }
 
-void
-PCellParametersPage::lazy_eval_mode_slot ()
+void PCellParametersPage::lazy_eval_mode_slot ()
 {
   if (sender () == mp_always_lazy_eval_action) {
     lazy_eval_mode (1);
@@ -337,8 +320,7 @@ PCellParametersPage::lazy_eval_mode_slot ()
   }
 }
 
-void
-PCellParametersPage::lazy_eval_mode (int mode)
+void PCellParametersPage::lazy_eval_mode (int mode)
 {
   if (mode == m_lazy_evaluation) {
     return;
@@ -357,8 +339,7 @@ PCellParametersPage::lazy_eval_mode (int mode)
   setup (mp_view, m_cv_index, mp_pcell_decl.get (), get_parameters ());
 }
 
-void
-PCellParametersPage::show_parameter_names (bool f)
+void PCellParametersPage::show_parameter_names (bool f)
 {
   if (m_show_parameter_names == f) {
     return;
@@ -374,10 +355,9 @@ PCellParametersPage::show_parameter_names (bool f)
   setup (mp_view, m_cv_index, mp_pcell_decl.get (), get_parameters ());
 }
 
-void
-PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters)
+void PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters)
 {
-  mp_pcell_decl.reset (const_cast<db::PCellDeclaration *> (pcell_decl));  //  no const weak_ptr ...
+  mp_pcell_decl.reset (const_cast<db::PCellDeclaration *> (pcell_decl)); //  no const weak_ptr ...
   mp_view = view;
   m_cv_index = cv_index;
   m_states = db::ParameterStates ();
@@ -466,7 +446,7 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
         mp_groups.push_back (gb);
         gb->setTitle (tl::to_qstring (gt));
         main_grid->addWidget (gb, main_row, 0, 1, 3);
-        
+
         inner_grid = new QGridLayout (gb);
         if (m_dense) {
           inner_grid->setContentsMargins (4, 4, 4, 4);
@@ -485,12 +465,10 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
         inner_grid = main_grid;
         inner_frame = mp_main_frame;
         row = main_row;
-
       }
 
       group_title = gt;
-
-    } 
+    }
 
     QLabel *icon_label = new QLabel (QString (), inner_frame);
     inner_grid->addWidget (icon_label, row, 0);
@@ -501,10 +479,9 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
     if (! p->min_value ().is_nil () || ! p->max_value ().is_nil ()) {
       range = tl::sprintf (
-                " [%s, %s]" ,
-                p->min_value ().is_nil () ? "-\u221e" /*infinity*/ : p->min_value ().to_string (),
-                p->max_value ().is_nil () ? "\u221e"  /*infinity*/ : p->max_value ().to_string ()
-              );
+        " [%s, %s]",
+        p->min_value ().is_nil () ? "-\u221e" /*infinity*/ : p->min_value ().to_string (),
+        p->max_value ().is_nil () ? "\u221e" /*infinity*/ : p->max_value ().to_string ());
     }
 
     if (p->get_type () != db::PCellParameterDeclaration::t_callback) {
@@ -523,126 +500,115 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
       QLabel *l = new QLabel (tl::to_qstring (tl::sprintf ("[%s]", p->get_name ())), inner_frame);
       inner_grid->addWidget (l, row, 1);
       m_all_widgets.back ().push_back (l);
-
     }
 
     if (p->get_choices ().empty ()) {
 
       switch (p->get_type ()) {
-        
+
       case db::PCellParameterDeclaration::t_int:
-      case db::PCellParameterDeclaration::t_double:
-        {
-          QFrame *f = new QFrame (inner_frame);
-          QHBoxLayout *hb = new QHBoxLayout (f);
-          hb->setContentsMargins (0, 0, 0, 0);
-          f->setLayout (hb);
-          f->setFrameShape (QFrame::NoFrame);
-          QSizePolicy sp = f->sizePolicy ();
-          sp.setHorizontalStretch (1);
-          f->setSizePolicy (sp);
+      case db::PCellParameterDeclaration::t_double: {
+        QFrame *f = new QFrame (inner_frame);
+        QHBoxLayout *hb = new QHBoxLayout (f);
+        hb->setContentsMargins (0, 0, 0, 0);
+        f->setLayout (hb);
+        f->setFrameShape (QFrame::NoFrame);
+        QSizePolicy sp = f->sizePolicy ();
+        sp.setHorizontalStretch (1);
+        f->setSizePolicy (sp);
 
-          QLineEdit *le = new QLineEdit (f);
-          hb->addWidget (le);
-          le->setMaximumWidth (150);
-          le->setObjectName (tl::to_qstring (p->get_name ()));
-          m_widgets.push_back (le);
+        QLineEdit *le = new QLineEdit (f);
+        hb->addWidget (le);
+        le->setMaximumWidth (150);
+        le->setObjectName (tl::to_qstring (p->get_name ()));
+        m_widgets.push_back (le);
 
-          if (! p->get_unit ().empty ()) {
-            QLabel *ul = new QLabel (f);
-            hb->addWidget (ul, 1);
-            ul->setText (tl::to_qstring (p->get_unit ()));
-          }
-
-          hb->addStretch (1);
-
-          inner_grid->addWidget (f, row, 2);
-          m_all_widgets.back ().push_back (f);
-
-          connect (le, SIGNAL (editingFinished ()), this, SLOT (parameter_changed ()));
+        if (! p->get_unit ().empty ()) {
+          QLabel *ul = new QLabel (f);
+          hb->addWidget (ul, 1);
+          ul->setText (tl::to_qstring (p->get_unit ()));
         }
-        break;
 
-      case db::PCellParameterDeclaration::t_callback:
-        {
-          QPushButton *pb = new QPushButton (inner_frame);
-          pb->setObjectName (tl::to_qstring (p->get_name ()));
-          pb->setText (tl::to_qstring (description));
-          QSizePolicy sp = pb->sizePolicy ();
-          sp.setHorizontalPolicy (QSizePolicy::Fixed);
-          sp.setHorizontalStretch (1);
-          pb->setSizePolicy (sp);
-          m_widgets.push_back (pb);
+        hb->addStretch (1);
 
-          inner_grid->addWidget (pb, row, 2);
-          m_all_widgets.back ().push_back (pb);
+        inner_grid->addWidget (f, row, 2);
+        m_all_widgets.back ().push_back (f);
 
-          connect (pb, SIGNAL (clicked ()), this, SLOT (parameter_changed ()));
-        }
-        break;
+        connect (le, SIGNAL (editingFinished ()), this, SLOT (parameter_changed ()));
+      } break;
+
+      case db::PCellParameterDeclaration::t_callback: {
+        QPushButton *pb = new QPushButton (inner_frame);
+        pb->setObjectName (tl::to_qstring (p->get_name ()));
+        pb->setText (tl::to_qstring (description));
+        QSizePolicy sp = pb->sizePolicy ();
+        sp.setHorizontalPolicy (QSizePolicy::Fixed);
+        sp.setHorizontalStretch (1);
+        pb->setSizePolicy (sp);
+        m_widgets.push_back (pb);
+
+        inner_grid->addWidget (pb, row, 2);
+        m_all_widgets.back ().push_back (pb);
+
+        connect (pb, SIGNAL (clicked ()), this, SLOT (parameter_changed ()));
+      } break;
 
       case db::PCellParameterDeclaration::t_string:
       case db::PCellParameterDeclaration::t_shape:
-      case db::PCellParameterDeclaration::t_list:
-        {
-          QLineEdit *le = new QLineEdit (inner_frame);
-          le->setObjectName (tl::to_qstring (p->get_name ()));
-          QSizePolicy sp = le->sizePolicy ();
-          sp.setHorizontalStretch (1);
-          le->setSizePolicy (sp);
-          m_widgets.push_back (le);
-          inner_grid->addWidget (le, row, 2);
-          m_all_widgets.back ().push_back (le);
+      case db::PCellParameterDeclaration::t_list: {
+        QLineEdit *le = new QLineEdit (inner_frame);
+        le->setObjectName (tl::to_qstring (p->get_name ()));
+        QSizePolicy sp = le->sizePolicy ();
+        sp.setHorizontalStretch (1);
+        le->setSizePolicy (sp);
+        m_widgets.push_back (le);
+        inner_grid->addWidget (le, row, 2);
+        m_all_widgets.back ().push_back (le);
 
-          connect (le, SIGNAL (editingFinished ()), this, SLOT (parameter_changed ()));
-        }
-        break;
+        connect (le, SIGNAL (editingFinished ()), this, SLOT (parameter_changed ()));
+      } break;
 
-      case db::PCellParameterDeclaration::t_layer:
-        {
-          QFrame *f = new QFrame (inner_frame);
-          QHBoxLayout *hb = new QHBoxLayout (f);
-          hb->setContentsMargins (0, 0, 0, 0);
-          f->setLayout (hb);
-          f->setFrameShape (QFrame::NoFrame);
-          QSizePolicy sp = f->sizePolicy ();
-          sp.setHorizontalStretch (1);
-          f->setSizePolicy (sp);
+      case db::PCellParameterDeclaration::t_layer: {
+        QFrame *f = new QFrame (inner_frame);
+        QHBoxLayout *hb = new QHBoxLayout (f);
+        hb->setContentsMargins (0, 0, 0, 0);
+        f->setLayout (hb);
+        f->setFrameShape (QFrame::NoFrame);
+        QSizePolicy sp = f->sizePolicy ();
+        sp.setHorizontalStretch (1);
+        f->setSizePolicy (sp);
 
-          lay::LayerSelectionComboBox *ly = new lay::LayerSelectionComboBox (f);
-          hb->addWidget (ly);
-          ly->set_no_layer_available (true);
-          ly->set_view (mp_view, m_cv_index, true /*all layers*/);
-          ly->setObjectName (tl::to_qstring (p->get_name ()));
-          sp = ly->sizePolicy ();
-          sp.setHorizontalPolicy (QSizePolicy::Fixed);
-          ly->setSizePolicy (sp);
-          m_widgets.push_back (ly);
+        lay::LayerSelectionComboBox *ly = new lay::LayerSelectionComboBox (f);
+        hb->addWidget (ly);
+        ly->set_no_layer_available (true);
+        ly->set_view (mp_view, m_cv_index, true /*all layers*/);
+        ly->setObjectName (tl::to_qstring (p->get_name ()));
+        sp = ly->sizePolicy ();
+        sp.setHorizontalPolicy (QSizePolicy::Fixed);
+        ly->setSizePolicy (sp);
+        m_widgets.push_back (ly);
 
-          hb->addStretch (1);
+        hb->addStretch (1);
 
-          inner_grid->addWidget (f, row, 2);
-          m_all_widgets.back ().push_back (f);
+        inner_grid->addWidget (f, row, 2);
+        m_all_widgets.back ().push_back (f);
 
-          connect (ly, SIGNAL (activated (int)), this, SLOT (parameter_changed ()));
-        }
-        break;
+        connect (ly, SIGNAL (activated (int)), this, SLOT (parameter_changed ()));
+      } break;
 
-      case db::PCellParameterDeclaration::t_boolean:
-        {
-          QCheckBox *cbx = new QCheckBox (inner_frame);
-          //  this makes the checkbox not stretch over the full width - better when navigating with tab
-          QSizePolicy sp = cbx->sizePolicy ();
-          sp.setHorizontalStretch (1);
-          cbx->setSizePolicy (sp);
-          cbx->setObjectName (tl::to_qstring (p->get_name ()));
-          m_widgets.push_back (cbx);
-          inner_grid->addWidget (cbx, row, 2);
-          m_all_widgets.back ().push_back (cbx);
+      case db::PCellParameterDeclaration::t_boolean: {
+        QCheckBox *cbx = new QCheckBox (inner_frame);
+        //  this makes the checkbox not stretch over the full width - better when navigating with tab
+        QSizePolicy sp = cbx->sizePolicy ();
+        sp.setHorizontalStretch (1);
+        cbx->setSizePolicy (sp);
+        cbx->setObjectName (tl::to_qstring (p->get_name ()));
+        m_widgets.push_back (cbx);
+        inner_grid->addWidget (cbx, row, 2);
+        m_all_widgets.back ().push_back (cbx);
 
-          connect (cbx, SIGNAL (stateChanged (int)), this, SLOT (parameter_changed ()));
-        }
-        break;
+        connect (cbx, SIGNAL (stateChanged (int)), this, SLOT (parameter_changed ()));
+      } break;
 
       default:
         m_widgets.push_back (0);
@@ -683,14 +649,12 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
       inner_grid->addWidget (f, row, 2);
       m_all_widgets.back ().push_back (f);
-
     }
 
     ++row;
     if (inner_frame == mp_main_frame) {
       ++main_row;
     }
-
   }
 
   //  adds some default buffer space
@@ -738,8 +702,7 @@ PCellParametersPage::get_state ()
   return s;
 }
 
-void
-PCellParametersPage::set_state (const State &s)
+void PCellParametersPage::set_state (const State &s)
 {
   if (s.valid) {
 
@@ -752,12 +715,10 @@ PCellParametersPage::set_state (const State &s)
         c->setFocus ();
       }
     }
-
   }
 }
 
-void
-PCellParametersPage::parameter_changed ()
+void PCellParametersPage::parameter_changed ()
 {
   if (! mp_pcell_decl) {
     return;
@@ -808,19 +769,17 @@ PCellParametersPage::parameter_changed ()
   dm_parameter_changed ();
 }
 
-void
-PCellParametersPage::deleteLater ()
+void PCellParametersPage::deleteLater ()
 {
   dm_parameter_changed.cancel ();
   QFrame::deleteLater ();
 }
 
-void
-PCellParametersPage::do_parameter_changed ()
+void PCellParametersPage::do_parameter_changed ()
 {
   bool ok = true;
   db::ParameterStates states = m_states;
-  get_parameters (states, &ok);   //  includes coerce
+  get_parameters (states, &ok); //  includes coerce
   if (ok) {
     update_widgets_from_states (states, lazy_evaluation ());
     if (! lazy_evaluation ()) {
@@ -829,20 +788,18 @@ PCellParametersPage::do_parameter_changed ()
   }
 }
 
-void
-PCellParametersPage::update_button_pressed ()
+void PCellParametersPage::update_button_pressed ()
 {
   if (update_current_parameters ()) {
     emit edited ();
   }
 }
 
-bool
-PCellParametersPage::update_current_parameters ()
+bool PCellParametersPage::update_current_parameters ()
 {
   bool ok = true;
   db::ParameterStates states = m_states;
-  get_parameters (states, &ok);   //  includes coerce
+  get_parameters (states, &ok); //  includes coerce
   if (ok) {
     m_current_states = states;
     mp_update_frame->hide ();
@@ -851,8 +808,7 @@ PCellParametersPage::update_current_parameters ()
   return ok;
 }
 
-void
-PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool &edit_error)
+void PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool &edit_error)
 {
   edit_error = false;
 
@@ -870,114 +826,97 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
 
       switch (p->get_type ()) {
 
-      case db::PCellParameterDeclaration::t_int:
-        {
-          QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
-          if (le) {
+      case db::PCellParameterDeclaration::t_int: {
+        QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
+        if (le) {
 
+          try {
+
+            int v = 0;
+            tl::from_string_ext (tl::to_string (le->text ()), v);
+
+            ps.set_value (tl::Variant (v));
+            lay::indicate_error (le, (tl::Exception *) 0);
+
+            check_range (tl::Variant (v), *p);
+
+          } catch (tl::Exception &ex) {
+
+            lay::indicate_error (le, &ex);
+            edit_error = true;
+          }
+        }
+      } break;
+
+      case db::PCellParameterDeclaration::t_double: {
+        QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
+        if (le) {
+
+          try {
+
+            double v = 0;
+            tl::from_string_ext (tl::to_string (le->text ()), v);
+
+            ps.set_value (tl::Variant (v));
+            lay::indicate_error (le, (tl::Exception *) 0);
+
+            check_range (tl::Variant (v), *p);
+
+          } catch (tl::Exception &ex) {
+
+            lay::indicate_error (le, &ex);
+            edit_error = true;
+          }
+        }
+      } break;
+
+      case db::PCellParameterDeclaration::t_string: {
+        QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
+        if (le) {
+          ps.set_value (tl::Variant (tl::to_string (le->text ())));
+        }
+      } break;
+
+      case db::PCellParameterDeclaration::t_list: {
+        QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
+        if (le) {
+
+          std::string s = tl::to_string (le->text ());
+
+          //  try parsing a bracketed expression
+          tl::Extractor ex (s.c_str ());
+          if (*ex.skip () == '(') {
+            tl::Variant v;
             try {
-
-              int v = 0;
-              tl::from_string_ext (tl::to_string (le->text ()), v);
-
-              ps.set_value (tl::Variant (v));
-              lay::indicate_error (le, (tl::Exception *) 0);
-
-              check_range(tl::Variant (v), *p);
-
-            } catch (tl::Exception &ex) {
-
-              lay::indicate_error (le, &ex);
-              edit_error = true;
-
-            }
-
-          }
-        }
-        break;
-
-      case db::PCellParameterDeclaration::t_double:
-        {
-          QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
-          if (le) {
-
-            try {
-
-              double v = 0;
-              tl::from_string_ext (tl::to_string (le->text ()), v);
-
-              ps.set_value (tl::Variant (v));
-              lay::indicate_error (le, (tl::Exception *) 0);
-
-              check_range(tl::Variant (v), *p);
-
-            } catch (tl::Exception &ex) {
-
-              lay::indicate_error (le, &ex);
-              edit_error = true;
-
-            }
-
-          }
-        }
-        break;
-
-      case db::PCellParameterDeclaration::t_string:
-        {
-          QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
-          if (le) {
-            ps.set_value (tl::Variant (tl::to_string (le->text ())));
-          }
-        }
-        break;
-
-      case db::PCellParameterDeclaration::t_list:
-        {
-          QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
-          if (le) {
-
-            std::string s = tl::to_string (le->text ());
-
-            //  try parsing a bracketed expression
-            tl::Extractor ex (s.c_str ());
-            if (*ex.skip () == '(') {
-              tl::Variant v;
-              try {
-                ex.read (v);
-                ps.set_value (v);
-                break;
-              } catch (...) {
-                //  ignore errors
-              }
-            } else if (ex.at_end ()) {
-              ps.set_value (tl::Variant::empty_list ());
+              ex.read (v);
+              ps.set_value (v);
               break;
+            } catch (...) {
+              //  ignore errors
             }
-
-            //  otherwise: plain splitting at comma
-            std::vector<std::string> values = tl::split (s, ",");
-            ps.set_value (tl::Variant (values.begin (), values.end ()));
-
+          } else if (ex.at_end ()) {
+            ps.set_value (tl::Variant::empty_list ());
+            break;
           }
-        }
-        break;
 
-      case db::PCellParameterDeclaration::t_layer:
-        {
-          lay::LayerSelectionComboBox *ly = dynamic_cast<lay::LayerSelectionComboBox *> (m_widgets [r]);
-          if (ly) {
-            ps.set_value (tl::Variant (ly->current_layer_props ()));
-          }
+          //  otherwise: plain splitting at comma
+          std::vector<std::string> values = tl::split (s, ",");
+          ps.set_value (tl::Variant (values.begin (), values.end ()));
         }
-        break;
-      case db::PCellParameterDeclaration::t_boolean:
-        {
-          QCheckBox *cbx = dynamic_cast<QCheckBox *> (m_widgets [r]);
-          if (cbx) {
-            ps.set_value (tl::Variant (cbx->isChecked ()));
-          }
+      } break;
+
+      case db::PCellParameterDeclaration::t_layer: {
+        lay::LayerSelectionComboBox *ly = dynamic_cast<lay::LayerSelectionComboBox *> (m_widgets [r]);
+        if (ly) {
+          ps.set_value (tl::Variant (ly->current_layer_props ()));
         }
-        break;
+      } break;
+      case db::PCellParameterDeclaration::t_boolean: {
+        QCheckBox *cbx = dynamic_cast<QCheckBox *> (m_widgets [r]);
+        if (cbx) {
+          ps.set_value (tl::Variant (cbx->isChecked ()));
+        }
+      } break;
 
       default:
         break;
@@ -985,18 +924,15 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
 
     } else {
 
-      QComboBox *cb = dynamic_cast<QComboBox*> (m_widgets [r]);
+      QComboBox *cb = dynamic_cast<QComboBox *> (m_widgets [r]);
       if (cb && cb->currentIndex () >= 0 && cb->currentIndex () < int (p->get_choices ().size ())) {
         ps.set_value (p->get_choices () [cb->currentIndex ()]);
       }
-
     }
-
   }
 }
 
-void
-PCellParametersPage::get_parameters (db::ParameterStates &states, bool *ok)
+void PCellParametersPage::get_parameters (db::ParameterStates &states, bool *ok)
 {
   try {
 
@@ -1026,7 +962,6 @@ PCellParametersPage::get_parameters (db::ParameterStates &states, bool *ok)
         states_from_parameters (states, parameters);
         set_parameters_internal (states, lazy_evaluation ());
       }
-
     }
 
     if (ok) {
@@ -1053,7 +988,6 @@ PCellParametersPage::get_parameters (db::ParameterStates &states, bool *ok)
     } else {
       throw;
     }
-
   }
 }
 
@@ -1066,8 +1000,7 @@ PCellParametersPage::get_parameters (bool *ok)
   return parameter_from_states (states);
 }
 
-void
-PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
+void PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
 {
   if (! mp_pcell_decl) {
     return;
@@ -1094,8 +1027,7 @@ PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
   update_widgets_from_states (m_states, false);
 }
 
-void
-PCellParametersPage::update_widgets_from_states (const db::ParameterStates &states, bool tentatively)
+void PCellParametersPage::update_widgets_from_states (const db::ParameterStates &states, bool tentatively)
 {
   if (! mp_pcell_decl) {
     return;
@@ -1158,9 +1090,7 @@ PCellParametersPage::update_widgets_from_states (const db::ParameterStates &stat
         m_icon_widgets [i]->setVisible (ps.is_visible ());
         break;
       }
-
     }
-
   }
 
   set_parameters_internal (states, tentatively);
@@ -1172,8 +1102,7 @@ PCellParametersPage::update_widgets_from_states (const db::ParameterStates &stat
   }
 }
 
-void
-PCellParametersPage::set_parameters_internal (const db::ParameterStates &states, bool tentatively)
+void PCellParametersPage::set_parameters_internal (const db::ParameterStates &states, bool tentatively)
 {
   if (! mp_pcell_decl) {
     return;
@@ -1213,14 +1142,12 @@ PCellParametersPage::parameter_from_states (const db::ParameterStates &states) c
         parameters.push_back (states.parameter (p->get_name ()).value ());
       }
     }
-
   }
 
   return parameters;
 }
 
-void
-PCellParametersPage::states_from_parameters (db::ParameterStates &states, const std::vector<tl::Variant> &parameters)
+void PCellParametersPage::states_from_parameters (db::ParameterStates &states, const std::vector<tl::Variant> &parameters)
 {
   if (! mp_pcell_decl) {
     return;
@@ -1238,8 +1165,7 @@ PCellParametersPage::states_from_parameters (db::ParameterStates &states, const 
   }
 }
 
-void
-PCellParametersPage::check_range (const tl::Variant &value, const db::PCellParameterDeclaration &decl)
+void PCellParametersPage::check_range (const tl::Variant &value, const db::PCellParameterDeclaration &decl)
 {
   if (! decl.min_value ().is_nil () && value < decl.min_value ()) {
     throw tl::Exception (tl::sprintf (tl::to_string (tr ("The value is lower than the minimum allowed value: given value is %s, minimum value is %s")), value.to_string (), decl.min_value ().to_string ()));

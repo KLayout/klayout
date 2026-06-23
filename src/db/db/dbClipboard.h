@@ -38,7 +38,7 @@ class Object;
  *  @brief The clipboard object
  *
  *  Each object stored in the clipboard must be derived from this
- *  base class. 
+ *  base class.
  */
 class DB_PUBLIC ClipboardObject
 {
@@ -63,11 +63,11 @@ public:
 /**
  *  @brief A basic clipboard object with a "type"
  *
- *  This object encapsulates any type into a clipboard 
+ *  This object encapsulates any type into a clipboard
  *  object for retrieval from the clipboard.
  */
 template <class Value>
-class ClipboardValue 
+class ClipboardValue
   : public ClipboardObject
 {
 public:
@@ -82,7 +82,7 @@ public:
 
   /**
    *  @brief Create a clipboard object that can be stored
-   *  
+   *
    *  @param value The value to store
    */
   ClipboardValue (const Value &value)
@@ -102,7 +102,7 @@ public:
   /**
    *  @brief Accessor the the value (non-const)
    */
-  Value &get () 
+  Value &get ()
   {
     return m_value;
   }
@@ -123,7 +123,7 @@ private:
 class DB_PUBLIC Clipboard
 {
 public:
-  typedef std::vector <const ClipboardObject *>::const_iterator iterator;
+  typedef std::vector<const ClipboardObject *>::const_iterator iterator;
 
   /**
    *  @brief The singleton instance
@@ -156,7 +156,7 @@ public:
   /**
    *  @brief Access to the objects: start iterator
    */
-  iterator begin () 
+  iterator begin ()
   {
     return m_objects.begin ();
   }
@@ -164,7 +164,7 @@ public:
   /**
    *  @brief Access to the objects: end iterator
    */
-  iterator end () 
+  iterator end ()
   {
     return m_objects.end ();
   }
@@ -186,15 +186,14 @@ public:
   }
 
 private:
-  std::vector <const ClipboardObject *> m_objects;
+  std::vector<const ClipboardObject *> m_objects;
   static Clipboard m_instance;
 
   //  no copying
   Clipboard (const Clipboard &);
-  Clipboard &operator=(const Clipboard &);
+  Clipboard &operator= (const Clipboard &);
 };
 
 } // namespace db
 
 #endif
-

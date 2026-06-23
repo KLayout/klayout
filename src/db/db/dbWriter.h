@@ -29,10 +29,10 @@
 #include "tlException.h"
 #include "dbSaveLayoutOptions.h"
 
-namespace tl 
+namespace tl
 {
-  class OutputStream;
-  class OutputStreamBase;
+class OutputStream;
+class OutputStreamBase;
 }
 
 namespace db
@@ -49,12 +49,12 @@ public:
   /**
    *  @brief Constructor
    */
-  WriterBase () { }
+  WriterBase () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~WriterBase () { }
+  virtual ~WriterBase () {}
 
   /**
    *  @brief Actually write the layout
@@ -104,4 +104,3 @@ private:
 }
 
 #endif
-

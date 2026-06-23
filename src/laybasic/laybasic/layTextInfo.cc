@@ -93,7 +93,7 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
     //  count the lines
 
     unsigned int lines = 1;
-    for (const char *cp = text.string (); *cp; ) {
+    for (const char *cp = text.string (); *cp;) {
       if (tl::skip_newline (cp)) {
         ++lines;
       } else {
@@ -125,7 +125,7 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
     while (*cp) {
 
       unsigned int length = 0;
-      while (*cp && !tl::skip_newline (cp)) {
+      while (*cp && ! tl::skip_newline (cp)) {
         tl::utf32_from_utf8 (cp);
         ++length;
       }
@@ -150,7 +150,6 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
         xright = xr;
       }
       first = false;
-
     }
 
     return (db::DBox (xleft, ybottom, xright, ytop) * (1.0 / vp_trans.mag ())).transformed (tt);
@@ -160,7 +159,6 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
     db::DHershey ht (text.string (), font);
     ht.justify (db::DBox (dp1, dp2), halign, valign);
     return ht.bbox ().transformed (tt);
-
   }
 }
 

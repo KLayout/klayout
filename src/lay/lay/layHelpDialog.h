@@ -33,7 +33,7 @@
 
 namespace Ui
 {
-  class HelpDialog;
+class HelpDialog;
 }
 
 namespace lay
@@ -45,10 +45,10 @@ class BrowserPanel;
 /**
  *  @brief The help dialog (aka assistant)
  */
-class HelpDialog 
-  : public QDialog 
+class HelpDialog
+  : public QDialog
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   HelpDialog (QWidget *parent, bool modal = false);
@@ -75,4 +75,3 @@ private:
 }
 
 #endif
-

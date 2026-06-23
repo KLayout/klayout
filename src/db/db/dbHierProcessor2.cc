@@ -43,16 +43,16 @@
 
 #include <cronology/events.hpp>
 
-CRONOLOGY_MAKE_EVENT(event_compute_contexts, "Compute contexts")
-CRONOLOGY_MAKE_EVENT(event_compute_contexts_unlocked, "Compute contexts (unlocked)")
+CRONOLOGY_MAKE_EVENT (event_compute_contexts, "Compute contexts")
+CRONOLOGY_MAKE_EVENT (event_compute_contexts_unlocked, "Compute contexts (unlocked)")
 
 cronology::events::event_collection<event_compute_contexts, event_compute_contexts_unlocked> collect_events;
 
 #define CRONOLOGY_COLLECTION_BRACKET(event_name) cronology::EventBracket __bracket##event_name (collect_events.threadwise ()->event<event_name> ().event ());
 
-CRONOLOGY_MAKE_EVENT(event_compute_results, "Compute results")
-CRONOLOGY_MAKE_EVENT(event_compute_local_cell, "Compute local cell results")
-CRONOLOGY_MAKE_EVENT(event_propagate, "Propagate local cell results")
+CRONOLOGY_MAKE_EVENT (event_compute_results, "Compute results")
+CRONOLOGY_MAKE_EVENT (event_compute_local_cell, "Compute local cell results")
+CRONOLOGY_MAKE_EVENT (event_propagate, "Propagate local cell results")
 
 cronology::events::event_collection<event_compute_results, event_compute_local_cell, event_propagate> compute_events;
 
@@ -94,15 +94,13 @@ local_processor_cell_context<TS, TI, TR>::operator= (const local_processor_cell_
 }
 
 template <class TS, class TI, class TR>
-void
-local_processor_cell_context<TS, TI, TR>::add (db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *parent, const db::ICplxTrans &cell_inst)
+void local_processor_cell_context<TS, TI, TR>::add (db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *parent, const db::ICplxTrans &cell_inst)
 {
   m_drops.push_back (local_processor_cell_drop<TS, TI, TR> (parent_context, parent, cell_inst));
 }
 
 template <class TS, class TI, class TR>
-void
-local_processor_cell_context<TS, TI, TR>::propagate (unsigned int output_layer, const std::unordered_set<TR> &res)
+void local_processor_cell_context<TS, TI, TR>::propagate (unsigned int output_layer, const std::unordered_set<TR> &res)
 {
   if (res.empty ()) {
     return;
@@ -111,7 +109,7 @@ local_processor_cell_context<TS, TI, TR>::propagate (unsigned int output_layer, 
   db::Layout *subject_layout = 0;
   shape_reference_translator_with_trans<TR, db::ICplxTrans> rt (subject_layout);
 
-  for (typename std::vector<local_processor_cell_drop<TS, TI, TR> >::const_iterator d = m_drops.begin (); d != m_drops.end (); ++d) {
+  for (typename std::vector<local_processor_cell_drop<TS, TI, TR>>::const_iterator d = m_drops.begin (); d != m_drops.end (); ++d) {
 
     tl_assert (d->parent_context != 0);
     tl_assert (d->parent != 0);
@@ -132,7 +130,6 @@ local_processor_cell_context<TS, TI, TR>::propagate (unsigned int output_layer, 
       tl::MutexLocker locker (&d->parent_context->lock ());
       d->parent_context->propagated (output_layer).insert (new_refs.begin (), new_refs.end ());
     }
-
   }
 }
 
@@ -157,7 +154,7 @@ template <class TS, class TI, class TR>
 db::local_processor_cell_context<TS, TI, TR> *
 local_processor_cell_contexts<TS, TI, TR>::find_context (const context_key_type &intruders)
 {
-  typename std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR> >::iterator c = m_contexts.find (intruders);
+  typename std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR>>::iterator c = m_contexts.find (intruders);
   return c != m_contexts.end () ? &c->second : 0;
 }
 
@@ -165,7 +162,7 @@ template <class TS, class TI, class TR>
 db::local_processor_cell_context<TS, TI, TR> *
 local_processor_cell_contexts<TS, TI, TR>::create (const context_key_type &intruders)
 {
-  return &m_contexts[intruders];
+  return &m_contexts [intruders];
 }
 
 template <class TR>
@@ -201,7 +198,7 @@ subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::
 
   for (std::unordered_set<db::PolygonRef>::const_iterator i = res.begin (); i != res.end (); ++i) {
     const db::PolygonRef &subject = *i;
-    for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+    for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end (); ++e) {
       ep.insert (*e, p1);
     }
     p1 += 2;
@@ -209,7 +206,7 @@ subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::
 
   for (std::unordered_set<db::PolygonRef>::const_iterator i = other.begin (); i != other.end (); ++i) {
     const db::PolygonRef &subject = *i;
-    for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+    for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end (); ++e) {
       ep.insert (*e, p2);
     }
     p2 += 2;
@@ -242,12 +239,12 @@ subtract (std::unordered_set<db::PolygonRefWithProperties> &res, const std::unor
   std::unordered_set<db::PolygonRefWithProperties> first;
   first.swap (res);
 
-  std::map<db::properties_id_type, std::pair<std::vector<const db::PolygonRefWithProperties *>, std::vector<const db::PolygonRefWithProperties *> >, ComparePropertiesIds> by_prop_id;
-  for (auto i = first.begin (); i != first.end (); ++i)   {
-    by_prop_id [i->properties_id ()].first.push_back (i.operator-> ());
+  std::map<db::properties_id_type, std::pair<std::vector<const db::PolygonRefWithProperties *>, std::vector<const db::PolygonRefWithProperties *>>, ComparePropertiesIds> by_prop_id;
+  for (auto i = first.begin (); i != first.end (); ++i) {
+    by_prop_id [i->properties_id ()].first.push_back (i.operator->());
   }
-  for (auto i = other.begin (); i != other.end (); ++i)   {
-    by_prop_id [i->properties_id ()].second.push_back (i.operator-> ());
+  for (auto i = other.begin (); i != other.end (); ++i) {
+    by_prop_id [i->properties_id ()].second.push_back (i.operator->());
   }
 
   db::EdgeProcessor ep;
@@ -275,7 +272,6 @@ subtract (std::unordered_set<db::PolygonRefWithProperties> &res, const std::unor
     db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
     db::PolygonGenerator pg (splitter, true, true);
     ep.process (pg, op);
-
   }
 }
 
@@ -296,14 +292,14 @@ subtract (std::unordered_set<db::Edge> &res, const std::unordered_set<db::Edge> 
   scanner.reserve (res.size () + other.size ());
 
   for (std::unordered_set<Edge>::const_iterator i = res.begin (); i != res.end (); ++i) {
-    scanner.insert (i.operator-> (), 0);
+    scanner.insert (i.operator->(), 0);
   }
   for (std::unordered_set<Edge>::const_iterator i = other.begin (); i != other.end (); ++i) {
-    scanner.insert (i.operator-> (), 1);
+    scanner.insert (i.operator->(), 1);
   }
 
   std::unordered_set<db::Edge> result;
-  EdgeBooleanClusterCollector<std::unordered_set<db::Edge> > cluster_collector (&result, EdgeNot);
+  EdgeBooleanClusterCollector<std::unordered_set<db::Edge>> cluster_collector (&result, EdgeNot);
   scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
 
   res.swap (result);
@@ -325,12 +321,12 @@ subtract (std::unordered_set<db::EdgeWithProperties> &res, const std::unordered_
   std::unordered_set<db::EdgeWithProperties> first;
   first.swap (res);
 
-  std::map<db::properties_id_type, std::pair<std::vector<const db::EdgeWithProperties *>, std::vector<const db::EdgeWithProperties *> >, ComparePropertiesIds> by_prop_id;
-  for (auto i = first.begin (); i != first.end (); ++i)   {
-    by_prop_id [i->properties_id ()].first.push_back (i.operator-> ());
+  std::map<db::properties_id_type, std::pair<std::vector<const db::EdgeWithProperties *>, std::vector<const db::EdgeWithProperties *>>, ComparePropertiesIds> by_prop_id;
+  for (auto i = first.begin (); i != first.end (); ++i) {
+    by_prop_id [i->properties_id ()].first.push_back (i.operator->());
   }
-  for (auto i = other.begin (); i != other.end (); ++i)   {
-    by_prop_id [i->properties_id ()].second.push_back (i.operator-> ());
+  for (auto i = other.begin (); i != other.end (); ++i) {
+    by_prop_id [i->properties_id ()].second.push_back (i.operator->());
   }
 
   for (auto s2p = by_prop_id.begin (); s2p != by_prop_id.end (); ++s2p) {
@@ -353,12 +349,10 @@ subtract (std::unordered_set<db::EdgeWithProperties> &res, const std::unordered_
         scanner.insert (*i, 1);
       }
 
-      db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > prop_inject (&res, s2p->first);
-      EdgeBooleanClusterCollector<db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > > cluster_collector (&prop_inject, EdgeNot);
+      db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties>> prop_inject (&res, s2p->first);
+      EdgeBooleanClusterCollector<db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties>>> cluster_collector (&prop_inject, EdgeNot);
       scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
-
     }
-
   }
 }
 
@@ -369,13 +363,13 @@ subtract (std::unordered_set<TR> &res, const std::unordered_set<TR> &other, db::
   subtract_set (res, other);
 }
 
-namespace {
+namespace
+{
 
 template <class TS, class TI, class TR>
-struct context_sorter
-{
-  bool operator () (const std::pair<const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> &a,
-                    const std::pair<const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> &b)
+struct context_sorter {
+  bool operator() (const std::pair<const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> &a,
+                   const std::pair<const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> &b)
   {
     return *a.first < *b.first;
   }
@@ -384,13 +378,12 @@ struct context_sorter
 }
 
 template <class TS, class TI, class TR>
-void
-local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processor_contexts<TS, TI, TR> &contexts, db::Cell *cell, const local_operation<TS, TI, TR> *op, const std::vector<unsigned int> &output_layers, const local_processor<TS, TI, TR> *proc)
+void local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processor_contexts<TS, TI, TR> &contexts, db::Cell *cell, const local_operation<TS, TI, TR> *op, const std::vector<unsigned int> &output_layers, const local_processor<TS, TI, TR> *proc)
 {
-  CRONOLOGY_COMPUTE_BRACKET(event_compute_results)
+  CRONOLOGY_COMPUTE_BRACKET (event_compute_results)
 
   bool first = true;
-  std::vector<std::unordered_set<TR> > common;
+  std::vector<std::unordered_set<TR>> common;
   common.resize (output_layers.size ());
 
   int index = 0;
@@ -399,15 +392,15 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
   //  NOTE: we use the ordering provided by key_type::operator< rather than the unordered map to achieve
   //  reproducibility across different platforms. unordered_map is faster, but for processing them,
   //  strict ordering is a more robust choice.
-  std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> > sorted_contexts;
+  std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *>> sorted_contexts;
   sorted_contexts.reserve (m_contexts.size ());
-  for (typename std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR> >::iterator c = m_contexts.begin (); c != m_contexts.end (); ++c) {
+  for (typename std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR>>::iterator c = m_contexts.begin (); c != m_contexts.end (); ++c) {
     sorted_contexts.push_back (std::make_pair (&c->first, &c->second));
   }
 
   std::sort (sorted_contexts.begin (), sorted_contexts.end (), context_sorter<TS, TI, TR> ());
 
-  for (typename std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> >::const_iterator c = sorted_contexts.begin (); c != sorted_contexts.end (); ++c) {
+  for (typename std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *>>::const_iterator c = sorted_contexts.begin (); c != sorted_contexts.end (); ++c) {
 
     proc->next ();
     ++index;
@@ -425,13 +418,13 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
         }
       }
 
-      CRONOLOGY_COMPUTE_BRACKET(event_compute_local_cell)
+      CRONOLOGY_COMPUTE_BRACKET (event_compute_local_cell)
       proc->compute_local_cell (contexts, cell, mp_intruder_cell, op, *c->first, common);
       first = false;
 
     } else {
 
-      std::vector<std::unordered_set<TR> > res;
+      std::vector<std::unordered_set<TR>> res;
       res.resize (output_layers.size ());
 
       {
@@ -442,7 +435,7 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
       }
 
       {
-        CRONOLOGY_COMPUTE_BRACKET(event_compute_local_cell)
+        CRONOLOGY_COMPUTE_BRACKET (event_compute_local_cell)
         proc->compute_local_cell (contexts, cell, mp_intruder_cell, op, *c->first, res);
       }
 
@@ -453,7 +446,7 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
 
       if (common_empty) {
 
-        CRONOLOGY_COMPUTE_BRACKET(event_propagate)
+        CRONOLOGY_COMPUTE_BRACKET (event_propagate)
         for (std::vector<unsigned int>::const_iterator o = output_layers.begin (); o != output_layers.end (); ++o) {
           c->second->propagate (*o, res [o - output_layers.begin ()]);
         }
@@ -466,7 +459,7 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
       } else if (res != common) {
 #endif
 
-        CRONOLOGY_COMPUTE_BRACKET(event_propagate)
+        CRONOLOGY_COMPUTE_BRACKET (event_propagate)
 
         for (std::vector<unsigned int>::const_iterator o = output_layers.begin (); o != output_layers.end (); ++o) {
 
@@ -474,25 +467,23 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
 
           std::unordered_set<TR> lost;
 
-          for (typename std::unordered_set<TR>::const_iterator i = common[oi].begin (); i != common[oi].end (); ++i) {
-            if (res[oi].find (*i) == res[oi].end ()) {
+          for (typename std::unordered_set<TR>::const_iterator i = common [oi].begin (); i != common [oi].end (); ++i) {
+            if (res [oi].find (*i) == res [oi].end ()) {
               lost.insert (*i);
             }
           }
 
           if (! lost.empty ()) {
 
-            subtract (lost, res[oi], cell->layout (), proc);
+            subtract (lost, res [oi], cell->layout (), proc);
 
             if (! lost.empty ()) {
-              subtract (common[oi], lost, cell->layout (), proc);
-              for (typename std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> >::const_iterator cc = sorted_contexts.begin (); cc != c; ++cc) {
+              subtract (common [oi], lost, cell->layout (), proc);
+              for (typename std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *>>::const_iterator cc = sorted_contexts.begin (); cc != c; ++cc) {
                 cc->second->propagate (*o, lost);
               }
             }
-
           }
-
         }
 
         for (std::vector<unsigned int>::const_iterator o = output_layers.begin (); o != output_layers.end (); ++o) {
@@ -500,28 +491,23 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
           std::unordered_set<TR> gained;
 
           size_t oi = o - output_layers.begin ();
-          for (typename std::unordered_set<TR>::const_iterator i = res[oi].begin (); i != res[oi].end (); ++i) {
-            if (common[oi].find (*i) == common[oi].end ()) {
+          for (typename std::unordered_set<TR>::const_iterator i = res [oi].begin (); i != res [oi].end (); ++i) {
+            if (common [oi].find (*i) == common [oi].end ()) {
               gained.insert (*i);
             }
           }
 
           if (! gained.empty ()) {
 
-            subtract (gained, common[oi], cell->layout (), proc);
+            subtract (gained, common [oi], cell->layout (), proc);
 
             if (! gained.empty ()) {
               c->second->propagate (*o, gained);
             }
-
           }
-
         }
-
       }
-
     }
-
   }
 
   //  store the results
@@ -634,4 +620,3 @@ template class DB_PUBLIC local_processor_cell_contexts<db::TextRef, db::PolygonR
 template class DB_PUBLIC local_processor_cell_contexts<db::TextRef, db::PolygonRef, db::TextRef>;
 
 }
-

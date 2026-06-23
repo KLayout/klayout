@@ -35,7 +35,7 @@ namespace tl
  *  @brief A preliminary class for writing XML files
  */
 
-class TL_PUBLIC XMLWriter 
+class TL_PUBLIC XMLWriter
 {
 public:
   XMLWriter (std::ostream &os);
@@ -61,4 +61,3 @@ private:
 }
 
 #endif
-

@@ -26,7 +26,7 @@
 #include "dbTextWriter.h"
 #include "tlCommandLineParser.h"
 
-BD_PUBLIC int strm2txt (int argc, char *argv[])
+BD_PUBLIC int strm2txt (int argc, char *argv [])
 {
   bd::GenericReaderOptions generic_reader_options;
   std::string infile, outfile;
@@ -34,9 +34,8 @@ BD_PUBLIC int strm2txt (int argc, char *argv[])
   tl::CommandLineOptions cmd;
   generic_reader_options.add_options (cmd);
 
-  cmd << tl::arg ("input",  &infile,  "The input file (any format, may be gzip compressed)")
-      << tl::arg ("output", &outfile, "The output file (proprietary text format)")
-    ;
+  cmd << tl::arg ("input", &infile, "The input file (any format, may be gzip compressed)")
+      << tl::arg ("output", &outfile, "The output file (proprietary text format)");
 
   cmd.brief ("This program will convert the given file to a proprietary text format file");
 

@@ -54,7 +54,7 @@ InstElement::to_string (bool resolve_cell_name) const
 //  Implementation of "find_path"
 
 static bool
-find_path (const db::Layout &layout, db::cell_index_type from, db::cell_index_type to, std::set <db::cell_index_type> &visited, std::vector<db::InstElement> &path)
+find_path (const db::Layout &layout, db::cell_index_type from, db::cell_index_type to, std::set<db::cell_index_type> &visited, std::vector<db::InstElement> &path)
 {
   const db::Cell &cell = layout.cell (from);
   for (db::Cell::parent_inst_iterator p = cell.begin_parent_insts (); ! p.at_end (); ++p) {
@@ -72,22 +72,19 @@ find_path (const db::Layout &layout, db::cell_index_type from, db::cell_index_ty
         return true;
       }
       path.pop_back ();
-
     }
-
   }
 
   return false;
 }
 
-bool
-find_path (const db::Layout &layout, db::cell_index_type from, db::cell_index_type to, std::vector<db::InstElement> &path)
+bool find_path (const db::Layout &layout, db::cell_index_type from, db::cell_index_type to, std::vector<db::InstElement> &path)
 {
   path.clear ();
   if (from == to) {
     return true;
   } else {
-    std::set <db::cell_index_type> v;
+    std::set<db::cell_index_type> v;
     if (find_path (layout, from, to, v, path)) {
       std::reverse (path.begin (), path.end ());
       return true;

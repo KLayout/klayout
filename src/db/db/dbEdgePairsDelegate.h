@@ -30,7 +30,8 @@
 #include "dbShapeCollectionUtils.h"
 #include "dbGenericShapeIterator.h"
 
-namespace db {
+namespace db
+{
 
 class RecursiveShapeIterator;
 class EdgePairs;
@@ -44,15 +45,16 @@ typedef shape_collection_processor<db::EdgePair, db::Polygon> EdgePairToPolygonP
 typedef shape_collection_processor<db::EdgePair, db::Edge> EdgePairToEdgeProcessorBase;
 
 class DB_PUBLIC
-EdgePairToPolygonProcessor
+  EdgePairToPolygonProcessor
   : public EdgePairToPolygonProcessorBase
 {
 public:
   EdgePairToPolygonProcessor (db::Coord e)
     : m_e (e)
-  { }
+  {
+  }
 
-  void process(const EdgePairWithProperties &ep, std::vector<db::PolygonWithProperties> &res) const
+  void process (const EdgePairWithProperties &ep, std::vector<db::PolygonWithProperties> &res) const
   {
     db::Polygon poly = ep.normalized ().to_polygon (m_e);
     if (poly.vertices () >= 3) {
@@ -65,14 +67,15 @@ private:
 };
 
 class DB_PUBLIC
-EdgePairToEdgesProcessor
+  EdgePairToEdgesProcessor
   : public EdgePairToEdgeProcessorBase
 {
 public:
   EdgePairToEdgesProcessor ()
-  { }
+  {
+  }
 
-  void process(const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
+  void process (const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
   {
     res.push_back (db::EdgeWithProperties (ep.first (), ep.properties_id ()));
     res.push_back (db::EdgeWithProperties (ep.second (), ep.properties_id ()));
@@ -80,14 +83,15 @@ public:
 };
 
 class DB_PUBLIC
-EdgePairToFirstEdgesProcessor
+  EdgePairToFirstEdgesProcessor
   : public EdgePairToEdgeProcessorBase
 {
 public:
   EdgePairToFirstEdgesProcessor ()
-  { }
+  {
+  }
 
-  void process(const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
+  void process (const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
   {
     res.push_back (db::EdgeWithProperties (ep.first (), ep.properties_id ()));
     if (ep.is_symmetric ()) {
@@ -97,14 +101,15 @@ public:
 };
 
 class DB_PUBLIC
-EdgePairToSecondEdgesProcessor
+  EdgePairToSecondEdgesProcessor
   : public EdgePairToEdgeProcessorBase
 {
 public:
   EdgePairToSecondEdgesProcessor ()
-  { }
+  {
+  }
 
-  void process(const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
+  void process (const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
   {
     if (! ep.is_symmetric ()) {
       res.push_back (db::EdgeWithProperties (ep.second (), ep.properties_id ()));
@@ -113,28 +118,30 @@ public:
 };
 
 class DB_PUBLIC
-EdgePairToLesserEdgesProcessor
+  EdgePairToLesserEdgesProcessor
   : public EdgePairToEdgeProcessorBase
 {
 public:
   EdgePairToLesserEdgesProcessor ()
-  { }
+  {
+  }
 
-  void process(const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
+  void process (const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
   {
     res.push_back (db::EdgeWithProperties (ep.lesser (), ep.properties_id ()));
   }
 };
 
 class DB_PUBLIC
-EdgePairToGreaterEdgesProcessor
+  EdgePairToGreaterEdgesProcessor
   : public EdgePairToEdgeProcessorBase
 {
 public:
   EdgePairToGreaterEdgesProcessor ()
-  { }
+  {
+  }
 
-  void process(const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
+  void process (const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
   {
     res.push_back (db::EdgeWithProperties (ep.greater (), ep.properties_id ()));
   }
@@ -143,7 +150,7 @@ public:
 /**
  *  @brief The edge pair set iterator delegate
  */
-typedef db::generic_shape_iterator_delegate_base <db::EdgePair> EdgePairsIteratorDelegate;
+typedef db::generic_shape_iterator_delegate_base<db::EdgePair> EdgePairsIteratorDelegate;
 
 /**
  *  @brief The delegate for the actual edge set implementation
@@ -183,9 +190,9 @@ public:
   void disable_progress ();
 
   //  dummy features to harmonize the interface of region, edges and edge pair delegates
-  void set_merged_semantics (bool) { }
+  void set_merged_semantics (bool) {}
   bool merged_semantics () const { return false; }
-  void set_is_merged (bool) { }
+  void set_is_merged (bool) {}
   bool is_merged () const { return false; }
 
   virtual std::string to_string (size_t nmax) const = 0;
@@ -266,4 +273,3 @@ private:
 }
 
 #endif
-

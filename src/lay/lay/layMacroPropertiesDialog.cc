@@ -41,8 +41,7 @@ MacroPropertiesDialog::MacroPropertiesDialog (QWidget *parent)
   activate_help_links (helpLabel);
 }
 
-int 
-MacroPropertiesDialog::exec_dialog (lym::Macro *macro)
+int MacroPropertiesDialog::exec_dialog (lym::Macro *macro)
 {
   update (macro);
   int ret = QDialog::exec ();
@@ -52,15 +51,13 @@ MacroPropertiesDialog::exec_dialog (lym::Macro *macro)
   return ret;
 }
 
-void
-MacroPropertiesDialog::shortcut_edited ()
+void MacroPropertiesDialog::shortcut_edited ()
 {
   QKeySequence ks (shortcut->text ());
   shortcut->setText (ks.toString ());
 }
 
-void 
-MacroPropertiesDialog::update (const lym::Macro *macro)
+void MacroPropertiesDialog::update (const lym::Macro *macro)
 {
   std::string ip = "-";
   if (macro->interpreter () == lym::Macro::Ruby) {
@@ -69,7 +66,7 @@ MacroPropertiesDialog::update (const lym::Macro *macro)
     ip = "Python";
   } else if (macro->interpreter () == lym::Macro::DSLInterpreter) {
     ip = lym::MacroInterpreter::description (macro->dsl_interpreter ());
-  } 
+  }
   interpreterLabel->setText (tl::to_qstring (ip));
 
   propertiesFrame->setEnabled (! macro->is_readonly ());
@@ -86,8 +83,7 @@ MacroPropertiesDialog::update (const lym::Macro *macro)
   menuPath->setText (tl::to_qstring (macro->menu_path ()));
 }
 
-void 
-MacroPropertiesDialog::commit (lym::Macro *macro)
+void MacroPropertiesDialog::commit (lym::Macro *macro)
 {
   macro->set_description (tl::to_string (description->text ()));
   macro->set_version (tl::to_string (version->text ()));
@@ -106,4 +102,3 @@ MacroPropertiesDialog::commit (lym::Macro *macro)
 }
 
 }
-

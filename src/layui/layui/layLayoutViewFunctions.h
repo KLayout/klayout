@@ -28,12 +28,13 @@
 #include "layuiCommon.h"
 
 #include "layPlugin.h"
-#include "layDialogs.h"   //  For AlignCellOptions
+#include "layDialogs.h" //  For AlignCellOptions
 
 #include "dbTrans.h"
 #include "dbLayerProperties.h"
 
-namespace lay {
+namespace lay
+{
 
 class LayoutViewBase;
 
@@ -49,7 +50,7 @@ public:
    */
   LayoutViewFunctions (db::Manager *manager, lay::LayoutViewBase *view);
 
-  /** 
+  /**
    *  @brief Destructor
    */
   ~LayoutViewFunctions ();
@@ -179,4 +180,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

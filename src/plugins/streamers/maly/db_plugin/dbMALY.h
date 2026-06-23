@@ -70,23 +70,22 @@ public:
    */
   MALYTitle ()
     : width (0.0), height (0.0), pitch (0.0), type (String), font (Standard)
-  { }
+  {
+  }
 
   /**
    *  @brief The type of the title
    */
-  enum Type
-  {
-    String = 0,     //  A user-defined string
-    Date = 1,       //  The date
-    Serial = 2      //  A serial number
+  enum Type {
+    String = 0, //  A user-defined string
+    Date = 1,   //  The date
+    Serial = 2  //  A serial number
   };
 
   /**
    *  @brief The font to be used
    */
-  enum Font
-  {
+  enum Font {
     FontNotSet = 0, //  Undef
     Standard = 1,   //  Standard font
     Native = 2      //  Native tool font
@@ -147,7 +146,8 @@ public:
    */
   MALYStructure ()
     : nx (1), ny (1), dx (0.0), dy (0.0), layer (-1)
-  { }
+  {
+  }
 
   /**
    *  @brief The (expanded) path of the pattern file
@@ -229,7 +229,8 @@ public:
    */
   MALYMask ()
     : size_um (0.0)
-  { }
+  {
+  }
 
   /**
    *  @brief Size of the mask in micrometers
@@ -269,7 +270,8 @@ public:
    *  @brief Default constructor
    */
   MALYData ()
-  { }
+  {
+  }
 
   /**
    *  @brief The masks defined by the file
@@ -285,4 +287,3 @@ public:
 }
 
 #endif
-

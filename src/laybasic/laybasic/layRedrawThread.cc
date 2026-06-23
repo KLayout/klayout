@@ -30,7 +30,7 @@
 
 #include <memory>
 
-namespace lay 
+namespace lay
 {
 
 // -------------------------------------------------------------
@@ -68,8 +68,7 @@ void RedrawThread::layout_changed ()
   stop ();
 }
 
-void
-RedrawThread::task_finished (int task_id)
+void RedrawThread::task_finished (int task_id)
 {
   //  mark this entry as already drawn.
   //  HINT: that is MT safe given the exclusive nature of the tasks ...
@@ -82,7 +81,7 @@ RedrawThread::task_finished (int task_id)
   }
 }
 
-std::vector<db::DBox> 
+std::vector<db::DBox>
 subtract_box (const db::DBox &subject, const db::DBox &with)
 {
   std::vector<db::DBox> res;
@@ -106,8 +105,7 @@ subtract_box (const db::DBox &subject, const db::DBox &with)
   return res;
 }
 
-void
-RedrawThread::commit (const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, double font_resolution)
+void RedrawThread::commit (const std::vector<lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, double font_resolution)
 {
   m_vp_trans = vp.trans ();
   m_width = vp.width ();
@@ -132,8 +130,7 @@ RedrawThread::commit (const std::vector <lay::RedrawLayerInfo> &layers, const la
   m_custom_already_drawn = false;
 }
 
-void
-RedrawThread::start (int workers, const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, double font_resolution, bool force_redraw)
+void RedrawThread::start (int workers, const std::vector<lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, double font_resolution, bool force_redraw)
 {
   m_vp_trans = vp.trans ();
   m_width = vp.width ();
@@ -149,7 +146,7 @@ RedrawThread::start (int workers, const std::vector <lay::RedrawLayerInfo> &laye
 
   //  test, if we can shift the current image and redraw only the missing parts
   if (! force_redraw && mp_canvas->shift_supported () &&
-      m_valid_region.overlaps (new_region) && m_stored_fp == m_vp_trans.fp_trans () && 
+      m_valid_region.overlaps (new_region) && m_stored_fp == m_vp_trans.fp_trans () &&
       fabs (new_region.width () - m_stored_region.width ()) < epsilon && fabs (new_region.height () - m_stored_region.height ()) < epsilon) {
 
     db::Box full (db::Point (0, 0), db::Point (m_width, m_height));
@@ -179,7 +176,6 @@ RedrawThread::start (int workers, const std::vector <lay::RedrawLayerInfo> &laye
 
     //  mark current image as unusable
     m_valid_region = m_stored_region = db::DBox ();
-
   }
 
   m_last_center = new_region.center ();
@@ -188,8 +184,7 @@ RedrawThread::start (int workers, const std::vector <lay::RedrawLayerInfo> &laye
   do_start (true, shift_vector, &layers, restart, workers);
 }
 
-void  
-RedrawThread::restart (const std::vector<int> &restart)
+void RedrawThread::restart (const std::vector<int> &restart)
 {
   m_redraw_regions.clear ();
   m_redraw_regions.push_back (db::Box (db::Point (0, 0), db::Point (m_width, m_height)));
@@ -198,16 +193,14 @@ RedrawThread::restart (const std::vector<int> &restart)
   do_start (false, 0, 0, restart, -1);
 }
 
-void  
-RedrawThread::change_visibility (const std::vector<bool> &visibility)
+void RedrawThread::change_visibility (const std::vector<bool> &visibility)
 {
   for (unsigned int i = 0; i < visibility.size () && i < m_layers.size (); ++i) {
     m_layers [i].visible = visibility [i];
   }
 }
 
-void 
-RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::vector <lay::RedrawLayerInfo> *layers, const std::vector<int> &restart, int nworkers)
+void RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::vector<lay::RedrawLayerInfo> *layers, const std::vector<int> &restart, int nworkers)
 {
   // change the number of workers if required.
   if (nworkers >= 0 && nworkers != num_workers ()) {
@@ -232,7 +225,7 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
     }
     tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Preparing to draw")));
 
-    //  detach from all layout objects 
+    //  detach from all layout objects
     tl::Object::detach_from_all_events ();
 
     //  Update all relevant layout objects.
@@ -247,7 +240,7 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
     }
     mp_view->annotation_shapes ().update ();
     //  attach to the layout object to receive change notifications to stop the redraw thread
-    mp_view->annotation_shapes ().hier_changed_event.add (this, &RedrawThread::layout_changed);  //  not really required, since the shapes have no hierarchy, but for completeness ..
+    mp_view->annotation_shapes ().hier_changed_event.add (this, &RedrawThread::layout_changed); //  not really required, since the shapes have no hierarchy, but for completeness ..
     mp_view->annotation_shapes ().bboxes_changed_any_event.add (this, &RedrawThread::layout_changed);
     mp_view->cellviews_about_to_change_event.add (this, &RedrawThread::layout_changed);
     mp_view->cellview_about_to_change_event.add (this, &RedrawThread::layout_changed_with_int);
@@ -274,7 +267,7 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
         std::vector<int> planes_to_init;
         for (std::vector<int>::const_iterator l = restart.begin (); l != restart.end (); ++l) {
           if (*l == draw_custom_queue_entry) {
-            planes_to_init.push_back (-1); 
+            planes_to_init.push_back (-1);
           } else if (*l >= 0 && *l < int (m_layers.size ())) {
             for (int i = 0; i < planes_per_layer / 3; ++i) {
               planes_to_init.push_back (*l * (planes_per_layer / 3) + special_planes_before + i);
@@ -297,7 +290,7 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
         }
       }
 
-      //  set up the drawing tasks: controls the sequence of things to 
+      //  set up the drawing tasks: controls the sequence of things to
       //  draw. First there are the visible layers, then there are the
       //  cell boundaries. Then come the invisible layers.
 
@@ -320,7 +313,6 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
     } else {
       mp_canvas->prepare (1, m_width, m_height, m_resolution, m_font_resolution, 0, 0, mp_view->drawings ());
     }
-
   }
 
   if (tl::verbosity () >= 21) {
@@ -341,8 +333,7 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
   m_start_recursion_sentinel = false;
 }
 
-void
-RedrawThread::start ()
+void RedrawThread::start ()
 {
   JobBase::start ();
 }
@@ -353,8 +344,7 @@ RedrawThread::create_worker ()
   return new RedrawThreadWorker (this);
 }
 
-void 
-RedrawThread::setup_worker (tl::Worker *worker)
+void RedrawThread::setup_worker (tl::Worker *worker)
 {
   RedrawThreadWorker *redraw_thread_worker = dynamic_cast<RedrawThreadWorker *> (worker);
   if (redraw_thread_worker) {
@@ -362,8 +352,7 @@ RedrawThread::setup_worker (tl::Worker *worker)
   }
 }
 
-void
-RedrawThread::stopped ()
+void RedrawThread::stopped ()
 {
   // because we may have already shifted, we can only reuse the part that was inside the new viewport
   m_stored_region = m_vp_trans.inverted () * db::DBox (db::DPoint (0, 0), db::DPoint (m_width, m_height));
@@ -373,17 +362,16 @@ RedrawThread::stopped ()
   done ();
 }
 
-void
-RedrawThread::done ()
+void RedrawThread::done ()
 {
-  //  stop timer if there is one 
+  //  stop timer if there is one
   m_main_timer.reset (0);
 
   wakeup ();
 
   //  release the workers' resources
   for (int i = 0; i < num_workers (); ++i) {
-    RedrawThreadWorker *w = dynamic_cast <RedrawThreadWorker *> (worker (i));
+    RedrawThreadWorker *w = dynamic_cast<RedrawThreadWorker *> (worker (i));
     if (w) {
       w->finish ();
     }
@@ -393,8 +381,7 @@ RedrawThread::done ()
   mp_canvas->signal_end_of_drawing ();
 }
 
-void
-RedrawThread::finished ()
+void RedrawThread::finished ()
 {
   m_stored_region = m_valid_region = m_vp_trans.inverted () * db::DBox (db::DPoint (0, 0), db::DPoint (m_width, m_height));
   m_stored_fp = m_vp_trans.fp_trans ();
@@ -402,8 +389,7 @@ RedrawThread::finished ()
   done ();
 }
 
-void
-RedrawThread::wakeup_checked ()
+void RedrawThread::wakeup_checked ()
 {
   tl::Clock c = tl::Clock::current ();
   if ((c - m_clock).seconds () > update_interval * 0.8 * 0.001) {
@@ -412,8 +398,7 @@ RedrawThread::wakeup_checked ()
   }
 }
 
-void
-RedrawThread::wakeup ()
+void RedrawThread::wakeup ()
 {
   bool send_event = false;
 

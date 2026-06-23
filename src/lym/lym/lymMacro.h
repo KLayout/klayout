@@ -33,7 +33,7 @@
 #include <set>
 
 #if defined(HAVE_QT)
-#  include <QObject>
+#include <QObject>
 #endif
 
 namespace lym
@@ -44,10 +44,10 @@ class MacroCollection;
 /**
  *  @brief Represents a macro in the framework
  *
- *  A macro is basically a piece of script code that is either 
+ *  A macro is basically a piece of script code that is either
  *  executed on startup or on request.
  *
- *  A macro can be persisted to a file and is located in the 
+ *  A macro can be persisted to a file and is located in the
  *  file hierarchy in one of the configuration folders.
  *  The path of the macro is given by the path property.
  *
@@ -60,56 +60,56 @@ class MacroCollection;
  */
 class LYM_PUBLIC Macro :
 #if defined(HAVE_QT)
-    public QObject,
+  public QObject,
 #endif
-    public tl::Object
+  public tl::Object
 {
 #if defined(HAVE_QT)
-Q_OBJECT
+  Q_OBJECT
 #endif
 
 public:
   /**
    *  @brief Interpreter type
    */
-  enum Interpreter { 
+  enum Interpreter {
 
     /**
      *  @brief Pure Ruby
      */
-    Ruby, 
-    
+    Ruby,
+
     /**
      *  @brief Pure Python
      */
-    Python, 
-    
+    Python,
+
     /**
      *  @brief Plain text (no interpreter)
      */
-    Text, 
-    
+    Text,
+
     /**
      *  @brief General DSL (uses dsl_interpreter to identify the actual interpreter class)
      */
-    DSLInterpreter, 
+    DSLInterpreter,
 
     /**
      *  @brief No specific language. Interpreter won't be available.
      */
-    None 
+    None
 
   };
 
   /**
    *  @brief Specification of how the file is stored
    */
-  enum Format { 
+  enum Format {
 
     /**
      *  @brief KLayout macro format (XML)
      */
-    MacroFormat, 
+    MacroFormat,
 
     /**
      *  @brief Plain text format
@@ -124,7 +124,7 @@ public:
     /**
      *  @brief No file associated
      */
-    NoFormat 
+    NoFormat
 
   };
 
@@ -137,14 +137,14 @@ public:
 
   /**
    *  @brief Assignment from another macro
-   * 
+   *
    *  This will assign the definition of the macro but keep the name.
    *  It will also not modify the parent nor the readonly flag.
    */
   void assign (const lym::Macro &other);
 
   /**
-   *  @brief Returns the parent of the macro collection 
+   *  @brief Returns the parent of the macro collection
    *
    *  Returns 0, if there is no parent of this collection (this is the root)
    */
@@ -169,21 +169,21 @@ public:
   std::string interpreter_name () const;
 
   /**
-   *  @brief Gets the summary text 
+   *  @brief Gets the summary text
    *
    *  The summary text is shown in the tooltip of the tabs
    */
   std::string summary () const;
-  
+
   /**
-   *  @brief Gets the path 
+   *  @brief Gets the path
    *
    *  The path is the file where the macro is stored.
    *  The path is changed when the macro is saved.
    *  If the macro was never saved, the path is empty.
    */
   std::string path () const;
-  
+
   /**
    *  @brief Saves the macro to it's path
    */
@@ -218,7 +218,7 @@ public:
    *  @brief Load the macro from a string
    *
    *  This method does not change the macro's path nor does it set the is_file property.
-   *  It is used for importing macros. 
+   *  It is used for importing macros.
    *  The url must be given in order to determine the format.
    */
   void load_from_string (const std::string &text, const std::string &url);
@@ -239,7 +239,7 @@ public:
     return m_name;
   }
 
-  /** 
+  /**
    *  @brief Rename a Macro
    *
    *  Renames the macro. If the macro is a file, the file will be renamed as well.
@@ -264,7 +264,7 @@ public:
   /**
    *  @brief Gets the category tags of the macro
    *
-   *  The category tags string is a comma-separated list of categories to which the 
+   *  The category tags string is a comma-separated list of categories to which the
    *  macro shall apply.
    */
   const std::string &category () const
@@ -275,7 +275,7 @@ public:
   /**
    *  @brief Sets the category tags of the macro
    */
-  void set_category (const std::string &c) 
+  void set_category (const std::string &c)
   {
     m_category = c;
   }
@@ -370,7 +370,7 @@ public:
 
   /**
    *  @brief Set the macro's file path
-   *  The file path can be used when the macro is a standalone object and 
+   *  The file path can be used when the macro is a standalone object and
    *  there is no parent folder by which the path can be derived.
    */
   void set_file_path (const std::string &fp);
@@ -422,7 +422,7 @@ public:
    *
    *  On error, this method throws an exception.
    *
-   *  If the scripts exits with "exit", the status code will be returned by the run 
+   *  If the scripts exits with "exit", the status code will be returned by the run
    *  method.
    */
   int run () const;
@@ -576,7 +576,7 @@ public:
   static std::string suffix_for_format (Macro::Interpreter interpreter, const std::string &dsl_name, Macro::Format format);
 
   /**
-   *  @brief Gets the interpreter, dsl interpreter name, autorun preference and format for a given file name 
+   *  @brief Gets the interpreter, dsl interpreter name, autorun preference and format for a given file name
    *
    *  Returns false, if the suffix is not a known suffix.
    */
@@ -610,7 +610,7 @@ public:
 
   /**
    *  @brief Gets a value indicating whether the macro is backed up by a file
-   *  
+   *
    *  A macro is not a file as long as it's just constructed by not saved.
    */
   bool is_file () const
@@ -638,7 +638,7 @@ public:
    */
   bool operator!= (const Macro &other) const
   {
-    return !(*this == other);
+    return ! (*this == other);
   }
 
 #if defined(HAVE_QT)
@@ -707,4 +707,3 @@ private:
 }
 
 #endif
-

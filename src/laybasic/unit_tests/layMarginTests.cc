@@ -24,7 +24,7 @@
 
 #include "tlUnitTest.h"
 
-TEST(1)
+TEST (1)
 {
   lay::Margin m;
 

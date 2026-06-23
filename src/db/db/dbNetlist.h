@@ -43,8 +43,8 @@ class DB_PUBLIC NetlistManipulationCallbacks
   : public tl::Object
 {
 public:
-  NetlistManipulationCallbacks () { }
-  virtual ~NetlistManipulationCallbacks () { }
+  NetlistManipulationCallbacks () {}
+  virtual ~NetlistManipulationCallbacks () {}
 
   virtual size_t link_net_to_parent_circuit (const db::Net *subcircuit_net, db::Circuit *parent_circuit, const db::DCplxTrans &trans) = 0;
   virtual void link_nets (const db::Net *net, const db::Net *with) = 0;
@@ -58,7 +58,8 @@ public:
  *  The circuits represent cells, the device classes type of devices.
  */
 class DB_PUBLIC Netlist
-  : public gsi::ObjectBase, public tl::Object
+  : public gsi::ObjectBase,
+    public tl::Object
 {
 public:
   typedef tl::shared_collection<Circuit> circuit_list;
@@ -71,7 +72,7 @@ public:
   typedef device_abstract_list::const_iterator const_abstract_model_iterator;
   typedef device_abstract_list::iterator device_abstract_iterator;
   typedef dereferencing_iterator<tl::vector<Circuit *>::iterator, Circuit> top_down_circuit_iterator;
-  typedef dereferencing_iterator<tl::vector<const Circuit *>::const_iterator, const Circuit>  const_top_down_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<const Circuit *>::const_iterator, const Circuit> const_top_down_circuit_iterator;
   typedef dereferencing_iterator<tl::vector<Circuit *>::reverse_iterator, Circuit> bottom_up_circuit_iterator;
   typedef dereferencing_iterator<tl::vector<const Circuit *>::const_reverse_iterator, const Circuit> const_bottom_up_circuit_iterator;
 
@@ -579,13 +580,13 @@ private:
   bool m_valid_topology;
   int m_lock_count;
   tl::vector<Circuit *> m_top_down_circuits;
-  tl::vector<tl::vector<Circuit *> > m_child_circuits;
-  tl::vector<tl::vector<Circuit *> > m_parent_circuits;
+  tl::vector<tl::vector<Circuit *>> m_child_circuits;
+  tl::vector<tl::vector<Circuit *>> m_parent_circuits;
   size_t m_top_circuits;
-  object_by_attr<Netlist, Netlist::circuit_iterator, name_attribute<Circuit> > m_circuit_by_name;
-  object_by_attr<Netlist, Netlist::circuit_iterator, cell_index_attribute<Circuit> > m_circuit_by_cell_index;
-  object_by_attr<Netlist, Netlist::device_abstract_iterator, name_attribute<DeviceAbstract> > m_device_abstract_by_name;
-  object_by_attr<Netlist, Netlist::device_abstract_iterator, cell_index_attribute<DeviceAbstract> > m_device_abstract_by_cell_index;
+  object_by_attr<Netlist, Netlist::circuit_iterator, name_attribute<Circuit>> m_circuit_by_name;
+  object_by_attr<Netlist, Netlist::circuit_iterator, cell_index_attribute<Circuit>> m_circuit_by_cell_index;
+  object_by_attr<Netlist, Netlist::device_abstract_iterator, name_attribute<DeviceAbstract>> m_device_abstract_by_name;
+  object_by_attr<Netlist, Netlist::device_abstract_iterator, cell_index_attribute<DeviceAbstract>> m_device_abstract_by_cell_index;
 
   db::NetlistManipulationCallbacks *callbacks ()
   {

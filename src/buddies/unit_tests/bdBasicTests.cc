@@ -29,44 +29,43 @@
 #include "dbSaveLayoutOptions.h"
 
 //  Testing writer options
-TEST(1)
+TEST (1)
 {
   bd::GenericWriterOptions opt;
   tl::CommandLineOptions cmd;
 
   opt.add_options (cmd);
 
-  const char *argv[] = {
-                   "x",
-                   "-os=1.25",
-                   "-od=0.125",
-                   "--drop-empty-cells",
-                   "--keep-instances",
-                   "--no-context-info",
-                   "-ol=MYLIBNAME",
-                   //  CIF
-                   "--blank-separator",
-                   "--dummy-calls",
-                   //  DXF
-                   "-op=2",
-                   //  GDS2
-                   "-ov=250",
-                   "--multi-xy-records",
-                   "--no-timestamps",
-                   "--no-zero-length-paths",
-                   "--user-units=2.5",
-                   "--write-cell-properties",
-                   "--write-file-properties",
-                   //  OASIS
-                   "-ob=false",
-                   "-ok=9",
-                   "-ot=false",
-                   "--recompress",
-                   "--subst-char=XY",
-                   "--write-std-properties=2"
-                 };
+  const char *argv [] = {
+    "x",
+    "-os=1.25",
+    "-od=0.125",
+    "--drop-empty-cells",
+    "--keep-instances",
+    "--no-context-info",
+    "-ol=MYLIBNAME",
+    //  CIF
+    "--blank-separator",
+    "--dummy-calls",
+    //  DXF
+    "-op=2",
+    //  GDS2
+    "-ov=250",
+    "--multi-xy-records",
+    "--no-timestamps",
+    "--no-zero-length-paths",
+    "--user-units=2.5",
+    "--write-cell-properties",
+    "--write-file-properties",
+    //  OASIS
+    "-ob=false",
+    "-ok=9",
+    "-ot=false",
+    "--recompress",
+    "--subst-char=XY",
+    "--write-std-properties=2"};
 
-  cmd.parse (sizeof (argv) / sizeof (argv[0]), const_cast<char **> (argv));
+  cmd.parse (sizeof (argv) / sizeof (argv [0]), const_cast<char **> (argv));
 
   db::Layout layout;
 
@@ -122,19 +121,19 @@ TEST(1)
 }
 
 //  Testing writer options (default_text_size)
-TEST(2)
+TEST (2)
 {
   bd::GenericWriterOptions opt;
   tl::CommandLineOptions cmd;
 
   opt.add_options (cmd);
 
-  const char *argv[] = {
-                   "x",
-                   "--default-text-size=1.25",
-                 };
+  const char *argv [] = {
+    "x",
+    "--default-text-size=1.25",
+  };
 
-  cmd.parse (sizeof (argv) / sizeof (argv[0]), const_cast<char **> (argv));
+  cmd.parse (sizeof (argv) / sizeof (argv [0]), const_cast<char **> (argv));
 
   db::Layout layout;
 
@@ -145,19 +144,19 @@ TEST(2)
 }
 
 //  Testing writer options (default_text_size)
-TEST(3)
+TEST (3)
 {
   bd::GenericWriterOptions opt;
   tl::CommandLineOptions cmd;
 
   opt.add_options (cmd);
 
-  const char *argv[] = {
-                   "x",
-                   "--default-text-size=-1",
-                 };
+  const char *argv [] = {
+    "x",
+    "--default-text-size=-1",
+  };
 
-  cmd.parse (sizeof (argv) / sizeof (argv[0]), const_cast<char **> (argv));
+  cmd.parse (sizeof (argv) / sizeof (argv [0]), const_cast<char **> (argv));
 
   db::Layout layout;
 
@@ -180,7 +179,7 @@ static std::string cells2string (const db::Layout &layout, const std::set<db::ce
 }
 
 //  Testing writer options: cell resolution
-TEST(4)
+TEST (4)
 {
   //  Build a layout with the hierarchy
   //    TOP -> A, B
@@ -203,15 +202,16 @@ TEST(4)
   tl::CommandLineOptions cmd;
   opt.add_options (cmd);
 
-  std::set <db::cell_index_type> cells;
-  std::vector <std::pair <unsigned int, db::LayerProperties> > valid_layers;
+  std::set<db::cell_index_type> cells;
+  std::vector<std::pair<unsigned int, db::LayerProperties>> valid_layers;
   db::SaveLayoutOptions stream_opt;
 
   {
-    const char *argv[] = { "x",
-                           "--write-cells=A,-C,(C)",
-                         };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
+    const char *argv [] = {
+      "x",
+      "--write-cells=A,-C,(C)",
+    };
+    cmd.parse (sizeof (argv) / sizeof (argv [0]), (char **) argv);
   }
 
   opt.configure (stream_opt, layout);
@@ -223,10 +223,11 @@ TEST(4)
   EXPECT_EQ (cells2string (layout, cells), "A,B,C");
 
   {
-    const char *argv[] = { "x",
-                           "--write-cells=(C),(TOP)",
-                         };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
+    const char *argv [] = {
+      "x",
+      "--write-cells=(C),(TOP)",
+    };
+    cmd.parse (sizeof (argv) / sizeof (argv [0]), (char **) argv);
   }
 
   opt.configure (stream_opt, layout);
@@ -238,10 +239,11 @@ TEST(4)
   EXPECT_EQ (cells2string (layout, cells), "TOP,C");
 
   {
-    const char *argv[] = { "x",
-                           "--write-cells=(TOP),+B",
-                         };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
+    const char *argv [] = {
+      "x",
+      "--write-cells=(TOP),+B",
+    };
+    cmd.parse (sizeof (argv) / sizeof (argv [0]), (char **) argv);
   }
 
   opt.configure (stream_opt, layout);
@@ -254,14 +256,14 @@ TEST(4)
 }
 
 //  Testing reader options
-TEST(10)
+TEST (10)
 {
   bd::GenericReaderOptions opt;
   tl::CommandLineOptions cmd;
 
   opt.add_options (cmd);
 
-  const char *argv[] = { "x",
+  const char *argv [] = {"x",
                          //  CIF and DXF
                          "-id=0.125",
                          //  CIF
@@ -286,10 +288,9 @@ TEST(10)
                          "-is",
                          "--blend-mode=1",
                          //  OASIS
-                         "--expect-strict-mode=1"
-                       };
+                         "--expect-strict-mode=1"};
 
-  cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
+  cmd.parse (sizeof (argv) / sizeof (argv [0]), (char **) argv);
 
   db::LoadLayoutOptions stream_opt;
   EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("cif_dbu").to_double ()), "0.001");
@@ -345,16 +346,16 @@ TEST(10)
 
 
 //  Testing reader options - blend mode "Rename" is default
-TEST(11)
+TEST (11)
 {
   bd::GenericReaderOptions opt;
   tl::CommandLineOptions cmd;
 
   opt.add_options (cmd);
 
-  const char *argv[] = { "x" };
+  const char *argv [] = {"x"};
 
-  cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
+  cmd.parse (sizeof (argv) / sizeof (argv [0]), (char **) argv);
 
   db::LoadLayoutOptions stream_opt;
   opt.configure (stream_opt);
@@ -363,7 +364,7 @@ TEST(11)
 }
 
 //  Testing writer options
-TEST(12_issue1885)
+TEST (12_issue1885)
 {
   bd::GenericWriterOptions opt;
   tl::CommandLineOptions cmd;
@@ -377,26 +378,25 @@ TEST(12_issue1885)
 
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_substitution_char").to_string (), "");
 
-  const char *argv[] = {
-                   "x",
-                   "--subst-char=x",
-                 };
+  const char *argv [] = {
+    "x",
+    "--subst-char=x",
+  };
 
-  cmd.parse (sizeof (argv) / sizeof (argv[0]), const_cast<char **> (argv));
+  cmd.parse (sizeof (argv) / sizeof (argv [0]), const_cast<char **> (argv));
 
   opt.configure (stream_opt, layout);
 
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_substitution_char").to_string (), "x");
 
-  const char *argv2[] = {
-                   "x",
-                   "--subst-char=",
-                 };
+  const char *argv2 [] = {
+    "x",
+    "--subst-char=",
+  };
 
-  cmd.parse (sizeof (argv2) / sizeof (argv2[0]), const_cast<char **> (argv2));
+  cmd.parse (sizeof (argv2) / sizeof (argv2 [0]), const_cast<char **> (argv2));
 
   opt.configure (stream_opt, layout);
 
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_substitution_char").to_string (), "");
 }
-

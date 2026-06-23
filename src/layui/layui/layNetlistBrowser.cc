@@ -70,14 +70,12 @@ static struct {
   lay::NetlistBrowserConfig::net_window_type mode;
   const char *string;
 } window_modes [] = {
-  { lay::NetlistBrowserConfig::DontChange,    "dont-change" },
-  { lay::NetlistBrowserConfig::FitNet,        "fit-net"     },
-  { lay::NetlistBrowserConfig::Center,        "center"      },
-  { lay::NetlistBrowserConfig::CenterSize,    "center-size" }
-};
+  {lay::NetlistBrowserConfig::DontChange, "dont-change"},
+  {lay::NetlistBrowserConfig::FitNet, "fit-net"},
+  {lay::NetlistBrowserConfig::Center, "center"},
+  {lay::NetlistBrowserConfig::CenterSize, "center-size"}};
 
-void
-NetlistBrowserWindowModeConverter::from_string (const std::string &value, lay::NetlistBrowserConfig::net_window_type &mode)
+void NetlistBrowserWindowModeConverter::from_string (const std::string &value, lay::NetlistBrowserConfig::net_window_type &mode)
 {
   for (unsigned int i = 0; i < sizeof (window_modes) / sizeof (window_modes [0]); ++i) {
     if (value == window_modes [i].string) {
@@ -116,8 +114,7 @@ NetlistBrowserConfigPage::~NetlistBrowserConfigPage ()
   mp_ui = 0;
 }
 
-void
-NetlistBrowserConfigPage::setup (lay::Dispatcher *root)
+void NetlistBrowserConfigPage::setup (lay::Dispatcher *root)
 {
   //  window mode
   lay::NetlistBrowserConfig::net_window_type wmode = lay::NetlistBrowserConfig::FitNet;
@@ -138,14 +135,12 @@ NetlistBrowserConfigPage::setup (lay::Dispatcher *root)
   window_changed (int (wmode));
 }
 
-void
-NetlistBrowserConfigPage::window_changed (int m)
+void NetlistBrowserConfigPage::window_changed (int m)
 {
   mp_ui->le_window->setEnabled (m == int (lay::NetlistBrowserConfig::FitNet) || m == int (lay::NetlistBrowserConfig::CenterSize));
 }
 
-void
-NetlistBrowserConfigPage::commit (lay::Dispatcher *root)
+void NetlistBrowserConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
   tl::from_string_ext (tl::to_string (mp_ui->le_window->text ()), dim);
@@ -160,7 +155,7 @@ NetlistBrowserConfigPage::commit (lay::Dispatcher *root)
 
 // ------------------------------------------------------------
 
-static QToolButton * (Ui::NetlistBrowserConfigPage2::*cc_buttons []) = {
+static QToolButton *(Ui::NetlistBrowserConfigPage2::*cc_buttons []) = {
   &Ui::NetlistBrowserConfigPage2::cc0,
   &Ui::NetlistBrowserConfigPage2::cc1,
   &Ui::NetlistBrowserConfigPage2::cc2,
@@ -168,8 +163,7 @@ static QToolButton * (Ui::NetlistBrowserConfigPage2::*cc_buttons []) = {
   &Ui::NetlistBrowserConfigPage2::cc4,
   &Ui::NetlistBrowserConfigPage2::cc5,
   &Ui::NetlistBrowserConfigPage2::cc6,
-  &Ui::NetlistBrowserConfigPage2::cc7
-};
+  &Ui::NetlistBrowserConfigPage2::cc7};
 
 NetlistBrowserConfigPage2::NetlistBrowserConfigPage2 (QWidget *parent)
   : lay::ConfigPage (parent)
@@ -188,8 +182,7 @@ NetlistBrowserConfigPage2::~NetlistBrowserConfigPage2 ()
   mp_ui = 0;
 }
 
-void
-NetlistBrowserConfigPage2::color_button_clicked ()
+void NetlistBrowserConfigPage2::color_button_clicked ()
 {
   for (unsigned int i = 0; i < sizeof (cc_buttons) / sizeof (cc_buttons [0]); ++i) {
 
@@ -207,14 +200,11 @@ NetlistBrowserConfigPage2::color_button_clicked ()
       }
 
       break;
-
     }
-
   }
 }
 
-void
-NetlistBrowserConfigPage2::setup (lay::Dispatcher *root)
+void NetlistBrowserConfigPage2::setup (lay::Dispatcher *root)
 {
   bool cycle_enabled = false;
   root->config_get (cfg_l2ndb_marker_cycle_colors_enabled, cycle_enabled);
@@ -279,8 +269,7 @@ NetlistBrowserConfigPage2::setup (lay::Dispatcher *root)
   mp_ui->halo_cb->setCheckState (halo < 0 ? Qt::PartiallyChecked : (halo ? Qt::Checked : Qt::Unchecked));
 }
 
-void
-NetlistBrowserConfigPage2::update_colors ()
+void NetlistBrowserConfigPage2::update_colors ()
 {
   for (unsigned int i = 0; i < sizeof (cc_buttons) / sizeof (cc_buttons [0]); ++i) {
 
@@ -301,12 +290,10 @@ NetlistBrowserConfigPage2::update_colors ()
 
     (mp_ui->*(cc_buttons [i]))->setIconSize (pxmp.size ());
     (mp_ui->*(cc_buttons [i]))->setIcon (QIcon (pxmp));
-
   }
 }
 
-void
-NetlistBrowserConfigPage2::commit (lay::Dispatcher *root)
+void NetlistBrowserConfigPage2::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_l2ndb_marker_cycle_colors_enabled, mp_ui->cycle_colors_cb->isChecked ());
   root->config_set (cfg_l2ndb_marker_cycle_colors, m_palette.to_string ());
@@ -321,7 +308,8 @@ NetlistBrowserConfigPage2::commit (lay::Dispatcher *root)
       int s;
       tl::from_string_ext (tl::to_string (mp_ui->lw_le->text ()), s);
       root->config_set (cfg_l2ndb_marker_line_width, s);
-    } catch (...) { }
+    } catch (...) {
+    }
   }
 
   if (mp_ui->vs_le->text ().isEmpty ()) {
@@ -331,7 +319,8 @@ NetlistBrowserConfigPage2::commit (lay::Dispatcher *root)
       int s;
       tl::from_string_ext (tl::to_string (mp_ui->vs_le->text ()), s);
       root->config_set (cfg_l2ndb_marker_vertex_size, s);
-    } catch (...) { }
+    } catch (...) {
+    }
   }
 
   root->config_set (cfg_l2ndb_marker_dither_pattern, mp_ui->stipple_pb->dither_pattern ());
@@ -356,7 +345,7 @@ class NetlistBrowserPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_window_mode, "fit-net"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_window_dim, "1.0"));
@@ -381,9 +370,9 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_export_device_cell_prefix, "DEVICE_"));
   }
 
-  virtual std::vector<std::pair <std::string, lay::ConfigPage *> > config_pages (QWidget *parent) const
+  virtual std::vector<std::pair<std::string, lay::ConfigPage *>> config_pages (QWidget *parent) const
   {
-    std::vector<std::pair <std::string, lay::ConfigPage *> > pages;
+    std::vector<std::pair<std::string, lay::ConfigPage *>> pages;
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Netlist Browser|Setup")), new NetlistBrowserConfigPage (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Netlist Browser|Net Appearance")), new NetlistBrowserConfigPage2 (parent)));
     return pages;

@@ -47,7 +47,7 @@ class FillDialogPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > & /*options*/) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> & /*options*/) const
   {
     //  .. no options yet ..
   }
@@ -62,7 +62,7 @@ public:
     lay::PluginDeclaration::get_menu_entries (menu_entries);
     menu_entries.push_back (lay::menu_item ("fill_tool::show", "fill_tool:edit_mode", "edit_menu.utils_menu.end", tl::to_string (QObject::tr ("Fill Tool"))));
   }
- 
+
   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *view) const
   {
     if (lay::has_gui ()) {
@@ -98,8 +98,7 @@ FillDialog::FillDialog (QWidget *parent, LayoutViewBase *view)
   connect (choose_fc_2nd_pb, SIGNAL (clicked ()), this, SLOT (choose_fc_2nd ()));
 }
 
-void 
-FillDialog::menu_activated (const std::string &symbol)
+void FillDialog::menu_activated (const std::string &symbol)
 {
   if (symbol == "fill_tool::show") {
 
@@ -122,8 +121,7 @@ FillDialog::~FillDialog ()
   //  .. nothing yet ..
 }
 
-void 
-FillDialog::choose_fc ()
+void FillDialog::choose_fc ()
 {
   CellSelectionForm form (this, mp_view, "browse_cell", true /*simple mode*/);
   if (form.exec ()) {
@@ -132,8 +130,7 @@ FillDialog::choose_fc ()
   }
 }
 
-void 
-FillDialog::choose_fc_2nd ()
+void FillDialog::choose_fc_2nd ()
 {
   CellSelectionForm form (this, mp_view, "browse_cell", true /*simple mode*/);
   if (form.exec ()) {
@@ -142,8 +139,7 @@ FillDialog::choose_fc_2nd ()
   }
 }
 
-void
-FillDialog::generate_fill (const FillParameters &fp)
+void FillDialog::generate_fill (const FillParameters &fp)
 {
   if (tl::verbosity () >= 10) {
     tl::info << "Running fill";
@@ -152,7 +148,7 @@ FillDialog::generate_fill (const FillParameters &fp)
   lay::CellView cv = mp_view->cellview (mp_view->active_cellview_index ());
   db::Layout &ly = cv->layout ();
 
-  std::vector <unsigned int> exclude_layers;
+  std::vector<unsigned int> exclude_layers;
 
   if (fp.exclude_all_layers) {
     //  all layers
@@ -242,7 +238,7 @@ FillDialog::generate_fill (const FillParameters &fp)
     //  collect sized shapes from the exclude layers
     db::Region es;
     es.enable_progress (tl::to_string (tr ("Preparing exclude layers")));
-    for (std::vector <unsigned int>::const_iterator l = exclude_layers.begin (); l != exclude_layers.end (); ++l) {
+    for (std::vector<unsigned int>::const_iterator l = exclude_layers.begin (); l != exclude_layers.end (); ++l) {
 
       db::Region exclude (db::RecursiveShapeIterator (cv->layout (), *cv.cell (), *l));
       exclude.enable_progress (tl::to_string (tr ("Preparing exclude layer: ")) + cv->layout ().get_properties (*l).to_string ());
@@ -254,7 +250,6 @@ FillDialog::generate_fill (const FillParameters &fp)
       }
 
       es += exclude;
-
     }
 
     if (tl::verbosity () >= 20) {
@@ -289,7 +284,6 @@ FillDialog::generate_fill (const FillParameters &fp)
       fill_cell2 = 0;
 
     } while (fill_cell != 0 && ! fill_region.empty ());
-
   }
 
   if (tl::verbosity () >= 20) {
@@ -329,7 +323,6 @@ FillDialog::get_fill_parameters ()
         fp.exclude_layers.push_back (cv->layout ().get_properties ((*l)->layer_index ()));
       }
     }
-
   }
 
   //  read exclude spacing
@@ -374,7 +367,7 @@ FillDialog::get_fill_parameters ()
 
     //  ruler
 
-    ant::Service *ant_service = mp_view->get_plugin <ant::Service> ();
+    ant::Service *ant_service = mp_view->get_plugin<ant::Service> ();
     if (ant_service) {
       ant::AnnotationIterator ant = ant_service->begin_annotations ();
       while (! ant.at_end ()) {
@@ -405,7 +398,7 @@ FillDialog::get_fill_parameters ()
     fp.fill_region_mode = FillParameters::Region;
 
     //  selection
-    std::vector<edt::Service *> edt_services = mp_view->get_plugins <edt::Service> ();
+    std::vector<edt::Service *> edt_services = mp_view->get_plugins<edt::Service> ();
     for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
       for (edt::EditableSelectionIterator sel = (*s)->begin_selection (); ! sel.at_end (); ++sel) {
         if (! sel->is_cell_inst () && (sel->shape ().is_polygon () || sel->shape ().is_path () || sel->shape ().is_box ())) {
@@ -415,7 +408,6 @@ FillDialog::get_fill_parameters ()
         }
       }
     }
-
   }
 
   //  read distance to border
@@ -553,16 +545,14 @@ FillDialog::get_fill_parameters ()
     }
 
     fp.fc_bbox2 = fc_bbox2;
-
   }
 
   return fp;
 }
 
-void 
-FillDialog::ok_pressed ()
+void FillDialog::ok_pressed ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   FillParameters fp = get_fill_parameters ();
 
@@ -585,17 +575,15 @@ BEGIN_PROTECTED
   //  close this dialog
   QDialog::accept ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-FillDialog::enhanced_fill_changed (int ef)
+void FillDialog::enhanced_fill_changed (int ef)
 {
   origin_le->setEnabled (ef != Qt::Checked);
 }
 
-void 
-FillDialog::fill_area_changed (int fa)
+void FillDialog::fill_area_changed (int fa)
 {
   if (fa == 1) {
     fill_area_stack->setCurrentIndex (1);
@@ -606,13 +594,10 @@ FillDialog::fill_area_changed (int fa)
   }
 }
 
-bool 
-FillDialog::configure (const std::string & /*name*/, const std::string & /*value*/)
+bool FillDialog::configure (const std::string & /*name*/, const std::string & /*value*/)
 {
   //  .. nothing yet ..
   return false;
 }
 
 }
-
-

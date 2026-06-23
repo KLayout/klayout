@@ -60,7 +60,8 @@ class QStackedWidget;
 class QDockWidget;
 class QAction;
 
-namespace lay {
+namespace lay
+{
 
 class SettingsForm;
 class ViewWidgetStack;
@@ -97,9 +98,8 @@ class LAY_PUBLIC MainWindow
     public gsi::ObjectBase,
     public lay::DispatcherDelegate
 {
-Q_OBJECT
+  Q_OBJECT
 public:
-
   /**
    *  @brief The (only) instance of the main window
    */
@@ -592,12 +592,12 @@ public:
   /**
    *  @brief Reimplementation of the dragEnterEvent event handler
    */
-  void dragEnterEvent(QDragEnterEvent *event);
+  void dragEnterEvent (QDragEnterEvent *event);
 
   /**
    *  @brief Reimplementation of the dropEvent event handler
    */
-  void dropEvent(QDropEvent *event);
+  void dropEvent (QDropEvent *event);
 
   /**
    *  @brief An event indicating that the current view has changed
@@ -678,7 +678,7 @@ public slots:
   void open_recent_session (size_t n);
   void open_recent_layer_properties (size_t n);
   void open_recent_bookmarks (size_t n);
-  bool is_available_recent(size_t n);
+  bool is_available_recent (size_t n);
   bool is_available_recent_session (size_t n);
   bool is_available_recent_layer_properties (size_t n);
   bool is_available_recent_bookmarks (size_t n);
@@ -747,10 +747,10 @@ private:
   lay::LogViewerDialog *mp_log_viewer_dialog;
   int m_mode;
   SettingsForm *mp_setup_form;
-  std::vector <lay::LayoutViewWidget *> mp_views;
+  std::vector<lay::LayoutViewWidget *> mp_views;
   int m_open_mode;
   int m_keep_backups;
-  std::vector<std::pair<std::string, std::string> > m_mru;
+  std::vector<std::pair<std::string, std::string>> m_mru;
   std::vector<std::string> m_mru_sessions, m_mru_layer_properties, m_mru_bookmarks;
   QStatusBar *mp_status_bar;
   QStackedWidget *mp_main_stack_widget;
@@ -779,8 +779,8 @@ private:
   std::vector<double> m_default_grids;
   double m_default_grid;
   bool m_default_grids_updated;
-  std::vector<std::pair<std::string, std::string> > m_key_bindings;
-  std::vector<std::pair<std::string, bool> > m_hidden;
+  std::vector<std::pair<std::string, std::string>> m_key_bindings;
+  std::vector<std::pair<std::string, bool>> m_hidden;
   bool m_new_layout_current_panel;
   bool m_synchronized_views;
   bool m_synchronous;

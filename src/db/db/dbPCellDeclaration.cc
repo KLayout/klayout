@@ -57,8 +57,7 @@ ParameterStates::operator= (const ParameterStates &other)
   return *this;
 }
 
-void
-ParameterStates::set_parameter (const std::string &name, const ParameterState &ps)
+void ParameterStates::set_parameter (const std::string &name, const ParameterState &ps)
 {
   m_states [name] = ps;
 }
@@ -81,18 +80,17 @@ ParameterStates::parameter (const std::string &name) const
   }
 }
 
-bool
-ParameterStates::has_parameter (const std::string &name) const
+bool ParameterStates::has_parameter (const std::string &name) const
 {
   return m_states.find (name) != m_states.end ();
 }
 
-bool
-ParameterStates::values_are_equal (const db::ParameterStates &other) const
+bool ParameterStates::values_are_equal (const db::ParameterStates &other) const
 {
   auto i = m_states.begin (), j = other.m_states.begin ();
   while (i != m_states.end () && j != other.m_states.end () && i->first == j->first && i->second.value () == j->second.value ()) {
-    ++i; ++j;
+    ++i;
+    ++j;
   }
   return i == m_states.end () && j == other.m_states.end ();
 }
@@ -103,18 +101,16 @@ ParameterStates::values_are_equal (const db::ParameterStates &other) const
 
 PCellDeclaration::PCellDeclaration ()
   : m_ref_count (0), m_id (0), mp_layout (0), m_has_parameter_declarations (false)
-{ 
+{
   // .. nothing yet ..
 }
 
-void 
-PCellDeclaration::add_ref ()
+void PCellDeclaration::add_ref ()
 {
   ++m_ref_count;
 }
 
-void 
-PCellDeclaration::release_ref ()
+void PCellDeclaration::release_ref ()
 {
   --m_ref_count;
   if (m_ref_count <= 0) {
@@ -203,4 +199,3 @@ PCellDeclaration::named_parameters (const pcell_parameters_type &pv) const
 }
 
 }
-

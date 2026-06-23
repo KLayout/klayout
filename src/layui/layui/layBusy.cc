@@ -78,8 +78,7 @@ BusySection::~BusySection ()
   tl::FileSystemWatcher::global_enable (true);
 }
 
-bool 
-BusySection::is_busy ()
+bool BusySection::is_busy ()
 {
   tl::MutexLocker locker (&s_lock);
   return sp_busy_mode && sp_busy_mode->is_busy ();

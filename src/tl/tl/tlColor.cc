@@ -71,8 +71,7 @@ Color::Color (const char *name)
   init_from_string (name);
 }
 
-void
-Color::init_from_string (const char *s)
+void Color::init_from_string (const char *s)
 {
   tl::Extractor ex (s);
 
@@ -120,8 +119,8 @@ Color::to_string () const
 
     uint32_t c = m_color;
     char s [10];
-    s[n + 1] = 0;
-    s[0] = '#';
+    s [n + 1] = 0;
+    s [0] = '#';
     while (n > 0) {
       s [n] = "0123456789abcdef" [c & 0xf];
       c >>= 4;
@@ -129,7 +128,6 @@ Color::to_string () const
     }
 
     return std::string (s);
-
   }
 }
 
@@ -141,14 +139,12 @@ Color::to_qc () const
 }
 #endif
 
-bool
-Color::is_valid () const
+bool Color::is_valid () const
 {
   return (m_color & 0xff000000) != 0;
 }
 
-void
-Color::get_hsv (unsigned int &hue, unsigned int &saturation, unsigned int &value) const
+void Color::get_hsv (unsigned int &hue, unsigned int &saturation, unsigned int &value) const
 {
   double r = double (red ()) / 255.0;
   double g = double (green ()) / 255.0;
@@ -179,7 +175,6 @@ Color::get_hsv (unsigned int &hue, unsigned int &saturation, unsigned int &value
     }
 
     hue = (unsigned int) tl::round (h, 1);
-
   }
 }
 
@@ -222,7 +217,6 @@ Color::from_hsv (unsigned int hue, unsigned int saturation, unsigned int value)
   default:
     return tl::Color ();
   }
-
 }
 
 }

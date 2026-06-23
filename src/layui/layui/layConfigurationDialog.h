@@ -33,7 +33,7 @@
 
 namespace Ui
 {
-  class ConfigurationDialog;
+class ConfigurationDialog;
 }
 
 namespace lay
@@ -52,7 +52,7 @@ public:
   ConfigurationDialog (QWidget *parent, lay::Dispatcher *root, lay::PluginDeclaration *decl, const char *name = "");
   ConfigurationDialog (QWidget *parent, lay::Dispatcher *root, const std::string &plugin_name, const char *name = "");
   ~ConfigurationDialog ();
-  
+
   void commit ();
 
 public slots:
@@ -60,7 +60,7 @@ public slots:
 
 private:
   lay::Dispatcher *mp_root;
-  std::vector <lay::ConfigPage *> m_config_pages;
+  std::vector<lay::ConfigPage *> m_config_pages;
   Ui::ConfigurationDialog *mp_ui;
 
   void init (const lay::PluginDeclaration *decl);
@@ -70,4 +70,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

@@ -29,13 +29,15 @@
 #include "dbMutableRegion.h"
 #include "dbDeepShapeStore.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief A deep, polygon-set delegate
  */
 class DB_PUBLIC DeepRegion
-  : public MutableRegion, public DeepShapeCollectionDelegateBase
+  : public MutableRegion,
+    public DeepShapeCollectionDelegateBase
 {
 public:
   typedef db::layer<db::Polygon, db::unstable_layer_tag> polygon_layer_type;
@@ -201,4 +203,3 @@ private:
 }
 
 #endif
-

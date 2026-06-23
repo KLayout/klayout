@@ -37,7 +37,6 @@ namespace lay
 class LAYBASIC_PUBLIC ColorPalette
 {
 public:
-
   /**
    *  @brief Default constructor
    *
@@ -46,7 +45,7 @@ public:
   ColorPalette ();
 
   /**
-   *  @brief Constructor from the data 
+   *  @brief Constructor from the data
    *
    *  @param color The colors as a vector
    *  @param luminous_colors The list of indices of luminous colors as a vector
@@ -96,7 +95,7 @@ public:
    */
   void clear_luminous_colors ();
 
-  /** 
+  /**
    *  @brief Retrieve the color by index
    */
   tl::color_t color_by_index (unsigned int n) const;
@@ -108,16 +107,16 @@ public:
    */
   unsigned int colors () const;
 
-  /** 
+  /**
    *  @brief Retrieve the luminous color by index
    */
-  tl::color_t 
+  tl::color_t
   luminous_color_by_index (unsigned int n) const
   {
     return color_by_index (luminous_color_index_by_index (n));
   }
 
-  /** 
+  /**
    *  @brief Retrieve the luminous color index by index (0 to luminous_colors()-1)
    *
    *  The index returned is the index of the color referenced. The actual color
@@ -135,8 +134,8 @@ public:
    */
   unsigned int luminous_colors () const;
 
-  /** 
-   *  @brief Conversion to a string 
+  /**
+   *  @brief Conversion to a string
    */
   std::string to_string () const;
 
@@ -154,15 +153,13 @@ public:
   /**
    *  @brief Deliver the default palette
    */
-  static ColorPalette default_palette (); 
+  static ColorPalette default_palette ();
 
 private:
-  std::vector <tl::color_t> m_colors;
-  std::vector <unsigned int> m_luminous_color_indices;
-
+  std::vector<tl::color_t> m_colors;
+  std::vector<unsigned int> m_luminous_color_indices;
 };
 
 }
 
 #endif
-

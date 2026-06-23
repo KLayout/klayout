@@ -25,7 +25,7 @@
 #include "dbLayout.h"
 #include "tlUnitTest.h"
 
-TEST(1)
+TEST (1)
 {
   db::Text t;
   db::Text empty;
@@ -34,12 +34,12 @@ TEST(1)
 
   EXPECT_EQ (empty == t, true);
 
-  EXPECT_EQ (std::string (t.string ()), ""); 
+  EXPECT_EQ (std::string (t.string ()), "");
   t = db::Text ("abcdef", t1);
 
-  EXPECT_EQ (std::string (t.string ()), "abcdef"); 
-  EXPECT_EQ (t.trans (),  t1);
-  
+  EXPECT_EQ (std::string (t.string ()), "abcdef");
+  EXPECT_EQ (t.trans (), t1);
+
   t.transform (t2);
 
   EXPECT_EQ (t.trans (), t2 * t1);
@@ -53,7 +53,7 @@ TEST(1)
   EXPECT_EQ (std::string (it.to_string ()), "('abcdef',m0 200,100)")
 }
 
-TEST(2)
+TEST (2)
 {
   size_t n = db::StringRepository::instance ()->size ();
 
@@ -88,7 +88,7 @@ TEST(2)
   EXPECT_EQ (db::StringRepository::instance ()->size (), n);
 }
 
-TEST(3)
+TEST (3)
 {
   db::Layout ly1 (true);
   unsigned int l1 = ly1.insert_layer ();
@@ -104,7 +104,7 @@ TEST(3)
   db::Text t (ref1, db::Trans ());
   db::Shape s1 = c1->shapes (l1).insert (t);
   EXPECT_EQ (std::string (s1.text_string ()), "X");
-  
+
   db::Layout ly1dup (ly1);
   unsigned int l1dup = (*ly1dup.begin_layers ()).first;
   db::Cell *c1dup = &ly1dup.cell (ly1dup.cell_by_name ("TOP").second);
@@ -146,7 +146,7 @@ std::string string_trip (const db::Text &t)
   return t2.to_string ();
 }
 
-TEST(4)
+TEST (4)
 {
   db::Text t ("abc", db::Trans (db::Trans::r90));
 

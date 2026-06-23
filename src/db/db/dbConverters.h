@@ -38,8 +38,7 @@ namespace db
  *  T is supposed a transformation type such as "db::DCplxTrans".
  */
 template <class T>
-struct DB_PUBLIC_TEMPLATE TransformationConverter
-{
+struct DB_PUBLIC_TEMPLATE TransformationConverter {
   std::string to_string (const T &t) const
   {
     return t.to_string ();
@@ -56,8 +55,7 @@ struct DB_PUBLIC_TEMPLATE TransformationConverter
 /**
  *  @brief A converter for layout layers
  */
-struct DB_PUBLIC LayoutLayerConverter
-{
+struct DB_PUBLIC LayoutLayerConverter {
   std::string to_string (const db::LayerProperties &p) const
   {
     return p.to_string ();
@@ -77,8 +75,7 @@ struct DB_PUBLIC LayoutLayerConverter
  *  P is supposed to be a point type (i.e. db::DPoint).
  */
 template <class P>
-struct DB_PUBLIC_TEMPLATE PointConverter
-{
+struct DB_PUBLIC_TEMPLATE PointConverter {
   std::string to_string (const P &p) const
   {
     return tl::to_string (p.x ()) + "," + tl::to_string (p.y ());
@@ -95,7 +92,6 @@ struct DB_PUBLIC_TEMPLATE PointConverter
     ex.expect_end ();
   }
 };
-
 }
 
 #endif

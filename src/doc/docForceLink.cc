@@ -24,9 +24,8 @@
 
 namespace doc
 {
-  int _force_link_f ()
-  {
-    return 0;
-  }
+int _force_link_f ()
+{
+  return 0;
 }
-
+}

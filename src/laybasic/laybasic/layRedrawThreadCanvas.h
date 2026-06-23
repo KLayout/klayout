@@ -34,7 +34,8 @@
 
 #include <vector>
 
-namespace lay {
+namespace lay
+{
 
 class CanvasPlane;
 class Bitmap;
@@ -48,28 +49,29 @@ public:
   /**
    *  @brief Constructor
    */
-  RedrawThreadCanvas () 
+  RedrawThreadCanvas ()
     : m_resolution (1.0), m_font_resolution (1.0), m_width (0), m_height (0)
-  { }
+  {
+  }
 
   /**
    *  @brief Destructor
    */
-  virtual ~RedrawThreadCanvas () { }
+  virtual ~RedrawThreadCanvas () {}
 
   /**
    *  @brief Signal that a transfer has been done
    *
    *  This method is called (from the redraw thread) if a transfer has been performed asynchronously
    */
-  virtual void signal_transfer_done () { }
+  virtual void signal_transfer_done () {}
 
   /**
    *  @brief Signal that the drawing has ended
    *
    *  This method is called (from the redraw thread) once the drawing has ended.
    */
-  virtual void signal_end_of_drawing () { }
+  virtual void signal_end_of_drawing () {}
 
   /**
    *  @brief Returns true, if shifting is supported
@@ -116,18 +118,18 @@ public:
    *  This method is called from the redraw thread.
    */
   virtual void set_drawing_plane (unsigned int d, unsigned int n, const lay::CanvasPlane *plane) = 0;
-  
-  /** 
+
+  /**
    *  @brief Create a new, unassociated drawing plane
    */
   virtual lay::CanvasPlane *create_drawing_plane () = 0;
 
-  /** 
+  /**
    *  @brief Initialize a drawing plane for drawing on plane number n
    */
   virtual void initialize_plane (lay::CanvasPlane *plane, unsigned int n) = 0;
 
-  /** 
+  /**
    *  @brief Initialize a drawing plane for drawing on drawing d and plane number n
    */
   virtual void initialize_plane (lay::CanvasPlane *plane, unsigned int d, unsigned int n) = 0;
@@ -135,7 +137,7 @@ public:
   /**
    *  @brief Lock the plane sets against changes by other threads
    */
-  void lock () 
+  void lock ()
   {
     m_mutex.lock ();
   }
@@ -143,7 +145,7 @@ public:
   /**
    *  @brief Unlock the plane sets against changes by other threads
    */
-  void unlock () 
+  void unlock ()
   {
     m_mutex.unlock ();
   }
@@ -225,7 +227,7 @@ public:
   /**
    *  @brief Constructor from raw plan buffers
    */
-  BitmapCanvasData (const std::vector <lay::Bitmap *> &plane_buffers, const std::vector <std::vector <lay::Bitmap *> > &drawing_plane_buffers, unsigned int width, unsigned int height);
+  BitmapCanvasData (const std::vector<lay::Bitmap *> &plane_buffers, const std::vector<std::vector<lay::Bitmap *>> &drawing_plane_buffers, unsigned int width, unsigned int height);
 
   /**
    *  @brief Assignment
@@ -235,12 +237,12 @@ public:
   /**
    *  @brief Fetches the data into the given buffers
    */
-  void fetch (std::vector <lay::Bitmap *> &plane_buffers, std::vector <std::vector <lay::Bitmap *> > &drawing_plane_buffers, unsigned int &width, unsigned int &height) const;
+  void fetch (std::vector<lay::Bitmap *> &plane_buffers, std::vector<std::vector<lay::Bitmap *>> &drawing_plane_buffers, unsigned int &width, unsigned int &height) const;
 
   /**
    *  @brief Gets a value indicating whether we can fetch the data
    */
-  bool can_fetch (const std::vector <lay::Bitmap *> &plane_buffers, const std::vector <std::vector <lay::Bitmap *> > &drawing_plane_buffers, unsigned int width, unsigned int height) const;
+  bool can_fetch (const std::vector<lay::Bitmap *> &plane_buffers, const std::vector<std::vector<lay::Bitmap *>> &drawing_plane_buffers, unsigned int width, unsigned int height) const;
 
   /**
    *  @brief Swap with another data object
@@ -249,11 +251,11 @@ public:
 
 private:
   void clear_planes ();
-  static void assign (std::vector <lay::Bitmap *> &to, const std::vector <lay::Bitmap *> &from);
-  static void assign(std::vector <std::vector <lay::Bitmap *> > &to, const std::vector <std::vector <lay::Bitmap *> > &from);
+  static void assign (std::vector<lay::Bitmap *> &to, const std::vector<lay::Bitmap *> &from);
+  static void assign (std::vector<std::vector<lay::Bitmap *>> &to, const std::vector<std::vector<lay::Bitmap *>> &from);
 
-  std::vector <lay::Bitmap *> mp_plane_buffers;
-  std::vector <std::vector <lay::Bitmap *> > mp_drawing_plane_buffers;
+  std::vector<lay::Bitmap *> mp_plane_buffers;
+  std::vector<std::vector<lay::Bitmap *>> mp_drawing_plane_buffers;
   unsigned int m_width, m_height;
 };
 
@@ -275,7 +277,7 @@ public:
    *  @brief Returns true, if shifting is supported
    */
   virtual bool shift_supported () const;
-  
+
   /**
    *  @brief Prepare the given number of planes
    *
@@ -283,7 +285,7 @@ public:
    *  redraw thread.
    */
   virtual void prepare (unsigned int nlayers, unsigned int width, unsigned int height, double resolution, double font_resolution, const db::Vector *shift_vector, const std::vector<int> *planes, const lay::Drawings *drawings);
-  
+
   /**
    *  @brief Test a plane with the given index for emptiness
    */
@@ -303,18 +305,18 @@ public:
    *  This method is called from the redraw thread.
    */
   virtual void set_drawing_plane (unsigned int d, unsigned int n, const lay::CanvasPlane *plane);
-  
-  /** 
+
+  /**
    *  @brief Create a new, unassociated drawing plane
    */
   virtual lay::CanvasPlane *create_drawing_plane ();
 
-  /** 
+  /**
    *  @brief Initialize a drawing plane for drawing on plane number n
    */
   virtual void initialize_plane (lay::CanvasPlane *plane, unsigned int n);
 
-  /** 
+  /**
    *  @brief Initialize a drawing plane for drawing on drawing d and plane number n
    */
   virtual void initialize_plane (lay::CanvasPlane *plane, unsigned int d, unsigned int n);
@@ -322,20 +324,20 @@ public:
   /**
    *  @brief Provide the renderer
    */
-  virtual lay::Renderer *create_renderer () 
-  { 
+  virtual lay::Renderer *create_renderer ()
+  {
     return new lay::BitmapRenderer (m_width, m_height, resolution (), font_resolution ());
   }
 
   /**
    *  @brief Transfer the content to a PixelBuffer
    */
-  void to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, double dpr, tl::Color background, tl::Color foreground, tl::Color active, const lay::Drawings *drawings, tl::PixelBuffer &img, unsigned int width, unsigned int height);
+  void to_image (const std::vector<lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, double dpr, tl::Color background, tl::Color foreground, tl::Color active, const lay::Drawings *drawings, tl::PixelBuffer &img, unsigned int width, unsigned int height);
 
   /**
    *  @brief Transfer the content to a BitmapBuffer (monochrome)
    */
-  void to_image_mono (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, double dpr, bool background, bool foreground, bool active, const lay::Drawings *drawings, tl::BitmapBuffer &img, unsigned int width, unsigned int height);
+  void to_image_mono (const std::vector<lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, double dpr, bool background, bool foreground, bool active, const lay::Drawings *drawings, tl::BitmapBuffer &img, unsigned int width, unsigned int height);
 
   /**
    *  @brief Gets the current bitmap data as a BitmapCanvasData object
@@ -354,7 +356,7 @@ public:
   }
 
   /**
-   *  @brief Restores the data 
+   *  @brief Restores the data
    */
   void restore_data (const BitmapCanvasData &data)
   {
@@ -364,12 +366,11 @@ public:
 private:
   void clear_planes ();
 
-  std::vector <lay::Bitmap *> mp_plane_buffers;
-  std::vector <std::vector <lay::Bitmap *> > mp_drawing_plane_buffers;
+  std::vector<lay::Bitmap *> mp_plane_buffers;
+  std::vector<std::vector<lay::Bitmap *>> mp_drawing_plane_buffers;
   unsigned int m_width, m_height;
 };
 
 }
 
 #endif
-

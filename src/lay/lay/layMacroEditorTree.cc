@@ -78,8 +78,7 @@ static QIcon tree_icon_for_format (const lym::Macro *m, bool active)
   }
 }
 
-struct FilteredMacroCollectionIter
-{
+struct FilteredMacroCollectionIter {
   FilteredMacroCollectionIter (const lym::MacroCollection *mc, const std::string &cat)
     : m_b (mc->begin_children ()), m_e (mc->end_children ()), m_category (cat)
   {
@@ -96,12 +95,12 @@ struct FilteredMacroCollectionIter
     return m_b.operator* ();
   }
 
-  const std::pair<const std::string, lym::MacroCollection *> *operator-> () const
+  const std::pair<const std::string, lym::MacroCollection *> *operator->() const
   {
-    return m_b.operator-> ();
+    return m_b.operator->();
   }
 
-  void operator++ () 
+  void operator++ ()
   {
     ++m_b;
     next ();
@@ -143,7 +142,7 @@ MacroTreeModel::MacroTreeModel (QWidget *parent, lym::MacroCollection *root, con
   connect (root, SIGNAL (about_to_change ()), this, SLOT (about_to_change ()));
 }
 
-Qt::DropActions MacroTreeModel::supportedDropActions() const
+Qt::DropActions MacroTreeModel::supportedDropActions () const
 {
   return Qt::MoveAction;
 }
@@ -181,7 +180,7 @@ void MacroTreeModel::macro_changed ()
 
 void MacroTreeModel::update_data ()
 {
-  int rc = rowCount (QModelIndex());
+  int rc = rowCount (QModelIndex ());
   if (rc > 0) {
     emit dataChanged (index (0, 0, QModelIndex ()), index (rc - 1, 0, QModelIndex ()));
   }
@@ -200,8 +199,8 @@ void MacroTreeModel::macro_collection_changed ()
   QModelIndexList pi = persistentIndexList ();
   for (QModelIndexList::const_iterator i = pi.begin (); i != pi.end (); ++i) {
     if (is_valid_pointer (i->internalPointer ())) {
-      lym::Macro *macro = dynamic_cast <lym::Macro *> ((QObject *) i->internalPointer ());
-      lym::MacroCollection *mc = dynamic_cast <lym::MacroCollection *> ((QObject *) i->internalPointer ());
+      lym::Macro *macro = dynamic_cast<lym::Macro *> ((QObject *) i->internalPointer ());
+      lym::MacroCollection *mc = dynamic_cast<lym::MacroCollection *> ((QObject *) i->internalPointer ());
       if (macro) {
         changePersistentIndex (*i, index_for (macro));
       } else if (mc) {
@@ -230,12 +229,11 @@ bool MacroTreeModel::is_valid_pointer (void *ptr) const
     std::set<lym::MacroCollection *> macro_collections;
     mp_root->collect_used_nodes (macros, macro_collections);
     for (std::set<lym::Macro *>::const_iterator m = macros.begin (); m != macros.end (); ++m) {
-      m_valid_objects.insert ((void *)(QObject *)*m);
+      m_valid_objects.insert ((void *) (QObject *) *m);
     }
     for (std::set<lym::MacroCollection *>::const_iterator m = macro_collections.begin (); m != macro_collections.end (); ++m) {
-      m_valid_objects.insert ((void *)(QObject *)*m);
+      m_valid_objects.insert ((void *) (QObject *) *m);
     }
-
   }
 
   return m_valid_objects.find (ptr) != m_valid_objects.end ();
@@ -248,16 +246,16 @@ QStringList MacroTreeModel::mimeTypes () const
   return types;
 }
 
-QMimeData *MacroTreeModel::mimeData(const QModelIndexList &indexes) const
+QMimeData *MacroTreeModel::mimeData (const QModelIndexList &indexes) const
 {
-  QMimeData *mimeData = new QMimeData();
+  QMimeData *mimeData = new QMimeData ();
   QByteArray encodedData;
 
   QDataStream stream (&encodedData, QIODevice::WriteOnly);
   stream << (quintptr) this;
 
   for (QModelIndexList::const_iterator i = indexes.begin (); i != indexes.end (); ++i) {
-    if (i->isValid()) {
+    if (i->isValid ()) {
       stream << (quintptr) i->internalPointer ();
     }
   }
@@ -279,9 +277,9 @@ bool MacroTreeModel::dropMimeData (const QMimeData *data, Qt::DropAction /*actio
 
   if (! parent.isValid () || ! is_valid_pointer (parent.internalPointer ())) {
     return false;
-  } 
-  
-  lym::MacroCollection *to_mc = dynamic_cast <lym::MacroCollection *> ((QObject *) parent.internalPointer ());
+  }
+
+  lym::MacroCollection *to_mc = dynamic_cast<lym::MacroCollection *> ((QObject *) parent.internalPointer ());
   if (! to_mc) {
     return false;
   }
@@ -294,17 +292,15 @@ bool MacroTreeModel::dropMimeData (const QMimeData *data, Qt::DropAction /*actio
     if (is_valid_pointer ((void *) p)) {
 
       QObject *from_object = (QObject *) (void *) p;
-      lym::Macro *from_macro = dynamic_cast <lym::Macro *> (from_object);
-      lym::MacroCollection *from_mc = dynamic_cast <lym::MacroCollection *> (from_object);
+      lym::Macro *from_macro = dynamic_cast<lym::Macro *> (from_object);
+      lym::MacroCollection *from_mc = dynamic_cast<lym::MacroCollection *> (from_object);
 
       if (from_macro) {
         emit move_macro (from_macro, to_mc);
       } else if (from_mc) {
         emit move_folder (from_mc, to_mc);
       }
-
-    } 
-
+    }
   }
 
   return true;
@@ -315,15 +311,15 @@ int MacroTreeModel::columnCount (const QModelIndex & /*parent*/) const
   return 1;
 }
 
-bool MacroTreeModel::setData (const QModelIndex &index, const QVariant &v, int role) 
+bool MacroTreeModel::setData (const QModelIndex &index, const QVariant &v, int role)
 {
   if (! index.isValid () || role != Qt::UserRole || ! is_valid_pointer (index.internalPointer ())) {
     return false;
-  } 
-  
+  }
+
   QObject *object = (QObject *) index.internalPointer ();
-  lym::Macro *macro = dynamic_cast <lym::Macro *> (object);
-  lym::MacroCollection *mc = dynamic_cast <lym::MacroCollection *> (object);
+  lym::Macro *macro = dynamic_cast<lym::Macro *> (object);
+  lym::MacroCollection *mc = dynamic_cast<lym::MacroCollection *> (object);
 
   //  TODO: don't do this while executing
   if (macro) {
@@ -357,11 +353,11 @@ QVariant MacroTreeModel::data (const QModelIndex &index, int role) const
 {
   if (! index.isValid () || ! is_valid_pointer (index.internalPointer ())) {
     return QVariant ();
-  } 
-  
+  }
+
   const QObject *object = (QObject *) index.internalPointer ();
-  const lym::Macro *macro = dynamic_cast <const lym::Macro *> (object);
-  const lym::MacroCollection *mc = dynamic_cast <const lym::MacroCollection *> (object);
+  const lym::Macro *macro = dynamic_cast<const lym::Macro *> (object);
+  const lym::MacroCollection *mc = dynamic_cast<const lym::MacroCollection *> (object);
   if (macro) {
     if (role == Qt::DisplayRole) {
       return QVariant (tl::to_qstring (macro->display_string ()));
@@ -407,8 +403,8 @@ Qt::ItemFlags MacroTreeModel::flags (const QModelIndex &index) const
   }
 
   const QObject *object = (QObject *) index.internalPointer ();
-  const lym::Macro *macro = dynamic_cast <const lym::Macro *> (object);
-  const lym::MacroCollection *mc = dynamic_cast <const lym::MacroCollection *> (object);
+  const lym::Macro *macro = dynamic_cast<const lym::Macro *> (object);
+  const lym::MacroCollection *mc = dynamic_cast<const lym::MacroCollection *> (object);
   if (macro) {
     if (! macro->is_readonly ()) {
       return QAbstractItemModel::flags (index) | Qt::ItemIsEditable | Qt::ItemIsDragEnabled;
@@ -416,14 +412,14 @@ Qt::ItemFlags MacroTreeModel::flags (const QModelIndex &index) const
       return QAbstractItemModel::flags (index) | Qt::ItemIsDragEnabled;
     }
   } else if (mc) {
-    if (!mc->is_readonly () && !mc->virtual_mode ()) {
+    if (! mc->is_readonly () && ! mc->virtual_mode ()) {
       return QAbstractItemModel::flags (index) | Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
-    } else if (!mc->is_readonly () && mc->virtual_mode ()) {
+    } else if (! mc->is_readonly () && mc->virtual_mode ()) {
       return QAbstractItemModel::flags (index) | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
     } else {
       return QAbstractItemModel::flags (index) | Qt::ItemIsDragEnabled;
     }
-  } 
+  }
   return QAbstractItemModel::flags (index);
 }
 
@@ -436,7 +432,7 @@ bool MacroTreeModel::hasChildren (const QModelIndex &parent) const
     if (! is_valid_pointer (parent.internalPointer ())) {
       return false;
     }
-    mc = dynamic_cast <const lym::MacroCollection *> ((QObject *) parent.internalPointer ());
+    mc = dynamic_cast<const lym::MacroCollection *> ((QObject *) parent.internalPointer ());
   }
   if (mc) {
     return ! FilteredMacroCollectionIter (mc, m_category).at_end () || mc->begin () != mc->end ();
@@ -452,8 +448,8 @@ QModelIndex MacroTreeModel::parent (const QModelIndex &index) const
   }
 
   const QObject *object = (QObject *) index.internalPointer ();
-  const lym::Macro *macro = dynamic_cast <const lym::Macro *> (object);
-  const lym::MacroCollection *mc = dynamic_cast <const lym::MacroCollection *> (object);
+  const lym::Macro *macro = dynamic_cast<const lym::Macro *> (object);
+  const lym::MacroCollection *mc = dynamic_cast<const lym::MacroCollection *> (object);
 
   const lym::MacroCollection *p = 0;
   if (macro) {
@@ -468,7 +464,7 @@ QModelIndex MacroTreeModel::parent (const QModelIndex &index) const
       int row = 0;
       for (FilteredMacroCollectionIter i (pp, m_category); ! i.at_end (); ++i, ++row) {
         if (i->second == p) {
-          return createIndex (row, index.column (), (void *)(QObject *)p);
+          return createIndex (row, index.column (), (void *) (QObject *) p);
         }
       }
     }
@@ -486,7 +482,7 @@ QModelIndex MacroTreeModel::index (int row, int column, const QModelIndex &paren
     if (! is_valid_pointer (parent.internalPointer ())) {
       return QModelIndex ();
     }
-    mc = dynamic_cast <const lym::MacroCollection *> ((QObject *) parent.internalPointer ());
+    mc = dynamic_cast<const lym::MacroCollection *> ((QObject *) parent.internalPointer ());
   }
 
   if (mc) {
@@ -494,14 +490,14 @@ QModelIndex MacroTreeModel::index (int row, int column, const QModelIndex &paren
     int r = row;
     while (! i.at_end ()) {
       if (r-- <= 0) {
-        return createIndex (row, column, (void *)(QObject *)i->second);
+        return createIndex (row, column, (void *) (QObject *) i->second);
       }
       ++i;
     }
     lym::MacroCollection::const_iterator j = mc->begin ();
     while (j != mc->end ()) {
       if (r-- <= 0) {
-        return createIndex (row, column, (void *)(QObject *)j->second);
+        return createIndex (row, column, (void *) (QObject *) j->second);
       }
       ++j;
     }
@@ -510,7 +506,7 @@ QModelIndex MacroTreeModel::index (int row, int column, const QModelIndex &paren
   return QModelIndex ();
 }
 
-int MacroTreeModel::rowCount (const QModelIndex &parent) const 
+int MacroTreeModel::rowCount (const QModelIndex &parent) const
 {
   const lym::MacroCollection *mc = 0;
   if (! parent.isValid ()) {
@@ -519,7 +515,7 @@ int MacroTreeModel::rowCount (const QModelIndex &parent) const
     if (! is_valid_pointer (parent.internalPointer ())) {
       return 0;
     }
-    mc = dynamic_cast <const lym::MacroCollection *> ((QObject *) parent.internalPointer ());
+    mc = dynamic_cast<const lym::MacroCollection *> ((QObject *) parent.internalPointer ());
   }
 
   int n = 0;
@@ -534,7 +530,7 @@ int MacroTreeModel::rowCount (const QModelIndex &parent) const
   return n;
 }
 
-QModelIndex 
+QModelIndex
 MacroTreeModel::index_for (lym::Macro *macro) const
 {
   if (! macro || ! macro->parent ()) {
@@ -554,18 +550,18 @@ MacroTreeModel::index_for (lym::Macro *macro) const
   pp = macro->parent ();
   int row = 0;
   for (FilteredMacroCollectionIter i (pp, m_category); ! i.at_end (); ++i, ++row) {
-    ; 
+    ;
   }
   for (lym::MacroCollection::const_iterator i = pp->begin (); i != pp->end (); ++i, ++row) {
     if (i->second == macro) {
-      return createIndex (row, 0, (void *)(QObject *)macro);
+      return createIndex (row, 0, (void *) (QObject *) macro);
     }
   }
-   
+
   return QModelIndex ();
 }
 
-QModelIndex 
+QModelIndex
 MacroTreeModel::index_for (lym::MacroCollection *mc) const
 {
   if (! mc || ! mc->parent ()) {
@@ -586,10 +582,10 @@ MacroTreeModel::index_for (lym::MacroCollection *mc) const
   int row = 0;
   for (FilteredMacroCollectionIter i (pp, m_category); ! i.at_end (); ++i, ++row) {
     if (i->second == mc) {
-      return createIndex (row, 0, (void *)(QObject *)mc);
+      return createIndex (row, 0, (void *) (QObject *) mc);
     }
   }
-   
+
   return QModelIndex ();
 }
 
@@ -635,9 +631,9 @@ lym::Macro *MacroEditorTree::current_macro () const
 {
   QModelIndex ci = mp_proxyModel->mapToSource (currentIndex ());
   if (ci.isValid () && mp_model->is_valid_pointer (ci.internalPointer ())) {
-    return dynamic_cast <lym::Macro *> ((QObject *) ci.internalPointer ());
+    return dynamic_cast<lym::Macro *> ((QObject *) ci.internalPointer ());
   } else {
-    return 0; 
+    return 0;
   }
 }
 
@@ -645,9 +641,9 @@ lym::MacroCollection *MacroEditorTree::current_macro_collection () const
 {
   QModelIndex ci = mp_proxyModel->mapToSource (currentIndex ());
   if (ci.isValid () && mp_model->is_valid_pointer (ci.internalPointer ())) {
-    return dynamic_cast <lym::MacroCollection *> ((QObject *) ci.internalPointer ());
+    return dynamic_cast<lym::MacroCollection *> ((QObject *) ci.internalPointer ());
   } else {
-    return 0; 
+    return 0;
   }
 }
 
@@ -696,17 +692,15 @@ void MacroEditorTree::double_clicked_slot (const QModelIndex &index)
   if (mp_model->is_valid_pointer (i.internalPointer ())) {
 
     QObject *object = (QObject *) i.internalPointer ();
-    lym::Macro *macro = dynamic_cast <lym::Macro *> (object);
-    lym::MacroCollection *mc = dynamic_cast <lym::MacroCollection *> (object);
+    lym::Macro *macro = dynamic_cast<lym::Macro *> (object);
+    lym::MacroCollection *mc = dynamic_cast<lym::MacroCollection *> (object);
 
     if (macro) {
       emit macro_double_clicked (macro);
     } else if (mc) {
       emit macro_collection_double_clicked (mc);
     }
-
   }
 }
 
 }
-

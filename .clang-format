@@ -1,0 +1,56 @@
+# clang-format configuration for KLayout
+# -------------------------------------------------------------------------
+# The distinctive KLayout idioms are:
+#   - space before parentheses, including in calls:  foo (x)
+#   - space after unary not:                         if (! x)
+#   - space before subscript brackets:               arr [i]
+#   - space after C-style casts:                     (int) x
+#   - braces on their own line for functions, classes and namespaces,
+#     but attached for control statements (Linux brace style)
+#   - two-space indentation, pointers/references bound to the name
+# -------------------------------------------------------------------------
+Language: Cpp
+BasedOnStyle: LLVM
+
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+ContinuationIndentWidth: 2
+ConstructorInitializerIndentWidth: 2
+AccessModifierOffset: -2
+NamespaceIndentation: None
+
+# Do not reflow existing lines: KLayout has many intentionally long lines
+ColumnLimit: 0
+
+# Functions / classes / namespaces: brace on its own line.
+# Control statements (if/for/while/else): attached brace.
+BreakBeforeBraces: Linux
+
+# KLayout spacing idioms
+SpaceBeforeParens: Always
+SpaceAfterCStyleCast: true
+SpaceAfterLogicalNot: true
+SpaceBeforeSquareBrackets: true
+
+PointerAlignment: Right
+ReferenceAlignment: Right
+
+AllowShortFunctionsOnASingleLine: All
+AllowShortBlocksOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: No
+
+IndentCaseLabels: false
+
+# Includes are grouped and ordered by hand
+SortIncludes: false
+
+# Namespace-closing comments are not used consistently; do not add them.
+FixNamespaceComments: false
+
+# Preserve the existing vertical spacing
+# Up to three blank lines are used after the licence header
+KeepEmptyLinesAtTheStartOfBlocks: true
+MaxEmptyLinesToKeep: 3

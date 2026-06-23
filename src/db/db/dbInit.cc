@@ -30,9 +30,9 @@
 #include "tlGlobPattern.h"
 
 #ifdef _WIN32
-#  include <windows.h>
+#include <windows.h>
 #else
-#  include <dlfcn.h>
+#include <dlfcn.h>
 #endif
 
 #include <set>
@@ -155,9 +155,7 @@ void init (const std::vector<std::string> &_paths)
           tl::error << ex.msg ();
         }
       }
-
     }
-
   }
 }
 

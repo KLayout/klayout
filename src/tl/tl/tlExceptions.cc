@@ -48,16 +48,16 @@ void set_ui_exception_handlers (void (*handler_tl) (const tl::Exception &, QWidg
 
 void handle_exception_silent (const tl::Exception &ex)
 {
-  const tl::ScriptError *script_error = dynamic_cast <const tl::ScriptError *> (&ex);
+  const tl::ScriptError *script_error = dynamic_cast<const tl::ScriptError *> (&ex);
   if (script_error) {
     if (script_error->line () > 0) {
-      tl::error << script_error->sourcefile () << ":" << script_error->line () << ": " 
+      tl::error << script_error->sourcefile () << ":" << script_error->line () << ": "
                 << script_error->msg () << tl::to_string (tr (" (class ")) << script_error->cls () << ")";
     } else {
       tl::error << script_error->msg () << tl::to_string (tr (" (class ")) << script_error->cls () << ")";
     }
   } else {
-    tl::error << ex.msg (); 
+    tl::error << ex.msg ();
   }
 }
 
@@ -77,7 +77,7 @@ void handle_exception_ui (const tl::Exception &ex, QWidget *parent)
 
 void handle_exception_silent (const std::exception &ex)
 {
-  tl::error << ex.what (); 
+  tl::error << ex.what ();
 }
 
 void handle_exception (const std::exception &ex)
@@ -114,4 +114,3 @@ void handle_exception_ui (QWidget *parent)
 }
 
 }
-

@@ -132,17 +132,15 @@ MarkerBrowserDialog::~MarkerBrowserDialog ()
   mp_ui = 0;
 }
 
-void
-MarkerBrowserDialog::configure_clicked ()
+void MarkerBrowserDialog::configure_clicked ()
 {
   lay::ConfigurationDialog config_dialog (this, lay::Dispatcher::instance (), "MarkerBrowserPlugin");
   config_dialog.exec ();
 }
 
-void
-MarkerBrowserDialog::unload_all_clicked ()
+void MarkerBrowserDialog::unload_all_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   bool modified = false;
   for (int i = 0; i < int (view ()->num_rdbs ()); ++i) {
@@ -156,7 +154,7 @@ BEGIN_PROTECTED
   if (modified) {
 
     QMessageBox msgbox (QMessageBox::Question, QObject::tr ("Unload Without Saving"),
-                                               QObject::tr ("At least one database was not saved.\nPress 'Continue' to continue anyway or 'Cancel' for not unloading the database."));
+                        QObject::tr ("At least one database was not saved.\nPress 'Continue' to continue anyway or 'Cancel' for not unloading the database."));
     QPushButton *ok = msgbox.addButton (QObject::tr ("Continue"), QMessageBox::AcceptRole);
     msgbox.setDefaultButton (msgbox.addButton (QMessageBox::Cancel));
 
@@ -165,22 +163,20 @@ BEGIN_PROTECTED
     if (msgbox.clickedButton () != ok) {
       return;
     }
-
   }
 
   while (view ()->num_rdbs () > 0) {
     view ()->remove_rdb (0);
   }
 
-  rdb_index_changed (-1);      
+  rdb_index_changed (-1);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MarkerBrowserDialog::unload_clicked ()
+void MarkerBrowserDialog::unload_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
 
@@ -188,7 +184,7 @@ BEGIN_PROTECTED
     if (rdb && rdb->is_modified ()) {
 
       QMessageBox msgbox (QMessageBox::Question, QObject::tr ("Unload Without Saving"),
-                                                 QObject::tr ("The database was not saved.\nPress 'Continue' to continue anyway or 'Cancel' for not unloading the database."));
+                          QObject::tr ("The database was not saved.\nPress 'Continue' to continue anyway or 'Cancel' for not unloading the database."));
       QPushButton *ok = msgbox.addButton (QObject::tr ("Continue"), QMessageBox::AcceptRole);
       msgbox.setDefaultButton (msgbox.addButton (QMessageBox::Cancel));
 
@@ -197,7 +193,6 @@ BEGIN_PROTECTED
       if (msgbox.clickedButton () != ok) {
         return;
       }
-
     }
 
     int new_rdb_index = m_rdb_index;
@@ -209,16 +204,15 @@ BEGIN_PROTECTED
       --new_rdb_index;
     }
     if (new_rdb_index < int (view ()->num_rdbs ()) && new_rdb_index >= 0) {
-      rdb_index_changed (new_rdb_index);      
+      rdb_index_changed (new_rdb_index);
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
 static void
-collect_categories (const Category *cat, std::vector <const Category *> &categories)
+collect_categories (const Category *cat, std::vector<const Category *> &categories)
 {
   if (cat->sub_categories ().begin () == cat->sub_categories ().end ()) {
     if (cat->num_items () > 0) {
@@ -231,10 +225,9 @@ collect_categories (const Category *cat, std::vector <const Category *> &categor
   }
 }
 
-void
-MarkerBrowserDialog::export_clicked ()
+void MarkerBrowserDialog::export_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (m_rdb_index >= int (view ()->num_rdbs ()) || m_rdb_index < 0) {
     return;
@@ -251,10 +244,10 @@ BEGIN_PROTECTED
   }
 
   bool ok;
-  QString text = QInputDialog::getText(this, QObject::tr ("Layer Offset"),
-                                             QObject::tr ("Enter the first GDS layer that is produced.\nLeave empty for not producing GDS layer numbers at all:"),
-                                             QLineEdit::Normal,
-                                             QString (), &ok);
+  QString text = QInputDialog::getText (this, QObject::tr ("Layer Offset"),
+                                        QObject::tr ("Enter the first GDS layer that is produced.\nLeave empty for not producing GDS layer numbers at all:"),
+                                        QLineEdit::Normal,
+                                        QString (), &ok);
   if (! ok) {
     return;
   }
@@ -274,12 +267,12 @@ BEGIN_PROTECTED
 
     db::Transaction transaction (view ()->is_editable () ? view ()->manager () : 0, tl::to_string (QObject::tr ("Export Markers")));
 
-    std::vector <const Category *> categories;
+    std::vector<const Category *> categories;
     for (rdb::Categories::const_iterator cat = rdb->categories ().begin (); cat != rdb->categories ().end (); ++cat) {
       collect_categories (&*cat, categories);
     }
 
-    for (std::vector <const Category *>::const_iterator cat = categories.begin (); cat != categories.end (); ++cat) {
+    for (std::vector<const Category *>::const_iterator cat = categories.begin (); cat != categories.end (); ++cat) {
 
       db::LayerProperties lp;
       if (lnum >= 0) {
@@ -313,7 +306,7 @@ BEGIN_PROTECTED
         } else {
           const rdb::Cell *top_cell = rdb->cell_by_qname (rdb->top_cell_name ());
           if (top_cell) {
-            std::pair <bool, db::DCplxTrans> context = cell->path_to (top_cell->id (), rdb);
+            std::pair<bool, db::DCplxTrans> context = cell->path_to (top_cell->id (), rdb);
             if (context.first) {
               trans = context.second;
             }
@@ -325,10 +318,10 @@ BEGIN_PROTECTED
           //  Produce the shapes ...
           for (rdb::Values::const_iterator v = (*item)->values ().begin (); v != (*item)->values ().end (); ++v) {
 
-            const rdb::Value<db::DPolygon> *polygon_value = dynamic_cast <const rdb::Value<db::DPolygon> *> (v->get ());
-            const rdb::Value<db::DBox> *box_value = dynamic_cast <const rdb::Value<db::DBox> *> (v->get ());
-            const rdb::Value<db::DEdge> *edge_value = dynamic_cast <const rdb::Value<db::DEdge> *> (v->get ());
-            const rdb::Value<db::DEdgePair> *edge_pair_value = dynamic_cast <const rdb::Value<db::DEdgePair> *> (v->get ());
+            const rdb::Value<db::DPolygon> *polygon_value = dynamic_cast<const rdb::Value<db::DPolygon> *> (v->get ());
+            const rdb::Value<db::DBox> *box_value = dynamic_cast<const rdb::Value<db::DBox> *> (v->get ());
+            const rdb::Value<db::DEdge> *edge_value = dynamic_cast<const rdb::Value<db::DEdge> *> (v->get ());
+            const rdb::Value<db::DEdgePair> *edge_pair_value = dynamic_cast<const rdb::Value<db::DEdgePair> *> (v->get ());
 
             if (polygon_value) {
 
@@ -350,15 +343,10 @@ BEGIN_PROTECTED
 
               db::Polygon polygon = db::Polygon (db::DCplxTrans (1.0 / cv->layout ().dbu ()) * trans * db::DPolygon (box_value->value ()));
               cv->layout ().cell (target_cell).shapes (layer).insert (polygon);
-
             }
-
           }
-
         }
-
       }
-
     }
 
     view ()->update_content ();
@@ -368,13 +356,12 @@ BEGIN_PROTECTED
     throw;
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MarkerBrowserDialog::save_clicked ()
+void MarkerBrowserDialog::save_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
 
@@ -389,20 +376,16 @@ BEGIN_PROTECTED
 
         rdb->save (rdb->filename ());
         rdb->reset_modified ();
-
       }
-
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MarkerBrowserDialog::apply_waiver_db_clicked ()
+void MarkerBrowserDialog::apply_waiver_db_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   rdb::Database *rdb = 0;
   if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
@@ -429,7 +412,6 @@ BEGIN_PROTECTED
     if (! open_dialog.get_open (wdb_filename)) {
       return;
     }
-
   }
 
   rdb::Database wdb;
@@ -439,13 +421,12 @@ BEGIN_PROTECTED
   rdb->apply (wdb);
   mp_ui->browser_frame->set_rdb (rdb);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MarkerBrowserDialog::saveas_waiver_db_clicked ()
+void MarkerBrowserDialog::saveas_waiver_db_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   rdb::Database *rdb = 0;
   if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
@@ -461,13 +442,12 @@ BEGIN_PROTECTED
 
   rdb->write (rdb->filename () + ".w");
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MarkerBrowserDialog::saveas_clicked ()
+void MarkerBrowserDialog::saveas_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
 
@@ -484,18 +464,14 @@ BEGIN_PROTECTED
 
         //  update the RDB title strings
         rdbs_changed ();
-
       }
-
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MarkerBrowserDialog::info_clicked ()
+void MarkerBrowserDialog::info_clicked ()
 {
   rdb::Database *rdb = 0;
   if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
@@ -530,10 +506,9 @@ MarkerBrowserDialog::info_clicked ()
   info_dialog->exec ();
 }
 
-void
-MarkerBrowserDialog::reload_clicked ()
+void MarkerBrowserDialog::reload_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
 
     rdb::Database *rdb = view ()->get_rdb (m_rdb_index);
@@ -542,17 +517,14 @@ BEGIN_PROTECTED
       mp_ui->browser_frame->set_rdb (0);
       rdb->load (rdb->filename ());
       mp_ui->browser_frame->set_rdb (rdb);
-
     }
-
   }
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MarkerBrowserDialog::open_clicked ()
+void MarkerBrowserDialog::open_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   //  collect the formats available ...
   std::string fmts = tl::to_string (QObject::tr ("All files (*)"));
@@ -570,7 +542,7 @@ BEGIN_PROTECTED
 
   if (open_dialog.get_open (m_open_filename)) {
 
-    std::unique_ptr <rdb::Database> db (new rdb::Database ());
+    std::unique_ptr<rdb::Database> db (new rdb::Database ());
     db->load (m_open_filename);
 
     int rdb_index = view ()->add_rdb (db.release ());
@@ -578,14 +550,12 @@ BEGIN_PROTECTED
 
     //  it looks like the setCurrentIndex does not issue this signal:
     rdb_index_changed (rdb_index);
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-bool 
-MarkerBrowserDialog::configure (const std::string &name, const std::string &value)
+bool MarkerBrowserDialog::configure (const std::string &name, const std::string &value)
 {
   bool need_update = false;
   bool taken = true;
@@ -694,8 +664,7 @@ MarkerBrowserDialog::configure (const std::string &name, const std::string &valu
   return taken;
 }
 
-void
-MarkerBrowserDialog::load (int rdb_index, int cv_index)
+void MarkerBrowserDialog::load (int rdb_index, int cv_index)
 {
   if (! view ()->get_rdb (rdb_index)) {
     return;
@@ -710,15 +679,14 @@ MarkerBrowserDialog::load (int rdb_index, int cv_index)
   //  set the new references (by name)
   m_rdb_name = view ()->get_rdb (rdb_index)->name ();
 
-  //  force an update 
+  //  force an update
   rdbs_changed ();
   cellviews_changed ();
 
   activate ();
 }
 
-void 
-MarkerBrowserDialog::rdbs_changed ()
+void MarkerBrowserDialog::rdbs_changed ()
 {
   int rdb_index = -1;
 
@@ -750,14 +718,12 @@ MarkerBrowserDialog::rdbs_changed ()
   }
 }
 
-void 
-MarkerBrowserDialog::cellview_changed (int)
+void MarkerBrowserDialog::cellview_changed (int)
 {
   mp_ui->browser_frame->update_markers ();
 }
 
-void 
-MarkerBrowserDialog::cellviews_changed ()
+void MarkerBrowserDialog::cellviews_changed ()
 {
   int cv_index = -1;
 
@@ -775,8 +741,7 @@ MarkerBrowserDialog::cellviews_changed ()
   cv_index_changed (cv_index);
 }
 
-void 
-MarkerBrowserDialog::rdb_index_changed (int index)
+void MarkerBrowserDialog::rdb_index_changed (int index)
 {
   if (m_rdb_index != index) {
     m_rdb_index = index;
@@ -786,8 +751,7 @@ MarkerBrowserDialog::rdb_index_changed (int index)
   }
 }
 
-void 
-MarkerBrowserDialog::cv_index_changed (int index)
+void MarkerBrowserDialog::cv_index_changed (int index)
 {
   if (m_cv_index != index) {
     m_cv_index = index;
@@ -797,8 +761,7 @@ MarkerBrowserDialog::cv_index_changed (int index)
   }
 }
 
-void 
-MarkerBrowserDialog::activated ()
+void MarkerBrowserDialog::activated ()
 {
   std::string state;
   view ()->config_get (cfg_rdb_window_state, state);
@@ -820,12 +783,11 @@ MarkerBrowserDialog::activated ()
   }
 }
 
-void
-MarkerBrowserDialog::update_content ()
+void MarkerBrowserDialog::update_content ()
 {
   rdb::Database *rdb = view ()->get_rdb (m_rdb_index);
-  
-  if (!rdb ) {
+
+  if (! rdb) {
     mp_ui->central_stack->setCurrentIndex (1);
   }
 
@@ -839,8 +801,8 @@ MarkerBrowserDialog::update_content ()
   mp_ui->reload_action->setEnabled (rdb != 0);
   mp_ui->info_action->setEnabled (rdb != 0);
 
-  mp_ui->browser_frame->enable_updates (false);  //  Avoid building the internal lists several times ...
-  mp_ui->browser_frame->set_rdb (0);    //  force update
+  mp_ui->browser_frame->enable_updates (false); //  Avoid building the internal lists several times ...
+  mp_ui->browser_frame->set_rdb (0);            //  force update
   mp_ui->browser_frame->set_rdb (rdb);
   mp_ui->browser_frame->set_max_marker_count (m_max_marker_count);
   mp_ui->browser_frame->set_marker_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern);
@@ -853,7 +815,7 @@ MarkerBrowserDialog::update_content ()
   mp_ui->browser_frame->set_tree_state (tree_state);
 
   if (rdb) {
-    //  Note: it appears to be required to show the browser page after it has been configured. 
+    //  Note: it appears to be required to show the browser page after it has been configured.
     //  Otherwise the header gets messed up and the configuration is reset.
     mp_ui->central_stack->setCurrentIndex (0);
   }
@@ -873,8 +835,7 @@ MarkerBrowserDialog::update_content ()
   }
 }
 
-void 
-MarkerBrowserDialog::deactivated ()
+void MarkerBrowserDialog::deactivated ()
 {
   if (lay::Dispatcher::instance ()) {
     lay::Dispatcher::instance ()->config_set (cfg_rdb_window_state, lay::save_dialog_state (this));
@@ -888,20 +849,17 @@ MarkerBrowserDialog::deactivated ()
   mp_ui->browser_frame->set_view (0, 0);
 }
 
-void 
-MarkerBrowserDialog::scan_layer ()
+void MarkerBrowserDialog::scan_layer ()
 {
   scan_layer_flat_or_hierarchical (false);
 }
 
-void
-MarkerBrowserDialog::scan_layer_flat ()
+void MarkerBrowserDialog::scan_layer_flat ()
 {
   scan_layer_flat_or_hierarchical (true);
 }
 
-void
-MarkerBrowserDialog::scan_layer_flat_or_hierarchical (bool flat)
+void MarkerBrowserDialog::scan_layer_flat_or_hierarchical (bool flat)
 {
   std::vector<lay::LayerPropertiesConstIterator> layers = view ()->selected_layers ();
   if (layers.empty ()) {
@@ -910,7 +868,7 @@ MarkerBrowserDialog::scan_layer_flat_or_hierarchical (bool flat)
 
   int cv_index = -1;
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-    if (!(*l)->has_children ()) {
+    if (! (*l)->has_children ()) {
       if (cv_index < 0) {
         cv_index = (*l)->cellview_index ();
       } else if ((*l)->cellview_index () >= 0) {
@@ -928,9 +886,9 @@ MarkerBrowserDialog::scan_layer_flat_or_hierarchical (bool flat)
   const lay::CellView &cv = view ()->cellview (cv_index);
   const db::Layout &layout = cv->layout ();
 
-  std::vector<std::pair <unsigned int, std::string> > layer_indexes;
+  std::vector<std::pair<unsigned int, std::string>> layer_indexes;
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-    if (!(*l)->has_children () && (*l)->cellview_index () == cv_index && layout.is_valid_layer ((*l)->layer_index ())) {
+    if (! (*l)->has_children () && (*l)->cellview_index () == cv_index && layout.is_valid_layer ((*l)->layer_index ())) {
       layer_indexes.push_back (std::make_pair ((*l)->layer_index (), (*l)->name ()));
     }
   }
@@ -943,8 +901,7 @@ MarkerBrowserDialog::scan_layer_flat_or_hierarchical (bool flat)
   view ()->open_rdb_browser (rdb_index, cv_index);
 }
 
-void 
-MarkerBrowserDialog::menu_activated (const std::string &symbol)
+void MarkerBrowserDialog::menu_activated (const std::string &symbol)
 {
   if (symbol == "marker_browser::show") {
     view ()->deactivate_all_browsers ();

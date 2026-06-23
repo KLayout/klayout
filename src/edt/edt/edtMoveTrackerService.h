@@ -28,7 +28,8 @@
 #include "layEditorServiceBase.h"
 #include "edtEditorHooks.h"
 
-namespace edt {
+namespace edt
+{
 
 /**
  *  @brief A service tracking move commands a forwarding them to the editor hooks
@@ -37,7 +38,7 @@ namespace edt {
 class EDT_PUBLIC MoveTrackerService
   : public lay::EditorServiceBase
 {
-public: 
+public:
   /**
    *  @brief The constructor
    */
@@ -99,4 +100,3 @@ private:
 }
 
 #endif
-

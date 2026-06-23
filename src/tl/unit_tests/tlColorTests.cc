@@ -28,7 +28,7 @@
 #include <QColor>
 #endif
 
-TEST(1)
+TEST (1)
 {
   EXPECT_EQ (tl::Color ().is_valid (), false);
   EXPECT_EQ (tl::Color ().to_string (), "");
@@ -40,12 +40,12 @@ TEST(1)
   EXPECT_EQ (tl::Color (QColor ()).rgb (), 0x00000000u);
   EXPECT_EQ (tl::Color (QColor ()).to_qc ().isValid (), false);
   EXPECT_EQ (QColor ().isValid (), false);
-  EXPECT_EQ (tl::to_string (QColor ().name ()), "#000000");  // why?
+  EXPECT_EQ (tl::to_string (QColor ().name ()), "#000000"); // why?
   EXPECT_EQ (QColor ().rgb (), 0xff000000u);
 #endif
 }
 
-TEST(2)
+TEST (2)
 {
   EXPECT_EQ (tl::Color (0x102030).is_valid (), true);
   EXPECT_EQ (tl::Color (0x102030).to_string (), "#102030");
@@ -63,7 +63,7 @@ TEST(2)
 #endif
 }
 
-TEST(3)
+TEST (3)
 {
   EXPECT_EQ (tl::Color (std::string ()).is_valid (), false);
   EXPECT_EQ (tl::Color ("#102030").is_valid (), true);
@@ -80,14 +80,14 @@ TEST(3)
 #endif
 }
 
-TEST(4)
+TEST (4)
 {
   EXPECT_EQ (tl::Color ("#123").is_valid (), true);
   EXPECT_EQ (tl::Color ("#123").to_string (), "#112233");
   EXPECT_EQ (tl::Color ("#123").rgb (), 0xff112233u);
 }
 
-TEST(5)
+TEST (5)
 {
   EXPECT_EQ (tl::Color ("#80102030").is_valid (), true);
   EXPECT_EQ (tl::Color ("#80102030").alpha (), 128u);
@@ -105,14 +105,14 @@ TEST(5)
 #endif
 }
 
-TEST(6)
+TEST (6)
 {
   EXPECT_EQ (tl::Color ("#8123").is_valid (), true);
   EXPECT_EQ (tl::Color ("#8123").to_string (), "#88112233");
   EXPECT_EQ (tl::Color ("#8123").rgb (), 0x88112233u);
 }
 
-TEST(7)
+TEST (7)
 {
   EXPECT_EQ (tl::Color (16, 32, 48, 128).is_valid (), true);
   EXPECT_EQ (tl::Color (16, 32, 48, 128).to_string (), "#80102030");
@@ -126,7 +126,7 @@ TEST(7)
 #endif
 }
 
-TEST(8)
+TEST (8)
 {
   unsigned int h, s, v;
   int ih, is, iv;

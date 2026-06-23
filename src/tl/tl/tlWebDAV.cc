@@ -50,9 +50,8 @@ namespace
 /**
  *  @brief A dummy "DOM" for the WebDAV reply
  */
-struct ResourceType
-{
-  ResourceType () : is_collection (false) { }
+struct ResourceType {
+  ResourceType () : is_collection (false) {}
 
   const std::string &collection () const
   {
@@ -71,16 +70,14 @@ struct ResourceType
 /**
  *  @brief A dummy "DOM" for the WebDAV reply
  */
-struct Prop
-{
+struct Prop {
   ResourceType resourcetype;
 };
 
 /**
  *  @brief A dummy "DOM" for the WebDAV reply
  */
-struct PropStat
-{
+struct PropStat {
   std::string status;
   Prop prop;
 };
@@ -88,8 +85,7 @@ struct PropStat
 /**
  *  @brief A dummy "DOM" for the WebDAV reply
  */
-struct Response
-{
+struct Response {
   std::string href;
   PropStat propstat;
 };
@@ -97,8 +93,7 @@ struct Response
 /**
  *  @brief A dummy "DOM" for the WebDAV reply
  */
-struct MultiStatus
-{
+struct MultiStatus {
   typedef std::list<Response> container;
   typedef container::const_iterator iterator;
 
@@ -112,27 +107,22 @@ struct MultiStatus
 }
 
 tl::XMLStruct<MultiStatus> xml_struct ("multistatus",
-  tl::make_element (&MultiStatus::begin, &MultiStatus::end, &MultiStatus::add, "response",
-    tl::make_member (&Response::href, "href") +
-    tl::make_element (&Response::propstat, "propstat",
-      tl::make_member (&PropStat::status, "status") +
-      tl::make_element (&PropStat::prop, "prop",
-        tl::make_element (&Prop::resourcetype, "resourcetype",
-          tl::make_member (&ResourceType::collection, &ResourceType::set_collection, "collection")
-        )
-      )
-    )
-  )
-);
+                                       tl::make_element (&MultiStatus::begin, &MultiStatus::end, &MultiStatus::add, "response",
+                                                         tl::make_member (&Response::href, "href") +
+                                                           tl::make_element (&Response::propstat, "propstat",
+                                                                             tl::make_member (&PropStat::status, "status") +
+                                                                               tl::make_element (&PropStat::prop, "prop",
+                                                                                                 tl::make_element (&Prop::resourcetype, "resourcetype",
+                                                                                                                   tl::make_member (&ResourceType::collection, &ResourceType::set_collection, "collection"))))));
 
 static std::string item_name (const std::string &path1, const std::string &path2)
 {
-  std::vector <std::string> sl1 = tl::split (path1, "/");
+  std::vector<std::string> sl1 = tl::split (path1, "/");
   if (! sl1.empty () && sl1.back ().empty ()) {
     sl1.pop_back ();
   }
 
-  std::vector <std::string> sl2 = tl::split (path2, "/");
+  std::vector<std::string> sl2 = tl::split (path2, "/");
   if (! sl2.empty () && sl2.back ().empty ()) {
     sl2.pop_back ();
   }
@@ -147,8 +137,7 @@ static std::string item_name (const std::string &path1, const std::string &path2
   }
 }
 
-void
-WebDAVObject::read (const std::string &url, int depth, double timeout, tl::InputHttpStreamCallback *callback)
+void WebDAVObject::read (const std::string &url, int depth, double timeout, tl::InputHttpStreamCallback *callback)
 {
   tl::URI base_uri (url);
 
@@ -182,15 +171,13 @@ WebDAVObject::read (const std::string &url, int depth, double timeout, tl::Input
       m_is_collection = is_collection;
       m_url = item_url_string;
     }
-
   }
 }
 
 namespace
 {
 
-struct DownloadItem
-{
+struct DownloadItem {
   DownloadItem (const std::string &u, const std::string &p)
   {
     url = u;
@@ -203,8 +190,7 @@ struct DownloadItem
 
 }
 
-static
-void fetch_download_items (const std::string &url, const std::string &target, std::list<DownloadItem> &items, tl::AbsoluteProgress &progress, double timeout, tl::InputHttpStreamCallback *callback)
+static void fetch_download_items (const std::string &url, const std::string &target, std::list<DownloadItem> &items, tl::AbsoluteProgress &progress, double timeout, tl::InputHttpStreamCallback *callback)
 {
   ++progress;
 
@@ -242,7 +228,6 @@ void fetch_download_items (const std::string &url, const std::string &target, st
         }
 
         items.push_back (DownloadItem (i->url (), item_path));
-
       }
     }
 
@@ -262,8 +247,7 @@ WebDAVObject::download_item (const std::string &url, double timeout, tl::InputHt
   return new tl::InputStream (http);
 }
 
-bool
-WebDAVObject::download (const std::string &url, const std::string &target, double timeout, tl::InputHttpStreamCallback *callback)
+bool WebDAVObject::download (const std::string &url, const std::string &target, double timeout, tl::InputHttpStreamCallback *callback)
 {
   std::list<DownloadItem> items;
 
@@ -274,7 +258,8 @@ WebDAVObject::download (const std::string &url, const std::string &target, doubl
     fetch_download_items (url, target, items, progress, timeout, callback);
 
   } catch (tl::Exception &ex) {
-    tl::error << tr ("Error downloading file structure from '") << url << "':" << tl::endl << ex.msg ();
+    tl::error << tr ("Error downloading file structure from '") << url << "':" << tl::endl
+              << ex.msg ();
     return false;
   }
 
@@ -298,18 +283,20 @@ WebDAVObject::download (const std::string &url, const std::string &target, doubl
         ++progress;
 
       } catch (tl::BreakException &ex) {
-        tl::info << tr ("Download was cancelled") << tl::endl << ex.msg ();
+        tl::info << tr ("Download was cancelled") << tl::endl
+                 << ex.msg ();
         has_errors = true;
         break;
       } catch (tl::CancelException &ex) {
-        tl::info << tr ("Download was cancelled") << tl::endl << ex.msg ();
+        tl::info << tr ("Download was cancelled") << tl::endl
+                 << ex.msg ();
         has_errors = true;
         break;
       } catch (tl::Exception &ex) {
-        tl::error << tr ("Error downloading file from '") << i->url << "':" << tl::endl << ex.msg ();
+        tl::error << tr ("Error downloading file from '") << i->url << "':" << tl::endl
+                  << ex.msg ();
         has_errors = true;
       }
-
     }
   }
 

@@ -65,36 +65,31 @@ template <class Container>
 static gsi::Methods
 make_property_methods ()
 {
-  return
-  gsi::method_ext ("enable_properties", &enable_properties<Container>,
-    "@brief Enables properties for the given container.\n"
-    "This method has an effect mainly on original layers and will import properties from such layers. "
-    "By default, properties are not enabled on original layers. Alternatively you can apply \\filter_properties "
-    "or \\map_properties to enable properties with a specific name key.\n"
-    "\n"
-    "This method has been introduced in version 0.28.4."
-  ) +
-  gsi::method_ext ("remove_properties", &remove_properties<Container>,
-    "@brief Removes properties for the given container.\n"
-    "This will remove all properties on the given container.\n"
-    "\n"
-    "This method has been introduced in version 0.28.4."
-  ) +
-  gsi::method_ext ("filter_properties", &filter_properties<Container>, gsi::arg ("keys"),
-    "@brief Filters properties by certain keys.\n"
-    "Calling this method on a container will reduce the properties to values with name keys from the 'keys' list.\n"
-    "As a side effect, this method enables properties on original layers.\n"
-    "\n"
-    "This method has been introduced in version 0.28.4."
-  ) +
-  gsi::method_ext ("map_properties", &map_properties<Container>, gsi::arg ("key_map"),
-    "@brief Maps properties by name key.\n"
-    "Calling this method on a container will reduce the properties to values with name keys from the 'keys' hash and "
-    "renames the properties. Properties not listed in the key map will be removed.\n"
-    "As a side effect, this method enables properties on original layers.\n"
-    "\n"
-    "This method has been introduced in version 0.28.4."
-  );
+  return gsi::method_ext ("enable_properties", &enable_properties<Container>,
+                          "@brief Enables properties for the given container.\n"
+                          "This method has an effect mainly on original layers and will import properties from such layers. "
+                          "By default, properties are not enabled on original layers. Alternatively you can apply \\filter_properties "
+                          "or \\map_properties to enable properties with a specific name key.\n"
+                          "\n"
+                          "This method has been introduced in version 0.28.4.") +
+         gsi::method_ext ("remove_properties", &remove_properties<Container>,
+                          "@brief Removes properties for the given container.\n"
+                          "This will remove all properties on the given container.\n"
+                          "\n"
+                          "This method has been introduced in version 0.28.4.") +
+         gsi::method_ext ("filter_properties", &filter_properties<Container>, gsi::arg ("keys"),
+                          "@brief Filters properties by certain keys.\n"
+                          "Calling this method on a container will reduce the properties to values with name keys from the 'keys' list.\n"
+                          "As a side effect, this method enables properties on original layers.\n"
+                          "\n"
+                          "This method has been introduced in version 0.28.4.") +
+         gsi::method_ext ("map_properties", &map_properties<Container>, gsi::arg ("key_map"),
+                          "@brief Maps properties by name key.\n"
+                          "Calling this method on a container will reduce the properties to values with name keys from the 'keys' hash and "
+                          "renames the properties. Properties not listed in the key map will be removed.\n"
+                          "As a side effect, this method enables properties on original layers.\n"
+                          "\n"
+                          "This method has been introduced in version 0.28.4.");
 }
 
 // ---------------------------------------------------------------------------------
@@ -162,65 +157,58 @@ public:
     if (with_requires_raw_input) {
       decls =
         method ("requires_raw_input?", &shape_filter_impl::requires_raw_input,
-          "@brief Gets a value indicating whether the filter needs raw (unmerged) input\n"
-          "See \\requires_raw_input= for details.\n"
-        ) +
+                "@brief Gets a value indicating whether the filter needs raw (unmerged) input\n"
+                "See \\requires_raw_input= for details.\n") +
         method ("requires_raw_input=", &shape_filter_impl::set_requires_raw_input, gsi::arg ("flag"),
-          "@brief Sets a value indicating whether the filter needs raw (unmerged) input\n"
-          "This flag must be set before using this filter. It tells the filter implementation whether the "
-          "filter wants to have raw input (unmerged). The default value is 'false', meaning that\n"
-          "the filter will receive merged polygons ('merged semantics').\n"
-          "\n"
-          "Setting this value to false potentially saves some CPU time needed for merging the polygons.\n"
-          "Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, "
-          "empty or degenerated polygons are preserved."
-        );
+                "@brief Sets a value indicating whether the filter needs raw (unmerged) input\n"
+                "This flag must be set before using this filter. It tells the filter implementation whether the "
+                "filter wants to have raw input (unmerged). The default value is 'false', meaning that\n"
+                "the filter will receive merged polygons ('merged semantics').\n"
+                "\n"
+                "Setting this value to false potentially saves some CPU time needed for merging the polygons.\n"
+                "Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, "
+                "empty or degenerated polygons are preserved.");
     }
 
     decls +=
       method ("wants_variants?", &shape_filter_impl::wants_variants,
-        "@brief Gets a value indicating whether the filter prefers cell variants\n"
-        "See \\wants_variants= for details.\n"
-      ) +
+              "@brief Gets a value indicating whether the filter prefers cell variants\n"
+              "See \\wants_variants= for details.\n") +
       method ("wants_variants=", &shape_filter_impl::set_wants_variants, gsi::arg ("flag"),
-        "@brief Sets a value indicating whether the filter prefers cell variants\n"
-        "This flag must be set before using this filter for hierarchical applications (deep mode). "
-        "It tells the filter implementation whether cell variants should be created (true, the default) "
-        "or shape propagation will be applied (false).\n"
-        "\n"
-        "This decision needs to be made, if the filter indicates that it will deliver different results\n"
-        "for scaled or rotated versions of the shape (see \\is_isotropic and the other hints). If a cell\n"
-        "is present with different qualities - as seen from the top cell - the respective instances\n"
-        "need to be differentiated. Cell variant formation is one way, shape propagation the other way.\n"
-        "Typically, cell variant formation is less expensive, but the hierarchy will be modified."
-      ) +
+              "@brief Sets a value indicating whether the filter prefers cell variants\n"
+              "This flag must be set before using this filter for hierarchical applications (deep mode). "
+              "It tells the filter implementation whether cell variants should be created (true, the default) "
+              "or shape propagation will be applied (false).\n"
+              "\n"
+              "This decision needs to be made, if the filter indicates that it will deliver different results\n"
+              "for scaled or rotated versions of the shape (see \\is_isotropic and the other hints). If a cell\n"
+              "is present with different qualities - as seen from the top cell - the respective instances\n"
+              "need to be differentiated. Cell variant formation is one way, shape propagation the other way.\n"
+              "Typically, cell variant formation is less expensive, but the hierarchy will be modified.") +
       method ("is_isotropic", &shape_filter_impl::is_isotropic,
-        "@brief Indicates that the filter has isotropic properties\n"
-        "Call this method before using the filter to indicate that the selection is independent of "
-        "the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
-        "hierarchical mode.\n"
-        "\n"
-        "Examples for isotropic (polygon) filters are area or perimeter filters. The area or perimeter of a polygon "
-        "depends on the scale, but not on the orientation of the polygon."
-      ) +
+              "@brief Indicates that the filter has isotropic properties\n"
+              "Call this method before using the filter to indicate that the selection is independent of "
+              "the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
+              "hierarchical mode.\n"
+              "\n"
+              "Examples for isotropic (polygon) filters are area or perimeter filters. The area or perimeter of a polygon "
+              "depends on the scale, but not on the orientation of the polygon.") +
       method ("is_scale_invariant", &shape_filter_impl::is_scale_invariant,
-        "@brief Indicates that the filter is scale invariant\n"
-        "Call this method before using the filter to indicate that the selection is independent of "
-        "the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
-        "hierarchical mode.\n"
-        "\n"
-        "An example for a scale invariant (polygon) filter is the bounding box aspect ratio (height/width) filter. "
-        "The definition of heigh and width depends on the orientation, but the ratio is independent on scale."
-      ) +
+              "@brief Indicates that the filter is scale invariant\n"
+              "Call this method before using the filter to indicate that the selection is independent of "
+              "the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
+              "hierarchical mode.\n"
+              "\n"
+              "An example for a scale invariant (polygon) filter is the bounding box aspect ratio (height/width) filter. "
+              "The definition of heigh and width depends on the orientation, but the ratio is independent on scale.") +
       method ("is_isotropic_and_scale_invariant", &shape_filter_impl::is_isotropic_and_scale_invariant,
-        "@brief Indicates that the filter is isotropic and scale invariant\n"
-        "Call this method before using the filter to indicate that the selection is independent of "
-        "the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
-        "hierarchical mode.\n"
-        "\n"
-        "An example for such a (polygon) filter is the square selector. Whether a polygon is a square or not does not depend on "
-        "the polygon's orientation nor scale."
-      );
+              "@brief Indicates that the filter is isotropic and scale invariant\n"
+              "Call this method before using the filter to indicate that the selection is independent of "
+              "the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
+              "hierarchical mode.\n"
+              "\n"
+              "An example for such a (polygon) filter is the square selector. Whether a polygon is a square or not does not depend on "
+              "the polygon's orientation nor scale.");
 
     return decls;
   }
@@ -333,85 +321,74 @@ public:
     if (with_merged_options) {
       decls +=
         method ("requires_raw_input?", &shape_processor_base::requires_raw_input,
-          "@brief Gets a value indicating whether the processor needs raw (unmerged) input\n"
-          "See \\requires_raw_input= for details.\n"
-        ) +
+                "@brief Gets a value indicating whether the processor needs raw (unmerged) input\n"
+                "See \\requires_raw_input= for details.\n") +
         method ("requires_raw_input=", &shape_processor_base::set_requires_raw_input, gsi::arg ("flag"),
-          "@brief Sets a value indicating whether the processor needs raw (unmerged) input\n"
-          "This flag must be set before using this processor. It tells the processor implementation whether the "
-          "processor wants to have raw input (unmerged). The default value is 'false', meaning that\n"
-          "the processor will receive merged polygons ('merged semantics').\n"
-          "\n"
-          "Setting this value to false potentially saves some CPU time needed for merging the polygons.\n"
-          "Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, "
-          "empty or degenerated polygons are preserved."
-        ) +
+                "@brief Sets a value indicating whether the processor needs raw (unmerged) input\n"
+                "This flag must be set before using this processor. It tells the processor implementation whether the "
+                "processor wants to have raw input (unmerged). The default value is 'false', meaning that\n"
+                "the processor will receive merged polygons ('merged semantics').\n"
+                "\n"
+                "Setting this value to false potentially saves some CPU time needed for merging the polygons.\n"
+                "Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, "
+                "empty or degenerated polygons are preserved.") +
         method ("result_is_merged?", &shape_processor_base::result_is_merged,
-          "@brief Gets a value indicating whether the processor delivers merged output\n"
-          "See \\result_is_merged= for details.\n"
-        ) +
+                "@brief Gets a value indicating whether the processor delivers merged output\n"
+                "See \\result_is_merged= for details.\n") +
         method ("result_is_merged=", &shape_processor_base::set_result_is_merged, gsi::arg ("flag"),
-          "@brief Sets a value indicating whether the processor delivers merged output\n"
-          "This flag must be set before using this processor. If the processor maintains the merged condition\n"
-          "by design (output is merged if input is), it is a good idea to set this predicate to 'true'.\n"
-          "This will avoid additional merge steps when the resulting collection is used in further operations\n"
-          "that need merged input\n."
-        ) +
+                "@brief Sets a value indicating whether the processor delivers merged output\n"
+                "This flag must be set before using this processor. If the processor maintains the merged condition\n"
+                "by design (output is merged if input is), it is a good idea to set this predicate to 'true'.\n"
+                "This will avoid additional merge steps when the resulting collection is used in further operations\n"
+                "that need merged input\n.") +
         method ("result_must_not_be_merged?", &shape_processor_base::result_must_not_be_merged,
-          "@brief Gets a value indicating whether the processor's output must not be merged\n"
-          "See \\result_must_not_be_merged= for details.\n"
-        ) +
+                "@brief Gets a value indicating whether the processor's output must not be merged\n"
+                "See \\result_must_not_be_merged= for details.\n") +
         method ("result_must_not_be_merged=", &shape_processor_base::set_result_must_not_be_merged, gsi::arg ("flag"),
-          "@brief Sets a value indicating whether the processor's output must not be merged\n"
-          "This flag must be set before using this processor. The processor can set this flag if it wants to\n"
-          "deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.\n."
-        );
+                "@brief Sets a value indicating whether the processor's output must not be merged\n"
+                "This flag must be set before using this processor. The processor can set this flag if it wants to\n"
+                "deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.\n.");
     }
 
     decls +=
       method ("wants_variants?", &shape_processor_base::wants_variants,
-        "@brief Gets a value indicating whether the filter prefers cell variants\n"
-        "See \\wants_variants= for details.\n"
-      ) +
+              "@brief Gets a value indicating whether the filter prefers cell variants\n"
+              "See \\wants_variants= for details.\n") +
       method ("wants_variants=", &shape_processor_base::set_wants_variants, gsi::arg ("flag"),
-        "@brief Sets a value indicating whether the filter prefers cell variants\n"
-        "This flag must be set before using this filter for hierarchical applications (deep mode). "
-        "It tells the filter implementation whether cell variants should be created (true, the default) "
-        "or shape propagation will be applied (false).\n"
-        "\n"
-        "This decision needs to be made, if the filter indicates that it will deliver different results\n"
-        "for scaled or rotated versions of the shape (see \\is_isotropic and the other hints). If a cell\n"
-        "is present with different qualities - as seen from the top cell - the respective instances\n"
-        "need to be differentiated. Cell variant formation is one way, shape propagation the other way.\n"
-        "Typically, cell variant formation is less expensive, but the hierarchy will be modified."
-      ) +
+              "@brief Sets a value indicating whether the filter prefers cell variants\n"
+              "This flag must be set before using this filter for hierarchical applications (deep mode). "
+              "It tells the filter implementation whether cell variants should be created (true, the default) "
+              "or shape propagation will be applied (false).\n"
+              "\n"
+              "This decision needs to be made, if the filter indicates that it will deliver different results\n"
+              "for scaled or rotated versions of the shape (see \\is_isotropic and the other hints). If a cell\n"
+              "is present with different qualities - as seen from the top cell - the respective instances\n"
+              "need to be differentiated. Cell variant formation is one way, shape propagation the other way.\n"
+              "Typically, cell variant formation is less expensive, but the hierarchy will be modified.") +
       method ("is_isotropic", &shape_processor_base::is_isotropic,
-        "@brief Indicates that the filter has isotropic properties\n"
-        "Call this method before using the filter to indicate that the selection is independent of "
-        "the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
-        "hierarchical mode.\n"
-        "\n"
-        "Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent "
-        "on orientation unless size or shrink needs to be different in x and y direction."
-      ) +
+              "@brief Indicates that the filter has isotropic properties\n"
+              "Call this method before using the filter to indicate that the selection is independent of "
+              "the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
+              "hierarchical mode.\n"
+              "\n"
+              "Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent "
+              "on orientation unless size or shrink needs to be different in x and y direction.") +
       method ("is_scale_invariant", &shape_processor_base::is_scale_invariant,
-        "@brief Indicates that the filter is scale invariant\n"
-        "Call this method before using the filter to indicate that the selection is independent of "
-        "the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
-        "hierarchical mode.\n"
-        "\n"
-        "An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, "
-        "but on the original orientation as mirrored versions need to be rotated differently."
-      ) +
+              "@brief Indicates that the filter is scale invariant\n"
+              "Call this method before using the filter to indicate that the selection is independent of "
+              "the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
+              "hierarchical mode.\n"
+              "\n"
+              "An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, "
+              "but on the original orientation as mirrored versions need to be rotated differently.") +
       method ("is_isotropic_and_scale_invariant", &shape_processor_base::is_isotropic_and_scale_invariant,
-        "@brief Indicates that the filter is isotropic and scale invariant\n"
-        "Call this method before using the filter to indicate that the selection is independent of "
-        "the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
-        "hierarchical mode.\n"
-        "\n"
-        "An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into "
-        "convex parts is an operation that is not depending on scale nor orientation."
-      );
+              "@brief Indicates that the filter is isotropic and scale invariant\n"
+              "Call this method before using the filter to indicate that the selection is independent of "
+              "the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
+              "hierarchical mode.\n"
+              "\n"
+              "An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into "
+              "convex parts is an operation that is not depending on scale nor orientation.");
 
     return decls;
   }
@@ -451,7 +428,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void process (const db::object_with_properties<shape_type> &shape, std::vector<db::object_with_properties<result_type> > &res) const
+  virtual void process (const db::object_with_properties<shape_type> &shape, std::vector<db::object_with_properties<result_type>> &res) const
   {
     res = do_process_wp (shape);
 
@@ -477,15 +454,15 @@ public:
 
   gsi::Callback f_process;
 
-  std::vector<db::object_with_properties<result_type> > issue_do_process_wp (const db::object_with_properties<shape_type> &) const
+  std::vector<db::object_with_properties<result_type>> issue_do_process_wp (const db::object_with_properties<shape_type> &) const
   {
-    return std::vector<db::object_with_properties<result_type> > ();
+    return std::vector<db::object_with_properties<result_type>> ();
   }
 
-  std::vector<db::object_with_properties<result_type> > do_process_wp (const db::object_with_properties<shape_type> &shape) const
+  std::vector<db::object_with_properties<result_type>> do_process_wp (const db::object_with_properties<shape_type> &shape) const
   {
     if (f_process_wp.can_issue ()) {
-      return f_process_wp.issue<shape_processor_impl, std::vector<db::object_with_properties<result_type> >, const db::object_with_properties<shape_type> &> (&shape_processor_impl::issue_do_process_wp, shape);
+      return f_process_wp.issue<shape_processor_impl, std::vector<db::object_with_properties<result_type>>, const db::object_with_properties<shape_type> &> (&shape_processor_impl::issue_do_process_wp, shape);
     } else {
       return issue_do_process_wp (shape);
     }
@@ -497,22 +474,20 @@ public:
   {
     gsi::Methods decls =
       callback ("process", &shape_processor_impl::issue_do_process, &shape_processor_impl::f_process, gsi::arg ("shape"),
-        "@brief Processes a shape\n"
-        "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
-        "If needs to process the input shape and deliver a list of output shapes.\n"
-        "The output list may be empty to entirely discard the input shape. It may also contain more than a single shape.\n"
-        "In that case, the number of total shapes may grow during application of the processor.\n"
-        "\n"
-        "Instead of implementing 'process', you can also implement \\process_with_properties. The latter function "
-        "allows modifying the properties of an object."
-      ) +
+                "@brief Processes a shape\n"
+                "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
+                "If needs to process the input shape and deliver a list of output shapes.\n"
+                "The output list may be empty to entirely discard the input shape. It may also contain more than a single shape.\n"
+                "In that case, the number of total shapes may grow during application of the processor.\n"
+                "\n"
+                "Instead of implementing 'process', you can also implement \\process_with_properties. The latter function "
+                "allows modifying the properties of an object.") +
       callback ("process_witp_properties", &shape_processor_impl::issue_do_process_wp, &shape_processor_impl::f_process_wp, gsi::arg ("shape"),
-        "@brief Processes a shape with properties\n"
-        "This method is called in addition to \\process. If reimplemented it allows producing objects "
-        "with different properties than the input one.\n"
-        "\n"
-        "Modification of properties is supported since version 0.30.3.\n"
-      );
+                "@brief Processes a shape with properties\n"
+                "This method is called in addition to \\process. If reimplemented it allows producing objects "
+                "with different properties than the input one.\n"
+                "\n"
+                "Modification of properties is supported since version 0.30.3.\n");
 
     return decls + shape_processor_base<ProcessorBase>::method_decls (with_merged_options);
   }

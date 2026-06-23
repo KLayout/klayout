@@ -38,7 +38,8 @@
 #include <set>
 #include <map>
 
-namespace db {
+namespace db
+{
 
 class DeepShapeStore;
 class DeepShapeStoreState;
@@ -129,7 +130,7 @@ public:
    *  @brief Gets the layout object
    *  The return value is guaranteed to be non-null.
    */
-  Layout &layout();
+  Layout &layout ();
 
   /**
    *  @brief Gets the layout object (const version)
@@ -140,7 +141,7 @@ public:
    *  @brief Gets the layout object
    *  The return value is guaranteed to be non-null.
    */
-  Cell &initial_cell();
+  Cell &initial_cell ();
 
   /**
    *  @brief Gets the initial cell object (const version)
@@ -276,7 +277,7 @@ private:
   size_t m_max_vertex_count;
   bool m_reject_odd_polygons;
   tl::Variant m_text_property_name;
-  std::vector<std::pair<std::set<db::cell_index_type>, size_t> > m_breakout_cells;
+  std::vector<std::pair<std::set<db::cell_index_type>, size_t>> m_breakout_cells;
   int m_text_enlargement;
   bool m_subcircuit_hierarchy_for_nets;
 
@@ -289,9 +290,8 @@ private:
   }
 };
 
-struct DB_PUBLIC RecursiveShapeIteratorCompareForTargetHierarchy
-{
-  bool operator () (const std::pair<db::RecursiveShapeIterator, std::pair<size_t, db::ICplxTrans> > &a, const std::pair<db::RecursiveShapeIterator, std::pair<size_t, db::ICplxTrans> > &b) const
+struct DB_PUBLIC RecursiveShapeIteratorCompareForTargetHierarchy {
+  bool operator() (const std::pair<db::RecursiveShapeIterator, std::pair<size_t, db::ICplxTrans>> &a, const std::pair<db::RecursiveShapeIterator, std::pair<size_t, db::ICplxTrans>> &b) const
   {
     int cmp_iter = db::compare_iterators_with_respect_to_target_hierarchy (a.first, b.first);
     if (cmp_iter != 0) {
@@ -349,7 +349,8 @@ private:
  *  algorithms for doing the preparation and transfer.
  */
 class DB_PUBLIC DeepShapeStore
-  : public tl::Object, public gsi::ObjectBase
+  : public tl::Object,
+    public gsi::ObjectBase
 {
 public:
   /**
@@ -661,7 +662,7 @@ public:
   /**
    *  @brief Gets a value indicating whether a net building is available
    */
-  bool has_net_builder_for(unsigned int layout_index, db::LayoutToNetlist *l2n);
+  bool has_net_builder_for (unsigned int layout_index, db::LayoutToNetlist *l2n);
 
   /**
    *  @brief Gets the net builder object for a given LayoutToNetlist database (requires the DSS to be singular)
@@ -863,16 +864,16 @@ private:
 
   void require_singular () const;
 
-  void issue_variants (unsigned int layout, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_map);
+  void issue_variants (unsigned int layout, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type>> &var_map);
 
-  typedef std::map<std::pair<db::RecursiveShapeIterator, std::pair<size_t, db::ICplxTrans> >, unsigned int, RecursiveShapeIteratorCompareForTargetHierarchy> layout_map_type;
+  typedef std::map<std::pair<db::RecursiveShapeIterator, std::pair<size_t, db::ICplxTrans>>, unsigned int, RecursiveShapeIteratorCompareForTargetHierarchy> layout_map_type;
 
   //  no copying
   DeepShapeStore (const DeepShapeStore &);
   DeepShapeStore &operator= (const DeepShapeStore &);
 
   std::vector<LayoutHolder *> m_layouts;
-  std::map<size_t, std::pair<unsigned int, unsigned int> > m_layers_for_flat;
+  std::map<size_t, std::pair<unsigned int, unsigned int>> m_layers_for_flat;
   std::map<std::pair<unsigned int, unsigned int>, size_t> m_flat_region_id;
   layout_map_type m_layout_map;
   DeepShapeStoreState m_state;
@@ -882,8 +883,7 @@ private:
   double m_sparse_array_limit;
   tl::Mutex m_lock;
 
-  struct DeliveryMappingCacheKey
-  {
+  struct DeliveryMappingCacheKey {
     //  NOTE: we shouldn't keep pointers here as the layouts may get deleted and recreated with the same address.
     //  But as we don't access these objects that's fairly safe.
     DeliveryMappingCacheKey (unsigned int _from_index, tl::id_type _into_layout, db::cell_index_type _into_cell)
@@ -900,7 +900,7 @@ private:
       if (into_layout != other.into_layout) {
         return into_layout < other.into_layout;
       }
-      return into_cell <other.into_cell;
+      return into_cell < other.into_cell;
     }
 
     unsigned int from_index;
@@ -911,8 +911,6 @@ private:
   std::map<DeliveryMappingCacheKey, CellMappingWithGenerationIds> m_delivery_mapping_cache;
   std::map<std::pair<unsigned int, unsigned int>, CellMappingWithGenerationIds> m_internal_mapping_cache;
 };
-
 }
 
 #endif
-

@@ -31,7 +31,8 @@
 
 #include <vector>
 
-namespace db {
+namespace db
+{
 
 struct HersheyFont;
 
@@ -78,13 +79,13 @@ public:
   {
     //  .. nothing yet.
   }
-  
+
   /**
    *  @brief Test if there are more edges
    *
    *  @return true, if there are more edges to deliver
    */
-  bool 
+  bool
   at_end () const
   {
     return basic_hershey_edge_iterator::at_end ();
@@ -123,19 +124,18 @@ private:
  */
 
 template <class C>
-struct DB_PUBLIC_TEMPLATE hershey
-{
+struct DB_PUBLIC_TEMPLATE hershey {
   typedef C coord_type;
   typedef db::coord_traits<C> coord_traits;
   typedef hershey_edge_iterator<C> edge_iterator;
 
-  /** 
+  /**
    *  @brief Default constructor
    *
    *  Creates a text object with an empty text
    */
-  hershey () 
-    : m_string (), 
+  hershey ()
+    : m_string (),
       m_font (DefaultFont),
       m_scale (1.0),
       m_left (0.0), m_bottom (0.0)
@@ -148,8 +148,8 @@ struct DB_PUBLIC_TEMPLATE hershey
    *
    *  @param s The text
    */
-  hershey (const std::string &s, Font f) 
-    : m_string (s), 
+  hershey (const std::string &s, Font f)
+    : m_string (s),
       m_font (f),
       m_scale (1.0),
       m_left (0.0), m_bottom (0.0)
@@ -162,7 +162,7 @@ struct DB_PUBLIC_TEMPLATE hershey
    *
    *  @param s The scaling factor
    */
-  void scale (double s) 
+  void scale (double s)
   {
     m_scale *= s;
   }
@@ -192,7 +192,7 @@ struct DB_PUBLIC_TEMPLATE hershey
    *
    *  @param p The lower left point of the first characters
    */
-  void position (const point<C> &p) 
+  void position (const point<C> &p)
   {
     m_linestarts.clear ();
     m_linestarts.push_back (db::DPoint (coord_traits::rounded (p.x () / m_scale), coord_traits::rounded (p.y () / m_scale)));
@@ -207,7 +207,7 @@ struct DB_PUBLIC_TEMPLATE hershey
    *  @param scale true, if the text should be scaled to fit into the box
    *  @param margin The amount of margin to leave around the text when scale = true and the box is a "real" box
    *
-   *  If the target box is degenerated (width or height is 0) it specifies the 
+   *  If the target box is degenerated (width or height is 0) it specifies the
    *  height or width of the "M" character instead of the whole text.
    */
   void justify (const box<C> &b, HAlign halign, VAlign valign, bool scale = true, double margin = 0.1)
@@ -239,7 +239,6 @@ struct DB_PUBLIC_TEMPLATE hershey
         } else if (coord_traits::less (0, b.height ())) {
 
           m_scale = double (b.height ()) / double (hershey_font_height (m_font));
-
         }
 
         if (m_scale > 1e-6) {
@@ -247,9 +246,7 @@ struct DB_PUBLIC_TEMPLATE hershey
           db::DPoint p2 (b.p2 ().x () / m_scale, b.p2 ().y () / m_scale);
           hershey_justify (m_string, m_font, db::DBox (p1, p2), halign, valign, m_linestarts, m_left, m_bottom);
         }
-
       }
-
     }
   }
 
@@ -272,7 +269,7 @@ struct DB_PUBLIC_TEMPLATE hershey
   hershey_edge_iterator<C> begin_edges () const
   {
     return hershey_edge_iterator<C> (m_string, (unsigned int) m_font, m_linestarts, m_scale);
-  }  
+  }
 
   /**
    *  @brief Get font names
@@ -283,7 +280,7 @@ struct DB_PUBLIC_TEMPLATE hershey
    *
    *  @return a vector with the font names.
    */
-  static std::vector<std::string> font_names () 
+  static std::vector<std::string> font_names ()
   {
     return hershey_font_names ();
   }
@@ -293,7 +290,7 @@ private:
   std::string m_string;
   Font m_font;
   double m_scale;
-  std::vector <db::DPoint> m_linestarts;
+  std::vector<db::DPoint> m_linestarts;
   double m_left, m_bottom;
 };
 
@@ -312,4 +309,3 @@ typedef db::hershey<db::DCoord> DHershey;
 }
 
 #endif
-

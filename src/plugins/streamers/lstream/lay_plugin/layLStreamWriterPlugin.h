@@ -33,7 +33,7 @@ namespace lay
 class LStreamWriterOptionPage
   : public StreamWriterOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LStreamWriterOptionPage (QWidget *parent);
@@ -49,4 +49,3 @@ private:
 }
 
 #endif
-

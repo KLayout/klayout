@@ -48,7 +48,7 @@ ResourceHelpProvider::ResourceHelpProvider (const char *folder, const std::strin
   // .. nothing yet ..
 }
 
-QDomDocument 
+QDomDocument
 ResourceHelpProvider::get (lay::HelpSource * /*src*/, const std::string &path) const
 {
   QString qpath = tl::to_qstring (path);
@@ -63,9 +63,9 @@ ResourceHelpProvider::get (lay::HelpSource * /*src*/, const std::string &path) c
 #else
   if (res.isCompressed ()) {
 #endif
-    data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+    data = qUncompress ((const unsigned char *) res.data (), (int) res.size ());
   } else {
-    data = QByteArray ((const char *)res.data (), (int)res.size ());
+    data = QByteArray ((const char *) res.data (), (int) res.size ());
   }
 
   if (tl::verbosity () >= 20) {
@@ -74,11 +74,11 @@ ResourceHelpProvider::get (lay::HelpSource * /*src*/, const std::string &path) c
 
   QDomDocument doc;
   QString errorMsg;
-  int errorLine = 0 ;
+  int errorLine = 0;
   if (! doc.setContent (data, true, &errorMsg, &errorLine)) {
     throw tl::Exception (tl::to_string (errorMsg) + ", in line " + tl::to_string (errorLine) + " of " + path);
   }
-  
+
   return doc;
 }
 
@@ -88,4 +88,3 @@ static tl::RegisteredClass<lay::HelpProvider> about_help_provider (new ResourceH
 static tl::RegisteredClass<lay::HelpProvider> programming_help_provider (new ResourceHelpProvider ("programming", tl::to_string (QObject::tr ("Programming Ruby Scripts"))), 300);
 
 }
-

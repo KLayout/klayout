@@ -38,9 +38,9 @@ template <class I, class T>
 class iv_compare_f
 {
 public:
-  bool operator() (const std::pair< std::pair<I, I>, T> &p, const I &i) const
+  bool operator() (const std::pair<std::pair<I, I>, T> &p, const I &i) const
   {
-    return !(i < p.first.second);
+    return ! (i < p.first.second);
   }
 };
 
@@ -79,11 +79,11 @@ public:
    *  @param i1 The first index of the interval
    *  @param i2 The second index of the interval
    *  @param t The value to insert
-   *  @param j The joining operator 
+   *  @param j The joining operator
    *  @param compress Set this parameter to true to enable compression of the intervals where possible
    */
-  template <class J> 
-  void add (I i1, I i2, const T &t, J &j) 
+  template <class J>
+  void add (I i1, I i2, const T &t, J &j)
   {
     typename index_map::iterator lb = std::lower_bound (m_index_map.begin (), m_index_map.end (), i1, iv_compare_f<I, T> ());
     size_t ni = std::distance (m_index_map.begin (), lb);
@@ -93,13 +93,13 @@ public:
       if (lb == m_index_map.end () || ! (lb->first.first < i2)) {
 
         //  current and new interval do not overlap: create new interval(s):
-        //  we can simply insert, because we create a new entry 
+        //  we can simply insert, because we create a new entry
         lb = m_index_map.insert (lb, index_value_pair (index_pair (i1, i2), t));
         ++lb;
         i1 = i2;
 
       } else {
-      
+
         //  current and new interval do overlap: create new interval(s)
 
         //  the part of [i1,i2) before *lb ..
@@ -113,7 +113,7 @@ public:
           ++lb;
         }
 
-        //  the part of *lb before [i1',i2) 
+        //  the part of *lb before [i1',i2)
         if (lb->first.first < i1) {
           index_value_pair v (*lb); //  this copy is important since the insert may invalid the element *lb!
           lb = m_index_map.insert (lb, v);
@@ -122,7 +122,7 @@ public:
           lb->first.first = i1;
         }
 
-        //  the part of *lb after [i1',i2) 
+        //  the part of *lb after [i1',i2)
         if (i2 < lb->first.second) {
           index_value_pair v (*lb); //  this copy is important since the insert may invalid the element *lb!
           lb = m_index_map.insert (lb, v);
@@ -136,12 +136,10 @@ public:
         j (lb->second, t);
         i1 = lb->first.second;
         ++lb;
-
       }
-
     }
-        
-    //  search for identical intervals that can be joined 
+
+    //  search for identical intervals that can be joined
     //  (only the one before the current interval and the one following can participate)
 
     size_t nf = std::distance (m_index_map.begin (), lb);
@@ -165,10 +163,8 @@ public:
         nf -= std::distance (lbb, lb);
         lb->first.first = lbb->first.first;
         lb = m_index_map.erase (lbb, lb);
-      } 
-
+      }
     }
-
   }
 
   /**
@@ -190,7 +186,7 @@ public:
       ++n;
       ++lb;
     }
-    
+
     if (n == 0) {
 
       //  past the end: do nothing
@@ -215,7 +211,7 @@ public:
       --lb;
       if (i2 < lb->first.second) {
         //  the last one is overlapping above i2: cut it
-        lb->first.first = i2; 
+        lb->first.first = i2;
       } else {
         ++lb;
       }
@@ -224,15 +220,14 @@ public:
       if (lb0 != lb) {
         m_index_map.erase (lb0, lb);
       }
-
     }
   }
 
-  /** 
+  /**
    *  @brief Query a mapping
    *
    *  Given the index i, this method will return 0 if there is no mapping
-   *  for the given index. Otherwise it will return the address of the 
+   *  for the given index. Otherwise it will return the address of the
    *  value. The address is valid until the next add or erase method call
    *  only.
    *
@@ -249,11 +244,11 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Query a mapping (const version)
    *
    *  Given the index i, this method will return 0 if there is no mapping
-   *  for the given index. Otherwise it will return the address of the 
+   *  for the given index. Otherwise it will return the address of the
    *  value. The address is valid until the next add or erase method call
    *  only.
    *
@@ -322,7 +317,7 @@ public:
   /**
    *  @brief begin Iterator
    */
-  const_iterator begin () const 
+  const_iterator begin () const
   {
     return m_index_map.begin ();
   }
@@ -330,7 +325,7 @@ public:
   /**
    *  @brief end Iterator
    */
-  const_iterator end () const 
+  const_iterator end () const
   {
     return m_index_map.end ();
   }
@@ -338,7 +333,7 @@ public:
   /**
    *  @brief begin Iterator
    */
-  iterator begin () 
+  iterator begin ()
   {
     return m_index_map.begin ();
   }
@@ -346,7 +341,7 @@ public:
   /**
    *  @brief end Iterator
    */
-  iterator end () 
+  iterator end ()
   {
     return m_index_map.end ();
   }
@@ -354,7 +349,7 @@ public:
   /**
    *  @brief equality operator
    */
-  bool operator== (const interval_map<I, T> &d) const 
+  bool operator== (const interval_map<I, T> &d) const
   {
     return m_index_map == d.m_index_map;
   }
@@ -362,7 +357,7 @@ public:
   /**
    *  @brief inequality operator
    */
-  bool operator!= (const interval_map<I, T> &d) const 
+  bool operator!= (const interval_map<I, T> &d) const
   {
     return m_index_map != d.m_index_map;
   }
@@ -374,4 +369,3 @@ private:
 } // namespace tl
 
 #endif
-

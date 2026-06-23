@@ -47,13 +47,13 @@
 namespace db
 {
 
-namespace {
-
-struct ResultCountingInserter
+namespace
 {
+
+struct ResultCountingInserter {
   typedef db::Polygon value_type;
 
-  ResultCountingInserter (std::unordered_map<const db::Polygon *, size_t, tl::ptr_hash_from_value<db::Polygon> > &result)
+  ResultCountingInserter (std::unordered_map<const db::Polygon *, size_t, tl::ptr_hash_from_value<db::Polygon>> &result)
     : mp_result (&result)
   {
     //  .. nothing yet ..
@@ -61,22 +61,21 @@ struct ResultCountingInserter
 
   void insert (const db::Polygon &p)
   {
-    (*mp_result)[&p] += 1;
+    (*mp_result) [&p] += 1;
   }
 
   void init (const db::Polygon *p)
   {
-    (*mp_result)[p] = 0;
+    (*mp_result) [p] = 0;
   }
 
 private:
-  std::unordered_map<const db::Polygon *, size_t, tl::ptr_hash_from_value<db::Polygon> > *mp_result;
+  std::unordered_map<const db::Polygon *, size_t, tl::ptr_hash_from_value<db::Polygon>> *mp_result;
 };
 
 }
 
-static
-RegionDelegate *region_from_box (const db::Box &b, db::properties_id_type prop_id)
+static RegionDelegate *region_from_box (const db::Box &b, db::properties_id_type prop_id)
 {
   if (! b.empty () && b.width () > 0 && b.height () > 0) {
     FlatRegion *new_region = new FlatRegion ();
@@ -128,7 +127,7 @@ AsIfFlatRegion::to_string (size_t nmax) const
   std::ostringstream os;
   RegionIterator p (begin ());
   bool first = true;
-  for ( ; ! p.at_end () && nmax != 0; ++p, --nmax) {
+  for (; ! p.at_end () && nmax != 0; ++p, --nmax) {
     if (! first) {
       os << ";";
     }
@@ -187,16 +186,13 @@ AsIfFlatRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcesso
           }
         }
       }
-
     }
-
   }
 
   return result.release ();
 }
 
-bool
-AsIfFlatRegion::is_box () const
+bool AsIfFlatRegion::is_box () const
 {
   RegionIterator p (begin ());
   if (p.at_end ()) {
@@ -258,23 +254,18 @@ AsIfFlatRegion::perimeter (const db::Box &box) const
             db::Coord dy = ce.second.dy ();
             db::Coord x = ce.second.p1 ().x ();
             db::Coord y = ce.second.p1 ().y ();
-            if ((dx == 0 && x == box.left ()   && dy < 0) ||
-                (dx == 0 && x == box.right ()  && dy > 0) ||
-                (dy == 0 && y == box.top ()    && dx < 0) ||
+            if ((dx == 0 && x == box.left () && dy < 0) ||
+                (dx == 0 && x == box.right () && dy > 0) ||
+                (dy == 0 && y == box.top () && dx < 0) ||
                 (dy == 0 && y == box.bottom () && dx > 0)) {
               //  not counted -> box is at outside side of the edge
             } else {
               d += ce.second.length ();
             }
-
           }
-
         }
-
       }
-
     }
-
   }
 
   return d;
@@ -312,8 +303,7 @@ void AsIfFlatRegion::invalidate_bbox ()
 namespace
 {
 
-struct ComparePolygonsWithProperties
-{
+struct ComparePolygonsWithProperties {
   bool operator() (const std::pair<db::properties_id_type, const db::Polygon *> &a, const std::pair<db::properties_id_type, const db::Polygon *> &b) const
   {
     if (a.first != b.first) {
@@ -389,7 +379,7 @@ void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, 
 
     //  collect original property IDs per merged polygon
 
-    std::vector<std::set<db::properties_id_type> > prop_ids_per_merged_polygon;
+    std::vector<std::set<db::properties_id_type>> prop_ids_per_merged_polygon;
     prop_ids_per_merged_polygon.resize (merged_poly_id - org_poly_id);
 
     for (auto ii = id.begin (); ii != id.end (); ++ii) {
@@ -424,25 +414,24 @@ void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, 
       } else {
         output.insert (*p);
       }
-
     }
 
   } else if (multiple_properties) {
 
     db::Shapes result (output.is_editable ());
 
-    std::vector<std::pair<db::properties_id_type, const db::Polygon *> > polygons_by_prop_id;
+    std::vector<std::pair<db::properties_id_type, const db::Polygon *>> polygons_by_prop_id;
     polygons_by_prop_id.reserve (n);
 
     db::AddressablePolygonDelivery addressable_polygons (begin ());
     while (! addressable_polygons.at_end ()) {
-      polygons_by_prop_id.push_back (std::make_pair (addressable_polygons.prop_id (), addressable_polygons.operator-> ()));
+      polygons_by_prop_id.push_back (std::make_pair (addressable_polygons.prop_id (), addressable_polygons.operator->()));
       addressable_polygons.inc ();
     }
 
     std::sort (polygons_by_prop_id.begin (), polygons_by_prop_id.end (), ComparePolygonsWithProperties ());
 
-    for (auto p = polygons_by_prop_id.begin (); p != polygons_by_prop_id.end (); ) {
+    for (auto p = polygons_by_prop_id.begin (); p != polygons_by_prop_id.end ();) {
 
       auto pp = p;
       while (pp != polygons_by_prop_id.end () && pp->first == p->first) {
@@ -469,7 +458,6 @@ void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, 
       ep.process (pg, op);
 
       p = pp;
-
     }
 
     output.swap (result);
@@ -495,7 +483,6 @@ void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, 
     db::ShapeGenerator pc (output, false /*don't clear*/, prop_id);
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence);
     ep.process (pg, op);
-
   }
 }
 
@@ -566,7 +553,6 @@ AsIfFlatRegion::processed (const PolygonProcessorBase &filter) const
         new_region->insert (pr->base ());
       }
     }
-
   }
 
   return new_region.release ();
@@ -593,7 +579,6 @@ AsIfFlatRegion::processed_to_edges (const PolygonToEdgeProcessorBase &filter) co
         new_edges->insert (er->base ());
       }
     }
-
   }
 
   return new_edges.release ();
@@ -620,13 +605,13 @@ AsIfFlatRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &f
         new_edge_pairs->insert (epr->base ());
       }
     }
-
   }
 
   return new_edge_pairs.release ();
 }
 
-namespace {
+namespace
+{
 
 class OutputPairHolder
 {
@@ -639,14 +624,14 @@ public:
 
     if (output_mode == Positive || output_mode == Negative || output_mode == PositiveAndNegative) {
       m_positive.reset (new FlatRegion (merged_semantics));
-      m_results.push_back (& m_positive->raw_polygons ());
+      m_results.push_back (&m_positive->raw_polygons ());
     } else {
       m_results.push_back ((db::Shapes *) 0);
     }
 
     if (output_mode == PositiveAndNegative) {
       m_negative.reset (new FlatRegion (merged_semantics));
-      m_results.push_back (& m_negative->raw_polygons ());
+      m_results.push_back (&m_negative->raw_polygons ());
     }
   }
 
@@ -690,7 +675,7 @@ AsIfFlatRegion::in_and_out_generic (const Region &other, InteractingOutputMode o
     }
   }
 
-  std::set <db::Polygon> op;
+  std::set<db::Polygon> op;
   for (RegionIterator o (other.begin_merged ()); ! o.at_end (); ++o) {
     op.insert (*o);
   }
@@ -742,7 +727,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, InteractingOut
     }
   }
 
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+  bool counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   db::RegionIterator polygons (begin_merged ());
 
@@ -753,7 +738,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, InteractingOut
   proc.set_description (progress_desc ());
   proc.set_report_progress (report_progress ());
 
-  std::vector<generic_shape_iterator<db::Edge> > others;
+  std::vector<generic_shape_iterator<db::Edge>> others;
   others.push_back (counting ? other.begin_merged () : other.begin ());
 
   std::unique_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
@@ -802,7 +787,7 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, InteractingOut
   proc.set_description (progress_desc ());
   proc.set_report_progress (report_progress ());
 
-  std::vector<generic_shape_iterator<db::Text> > others;
+  std::vector<generic_shape_iterator<db::Text>> others;
   others.push_back (other.begin ());
 
   proc.run_flat (polygons, others, std::vector<bool> (), &op, oph.results ());
@@ -843,7 +828,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
       }
     } else {
       if (output_mode == Positive) {
-        return std::make_pair (clone(), (RegionDelegate *) 0);
+        return std::make_pair (clone (), (RegionDelegate *) 0);
       } else if (output_mode == Negative) {
         return std::make_pair (new EmptyRegion (), (RegionDelegate *) 0);
       } else {
@@ -852,7 +837,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
     }
   }
 
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+  bool counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   db::RegionIterator polygons (begin_merged ());
 
@@ -863,7 +848,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   proc.set_description (progress_desc ());
   proc.set_report_progress (report_progress ());
 
-  std::vector<generic_shape_iterator<db::Polygon> > others;
+  std::vector<generic_shape_iterator<db::Polygon>> others;
   //  NOTE: with counting the other region needs to be merged
   others.push_back (counting ? other.begin_merged () : other.begin ());
 
@@ -883,14 +868,14 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
 
   db::RegionIterator polygons (begin ());
 
-  db::pull_with_edge_local_operation <db::Polygon, db::Edge, db::Edge> op;
+  db::pull_with_edge_local_operation<db::Polygon, db::Edge, db::Edge> op;
 
   db::local_processor<db::Polygon, db::Edge, db::Edge> proc;
   proc.set_base_verbosity (base_verbosity ());
   proc.set_description (progress_desc ());
   proc.set_report_progress (report_progress ());
 
-  std::vector<generic_shape_iterator<db::Edge> > others;
+  std::vector<generic_shape_iterator<db::Edge>> others;
   others.push_back (other.begin_merged ());
 
   std::unique_ptr<FlatEdges> output (new FlatEdges (other.merged_semantics () || other.is_merged ()));
@@ -907,14 +892,14 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
 {
   db::RegionIterator polygons (begin ());
 
-  db::pull_with_text_local_operation <db::Polygon, db::Text, db::Text> op;
+  db::pull_with_text_local_operation<db::Polygon, db::Text, db::Text> op;
 
   db::local_processor<db::Polygon, db::Text, db::Text> proc;
   proc.set_base_verbosity (base_verbosity ());
   proc.set_description (progress_desc ());
   proc.set_report_progress (report_progress ());
 
-  std::vector<generic_shape_iterator<db::Text> > others;
+  std::vector<generic_shape_iterator<db::Text>> others;
   others.push_back (other.begin ());
 
   std::unique_ptr<FlatTexts> output (new FlatTexts ());
@@ -931,14 +916,14 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
 {
   db::RegionIterator polygons (begin ());
 
-  db::pull_local_operation <db::Polygon, db::Polygon, db::Polygon> op (mode, touching);
+  db::pull_local_operation<db::Polygon, db::Polygon, db::Polygon> op (mode, touching);
 
   db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
   proc.set_base_verbosity (base_verbosity ());
   proc.set_description (progress_desc ());
   proc.set_report_progress (report_progress ());
 
-  std::vector<generic_shape_iterator<db::Polygon> > others;
+  std::vector<generic_shape_iterator<db::Polygon>> others;
   others.push_back (other.begin_merged ());
 
   std::unique_ptr<FlatRegion> output (new FlatRegion (other.merged_semantics () || other.is_merged ()));
@@ -951,8 +936,7 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
 }
 
 template <class Trans>
-void
-AsIfFlatRegion::produce_markers_for_grid_check (const db::Polygon &poly, const Trans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes)
+void AsIfFlatRegion::produce_markers_for_grid_check (const db::Polygon &poly, const Trans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes)
 {
   Trans tr_inv = tr.inverted ();
 
@@ -968,7 +952,7 @@ AsIfFlatRegion::produce_markers_for_grid_check (const db::Polygon &poly, const T
       e = poly.end_hull ();
     } else {
       b = poly.begin_hole ((unsigned int) (i - 1));
-      e = poly.end_hole ((unsigned int)  (i - 1));
+      e = poly.end_hole ((unsigned int) (i - 1));
     }
 
     for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
@@ -977,7 +961,6 @@ AsIfFlatRegion::produce_markers_for_grid_check (const db::Polygon &poly, const T
         shapes.insert (EdgePair (db::Edge (p, p), db::Edge (p, p)).transformed (tr_inv));
       }
     }
-
   }
 }
 
@@ -1018,8 +1001,7 @@ static bool ac_less (double cos_a, bool gt180_a, double cos_b, bool gt180_b)
 }
 
 template <class Trans>
-void
-AsIfFlatRegion::produce_markers_for_angle_check (const db::Polygon &poly, const Trans &tr, double min, double max, bool inverse, db::Shapes &shapes)
+void AsIfFlatRegion::produce_markers_for_angle_check (const db::Polygon &poly, const Trans &tr, double min, double max, bool inverse, db::Shapes &shapes)
 {
   double cos_min = cos (std::max (0.0, std::min (360.0, min)) / 180.0 * M_PI);
   double cos_max = cos (std::max (0.0, std::min (360.0, max)) / 180.0 * M_PI);
@@ -1050,12 +1032,10 @@ AsIfFlatRegion::produce_markers_for_angle_check (const db::Polygon &poly, const 
       double cos_a = -db::sprod (e, ee) / (le * lee);
       bool gt180_a = db::vprod_sign (e, ee) > 0;
 
-      if ((ac_less (cos_a, gt180_a, cos_max, gt180_max) && !ac_less (cos_a, gt180_a, cos_min, gt180_min)) == !inverse) {
+      if ((ac_less (cos_a, gt180_a, cos_max, gt180_max) && ! ac_less (cos_a, gt180_a, cos_min, gt180_min)) == ! inverse) {
         shapes.insert (EdgePair (e, ee));
       }
-
     }
-
   }
 }
 
@@ -1121,17 +1101,16 @@ AsIfFlatRegion::scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db
 }
 
 template <class TR>
-static
-void region_cop_with_properties_impl (AsIfFlatRegion *region, db::Shapes *output_to, db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
+static void region_cop_with_properties_impl (AsIfFlatRegion *region, db::Shapes *output_to, db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
-  db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::object_with_properties<TR> > proc;
+  db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::object_with_properties<TR>> proc;
   proc.set_base_verbosity (region->base_verbosity ());
   proc.set_description (region->progress_desc ());
   proc.set_report_progress (region->report_progress ());
 
   db::generic_shape_iterator<db::PolygonWithProperties> polygons (db::make_wp_iter (region->begin_merged ()));
 
-  std::vector<generic_shape_iterator<db::PolygonWithProperties> > others;
+  std::vector<generic_shape_iterator<db::PolygonWithProperties>> others;
   std::vector<bool> foreign;
   std::vector<db::Region *> inputs = node.inputs ();
   for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
@@ -1300,13 +1279,12 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
     proc.set_description (progress_desc ());
     proc.set_report_progress (report_progress ());
 
-    std::vector<db::generic_shape_iterator<db::PolygonWithProperties> > others_wp;
+    std::vector<db::generic_shape_iterator<db::PolygonWithProperties>> others_wp;
     for (auto o = others.begin (); o != others.end (); ++o) {
       others_wp.push_back (db::make_wp_iter (std::move (*o)));
     }
 
     proc.run_flat (db::make_wp_iter (std::move (polygons)), others_wp, foreign, &op, results);
-
   }
 
   return output.release ();
@@ -1327,7 +1305,6 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
     do {
       poly_check.single (*p, 0);
     } while (edge_check.prepare_next_pass ());
-
   }
 
   return result.release ();
@@ -1355,7 +1332,6 @@ AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc, bool join_prope
     merge_polygons_to (new_region->raw_polygons (), min_coherence, min_wc, join_properties_on_merge);
 
     return new_region.release ();
-
   }
 }
 
@@ -1449,7 +1425,6 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
     }
 
     return new_region.release ();
-
   }
 }
 
@@ -1521,7 +1496,7 @@ AsIfFlatRegion::sized_inside (const Region &inside, bool outside, coord_type dx,
     proc.set_description (proc.description (&op) + tl::sprintf (tl::to_string (tr (" (steps %d..%d)")), steps_from + 1, steps_from + steps_chunk + 1));
     steps_from += steps_chunk;
 
-    std::vector<db::generic_shape_iterator<db::Polygon> > others;
+    std::vector<db::generic_shape_iterator<db::Polygon>> others;
     others.push_back (inside_polygons);
 
     std::vector<db::Shapes *> results;
@@ -1538,7 +1513,6 @@ AsIfFlatRegion::sized_inside (const Region &inside, bool outside, coord_type dx,
     } else {
       res.reset (res->processed (db::PolygonBreaker (proc.max_vertex_count (), proc.area_ratio ())));
     }
-
   }
 
   return res.release ();
@@ -1594,9 +1568,7 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
             new_region->raw_polygons ().insert (db::PolygonWithProperties (*i, prop_id_out));
           }
         }
-
       }
-
     }
 
     return new_region.release ();
@@ -1626,9 +1598,7 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
             new_region->raw_polygons ().insert (db::PolygonWithProperties (*i, prop_id_out));
           }
         }
-
       }
-
     }
 
     return new_region.release ();
@@ -1718,13 +1688,12 @@ AsIfFlatRegion::and_or_not_with (bool is_and, const Region &other, PropertyConst
     proc.set_description (progress_desc ());
     proc.set_report_progress (report_progress ());
 
-    std::vector<db::generic_shape_iterator<db::PolygonWithProperties> > others;
+    std::vector<db::generic_shape_iterator<db::PolygonWithProperties>> others;
     others.push_back (db::make_wp_iter (other.begin ()));
 
     proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
 
     return output.release ();
-
   }
 }
 
@@ -1782,7 +1751,7 @@ AsIfFlatRegion::andnot_with (const Region &other, PropertyConstraint property_co
     db::ShapeGenerator pc2 (new_region2->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg2 (pc2, false /*don't resolve holes*/, min_coherence ());
 
-    std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+    std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *>> procs;
     procs.push_back (std::make_pair (&pg1, &op1));
     procs.push_back (std::make_pair (&pg2, &op2));
     ep.process (procs);
@@ -1806,13 +1775,12 @@ AsIfFlatRegion::andnot_with (const Region &other, PropertyConstraint property_co
     proc.set_description (progress_desc ());
     proc.set_report_progress (report_progress ());
 
-    std::vector<db::generic_shape_iterator<db::PolygonWithProperties> > others;
+    std::vector<db::generic_shape_iterator<db::PolygonWithProperties>> others;
     others.push_back (db::make_wp_iter (other.begin ()));
 
     proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
 
     return std::make_pair (output1.release (), output2.release ());
-
   }
 }
 
@@ -1867,7 +1835,6 @@ AsIfFlatRegion::xor_with (const Region &other, PropertyConstraint prop_constrain
     ep.process (pg, op);
 
     return new_region.release ();
-
   }
 }
 
@@ -1923,7 +1890,6 @@ AsIfFlatRegion::or_with (const Region &other, PropertyConstraint /*prop_constrai
     ep.process (pg, op);
 
     return new_region.release ();
-
   }
 }
 
@@ -1967,7 +1933,6 @@ AsIfFlatRegion::add (const Region &other) const
     }
 
     return new_region.release ();
-
   }
 }
 
@@ -1979,7 +1944,7 @@ deliver_shapes_of_nets_recursive (db::Shapes &out, const db::Circuit *circuit, c
 
   for (auto n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
 
-    if (! net_filter || net_filter->find (n.operator-> ()) != net_filter->end ()) {
+    if (! net_filter || net_filter->find (n.operator->()) != net_filter->end ()) {
       db::properties_id_type prop_id = db::NetBuilder::make_netname_propid (prop_mode, net_prop_name, *n);
       l2n->shapes_of_net (*n, lid, true, out, prop_id, tr);
     }
@@ -1990,7 +1955,6 @@ deliver_shapes_of_nets_recursive (db::Shapes &out, const db::Circuit *circuit, c
       db::ICplxTrans tr_ref = tr * (dbu_trans_inv * sc->trans () * dbu_trans);
       deliver_shapes_of_nets_recursive (out, circuit_ref, l2n, lid, prop_mode, net_prop_name, tr_ref, net_filter);
     }
-
   }
 }
 
@@ -2013,7 +1977,7 @@ AsIfFlatRegion::nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl:
   } else if (l2n->netlist ()->top_circuit_count () > 1) {
     throw tl::Exception (tl::to_string (tr ("More than one top circuit found in netlist")));
   }
-  const db::Circuit *top_circuit = l2n->netlist ()->begin_top_down ().operator-> ();
+  const db::Circuit *top_circuit = l2n->netlist ()->begin_top_down ().operator->();
 
   std::set<const db::Net *> net_filter_set;
   if (net_filter) {
@@ -2025,8 +1989,7 @@ AsIfFlatRegion::nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl:
   return result.release ();
 }
 
-void
-AsIfFlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+void AsIfFlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   //  improves performance when inserting an original layout into the same layout
   db::LayoutLocker locker (layout);
@@ -2042,8 +2005,7 @@ AsIfFlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsi
   }
 }
 
-bool
-AsIfFlatRegion::equals (const Region &other) const
+bool AsIfFlatRegion::equals (const Region &other) const
 {
   if (empty () != other.empty ()) {
     return false;
@@ -2063,8 +2025,7 @@ AsIfFlatRegion::equals (const Region &other) const
   return true;
 }
 
-bool
-AsIfFlatRegion::less (const Region &other) const
+bool AsIfFlatRegion::less (const Region &other) const
 {
   if (empty () != other.empty ()) {
     return empty () < other.empty ();
@@ -2085,4 +2046,3 @@ AsIfFlatRegion::less (const Region &other) const
 }
 
 }
-

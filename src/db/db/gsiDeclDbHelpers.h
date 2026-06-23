@@ -28,55 +28,55 @@
 
 namespace gsi
 {
-  /**
-   *  @brief A safe iterator locking the layout while iterating a container within it
-   */
-  template <class I>
-  class layout_locking_iterator2
-    : private db::LayoutLocker
-  {
-  public:
-    typedef typename I::value_type value_type;
-    typedef typename I::reference reference;
-    typedef typename I::pointer pointer;
-    typedef typename I::difference_type difference_type;
-    typedef typename I::iterator_category iterator_category;
+/**
+ *  @brief A safe iterator locking the layout while iterating a container within it
+ */
+template <class I>
+class layout_locking_iterator2
+  : private db::LayoutLocker
+{
+public:
+  typedef typename I::value_type value_type;
+  typedef typename I::reference reference;
+  typedef typename I::pointer pointer;
+  typedef typename I::difference_type difference_type;
+  typedef typename I::iterator_category iterator_category;
 
-    layout_locking_iterator2 (const db::Layout *layout, const I &b, const I &e) : db::LayoutLocker (const_cast<db::Layout *> (layout)), m_b (b), m_e (e) {}
-    bool at_end () const { return m_b == m_e; }
-    void operator++ () { ++m_b; }
+  layout_locking_iterator2 (const db::Layout *layout, const I &b, const I &e) : db::LayoutLocker (const_cast<db::Layout *> (layout)), m_b (b), m_e (e) {}
+  bool at_end () const { return m_b == m_e; }
+  void operator++ () { ++m_b; }
 
-    reference operator* () const { return *m_b; }
-    pointer operator-> () const { return m_b.operator-> (); }
+  reference operator* () const { return *m_b; }
+  pointer operator->() const { return m_b.operator->(); }
 
-  private:
-    I m_b, m_e;
-  };
+private:
+  I m_b, m_e;
+};
 
-  /**
-   *  @brief A safe iterator locking the layout while iterating a container within it
-   */
-  template <class I>
-  class layout_locking_iterator1
-    : private db::LayoutLocker
-  {
-  public:
-    typedef typename I::value_type value_type;
-    typedef typename I::reference reference;
-    typedef typename I::pointer pointer;
-    typedef typename I::difference_type difference_type;
-    typedef typename I::iterator_category iterator_category;
+/**
+ *  @brief A safe iterator locking the layout while iterating a container within it
+ */
+template <class I>
+class layout_locking_iterator1
+  : private db::LayoutLocker
+{
+public:
+  typedef typename I::value_type value_type;
+  typedef typename I::reference reference;
+  typedef typename I::pointer pointer;
+  typedef typename I::difference_type difference_type;
+  typedef typename I::iterator_category iterator_category;
 
-    layout_locking_iterator1 (const db::Layout *layout, const I &i) : db::LayoutLocker (const_cast<db::Layout *> (layout)), m_i (i) { }
-    bool at_end () const { return m_i.at_end (); }
-    void operator++ () { ++m_i; }
+  layout_locking_iterator1 (const db::Layout *layout, const I &i) : db::LayoutLocker (const_cast<db::Layout *> (layout)), m_i (i) {}
+  bool at_end () const { return m_i.at_end (); }
+  void operator++ () { ++m_i; }
 
-    reference operator* () const { return *m_i; }
-    pointer operator-> () const { return m_i.operator-> (); }
+  reference operator* () const { return *m_i; }
+  pointer operator->() const { return m_i.operator->(); }
 
-  private:
-    I m_i;
-  };
+private:
+  I m_i;
+};
 
 }
 

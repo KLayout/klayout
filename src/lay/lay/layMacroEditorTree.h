@@ -37,10 +37,10 @@ namespace lay
 
 class MacroEditorDialog;
 
-class MacroTreeModel 
+class MacroTreeModel
   : public QAbstractItemModel
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MacroTreeModel (QObject *parent, lay::MacroEditorDialog *dialog, lym::MacroCollection *root, const std::string &cat);
@@ -54,7 +54,7 @@ public:
   QModelIndex parent (const QModelIndex &index) const;
   int rowCount (const QModelIndex &parent) const;
   bool setData (const QModelIndex &index, const QVariant &v, int role);
-  Qt::DropActions supportedDropActions() const;
+  Qt::DropActions supportedDropActions () const;
   QModelIndex index_for (lym::Macro *macro) const;
   QModelIndex index_for (lym::MacroCollection *mc) const;
 
@@ -86,13 +86,13 @@ private:
   QWidget *mp_parent;
   lym::MacroCollection *mp_root;
   std::string m_category;
-  mutable std::set <void *> m_valid_objects;
+  mutable std::set<void *> m_valid_objects;
 };
 
-class MacroEditorTree 
+class MacroEditorTree
   : public QTreeView
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MacroEditorTree (QWidget *parent, const std::string &cat);
@@ -148,4 +148,3 @@ private slots:
 }
 
 #endif
-

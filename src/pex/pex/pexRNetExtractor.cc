@@ -44,25 +44,24 @@ RNetExtractor::RNetExtractor (double dbu)
   //  .. nothing yet ..
 }
 
-void
-RNetExtractor::extract (const RExtractorTech &tech,
-                        const std::map<unsigned int, db::Region> &geo,
-                        const std::map<unsigned int, std::vector<db::Point> > &vertex_ports,
-                        const std::map<unsigned int, std::vector<db::Polygon> > &polygon_ports,
-                        RNetwork &rnetwork)
+void RNetExtractor::extract (const RExtractorTech &tech,
+                             const std::map<unsigned int, db::Region> &geo,
+                             const std::map<unsigned int, std::vector<db::Point>> &vertex_ports,
+                             const std::map<unsigned int, std::vector<db::Polygon>> &polygon_ports,
+                             RNetwork &rnetwork)
 {
   rnetwork.clear ();
 
-  std::map<unsigned int, std::vector<ViaPort> > via_ports;
+  std::map<unsigned int, std::vector<ViaPort>> via_ports;
   create_via_ports (tech, geo, via_ports, rnetwork);
 
   for (auto g = geo.begin (); g != geo.end (); ++g) {
 
     //  Find the conductor spec for the given layer
     const RExtractorTechConductor *cond = 0;
-    for (auto c = tech.conductors.begin (); c != tech.conductors.end () && !cond; ++c) {
+    for (auto c = tech.conductors.begin (); c != tech.conductors.end () && ! cond; ++c) {
       if (c->layer == g->first) {
-        cond = c.operator-> ();
+        cond = c.operator->();
       }
     }
     if (! cond) {
@@ -86,7 +85,6 @@ RNetExtractor::extract (const RExtractorTech &tech,
 
     //  extract the conductor polygon and integrate the results into the target network
     extract_conductor (*cond, g->second, vp, pp, viap, rnetwork);
-
   }
 
   if (! tech.skip_simplify) {
@@ -96,8 +94,8 @@ RNetExtractor::extract (const RExtractorTech &tech,
 
 static double
 via_conductance (const RExtractorTechVia &via_tech,
-                const db::Polygon &poly,
-                double dbu)
+                 const db::Polygon &poly,
+                 double dbu)
 {
   if (via_tech.resistance < 1e-10) {
     return RElement::short_value ();
@@ -148,7 +146,7 @@ public:
 
 private:
   const RExtractorTechVia *mp_via_tech;
-  std::vector<std::pair<double, db::Point> > *mp_conductances;
+  std::vector<std::pair<double, db::Point>> *mp_conductances;
   db::property_names_id_type m_prop_name_id;
   double m_dbu;
 };
@@ -157,13 +155,12 @@ db::property_names_id_type ViaAggregationVisitor::prop_name_id = db::property_na
 
 }
 
-void
-RNetExtractor::create_via_port (const pex::RExtractorTechVia &tech,
-                                double conductance,
-                                const db::Polygon &poly,
-                                unsigned int &port_index,
-                                std::map<unsigned int, std::vector<ViaPort> > &vias,
-                                RNetwork &rnetwork)
+void RNetExtractor::create_via_port (const pex::RExtractorTechVia &tech,
+                                     double conductance,
+                                     const db::Polygon &poly,
+                                     unsigned int &port_index,
+                                     std::map<unsigned int, std::vector<ViaPort>> &vias,
+                                     RNetwork &rnetwork)
 {
   RNode *a = rnetwork.create_node (RNode::Internal, port_index++, tech.bottom_conductor);
   RNode *b = rnetwork.create_node (RNode::Internal, port_index++, tech.top_conductor);
@@ -174,15 +171,14 @@ RNetExtractor::create_via_port (const pex::RExtractorTechVia &tech,
 
   rnetwork.create_element (conductance, a, b);
 
-  vias[tech.bottom_conductor].push_back (ViaPort (box.center (), a));
-  vias[tech.top_conductor].push_back (ViaPort (box.center (), b));
+  vias [tech.bottom_conductor].push_back (ViaPort (box.center (), a));
+  vias [tech.top_conductor].push_back (ViaPort (box.center (), b));
 }
 
-void
-RNetExtractor::create_via_ports (const RExtractorTech &tech,
-                                 const std::map<unsigned int, db::Region> &geo,
-                                 std::map<unsigned int, std::vector<ViaPort> > &vias,
-                                 RNetwork &rnetwork)
+void RNetExtractor::create_via_ports (const RExtractorTech &tech,
+                                      const std::map<unsigned int, db::Region> &geo,
+                                      std::map<unsigned int, std::vector<ViaPort>> &vias,
+                                      RNetwork &rnetwork)
 {
   unsigned int port_index = 0;
 
@@ -209,7 +205,7 @@ RNetExtractor::create_via_ports (const RExtractorTech &tech,
       children.push_back (new db::CompoundRegionOperationPrimaryNode ());
       children.push_back (new db::CompoundRegionOperationSecondaryNode (const_cast<db::Region *> (&g->second)));
 
-      ViaAggregationVisitor visitor (v.operator-> (), m_dbu);
+      ViaAggregationVisitor visitor (v.operator->(), m_dbu);
       db::PolygonNeighborhoodCompoundOperationNode en_node (children, &visitor, 0);
       auto aggregated = merged_vias.cop_to_region (en_node);
 
@@ -223,9 +219,7 @@ RNetExtractor::create_via_ports (const RExtractorTech &tech,
       for (auto p = g->second.begin_merged (); ! p.at_end (); ++p) {
         create_via_port (*v, via_conductance (*v, *p, m_dbu), *p, port_index, vias, rnetwork);
       }
-
     }
-
   }
 }
 
@@ -287,12 +281,12 @@ public:
   void add (const db::Polygon *poly, const size_t poly_id, const db::Box *port, const size_t port_id)
   {
     if (db::interact (*poly, *port)) {
-      m_interacting_ports[poly_id].insert (port_id);
+      m_interacting_ports [poly_id].insert (port_id);
     }
   }
 
 private:
-  std::map<size_t, std::set<size_t> > m_interacting_ports;
+  std::map<size_t, std::set<size_t>> m_interacting_ports;
   const RExtractorTechConductor *mp_cond;
   const std::vector<db::Point> *mp_vertex_ports;
   const std::vector<db::Polygon> *mp_polygon_ports;
@@ -311,15 +305,15 @@ private:
 
     for (auto i = port_ids.begin (); i != port_ids.end (); ++i) {
       switch (type_from_id (*i)) {
-      case 0:  //  vertex port
+      case 0: //  vertex port
         local_vertex_port_ids.push_back (*i);
         local_vertex_ports.push_back ((*mp_vertex_ports) [index_from_id (*i)]);
         break;
-      case 1:  //  via port
+      case 1: //  via port
         local_vertex_port_ids.push_back (*i);
         local_vertex_ports.push_back ((*mp_via_ports) [index_from_id (*i)].position);
         break;
-      case 2:  //  polygon port
+      case 2: //  polygon port
         local_polygon_port_ids.push_back (*i);
         local_polygon_ports.push_back ((*mp_polygon_ports) [index_from_id (*i)]);
         break;
@@ -330,18 +324,14 @@ private:
 
     switch (mp_cond->algorithm) {
     case RExtractorTechConductor::SquareCounting:
-    default:
-      {
-        pex::SquareCountingRExtractor rex (m_dbu);
-        rex.extract (poly, local_vertex_ports, local_polygon_ports, local_network);
-      }
-      break;
-    case RExtractorTechConductor::Tesselation:
-      {
-        pex::TriangulationRExtractor rex (m_dbu);
-        rex.extract (poly, local_vertex_ports, local_polygon_ports, local_network);
-      }
-      break;
+    default: {
+      pex::SquareCountingRExtractor rex (m_dbu);
+      rex.extract (poly, local_vertex_ports, local_polygon_ports, local_network);
+    } break;
+    case RExtractorTechConductor::Tesselation: {
+      pex::TriangulationRExtractor rex (m_dbu);
+      rex.extract (poly, local_vertex_ports, local_polygon_ports, local_network);
+    } break;
     }
 
     integrate (local_network, local_vertex_port_ids, local_polygon_port_ids);
@@ -355,7 +345,7 @@ private:
     std::unordered_map<const RNode *, RNode *> n2n;
     for (auto n = local_network.begin_nodes (); n != local_network.end_nodes (); ++n) {
 
-      const RNode *local = n.operator-> ();
+      const RNode *local = n.operator->();
       RNode *global = 0;
 
       if (local->type == RNode::Internal) {
@@ -375,10 +365,10 @@ private:
         if (i2n != m_id_to_node.end ()) {
           global = i2n->second;
         } else {
-          if (type_from_id (id) == 0) {  // vertex port
+          if (type_from_id (id) == 0) { // vertex port
             global = mp_rnetwork->create_node (RNode::VertexPort, index_from_id (id), mp_cond->layer);
             global->location = local->location;
-          } else if (type_from_id (id) == 1) {  // via port
+          } else if (type_from_id (id) == 1) { // via port
             global = (*mp_via_ports) [index_from_id (id)].node;
           }
           m_id_to_node.insert (std::make_pair (id, global));
@@ -399,18 +389,16 @@ private:
           global->location = local->location;
           m_id_to_node.insert (std::make_pair (id, global));
         }
-
       }
 
       tl_assert (global != 0);
       n2n.insert (std::make_pair (local, global));
-
     }
 
     //  create the R elements in the target network
     for (auto e = local_network.begin_elements (); e != local_network.end_elements (); ++e) {
 
-      const RElement *local = e.operator-> ();
+      const RElement *local = e.operator->();
 
       auto ia = n2n.find (local->a ());
       auto ib = n2n.find (local->b ());
@@ -425,26 +413,24 @@ private:
       }
 
       mp_rnetwork->create_element (c, ia->second, ib->second);
-
     }
   }
 };
 
 }
 
-void
-RNetExtractor::extract_conductor (const RExtractorTechConductor &cond,
-                                  const db::Region &region,
-                                  const std::vector<db::Point> &vertex_ports,
-                                  const std::vector<db::Polygon> &polygon_ports,
-                                  const std::vector<ViaPort> &via_ports,
-                                  RNetwork &rnetwork)
+void RNetExtractor::extract_conductor (const RExtractorTechConductor &cond,
+                                       const db::Region &region,
+                                       const std::vector<db::Point> &vertex_ports,
+                                       const std::vector<db::Polygon> &polygon_ports,
+                                       const std::vector<ViaPort> &via_ports,
+                                       RNetwork &rnetwork)
 {
   db::box_scanner2<db::Polygon, size_t, db::Box, size_t> scanner;
 
   size_t poly_id = 0;
   for (auto p = region.addressable_merged_polygons (); ! p.at_end (); ++p) {
-    scanner.insert1 (p.operator-> (), poly_id++);
+    scanner.insert1 (p.operator->(), poly_id++);
   }
 
   std::list<db::Box> box_heap;

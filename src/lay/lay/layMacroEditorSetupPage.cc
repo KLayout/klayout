@@ -39,16 +39,15 @@ namespace lay
 {
 
 struct MacroEditorSetupDialogData
-  : public QObject
-{
+  : public QObject {
   MacroEditorSetupDialogData (QObject *parent)
-    : QObject(parent),
+    : QObject (parent),
       basic_attributes (0), tab_width (8), indent (2), save_all_on_run (true), stop_on_exception (true), file_watcher_enabled (true), font_size (0)
   {
   }
 
   GenericSyntaxHighlighterAttributes basic_attributes;
-  std::vector <std::pair <std::string, GenericSyntaxHighlighterAttributes> > specific_attributes;
+  std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes>> specific_attributes;
   int tab_width;
   int indent;
   bool save_all_on_run;
@@ -56,7 +55,7 @@ struct MacroEditorSetupDialogData
   bool file_watcher_enabled;
   std::string font_family;
   int font_size;
-  std::set <std::string> ignore_exceptions_list;
+  std::set<std::string> ignore_exceptions_list;
 
   void setup (lay::Dispatcher *root)
   {
@@ -69,7 +68,7 @@ struct MacroEditorSetupDialogData
       basic_attributes.assign (*highlighters.basic_attributes ());
     }
     for (lay::MacroEditorHighlighters::const_iterator a = highlighters.begin (); a != highlighters.end (); ++a) {
-      specific_attributes.push_back (std::make_pair (a->first, GenericSyntaxHighlighterAttributes (& basic_attributes)));
+      specific_attributes.push_back (std::make_pair (a->first, GenericSyntaxHighlighterAttributes (&basic_attributes)));
       specific_attributes.back ().second.assign (a->second);
     }
 
@@ -102,7 +101,7 @@ struct MacroEditorSetupDialogData
     }
 
     for (MacroEditorHighlighters::iterator a = highlighters.begin (); a != highlighters.end (); ++a) {
-      for (std::vector< std::pair<std::string, GenericSyntaxHighlighterAttributes> >::const_iterator i = specific_attributes.begin (); i != specific_attributes.end (); ++i) {
+      for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes>>::const_iterator i = specific_attributes.begin (); i != specific_attributes.end (); ++i) {
         if (i->first == a->first) {
           a->second.assign (i->second);
           break;
@@ -129,7 +128,6 @@ struct MacroEditorSetupDialogData
       il += tl::to_quoted_string (*i);
     }
     root->config_set (cfg_macro_editor_ignore_exception_list, il);
-
   }
 };
 
@@ -164,27 +162,23 @@ MacroEditorSetupPage::~MacroEditorSetupPage ()
   //  .. nothing yet ..
 }
 
-void 
-MacroEditorSetupPage::color_changed (QColor)
+void MacroEditorSetupPage::color_changed (QColor)
 {
   commit_attributes (styles_list->currentItem ());
 }
 
-void 
-MacroEditorSetupPage::cb_changed (int)
+void MacroEditorSetupPage::cb_changed (int)
 {
   commit_attributes (styles_list->currentItem ());
 }
 
-void
-MacroEditorSetupPage::clear_exception_list ()
+void MacroEditorSetupPage::clear_exception_list ()
 {
   mp_data->ignore_exceptions_list.clear ();
   update_ignore_exception_list ();
 }
 
-void
-MacroEditorSetupPage::update_ignore_exception_list ()
+void MacroEditorSetupPage::update_ignore_exception_list ()
 {
   exception_list->clear ();
   for (std::set<std::string>::const_iterator i = mp_data->ignore_exceptions_list.begin (); i != mp_data->ignore_exceptions_list.end (); ++i) {
@@ -192,18 +186,16 @@ MacroEditorSetupPage::update_ignore_exception_list ()
   }
 }
 
-void 
-MacroEditorSetupPage::update_font ()
+void MacroEditorSetupPage::update_font ()
 {
   QFont f;
-  f.setFamily (font_sel->currentFont().family ());
+  f.setFamily (font_sel->currentFont ().family ());
   f.setPointSize (font_size->value ());
   f.setFixedPitch (true);
   styles_list->setFont (f);
 }
 
-void
-MacroEditorSetupPage::setup (Dispatcher *root)
+void MacroEditorSetupPage::setup (Dispatcher *root)
 {
   delete mp_data;
   mp_data = new MacroEditorSetupDialogData (this);
@@ -231,7 +223,7 @@ MacroEditorSetupPage::setup (Dispatcher *root)
 
   styles_list->clear ();
 
-  std::map <int, QString> basic_names;
+  std::map<int, QString> basic_names;
 
   for (GenericSyntaxHighlighterAttributes::const_iterator a = mp_data->basic_attributes.begin (); a != mp_data->basic_attributes.end (); ++a) {
     QListWidgetItem *item = new QListWidgetItem (styles_list);
@@ -244,7 +236,7 @@ MacroEditorSetupPage::setup (Dispatcher *root)
   }
 
   int na = 0;
-  for (std::vector <std::pair <std::string, GenericSyntaxHighlighterAttributes> >::const_iterator sa = mp_data->specific_attributes.begin (); sa != mp_data->specific_attributes.end (); ++sa, ++na) {
+  for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes>>::const_iterator sa = mp_data->specific_attributes.begin (); sa != mp_data->specific_attributes.end (); ++sa, ++na) {
 
     QString l = tl::to_qstring ("(" + sa->first + ") ");
 
@@ -252,7 +244,7 @@ MacroEditorSetupPage::setup (Dispatcher *root)
       QListWidgetItem *item = new QListWidgetItem (styles_list);
       item->setData (Qt::UserRole, na);
       item->setData (Qt::UserRole + 1, a->second);
-      std::map <int, QString>::const_iterator bn = basic_names.find (sa->second.basic_id (a->second));
+      std::map<int, QString>::const_iterator bn = basic_names.find (sa->second.basic_id (a->second));
       if (bn != basic_names.end ()) {
         item->setText (l + a->first + QObject::tr (" - based on ") + bn->second);
       } else {
@@ -260,7 +252,6 @@ MacroEditorSetupPage::setup (Dispatcher *root)
       }
       update_item (item, sa->second.format_for (a->second));
     }
-
   }
 
   styles_list->blockSignals (false);
@@ -269,8 +260,7 @@ MacroEditorSetupPage::setup (Dispatcher *root)
   update_font ();
 }
 
-void
-MacroEditorSetupPage::commit (Dispatcher *root)
+void MacroEditorSetupPage::commit (Dispatcher *root)
 {
   if (styles_list->currentItem ()) {
     commit_attributes (styles_list->currentItem ());
@@ -288,8 +278,7 @@ MacroEditorSetupPage::commit (Dispatcher *root)
   mp_data->commit (root);
 }
 
-void 
-MacroEditorSetupPage::current_attribute_changed (QListWidgetItem *current, QListWidgetItem *previous)
+void MacroEditorSetupPage::current_attribute_changed (QListWidgetItem *current, QListWidgetItem *previous)
 {
   if (previous) {
     commit_attributes (previous);
@@ -298,8 +287,7 @@ MacroEditorSetupPage::current_attribute_changed (QListWidgetItem *current, QList
   update_attributes (current);
 }
 
-void 
-MacroEditorSetupPage::commit_attributes (QListWidgetItem *to_item)
+void MacroEditorSetupPage::commit_attributes (QListWidgetItem *to_item)
 {
   if (! to_item) {
     return;
@@ -356,7 +344,6 @@ MacroEditorSetupPage::commit_attributes (QListWidgetItem *to_item)
     }
 
     attributes->set_style (id, style);
-
   }
 
   //  update all list styles (because we may modify a basic entry, we have to update dependent ones as well)
@@ -375,13 +362,10 @@ MacroEditorSetupPage::commit_attributes (QListWidgetItem *to_item)
       int id = item->data (Qt::UserRole + 1).toInt ();
       update_item (item, attributes->format_for (id));
     }
-
   }
-
 }
 
-void 
-MacroEditorSetupPage::update_attributes (QListWidgetItem *from_item)
+void MacroEditorSetupPage::update_attributes (QListWidgetItem *from_item)
 {
   if (from_item) {
 
@@ -441,7 +425,6 @@ MacroEditorSetupPage::update_attributes (QListWidgetItem *from_item)
       } else {
         background_color_button->set_color (QColor ());
       }
-
     }
 
   } else {
@@ -458,9 +441,7 @@ MacroEditorSetupPage::update_attributes (QListWidgetItem *from_item)
     underline_cb->setEnabled (false);
     strikeout_cb->setCheckState (Qt::PartiallyChecked);
     strikeout_cb->setEnabled (false);
-
   }
 }
 
 }
-

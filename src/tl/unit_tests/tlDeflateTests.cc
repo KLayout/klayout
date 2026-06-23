@@ -27,19 +27,32 @@
 
 #include "zlib.h"
 
-TEST(1) 
+TEST (1)
 {
-  unsigned char data[] = {
+  unsigned char data [] = {
     // gzip header:
-    // 0x1f, 0x8b, 0x08, 0x08, 
-    // 0xed, 0x11, 0x07, 0x50, 
-    // 0x00, 0x03, 
-    // 0x78, 0x00, 
-    0x0b, 0xc9, 0xc8, 0x2c,
-    0x56, 0x00, 0xa2, 0x44, 
-    0x85, 0x92, 0xd4, 0xe2, 
-    0x12, 0x85, 0x18, 0x45, 
-    0x2e, 0x00,
+    // 0x1f, 0x8b, 0x08, 0x08,
+    // 0xed, 0x11, 0x07, 0x50,
+    // 0x00, 0x03,
+    // 0x78, 0x00,
+    0x0b,
+    0xc9,
+    0xc8,
+    0x2c,
+    0x56,
+    0x00,
+    0xa2,
+    0x44,
+    0x85,
+    0x92,
+    0xd4,
+    0xe2,
+    0x12,
+    0x85,
+    0x18,
+    0x45,
+    0x2e,
+    0x00,
     // gzip tail (8 bytes):
     // 0x20, 0xc7, 0x43, 0x6a,  CRC32
     // 0x12, 0x00, 0x00, 0x00   uncompressed file size
@@ -47,7 +60,7 @@ TEST(1)
 
   tl::InputMemoryStream ims ((const char *) data, sizeof (data));
   tl::InputStream is (ims);
-  
+
   std::string out;
   tl::InflateFilter f (is);
   while (! f.at_end ()) {
@@ -57,9 +70,9 @@ TEST(1)
   EXPECT_EQ (out, "This is a test \\!\n");
 }
 
-TEST(2)
+TEST (2)
 {
-  const char hello[] = "This is a test \\!";
+  const char hello [] = "This is a test \\!";
 
   tl::OutputStringStream oss;
   tl::OutputStream os (oss);
@@ -68,11 +81,11 @@ TEST(2)
   fg.flush ();
 
   std::string deflated = oss.string ();
-  for (size_t i = 0; i < deflated.size(); ++i) {
+  for (size_t i = 0; i < deflated.size (); ++i) {
   }
   tl::InputMemoryStream ims ((const char *) deflated.c_str (), deflated.size ());
   tl::InputStream is (ims);
-  
+
   std::string out;
   tl::InflateFilter f (is);
   while (! f.at_end ()) {
@@ -83,15 +96,15 @@ TEST(2)
 }
 
 //  Big deflate:
-TEST(3)
+TEST (3)
 {
-  size_t n_hello = 1024*1024;
-  char *hello = new char[n_hello + 1];
-  hello[n_hello] = 0;
+  size_t n_hello = 1024 * 1024;
+  char *hello = new char [n_hello + 1];
+  hello [n_hello] = 0;
   size_t r = 1;
   for (size_t i = 0; i < n_hello; ++i) {
     r *= 12361;
-    r ^= (r >> 8); 
+    r ^= (r >> 8);
     hello [i] = "abc" [r % 3];
   }
 
@@ -107,7 +120,7 @@ TEST(3)
   EXPECT_EQ (n_hello, fg.uncompressed ());
   tl::InputMemoryStream ims ((const char *) deflated.c_str (), deflated.size ());
   tl::InputStream is (ims);
-  
+
   std::string out;
   tl::InflateFilter f (is);
   while (! f.at_end ()) {
@@ -115,7 +128,6 @@ TEST(3)
   }
 
   EXPECT_EQ (out, hello);
-  
-  delete[] hello;
-}
 
+  delete [] hello;
+}

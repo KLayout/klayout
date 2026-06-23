@@ -49,54 +49,48 @@ inline void *get_object (tl::Variant &var)
 bool test_arg (const gsi::ArgType &atype, const tl::Variant &arg, bool loose, bool object_substitution);
 
 template <class R>
-struct test_arg_func
-{
-  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
+struct test_arg_func {
+  void operator() (bool *ret, const tl::Variant &arg, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
   {
     *ret = arg.can_convert_to<R> ();
   }
 };
 
 template <>
-struct test_arg_func<gsi::VoidType>
-{
-  void operator () (bool *ret, const tl::Variant & /*arg*/, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
+struct test_arg_func<gsi::VoidType> {
+  void operator() (bool *ret, const tl::Variant & /*arg*/, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
   {
     *ret = true;
   }
 };
 
 template <>
-struct test_arg_func<gsi::VariantType>
-{
-  void operator () (bool *ret, const tl::Variant & /*arg*/, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
+struct test_arg_func<gsi::VariantType> {
+  void operator() (bool *ret, const tl::Variant & /*arg*/, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
   {
     *ret = true;
   }
 };
 
 template <>
-struct test_arg_func<gsi::StringType>
-{
-  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
+struct test_arg_func<gsi::StringType> {
+  void operator() (bool *ret, const tl::Variant &arg, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
   {
     *ret = arg.is_a_string ();
   }
 };
 
 template <>
-struct test_arg_func<gsi::ByteArrayType>
-{
-  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
+struct test_arg_func<gsi::ByteArrayType> {
+  void operator() (bool *ret, const tl::Variant &arg, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
   {
     *ret = arg.is_a_bytearray ();
   }
 };
 
 template <>
-struct test_arg_func<gsi::ObjectType>
-{
-  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose, bool object_substitution)
+struct test_arg_func<gsi::ObjectType> {
+  void operator() (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose, bool object_substitution)
   {
     //  allow nil of pointers
     if ((atype.is_ptr () || atype.is_cptr ()) && arg.is_nil ()) {
@@ -120,7 +114,6 @@ struct test_arg_func<gsi::ObjectType>
       }
 
       return;
-
     }
 
     if (! arg.is_user ()) {
@@ -132,8 +125,8 @@ struct test_arg_func<gsi::ObjectType>
     if (! cls) {
       *ret = false;
     } else if (! (cls->gsi_cls () == atype.cls () ||
-                    (loose && (cls->gsi_cls ()->is_derived_from (atype.cls ()) ||
-                       (object_substitution && cls->gsi_cls ()->can_convert_to (atype.cls ())))))) {
+                  (loose && (cls->gsi_cls ()->is_derived_from (atype.cls ()) ||
+                             (object_substitution && cls->gsi_cls ()->can_convert_to (atype.cls ())))))) {
       *ret = false;
     } else {
       *ret = true;
@@ -142,9 +135,8 @@ struct test_arg_func<gsi::ObjectType>
 };
 
 template <>
-struct test_arg_func<gsi::VectorType>
-{
-  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
+struct test_arg_func<gsi::VectorType> {
+  void operator() (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     if (! arg.is_list ()) {
       *ret = false;
@@ -164,9 +156,8 @@ struct test_arg_func<gsi::VectorType>
 };
 
 template <>
-struct test_arg_func<gsi::MapType>
-{
-  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
+struct test_arg_func<gsi::MapType> {
+  void operator() (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     //  Note: delegating that to the function avoids "injected class name used as template template expression" warning
     if (! arg.is_array ()) {
@@ -190,8 +181,7 @@ struct test_arg_func<gsi::MapType>
   }
 };
 
-bool
-test_arg (const gsi::ArgType &atype, const tl::Variant &arg, bool loose, bool object_substitution)
+bool test_arg (const gsi::ArgType &atype, const tl::Variant &arg, bool loose, bool object_substitution)
 {
   //  for const X * or X *, nil is an allowed value
   if ((atype.is_cptr () || atype.is_ptr ()) && arg.is_nil ()) {
@@ -207,8 +197,7 @@ test_arg (const gsi::ArgType &atype, const tl::Variant &arg, bool loose, bool ob
 //  Variant to C conversion
 
 template <class R>
-struct var2c
-{
+struct var2c {
   static R get (const tl::Variant &rval)
   {
     return rval.to<R> ();
@@ -216,8 +205,7 @@ struct var2c
 };
 
 template <>
-struct var2c<tl::Variant>
-{
+struct var2c<tl::Variant> {
   static const tl::Variant &get (const tl::Variant &rval)
   {
     return rval;
@@ -310,8 +298,7 @@ private:
  *  @brief Serialization of POD types
  */
 template <class R>
-struct writer
-{
+struct writer {
   void operator() (gsi::SerialArgs *aa, tl::Variant *arg, const gsi::ArgType &atype, tl::Heap *heap)
   {
     if (arg->is_nil () && atype.type () != gsi::T_var) {
@@ -319,9 +306,9 @@ struct writer
       if (! (atype.is_ptr () || atype.is_cptr ())) {
         throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else if (atype.is_ptr ()) {
-        aa->write<R *> ((R *)0);
+        aa->write<R *> ((R *) 0);
       } else {
-        aa->write<const R *> ((const R *)0);
+        aa->write<const R *> ((const R *) 0);
       }
 
     } else {
@@ -347,7 +334,6 @@ struct writer
       } else {
         aa->write<R> (var2c<R>::get (*arg));
       }
-
     }
   }
 };
@@ -356,20 +342,19 @@ struct writer
  *  @brief Serialization for strings
  */
 template <>
-struct writer<StringType>
-{
+struct writer<StringType> {
   void operator() (gsi::SerialArgs *aa, tl::Variant *arg, const gsi::ArgType &atype, tl::Heap *)
   {
     //  Cannot pass ownership currently
-    tl_assert (!atype.pass_obj ());
+    tl_assert (! atype.pass_obj ());
 
     if (arg->is_nil ()) {
 
       if (! (atype.is_ptr () || atype.is_cptr ())) {
         //  nil is treated as an empty string for references
-        aa->write<void *> ((void *)new StringAdaptorImpl<std::string> (std::string ()));
+        aa->write<void *> ((void *) new StringAdaptorImpl<std::string> (std::string ()));
       } else {
-        aa->write<void *> ((void *)0);
+        aa->write<void *> ((void *) 0);
       }
 
     } else {
@@ -377,8 +362,7 @@ struct writer<StringType>
       // TODO: morph the variant to the requested type and pass its pointer (requires a non-const reference for arg)
       // -> we would have a reference that can modify the argument (out parameter).
       // NOTE: by convention we pass the ownership to the receiver for adaptors.
-      aa->write<void *> ((void *)new StringAdaptorImpl<std::string> (arg->to_string ()));
-
+      aa->write<void *> ((void *) new StringAdaptorImpl<std::string> (arg->to_string ()));
     }
   }
 };
@@ -387,13 +371,12 @@ struct writer<StringType>
  *  @brief Specialization for Variant
  */
 template <>
-struct writer<VariantType>
-{
+struct writer<VariantType> {
   void operator() (gsi::SerialArgs *aa, tl::Variant *arg, const gsi::ArgType &, tl::Heap *)
   {
     //  TODO: clarify: is nil a zero-pointer to a variant or a pointer to a "nil" variant?
     // NOTE: by convention we pass the ownership to the receiver for adaptors.
-    aa->write<void *> ((void *)new VariantAdaptorImpl<tl::Variant> (arg));
+    aa->write<void *> ((void *) new VariantAdaptorImpl<tl::Variant> (arg));
   }
 };
 
@@ -401,19 +384,18 @@ struct writer<VariantType>
  *  @brief Specialization for Vectors
  */
 template <>
-struct writer<VectorType>
-{
+struct writer<VectorType> {
   void operator() (gsi::SerialArgs *aa, tl::Variant *arg, const gsi::ArgType &atype, tl::Heap *)
   {
     if (arg->is_nil ()) {
       if (! (atype.is_ptr () || atype.is_cptr ())) {
         throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else {
-        aa->write<void *> ((void *)0);
+        aa->write<void *> ((void *) 0);
       }
     } else {
       tl_assert (atype.inner () != 0);
-      aa->write<void *> ((void *)new VariantBasedVectorAdaptor (arg, atype.inner ()));
+      aa->write<void *> ((void *) new VariantBasedVectorAdaptor (arg, atype.inner ()));
     }
   }
 };
@@ -422,20 +404,19 @@ struct writer<VectorType>
  *  @brief Specialization for Maps
  */
 template <>
-struct writer<MapType>
-{
+struct writer<MapType> {
   void operator() (gsi::SerialArgs *aa, tl::Variant *arg, const gsi::ArgType &atype, tl::Heap *)
   {
     if (arg->is_nil ()) {
       if (! (atype.is_ptr () || atype.is_cptr ())) {
         throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else {
-        aa->write<void *> ((void *)0);
+        aa->write<void *> ((void *) 0);
       }
     } else {
       tl_assert (atype.inner () != 0);
       tl_assert (atype.inner_k () != 0);
-      aa->write<void *> ((void *)new VariantBasedMapAdaptor (arg, atype.inner (), atype.inner_k ()));
+      aa->write<void *> ((void *) new VariantBasedMapAdaptor (arg, atype.inner (), atype.inner_k ()));
     }
   }
 };
@@ -444,8 +425,7 @@ struct writer<MapType>
  *  @brief Specialization for void
  */
 template <>
-struct writer<gsi::VoidType>
-{
+struct writer<gsi::VoidType> {
   void operator() (gsi::SerialArgs *, tl::Variant *, const gsi::ArgType &, tl::Heap *)
   {
     //  nothing - void type won't be serialized
@@ -458,8 +438,7 @@ void push_args (gsi::SerialArgs &arglist, const tl::Variant &args, const gsi::Me
  *  @brief Specialization for void
  */
 template <>
-struct writer<gsi::ObjectType>
-{
+struct writer<gsi::ObjectType> {
   void operator() (gsi::SerialArgs *aa, tl::Variant *arg, const gsi::ArgType &atype, tl::Heap *heap)
   {
     if (arg->is_nil ()) {
@@ -486,7 +465,7 @@ struct writer<gsi::ObjectType>
         }
       }
 
-      if (!meth) {
+      if (! meth) {
         throw tl::Exception (tl::to_string (tr ("No constructor of %s available that takes %d arguments (implicit call from tuple)")), atype.cls ()->name (), n);
       }
 
@@ -515,7 +494,7 @@ struct writer<gsi::ObjectType>
       }
 
       const tl::VariantUserClassBase *cls = arg->user_cls ();
-      if (!cls) {
+      if (! cls) {
         throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
       }
       if (cls->is_const () && (atype.is_ref () || atype.is_ptr ())) {
@@ -562,11 +541,8 @@ struct writer<gsi::ObjectType>
         } else {
           throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
         }
-
       }
-
     }
-
   }
 };
 
@@ -584,7 +560,7 @@ void push_args (gsi::SerialArgs &arglist, const tl::Variant &args, const gsi::Me
     try {
       //  Note: this const_cast is ugly, but it will basically enable "out" parameters
       //  TODO: clean this up.
-      gsi::do_on_type<writer> () (a->type (), &arglist, const_cast<tl::Variant *> ((args.get_list ().begin () + narg).operator-> ()), *a, heap);
+      gsi::do_on_type<writer> () (a->type (), &arglist, const_cast<tl::Variant *> ((args.get_list ().begin () + narg).operator->()), *a, heap);
     } catch (tl::Exception &ex) {
       std::string msg = ex.msg () + tl::sprintf (tl::to_string (tr (" (argument '%s')")), a->spec ()->name ());
       throw tl::Exception (msg);
@@ -599,8 +575,7 @@ void push_args (gsi::SerialArgs &arglist, const tl::Variant &args, const gsi::Me
  *  @brief A reader function
  */
 template <class R>
-struct reader
-{
+struct reader {
   void
   operator() (tl::Variant *out, gsi::SerialArgs *rr, const gsi::ArgType &atype, tl::Heap *heap)
   {
@@ -632,15 +607,14 @@ struct reader
  *  @brief A reader specialization for void *
  */
 template <>
-struct reader<void *>
-{
+struct reader<void *> {
   void
   operator() (tl::Variant *out, gsi::SerialArgs *rr, const gsi::ArgType &atype, tl::Heap *heap)
   {
-    tl_assert (!atype.is_ref ());
-    tl_assert (!atype.is_cref ());
-    tl_assert (!atype.is_ptr ());
-    tl_assert (!atype.is_cptr ());
+    tl_assert (! atype.is_ref ());
+    tl_assert (! atype.is_cref ());
+    tl_assert (! atype.is_ptr ());
+    tl_assert (! atype.is_cptr ());
     *out = size_t (rr->read<void *> (*heap));
   }
 };
@@ -649,13 +623,12 @@ struct reader<void *>
  *  @brief A reader specialization for strings
  */
 template <>
-struct reader<gsi::StringType>
-{
+struct reader<gsi::StringType> {
   void
   operator() (tl::Variant *out, gsi::SerialArgs *rr, const gsi::ArgType &, tl::Heap *heap)
   {
-    std::unique_ptr<StringAdaptor> a ((StringAdaptor *) rr->read<void *>(*heap));
-    if (!a.get ()) {
+    std::unique_ptr<StringAdaptor> a ((StringAdaptor *) rr->read<void *> (*heap));
+    if (! a.get ()) {
       *out = tl::Variant ();
     } else {
       *out = tl::Variant (std::string (a->c_str (), a->size ()));
@@ -667,13 +640,12 @@ struct reader<gsi::StringType>
  *  @brief A reader specialization for variants
  */
 template <>
-struct reader<gsi::VariantType>
-{
+struct reader<gsi::VariantType> {
   void
   operator() (tl::Variant *out, gsi::SerialArgs *rr, const gsi::ArgType &, tl::Heap *heap)
   {
-    std::unique_ptr<VariantAdaptor> a ((VariantAdaptor *) rr->read<void *>(*heap));
-    if (!a.get ()) {
+    std::unique_ptr<VariantAdaptor> a ((VariantAdaptor *) rr->read<void *> (*heap));
+    if (! a.get ()) {
       *out = tl::Variant ();
     } else {
       *out = a->var ();
@@ -685,13 +657,12 @@ struct reader<gsi::VariantType>
  *  @brief A reader specialization for maps
  */
 template <>
-struct reader<MapType>
-{
+struct reader<MapType> {
   void
   operator() (tl::Variant *out, gsi::SerialArgs *rr, const gsi::ArgType &atype, tl::Heap *heap)
   {
-    std::unique_ptr<MapAdaptor> a ((MapAdaptor *) rr->read<void *>(*heap));
-    if (!a.get ()) {
+    std::unique_ptr<MapAdaptor> a ((MapAdaptor *) rr->read<void *> (*heap));
+    if (! a.get ()) {
       *out = tl::Variant ();
     } else {
       tl_assert (atype.inner () != 0);
@@ -706,13 +677,12 @@ struct reader<MapType>
  *  @brief A reader specialization for const char *
  */
 template <>
-struct reader<VectorType>
-{
+struct reader<VectorType> {
   void
   operator() (tl::Variant *out, gsi::SerialArgs *rr, const gsi::ArgType &atype, tl::Heap *heap)
   {
-    std::unique_ptr<VectorAdaptor> a ((VectorAdaptor *) rr->read<void *>(*heap));
-    if (!a.get ()) {
+    std::unique_ptr<VectorAdaptor> a ((VectorAdaptor *) rr->read<void *> (*heap));
+    if (! a.get ()) {
       *out = tl::Variant ();
     } else {
       tl_assert (atype.inner () != 0);
@@ -726,8 +696,7 @@ struct reader<VectorType>
  *  @brief A reader specialization for objects
  */
 template <>
-struct reader<ObjectType>
-{
+struct reader<ObjectType> {
   void
   operator() (tl::Variant *out, gsi::SerialArgs *rr, const gsi::ArgType &atype, tl::Heap *heap)
   {
@@ -747,7 +716,7 @@ struct reader<ObjectType>
 
       *out = tl::Variant ();
 
-    } else if (!clsact->adapted_type_info () && clsact->is_managed ()) {
+    } else if (! clsact->adapted_type_info () && clsact->is_managed ()) {
 
       //  gsi::ObjectBase-based objects can be managed by reference since they
       //  provide a tl::Object through the proxy.
@@ -769,7 +738,6 @@ struct reader<ObjectType>
         proxy->set (obj, owner, is_const, can_destroy);
 
         out->set_user_ref (proxy, cls, owner);
-
       }
 
     } else {
@@ -792,13 +760,12 @@ struct reader<ObjectType>
       *out = tl::Variant ();
 
       //  consider prefer_copy
-      if (! owner && atype.prefer_copy () && !clsact->is_managed () && clsact->can_copy ()) {
+      if (! owner && atype.prefer_copy () && ! clsact->is_managed () && clsact->can_copy ()) {
         obj = clsact->clone (obj);
         owner = true;
       }
 
       out->set_user (obj, cls, owner);
-
     }
   }
 };
@@ -807,8 +774,7 @@ struct reader<ObjectType>
  *  @brief A reader specialization for new objects
  */
 template <>
-struct reader<VoidType>
-{
+struct reader<VoidType> {
   void
   operator() (tl::Variant *, gsi::SerialArgs *, const gsi::ArgType &, tl::Heap *)
   {
@@ -941,8 +907,7 @@ size_t VariantBasedMapAdaptor::serial_size () const
 // ---------------------------------------------------------------------
 //  pop_arg implementation
 
-void
-pull_arg (gsi::SerialArgs &retlist, const gsi::ArgType &atype, tl::Variant &arg_out, tl::Heap *heap)
+void pull_arg (gsi::SerialArgs &retlist, const gsi::ArgType &atype, tl::Variant &arg_out, tl::Heap *heap)
 {
   gsi::do_on_type<reader> () (atype.type (), &arg_out, &retlist, atype, heap);
 }

@@ -67,9 +67,9 @@ public:
     return new QLineEdit (parent);
   }
 
-  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
+  void updateEditorGeometry (QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
   {
-    editor->setGeometry(option.rect);
+    editor->setGeometry (option.rect);
   }
 
   void setEditorData (QWidget *widget, const QModelIndex &index) const
@@ -109,9 +109,7 @@ public:
         } else if (index.column () == 1) {
           mp_data->begin () [n].set_description (text);
         }
-
       }
-
     }
   }
 
@@ -155,13 +153,12 @@ NetTracerTechComponentEditor::NetTracerTechComponentEditor (QWidget *parent)
   stack_tree->header ()->setHighlightSections (false);
   stack_tree->header ()->setStretchLastSection (true);
 
-  connect (stack_tree, SIGNAL (currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT (current_item_changed(QTreeWidgetItem *, QTreeWidgetItem *)));
+  connect (stack_tree, SIGNAL (currentItemChanged (QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT (current_item_changed (QTreeWidgetItem *, QTreeWidgetItem *)));
 }
 
-void 
-NetTracerTechComponentEditor::commit ()
+void NetTracerTechComponentEditor::commit ()
 {
-  db::NetTracerTechnologyComponent *data = dynamic_cast <db::NetTracerTechnologyComponent *> (tech_component ());
+  db::NetTracerTechnologyComponent *data = dynamic_cast<db::NetTracerTechnologyComponent *> (tech_component ());
   if (! data) {
     return;
   }
@@ -170,10 +167,9 @@ NetTracerTechComponentEditor::commit ()
   *data = m_data;
 }
 
-void 
-NetTracerTechComponentEditor::setup ()
+void NetTracerTechComponentEditor::setup ()
 {
-  db::NetTracerTechnologyComponent *data = dynamic_cast <db::NetTracerTechnologyComponent *> (tech_component ());
+  db::NetTracerTechnologyComponent *data = dynamic_cast<db::NetTracerTechnologyComponent *> (tech_component ());
   if (! data) {
     return;
   }
@@ -195,8 +191,7 @@ NetTracerTechComponentEditor::setup ()
   current_item_changed (stack_tree->currentItem (), 0);
 }
 
-void
-NetTracerTechComponentEditor::current_item_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous)
+void NetTracerTechComponentEditor::current_item_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous)
 {
   commit_current (previous);
 
@@ -205,30 +200,28 @@ NetTracerTechComponentEditor::current_item_changed (QTreeWidgetItem *current, QT
     connectivity_editor_widget->set_connectivity (db::NetTracerConnectivity ());
     connectivity_editor_widget->hide ();
   } else {
-    connectivity_editor_widget->set_connectivity (m_data.begin ()[row]);
+    connectivity_editor_widget->set_connectivity (m_data.begin () [row]);
     connectivity_editor_widget->show ();
   }
 }
 
-void
-NetTracerTechComponentEditor::commit_current ()
+void NetTracerTechComponentEditor::commit_current ()
 {
   commit_current (stack_tree->currentItem ());
 }
 
-void
-NetTracerTechComponentEditor::commit_current (QTreeWidgetItem *current)
+void NetTracerTechComponentEditor::commit_current (QTreeWidgetItem *current)
 {
   int row = current ? stack_tree->indexOfTopLevelItem (current) : -1;
   if (row >= 0 && row < int (m_data.size ())) {
-     connectivity_editor_widget->get_connectivity (m_data.begin () [row]);
+    connectivity_editor_widget->get_connectivity (m_data.begin () [row]);
   }
 }
 
 static std::string
 new_name (const db::NetTracerTechnologyComponent &data)
 {
-  for (int i = 1; ; ++i) {
+  for (int i = 1;; ++i) {
     std::string n = "STACK" + tl::to_string (i);
     bool found = false;
     for (auto d = data.begin (); d != data.end () && ! found; ++d) {
@@ -242,8 +235,7 @@ new_name (const db::NetTracerTechnologyComponent &data)
   return std::string ();
 }
 
-void
-NetTracerTechComponentEditor::clone_clicked ()
+void NetTracerTechComponentEditor::clone_clicked ()
 {
   //  removes focus from the tree view - commits the data
   add_pb->setFocus ();
@@ -256,17 +248,16 @@ NetTracerTechComponentEditor::clone_clicked ()
   } else {
     row += 1;
     m_data.insert (m_data.begin () + row, db::NetTracerConnectivity ());
-    m_data.begin ()[row] = m_data.begin ()[row - 1];
+    m_data.begin () [row] = m_data.begin () [row - 1];
   }
 
-  m_data.begin ()[row].set_name (new_name (m_data));
+  m_data.begin () [row].set_name (new_name (m_data));
 
   update ();
   stack_tree->setCurrentItem (stack_tree->topLevelItem (row));
 }
 
-void
-NetTracerTechComponentEditor::add_clicked ()
+void NetTracerTechComponentEditor::add_clicked ()
 {
   //  removes focus from the tree view - commits the data
   add_pb->setFocus ();
@@ -281,14 +272,13 @@ NetTracerTechComponentEditor::add_clicked ()
     m_data.insert (m_data.begin () + row, db::NetTracerConnectivity ());
   }
 
-  m_data.begin ()[row].set_name (new_name (m_data));
+  m_data.begin () [row].set_name (new_name (m_data));
 
   update ();
   stack_tree->setCurrentItem (stack_tree->topLevelItem (row));
 }
 
-void 
-NetTracerTechComponentEditor::del_clicked ()
+void NetTracerTechComponentEditor::del_clicked ()
 {
   //  removes focus from the tree view - commits the data
   del_pb->setFocus ();
@@ -310,8 +300,7 @@ NetTracerTechComponentEditor::del_clicked ()
   stack_tree->setCurrentItem (0);
 }
 
-void 
-NetTracerTechComponentEditor::move_up_clicked ()
+void NetTracerTechComponentEditor::move_up_clicked ()
 {
   //  removes focus from the tree view - commits the data
   move_up_pb->setFocus ();
@@ -343,7 +332,7 @@ NetTracerTechComponentEditor::move_up_clicked ()
   update ();
 
   // select the new items
-  for (std::set <int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
+  for (std::set<int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
     stack_tree->topLevelItem (*s)->setSelected (true);
   }
   if (n_current >= 0) {
@@ -351,8 +340,7 @@ NetTracerTechComponentEditor::move_up_clicked ()
   }
 }
 
-void 
-NetTracerTechComponentEditor::move_down_clicked ()
+void NetTracerTechComponentEditor::move_down_clicked ()
 {
   //  removes focus from the tree view - commits the data
   move_down_pb->setFocus ();
@@ -370,7 +358,7 @@ NetTracerTechComponentEditor::move_down_clicked ()
   stack_tree->setCurrentIndex (QModelIndex ());
 
   int n = int (m_data.size ());
-  for (db::NetTracerTechnologyComponent::iterator l = m_data.end (); l != m_data.begin (); ) {
+  for (db::NetTracerTechnologyComponent::iterator l = m_data.end (); l != m_data.begin ();) {
     --l;
     --n;
     if (selected_rows.find (n - 1) != selected_rows.end () && selected_rows.find (n) == selected_rows.end ()) {
@@ -386,7 +374,7 @@ NetTracerTechComponentEditor::move_down_clicked ()
   update ();
 
   // select the new items
-  for (std::set <int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
+  for (std::set<int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
     stack_tree->topLevelItem (*s)->setSelected (true);
   }
   if (n_current >= 0) {
@@ -394,8 +382,7 @@ NetTracerTechComponentEditor::move_down_clicked ()
   }
 }
 
-void
-NetTracerTechComponentEditor::update ()
+void NetTracerTechComponentEditor::update ()
 {
   stack_tree->clear ();
   stack_tree->clearSelection ();
@@ -416,9 +403,7 @@ NetTracerTechComponentEditor::update ()
 
     item->setData (1, Qt::DisplayRole, QVariant (tl::to_qstring (l->description ())));
     item->setData (1, Qt::UserRole, QVariant (n));
-
   }
 }
 
 }
-

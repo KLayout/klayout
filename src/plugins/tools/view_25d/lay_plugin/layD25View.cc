@@ -52,26 +52,26 @@ D25View::D25View (Dispatcher *root, LayoutViewBase *view)
   mp_ui->d25_view->setFocusPolicy (Qt::StrongFocus);
   mp_ui->d25_view->setFocus ();
 
-  connect (mp_ui->fit_back, SIGNAL (clicked()), this, SLOT (fit_button_clicked()));
-  connect (mp_ui->fit_front, SIGNAL (clicked()), this, SLOT (fit_button_clicked()));
-  connect (mp_ui->fit_left, SIGNAL (clicked()), this, SLOT (fit_button_clicked()));
-  connect (mp_ui->fit_right, SIGNAL (clicked()), this, SLOT (fit_button_clicked()));
-  connect (mp_ui->fit_top, SIGNAL (clicked()), this, SLOT (fit_button_clicked()));
-  connect (mp_ui->fit_bottom, SIGNAL (clicked()), this, SLOT (fit_button_clicked()));
-  connect (mp_ui->zoom_slider, SIGNAL (valueChanged(int)), this, SLOT (scale_slider_changed(int)));
-  connect (mp_ui->vzoom_slider, SIGNAL (valueChanged(int)), this, SLOT (vscale_slider_changed(int)));
-  connect (mp_ui->zoom_factor, SIGNAL (editingFinished()), this, SLOT (scale_value_edited()));
-  connect (mp_ui->vzoom_factor, SIGNAL (editingFinished()), this, SLOT (vscale_value_edited()));
-  connect (mp_ui->d25_view, SIGNAL (scale_factor_changed(double)), this, SLOT (scale_factor_changed(double)));
-  connect (mp_ui->d25_view, SIGNAL (vscale_factor_changed(double)), this, SLOT (vscale_factor_changed(double)));
-  connect (mp_ui->d25_view, SIGNAL (init_failed()), this, SLOT (init_failed()));
-  connect (mp_ui->rerun_button, SIGNAL (clicked()), this, SLOT (rerun_button_pressed()));
-  connect (mp_ui->hide_all_action, SIGNAL (triggered()), this, SLOT (hide_all_triggered()));
-  connect (mp_ui->hide_selected_action, SIGNAL (triggered()), this, SLOT (hide_selected_triggered()));
-  connect (mp_ui->show_all_action, SIGNAL (triggered()), this, SLOT (show_all_triggered()));
-  connect (mp_ui->show_selected_action, SIGNAL (triggered()), this, SLOT (show_selected_triggered()));
-  connect (mp_ui->visibility_follows_selection_action, SIGNAL (toggled(bool)), this, SLOT (visibility_follows_selection_changed(bool)));
-  connect (mp_ui->material_list, SIGNAL (itemSelectionChanged()), this, SLOT (update_visibility()));
+  connect (mp_ui->fit_back, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
+  connect (mp_ui->fit_front, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
+  connect (mp_ui->fit_left, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
+  connect (mp_ui->fit_right, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
+  connect (mp_ui->fit_top, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
+  connect (mp_ui->fit_bottom, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
+  connect (mp_ui->zoom_slider, SIGNAL (valueChanged (int)), this, SLOT (scale_slider_changed (int)));
+  connect (mp_ui->vzoom_slider, SIGNAL (valueChanged (int)), this, SLOT (vscale_slider_changed (int)));
+  connect (mp_ui->zoom_factor, SIGNAL (editingFinished ()), this, SLOT (scale_value_edited ()));
+  connect (mp_ui->vzoom_factor, SIGNAL (editingFinished ()), this, SLOT (vscale_value_edited ()));
+  connect (mp_ui->d25_view, SIGNAL (scale_factor_changed (double)), this, SLOT (scale_factor_changed (double)));
+  connect (mp_ui->d25_view, SIGNAL (vscale_factor_changed (double)), this, SLOT (vscale_factor_changed (double)));
+  connect (mp_ui->d25_view, SIGNAL (init_failed ()), this, SLOT (init_failed ()));
+  connect (mp_ui->rerun_button, SIGNAL (clicked ()), this, SLOT (rerun_button_pressed ()));
+  connect (mp_ui->hide_all_action, SIGNAL (triggered ()), this, SLOT (hide_all_triggered ()));
+  connect (mp_ui->hide_selected_action, SIGNAL (triggered ()), this, SLOT (hide_selected_triggered ()));
+  connect (mp_ui->show_all_action, SIGNAL (triggered ()), this, SLOT (show_all_triggered ()));
+  connect (mp_ui->show_selected_action, SIGNAL (triggered ()), this, SLOT (show_selected_triggered ()));
+  connect (mp_ui->visibility_follows_selection_action, SIGNAL (toggled (bool)), this, SLOT (visibility_follows_selection_changed (bool)));
+  connect (mp_ui->material_list, SIGNAL (itemSelectionChanged ()), this, SLOT (update_visibility ()));
 
   mp_ui->gl_stack->setCurrentIndex (2);
   mp_ui->rerun_button->setEnabled (false);
@@ -98,7 +98,7 @@ D25View::D25View (Dispatcher *root, LayoutViewBase *view)
   mp_ui->material_list->addAction (mp_ui->show_selected_action);
   mp_ui->material_list->setContextMenuPolicy (Qt::ActionsContextMenu);
 
-  connect (mp_ui->material_list, SIGNAL (itemChanged(QListWidgetItem *)), this, SLOT (material_item_changed(QListWidgetItem *)));
+  connect (mp_ui->material_list, SIGNAL (itemChanged (QListWidgetItem *)), this, SLOT (material_item_changed (QListWidgetItem *)));
 }
 
 D25View::~D25View ()
@@ -111,19 +111,17 @@ D25View::~D25View ()
   }
 }
 
-void
-D25View::cellviews_changed ()
+void D25View::cellviews_changed ()
 {
   deactivate ();
 }
 
-void
-D25View::layer_properties_changed (int)
+void D25View::layer_properties_changed (int)
 {
   //  .. nothing yet ..
 }
 
-bool D25View::configure(const std::string &name, const std::string &value)
+bool D25View::configure (const std::string &name, const std::string &value)
 {
   if (name == lay::cfg_background_color) {
 
@@ -142,14 +140,12 @@ bool D25View::configure(const std::string &name, const std::string &value)
     mp_ui->material_list->setPalette (palette);
 
     mp_ui->d25_view->update ();
-
   }
 
   return lay::Browser::configure (name, value);
 }
 
-void
-D25View::menu_activated (const std::string &symbol)
+void D25View::menu_activated (const std::string &symbol)
 {
   if (symbol == "lay::d25_view") {
 
@@ -166,7 +162,6 @@ D25View::menu_activated (const std::string &symbol)
         deactivate ();
         throw;
       }
-
     }
 
   } else {
@@ -190,20 +185,17 @@ D25View::open (lay::LayoutViewBase *view)
       d25_view->deactivate ();
       throw;
     }
-
   }
 
   return d25_view;
 }
 
-void
-D25View::close ()
+void D25View::close ()
 {
   hide ();
 }
 
-void
-D25View::clear ()
+void D25View::clear ()
 {
   if (! mp_ui->d25_view->has_error ()) {
     mp_ui->gl_stack->setCurrentIndex (2);
@@ -214,8 +206,7 @@ D25View::clear ()
   m_generator.clear ();
 }
 
-void
-D25View::begin (const std::string &generator)
+void D25View::begin (const std::string &generator)
 {
   clear ();
 
@@ -224,40 +215,35 @@ D25View::begin (const std::string &generator)
   }
 }
 
-void
-D25View::open_display (const tl::color_t *frame_color, const tl::color_t *fill_color, const db::LayerProperties *like, const std::string *name)
+void D25View::open_display (const tl::color_t *frame_color, const tl::color_t *fill_color, const db::LayerProperties *like, const std::string *name)
 {
   if (! mp_ui->d25_view->has_error ()) {
     mp_ui->d25_view->open_display (frame_color, fill_color, like, name);
   }
 }
 
-void
-D25View::close_display ()
+void D25View::close_display ()
 {
   if (! mp_ui->d25_view->has_error ()) {
     mp_ui->d25_view->close_display ();
   }
 }
 
-void
-D25View::entry (const db::Region &data, double dbu, double zstart, double zstop)
+void D25View::entry (const db::Region &data, double dbu, double zstart, double zstop)
 {
   if (! mp_ui->d25_view->has_error ()) {
     mp_ui->d25_view->entry (data, dbu, zstart, zstop);
   }
 }
 
-void
-D25View::entry_edge (const db::Edges &data, double dbu, double zstart, double zstop)
+void D25View::entry_edge (const db::Edges &data, double dbu, double zstart, double zstop)
 {
   if (! mp_ui->d25_view->has_error ()) {
     mp_ui->d25_view->entry (data, dbu, zstart, zstop);
   }
 }
 
-void
-D25View::entry_edge_pair (const db::EdgePairs &data, double dbu, double zstart, double zstop)
+void D25View::entry_edge_pair (const db::EdgePairs &data, double dbu, double zstart, double zstop)
 {
   if (! mp_ui->d25_view->has_error ()) {
     mp_ui->d25_view->entry (data, dbu, zstart, zstop);
@@ -293,8 +279,7 @@ static void layer_info_to_item (const lay::D25ViewWidget::LayerInfo &info, QList
   item->setIcon (icon);
 }
 
-void
-D25View::finish ()
+void D25View::finish ()
 {
   if (! mp_ui->d25_view->has_error ()) {
 
@@ -322,12 +307,10 @@ D25View::finish ()
 
     mp_ui->rerun_button->setEnabled (true);
     mp_ui->gl_stack->setCurrentIndex (0);
-
   }
 }
 
-void
-D25View::fit ()
+void D25View::fit ()
 {
   mp_ui->d25_view->fit ();
 }
@@ -337,16 +320,14 @@ static QString scale_factor_to_string (double f)
   return QString (QString::fromUtf8 ("%1")).arg (f, 0, 'g', 3);
 }
 
-void
-D25View::init_failed ()
+void D25View::init_failed ()
 {
   mp_ui->error_text->setPlainText (tl::to_qstring (mp_ui->d25_view->error ()));
   mp_ui->gl_stack->setCurrentIndex (1);
   mp_ui->rerun_button->setEnabled (false);
 }
 
-void
-D25View::scale_value_edited ()
+void D25View::scale_value_edited ()
 {
   double f = mp_ui->d25_view->scale_factor ();
   try {
@@ -359,8 +340,7 @@ D25View::scale_value_edited ()
   scale_factor_changed (f);
 }
 
-void
-D25View::vscale_value_edited ()
+void D25View::vscale_value_edited ()
 {
   double f = mp_ui->d25_view->vscale_factor ();
   try {
@@ -373,16 +353,14 @@ D25View::vscale_value_edited ()
   vscale_factor_changed (f);
 }
 
-void
-D25View::scale_slider_changed (int value)
+void D25View::scale_slider_changed (int value)
 {
   double f = exp (log (10.0) * -0.01 * value);
   mp_ui->zoom_factor->setText (scale_factor_to_string (f));
   mp_ui->d25_view->set_scale_factor (f);
 }
 
-void
-D25View::scale_factor_changed (double f)
+void D25View::scale_factor_changed (double f)
 {
   mp_ui->zoom_factor->setText (scale_factor_to_string (f));
   int v = floor (0.5 - log10 (f) * 100.0);
@@ -391,16 +369,14 @@ D25View::scale_factor_changed (double f)
   mp_ui->zoom_slider->blockSignals (false);
 }
 
-void
-D25View::vscale_slider_changed (int value)
+void D25View::vscale_slider_changed (int value)
 {
   double f = exp (log (10.0) * -0.01 * value);
   mp_ui->vzoom_factor->setText (scale_factor_to_string (f));
   mp_ui->d25_view->set_vscale_factor (f);
 }
 
-void
-D25View::vscale_factor_changed (double f)
+void D25View::vscale_factor_changed (double f)
 {
   mp_ui->vzoom_factor->setText (scale_factor_to_string (f));
   int v = floor (0.5 - log10 (f) * 100.0);
@@ -409,8 +385,7 @@ D25View::vscale_factor_changed (double f)
   mp_ui->vzoom_slider->blockSignals (false);
 }
 
-void
-D25View::material_item_changed (QListWidgetItem *item)
+void D25View::material_item_changed (QListWidgetItem *item)
 {
   int index = mp_ui->material_list->row (item);
   if (index >= 0) {
@@ -418,14 +393,12 @@ D25View::material_item_changed (QListWidgetItem *item)
   }
 }
 
-void
-D25View::deactivated ()
+void D25View::deactivated ()
 {
   mp_ui->d25_view->attach_view (0);
 }
 
-void
-D25View::activated ()
+void D25View::activated ()
 {
   mp_ui->d25_view->attach_view (view ());
   mp_ui->d25_view->reset ();
@@ -434,28 +407,25 @@ D25View::activated ()
   mp_ui->d25_view->fit ();
 }
 
-void
-D25View::rerun_button_pressed ()
+void D25View::rerun_button_pressed ()
 {
   //  NOTE: we use deferred execution, because otherwise the button won't get repainted properly
   dm_rerun_macro ();
 }
 
-void
-D25View::rerun_macro ()
+void D25View::rerun_macro ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (! m_generator.empty ()) {
     std::map<std::string, tl::Variant> add_pars;
     tl::Recipe::make (m_generator, add_pars);
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-D25View::fit_button_clicked ()
+void D25View::fit_button_clicked ()
 {
   double azimuth = mp_ui->d25_view->cam_azimuth ();
   double elevation = mp_ui->d25_view->cam_elevation ();
@@ -486,16 +456,14 @@ D25View::fit_button_clicked ()
   mp_ui->d25_view->fit ();
 }
 
-void
-D25View::hide_all_triggered ()
+void D25View::hide_all_triggered ()
 {
   for (int i = 0; i < mp_ui->material_list->count (); ++i) {
     mp_ui->material_list->item (i)->setCheckState (Qt::Unchecked);
   }
 }
 
-void
-D25View::hide_selected_triggered ()
+void D25View::hide_selected_triggered ()
 {
   for (int i = 0; i < mp_ui->material_list->count (); ++i) {
     if (mp_ui->material_list->item (i)->isSelected ()) {
@@ -504,16 +472,14 @@ D25View::hide_selected_triggered ()
   }
 }
 
-void
-D25View::show_all_triggered ()
+void D25View::show_all_triggered ()
 {
   for (int i = 0; i < mp_ui->material_list->count (); ++i) {
     mp_ui->material_list->item (i)->setCheckState (Qt::Checked);
   }
 }
 
-void
-D25View::show_selected_triggered ()
+void D25View::show_selected_triggered ()
 {
   for (int i = 0; i < mp_ui->material_list->count (); ++i) {
     if (mp_ui->material_list->item (i)->isSelected ()) {
@@ -522,15 +488,13 @@ D25View::show_selected_triggered ()
   }
 }
 
-void
-D25View::visibility_follows_selection_changed (bool checked)
+void D25View::visibility_follows_selection_changed (bool checked)
 {
   m_visibility_follows_selection = checked;
   update_visibility ();
 }
 
-void
-D25View::update_visibility ()
+void D25View::update_visibility ()
 {
   if (! m_visibility_follows_selection) {
     return;
@@ -542,17 +506,14 @@ D25View::update_visibility ()
   }
 }
 
-void 
-D25View::accept ()
+void D25View::accept ()
 {
   QDialog::accept ();
 }
 
-void
-D25View::reject ()
+void D25View::reject ()
 {
   QDialog::reject ();
 }
 
 }
-

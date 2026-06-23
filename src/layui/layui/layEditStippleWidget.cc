@@ -35,13 +35,12 @@ namespace lay
 const int stipple_pixel_size = 12;
 const int full_size = 40;
 
-struct PatternStorageOp 
-  : public db::Op
-{
+struct PatternStorageOp
+  : public db::Op {
   PatternStorageOp (const uint32_t *p, unsigned int w, unsigned int h, bool b)
     : db::Op (), width (w), height (h), before (b)
-  { 
-    memcpy (pattern, p, sizeof (pattern));    
+  {
+    memcpy (pattern, p, sizeof (pattern));
   }
 
   unsigned int width, height;
@@ -50,7 +49,7 @@ struct PatternStorageOp
 };
 
 EditStippleWidget::EditStippleWidget (QWidget *parent)
-  : QFrame (parent), db::Object (), m_last_mx (-1), m_last_my (0), 
+  : QFrame (parent), db::Object (), m_last_mx (-1), m_last_my (0),
     m_last_sx (32), m_last_sy (32), m_last_pattern_saved (false),
     m_clearing (false), m_readonly (false),
     m_sx (32), m_sy (32)
@@ -60,20 +59,17 @@ EditStippleWidget::EditStippleWidget (QWidget *parent)
   setBackgroundRole (QPalette::NoRole);
 }
 
-QSize 
-EditStippleWidget::sizeHint () const
+QSize EditStippleWidget::sizeHint () const
 {
   return QSize (stipple_pixel_size * full_size + 1, stipple_pixel_size * full_size + 1);
 }
 
-QSize 
-EditStippleWidget::minimumSize () const
+QSize EditStippleWidget::minimumSize () const
 {
   return QSize (stipple_pixel_size * full_size + 1, stipple_pixel_size * full_size + 1);
 }
 
-void
-EditStippleWidget::expand_pattern ()
+void EditStippleWidget::expand_pattern ()
 {
   if (m_sx < 32) {
     for (size_t i = 0; i < m_sy; ++i) {
@@ -91,8 +87,7 @@ EditStippleWidget::expand_pattern ()
   }
 }
 
-bool
-EditStippleWidget::get_pixel (int x, int y)
+bool EditStippleWidget::get_pixel (int x, int y)
 {
   while (x < 0) {
     x += m_sx;
@@ -108,11 +103,10 @@ EditStippleWidget::get_pixel (int x, int y)
   return (w & (1 << x)) != 0;
 }
 
-void
-EditStippleWidget::set_pixel (unsigned int xx, unsigned int yy, bool value)
+void EditStippleWidget::set_pixel (unsigned int xx, unsigned int yy, bool value)
 {
   if (xx >= 32 || yy >= 32) {
-    return; 
+    return;
   }
 
   for (int x = xx; x < 32; x += m_sx) {
@@ -127,13 +121,11 @@ EditStippleWidget::set_pixel (unsigned int xx, unsigned int yy, bool value)
       }
 
       m_pattern [y] = w;
-
     }
   }
 }
 
-bool 
-EditStippleWidget::mouse_to_pixel (const QPoint &pt, unsigned int &x, unsigned int &y)
+bool EditStippleWidget::mouse_to_pixel (const QPoint &pt, unsigned int &x, unsigned int &y)
 {
   int ix = pt.x () / stipple_pixel_size;
   int iy = (height () - 1 - pt.y ()) / stipple_pixel_size;
@@ -151,8 +143,7 @@ EditStippleWidget::mouse_to_pixel (const QPoint &pt, unsigned int &x, unsigned i
   }
 }
 
-void 
-EditStippleWidget::mouseMoveEvent (QMouseEvent *event)
+void EditStippleWidget::mouseMoveEvent (QMouseEvent *event)
 {
   if ((event->buttons () & Qt::LeftButton) != 0 && ! m_readonly) {
 
@@ -171,14 +162,11 @@ EditStippleWidget::mouseMoveEvent (QMouseEvent *event)
         emit changed ();
         update ();
       }
-
     }
-
   }
 }
 
-void 
-EditStippleWidget::mousePressEvent (QMouseEvent *event)
+void EditStippleWidget::mousePressEvent (QMouseEvent *event)
 {
   if ((event->buttons () & Qt::LeftButton) != 0 && ! m_readonly) {
 
@@ -202,12 +190,10 @@ EditStippleWidget::mousePressEvent (QMouseEvent *event)
       emit changed ();
       update ();
     }
-
   }
 }
 
-void 
-EditStippleWidget::mouseReleaseEvent (QMouseEvent *)
+void EditStippleWidget::mouseReleaseEvent (QMouseEvent *)
 {
   if (m_last_pattern_saved) {
     m_last_pattern_saved = false;
@@ -220,8 +206,7 @@ EditStippleWidget::mouseReleaseEvent (QMouseEvent *)
   }
 }
 
-void 
-EditStippleWidget::paintEvent (QPaintEvent *)
+void EditStippleWidget::paintEvent (QPaintEvent *)
 {
   QPainter painter (this);
 
@@ -229,8 +214,8 @@ EditStippleWidget::paintEvent (QPaintEvent *)
   QColor c0 = palette ().color (QPalette::Base);
   QColor c1 = palette ().color (QPalette::Text);
 
-  QColor cdis ((c0.red () + c1.red ()) / 2, 
-               (c0.green () + c1.green ()) / 2, 
+  QColor cdis ((c0.red () + c1.red ()) / 2,
+               (c0.green () + c1.green ()) / 2,
                (c0.blue () + c1.blue ()) / 2);
 
   painter.setPen (QPen (cf));
@@ -261,7 +246,6 @@ EditStippleWidget::paintEvent (QPaintEvent *)
         painter.fillRect (r, bf);
       }
     }
-
   }
 
   painter.drawLine (full_size * stipple_pixel_size, 0, full_size * stipple_pixel_size, full_size * stipple_pixel_size);
@@ -278,11 +262,9 @@ EditStippleWidget::paintEvent (QPaintEvent *)
   painter.drawLine (fr + 2, ft - 2, fr + 2, fb + 2);
   painter.drawLine (fr + 2, fb + 2, fl - 2, fb + 2);
   painter.drawLine (fl - 2, fb + 2, fl - 2, ft - 2);
-
 }
 
-void 
-EditStippleWidget::set_pattern (const uint32_t * const *pattern, unsigned int w, unsigned int h)
+void EditStippleWidget::set_pattern (const uint32_t *const *pattern, unsigned int w, unsigned int h)
 {
   if (w != m_sx || h != m_sy) {
     m_sx = w;
@@ -296,8 +278,7 @@ EditStippleWidget::set_pattern (const uint32_t * const *pattern, unsigned int w,
   update ();
 }
 
-void
-EditStippleWidget::set_pattern (const uint32_t *pattern, unsigned int w, unsigned int h)
+void EditStippleWidget::set_pattern (const uint32_t *pattern, unsigned int w, unsigned int h)
 {
   if (w != m_sx || h != m_sy) {
     m_sx = w;
@@ -311,8 +292,7 @@ EditStippleWidget::set_pattern (const uint32_t *pattern, unsigned int w, unsigne
   update ();
 }
 
-void
-EditStippleWidget::set_readonly (bool readonly)
+void EditStippleWidget::set_readonly (bool readonly)
 {
   if (m_readonly != readonly) {
     m_readonly = readonly;
@@ -320,8 +300,7 @@ EditStippleWidget::set_readonly (bool readonly)
   }
 }
 
-void 
-EditStippleWidget::clear ()
+void EditStippleWidget::clear ()
 {
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, true));
@@ -332,14 +311,13 @@ EditStippleWidget::clear ()
   }
   update ();
   emit changed ();
-  
+
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, false));
   }
 }
 
-void 
-EditStippleWidget::invert ()
+void EditStippleWidget::invert ()
 {
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, true));
@@ -350,14 +328,13 @@ EditStippleWidget::invert ()
   }
   update ();
   emit changed ();
-  
+
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, false));
   }
 }
 
-void
-EditStippleWidget::set_size (unsigned int sx, unsigned int sy)
+void EditStippleWidget::set_size (unsigned int sx, unsigned int sy)
 {
   if (sx != m_sx || sy != m_sy) {
 
@@ -376,12 +353,10 @@ EditStippleWidget::set_size (unsigned int sx, unsigned int sy)
     if (manager () && manager ()->transacting ()) {
       manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, true));
     }
-
   }
 }
 
-void
-EditStippleWidget::fliph ()
+void EditStippleWidget::fliph ()
 {
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, true));
@@ -391,7 +366,7 @@ EditStippleWidget::fliph ()
     uint32_t w = 0;
     for (unsigned int j = 0; j < m_sx; ++j) {
       w <<= 1;
-      w |= ((m_pattern [i] & (1 << j)) != 0 ? 1 : 0); 
+      w |= ((m_pattern [i] & (1 << j)) != 0 ? 1 : 0);
     }
     m_pattern [i] = w;
   }
@@ -399,37 +374,35 @@ EditStippleWidget::fliph ()
   expand_pattern ();
   update ();
   emit changed ();
-  
+
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, false));
   }
 }
 
-void 
-EditStippleWidget::flipv ()
+void EditStippleWidget::flipv ()
 {
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, true));
   }
 
-  uint32_t p[32];
+  uint32_t p [32];
   memcpy (p, m_pattern, sizeof (p));
 
   for (unsigned int i = 0; i < m_sy; ++i) {
-    m_pattern [m_sy - i - 1] = p[i];
+    m_pattern [m_sy - i - 1] = p [i];
   }
 
   expand_pattern ();
   update ();
   emit changed ();
-  
+
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, false));
   }
 }
 
-void 
-EditStippleWidget::rotate (int a)
+void EditStippleWidget::rotate (int a)
 {
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, true));
@@ -452,7 +425,7 @@ EditStippleWidget::rotate (int a)
       uint32_t w = 0;
       for (unsigned int j = 0; j < dim; ++j) {
         w <<= 1;
-        w |= ((m_pattern [j] & (1 << i)) != 0 ? 1 : 0); 
+        w |= ((m_pattern [j] & (1 << i)) != 0 ? 1 : 0);
       }
       bits [i] = w;
     }
@@ -460,20 +433,18 @@ EditStippleWidget::rotate (int a)
     memcpy (m_pattern, bits, sizeof (m_pattern));
 
     a -= 90;
-
-  } 
+  }
 
   expand_pattern ();
   update ();
   emit changed ();
-  
+
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, false));
   }
 }
 
-void 
-EditStippleWidget::shift (int dx, int dy)
+void EditStippleWidget::shift (int dx, int dy)
 {
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, true));
@@ -494,7 +465,7 @@ EditStippleWidget::shift (int dx, int dy)
         w = (w << 1) | b0;
       }
     }
-    bits [((unsigned int)(m_sy + i + dy)) % m_sy] = w;
+    bits [((unsigned int) (m_sy + i + dy)) % m_sy] = w;
   }
 
   memcpy (m_pattern, bits, sizeof (m_pattern));
@@ -502,26 +473,24 @@ EditStippleWidget::shift (int dx, int dy)
   expand_pattern ();
   update ();
   emit changed ();
-  
+
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new PatternStorageOp (m_pattern, m_sx, m_sy, false));
   }
 }
 
-void 
-EditStippleWidget::undo (db::Op *op)
+void EditStippleWidget::undo (db::Op *op)
 {
-  PatternStorageOp *pop = dynamic_cast <PatternStorageOp *> (op);
+  PatternStorageOp *pop = dynamic_cast<PatternStorageOp *> (op);
   if (pop && pop->before) {
     set_pattern (pop->pattern, pop->width, pop->height);
     emit changed ();
   }
 }
 
-void 
-EditStippleWidget::redo (db::Op *op)
+void EditStippleWidget::redo (db::Op *op)
 {
-  PatternStorageOp *pop = dynamic_cast <PatternStorageOp *> (op);
+  PatternStorageOp *pop = dynamic_cast<PatternStorageOp *> (op);
   if (pop && ! pop->before) {
     set_pattern (pop->pattern, pop->width, pop->height);
     emit changed ();

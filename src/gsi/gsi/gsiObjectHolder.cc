@@ -67,4 +67,3 @@ void *ObjectHolder::release ()
 }
 
 }
-

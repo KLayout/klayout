@@ -47,7 +47,7 @@ TEST (1)
 
   view->set_title ("xyz");
 
-  ant::Service *ant_service = view->get_plugin <ant::Service> ();
+  ant::Service *ant_service = view->get_plugin<ant::Service> ();
   tl_assert (ant_service != 0);
   if (ant_service) {
     ant::Object ruler;
@@ -55,7 +55,7 @@ TEST (1)
     ant_service->insert_ruler (ruler, false /*do not observe the ruler count limit*/);
   }
 
-  img::Service *img_service = view->get_plugin <img::Service> ();
+  img::Service *img_service = view->get_plugin<img::Service> ();
   tl_assert (img_service != 0);
   if (img_service) {
     img::Object img;
@@ -88,7 +88,7 @@ TEST (1)
 
   EXPECT_EQ (view->title (), "xyz");
 
-  ant_service = view->get_plugin <ant::Service> ();
+  ant_service = view->get_plugin<ant::Service> ();
   tl_assert (ant_service != 0);
   if (ant_service) {
     ant::AnnotationIterator a = ant_service->begin_annotations ();
@@ -100,7 +100,7 @@ TEST (1)
     }
   }
 
-  img_service = view->get_plugin <img::Service> ();
+  img_service = view->get_plugin<img::Service> ();
   tl_assert (img_service != 0);
   if (img_service) {
     img::ImageIterator i = img_service->begin_images ();
@@ -116,7 +116,7 @@ TEST (1)
   EXPECT_EQ (view->num_l2ndbs (), (unsigned int) 2);
   EXPECT_EQ (tl::filename (view->get_l2ndb (0)->filename ()), "test.l2n");
   EXPECT_EQ (tl::filename (view->get_l2ndb (1)->filename ()), "test.lvsdb");
-  EXPECT_EQ (dynamic_cast <db::LayoutVsSchematic *> (view->get_l2ndb (1)) != 0, true);
+  EXPECT_EQ (dynamic_cast<db::LayoutVsSchematic *> (view->get_l2ndb (1)) != 0, true);
 
   EXPECT_EQ (view->num_rdbs (), (unsigned int) 1);
   EXPECT_EQ (tl::filename (view->get_rdb (0)->filename ()), "test.lyrdb");
@@ -140,7 +140,7 @@ TEST (2)
   lay::LayoutView *view = mw->current_view ();
   tl_assert (view != 0);
 
-  ant::Service *ant_service = view->get_plugin <ant::Service> ();
+  ant::Service *ant_service = view->get_plugin<ant::Service> ();
   tl_assert (ant_service != 0);
   if (ant_service) {
     ant::AnnotationIterator a = ant_service->begin_annotations ();
@@ -152,7 +152,7 @@ TEST (2)
     }
   }
 
-  img::Service *img_service = view->get_plugin <img::Service> ();
+  img::Service *img_service = view->get_plugin<img::Service> ();
   tl_assert (img_service != 0);
   if (img_service) {
     img::ImageIterator i = img_service->begin_images ();
@@ -168,7 +168,7 @@ TEST (2)
   EXPECT_EQ (view->num_l2ndbs (), (unsigned int) 2);
   EXPECT_EQ (tl::filename (view->get_l2ndb (0)->filename ()), "test.l2n");
   EXPECT_EQ (tl::filename (view->get_l2ndb (1)->filename ()), "test.lvsdb");
-  EXPECT_EQ (dynamic_cast <db::LayoutVsSchematic *> (view->get_l2ndb (1)) != 0, true);
+  EXPECT_EQ (dynamic_cast<db::LayoutVsSchematic *> (view->get_l2ndb (1)) != 0, true);
 
   EXPECT_EQ (view->num_rdbs (), (unsigned int) 1);
   EXPECT_EQ (tl::filename (view->get_rdb (0)->filename ()), "test.lyrdb");

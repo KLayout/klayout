@@ -49,7 +49,8 @@ class Layout;
  *  enables algorithms to simply use the box without caching it.
  */
 
-struct DB_PUBLIC simple_bbox_tag { };
+struct DB_PUBLIC simple_bbox_tag {
+};
 
 /**
  *  @brief A tag class to indicate "complex" box computation
@@ -58,7 +59,8 @@ struct DB_PUBLIC simple_bbox_tag { };
  *  enables algorithms to use cached bboxes, i.e. for the dbBoxTree.
  */
 
-struct DB_PUBLIC complex_bbox_tag { };
+struct DB_PUBLIC complex_bbox_tag {
+};
 
 /**
  *  @brief The generic box converter for the shapes
@@ -72,8 +74,7 @@ struct DB_PUBLIC complex_bbox_tag { };
  *  The AllowEmpty flag is ignored currently.
  */
 template <class Sh, bool AllowEmpty>
-struct box_convert 
-{
+struct box_convert {
 };
 
 /**
@@ -82,8 +83,7 @@ struct box_convert
  *  The AllowEmpty flag is ignored currently.
  */
 template <class Sh, bool AllowEmpty>
-struct box_convert< db::object_with_properties<Sh>, AllowEmpty >
-{
+struct box_convert<db::object_with_properties<Sh>, AllowEmpty> {
   typedef db::box_convert<Sh> base_convert;
 
   typedef typename base_convert::complexity complexity;
@@ -106,8 +106,7 @@ struct box_convert< db::object_with_properties<Sh>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, bool AllowEmpty>
-struct box_convert< db::text<C>, AllowEmpty >
-{
+struct box_convert<db::text<C>, AllowEmpty> {
   typedef db::text<C> text_type;
   typedef db::box<C> box_type;
 
@@ -128,8 +127,7 @@ struct box_convert< db::text<C>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class Text, class Trans, bool AllowEmpty>
-struct box_convert< db::text_ref<Text, Trans>, AllowEmpty >
-{
+struct box_convert<db::text_ref<Text, Trans>, AllowEmpty> {
   typedef db::text_ref<Text, Trans> text_ref_type;
   typedef typename Text::coord_type coord_type;
   typedef db::box<coord_type> box_type;
@@ -151,8 +149,7 @@ struct box_convert< db::text_ref<Text, Trans>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class Text, class Trans, class ArrayTrans, bool AllowEmpty>
-struct box_convert< db::array< db::text_ref<Text, Trans>, ArrayTrans>, AllowEmpty >
-{
+struct box_convert<db::array<db::text_ref<Text, Trans>, ArrayTrans>, AllowEmpty> {
   typedef db::text_ref<Text, Trans> text_ref_type;
   typedef db::array<text_ref_type, ArrayTrans> text_ref_array_type;
   typedef typename Text::coord_type coord_type;
@@ -162,7 +159,7 @@ struct box_convert< db::array< db::text_ref<Text, Trans>, ArrayTrans>, AllowEmpt
 
   box_type operator() (const text_ref_array_type &t) const
   {
-    box_convert< db::text_ref<Text, Trans> > bc;
+    box_convert<db::text_ref<Text, Trans>> bc;
     return t.bbox (bc);
   }
 };
@@ -175,10 +172,9 @@ struct box_convert< db::array< db::text_ref<Text, Trans>, ArrayTrans>, AllowEmpt
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, bool AllowEmpty>
-struct box_convert < db::path<C>, AllowEmpty >
-{
-  typedef db::path <C> path_type;
-  typedef db::box <C> box_type;
+struct box_convert<db::path<C>, AllowEmpty> {
+  typedef db::path<C> path_type;
+  typedef db::box<C> box_type;
 
   typedef complex_bbox_tag complexity;
 
@@ -196,11 +192,10 @@ struct box_convert < db::path<C>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class Path, class Trans, bool AllowEmpty>
-struct box_convert < db::path_ref<Path, Trans>, AllowEmpty >
-{
-  typedef db::path_ref <Path, Trans> path_ref_type;
+struct box_convert<db::path_ref<Path, Trans>, AllowEmpty> {
+  typedef db::path_ref<Path, Trans> path_ref_type;
   typedef typename Path::coord_type coord_type;
-  typedef db::box <coord_type> box_type;
+  typedef db::box<coord_type> box_type;
 
   typedef complex_bbox_tag complexity;
 
@@ -218,18 +213,17 @@ struct box_convert < db::path_ref<Path, Trans>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class Path, class Trans, class ArrayTrans, bool AllowEmpty>
-struct box_convert < db::array< db::path_ref<Path, Trans>, ArrayTrans >, AllowEmpty >
-{
-  typedef db::path_ref <Path, Trans> path_ref_type;
+struct box_convert<db::array<db::path_ref<Path, Trans>, ArrayTrans>, AllowEmpty> {
+  typedef db::path_ref<Path, Trans> path_ref_type;
   typedef db::array<path_ref_type, ArrayTrans> path_ref_array_type;
   typedef typename Path::coord_type coord_type;
-  typedef db::box <coord_type> box_type;
+  typedef db::box<coord_type> box_type;
 
   typedef complex_bbox_tag complexity;
 
   box_type operator() (const path_ref_array_type &p) const
   {
-    box_convert< db::path_ref<Path, Trans> > bc;
+    box_convert<db::path_ref<Path, Trans>> bc;
     return p.bbox (bc);
   }
 };
@@ -242,8 +236,7 @@ struct box_convert < db::array< db::path_ref<Path, Trans>, ArrayTrans >, AllowEm
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, bool AllowEmpty>
-struct box_convert< db::polygon<C>, AllowEmpty >
-{
+struct box_convert<db::polygon<C>, AllowEmpty> {
   typedef db::polygon<C> polygon_type;
   typedef db::box<C> box_type;
 
@@ -263,8 +256,7 @@ struct box_convert< db::polygon<C>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, bool AllowEmpty>
-struct box_convert< db::simple_polygon<C>, AllowEmpty >
-{
+struct box_convert<db::simple_polygon<C>, AllowEmpty> {
   typedef db::simple_polygon<C> simple_polygon_type;
   typedef db::box<C> box_type;
 
@@ -284,8 +276,7 @@ struct box_convert< db::simple_polygon<C>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class Poly, class Trans, bool AllowEmpty>
-struct box_convert< db::polygon_ref<Poly, Trans>, AllowEmpty >
-{
+struct box_convert<db::polygon_ref<Poly, Trans>, AllowEmpty> {
   typedef db::polygon_ref<Poly, Trans> polygon_ref_type;
   typedef typename Poly::coord_type coord_type;
   typedef db::box<coord_type> box_type;
@@ -306,8 +297,7 @@ struct box_convert< db::polygon_ref<Poly, Trans>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class Poly, class Trans, class ArrayTrans, bool AllowEmpty>
-struct box_convert< db::array< db::polygon_ref<Poly, Trans>, ArrayTrans >, AllowEmpty >
-{
+struct box_convert<db::array<db::polygon_ref<Poly, Trans>, ArrayTrans>, AllowEmpty> {
   typedef db::polygon_ref<Poly, Trans> polygon_ref_type;
   typedef db::array<polygon_ref_type, ArrayTrans> polygon_ref_array_type;
   typedef typename Poly::coord_type coord_type;
@@ -317,7 +307,7 @@ struct box_convert< db::array< db::polygon_ref<Poly, Trans>, ArrayTrans >, Allow
 
   box_type operator() (const polygon_ref_array_type &p) const
   {
-    box_convert< db::polygon_ref<Poly, Trans> > bc;
+    box_convert<db::polygon_ref<Poly, Trans>> bc;
     return p.bbox (bc);
   }
 };
@@ -330,8 +320,7 @@ struct box_convert< db::array< db::polygon_ref<Poly, Trans>, ArrayTrans >, Allow
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, bool AllowEmpty>
-struct box_convert< db::point<C>, AllowEmpty >
-{
+struct box_convert<db::point<C>, AllowEmpty> {
   typedef db::point<C> point_type;
   typedef db::box<C> box_type;
 
@@ -351,8 +340,7 @@ struct box_convert< db::point<C>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, bool AllowEmpty>
-struct box_convert< db::vector<C>, AllowEmpty >
-{
+struct box_convert<db::vector<C>, AllowEmpty> {
   typedef db::vector<C> vector_type;
   typedef db::point<C> point_type;
   typedef db::box<C> box_type;
@@ -374,8 +362,7 @@ struct box_convert< db::vector<C>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, bool AllowEmpty>
-struct box_convert< db::edge_pair<C>, AllowEmpty >
-{
+struct box_convert<db::edge_pair<C>, AllowEmpty> {
   typedef db::edge_pair<C> edge_pair_type;
   typedef db::box<C> box_type;
 
@@ -396,8 +383,7 @@ struct box_convert< db::edge_pair<C>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, bool AllowEmpty>
-struct box_convert< db::edge<C>, AllowEmpty >
-{
+struct box_convert<db::edge<C>, AllowEmpty> {
   typedef db::edge<C> edge_type;
   typedef db::box<C> box_type;
 
@@ -415,8 +401,7 @@ struct box_convert< db::edge<C>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, bool AllowEmpty>
-struct box_convert< db::user_object<C>, AllowEmpty >
-{
+struct box_convert<db::user_object<C>, AllowEmpty> {
   typedef db::user_object<C> user_object_type;
   typedef db::box<C> box_type;
 
@@ -436,9 +421,8 @@ struct box_convert< db::user_object<C>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, bool AllowEmpty>
-struct box_convert <db::box <C>, AllowEmpty >
-{
-  typedef db::box <C> box_type;
+struct box_convert<db::box<C>, AllowEmpty> {
+  typedef db::box<C> box_type;
 
   typedef simple_bbox_tag complexity;
 
@@ -454,8 +438,7 @@ struct box_convert <db::box <C>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, class ArrayTrans, bool AllowEmpty>
-struct box_convert< db::array< db::box<C>, ArrayTrans >, AllowEmpty >
-{
+struct box_convert<db::array<db::box<C>, ArrayTrans>, AllowEmpty> {
   typedef C coord_type;
   typedef db::box<coord_type> box_type;
   typedef db::array<box_type, ArrayTrans> box_array_type;
@@ -477,9 +460,8 @@ struct box_convert< db::array< db::box<C>, ArrayTrans >, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, class R, bool AllowEmpty>
-struct box_convert <db::box <C, R>, AllowEmpty >
-{
-  typedef db::box <C> box_type;
+struct box_convert<db::box<C, R>, AllowEmpty> {
+  typedef db::box<C> box_type;
 
   typedef simple_bbox_tag complexity;
 
@@ -495,16 +477,15 @@ struct box_convert <db::box <C, R>, AllowEmpty >
  *  The AllowEmpty flag is ignored currently.
  */
 template <class C, class R, class ArrayTrans, bool AllowEmpty>
-struct box_convert< db::array< db::box<C, R>, ArrayTrans >, AllowEmpty >
-{
+struct box_convert<db::array<db::box<C, R>, ArrayTrans>, AllowEmpty> {
   typedef db::box<C> box_type;
-  typedef db::array< db::box<C, R>, ArrayTrans> box_array_type;
+  typedef db::array<db::box<C, R>, ArrayTrans> box_array_type;
 
   typedef simple_bbox_tag complexity;
 
   box_type operator() (const box_array_type &a) const
   {
-    box_convert< box<C, R> > bc;
+    box_convert<box<C, R>> bc;
     return a.bbox (bc);
   }
 };
@@ -522,8 +503,7 @@ DB_PUBLIC db::Box cell_box_convert_impl (const db::Cell &c, int layer, bool allo
  */
 
 template <bool AllowEmpty>
-struct DB_PUBLIC box_convert <db::Cell, AllowEmpty>
-{
+struct DB_PUBLIC box_convert<db::Cell, AllowEmpty> {
   typedef db::Cell cell_type;
   typedef db::Box box_type;
 
@@ -531,12 +511,14 @@ struct DB_PUBLIC box_convert <db::Cell, AllowEmpty>
 
   box_convert ()
     : m_layer (-1)
-  { }
-  
+  {
+  }
+
   box_convert (unsigned int l)
     : m_layer (l)
-  { }
-  
+  {
+  }
+
   box_type operator() (const cell_type &c) const
   {
     return cell_box_convert_impl (c, m_layer, AllowEmpty);
@@ -553,15 +535,14 @@ DB_PUBLIC db::Box cellinst_box_convert_impl (const db::CellInst &inst, const db:
  *  @brief The cell inst box converter
  *
  *  This class is used as a function to convert a cell instance
- *  to a box for a given layer. This requires that the per-layer 
+ *  to a box for a given layer. This requires that the per-layer
  *  bounding boxes of the cell have been computed already.
  *
  *  If AllowEmpty is false, the box converter treats empty cells as single points at 0, 0.
  */
 
 template <bool AllowEmpty>
-struct box_convert <db::CellInst, AllowEmpty>
-{
+struct box_convert<db::CellInst, AllowEmpty> {
   typedef db::CellInst cell_inst_type;
   typedef db::Layout layout_type;
   typedef db::Box box_type;
@@ -570,16 +551,19 @@ struct box_convert <db::CellInst, AllowEmpty>
 
   box_convert ()
     : mp_layout (0), m_layer (-1)
-  { }
-  
+  {
+  }
+
   box_convert (const layout_type &ly, unsigned int l)
     : mp_layout (&ly), m_layer (l)
-  { }
-  
+  {
+  }
+
   box_convert (const layout_type &ly)
     : mp_layout (&ly), m_layer (-1)
-  { }
-  
+  {
+  }
+
   box_type operator() (const cell_inst_type &t) const
   {
     return cellinst_box_convert_impl (t, mp_layout, m_layer, AllowEmpty);
@@ -594,16 +578,15 @@ private:
  *  @brief The cell inst array box converter
  *
  *  This class is used as a function to convert a cell instance array
- *  to a box for a given layer or for all layers. This requires that 
- *  the per-layer or overall bounding boxes of the cell have been 
+ *  to a box for a given layer or for all layers. This requires that
+ *  the per-layer or overall bounding boxes of the cell have been
  *  computed already.
  *
  *  If AllowEmpty is false, the box converter treats empty cells as single points at 0, 0.
  */
 
 template <class ArrayTrans, bool AllowEmpty>
-struct box_convert <db::array <db::CellInst, ArrayTrans>, AllowEmpty>
-{
+struct box_convert<db::array<db::CellInst, ArrayTrans>, AllowEmpty> {
   typedef db::CellInst cell_inst_type;
   typedef db::Layout layout_type;
   typedef db::Box box_type;
@@ -612,23 +595,26 @@ struct box_convert <db::array <db::CellInst, ArrayTrans>, AllowEmpty>
 
   box_convert ()
     : m_bc ()
-  { }
-  
+  {
+  }
+
   box_convert (const layout_type &g, unsigned int l)
     : m_bc (g, l)
-  { }
-  
+  {
+  }
+
   box_convert (const layout_type &g)
     : m_bc (g)
-  { }
-  
-  box_type operator() (const db::array <cell_inst_type, ArrayTrans> &t) const
+  {
+  }
+
+  box_type operator() (const db::array<cell_inst_type, ArrayTrans> &t) const
   {
     return t.bbox (m_bc);
   }
 
 private:
-  box_convert <cell_inst_type, AllowEmpty> m_bc;
+  box_convert<cell_inst_type, AllowEmpty> m_bc;
 };
 
 /**
@@ -637,9 +623,8 @@ private:
  *  If AllowEmpty is false, the box converter treats empty cells as single points at 0, 0.
  */
 template <class ArrayTrans, bool AllowEmpty>
-struct box_convert< db::object_with_properties< db::array <db::CellInst, ArrayTrans> >, AllowEmpty>
-{
-  typedef db::array <db::CellInst, ArrayTrans> cell_inst_array;
+struct box_convert<db::object_with_properties<db::array<db::CellInst, ArrayTrans>>, AllowEmpty> {
+  typedef db::array<db::CellInst, ArrayTrans> cell_inst_array;
   typedef db::box_convert<cell_inst_array, AllowEmpty> base_convert;
   typedef db::Layout layout_type;
 
@@ -648,15 +633,18 @@ struct box_convert< db::object_with_properties< db::array <db::CellInst, ArrayTr
 
   box_convert ()
     : bconvert ()
-  { }
+  {
+  }
 
   box_convert (const layout_type &g, unsigned int l)
     : bconvert (g, l)
-  { }
+  {
+  }
 
   box_convert (const layout_type &g)
     : bconvert (g)
-  { }
+  {
+  }
 
   box_type operator() (const db::object_with_properties<cell_inst_array> &s) const
   {
@@ -669,4 +657,3 @@ struct box_convert< db::object_with_properties< db::array <db::CellInst, ArrayTr
 }
 
 #endif
-

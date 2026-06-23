@@ -41,7 +41,7 @@ namespace img
 //  Navigator implementation
 
 Navigator::Navigator (QWidget *parent)
-  : QFrame (parent), 
+  : QFrame (parent),
     mp_view (0),
     mp_zoom_service (0)
 {
@@ -95,14 +95,12 @@ lay::LayoutView *Navigator::view ()
   return mp_view->view ();
 }
 
-void 
-Navigator::activate_service (lay::ViewService *service)
+void Navigator::activate_service (lay::ViewService *service)
 {
   view ()->canvas ()->activate (service);
 }
 
-void
-Navigator::background_color (QColor c)
+void Navigator::background_color (QColor c)
 {
   //  replace by "real" background color if required
   if (! c.isValid ()) {

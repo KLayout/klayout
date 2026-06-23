@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "QtNetworkMain.h"
-DEFINE_PYMOD(QtNetwork, "QtNetwork", "KLayout/Qt module 'QtNetwork'")
+DEFINE_PYMOD (QtNetwork, "QtNetwork", "KLayout/Qt module 'QtNetwork'")

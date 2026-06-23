@@ -64,10 +64,10 @@ double marker_text_border_in_pixels ();
 class LAYBASIC_PUBLIC MarkerBase
   : public lay::ViewObject
 {
-public: 
-  /** 
-   *  @brief The constructor 
-   */ 
+public:
+  /**
+   *  @brief The constructor
+   */
   MarkerBase (lay::LayoutViewBase *view);
 
   /**
@@ -280,7 +280,7 @@ private:
 /**
  *  @brief The generic marker object
  *
- *  This marker object is the base for shape and instance markers. 
+ *  This marker object is the base for shape and instance markers.
  *  This object is the base for specialized markers, i.e. instance and shape markers.
  *  The basic functionality is to keep a set of transformations.
  *  certain instance object in the layout. It is given an instance reference
@@ -290,10 +290,10 @@ private:
 class LAYBASIC_PUBLIC GenericMarkerBase
   : public MarkerBase
 {
-public: 
-  /** 
-   *  @brief The constructor 
-   */ 
+public:
+  /**
+   *  @brief The constructor
+   */
   GenericMarkerBase (lay::LayoutViewBase *view, unsigned int cv_index);
 
   /**
@@ -389,17 +389,17 @@ private:
 /**
  *  @brief The shape marker object
  *
- *  The marker is a visual object that "marks" (highlights) a 
+ *  The marker is a visual object that "marks" (highlights) a
  *  certain shape object in the layout.
  */
 
 class LAYBASIC_PUBLIC ShapeMarker
   : public GenericMarkerBase
 {
-public: 
-  /** 
-   *  @brief The constructor 
-   */ 
+public:
+  /**
+   *  @brief The constructor
+   */
   ShapeMarker (lay::LayoutViewBase *view, unsigned int cv_index);
 
   /**
@@ -436,13 +436,13 @@ private:
 
   virtual db::DBox item_bbox () const;
 
-  db::Shape m_shape; 
+  db::Shape m_shape;
 };
 
 /**
  *  @brief The instance marker object
  *
- *  The marker is a visual object that "marks" (highlights) a 
+ *  The marker is a visual object that "marks" (highlights) a
  *  certain instance object in the layout. It is given an instance reference
  *  thus pointing to a instance rather than keeping a copy of it.
  */
@@ -450,15 +450,15 @@ private:
 class LAYBASIC_PUBLIC InstanceMarker
   : public GenericMarkerBase
 {
-public: 
-  /** 
-   *  @brief The constructor 
+public:
+  /**
+   *  @brief The constructor
    *
    *  @param view The view the marker is intended for
    *  @param cv_index The cell view index of the layout that this marker is intended for
    *  @param draw_outline True to have instances drawing their outline
    *  @param max_shapes The maximum number of shapes to draw for instances (just a box is drawn if more shapes are present)
-   */ 
+   */
   InstanceMarker (lay::LayoutViewBase *view, unsigned int cv_index, bool draw_outline = true, size_t max_shapes = 0);
 
   /**
@@ -523,13 +523,13 @@ private:
 
   bool m_draw_outline;
   size_t m_max_shapes;
-  db::Instance m_inst; 
+  db::Instance m_inst;
 };
 
 /**
  *  @brief The marker object
  *
- *  The marker is a visual object that "marks" (highlights) a 
+ *  The marker is a visual object that "marks" (highlights) a
  *  certain area of the layout.
  *
  *  The objects can be given as either integer or float types.
@@ -548,15 +548,15 @@ private:
 class LAYBASIC_PUBLIC Marker
   : public GenericMarkerBase
 {
-public: 
-  /** 
+public:
+  /**
    *  The constructor
    *
    *  @param view The view the marker is intended for
    *  @param cv_index The cell view index of the layout that this marker is intended for
    *  @param draw_outline True to have instances drawing their outline
    *  @param max_shapes The maximum number of shapes to draw for instances (just a box is drawn if more shapes are present)
-   */ 
+   */
   Marker (lay::LayoutViewBase *view, unsigned int cv_index, bool draw_outline = true, size_t max_shapes = 0);
 
   /**
@@ -676,7 +676,7 @@ public:
 
   /**
    *  @brief Set the floating-point path the marker is to display
-   *  
+   *
    *  This variant draws the path multiple times at the given transformations.
    */
   void set (const db::DPath &path, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans);
@@ -688,7 +688,7 @@ public:
 
   /**
    *  @brief Set the text the marker is to display
-   *  
+   *
    *  This variant draws the text multiple times at the given transformations.
    */
   void set (const db::Text &text, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans);
@@ -700,7 +700,7 @@ public:
 
   /**
    *  @brief Set the floating-point text the marker is to display
-   *  
+   *
    *  This variant draws the text multiple times at the given transformations.
    */
   void set (const db::DText &text, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans);
@@ -743,7 +743,7 @@ public:
 
 protected:
   virtual db::DBox item_bbox () const;
-  
+
 private:
   virtual void render (const Viewport &vp, ViewObjectCanvas &canvas);
 
@@ -753,8 +753,22 @@ private:
   bool m_draw_outline;
   size_t m_max_shapes;
 
-  enum { 
-    None, Box, DBox, Polygon, PolygonRef, DPolygon, EdgePair, DEdgePair, Edge, DEdge, Path, DPath, Text, DText, Instance
+  enum {
+    None,
+    Box,
+    DBox,
+    Polygon,
+    PolygonRef,
+    DPolygon,
+    EdgePair,
+    DEdgePair,
+    Edge,
+    DEdge,
+    Path,
+    DPath,
+    Text,
+    DText,
+    Instance
   } m_type;
 
   union {
@@ -779,7 +793,7 @@ private:
 /**
  *  @brief The floating-point coordinate marker object
  *
- *  The marker is a visual object that "marks" (highlights) a 
+ *  The marker is a visual object that "marks" (highlights) a
  *  certain area of the layout. In contrast to the "Marker" object, this
  *  object accepts objects with coordinates in floating-point coordinates in micron values.
  *  It does not need a DBU value hence no cellview to display itself.
@@ -788,10 +802,10 @@ private:
 class LAYBASIC_PUBLIC DMarker
   : public MarkerBase
 {
-public: 
-  /** 
-   *  @brief The constructor 
-   */ 
+public:
+  /**
+   *  @brief The constructor
+   */
   DMarker (lay::LayoutViewBase *view);
 
   /**
@@ -835,14 +849,20 @@ public:
    *  @brief Gets the bounding box
    */
   virtual db::DBox bbox () const;
-  
+
 private:
   virtual void render (const Viewport &vp, ViewObjectCanvas &canvas);
 
   void remove_object ();
 
-  enum { 
-    None, Box, Polygon, EdgePair, Edge, Path, Text
+  enum {
+    None,
+    Box,
+    Polygon,
+    EdgePair,
+    Edge,
+    Path,
+    Text
   } m_type;
 
   union {
@@ -863,12 +883,14 @@ private:
  *  proxy for GSI binding.
  */
 class ManagedDMarker
-  : public lay::DMarker, public gsi::ObjectBase
+  : public lay::DMarker,
+    public gsi::ObjectBase
 {
 public:
   ManagedDMarker (lay::LayoutViewBase *view)
     : lay::DMarker (view)
-  { }
+  {
+  }
 };
 
 }

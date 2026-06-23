@@ -39,7 +39,8 @@ class QAction;
 class QWidget;
 class QTimer;
 
-namespace gtf {
+namespace gtf
+{
 
 /**
  *  @brief The base class for logged events
@@ -50,31 +51,31 @@ public:
   /**
    *   @brief Constructor
    */
-  LogEventBase (int xml_line) 
-    : m_xml_line (xml_line) 
-  { 
+  LogEventBase (int xml_line)
+    : m_xml_line (xml_line)
+  {
     //  .. nothing yet ..
   }
 
   /**
    *   @brief Destructor
    */
-  virtual ~LogEventBase () { }
+  virtual ~LogEventBase () {}
 
   /**
    *  @brief Issue the given event in playback mode
    */
   virtual void issue_event () = 0;
 
-  /** 
+  /**
    *  @brief Get the name of the element
    */
   virtual const char *name () const = 0;
 
-  /** 
+  /**
    *  @brief Get the attributes of the element
    */
-  virtual void attributes (std::vector< std::pair<std::string, std::string> > & /*attr*/) const { }
+  virtual void attributes (std::vector<std::pair<std::string, std::string>> & /*attr*/) const {}
 
   /**
    *  @brief Compare the event to an other event
@@ -99,19 +100,19 @@ public:
   void write (std::ostream &os, bool with_endl = true) const;
 
   /**
-   *  @brief Equality 
+   *  @brief Equality
    */
-  bool operator== (const LogEventBase &b) const 
+  bool operator== (const LogEventBase &b) const
   {
     return equals (b) && data () == b.data ();
   }
 
   /**
-   *  @brief Inequality 
+   *  @brief Inequality
    */
-  bool operator!= (const LogEventBase &b) const 
+  bool operator!= (const LogEventBase &b) const
   {
-    return !operator== (b);
+    return ! operator== (b);
   }
 
   /**
@@ -133,8 +134,8 @@ public:
   /**
    *  @brief Set the data object
    */
-  void set_data (const tl::Variant &d) 
-  { 
+  void set_data (const tl::Variant &d)
+  {
     m_data = d;
   }
 
@@ -146,10 +147,10 @@ protected:
 /**
  *  @brief A helper class to intercept an action's trigger signal
  */
-class ActionInterceptor 
+class ActionInterceptor
   : public QObject
 {
-Q_OBJECT
+  Q_OBJECT
 public:
   ActionInterceptor (QObject *parent, QAction *action);
 
@@ -163,7 +164,7 @@ private:
   QAction *mp_action;
 };
 
-/** 
+/**
  *  @brief A container for the list of events
  */
 class LAYBASIC_PUBLIC EventList
@@ -173,7 +174,7 @@ public:
   typedef container_type::const_iterator const_iterator;
   typedef container_type::iterator iterator;
 
-  /** 
+  /**
    *  @brief Constructor: create an empty list
    */
   EventList ();
@@ -188,7 +189,7 @@ public:
    *
    *  This method parses the given file and stores the events internally.
    *  If the file is not a valid log file or an error occurs, an exception
-   *  is thrown. 
+   *  is thrown.
    */
   void load (const std::string &filename, bool no_spontaneous = false);
 
@@ -210,7 +211,7 @@ public:
   /**
    *  @brief Last element of the list (non-const version)
    */
-  gtf::LogEventBase *back () 
+  gtf::LogEventBase *back ()
   {
     return m_events.back ();
   }
@@ -218,7 +219,7 @@ public:
   /**
    *  @brief pop an element
    */
-  void pop_back () 
+  void pop_back ()
   {
     m_events.pop_back ();
   }
@@ -240,7 +241,7 @@ public:
   }
 
   /**
-   *  @brief Random access 
+   *  @brief Random access
    */
   const gtf::LogEventBase *operator[] (unsigned int index) const
   {
@@ -250,7 +251,7 @@ public:
   /**
    *  @brief Random access (non-const version)
    */
-  gtf::LogEventBase *operator[] (unsigned int index) 
+  gtf::LogEventBase *operator[] (unsigned int index)
   {
     return m_events [index];
   }
@@ -274,7 +275,7 @@ public:
   /**
    *  @brief Start iterator for the events (non-const version)
    */
-  iterator begin () 
+  iterator begin ()
   {
     return m_events.begin ();
   }
@@ -288,7 +289,7 @@ public:
   }
 
   /**
-   *  @brief Add an event to the list 
+   *  @brief Add an event to the list
    */
   void add (gtf::LogEventBase *e)
   {
@@ -300,15 +301,15 @@ private:
 };
 
 /**
- *  @brief The player class 
- *  
+ *  @brief The player class
+ *
  *  The player parses the given log file, holds the events to be played
  *  and issues the event when the replay method is called.
  */
 class LAYBASIC_PUBLIC Player
   : public QObject
 {
-Q_OBJECT
+  Q_OBJECT
 public:
   /**
    *  @brief Instantiate the player
@@ -374,7 +375,7 @@ public:
    *
    *  This method parses the given file and stores the events internally.
    *  If the file is not a valid log file or an error occurs, an exception
-   *  is thrown. 
+   *  is thrown.
    */
   void load (const std::string &filename, bool no_spontaneous = false)
   {
@@ -446,7 +447,7 @@ public:
    *
    *  The GTF does not track events that lead to an action, because
    *  this is not possible in every case (i.e. key shortcuts). Instead,
-   *  the action is tracked itself. On each action, this function must be 
+   *  the action is tracked itself. On each action, this function must be
    *  called.
    */
   void action (QAction *action);
@@ -570,4 +571,4 @@ LAYBASIC_PUBLIC tl::Variant image_to_variant (const QImage &image);
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

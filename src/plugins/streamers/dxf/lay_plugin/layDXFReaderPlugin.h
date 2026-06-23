@@ -30,16 +30,16 @@
 
 namespace Ui
 {
-  class DXFReaderOptionPage;
+class DXFReaderOptionPage;
 }
 
 namespace lay
 {
 
-class DXFReaderOptionPage 
+class DXFReaderOptionPage
   : public StreamReaderOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   DXFReaderOptionPage (QWidget *parent);

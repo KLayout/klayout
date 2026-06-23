@@ -38,8 +38,8 @@ namespace db
  *
  *  A variable-width path is a path which has a non-constant width over it's
  *  length. A width can be assigned to certain points and will be interpolated
- *  for other points. Interpolation is performed along the length of the 
- *  path's spine. 
+ *  for other points. Interpolation is performed along the length of the
+ *  path's spine.
  *
  *  The initial and final width must be specified. A point can be assigned two
  *  widths: an incoming and an outgoing width. If one width is specified, the
@@ -61,13 +61,13 @@ public:
    *
    *  J is an iterator delivering width_spec_type objects.
    *
-   *  The width specification is a list of point index and width. The 
+   *  The width specification is a list of point index and width. The
    *  list must be sorted ascending by index. One index can be present
    *  twice. In this case, the first specification will be the incoming
    *  width, the second one will be the outgoing width.
    *
-   *  The first element of the width specification needs to be 
-   *  the initial width (0, w1) and the last element needs to be 
+   *  The first element of the width specification needs to be
+   *  the initial width (0, w1) and the last element needs to be
    *  the final width (n-1, w2) where n is the number of points.
    */
   template <class I, class J>
@@ -102,8 +102,8 @@ private:
   void init ();
 
   std::vector<point_type> m_points;
-  std::vector<std::pair<width_type, width_type> > m_widths;
-  std::vector<std::pair<size_t, C> > m_org_widths;
+  std::vector<std::pair<width_type, width_type>> m_widths;
+  std::vector<std::pair<size_t, C>> m_org_widths;
 };
 
 /**
@@ -119,5 +119,3 @@ typedef variable_width_path<db::DCoord> DVariableWidthPath;
 }
 
 #endif
-
-

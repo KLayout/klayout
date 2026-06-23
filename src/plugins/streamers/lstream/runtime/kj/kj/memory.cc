@@ -21,8 +21,9 @@
 
 #include "memory.h"
 
-namespace kj {
+namespace kj
+{
 
-const NullDisposer NullDisposer::instance = NullDisposer();
+const NullDisposer NullDisposer::instance = NullDisposer ();
 
-}  // namespace kj
+} // namespace kj

@@ -89,4 +89,3 @@ void EdgesDelegate::set_strict_handling (bool f)
 }
 
 }
-

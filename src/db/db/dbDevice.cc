@@ -138,7 +138,7 @@ const NetTerminalRef *Device::terminal_ref_for_terminal (size_t terminal_id) con
   if (terminal_id < m_terminal_refs.size ()) {
     Net::terminal_iterator p = m_terminal_refs [terminal_id];
     if (! tl::is_null_iterator (p)) {
-      return p.operator-> ();
+      return p.operator->();
     }
   }
   return 0;
@@ -192,7 +192,6 @@ void Device::set_parameter_value (size_t param_id, double v)
         }
       }
     }
-
   }
 
   m_parameters [param_id] = v;
@@ -214,7 +213,7 @@ void Device::add_others_terminals (unsigned int this_terminal, db::Device *other
 {
   std::vector<DeviceReconnectedTerminal> &terminals = m_reconnected_terminals [this_terminal];
 
-  std::map<unsigned int, std::vector<DeviceReconnectedTerminal> >::const_iterator ot = other->m_reconnected_terminals.find (other_terminal);
+  std::map<unsigned int, std::vector<DeviceReconnectedTerminal>>::const_iterator ot = other->m_reconnected_terminals.find (other_terminal);
   if (ot == other->m_reconnected_terminals.end ()) {
 
     terminals.push_back (DeviceReconnectedTerminal (other_abstracts ().size () + 1, other_terminal));
@@ -228,7 +227,6 @@ void Device::add_others_terminals (unsigned int this_terminal, db::Device *other
       terminals [n].device_index += other_abstracts ().size () + 1;
       ++n;
     }
-
   }
 }
 

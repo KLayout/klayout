@@ -47,7 +47,6 @@ HttpErrorException::format_error (const std::string &em, int ec, const std::stri
     } else {
       msg += body;
     }
-
   }
 
   return msg;

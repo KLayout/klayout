@@ -38,7 +38,7 @@ DeferredMethodSchedulerQt::DeferredMethodSchedulerQt ()
 
   connect (&m_timer, SIGNAL (timeout ()), this, SLOT (timer ()));
 
-  m_timer.setInterval (0); // immediately
+  m_timer.setInterval (0);      // immediately
   m_timer.setSingleShot (true); //  just once
 
   //  set up a fallback timer that cleans up pending execute jobs if something goes wrong
@@ -52,14 +52,12 @@ DeferredMethodSchedulerQt::~DeferredMethodSchedulerQt ()
   //  .. nothing yet ..
 }
 
-void 
-DeferredMethodSchedulerQt::queue_event ()
+void DeferredMethodSchedulerQt::queue_event ()
 {
   qApp->postEvent (this, new QEvent (QEvent::Type (m_event_type)));
 }
 
-bool
-DeferredMethodSchedulerQt::event (QEvent *event)
+bool DeferredMethodSchedulerQt::event (QEvent *event)
 {
   if (event->type () == m_event_type) {
     timer ();
@@ -69,8 +67,7 @@ DeferredMethodSchedulerQt::event (QEvent *event)
   }
 }
 
-void 
-DeferredMethodSchedulerQt::timer ()
+void DeferredMethodSchedulerQt::timer ()
 {
   if (is_disabled ()) {
     //  start again if disabled

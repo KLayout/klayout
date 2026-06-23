@@ -59,7 +59,7 @@ static void run_test_int (tl::TestBase *_this, I1 a, I2 b)
 {
   typedef typename LI1::basic_type basic_type;
   if (tl::verbose ()) {
-    printf("Long int test with pair (%ld,%ld)\n", long (a), long (b));
+    printf ("Long int test with pair (%ld,%ld)\n", long (a), long (b));
   }
 
   LI1 ae = to_e (a);
@@ -121,7 +121,7 @@ static void run_test (tl::TestBase *_this, I1 a, I2 b)
   run_test_int<I1, LI1, I2, LI2> (_this, b, a);
 }
 
-TEST(1)
+TEST (1)
 {
   run_test<i_type, li_type, i_type, li_type> (_this, 0, 1);
   run_test<i_type, li_type, i_type, li_type> (_this, 256, 257);
@@ -135,7 +135,7 @@ TEST(1)
   }
 }
 
-TEST(2)
+TEST (2)
 {
   run_test<ui_type, lui_type, i_type, li_type> (_this, 0, 1);
   run_test<ui_type, lui_type, i_type, li_type> (_this, 256, 257);
@@ -149,7 +149,7 @@ TEST(2)
   }
 }
 
-TEST(3)
+TEST (3)
 {
   run_test<i_type, li_type, ui_type, lui_type> (_this, 0, 1);
   run_test<i_type, li_type, ui_type, lui_type> (_this, 256, 257);
@@ -163,7 +163,7 @@ TEST(3)
   }
 }
 
-TEST(4)
+TEST (4)
 {
   run_test<ui_type, lui_type, ui_type, lui_type> (_this, 0, 1);
   run_test<ui_type, lui_type, ui_type, lui_type> (_this, 256, 257);

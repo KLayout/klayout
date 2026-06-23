@@ -102,8 +102,7 @@ void FlatEdges::reserve (size_t n)
   mp_edges->reserve (db::Edge::tag (), n);
 }
 
-void
-FlatEdges::ensure_merged_edges_valid () const
+void FlatEdges::ensure_merged_edges_valid () const
 {
   if (! m_merged_edges_valid) {
 
@@ -139,10 +138,10 @@ FlatEdges::ensure_merged_edges_valid () const
 
     } else {
 
-      std::map<db::properties_id_type, std::vector<const db::Edge *> > edges_by_props;
+      std::map<db::properties_id_type, std::vector<const db::Edge *>> edges_by_props;
 
       for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
-        edges_by_props [e.prop_id ()].push_back (e.operator-> ());
+        edges_by_props [e.prop_id ()].push_back (e.operator->());
       }
 
       for (auto s2p = edges_by_props.begin (); s2p != edges_by_props.end (); ++s2p) {
@@ -157,14 +156,11 @@ FlatEdges::ensure_merged_edges_valid () const
         }
 
         scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
-
       }
-
     }
 
     mp_merged_edges->swap (tmp);
     m_merged_edges_valid = true;
-
   }
 }
 
@@ -255,7 +251,6 @@ FlatEdges::processed_in_place (const EdgeProcessorBase &filter)
         }
       }
     }
-
   }
 
   e.get_layer<db::Edge, db::unstable_layer_tag> ().erase (pw, e.get_layer<db::Edge, db::unstable_layer_tag> ().end ());
@@ -325,7 +320,6 @@ EdgesDelegate *FlatEdges::add (const Edges &other) const
         new_region->raw_edges ().insert (db::EdgeWithProperties (*p, p.prop_id ()));
       }
     }
-
   }
 
   return new_region.release ();
@@ -353,7 +347,6 @@ EdgesDelegate *FlatEdges::add_in_place (const Edges &other)
         e.insert (db::EdgeWithProperties (*p, p.prop_id ()));
       }
     }
-
   }
 
   return this;
@@ -427,12 +420,10 @@ void FlatEdges::apply_property_translator (const db::PropertiesTranslator &pt)
     mp_edges->swap (new_edges);
 
     invalidate_cache ();
-
   }
 }
 
-void
-FlatEdges::do_insert (const db::Edge &edge, db::properties_id_type prop_id)
+void FlatEdges::do_insert (const db::Edge &edge, db::properties_id_type prop_id)
 {
   m_is_merged = empty ();
 
@@ -446,4 +437,3 @@ FlatEdges::do_insert (const db::Edge &edge, db::properties_id_type prop_id)
 }
 
 }
-

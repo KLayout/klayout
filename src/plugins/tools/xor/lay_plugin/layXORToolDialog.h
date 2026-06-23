@@ -29,12 +29,12 @@
 
 namespace Ui
 {
-  class XORToolDialog;
+class XORToolDialog;
 }
 
 namespace lay
 {
-  class LayoutViewBase;
+class LayoutViewBase;
 }
 
 namespace lay
@@ -55,7 +55,7 @@ extern std::string cfg_xor_region_mode;
 class XORToolDialog
   : public QDialog
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   XORToolDialog (QWidget *parent);
@@ -80,4 +80,3 @@ private:
 }
 
 #endif
-

@@ -32,9 +32,8 @@
 
 namespace img
 {
-  IMG_PUBLIC int _force_link_f ();
-  static int _force_link_target = _force_link_f ();
+IMG_PUBLIC int _force_link_f ();
+static int _force_link_target = _force_link_f ();
 }
 
 #endif
-

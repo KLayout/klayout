@@ -26,20 +26,23 @@
 
 CAPNP_BEGIN_HEADER
 
-namespace capnp {
+namespace capnp
+{
 
 template <typename T, typename CapnpPrivate = typename T::_capnpPrivate>
-inline schema::Node::Reader schemaProto() {
+inline schema::Node::Reader schemaProto ()
+{
   // Get the schema::Node for this type's schema. This function works even in lite mode.
-  return readMessageUnchecked<schema::Node>(CapnpPrivate::encodedSchema());
+  return readMessageUnchecked<schema::Node> (CapnpPrivate::encodedSchema ());
 }
 
 template <typename T, uint64_t id = schemas::EnumInfo<T>::typeId>
-inline schema::Node::Reader schemaProto() {
+inline schema::Node::Reader schemaProto ()
+{
   // Get the schema::Node for this type's schema. This function works even in lite mode.
-  return readMessageUnchecked<schema::Node>(schemas::EnumInfo<T>::encodedSchema());
+  return readMessageUnchecked<schema::Node> (schemas::EnumInfo<T>::encodedSchema ());
 }
 
-}  // namespace capnp
+} // namespace capnp
 
 CAPNP_END_HEADER

@@ -39,7 +39,7 @@ Browser::Browser (lay::Dispatcher *root, lay::LayoutViewBase *view, const char *
 #else
 Browser::Browser (lay::Dispatcher *root, lay::LayoutViewBase *view, const char *name, Qt::WFlags fl)
 #endif
-    //  TODO: clarify whether to keep the browsers as separate (potentially hidden) windows
+  //  TODO: clarify whether to keep the browsers as separate (potentially hidden) windows
   : QDialog (0 /*view*/, fl),
     lay::Plugin (view),
     m_active (false),
@@ -56,8 +56,7 @@ Browser::~Browser ()
   }
 }
 
-void 
-Browser::activate ()
+void Browser::activate ()
 {
   if (! active ()) {
     m_active = true;
@@ -66,8 +65,7 @@ Browser::activate ()
   }
 }
 
-void 
-Browser::deactivate ()
+void Browser::deactivate ()
 {
   if (active ()) {
     m_active = false;
@@ -76,8 +74,7 @@ Browser::deactivate ()
   }
 }
 
-void 
-Browser::closeEvent (QCloseEvent *event)
+void Browser::closeEvent (QCloseEvent *event)
 {
   if (active ()) {
     m_active = false;
@@ -86,8 +83,7 @@ Browser::closeEvent (QCloseEvent *event)
   }
 }
 
-void
-Browser::accept ()
+void Browser::accept ()
 {
   if (active ()) {
     m_active = false;
@@ -96,8 +92,7 @@ Browser::accept ()
   }
 }
 
-void
-Browser::reject ()
+void Browser::reject ()
 {
   if (active ()) {
     m_active = false;
@@ -109,4 +104,3 @@ Browser::reject ()
 }
 
 #endif
-

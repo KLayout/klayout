@@ -31,7 +31,8 @@
 #include "dbShapeFlags.h" //  for addressable_object_from_shape
 #include "tlSList.h"
 
-namespace db {
+namespace db
+{
 
 class Shapes;
 
@@ -44,7 +45,9 @@ class Shapes;
 class DB_PUBLIC NetShape
 {
 public:
-  enum shape_type { None, Text, Polygon };
+  enum shape_type { None,
+                    Text,
+                    Polygon };
 
   typedef db::Point point_type;
   typedef db::Box box_type;
@@ -163,8 +166,7 @@ public:
  *  @brief A box converter implementation for NetShape
  */
 template <>
-struct box_convert<db::NetShape>
-{
+struct box_convert<db::NetShape> {
   typedef db::NetShape::box_type box_type;
   typedef db::NetShape::coord_type coord_type;
   typedef db::complex_bbox_tag complexity;
@@ -176,11 +178,10 @@ struct box_convert<db::NetShape>
 };
 
 template <>
-struct addressable_object_from_shape<db::NetShape>
-{
+struct addressable_object_from_shape<db::NetShape> {
   typedef db::NetShape value_type;
 
-  const value_type *operator () (const db::Shape &shape)
+  const value_type *operator() (const db::Shape &shape)
   {
     if (shape.type () == db::Shape::TextRef) {
       m_heap.push_back (db::NetShape (shape.text_ref ()));
@@ -200,4 +201,3 @@ private:
 }
 
 #endif
-

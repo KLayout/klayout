@@ -68,7 +68,7 @@ std::string collect2 (db::RecursiveInstanceIterator &s, const db::Layout &layout
   return res;
 }
 
-TEST(1)
+TEST (1)
 {
   db::Manager m (true);
   db::Layout g (&m);
@@ -113,77 +113,77 @@ TEST(1)
   std::string x;
 
   db::RecursiveInstanceIterator i1 (g, c0, db::Box (0, 0, 100, 100));
-  x = collect(i1, g);
+  x = collect (i1, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
-  x = collect_with_copy(i1, g);
+  x = collect_with_copy (i1, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
 
   db::RecursiveInstanceIterator i1_1inf (g, c0, db::Box (0, 0, 100, 100));
-  i1_1inf.min_depth(0);
-  x = collect(i1_1inf, g);
+  i1_1inf.min_depth (0);
+  x = collect (i1_1inf, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
-  x = collect_with_copy(i1_1inf, g);
+  x = collect_with_copy (i1_1inf, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
 
   db::RecursiveInstanceIterator i1_11 (g, c0, db::Box (0, 0, 2000, 100));
-  i1_11.min_depth(0);
-  i1_11.max_depth(0);
-  x = collect(i1_11, g);
+  i1_11.min_depth (0);
+  i1_11.max_depth (0);
+  x = collect (i1_11, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
-  x = collect_with_copy(i1_11, g);
+  x = collect_with_copy (i1_11, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
 
   db::RecursiveInstanceIterator i1_12 (g, c0, db::Box (0, 0, 2000, 100));
-  i1_12.min_depth(0);
-  i1_12.max_depth(1);
-  x = collect(i1_12, g);
+  i1_12.min_depth (0);
+  i1_12.max_depth (1);
+  x = collect (i1_12, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100");
-  x = collect_with_copy(i1_12, g);
+  x = collect_with_copy (i1_12, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100");
 
   db::RecursiveInstanceIterator i1_22 (g, c0, db::Box (0, 0, 2000, 100));
-  i1_22.min_depth(1);
-  i1_22.max_depth(1);
-  x = collect(i1_22, g);
+  i1_22.min_depth (1);
+  i1_22.max_depth (1);
+  x = collect (i1_22, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0");
-  x = collect_with_copy(i1_22, g);
+  x = collect_with_copy (i1_22, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0");
 
   db::RecursiveInstanceIterator i1o (g, c0, db::Box (0, 0, 100, 100), true);
-  x = collect(i1o, g);
+  x = collect (i1o, g);
   EXPECT_EQ (x, "");
-  x = collect_with_copy(i1o, g);
+  x = collect_with_copy (i1o, g);
   EXPECT_EQ (x, "");
   i1o = db::RecursiveInstanceIterator (g, c0, db::Box (0, 0, 100, 101), true);
-  x = collect(i1o, g);
+  x = collect (i1o, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0");
-  x = collect_with_copy(i1o, g);
+  x = collect_with_copy (i1o, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0");
   i1o = db::RecursiveInstanceIterator (g, c0, db::Box (0, 0, 101, 101), true);
-  x = collect(i1o, g);
+  x = collect (i1o, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
-  x = collect_with_copy(i1o, g);
+  x = collect_with_copy (i1o, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
 
   db::RecursiveInstanceIterator i2 (g, c0, db::Box (-100, 0, 100, 100));
   db::RecursiveInstanceIterator i2c = i2;
-  x = collect(i2, g);
+  x = collect (i2, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect_with_copy(i2, g);
+  x = collect_with_copy (i2, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect(i2c, g);
+  x = collect (i2c, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect_with_copy(i2c, g);
+  x = collect_with_copy (i2c, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
   db::RecursiveInstanceIterator i2o (g, c0, db::Box (-100, 0, 100, 100), true);
-  x = collect(i2o, g);
+  x = collect (i2o, g);
   EXPECT_EQ (x, "");
-  x = collect_with_copy(i2o, g);
+  x = collect_with_copy (i2o, g);
   EXPECT_EQ (x, "");
   i2o = db::RecursiveInstanceIterator (g, c0, db::Box (-101, 0, 101, 101), true);
-  x = collect(i2o, g);
+  x = collect (i2o, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect_with_copy(i2o, g);
+  x = collect_with_copy (i2o, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
 
   db::Region r;
@@ -191,26 +191,26 @@ TEST(1)
   r.insert (db::Box (1600, 0, 1700, 100));
   db::RecursiveInstanceIterator i2r (g, c0, r);
   db::RecursiveInstanceIterator i2rc = i2r;
-  x = collect(i2r, g);
+  x = collect (i2r, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect_with_copy(i2r, g);
+  x = collect_with_copy (i2r, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect(i2rc, g);
+  x = collect (i2rc, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect_with_copy(i2rc, g);
+  x = collect_with_copy (i2rc, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
   db::RecursiveInstanceIterator i2ro (g, c0, r, true);
-  x = collect(i2ro, g);
+  x = collect (i2ro, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0/[$1]$3 r0 100,-100");
-  x = collect_with_copy(i2ro, g);
+  x = collect_with_copy (i2ro, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0/[$1]$3 r0 100,-100");
 
   db::RecursiveInstanceIterator i4 (g, c0, db::Box (-100, 0, 2000, 100));
   db::RecursiveInstanceIterator i4_copy (g, c0, db::Box (-100, 0, 2000, 100));
   i4.max_depth (0);
-  x = collect(i4, g);
+  x = collect (i4, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect_with_copy(i4, g);
+  x = collect_with_copy (i4, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
 
   EXPECT_EQ (i4 == i4, true);
@@ -221,21 +221,21 @@ TEST(1)
   EXPECT_EQ (i4 == i4_copy, true);
   EXPECT_EQ (i4 != i4_copy, false);
   i4.max_depth (1);
-  x = collect(i4, g);
+  x = collect (i4, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect_with_copy(i4, g);
+  x = collect_with_copy (i4, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
 
   i4 = i4_copy;
-  x = collect(i4, g);
+  x = collect (i4, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect_with_copy(i4, g);
+  x = collect_with_copy (i4, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
 
   db::RecursiveInstanceIterator i5 (g, c0, db::Box::world ());
-  x = collect(i5, g);
+  x = collect (i5, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect_with_copy(i5, g);
+  x = collect_with_copy (i5, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
 
   std::set<db::cell_index_type> cc;
@@ -246,20 +246,20 @@ TEST(1)
   cc.insert (c2.cell_index ());
   ii.unselect_all_cells ();
   ii.select_cells (cc);
-  x = collect(ii, g);
+  x = collect (ii, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0");
-  x = collect_with_copy(ii, g);
+  x = collect_with_copy (ii, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0");
   ii.reset ();
-  x = collect(ii, g);
+  x = collect (ii, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0");
-  x = collect_with_copy(ii, g);
+  x = collect_with_copy (ii, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0");
 
   ii.reset_selection ();
-  x = collect(ii, g);
+  x = collect (ii, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect_with_copy(ii, g);
+  x = collect_with_copy (ii, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
 
   ii.reset_selection ();
@@ -270,9 +270,9 @@ TEST(1)
   cc.clear ();
   cc.insert (c2.cell_index ());
   ii.select_cells (cc);
-  x = collect(ii, g);
+  x = collect (ii, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0");
-  x = collect_with_copy(ii, g);
+  x = collect_with_copy (ii, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0");
 
   ii = db::RecursiveInstanceIterator (g, c0, db::Box::world ());
@@ -280,9 +280,9 @@ TEST(1)
   cc.clear ();
   cc.insert (c0.cell_index ());
   ii.select_cells (cc);
-  x = collect(ii, g);
+  x = collect (ii, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
-  x = collect_with_copy(ii, g);
+  x = collect_with_copy (ii, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
 
   db::RecursiveInstanceIterator i1z (g, c0);
@@ -298,16 +298,16 @@ TEST(1)
   i1z.set_targets (ct);
   EXPECT_EQ (i1z.all_targets_enabled (), false);
 
-  x = collect(i1z, g);
+  x = collect (i1z, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0/[$1]$4 r90 0,0");
-  x = collect_with_copy(i1z, g);
+  x = collect_with_copy (i1z, g);
   EXPECT_EQ (x, "[$3]$4 r0 1100,0/[$1]$4 r90 0,0");
 }
 
 static db::Layout boxes2layout (const std::set<db::Box> &boxes)
 {
   db::Layout l;
-  l.insert_layer(0, db::LayerProperties (1, 0));
+  l.insert_layer (0, db::LayerProperties (1, 0));
   db::Cell &top (l.cell (l.add_cell ()));
 
   for (std::set<db::Box>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
@@ -317,32 +317,33 @@ static db::Layout boxes2layout (const std::set<db::Box> &boxes)
   return l;
 }
 
-namespace {
+namespace
+{
 
-  class FlatPusher
-    : public db::RecursiveInstanceReceiver
+class FlatPusher
+  : public db::RecursiveInstanceReceiver
+{
+public:
+  FlatPusher (std::set<db::Box> *boxes) : mp_boxes (boxes) {}
+
+  void enter_cell (const db::RecursiveInstanceIterator *iter, const db::Cell *cell, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
   {
-  public:
-    FlatPusher (std::set<db::Box> *boxes) : mp_boxes (boxes) { }
+    mp_boxes->insert (iter->trans () * cell->bbox ());
+  }
 
-    void enter_cell (const db::RecursiveInstanceIterator *iter, const db::Cell *cell, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
-    {
-      mp_boxes->insert (iter->trans () * cell->bbox ());
-    }
-
-  private:
-    std::set<db::Box> *mp_boxes;
-  };
+private:
+  std::set<db::Box> *mp_boxes;
+};
 
 }
 
-TEST(2)
+TEST (2)
 {
   //  Big fun with cells
 
   db::Manager m (true);
   db::Layout g (&m);
-  g.insert_layer(0);
+  g.insert_layer (0);
 
   db::Cell &c0 (g.cell (g.add_cell ()));
   db::Cell &c1 (g.cell (g.add_cell ()));
@@ -360,7 +361,6 @@ TEST(2)
     boxes.insert (basic_box.moved (db::Vector (x, y)));
 
     c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (x, y))));
-
   }
 
   db::Box search_box (2500, 2500, 7500, 7500);
@@ -368,7 +368,7 @@ TEST(2)
   std::set<db::Box> selected_boxes;
   std::set<db::Box> selected_boxes2;
 
-  for (db::RecursiveInstanceIterator iter = db::RecursiveInstanceIterator (g, c0, search_box, true); !iter.at_end (); ++iter) {
+  for (db::RecursiveInstanceIterator iter = db::RecursiveInstanceIterator (g, c0, search_box, true); ! iter.at_end (); ++iter) {
     selected_boxes.insert (iter.trans () * iter->inst_ptr.bbox ());
   }
 
@@ -400,7 +400,7 @@ TEST(2)
   reg.insert (search_box);
   reg.insert (search_box2);
 
-  for (db::RecursiveInstanceIterator iter = db::RecursiveInstanceIterator (g, c0, reg, true); !iter.at_end (); ++iter) {
+  for (db::RecursiveInstanceIterator iter = db::RecursiveInstanceIterator (g, c0, reg, true); ! iter.at_end (); ++iter) {
     selected_boxes.insert (iter.trans () * iter->bbox (db::box_convert<db::CellInst> (g)));
   }
 
@@ -424,13 +424,13 @@ TEST(2)
   EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
 }
 
-TEST(3)
+TEST (3)
 {
   //  Big fun with cells - 2 hierarchy levels
 
   db::Manager m (true);
   db::Layout g (&m);
-  g.insert_layer(0);
+  g.insert_layer (0);
 
   db::Cell &c0 (g.cell (g.add_cell ()));
   db::Cell &c1 (g.cell (g.add_cell ()));
@@ -455,7 +455,6 @@ TEST(3)
     boxes.insert (basic_box.moved (db::Vector (x + 1, y - 1)));
 
     c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (x, y))));
-
   }
 
   db::Box search_box (2500, 2500, 7500, 7500);
@@ -468,7 +467,7 @@ TEST(3)
   tc.insert (c2.cell_index ());
   iter.set_targets (tc);
   int n = 0;
-  for ( ; !iter.at_end (); ++iter) {
+  for (; ! iter.at_end (); ++iter) {
     ++n;
     selected_boxes.insert (iter.trans () * iter->bbox (db::box_convert<db::CellInst> (g)));
   }
@@ -505,7 +504,7 @@ TEST(3)
   reg.insert (search_box);
   reg.insert (search_box2);
 
-  for (db::RecursiveInstanceIterator iter = db::RecursiveInstanceIterator (g, c0, reg, true); !iter.at_end (); ++iter) {
+  for (db::RecursiveInstanceIterator iter = db::RecursiveInstanceIterator (g, c0, reg, true); ! iter.at_end (); ++iter) {
     selected_boxes.insert (iter.trans () * iter->bbox (db::box_convert<db::CellInst> (g)));
   }
 
@@ -529,13 +528,13 @@ TEST(3)
   EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
 }
 
-TEST(4)
+TEST (4)
 {
   //  Big fun with cells - 2 hierarchy levels + touching mode
 
   db::Manager m (true);
   db::Layout g (&m);
-  g.insert_layer(0);
+  g.insert_layer (0);
 
   db::Cell &c0 (g.cell (g.add_cell ()));
   db::Cell &c1 (g.cell (g.add_cell ()));
@@ -560,7 +559,6 @@ TEST(4)
     boxes.insert (basic_box.moved (db::Vector (x + 1, y - 1)));
 
     c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (x, y))));
-
   }
 
   db::Box search_box (2500, 2500, 7500, 7500);
@@ -573,7 +571,7 @@ TEST(4)
   tc.insert (c2.cell_index ());
   iter.set_targets (tc);
   int n = 0;
-  for ( ; !iter.at_end (); ++iter) {
+  for (; ! iter.at_end (); ++iter) {
     ++n;
     selected_boxes.insert (iter.trans () * iter->bbox (db::box_convert<db::CellInst> (g)));
   }
@@ -610,7 +608,7 @@ TEST(4)
   reg.insert (search_box);
   reg.insert (search_box2);
 
-  for (db::RecursiveInstanceIterator iter = db::RecursiveInstanceIterator (g, c0, reg); !iter.at_end (); ++iter) {
+  for (db::RecursiveInstanceIterator iter = db::RecursiveInstanceIterator (g, c0, reg); ! iter.at_end (); ++iter) {
     selected_boxes.insert (iter.trans () * iter->bbox (db::box_convert<db::CellInst> (g)));
   }
 
@@ -634,7 +632,7 @@ TEST(4)
   EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
 }
 
-TEST(5)
+TEST (5)
 {
   std::unique_ptr<db::Layout> g (new db::Layout ());
   g->insert_layer (0);
@@ -664,7 +662,7 @@ TEST(5)
   std::string x;
 
   db::RecursiveInstanceIterator i1 (*g, c0, db::Box (0, 0, 100, 100));
-  x = collect(i1, *g);
+  x = collect (i1, *g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
 
   g.reset (new db::Layout ());
@@ -672,12 +670,12 @@ TEST(5)
   //  now the layout is gone and the iterator stays silent (weak pointer to layout)
   //  NOTE: this only works on reset or re-initialization. Not during iteration.
   i1.reset ();
-  x = collect(i1, *g);
+  x = collect (i1, *g);
   EXPECT_EQ (x, "");
 }
 
 //  issue-1353
-TEST(6)
+TEST (6)
 {
   db::Layout layout;
 
@@ -695,103 +693,99 @@ TEST(6)
   db::cell_index_type c2 = layout.cell_by_name ("TOP_CELL_3_B").second;
   db::RecursiveInstanceIterator i1 (layout, layout.cell (c1));
 
-  x = collect2(i1, layout);
+  x = collect2 (i1, layout);
   EXPECT_EQ (x,
-    //  depth-first traversal
-    "CHILD_CELL_3_1_1@r0 *1 30000,0\n"
-    "CHILD_CELL_3_1@r0 *1 30000,0\n"
-    "CHILD_CELL_3@r0 *1 30000,0\n"
-    "CHILD_CELL_3_1_1@r0 *1 55000,0\n"
-    "CHILD_CELL_3_1@r0 *1 55000,0\n"
-    "CHILD_CELL_3@r0 *1 55000,0\n"
-    "CHILD_CELL_3_1_1@r0 *1 55000,20000\n"
-    "CHILD_CELL_3_1@r0 *1 55000,20000\n"
-    "CHILD_CELL_3@r0 *1 55000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 55000,40000\n"
-    "CHILD_CELL_3_1@r0 *1 55000,40000\n"
-    "CHILD_CELL_3@r0 *1 55000,40000\n"
-    "CHILD_CELL_3_1_1@r0 *1 75000,0\n"
-    "CHILD_CELL_3_1@r0 *1 75000,0\n"
-    "CHILD_CELL_3@r0 *1 75000,0\n"
-    "CHILD_CELL_3_1_1@r0 *1 75000,20000\n"
-    "CHILD_CELL_3_1@r0 *1 75000,20000\n"
-    "CHILD_CELL_3@r0 *1 75000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 75000,40000\n"
-    "CHILD_CELL_3_1@r0 *1 75000,40000\n"
-    "CHILD_CELL_3@r0 *1 75000,40000\n"
-    "CHILD_CELL_3_1_1@r0 *1 95000,0\n"
-    "CHILD_CELL_3_1@r0 *1 95000,0\n"
-    "CHILD_CELL_3@r0 *1 95000,0\n"
-    "CHILD_CELL_3_1_1@r0 *1 95000,20000\n"
-    "CHILD_CELL_3_1@r0 *1 95000,20000\n"
-    "CHILD_CELL_3@r0 *1 95000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 95000,40000\n"
-    "CHILD_CELL_3_1@r0 *1 95000,40000\n"
-    "CHILD_CELL_3@r0 *1 95000,40000\n"
-    "CHILD_CELL_3_1_1@r0 *1 30000,20000\n"
-    "CHILD_CELL_3_1@r0 *1 30000,20000\n"
-    "CHILD_CELL_3@r0 *1 30000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 30000,40000\n"
-    "CHILD_CELL_3_1@r0 *1 30000,40000\n"
-    "CHILD_CELL_3@r0 *1 30000,40000"
-  );
+             //  depth-first traversal
+             "CHILD_CELL_3_1_1@r0 *1 30000,0\n"
+             "CHILD_CELL_3_1@r0 *1 30000,0\n"
+             "CHILD_CELL_3@r0 *1 30000,0\n"
+             "CHILD_CELL_3_1_1@r0 *1 55000,0\n"
+             "CHILD_CELL_3_1@r0 *1 55000,0\n"
+             "CHILD_CELL_3@r0 *1 55000,0\n"
+             "CHILD_CELL_3_1_1@r0 *1 55000,20000\n"
+             "CHILD_CELL_3_1@r0 *1 55000,20000\n"
+             "CHILD_CELL_3@r0 *1 55000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 55000,40000\n"
+             "CHILD_CELL_3_1@r0 *1 55000,40000\n"
+             "CHILD_CELL_3@r0 *1 55000,40000\n"
+             "CHILD_CELL_3_1_1@r0 *1 75000,0\n"
+             "CHILD_CELL_3_1@r0 *1 75000,0\n"
+             "CHILD_CELL_3@r0 *1 75000,0\n"
+             "CHILD_CELL_3_1_1@r0 *1 75000,20000\n"
+             "CHILD_CELL_3_1@r0 *1 75000,20000\n"
+             "CHILD_CELL_3@r0 *1 75000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 75000,40000\n"
+             "CHILD_CELL_3_1@r0 *1 75000,40000\n"
+             "CHILD_CELL_3@r0 *1 75000,40000\n"
+             "CHILD_CELL_3_1_1@r0 *1 95000,0\n"
+             "CHILD_CELL_3_1@r0 *1 95000,0\n"
+             "CHILD_CELL_3@r0 *1 95000,0\n"
+             "CHILD_CELL_3_1_1@r0 *1 95000,20000\n"
+             "CHILD_CELL_3_1@r0 *1 95000,20000\n"
+             "CHILD_CELL_3@r0 *1 95000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 95000,40000\n"
+             "CHILD_CELL_3_1@r0 *1 95000,40000\n"
+             "CHILD_CELL_3@r0 *1 95000,40000\n"
+             "CHILD_CELL_3_1_1@r0 *1 30000,20000\n"
+             "CHILD_CELL_3_1@r0 *1 30000,20000\n"
+             "CHILD_CELL_3@r0 *1 30000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 30000,40000\n"
+             "CHILD_CELL_3_1@r0 *1 30000,40000\n"
+             "CHILD_CELL_3@r0 *1 30000,40000");
 
   std::set<db::cell_index_type> t;
   t.insert (layout.cell_by_name ("TOP_CELL_3_1_1").second);
   i1.set_targets (t);
 
-  x = collect2(i1, layout);
+  x = collect2 (i1, layout);
   EXPECT_EQ (x,
-    "CHILD_CELL_3_1_1@r0 *1 30000,0\n"
-    "CHILD_CELL_3_1_1@r0 *1 55000,0\n"
-    "CHILD_CELL_3_1_1@r0 *1 55000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 55000,40000\n"
-    "CHILD_CELL_3_1_1@r0 *1 75000,0\n"
-    "CHILD_CELL_3_1_1@r0 *1 75000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 75000,40000\n"
-    "CHILD_CELL_3_1_1@r0 *1 95000,0\n"
-    "CHILD_CELL_3_1_1@r0 *1 95000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 95000,40000\n"
-    "CHILD_CELL_3_1_1@r0 *1 30000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 30000,40000"
-  );
+             "CHILD_CELL_3_1_1@r0 *1 30000,0\n"
+             "CHILD_CELL_3_1_1@r0 *1 55000,0\n"
+             "CHILD_CELL_3_1_1@r0 *1 55000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 55000,40000\n"
+             "CHILD_CELL_3_1_1@r0 *1 75000,0\n"
+             "CHILD_CELL_3_1_1@r0 *1 75000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 75000,40000\n"
+             "CHILD_CELL_3_1_1@r0 *1 95000,0\n"
+             "CHILD_CELL_3_1_1@r0 *1 95000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 95000,40000\n"
+             "CHILD_CELL_3_1_1@r0 *1 30000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 30000,40000");
 
   db::RecursiveInstanceIterator i2 (layout, layout.cell (c2));
   i2.set_targets (t);
 
-  x = collect2(i2, layout);
+  x = collect2 (i2, layout);
   EXPECT_EQ (x,
-    "CHILD_CELL_3_1_1@r0 *1 30000,0\n"
-    "CHILD_CELL_3_1_1@r0 *1 55000,0\n"
-    "CHILD_CELL_3_1_1@r0 *1 55000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 55000,40000\n"
-    "CHILD_CELL_3_1_1@r0 *1 75000,0\n"
-    "CHILD_CELL_3_1_1@r0 *1 75000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 75000,40000\n"
-    "CHILD_CELL_3_1_1@r0 *1 95000,0\n"
-    "CHILD_CELL_3_1_1@r0 *1 95000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 95000,40000\n"
-    "CHILD_CELL_3_1_1@r0 *1 30000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 30000,40000\n"
-    "CHILD_CELL_3_1_1@r0 *1 120000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 120000,40000\n"
-    "CHILD_CELL_3_1_1@r0 *1 120000,0"
-  );
+             "CHILD_CELL_3_1_1@r0 *1 30000,0\n"
+             "CHILD_CELL_3_1_1@r0 *1 55000,0\n"
+             "CHILD_CELL_3_1_1@r0 *1 55000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 55000,40000\n"
+             "CHILD_CELL_3_1_1@r0 *1 75000,0\n"
+             "CHILD_CELL_3_1_1@r0 *1 75000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 75000,40000\n"
+             "CHILD_CELL_3_1_1@r0 *1 95000,0\n"
+             "CHILD_CELL_3_1_1@r0 *1 95000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 95000,40000\n"
+             "CHILD_CELL_3_1_1@r0 *1 30000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 30000,40000\n"
+             "CHILD_CELL_3_1_1@r0 *1 120000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 120000,40000\n"
+             "CHILD_CELL_3_1_1@r0 *1 120000,0");
 
   std::set<db::cell_index_type> sc;
   sc.insert (layout.cell_by_name ("CHILD_CELL_3").second);
   i2.unselect_cells (sc);
 
-  x = collect2(i2, layout);
+  x = collect2 (i2, layout);
   EXPECT_EQ (x,
-    "CHILD_CELL_3_1_1@r0 *1 120000,20000\n"
-    "CHILD_CELL_3_1_1@r0 *1 120000,40000\n"
-    "CHILD_CELL_3_1_1@r0 *1 120000,0"
-  );
+             "CHILD_CELL_3_1_1@r0 *1 120000,20000\n"
+             "CHILD_CELL_3_1_1@r0 *1 120000,40000\n"
+             "CHILD_CELL_3_1_1@r0 *1 120000,0");
 }
 
 //  layout locking
-TEST(7_LayoutLocking)
+TEST (7_LayoutLocking)
 {
   db::Layout layout;
 
@@ -855,4 +849,3 @@ TEST(7_LayoutLocking)
 
   EXPECT_EQ (layout.under_construction (), false);
 }
-

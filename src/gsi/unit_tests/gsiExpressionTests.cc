@@ -33,7 +33,7 @@
 //  Tests
 
 // basics
-TEST(1) 
+TEST (1)
 {
   tl::Eval e;
   tl::Variant v;
@@ -98,11 +98,11 @@ TEST(1)
   v = e.parse ("a.a4([5, 1, -1.25])").execute ();
   EXPECT_EQ (v.to_string (), std::string ("-1.25"));
   v = e.parse ("A.instance_count").execute ();
-  EXPECT_EQ (v.to_int (), base_insts + 1);   //  one instance more
+  EXPECT_EQ (v.to_int (), base_insts + 1); //  one instance more
   v = e.parse ("a=1; A.instance_count").execute ();
-  EXPECT_EQ (v.to_int (), base_insts);   //  remaining instances 
+  EXPECT_EQ (v.to_int (), base_insts); //  remaining instances
   v = e.parse ("A.instance_count").execute ();
-  EXPECT_EQ (v.to_int (), base_insts);   //  remaining instances 
+  EXPECT_EQ (v.to_int (), base_insts); //  remaining instances
 
   v = e.parse ("var a1=A.new; a1.a5(-15); var a2=a1.dup; a2.a5(107); a1.get_n").execute ();
   EXPECT_EQ (v.to_string (), std::string ("-15"));
@@ -206,10 +206,9 @@ TEST(1)
   EXPECT_EQ (v.to_string (), std::string ("a|b"));
 #endif
 #endif
-
 }
 
-TEST(2) 
+TEST (2)
 {
   tl::Eval e;
   tl::Variant v;
@@ -328,7 +327,7 @@ TEST(2)
   bool error = false;
   try {
     tl::Expression ex;
-    e.parse(ex, "b.amember_cref.a5(177)");
+    e.parse (ex, "b.amember_cref.a5(177)");
     v = ex.execute ();
   } catch (...) {
     //  can't call non-const method on const ref
@@ -380,7 +379,7 @@ TEST(2)
   EXPECT_EQ (error, true);
 }
 
-TEST(3) 
+TEST (3)
 {
   tl::Eval e;
   tl::Variant v;
@@ -390,7 +389,7 @@ TEST(3)
   //  Currently there is no way to override virtual methods in expressions so we can't check much else.
 }
 
-TEST(4) 
+TEST (4)
 {
   tl::Eval e;
   tl::Variant v;
@@ -456,7 +455,7 @@ TEST(4)
   EXPECT_EQ (v.to_string (), std::string ("nix"));
 }
 
-TEST(5) 
+TEST (5)
 {
   tl::Eval e;
   tl::Variant v;
@@ -474,7 +473,7 @@ TEST(5)
   EXPECT_EQ (v.to_string (), std::string ("117"));
 }
 
-TEST(6) 
+TEST (6)
 {
   tl::Eval e;
   tl::Variant v;
@@ -501,7 +500,7 @@ TEST(6)
   EXPECT_EQ (v.to_string (), std::string ("false"));
 }
 
-TEST(7) 
+TEST (7)
 {
   tl::Eval e;
   tl::Variant v;
@@ -542,7 +541,7 @@ TEST(7)
   EXPECT_EQ (v.to_string (), std::string ("nil"));
 }
 
-TEST(8)
+TEST (8)
 {
   tl::Eval e;
   tl::Variant v;
@@ -577,7 +576,7 @@ public:
 
 }
 
-TEST(9)
+TEST (9)
 {
   tl::Eval e;
   CollectFunction *collect_func = new CollectFunction ();
@@ -586,12 +585,12 @@ TEST(9)
   tl::Variant v;
   v = e.parse ("var x=Region.new(Box.new(0,0,100,100)); put(x.area); x=x.sized(10); put(x.area); x=x.sized(10); put(x.area);").execute ();
   EXPECT_EQ (collect_func->values.size (), size_t (3));
-  EXPECT_EQ (collect_func->values[0], 10000);
-  EXPECT_EQ (collect_func->values[1], 14400);
-  EXPECT_EQ (collect_func->values[2], 19600);
+  EXPECT_EQ (collect_func->values [0], 10000);
+  EXPECT_EQ (collect_func->values [1], 14400);
+  EXPECT_EQ (collect_func->values [2], 19600);
 }
 
-TEST(10)
+TEST (10)
 {
   tl::Eval e;
   tl::Variant v;
@@ -614,7 +613,7 @@ TEST(10)
   EXPECT_EQ (v.to_string (), std::string ("2"));
 }
 
-TEST(11)
+TEST (11)
 {
   tl::Eval e;
   tl::Variant v;
@@ -624,7 +623,7 @@ TEST(11)
   EXPECT_EQ (v.to_string (), std::string ("r90 -20,10"));
 }
 
-TEST(12)
+TEST (12)
 {
   //  Keyword arguments are best tested on transformations, here CplxTrans
 
@@ -689,7 +688,7 @@ TEST(12)
   EXPECT_EQ (v.to_string (), std::string ("r0 *1 0.15000,0.25000"));
 }
 
-TEST(13)
+TEST (13)
 {
   //  Keyword arguments are best tested on transformations, here Trans
 
@@ -730,7 +729,7 @@ TEST(13)
   EXPECT_EQ (v.to_string (), std::string ("r0 1,2"));
 }
 
-TEST(14)
+TEST (14)
 {
   //  Keyword arguments and errors
 
@@ -738,42 +737,42 @@ TEST(14)
   tl::Variant v;
 
   try {
-    v = e.parse("var t = CplxTrans.new(1.5, 2.5); t.to_s(dbu='abc')").execute();
+    v = e.parse ("var t = CplxTrans.new(1.5, 2.5); t.to_s(dbu='abc')").execute ();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg (), "Unexpected text after numeric value: '...abc' (argument 'dbu') at position 34 (...to_s(dbu='abc'))");
   }
 
   try {
-    v = e.parse("var t = CplxTrans.new(1.5, 2.5); var tt = CplxTrans.new(); t.assign(other=t)").execute();
+    v = e.parse ("var t = CplxTrans.new(1.5, 2.5); var tt = CplxTrans.new(); t.assign(other=t)").execute ();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg ().find ("Keyword arguments not permitted at position 60 (...assign(other=t))"), size_t (0));
   }
 
   try {
-    v = e.parse("var t = CplxTrans.new('abc');").execute();
+    v = e.parse ("var t = CplxTrans.new('abc');").execute ();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg ().find ("No overload with matching arguments. Variants are:"), size_t (0));
   }
 
   try {
-    v = e.parse("var t = CplxTrans.new(uu=17);").execute();
+    v = e.parse ("var t = CplxTrans.new(uu=17);").execute ();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg ().find ("Can't match arguments. Variants are:"), size_t (0));
   }
 
   try {
-    v = e.parse("var t = CplxTrans.new(u='17');").execute();
+    v = e.parse ("var t = CplxTrans.new(u='17');").execute ();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg ().find ("No overload with matching arguments. Variants are:"), size_t (0));
   }
 }
 
-TEST(15)
+TEST (15)
 {
   //  Keyword arguments, enums and errors
 
@@ -781,57 +780,57 @@ TEST(15)
   tl::Variant v;
 
   try {
-    v = e.parse("var bb = BB.new; bb.d4()").execute();
+    v = e.parse ("var bb = BB.new; bb.d4()").execute ();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg (), "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [no value given for argument #1 and following]\n at position 19 (...d4())");
   }
 
   try {
-    v = e.parse("var bb = BB.new; bb.d4(1, 'a')").execute();
+    v = e.parse ("var bb = BB.new; bb.d4(1, 'a')").execute ();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg (), "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [no value given for argument #3]\n at position 19 (...d4(1, 'a'))");
   }
 
   try {
-    v = e.parse("var bb = BB.new; bb.d4(1, 'a', 2.0, xxx=17)").execute();
+    v = e.parse ("var bb = BB.new; bb.d4(1, 'a', 2.0, xxx=17)").execute ();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg (), "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [unknown keyword parameter: xxx]\n at position 19 (...d4(1, 'a', 2.0, xxx..)");
   }
 
   try {
-    v = e.parse("var bb = BB.new; bb.d4(a=1, b='a', c=2.0, xxx=17)").execute();
+    v = e.parse ("var bb = BB.new; bb.d4(a=1, b='a', c=2.0, xxx=17)").execute ();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg (), "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [unknown keyword parameter: xxx]\n at position 19 (...d4(a=1, b='a', c=2...)");
   }
 
-  v = e.parse("var bb = BB.new; bb.d4(1, 'a', 2.0)").execute();
+  v = e.parse ("var bb = BB.new; bb.d4(1, 'a', 2.0)").execute ();
   EXPECT_EQ (v.to_string (), "1,a,2,100,nil");
 
-  v = e.parse("var bb = BB.new; bb.d4(1, 'a', 2.0, e=42)").execute();
+  v = e.parse ("var bb = BB.new; bb.d4(1, 'a', 2.0, e=42)").execute ();
   EXPECT_EQ (v.to_string (), "1,a,2,100,42");
 
-  v = e.parse("var bb = BB.new; bb.d4(1, 'a', c=2.0, e=42)").execute();
+  v = e.parse ("var bb = BB.new; bb.d4(1, 'a', c=2.0, e=42)").execute ();
   EXPECT_EQ (v.to_string (), "1,a,2,100,42");
 
-  v = e.parse("var bb = BB.new; bb.d4(c=2.0, a=1, b='a', e=42)").execute();
+  v = e.parse ("var bb = BB.new; bb.d4(c=2.0, a=1, b='a', e=42)").execute ();
   EXPECT_EQ (v.to_string (), "1,a,2,100,42");
 
-  v = e.parse("var bb = BB.new; bb.d4(1, 'a', 2.0, d=BB.E.E3B)").execute();
+  v = e.parse ("var bb = BB.new; bb.d4(1, 'a', 2.0, d=BB.E.E3B)").execute ();
   EXPECT_EQ (v.to_string (), "1,a,2,101,nil");
 
-  v = e.parse("var bb = BB.new; bb.d4(1, 'a', d=BB.E.E3B, c=2.0)").execute();
+  v = e.parse ("var bb = BB.new; bb.d4(1, 'a', d=BB.E.E3B, c=2.0)").execute ();
   EXPECT_EQ (v.to_string (), "1,a,2,101,nil");
 
-  v = e.parse("var bb = BB.new; bb.d4(1, 'a', 2.0, BB.E.E3B, 42)").execute();
+  v = e.parse ("var bb = BB.new; bb.d4(1, 'a', 2.0, BB.E.E3B, 42)").execute ();
   EXPECT_EQ (v.to_string (), "1,a,2,101,42");
 }
 
 //  constness
-TEST(16)
+TEST (16)
 {
   tl::Eval e;
   tl::Variant v;
@@ -864,7 +863,7 @@ TEST(16)
 }
 
 //  implicit conversions
-TEST(17)
+TEST (17)
 {
   tl::Eval e;
   tl::Variant v;
@@ -875,31 +874,35 @@ TEST(17)
                "var cell=rdb.create_cell('TOP');"
                "var it=rdb.create_item(cell,cat);"
                "var bwp=BoxWithProperties.new(Box.new(0,0,1,2), {1=>'value'});"
-               "it.add_value(bwp)").execute ();
+               "it.add_value(bwp)")
+        .execute ();
 
   v = e.parse ("var rdb=ReportDatabase.new();"
                "var cat=rdb.create_category('name');"
                "var cell=rdb.create_cell('TOP');"
                "var it=rdb.create_item(cell,cat);"
                "var bwp=DBoxWithProperties.new(DBox.new(0,0,1,2), {1=>'value'});"
-               "it.add_value(bwp)").execute ();
+               "it.add_value(bwp)")
+        .execute ();
 
   v = e.parse ("var rdb=ReportDatabase.new();"
                "var cat=rdb.create_category('name');"
                "var cell=rdb.create_cell('TOP');"
                "var it=rdb.create_item(cell,cat);"
                "var b=DBox.new(0,0,1,2);"
-               "it.add_value(b)").execute ();
+               "it.add_value(b)")
+        .execute ();
 
   v = e.parse ("var rdb=ReportDatabase.new();"
                "var cat=rdb.create_category('name');"
                "var cell=rdb.create_cell('TOP');"
                "var it=rdb.create_item(cell,cat);"
-               "it.add_value(17.5)").execute ();
+               "it.add_value(17.5)")
+        .execute ();
 }
 
 //  is_a
-TEST(18)
+TEST (18)
 {
   tl::Eval e;
   tl::Variant v;

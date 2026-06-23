@@ -216,7 +216,7 @@ public:
   static const TextGenerator *default_generator ();
 
 private:
-  std::map<char, std::vector<db::Polygon> > m_data;
+  std::map<char, std::vector<db::Polygon>> m_data;
   db::Coord m_width, m_height, m_line_width, m_design_grid;
   db::Box m_background;
   std::string m_description;
@@ -231,5 +231,3 @@ private:
 }
 
 #endif
-
-

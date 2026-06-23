@@ -60,7 +60,7 @@ collect_cells_to_delete (const db::Layout &layout, const db::Cell &cell, std::se
 {
   //  don't delete proxies - they are deleted later when the layout is cleaned
   for (db::Cell::child_cell_iterator cc = cell.begin_child_cells (); ! cc.at_end (); ++cc) {
-    if (called.find (*cc) == called.end () && !layout.cell (*cc).is_proxy ()) {
+    if (called.find (*cc) == called.end () && ! layout.cell (*cc).is_proxy ()) {
       called.insert (*cc);
       collect_cells_to_delete (layout, layout.cell (*cc), called);
     }
@@ -83,7 +83,6 @@ validate_cell_path (const db::Layout &layout, lay::LayoutViewBase::cell_path_typ
       }
 
       return true;
-
     }
   }
 
@@ -114,8 +113,7 @@ LayoutViewFunctions::~LayoutViewFunctions ()
   //  .. nothing yet..
 }
 
-void
-LayoutViewFunctions::menu_activated (const std::string &symbol)
+void LayoutViewFunctions::menu_activated (const std::string &symbol)
 {
   if (! view ()) {
     return;
@@ -214,7 +212,6 @@ LayoutViewFunctions::menu_activated (const std::string &symbol)
         view ()->set_current_cell_path (form.selected_cellview_index (), form.selected_cellview ().combined_unspecific_path ());
         view ()->zoom_fit ();
       }
-
     }
 
   } else if (symbol == "cm_new_cell") {
@@ -430,8 +427,7 @@ LayoutViewFunctions::menu_activated (const std::string &symbol)
   }
 }
 
-void
-LayoutViewFunctions::cm_cell_user_properties ()
+void LayoutViewFunctions::cm_cell_user_properties ()
 {
   int cv_index = view ()->active_cellview_index ();
   lay::LayoutViewBase::cell_path_type path;
@@ -449,14 +445,11 @@ LayoutViewFunctions::cm_cell_user_properties ()
       view ()->transaction (tl::to_string (tr ("Edit cell's user properties")));
       cell.prop_id (prop_id);
       view ()->commit ();
-
     }
-
   }
 }
 
-void
-LayoutViewFunctions::cm_cell_replace ()
+void LayoutViewFunctions::cm_cell_replace ()
 {
   int cv_index = view ()->active_cellview_index ();
   std::vector<lay::LayoutViewBase::cell_path_type> paths;
@@ -498,7 +491,7 @@ LayoutViewFunctions::cm_cell_replace ()
 
         view ()->transaction (tl::to_string (tr ("Replace cells")));
 
-        //  replace instances of the target cell with the new cell 
+        //  replace instances of the target cell with the new cell
 
         db::cell_index_type target_cell_index = paths.front ().back ();
         layout.replace_instances_of (target_cell_index, with_cell);
@@ -534,16 +527,12 @@ LayoutViewFunctions::cm_cell_replace ()
         if (validate_cell_path (layout, cell_path)) {
           view ()->select_cell (cell_path, cv_index);
         }
-
       }
-
     }
-
   }
 }
 
-void
-LayoutViewFunctions::cm_lay_convert_to_static ()
+void LayoutViewFunctions::cm_lay_convert_to_static ()
 {
   //  end move operations, cancel edit operations
   view ()->cancel_edits ();
@@ -586,12 +575,10 @@ LayoutViewFunctions::cm_lay_convert_to_static ()
     layout.cleanup ();
 
     view ()->commit ();
-
   }
 }
 
-void
-LayoutViewFunctions::cm_cell_convert_to_static ()
+void LayoutViewFunctions::cm_cell_convert_to_static ()
 {
   int cv_index = view ()->active_cellview_index ();
   std::vector<lay::LayoutViewBase::cell_path_type> paths;
@@ -662,12 +649,10 @@ LayoutViewFunctions::cm_cell_convert_to_static ()
     if (validate_cell_path (layout, cell_path)) {
       view ()->select_cell (cell_path, cv_index);
     }
-
   }
 }
 
-void
-LayoutViewFunctions::cm_cell_delete ()
+void LayoutViewFunctions::cm_cell_delete ()
 {
   int cv_index = view ()->active_cellview_index ();
   std::vector<lay::LayoutViewBase::cell_path_type> paths;
@@ -726,22 +711,18 @@ LayoutViewFunctions::cm_cell_delete ()
       if (validate_cell_path (layout, cell_path)) {
         view ()->select_cell (cell_path, cv_index);
       }
-
     }
-
   }
 }
 
-void 
-LayoutViewFunctions::cm_layer_copy ()
+void LayoutViewFunctions::cm_layer_copy ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->copy ();
   }
 }
 
-void 
-LayoutViewFunctions::cm_layer_cut ()
+void LayoutViewFunctions::cm_layer_cut ()
 {
   if (view ()->control_panel ()) {
     db::Transaction trans (manager (), tl::to_string (tr ("Cut Layers")));
@@ -749,8 +730,7 @@ LayoutViewFunctions::cm_layer_cut ()
   }
 }
 
-void 
-LayoutViewFunctions::cm_layer_paste ()
+void LayoutViewFunctions::cm_layer_paste ()
 {
   if (view ()->control_panel ()) {
     db::Transaction trans (manager (), tl::to_string (tr ("Paste Layers")));
@@ -758,8 +738,7 @@ LayoutViewFunctions::cm_layer_paste ()
   }
 }
 
-void
-LayoutViewFunctions::cm_cell_cut ()
+void LayoutViewFunctions::cm_cell_cut ()
 {
   if (view ()->hierarchy_panel ()) {
     //  TODO: currently the hierarchy panel's cut function does its own transaction handling.
@@ -768,8 +747,7 @@ LayoutViewFunctions::cm_cell_cut ()
   }
 }
 
-void
-LayoutViewFunctions::cm_cell_paste ()
+void LayoutViewFunctions::cm_cell_paste ()
 {
   if (view ()->hierarchy_panel ()) {
     db::Transaction trans (manager (), tl::to_string (tr ("Paste Cells")));
@@ -777,16 +755,14 @@ LayoutViewFunctions::cm_cell_paste ()
   }
 }
 
-void
-LayoutViewFunctions::cm_cell_copy ()
+void LayoutViewFunctions::cm_cell_copy ()
 {
   if (view ()->hierarchy_panel ()) {
     view ()->hierarchy_panel ()->copy ();
   }
 }
 
-void
-LayoutViewFunctions::cm_cell_flatten ()
+void LayoutViewFunctions::cm_cell_flatten ()
 {
   if (! view ()->hierarchy_panel ()) {
     return;
@@ -822,7 +798,7 @@ LayoutViewFunctions::cm_cell_flatten ()
 
         if (manager () && manager ()->is_enabled ()) {
 
-          lay::TipDialog td (QApplication::activeWindow (), 
+          lay::TipDialog td (QApplication::activeWindow (),
                              tl::to_string (tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")),
                              "flatten-undo-buffering",
                              lay::TipDialog::yesnocancel_buttons);
@@ -877,16 +853,12 @@ LayoutViewFunctions::cm_cell_flatten ()
         if (supports_undo && manager ()) {
           manager ()->commit ();
         }
-
       }
-
     }
-
   }
 }
 
-void
-LayoutViewFunctions::cm_cell_rename ()
+void LayoutViewFunctions::cm_cell_rename ()
 {
   int cv_index = view ()->active_cellview_index ();
   lay::LayoutViewBase::cell_path_type path;
@@ -903,28 +875,23 @@ LayoutViewFunctions::cm_cell_rename ()
       view ()->transaction (tl::to_string (tr ("Rename cell")));
       layout.rename_cell (path.back (), name.c_str ());
       view ()->commit ();
-
     }
-
   }
 }
 
-void
-LayoutViewFunctions::cm_cell_select ()
+void LayoutViewFunctions::cm_cell_select ()
 {
   if (view ()->hierarchy_panel ()) {
     view ()->hierarchy_panel ()->cm_cell_select ();
   }
 }
 
-void
-LayoutViewFunctions::cm_open_current_cell ()
+void LayoutViewFunctions::cm_open_current_cell ()
 {
   view ()->set_current_cell_path (view ()->active_cellview_index (), view ()->cellview (view ()->active_cellview_index ()).combined_unspecific_path ());
 }
 
-void
-LayoutViewFunctions::cm_cell_hide ()
+void LayoutViewFunctions::cm_cell_hide ()
 {
   std::vector<HierarchyControlPanel::cell_path_type> paths;
   view ()->selected_cells_paths (view ()->active_cellview_index (), paths);
@@ -940,8 +907,7 @@ LayoutViewFunctions::cm_cell_hide ()
   view ()->commit ();
 }
 
-void
-LayoutViewFunctions::cm_cell_show ()
+void LayoutViewFunctions::cm_cell_show ()
 {
   std::vector<HierarchyControlPanel::cell_path_type> paths;
   view ()->selected_cells_paths (view ()->active_cellview_index (), paths);
@@ -957,262 +923,229 @@ LayoutViewFunctions::cm_cell_show ()
   view ()->commit ();
 }
 
-void
-LayoutViewFunctions::cm_cell_show_all ()
+void LayoutViewFunctions::cm_cell_show_all ()
 {
   view ()->transaction (tl::to_string (tr ("Show all cells")));
   view ()->show_all_cells ();
   view ()->commit ();
 }
 
-void
-LayoutViewFunctions::cm_select_all ()
+void LayoutViewFunctions::cm_select_all ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_select_all ();
   }
 }
 
-void
-LayoutViewFunctions::cm_invert_selection ()
+void LayoutViewFunctions::cm_invert_selection ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_invert_selection ();
   }
 }
 
-void
-LayoutViewFunctions::cm_new_tab ()
+void LayoutViewFunctions::cm_new_tab ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_new_tab ();
   }
 }
 
-void
-LayoutViewFunctions::cm_remove_tab ()
+void LayoutViewFunctions::cm_remove_tab ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_remove_tab ();
   }
 }
 
-void
-LayoutViewFunctions::cm_rename_tab ()
+void LayoutViewFunctions::cm_rename_tab ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_rename_tab ();
   }
 }
 
-void
-LayoutViewFunctions::cm_make_invalid ()
+void LayoutViewFunctions::cm_make_invalid ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_make_invalid ();
   }
 }
 
-void
-LayoutViewFunctions::cm_make_valid ()
+void LayoutViewFunctions::cm_make_valid ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_make_valid ();
   }
 }
 
-void
-LayoutViewFunctions::cm_hide ()
+void LayoutViewFunctions::cm_hide ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_hide ();
   }
 }
 
-void
-LayoutViewFunctions::cm_hide_all ()
+void LayoutViewFunctions::cm_hide_all ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_hide_all ();
   }
 }
 
-void
-LayoutViewFunctions::cm_show_only ()
+void LayoutViewFunctions::cm_show_only ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_show_only ();
   }
 }
 
-void
-LayoutViewFunctions::cm_show_all ()
+void LayoutViewFunctions::cm_show_all ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_show_all ();
   }
 }
 
-void
-LayoutViewFunctions::cm_show ()
+void LayoutViewFunctions::cm_show ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_show ();
   }
 }
 
-void
-LayoutViewFunctions::cm_toggle_visibility ()
+void LayoutViewFunctions::cm_toggle_visibility ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_toggle_visibility ();
   }
 }
 
-void
-LayoutViewFunctions::cm_rename ()
+void LayoutViewFunctions::cm_rename ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_rename ();
   }
 }
 
-void
-LayoutViewFunctions::cm_delete ()
+void LayoutViewFunctions::cm_delete ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_delete ();
   }
 }
 
-void
-LayoutViewFunctions::cm_insert ()
+void LayoutViewFunctions::cm_insert ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_insert ();
   }
 }
 
-void
-LayoutViewFunctions::cm_group ()
+void LayoutViewFunctions::cm_group ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_group ();
   }
 }
 
-void
-LayoutViewFunctions::cm_ungroup ()
+void LayoutViewFunctions::cm_ungroup ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_ungroup ();
   }
 }
 
-void
-LayoutViewFunctions::cm_source ()
+void LayoutViewFunctions::cm_source ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_source ();
   }
 }
 
-void
-LayoutViewFunctions::cm_sort_by_name ()
+void LayoutViewFunctions::cm_sort_by_name ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_sort_by_name ();
   }
 }
 
-void
-LayoutViewFunctions::cm_sort_by_ild ()
+void LayoutViewFunctions::cm_sort_by_ild ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_sort_by_ild ();
   }
 }
 
-void
-LayoutViewFunctions::cm_sort_by_idl ()
+void LayoutViewFunctions::cm_sort_by_idl ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_sort_by_idl ();
   }
 }
 
-void
-LayoutViewFunctions::cm_sort_by_ldi ()
+void LayoutViewFunctions::cm_sort_by_ldi ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_sort_by_ldi ();
   }
 }
 
-void
-LayoutViewFunctions::cm_sort_by_dli ()
+void LayoutViewFunctions::cm_sort_by_dli ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_sort_by_dli ();
   }
 }
 
-void
-LayoutViewFunctions::cm_regroup_by_index ()
+void LayoutViewFunctions::cm_regroup_by_index ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_regroup_by_index ();
   }
 }
 
-void
-LayoutViewFunctions::cm_regroup_by_datatype ()
+void LayoutViewFunctions::cm_regroup_by_datatype ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_regroup_by_datatype ();
   }
 }
 
-void
-LayoutViewFunctions::cm_regroup_by_layer ()
+void LayoutViewFunctions::cm_regroup_by_layer ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_regroup_by_layer ();
   }
 }
 
-void
-LayoutViewFunctions::cm_regroup_flatten ()
+void LayoutViewFunctions::cm_regroup_flatten ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_regroup_flatten ();
   }
 }
 
-void
-LayoutViewFunctions::cm_expand_all ()
+void LayoutViewFunctions::cm_expand_all ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_expand_all ();
   }
 }
 
-void
-LayoutViewFunctions::cm_add_missing ()
+void LayoutViewFunctions::cm_add_missing ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_add_missing ();
   }
 }
 
-void
-LayoutViewFunctions::cm_remove_unused ()
+void LayoutViewFunctions::cm_remove_unused ()
 {
   view ()->remove_unused_layers ();
 }
 
-void
-LayoutViewFunctions::do_cm_duplicate (bool interactive)
+void LayoutViewFunctions::do_cm_duplicate (bool interactive)
 {
   view ()->cancel_edits ();
 
@@ -1236,8 +1169,7 @@ LayoutViewFunctions::do_cm_duplicate (bool interactive)
   }
 }
 
-void
-LayoutViewFunctions::do_cm_paste (bool interactive)
+void LayoutViewFunctions::do_cm_paste (bool interactive)
 {
   if (! db::Clipboard::instance ().empty ()) {
     view ()->cancel_edits ();
@@ -1249,8 +1181,7 @@ LayoutViewFunctions::do_cm_paste (bool interactive)
   }
 }
 
-void
-LayoutViewFunctions::cm_new_cell ()
+void LayoutViewFunctions::cm_new_cell ()
 {
   if (view ()->active_cellview_index () < 0) {
     throw tl::Exception (tl::to_string (tr ("No layout present to add a cell to")));
@@ -1262,7 +1193,7 @@ LayoutViewFunctions::cm_new_cell ()
   static std::string s_new_cell_cell_name;
 
   NewCellPropertiesDialog cell_prop_dia (parent_widget ());
-  if (cell_prop_dia.exec_dialog (& cv->layout (), s_new_cell_cell_name, s_new_cell_window_size)) {
+  if (cell_prop_dia.exec_dialog (&cv->layout (), s_new_cell_cell_name, s_new_cell_window_size)) {
 
     db::cell_index_type new_ci = view ()->new_cell (view ()->active_cellview_index (), s_new_cell_cell_name.c_str ());
     view ()->select_cell (new_ci, view ()->active_cellview_index ());
@@ -1273,17 +1204,15 @@ LayoutViewFunctions::cm_new_cell ()
     } else {
       view ()->zoom_box (zb);
     }
-
   }
 }
 
 //  TODO: this constant is defined in MainWindow.cc too ...
 const int max_dirty_files = 15;
 
-void
-LayoutViewFunctions::cm_reload ()
+void LayoutViewFunctions::cm_reload ()
 {
-  std::vector <int> selected;
+  std::vector<int> selected;
 
   if (view ()->cellviews () > 1) {
 
@@ -1303,7 +1232,7 @@ LayoutViewFunctions::cm_reload ()
     int dirty_layouts = 0;
     std::string dirty_files;
 
-    for (std::vector <int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
+    for (std::vector<int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
 
       const lay::CellView &cv = view ()->cellview (*i);
 
@@ -1318,7 +1247,6 @@ LayoutViewFunctions::cm_reload ()
           dirty_files += cv->name ();
         }
       }
-
     }
 
     bool can_reload = true;
@@ -1333,30 +1261,25 @@ LayoutViewFunctions::cm_reload ()
 
       mbox.exec ();
 
-      can_reload = (mbox.clickedButton() == yes_button);
-
+      can_reload = (mbox.clickedButton () == yes_button);
     }
 
     if (can_reload) {
 
       //  Actually reload
-      for (std::vector <int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
+      for (std::vector<int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
         view ()->reload_layout (*i);
       }
-
     }
-
   }
 }
 
-void
-LayoutViewFunctions::do_transform (const db::DCplxTrans &tr)
+void LayoutViewFunctions::do_transform (const db::DCplxTrans &tr)
 {
   view ()->transform (tr);
 }
 
-void
-LayoutViewFunctions::transform_layout (const db::DCplxTrans &tr_mic)
+void LayoutViewFunctions::transform_layout (const db::DCplxTrans &tr_mic)
 {
   //  end move operations, cancel edit operations
   view ()->cancel_edits ();
@@ -1374,7 +1297,7 @@ LayoutViewFunctions::transform_layout (const db::DCplxTrans &tr_mic)
       has_proxy = c->is_proxy ();
     }
 
-    if (has_proxy && 
+    if (has_proxy &&
         QMessageBox::question (parent_widget (),
                                tr ("Transforming PCells Or Library Cells"),
                                tr ("The layout contains PCells or library cells or both.\n"
@@ -1390,37 +1313,31 @@ LayoutViewFunctions::transform_layout (const db::DCplxTrans &tr_mic)
     view ()->transaction (tl::to_string (tr ("Transform layout")));
     layout.transform (trans);
     view ()->commit ();
-
   }
 }
 
-void 
-LayoutViewFunctions::cm_lay_flip_x ()
+void LayoutViewFunctions::cm_lay_flip_x ()
 {
   transform_layout (db::DCplxTrans (db::FTrans::m90));
 }
 
-void 
-LayoutViewFunctions::cm_lay_flip_y ()
+void LayoutViewFunctions::cm_lay_flip_y ()
 {
   transform_layout (db::DCplxTrans (db::FTrans::m0));
 }
 
-void 
-LayoutViewFunctions::cm_lay_rot_ccw ()
+void LayoutViewFunctions::cm_lay_rot_ccw ()
 {
   db::DCplxTrans tr (db::DFTrans::r90);
   transform_layout (db::DCplxTrans (db::FTrans::r90));
 }
 
-void 
-LayoutViewFunctions::cm_lay_rot_cw ()
+void LayoutViewFunctions::cm_lay_rot_cw ()
 {
   transform_layout (db::DCplxTrans (db::FTrans::r270));
 }
 
-void 
-LayoutViewFunctions::cm_lay_free_rot ()
+void LayoutViewFunctions::cm_lay_free_rot ()
 {
   static QString s_angle_value = QString::fromUtf8 ("0.0");
 
@@ -1434,8 +1351,7 @@ LayoutViewFunctions::cm_lay_free_rot ()
   dialog.exec_dialog (s_angle_value);
 }
 
-void
-LayoutViewFunctions::on_lay_free_rot (std::string text)
+void LayoutViewFunctions::on_lay_free_rot (std::string text)
 {
   double angle = 0.0;
   tl::from_string_ext (text, angle);
@@ -1443,8 +1359,7 @@ LayoutViewFunctions::on_lay_free_rot (std::string text)
   transform_layout (db::DCplxTrans (1.0, angle, false, db::DVector ()));
 }
 
-void 
-LayoutViewFunctions::cm_lay_scale ()
+void LayoutViewFunctions::cm_lay_scale ()
 {
   static QString s_scale_value = QString::fromUtf8 ("1.0");
 
@@ -1458,8 +1373,7 @@ LayoutViewFunctions::cm_lay_scale ()
   dialog.exec_dialog (s_scale_value);
 }
 
-void
-LayoutViewFunctions::on_lay_scale (std::string text)
+void LayoutViewFunctions::on_lay_scale (std::string text)
 {
   double scale = 0.0;
   tl::from_string_ext (text, scale);
@@ -1467,8 +1381,7 @@ LayoutViewFunctions::on_lay_scale (std::string text)
   transform_layout (db::DCplxTrans (scale));
 }
 
-void 
-LayoutViewFunctions::cm_lay_move ()
+void LayoutViewFunctions::cm_lay_move ()
 {
   lay::MoveOptionsDialog options (parent_widget ());
 
@@ -1478,14 +1391,12 @@ LayoutViewFunctions::cm_lay_move ()
   options.exec_dialog (m_move_dist);
 }
 
-void
-LayoutViewFunctions::on_lay_move (db::DVector dist)
+void LayoutViewFunctions::on_lay_move (db::DVector dist)
 {
   transform_layout (db::DCplxTrans (dist));
 }
 
-void
-LayoutViewFunctions::cm_sel_flip_x ()
+void LayoutViewFunctions::cm_sel_flip_x ()
 {
   db::DCplxTrans tr (db::DFTrans::m90);
   db::DBox sel_bbox (view ()->lay::Editables::selection_bbox ());
@@ -1495,8 +1406,7 @@ LayoutViewFunctions::cm_sel_flip_x ()
   do_transform (tr);
 }
 
-void 
-LayoutViewFunctions::cm_sel_flip_y ()
+void LayoutViewFunctions::cm_sel_flip_y ()
 {
   db::DCplxTrans tr (db::DFTrans::m0);
   db::DBox sel_bbox (view ()->lay::Editables::selection_bbox ());
@@ -1506,8 +1416,7 @@ LayoutViewFunctions::cm_sel_flip_y ()
   do_transform (tr);
 }
 
-void 
-LayoutViewFunctions::cm_sel_rot_ccw ()
+void LayoutViewFunctions::cm_sel_rot_ccw ()
 {
   db::DCplxTrans tr (db::DFTrans::r90);
   db::DBox sel_bbox (view ()->lay::Editables::selection_bbox ());
@@ -1517,8 +1426,7 @@ LayoutViewFunctions::cm_sel_rot_ccw ()
   do_transform (tr);
 }
 
-void 
-LayoutViewFunctions::cm_sel_rot_cw ()
+void LayoutViewFunctions::cm_sel_rot_cw ()
 {
   db::DCplxTrans tr (db::DFTrans::r270);
   db::DBox sel_bbox (view ()->lay::Editables::selection_bbox ());
@@ -1528,8 +1436,7 @@ LayoutViewFunctions::cm_sel_rot_cw ()
   do_transform (tr);
 }
 
-void 
-LayoutViewFunctions::cm_sel_free_rot ()
+void LayoutViewFunctions::cm_sel_free_rot ()
 {
   static QString s_angle_value = QString::fromUtf8 ("0.0");
 
@@ -1543,8 +1450,7 @@ LayoutViewFunctions::cm_sel_free_rot ()
   dialog.exec_dialog (s_angle_value);
 }
 
-void
-LayoutViewFunctions::on_sel_free_rot (std::string text)
+void LayoutViewFunctions::on_sel_free_rot (std::string text)
 {
   double angle = 0.0;
   tl::from_string_ext (text, angle);
@@ -1557,8 +1463,7 @@ LayoutViewFunctions::on_sel_free_rot (std::string text)
   do_transform (tr);
 }
 
-void
-LayoutViewFunctions::cm_sel_scale ()
+void LayoutViewFunctions::cm_sel_scale ()
 {
   static QString s_scale_value = QString::fromUtf8 ("1.0");
 
@@ -1572,8 +1477,7 @@ LayoutViewFunctions::cm_sel_scale ()
   dialog.exec_dialog (s_scale_value);
 }
 
-void
-LayoutViewFunctions::on_sel_scale (std::string text)
+void LayoutViewFunctions::on_sel_scale (std::string text)
 {
   double scale = 0.0;
   tl::from_string_ext (text, scale);
@@ -1586,17 +1490,15 @@ LayoutViewFunctions::on_sel_scale (std::string text)
   do_transform (tr);
 }
 
-void
-LayoutViewFunctions::cm_sel_move_interactive ()
+void LayoutViewFunctions::cm_sel_move_interactive ()
 {
   view ()->cancel_edits ();
   if (view ()->move_service ()->start_move ()) {
-    view ()->switch_mode (-1);  //  move mode
+    view ()->switch_mode (-1); //  move mode
   }
 }
 
-void 
-LayoutViewFunctions::cm_sel_move_to ()
+void LayoutViewFunctions::cm_sel_move_to ()
 {
   db::DBox sel_bbox (view ()->lay::Editables::selection_bbox ());
   if (sel_bbox.empty ()) {
@@ -1614,12 +1516,10 @@ LayoutViewFunctions::cm_sel_move_to ()
     y = sel_bbox.bottom () + (sel_bbox.height () * (1 + m_move_to_origin_mode_y) * 0.5);
 
     do_transform (db::DCplxTrans (move_target - db::DPoint (x, y)));
-
   }
 }
 
-void 
-LayoutViewFunctions::cm_sel_move ()
+void LayoutViewFunctions::cm_sel_move ()
 {
   lay::MoveOptionsDialog options (parent_widget ());
 
@@ -1629,24 +1529,24 @@ LayoutViewFunctions::cm_sel_move ()
   options.exec_dialog (m_move_dist);
 }
 
-void
-LayoutViewFunctions::on_sel_move(db::DVector disp)
+void LayoutViewFunctions::on_sel_move (db::DVector disp)
 {
   do_transform (db::DCplxTrans (disp));
 }
 
-void
-LayoutViewFunctions::cm_copy_layer ()
+void LayoutViewFunctions::cm_copy_layer ()
 {
-  struct { int *cv; int *layer; } specs [] = {
-    { &m_copy_cva, &m_copy_layera },
-    { &m_copy_cvr, &m_copy_layerr }
-  };
+  struct {
+    int *cv;
+    int *layer;
+  } specs [] = {
+    {&m_copy_cva, &m_copy_layera},
+    {&m_copy_cvr, &m_copy_layerr}};
 
-  for (unsigned int i = 0; i < sizeof (specs) / sizeof (specs[0]); ++i) {
+  for (unsigned int i = 0; i < sizeof (specs) / sizeof (specs [0]); ++i) {
 
-    int &cv = *(specs[i].cv);
-    int &layer = *(specs[i].layer);
+    int &cv = *(specs [i].cv);
+    int &layer = *(specs [i].layer);
 
     if (cv >= int (view ()->cellviews ())) {
       cv = -1;
@@ -1660,7 +1560,6 @@ LayoutViewFunctions::cm_copy_layer ()
     if (cv < 0 || ! view ()->cellview (cv)->layout ().is_valid_layer ((unsigned int) layer)) {
       layer = -1;
     }
-
   }
 
   lay::DuplicateLayerDialog dialog (parent_widget ());
@@ -1670,7 +1569,7 @@ LayoutViewFunctions::cm_copy_layer ()
 
     if (manager () && manager ()->is_enabled ()) {
 
-      lay::TipDialog td (QApplication::activeWindow (), 
+      lay::TipDialog td (QApplication::activeWindow (),
                          tl::to_string (tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")),
                          "copy-layer-undo-buffering",
                          lay::TipDialog::yesnocancel_buttons);
@@ -1730,11 +1629,11 @@ LayoutViewFunctions::cm_copy_layer ()
           //  flat mode (same layouts)
           tl::ident_map<db::Layout::properties_id_type> pm1;
           db::Shapes &res = target_cell.shapes (m_copy_layerr);
-          
+
           db::Layout &layout = view ()->cellview (m_copy_cvr)->layout ();
           try {
 
-            //  using update/start_layout and end_changes improves the performance since changing the 
+            //  using update/start_layout and end_changes improves the performance since changing the
             //  shapes collection will invalidate the layout and cause updates inside the RecursiveShapeIerator
             layout.update ();
             layout.start_changes ();
@@ -1747,9 +1646,8 @@ LayoutViewFunctions::cm_copy_layer ()
             layout.end_changes ();
             throw;
           }
-
         }
-        
+
       } else if (m_duplicate_hier_mode == 1) {
 
         db::Cell &cell = *view ()->cellview (m_copy_cva).cell ();
@@ -1757,7 +1655,7 @@ LayoutViewFunctions::cm_copy_layer ()
 
         if (m_clear_before) {
           target_cell.clear (m_copy_layerr);
-        } 
+        }
 
         if (m_copy_cvr == m_copy_cva) {
 
@@ -1770,9 +1668,8 @@ LayoutViewFunctions::cm_copy_layer ()
           for (db::Shapes::shape_iterator si = view ()->cellview (m_copy_cva).cell ()->shapes (m_copy_layera).begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
             target_cell.shapes (m_copy_layerr).insert (*si);
           }
-
         }
-        
+
       } else if (m_duplicate_hier_mode == 2) {
 
         //  subcells cell by cell - source and target layout must be identical
@@ -1785,10 +1682,9 @@ LayoutViewFunctions::cm_copy_layer ()
           db::Cell &cell = layout.cell (*c);
           if (m_clear_before) {
             cell.clear (m_copy_layerr);
-          } 
+          }
           cell.copy (m_copy_layera, m_copy_layerr);
         }
-
       }
 
       if (manager () && supports_undo) {
@@ -1801,12 +1697,10 @@ LayoutViewFunctions::cm_copy_layer ()
       }
       throw;
     }
-
   }
 }
 
-void
-LayoutViewFunctions::cm_new_layer ()
+void LayoutViewFunctions::cm_new_layer ()
 {
   int index = view ()->active_cellview_index ();
 
@@ -1826,20 +1720,17 @@ LayoutViewFunctions::cm_new_layer ()
       view ()->transaction (tl::to_string (tr ("New layer")));
 
       unsigned int l = cv->layout ().insert_layer (m_new_layer_props);
-      std::vector <unsigned int> nl;
+      std::vector<unsigned int> nl;
       nl.push_back (l);
       view ()->add_new_layers (nl, index);
       view ()->update_content ();
 
       view ()->commit ();
-
     }
-
   }
 }
 
-void
-LayoutViewFunctions::cm_align_cell_origin ()
+void LayoutViewFunctions::cm_align_cell_origin ()
 {
   int cv_index = view ()->active_cellview_index ();
   if (cv_index >= 0) {
@@ -1862,7 +1753,7 @@ LayoutViewFunctions::cm_align_cell_origin ()
       db::Box bbox;
 
       if (m_align_cell_options.visible_only) {
-        for (lay::LayerPropertiesConstIterator l = view ()->begin_layers (); !l.at_end (); ++l) {
+        for (lay::LayerPropertiesConstIterator l = view ()->begin_layers (); ! l.at_end (); ++l) {
           if (! l->has_children () && l->layer_index () >= 0 && l->cellview_index () == cv_index && l->visible (true /*real*/)) {
             bbox += cell->bbox (l->layer_index ());
           }
@@ -1915,27 +1806,23 @@ LayoutViewFunctions::cm_align_cell_origin ()
 
       if (m_align_cell_options.adjust_parents) {
 
-        std::vector<std::pair<db::Cell *, db::Instance> > insts_to_modify;
+        std::vector<std::pair<db::Cell *, db::Instance>> insts_to_modify;
         for (db::Cell::parent_inst_iterator pi = nc_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
-          insts_to_modify.push_back (std::make_pair (& layout.cell (pi->parent_cell_index ()), pi->child_inst ()));
+          insts_to_modify.push_back (std::make_pair (&layout.cell (pi->parent_cell_index ()), pi->child_inst ()));
         }
 
         db::Trans ti (db::Vector (refx, refy));
-        for (std::vector<std::pair<db::Cell *, db::Instance> >::const_iterator im = insts_to_modify.begin (); im != insts_to_modify.end (); ++im) {
+        for (std::vector<std::pair<db::Cell *, db::Instance>>::const_iterator im = insts_to_modify.begin (); im != insts_to_modify.end (); ++im) {
           im->first->transform (im->second, db::Trans (db::Vector (im->second.complex_trans ().trans (db::Vector (refx, refy)))));
         }
-
       }
 
       view ()->commit ();
-
     }
-
   }
 }
 
-void
-LayoutViewFunctions::cm_edit_layer ()
+void LayoutViewFunctions::cm_edit_layer ()
 {
   lay::LayerPropertiesConstIterator sel = view ()->current_layer ();
   if (sel.is_null ()) {
@@ -1969,7 +1856,7 @@ LayoutViewFunctions::cm_edit_layer ()
     //  Update all layer parameters for PCells inside the layout
 
     //  collect PCell variants first
-    std::vector<std::pair<db::cell_index_type, const db::PCellDeclaration *> > pcell_variants;
+    std::vector<std::pair<db::cell_index_type, const db::PCellDeclaration *>> pcell_variants;
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
       const db::PCellDeclaration *pcell_decl = layout.pcell_declaration_for_pcell_variant (c->cell_index ());
       if (pcell_decl) {
@@ -1999,9 +1886,8 @@ LayoutViewFunctions::cm_edit_layer ()
 
       if (! new_param.empty ()) {
         db::cell_index_type new_cell = layout.get_pcell_variant_cell (c->first, new_param);
-        cell_map[c->first] = new_cell;
+        cell_map [c->first] = new_cell;
       }
-
     }
 
     //  change instances
@@ -2031,23 +1917,21 @@ LayoutViewFunctions::cm_edit_layer ()
     view ()->update_content ();
 
     view ()->commit ();
-
   }
 }
 
-void
-LayoutViewFunctions::cm_delete_layer ()
+void LayoutViewFunctions::cm_delete_layer ()
 {
   std::vector<lay::LayerPropertiesConstIterator> sel = view ()->selected_layers ();
   std::sort (sel.begin (), sel.end (), CompareLayerIteratorBottomUp ());
 
   //  collect valid layers
   std::vector<lay::LayerPropertiesConstIterator> valid_sel;
-  std::set<std::pair<db::Layout *, unsigned int> > valid_layers;
+  std::set<std::pair<db::Layout *, unsigned int>> valid_layers;
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator si = sel.begin (); si != sel.end (); ++si) {
     int cv_index = (*si)->cellview_index ();
     const lay::CellView &cv = view ()->cellview (cv_index);
-    if (!(*si)->has_children () && cv_index >= 0 && int (view ()->cellviews ()) > cv_index && (*si)->layer_index () >= 0 && cv.is_valid ()) {
+    if (! (*si)->has_children () && cv_index >= 0 && int (view ()->cellviews ()) > cv_index && (*si)->layer_index () >= 0 && cv.is_valid ()) {
       valid_sel.push_back (*si);
       valid_layers.insert (std::make_pair (&cv->layout (), (*si)->layer_index ()));
     }
@@ -2070,7 +1954,7 @@ LayoutViewFunctions::cm_delete_layer ()
     view ()->delete_layer (lp);
   }
 
-  for (std::set<std::pair<db::Layout *, unsigned int> >::const_iterator li = valid_layers.begin (); li != valid_layers.end(); ++li) {
+  for (std::set<std::pair<db::Layout *, unsigned int>>::const_iterator li = valid_layers.begin (); li != valid_layers.end (); ++li) {
 
     unsigned int layer_index = li->second;
     db::Layout *layout = li->first;
@@ -2080,7 +1964,6 @@ LayoutViewFunctions::cm_delete_layer ()
     }
 
     layout->delete_layer (layer_index);
-
   }
 
   view ()->update_content ();
@@ -2088,8 +1971,7 @@ LayoutViewFunctions::cm_delete_layer ()
   view ()->commit ();
 }
 
-void
-LayoutViewFunctions::cm_clear_layer ()
+void LayoutViewFunctions::cm_clear_layer ()
 {
   std::vector<lay::LayerPropertiesConstIterator> sel = view ()->selected_layers ();
   if (sel.empty ()) {
@@ -2117,22 +1999,19 @@ LayoutViewFunctions::cm_clear_layer ()
 
           cv.cell ()->clear ((unsigned int) layer_index);
 
-          std::set <db::cell_index_type> called_cells;
+          std::set<db::cell_index_type> called_cells;
           cv.cell ()->collect_called_cells (called_cells);
-          for (std::set <db::cell_index_type>::const_iterator cc = called_cells.begin (); cc != called_cells.end (); ++cc) {
+          for (std::set<db::cell_index_type>::const_iterator cc = called_cells.begin (); cc != called_cells.end (); ++cc) {
             cv->layout ().cell (*cc).clear ((unsigned int) layer_index);
           }
 
         } else {
           cv->layout ().clear_layer ((unsigned int) layer_index);
         }
-
       }
-
     }
 
     view ()->commit ();
-
   }
 }
 
@@ -2301,7 +2180,6 @@ public:
 
     //  Add a hook for inserting new items after the modes
     menu_entries.push_back (lay::separator ("end_modes", "@toolbar.end"));
-
   }
 
   bool menu_activated (const std::string &symbol) const
@@ -2325,13 +2203,13 @@ public:
     }
   }
 
-  void implements_primary_mouse_modes (std::vector<std::pair<std::string, std::pair<std::string, int> > > &modes)
+  void implements_primary_mouse_modes (std::vector<std::pair<std::string, std::pair<std::string, int>>> &modes)
   {
-    std::vector <std::string> mode_titles;
+    std::vector<std::string> mode_titles;
     lay::LayoutViewBase::intrinsic_mouse_modes (&mode_titles);
 
     int mode_id = 0;
-    for (std::vector <std::string>::const_iterator t = mode_titles.begin (); t != mode_titles.end (); ++t, --mode_id) {
+    for (std::vector<std::string>::const_iterator t = mode_titles.begin (); t != mode_titles.end (); ++t, --mode_id) {
       //  modes: pair(title, pair(insert_pos, id))
       modes.push_back (std::make_pair (*t, std::make_pair ("edit_menu.mode_menu.end;@toolbar.end_modes", mode_id)));
     }

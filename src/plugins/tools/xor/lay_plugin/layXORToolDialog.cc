@@ -72,20 +72,27 @@ std::string cfg_xor_tiling ("xor-tiling");
 std::string cfg_xor_tiling_heal ("xor-tiling-heal");
 std::string cfg_xor_region_mode ("xor-region-mode");
 
-//  Note: this enum must match with the order of the combo box entries in the 
+//  Note: this enum must match with the order of the combo box entries in the
 //  dialog implementation
-enum input_mode_t { IMAll = 0, IMVisible, IMSpecific };
+enum input_mode_t { IMAll = 0,
+                    IMVisible,
+                    IMSpecific };
 
-//  Note: this enum must match with the order of the combo box entries in the 
+//  Note: this enum must match with the order of the combo box entries in the
 //  dialog implementation
-enum output_mode_t { OMMarkerDatabase = 0, OMNewLayout, OMNewLayersA, OMNewLayersB, OMNone };
+enum output_mode_t { OMMarkerDatabase = 0,
+                     OMNewLayout,
+                     OMNewLayersA,
+                     OMNewLayersB,
+                     OMNone };
 
-//  Note: this enum must match with the order of the combo box entries in the 
+//  Note: this enum must match with the order of the combo box entries in the
 //  dialog implementation
-enum region_mode_t { RMAll = 0, RMVisible, RMRulers };
+enum region_mode_t { RMAll = 0,
+                     RMVisible,
+                     RMRulers };
 
-struct InputModeConverter
-{
+struct InputModeConverter {
   std::string to_string (input_mode_t t)
   {
     switch (t) {
@@ -100,7 +107,7 @@ struct InputModeConverter
     }
   }
 
-  void from_string (const std::string &s, input_mode_t &t) 
+  void from_string (const std::string &s, input_mode_t &t)
   {
     t = IMAll;
     if (s == "visible") {
@@ -111,8 +118,7 @@ struct InputModeConverter
   }
 };
 
-struct OutputModeConverter
-{
+struct OutputModeConverter {
   std::string to_string (output_mode_t t)
   {
     switch (t) {
@@ -129,7 +135,7 @@ struct OutputModeConverter
     }
   }
 
-  void from_string (const std::string &s, output_mode_t &t) 
+  void from_string (const std::string &s, output_mode_t &t)
   {
     t = OMMarkerDatabase;
     if (s == "layout") {
@@ -142,8 +148,7 @@ struct OutputModeConverter
   }
 };
 
-struct RegionModeConverter
-{
+struct RegionModeConverter {
   std::string to_string (region_mode_t t)
   {
     switch (t) {
@@ -158,7 +163,7 @@ struct RegionModeConverter
     }
   }
 
-  void from_string (const std::string &s, region_mode_t &t) 
+  void from_string (const std::string &s, region_mode_t &t)
   {
     t = RMAll;
     if (s == "all") {
@@ -191,8 +196,7 @@ XORToolDialog::~XORToolDialog ()
   mp_ui = 0;
 }
 
-int 
-XORToolDialog::exec_dialog (lay::LayoutViewBase *view)
+int XORToolDialog::exec_dialog (lay::LayoutViewBase *view)
 {
   mp_view = view;
 
@@ -288,16 +292,15 @@ XORToolDialog::exec_dialog (lay::LayoutViewBase *view)
   return ret;
 }
 
-void 
-XORToolDialog::accept ()
+void XORToolDialog::accept ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   bool axorb = mp_ui->axorb_cb->isChecked ();
   bool anotb = mp_ui->anotb_cb->isChecked ();
   bool bnota = mp_ui->bnota_cb->isChecked ();
   if (axorb + anotb + bnota == 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("No mode selected")));  
+    throw tl::Exception (tl::to_string (QObject::tr ("No mode selected")));
   }
 
   int cv_index_a = mp_ui->layouta->current_cv_index ();
@@ -307,14 +310,14 @@ BEGIN_PROTECTED
   const lay::CellView &cvb = mp_view->cellview (cv_index_b);
 
   if (&cva->layout () == &cvb->layout () && cva.cell_index () == cvb.cell_index ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Trying to perform an XOR between identical layouts")));  
+    throw tl::Exception (tl::to_string (QObject::tr ("Trying to perform an XOR between identical layouts")));
   }
 
-  if (!cva.is_valid ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("First layout is not a valid input")));  
+  if (! cva.is_valid ()) {
+    throw tl::Exception (tl::to_string (QObject::tr ("First layout is not a valid input")));
   }
-  if (!cvb.is_valid ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Second layout is not a valid input")));  
+  if (! cvb.is_valid ()) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Second layout is not a valid input")));
   }
 
   {
@@ -335,11 +338,11 @@ BEGIN_PROTECTED
     double t = 0.0;
     if (ex.try_read (t)) {
       if (t < 0.001) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Invalid tile size (invalid text or negative)")));  
+        throw tl::Exception (tl::to_string (QObject::tr ("Invalid tile size (invalid text or negative)")));
       }
     }
   }
-  
+
   lay::Dispatcher *config_root = lay::Dispatcher::instance ();
 
   config_root->config_set (cfg_xor_input_mode, InputModeConverter ().to_string ((input_mode_t) mp_ui->input_layers_cbx->currentIndex ()));
@@ -359,25 +362,22 @@ BEGIN_PROTECTED
 
   QDialog::accept ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-XORToolDialog::deep_changed ()
+void XORToolDialog::deep_changed ()
 {
   bool deep = mp_ui->deep->isChecked ();
-  mp_ui->tiling->setEnabled (!deep);
-  mp_ui->heal_cb->setEnabled (!deep);
+  mp_ui->tiling->setEnabled (! deep);
+  mp_ui->heal_cb->setEnabled (! deep);
 }
 
-void
-XORToolDialog::input_changed (int /*index*/)
+void XORToolDialog::input_changed (int /*index*/)
 {
   // .. nothing yet ..
 }
 
-void
-XORToolDialog::output_changed (int index)
+void XORToolDialog::output_changed (int index)
 {
   bool enabled = (index == 2 || index == 3);
   mp_ui->layer_offset_lbl->setEnabled (enabled);
@@ -389,24 +389,23 @@ class XORJob
   : public tl::JobBase
 {
 public:
-  enum EmptyLayerHandling
-  {
-    EL_optimize,        // copy the non-empty contributions of a or b
-    EL_summarize,       // print a message about leaving away some operations and don't do anything
-    EL_process          // include in processing - the non-empty layer will be merged
+  enum EmptyLayerHandling {
+    EL_optimize,  // copy the non-empty contributions of a or b
+    EL_summarize, // print a message about leaving away some operations and don't do anything
+    EL_process    // include in processing - the non-empty layer will be merged
   };
 
-  XORJob (int nworkers, 
-          output_mode_t output_mode, 
+  XORJob (int nworkers,
+          output_mode_t output_mode,
           db::BooleanOp::BoolOp op,
           EmptyLayerHandling el_handling,
           double dbu,
           const lay::CellView &cva, const lay::CellView &cvb,
-          const std::vector <db::Coord> &tolerances,
-          const std::vector <rdb::Category *> &sub_categories,
-          const std::vector <std::vector <rdb::Category *> > &layer_categories,
-          const std::vector <db::Cell *> &sub_cells,
-          const std::vector <std::vector <unsigned int> > &sub_output_layers,
+          const std::vector<db::Coord> &tolerances,
+          const std::vector<rdb::Category *> &sub_categories,
+          const std::vector<std::vector<rdb::Category *>> &layer_categories,
+          const std::vector<db::Cell *> &sub_cells,
+          const std::vector<std::vector<unsigned int>> &sub_output_layers,
           rdb::Database *rdb,
           rdb::Cell *rdb_cell)
     : tl::JobBase (nworkers),
@@ -473,17 +472,17 @@ public:
     return m_cvb;
   }
 
-  const std::vector <db::Coord> &tolerances () const
+  const std::vector<db::Coord> &tolerances () const
   {
     return m_tolerances;
   }
 
-  const std::vector <std::vector <unsigned int> > &sub_output_layers () const
+  const std::vector<std::vector<unsigned int>> &sub_output_layers () const
   {
     return m_sub_output_layers;
   }
 
-  void next_progress () 
+  void next_progress ()
   {
     QMutexLocker locker (&m_mutex);
     ++m_progress;
@@ -493,7 +492,7 @@ public:
   {
     QMutexLocker locker (&m_mutex);
 
-    std::vector<std::vector<size_t> > &cc = m_results [std::make_pair (lp, tol)];
+    std::vector<std::vector<size_t>> &cc = m_results [std::make_pair (lp, tol)];
     if (cc.size () <= ix) {
       cc.resize (ix + 1, std::vector<size_t> ());
     }
@@ -502,10 +501,10 @@ public:
     }
 
     if (n == missing_in_a || n == missing_in_b) {
-      cc[ix][iy] = n;
+      cc [ix][iy] = n;
     } else {
       //  NOTE: we will not get a "normal" n after missing_in_a or missing_in_b
-      cc[ix][iy] += n;
+      cc [ix][iy] += n;
     }
   }
 
@@ -517,7 +516,7 @@ public:
       p = m_progress;
       progress.configure (m_dbu, int (m_nx), int (m_ny), m_tolerances);
       progress.merge_results (m_results);
-    }    
+    }
 
     progress.set (p, true /*force yield*/);
   }
@@ -528,11 +527,10 @@ public:
 
     if (m_output_mode == OMMarkerDatabase) {
 
-      rdb::Category *layercat = m_layer_categories[tol_index][layer_index];
+      rdb::Category *layercat = m_layer_categories [tol_index][layer_index];
 
       rdb::Item *item = m_rdb->create_item (m_rdb_cell->id (), layercat->id ());
-      item->values ().add (new rdb::Value <std::string> (s));
-
+      item->values ().add (new rdb::Value<std::string> (s));
     }
   }
 
@@ -543,18 +541,17 @@ public:
 
     if (m_output_mode == OMMarkerDatabase) {
 
-      rdb::Category *layercat = m_layer_categories[tol_index][layer_index];
+      rdb::Category *layercat = m_layer_categories [tol_index][layer_index];
 
       std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = region.begin_iter ();
       rdb::scan_layer (layercat, m_rdb_cell, trans * it.second, it.first, false);
 
     } else {
 
-      db::Cell *output_cell = m_sub_cells[tol_index];
-      unsigned int output_layer = m_sub_output_layers[tol_index][layer_index];
+      db::Cell *output_cell = m_sub_cells [tol_index];
+      unsigned int output_layer = m_sub_output_layers [tol_index][layer_index];
 
       region.insert_into (output_cell->layout (), output_cell->cell_index (), output_layer);
-
     }
   }
 
@@ -570,18 +567,18 @@ public:
 
     } else if (m_output_mode == OMMarkerDatabase) {
 
-      rdb::Category *layercat = m_layer_categories[tol_index][layer_index];
+      rdb::Category *layercat = m_layer_categories [tol_index][layer_index];
 
       rdb::Item *item = m_rdb->create_item (m_rdb_cell->id (), layercat->id ());
-      item->values ().add (new rdb::Value <db::DPolygon> (polygon.transformed (trans)));
+      item->values ().add (new rdb::Value<db::DPolygon> (polygon.transformed (trans)));
 
     } else {
 
       db::Cell *subcell = 0;
       unsigned int layout_layer = 0;
 
-      subcell = m_sub_cells[tol_index];
-      layout_layer = m_sub_output_layers[tol_index][layer_index];
+      subcell = m_sub_cells [tol_index];
+      layout_layer = m_sub_output_layers [tol_index][layer_index];
 
       double factor = 1.0;
       if (subcell->layout ()) {
@@ -592,7 +589,6 @@ public:
       } else {
         subcell->shapes (layout_layer).insert (db::Polygon (polygon * factor));
       }
-
     }
   }
 
@@ -600,7 +596,7 @@ public:
   {
     //  merge the polygons to heal and re-issue (this time without healing)
     for (std::map<std::pair<size_t, size_t>, db::Region>::iterator p = m_polygons_to_heal.begin (); p != m_polygons_to_heal.end (); ++p) {
-      for (db::Region::const_iterator mp = p->second.begin_merged (); !mp.at_end (); ++mp) {
+      for (db::Region::const_iterator mp = p->second.begin_merged (); ! mp.at_end (); ++mp) {
         issue_polygon ((unsigned int) p->first.first, (unsigned int) p->first.second, *mp, false);
       }
     }
@@ -617,18 +613,18 @@ private:
   double m_dbu;
   lay::CellView m_cva;
   lay::CellView m_cvb;
-  std::vector <db::Coord> m_tolerances;
-  std::vector <rdb::Category *> m_sub_categories;
-  std::vector <std::vector <rdb::Category *> > m_layer_categories;
-  std::vector <db::Cell *> m_sub_cells;
-  std::vector <std::vector <unsigned int> > m_sub_output_layers;
+  std::vector<db::Coord> m_tolerances;
+  std::vector<rdb::Category *> m_sub_categories;
+  std::vector<std::vector<rdb::Category *>> m_layer_categories;
+  std::vector<db::Cell *> m_sub_cells;
+  std::vector<std::vector<unsigned int>> m_sub_output_layers;
   rdb::Database *m_rdb;
   rdb::Cell *m_rdb_cell;
   unsigned int m_progress;
   QMutex m_mutex;
   std::string m_result_string;
   size_t m_nx, m_ny;
-  std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > m_results;
+  std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t>>> m_results;
   std::map<std::pair<size_t, size_t>, db::Region> m_polygons_to_heal;
 };
 
@@ -651,28 +647,28 @@ public:
   {
     return m_tile_desc;
   }
-  
+
   const db::Box &clip_box () const
   {
     return m_clip_box;
   }
-  
+
   const db::Box &region_a () const
   {
     return m_region_a;
   }
-  
+
   const db::Box &region_b () const
   {
     return m_region_b;
   }
 
-  const std::vector<unsigned int> &la () const 
+  const std::vector<unsigned int> &la () const
   {
     return m_la;
   }
 
-  const std::vector<unsigned int> &lb () const 
+  const std::vector<unsigned int> &lb () const
   {
     return m_lb;
   }
@@ -717,9 +713,9 @@ public:
     //  .. nothing yet ..
   }
 
-  void perform_task (tl::Task *task) 
+  void perform_task (tl::Task *task)
   {
-    XORTask *xor_task = dynamic_cast <XORTask *> (task);
+    XORTask *xor_task = dynamic_cast<XORTask *> (task);
     if (xor_task) {
       do_perform (xor_task);
     }
@@ -733,8 +729,7 @@ private:
   void do_perform_deep (const XORTask *task);
 };
 
-void
-XORWorker::do_perform (const XORTask *xor_task)
+void XORWorker::do_perform (const XORTask *xor_task)
 {
   if (xor_task->deep ()) {
     do_perform_deep (xor_task);
@@ -743,19 +738,18 @@ XORWorker::do_perform (const XORTask *xor_task)
   }
 }
 
-void
-XORWorker::do_perform_deep (const XORTask *xor_task)
+void XORWorker::do_perform_deep (const XORTask *xor_task)
 {
   db::DeepShapeStore dss;
   db::Region rr;
 
   unsigned int tol_index = 0;
-  for (std::vector <db::Coord>::const_iterator t = mp_job->tolerances ().begin (); t != mp_job->tolerances ().end (); ++t, ++tol_index) {
+  for (std::vector<db::Coord>::const_iterator t = mp_job->tolerances ().begin (); t != mp_job->tolerances ().end (); ++t, ++tol_index) {
 
     const std::vector<unsigned int> &la = xor_task->la ();
     const std::vector<unsigned int> &lb = xor_task->lb ();
 
-    if ((!la.empty () && !lb.empty ()) || mp_job->el_handling () != XORJob::EL_summarize) {
+    if ((! la.empty () && ! lb.empty ()) || mp_job->el_handling () != XORJob::EL_summarize) {
 
       if (tl::verbosity () >= 10) {
         tl::info << "XOR tool (hierarchical): layer " << xor_task->lp ().to_string () << ", tolerance " << *t * mp_job->dbu ();
@@ -765,7 +759,7 @@ XORWorker::do_perform_deep (const XORTask *xor_task)
 
       if (tol_index == 0) {
 
-        if ((!la.empty () && !lb.empty ()) || mp_job->el_handling () == XORJob::EL_process) {
+        if ((! la.empty () && ! lb.empty ()) || mp_job->el_handling () == XORJob::EL_process) {
 
           tl::SelfTimer timer (tl::verbosity () >= 21, "Boolean part");
 
@@ -787,18 +781,18 @@ XORWorker::do_perform_deep (const XORTask *xor_task)
           }
 
         } else if (mp_job->op () == db::BooleanOp::Xor ||
-                   (mp_job->op () == db::BooleanOp::ANotB && !la.empty ()) ||
-                   (mp_job->op () == db::BooleanOp::BNotA && !lb.empty ())) {
+                   (mp_job->op () == db::BooleanOp::ANotB && ! la.empty ()) ||
+                   (mp_job->op () == db::BooleanOp::BNotA && ! lb.empty ())) {
 
           tl::SelfTimer timer (tl::verbosity () >= 21, "Boolean part (shortcut)");
 
           db::RecursiveShapeIterator s;
           db::ICplxTrans dbu_scale;
 
-          if (!la.empty ()) {
+          if (! la.empty ()) {
             s = db::RecursiveShapeIterator (mp_job->cva ()->layout (), *mp_job->cva ().cell (), la, xor_task->region_a ());
             dbu_scale = db::ICplxTrans (mp_job->cva ()->layout ().dbu () / mp_job->dbu ());
-          } else if (!lb.empty ()) {
+          } else if (! lb.empty ()) {
             s = db::RecursiveShapeIterator (mp_job->cvb ()->layout (), *mp_job->cvb ().cell (), lb, xor_task->region_b ());
             dbu_scale = db::ICplxTrans (mp_job->cvb ()->layout ().dbu () / mp_job->dbu ());
           }
@@ -806,15 +800,13 @@ XORWorker::do_perform_deep (const XORTask *xor_task)
           s.set_for_merged_input (true);
 
           rr = db::Region (s, dss, dbu_scale);
-
         }
-
       }
 
       if (*t > 0) {
         tl::SelfTimer timer (tl::verbosity () >= 21, "Sizing part");
-        rr.size (-((*t + 1) / 2), (unsigned int)2);
-        rr.size (((*t + 1) / 2), (unsigned int)2);
+        rr.size (-((*t + 1) / 2), (unsigned int) 2);
+        rr.size (((*t + 1) / 2), (unsigned int) 2);
       }
 
       //  TODO: no clipping for hierarchical mode yet
@@ -823,28 +815,25 @@ XORWorker::do_perform_deep (const XORTask *xor_task)
       mp_job->add_results (xor_task->lp (), *t, rr.count (), xor_task->ix (), xor_task->iy ());
 
     } else if (mp_job->op () == db::BooleanOp::Xor ||
-               (mp_job->op () == db::BooleanOp::ANotB && !la.empty ()) ||
-               (mp_job->op () == db::BooleanOp::BNotA && !lb.empty ())) {
+               (mp_job->op () == db::BooleanOp::ANotB && ! la.empty ()) ||
+               (mp_job->op () == db::BooleanOp::BNotA && ! lb.empty ())) {
 
-      if (!la.empty ()) {
+      if (! la.empty ()) {
         mp_job->issue_string (tol_index, xor_task->layer_index (), tl::to_string (QObject::tr ("Layer not present at all in layout B")));
         mp_job->add_results (xor_task->lp (), *t, missing_in_b, 0, 0);
       }
 
-      if (!lb.empty ()) {
+      if (! lb.empty ()) {
         mp_job->issue_string (tol_index, xor_task->layer_index (), tl::to_string (QObject::tr ("Layer not present at all in layout A")));
         mp_job->add_results (xor_task->lp (), *t, missing_in_a, 0, 0);
       }
-
     }
 
     mp_job->next_progress ();
-
   }
 }
 
-void
-XORWorker::do_perform_tiled (const XORTask *xor_task)
+void XORWorker::do_perform_tiled (const XORTask *xor_task)
 {
   db::ShapeProcessor sp (true);
 
@@ -855,12 +844,12 @@ XORWorker::do_perform_tiled (const XORTask *xor_task)
   xor_results.insert_layer (0);
 
   unsigned int tol_index = 0;
-  for (std::vector <db::Coord>::const_iterator t = mp_job->tolerances ().begin (); t != mp_job->tolerances ().end (); ++t, ++tol_index) {
+  for (std::vector<db::Coord>::const_iterator t = mp_job->tolerances ().begin (); t != mp_job->tolerances ().end (); ++t, ++tol_index) {
 
     const std::vector<unsigned int> &la = xor_task->la ();
     const std::vector<unsigned int> &lb = xor_task->lb ();
 
-    if ((!la.empty () && !lb.empty ()) || mp_job->el_handling () != XORJob::EL_summarize) {
+    if ((! la.empty () && ! lb.empty ()) || mp_job->el_handling () != XORJob::EL_summarize) {
 
       if (tl::verbosity () >= (mp_job->has_tiles () ? 20 : 10)) {
         tl::info << "XOR tool: layer " << xor_task->lp ().to_string () << ", tolerance " << *t * mp_job->dbu () << ", tile " << xor_task->tile_desc ();
@@ -870,7 +859,7 @@ XORWorker::do_perform_tiled (const XORTask *xor_task)
 
       if (tol_index == 0) {
 
-        if ((!la.empty () && !lb.empty ()) || mp_job->el_handling () == XORJob::EL_process) {
+        if ((! la.empty () && ! lb.empty ()) || mp_job->el_handling () == XORJob::EL_process) {
 
           tl::SelfTimer timer (tl::verbosity () >= 31, "Boolean part");
           size_t n;
@@ -891,7 +880,7 @@ XORWorker::do_perform_tiled (const XORTask *xor_task)
               s_a = db::RecursiveShapeIterator (mp_job->cva ()->layout (), *mp_job->cva ().cell (), la);
             }
             s_a.set_for_merged_input (true);
-            for ( ; ! s_a.at_end (); ++s_a, ++n) {
+            for (; ! s_a.at_end (); ++s_a, ++n) {
               sp.insert (s_a.shape (), dbu_scale_a * s_a.trans (), n * 2);
             }
 
@@ -922,7 +911,7 @@ XORWorker::do_perform_tiled (const XORTask *xor_task)
             merge_helper.insert_layer (1);
 
             //  This implementation is faster when a lot of overlapping shapes are involved
-            if (!la.empty ()) {
+            if (! la.empty ()) {
 
               sp.clear ();
 
@@ -936,7 +925,7 @@ XORWorker::do_perform_tiled (const XORTask *xor_task)
                 s = db::RecursiveShapeIterator (mp_job->cva ()->layout (), *mp_job->cva ().cell (), la);
               }
               s.set_for_merged_input (true);
-              for ( ; ! s.at_end (); ++s, ++n) {
+              for (; ! s.at_end (); ++s, ++n) {
                 sp.insert (s.shape (), dbu_scale * s.trans (), n);
               }
 
@@ -944,10 +933,9 @@ XORWorker::do_perform_tiled (const XORTask *xor_task)
               db::ShapeGenerator sg (merge_helper_cell.shapes (0), true /*clear shapes*/);
               db::PolygonGenerator out (sg, false /*don't resolve holes*/, false /*no min. coherence*/);
               sp.process (out, op);
-
             }
 
-            if (!lb.empty ()) {
+            if (! lb.empty ()) {
 
               sp.clear ();
 
@@ -961,7 +949,7 @@ XORWorker::do_perform_tiled (const XORTask *xor_task)
                 s = db::RecursiveShapeIterator (mp_job->cvb ()->layout (), *mp_job->cvb ().cell (), lb);
               }
               s.set_for_merged_input (true);
-              for ( ; ! s.at_end (); ++s, ++n) {
+              for (; ! s.at_end (); ++s, ++n) {
                 sp.insert (s.shape (), dbu_scale * s.trans (), n);
               }
 
@@ -969,30 +957,28 @@ XORWorker::do_perform_tiled (const XORTask *xor_task)
               db::ShapeGenerator sg (merge_helper_cell.shapes (1), true /*clear shapes*/);
               db::PolygonGenerator out (sg, false /*don't resolve holes*/, false /*no min. coherence*/);
               sp.process (out, op);
-
             }
 
             sp.boolean (merge_helper, merge_helper_cell, 0,
                         merge_helper, merge_helper_cell, 1,
                         xor_results_cell.shapes (0), mp_job->op (), true, false, true);
-
           }
 
-        } else if (mp_job->op () == db::BooleanOp::Xor || 
-                   (mp_job->op () == db::BooleanOp::ANotB && !la.empty ()) ||
-                   (mp_job->op () == db::BooleanOp::BNotA && !lb.empty ())) {
+        } else if (mp_job->op () == db::BooleanOp::Xor ||
+                   (mp_job->op () == db::BooleanOp::ANotB && ! la.empty ()) ||
+                   (mp_job->op () == db::BooleanOp::BNotA && ! lb.empty ())) {
 
           db::RecursiveShapeIterator s;
           db::CplxTrans dbu_scale;
 
-          if (!la.empty ()) {
+          if (! la.empty ()) {
             if (mp_job->has_tiles ()) {
               s = db::RecursiveShapeIterator (mp_job->cva ()->layout (), *mp_job->cva ().cell (), la, xor_task->region_a ());
             } else {
               s = db::RecursiveShapeIterator (mp_job->cva ()->layout (), *mp_job->cva ().cell (), la);
             }
             dbu_scale = db::CplxTrans (mp_job->cva ()->layout ().dbu () / xor_results.dbu ());
-          } else if (!lb.empty ()) {
+          } else if (! lb.empty ()) {
             if (mp_job->has_tiles ()) {
               s = db::RecursiveShapeIterator (mp_job->cvb ()->layout (), *mp_job->cvb ().cell (), lb, xor_task->region_b ());
             } else {
@@ -1011,15 +997,13 @@ XORWorker::do_perform_tiled (const XORTask *xor_task)
               xor_results_cell.shapes (0).insert (p);
             }
           }
-
         }
-
       }
 
       if (*t > 0) {
         tl::SelfTimer timer (tl::verbosity () >= (mp_job->has_tiles () ? 31 : 21), "Sizing part");
-        sp.size (xor_results, xor_results_cell, 0, xor_results_cell.shapes (0), -((*t + 1) / 2), (unsigned int)2, false);
-        sp.size (xor_results, xor_results_cell, 0, xor_results_cell.shapes (0), ((*t + 1) / 2), (unsigned int)2, false);
+        sp.size (xor_results, xor_results_cell, 0, xor_results_cell.shapes (0), -((*t + 1) / 2), (unsigned int) 2, false);
+        sp.size (xor_results, xor_results_cell, 0, xor_results_cell.shapes (0), ((*t + 1) / 2), (unsigned int) 2, false);
       }
 
       size_t n = 0;
@@ -1028,45 +1012,41 @@ XORWorker::do_perform_tiled (const XORTask *xor_task)
 
         if (mp_job->has_tiles ()) {
 
-          std::vector <db::Polygon> clipped_poly;
+          std::vector<db::Polygon> clipped_poly;
           clip_poly (s->polygon (), xor_task->clip_box (), clipped_poly, false /*don't resolve holes*/);
           db::Box inner = xor_task->clip_box ().enlarged (db::Vector (-1, -1));
 
-          for (std::vector <db::Polygon>::const_iterator cp = clipped_poly.begin (); cp != clipped_poly.end (); ++cp) {
+          for (std::vector<db::Polygon>::const_iterator cp = clipped_poly.begin (); cp != clipped_poly.end (); ++cp) {
 
-            mp_job->issue_polygon (tol_index, xor_task->layer_index (), *cp, !cp->box ().inside (inner));
+            mp_job->issue_polygon (tol_index, xor_task->layer_index (), *cp, ! cp->box ().inside (inner));
             ++n;
           }
-        
+
         } else {
           mp_job->issue_polygon (tol_index, xor_task->layer_index (), s->polygon ());
           ++n;
         }
-
       }
 
       mp_job->add_results (xor_task->lp (), *t, n, xor_task->ix (), xor_task->iy ());
 
-    } else if (mp_job->op () == db::BooleanOp::Xor || 
-               (mp_job->op () == db::BooleanOp::ANotB && !la.empty ()) ||
-               (mp_job->op () == db::BooleanOp::BNotA && !lb.empty ())) {
+    } else if (mp_job->op () == db::BooleanOp::Xor ||
+               (mp_job->op () == db::BooleanOp::ANotB && ! la.empty ()) ||
+               (mp_job->op () == db::BooleanOp::BNotA && ! lb.empty ())) {
 
-      if (!la.empty ()) {
+      if (! la.empty ()) {
         mp_job->issue_string (tol_index, xor_task->layer_index (), tl::to_string (QObject::tr ("Layer not present at all in layout B")));
         mp_job->add_results (xor_task->lp (), *t, missing_in_b, 0, 0);
       }
 
-      if (!lb.empty ()) {
+      if (! lb.empty ()) {
         mp_job->issue_string (tol_index, xor_task->layer_index (), tl::to_string (QObject::tr ("Layer not present at all in layout A")));
         mp_job->add_results (xor_task->lp (), *t, missing_in_a, 0, 0);
       }
-
     }
-    
+
     mp_job->next_progress ();
-
   }
-
 }
 
 tl::Worker *
@@ -1075,8 +1055,7 @@ XORJob::create_worker ()
   return new XORWorker (this);
 }
 
-void 
-XORToolDialog::run_xor ()
+void XORToolDialog::run_xor ()
 {
   input_mode_t input_mode = (input_mode_t) mp_ui->input_layers_cbx->currentIndex ();
   output_mode_t output_mode = (output_mode_t) mp_ui->output_cbx->currentIndex ();
@@ -1107,18 +1086,18 @@ XORToolDialog::run_xor ()
   lay::CellView cva = mp_view->cellview (cv_index_a);
   lay::CellView cvb = mp_view->cellview (cv_index_b);
 
-  //  NOTE: basically we should take the common denominator rather than the minimum of the layout's DBU's. 
-  //  But this could be a very small number resulting in coordinate overflow issues. 
+  //  NOTE: basically we should take the common denominator rather than the minimum of the layout's DBU's.
+  //  But this could be a very small number resulting in coordinate overflow issues.
   double dbu = std::min (cva->layout ().dbu (), cvb->layout ().dbu ());
 
-  std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int> >, db::LPLogicalLessFunc> layers;
+  std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int>>, db::LPLogicalLessFunc> layers;
 
   for (db::Layout::layer_iterator la = cva->layout ().begin_layers (); la != cva->layout ().end_layers (); ++la) {
-    layers[*(*la).second].first.push_back ((*la).first);
+    layers [*(*la).second].first.push_back ((*la).first);
   }
 
   for (db::Layout::layer_iterator lb = cvb->layout ().begin_layers (); lb != cvb->layout ().end_layers (); ++lb) {
-    layers[*(*lb).second].second.push_back ((*lb).first);
+    layers [*(*lb).second].second.push_back ((*lb).first);
   }
 
   //  Keep only visible layers if requested. Treat invisible ones as empty.
@@ -1136,9 +1115,9 @@ XORToolDialog::run_xor ()
       }
     }
 
-    for (std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int> >, db::LPLogicalLessFunc>::iterator lm = layers.begin (); lm != layers.end (); ) {
+    for (std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int>>, db::LPLogicalLessFunc>::iterator lm = layers.begin (); lm != layers.end ();) {
 
-      std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int> >, db::LPLogicalLessFunc>::iterator lm_next = lm;
+      std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int>>, db::LPLogicalLessFunc>::iterator lm_next = lm;
       ++lm_next;
 
       std::sort (lm->second.first.begin (), lm->second.first.end ());
@@ -1152,12 +1131,10 @@ XORToolDialog::run_xor ()
       }
 
       lm = lm_next;
-
     }
-
   }
 
-  std::vector <db::Coord> tolerances;
+  std::vector<db::Coord> tolerances;
 
   {
     std::string text (tl::to_string (mp_ui->tolerances->text ()));
@@ -1168,7 +1145,7 @@ XORToolDialog::run_xor ()
         break;
       }
       ex.test (",");
-      tolerances.push_back (db::coord_traits <db::Coord>::rounded (t / dbu));
+      tolerances.push_back (db::coord_traits<db::Coord>::rounded (t / dbu));
     }
 
     std::sort (tolerances.begin (), tolerances.end ());
@@ -1179,9 +1156,9 @@ XORToolDialog::run_xor ()
     }
   }
 
-  //  Create a map of new layers for original ones 
-  std::map <db::LayerProperties, db::LayerProperties> new_layer_props;
-  for (std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int> >, db::LPLogicalLessFunc>::iterator lm = layers.begin (); lm != layers.end (); ++lm) {
+  //  Create a map of new layers for original ones
+  std::map<db::LayerProperties, db::LayerProperties> new_layer_props;
+  for (std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int>>, db::LPLogicalLessFunc>::iterator lm = layers.begin (); lm != layers.end (); ++lm) {
     new_layer_props.insert (std::make_pair (lm->first, lm->first));
   }
 
@@ -1195,11 +1172,11 @@ XORToolDialog::run_xor ()
     if (ex.try_read (t)) {
       tile_size = t;
       if (tile_size < 1.0) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Invalid tile size (smaller than 1 micron or negative)")));  
+        throw tl::Exception (tl::to_string (QObject::tr ("Invalid tile size (smaller than 1 micron or negative)")));
       }
     }
   }
-  
+
   std::string srca = cva->name () + ", Cell " + cva->layout ().cell_name (cva.cell_index ());
   std::string srcb = cvb->name () + ", Cell " + cvb->layout ().cell_name (cvb.cell_index ());
 
@@ -1211,7 +1188,7 @@ XORToolDialog::run_xor ()
   int output_cv = -1;
   db::Layout *output_layout = 0;
   db::Cell *output_cell = 0;
-  std::vector <unsigned int> output_layers;
+  std::vector<unsigned int> output_layers;
 
   if (output_mode == OMMarkerDatabase) {
 
@@ -1230,7 +1207,7 @@ XORToolDialog::run_xor ()
     output_layout = &mp_view->cellview (output_cv)->layout ();
     output_layout->dbu (dbu);
 
-    for (std::map <db::LayerProperties, db::LayerProperties>::const_iterator lp = new_layer_props.begin (); lp != new_layer_props.end (); ++lp) {
+    for (std::map<db::LayerProperties, db::LayerProperties>::const_iterator lp = new_layer_props.begin (); lp != new_layer_props.end (); ++lp) {
       output_layers.push_back (output_layout->insert_layer (lp->second));
       lay::LayerProperties lay_lp;
       lay_lp.set_source (lay::ParsedLayerSource (lp->second, output_cv));
@@ -1249,7 +1226,6 @@ XORToolDialog::run_xor ()
     output_cv = cv_index_b;
     output_layout = &cvb->layout ();
     output_cell = cvb.cell ();
-
   }
 
   //  Clear undo buffers if layout is created.
@@ -1257,7 +1233,7 @@ XORToolDialog::run_xor ()
     mp_view->manager ()->clear ();
   }
 
-  std::vector<db::DBox> boxes; 
+  std::vector<db::DBox> boxes;
 
   db::DBox overall_box = (db::DBox (cva.cell ()->bbox ()) * cva->layout ().dbu ()) + (db::DBox (cvb.cell ()->bbox ()) * cvb->layout ().dbu ());
 
@@ -1265,7 +1241,7 @@ XORToolDialog::run_xor ()
     overall_box &= mp_view->viewport ().box ();
     boxes.push_back (overall_box);
   } else if (region_mode == RMRulers) {
-    ant::Service *ant_service = mp_view->get_plugin <ant::Service> ();
+    ant::Service *ant_service = mp_view->get_plugin<ant::Service> ();
     if (ant_service) {
       ant::AnnotationIterator ant = ant_service->begin_annotations ();
       while (! ant.at_end ()) {
@@ -1280,7 +1256,7 @@ XORToolDialog::run_xor ()
   bool was_cancelled = false;
   for (int mode = 0; mode < 3 && ! was_cancelled; ++mode) {
 
-    rdb::Category *cat = 0; 
+    rdb::Category *cat = 0;
     db::BooleanOp::BoolOp op;
     std::string op_name;
     std::string op_desc;
@@ -1308,10 +1284,10 @@ XORToolDialog::run_xor ()
       output_cell = &output_layout->cell (output_layout->add_cell (op_name.c_str ()));
     }
 
-    std::vector <rdb::Category *> sub_categories;
-    std::vector <std::vector <rdb::Category *> > layer_categories;
-    std::vector <db::Cell *> sub_cells;
-    std::vector <std::vector <unsigned int> > sub_output_layers;
+    std::vector<rdb::Category *> sub_categories;
+    std::vector<std::vector<rdb::Category *>> layer_categories;
+    std::vector<db::Cell *> sub_cells;
+    std::vector<std::vector<unsigned int>> sub_output_layers;
 
     if (output_mode == OMMarkerDatabase) {
 
@@ -1323,30 +1299,26 @@ XORToolDialog::run_xor ()
 
       } else {
 
-        for (std::vector <db::Coord>::const_iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
+        for (std::vector<db::Coord>::const_iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
 
           rdb::Category *subcat;
           subcat = rdb->create_category (cat, tl::sprintf ("Tol_%g", *t * dbu));
           subcat->set_description (tl::sprintf ("XOR tolerance (min width reported): %g um", *t * dbu));
           sub_categories.push_back (subcat);
-
         }
-
       }
 
       layer_categories.reserve (sub_categories.size ());
       for (size_t i = 0; i < sub_categories.size (); ++i) {
 
-        layer_categories.push_back (std::vector <rdb::Category *> ());
+        layer_categories.push_back (std::vector<rdb::Category *> ());
 
-        for (std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int> >, db::LPLogicalLessFunc>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+        for (std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int>>, db::LPLogicalLessFunc>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
 
           rdb::Category *layercat = rdb->create_category (sub_categories [i], l->first.to_string ());
           layercat->set_description ("Results for layer " + l->first.to_string ());
           layer_categories.back ().push_back (layercat);
-
         }
-
       }
 
     } else if (output_mode == OMNewLayout) {
@@ -1358,15 +1330,13 @@ XORToolDialog::run_xor ()
 
       } else {
 
-        for (std::vector <db::Coord>::const_iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
+        for (std::vector<db::Coord>::const_iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
 
           sub_cells.push_back (&output_layout->cell (output_layout->add_cell (tl::sprintf ("%s_TOL_%g", op_name, *t * dbu).c_str ())));
           output_cell->insert (db::CellInstArray (db::CellInst (sub_cells.back ()->cell_index ()), db::Trans ()));
 
           sub_output_layers.push_back (output_layers);
-
         }
-
       }
 
     } else if (output_mode == OMNewLayersA || output_mode == OMNewLayersB) {
@@ -1378,7 +1348,7 @@ XORToolDialog::run_xor ()
           o.name = "*_" + op_desc; // "_XOR" postfix by default
         }
 
-        for (std::map <db::LayerProperties, db::LayerProperties>::iterator lp = new_layer_props.begin (); lp != new_layer_props.end (); ++lp) {
+        for (std::map<db::LayerProperties, db::LayerProperties>::iterator lp = new_layer_props.begin (); lp != new_layer_props.end (); ++lp) {
           if (lp->first.is_named ()) {
             lp->second.name = lp->first.name;
           }
@@ -1386,7 +1356,7 @@ XORToolDialog::run_xor ()
         }
 
         output_layers.clear ();
-        for (std::map <db::LayerProperties, db::LayerProperties>::iterator lp = new_layer_props.begin (); lp != new_layer_props.end (); ++lp) {
+        for (std::map<db::LayerProperties, db::LayerProperties>::iterator lp = new_layer_props.begin (); lp != new_layer_props.end (); ++lp) {
           output_layers.push_back (output_layout->insert_layer (lp->second));
           lay::LayerProperties lay_lp;
           lay_lp.set_source (lay::ParsedLayerSource (lp->second, output_cv));
@@ -1399,14 +1369,14 @@ XORToolDialog::run_xor ()
 
       } else {
 
-        for (std::vector <db::Coord>::const_iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
+        for (std::vector<db::Coord>::const_iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
 
           db::LayerOffset o = layer_offset;
           if (! o.is_named ()) {
             o.name = "*_" + op_desc + tl::sprintf ("_T%d", int (t - tolerances.begin ()) + 1); // "_XOR" postfix by default
           }
 
-          for (std::map <db::LayerProperties, db::LayerProperties>::iterator lp = new_layer_props.begin (); lp != new_layer_props.end (); ++lp) {
+          for (std::map<db::LayerProperties, db::LayerProperties>::iterator lp = new_layer_props.begin (); lp != new_layer_props.end (); ++lp) {
             if (lp->first.is_named ()) {
               lp->second.name = lp->first.name;
             }
@@ -1414,7 +1384,7 @@ XORToolDialog::run_xor ()
           }
 
           output_layers.clear ();
-          for (std::map <db::LayerProperties, db::LayerProperties>::iterator lp = new_layer_props.begin (); lp != new_layer_props.end (); ++lp) {
+          for (std::map<db::LayerProperties, db::LayerProperties>::iterator lp = new_layer_props.begin (); lp != new_layer_props.end (); ++lp) {
             output_layers.push_back (output_layout->insert_layer (lp->second));
             lay::LayerProperties lay_lp;
             lay_lp.set_source (lay::ParsedLayerSource (lp->second, output_cv));
@@ -1424,11 +1394,8 @@ XORToolDialog::run_xor ()
 
           sub_cells.push_back (output_cell);
           sub_output_layers.push_back (output_layers);
-
         }
-
       }
-
     }
 
     size_t todo_count = 0;
@@ -1472,22 +1439,20 @@ XORToolDialog::run_xor ()
           double box_width = tl::round_up (box.width () / ntiles_w, common_dbu);
           double box_height = tl::round_up (box.height () / ntiles_h, common_dbu);
 
-          box_width_a  = db::coord_traits<db::Coord>::rounded (box_width / cva->layout ().dbu ());
-          box_height_a  = db::coord_traits<db::Coord>::rounded (box_height / cva->layout ().dbu ());
+          box_width_a = db::coord_traits<db::Coord>::rounded (box_width / cva->layout ().dbu ());
+          box_height_a = db::coord_traits<db::Coord>::rounded (box_height / cva->layout ().dbu ());
 
-          box_width_b  = db::coord_traits<db::Coord>::rounded (box_width / cvb->layout ().dbu ());
-          box_height_b  = db::coord_traits<db::Coord>::rounded (box_height / cvb->layout ().dbu ());
+          box_width_b = db::coord_traits<db::Coord>::rounded (box_width / cvb->layout ().dbu ());
+          box_height_b = db::coord_traits<db::Coord>::rounded (box_height / cvb->layout ().dbu ());
 
-          box_width_out  = db::coord_traits<db::Coord>::rounded (box_width / dbu);
-          box_height_out  = db::coord_traits<db::Coord>::rounded (box_height / dbu);
-
+          box_width_out = db::coord_traits<db::Coord>::rounded (box_width / dbu);
+          box_height_out = db::coord_traits<db::Coord>::rounded (box_height / dbu);
         }
-
       }
 
       //  Enlarge the tiles by half the maximum tolerance
       db::Coord tile_enlargement = 0;
-      for (std::vector <db::Coord>::iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
+      for (std::vector<db::Coord>::iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
         db::Coord enlargement = (*t + 1) / 2; // round up
         if (enlargement > tile_enlargement) {
           tile_enlargement = enlargement;
@@ -1527,16 +1492,13 @@ XORToolDialog::run_xor ()
           std::string tile_desc = tl::sprintf ("%d/%d,%d/%d", int (nw + 1), ntiles_w, int (nh + 1), ntiles_h);
 
           unsigned int layer_index = 0;
-          for (std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int> >, db::LPLogicalLessFunc>::const_iterator l = layers.begin (); l != layers.end (); ++l, ++layer_index) {
+          for (std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int>>, db::LPLogicalLessFunc>::const_iterator l = layers.begin (); l != layers.end (); ++l, ++layer_index) {
             job.schedule (new XORTask (deep, tile_desc, clip_box, region_a, region_b, layer_index, l->first, l->second.first, l->second.second, int (nw), int (nh)));
           }
-
         }
-
       }
 
       todo_count += ntiles_w * ntiles_h * tolerances.size () * layers.size ();
-
     }
 
     bool was_cancelled = false;
@@ -1551,8 +1513,8 @@ XORToolDialog::run_xor ()
 
       //  We need to lock the layouts during the processing - in OMNewLayerA and OMNewLayerB mode
       //  we actually modify the layout we iterate over
-      db::LayoutLocker locker_a (& cva->layout ());
-      db::LayoutLocker locker_b (& cvb->layout ());
+      db::LayoutLocker locker_a (&cva->layout ());
+      db::LayoutLocker locker_b (&cvb->layout ());
 
       try {
 
@@ -1580,14 +1542,13 @@ XORToolDialog::run_xor ()
 
       //  apply healing if required
       job.finish ();
-
     }
 
     if (was_cancelled && output_mode == OMMarkerDatabase) {
       //  If the output mode is database, ask whether to keep the data collected so far.
       //  If the answer is yes, remove the RDB.
       //  Don't ask if the application has exit (window was closed)
-      if (lay::ApplicationBase::instance ()->main_window () && !lay::ApplicationBase::instance ()->main_window ()->exited ()) {
+      if (lay::ApplicationBase::instance ()->main_window () && ! lay::ApplicationBase::instance ()->main_window ()->exited ()) {
         QMessageBox msgbox (QMessageBox::Question,
                             QObject::tr ("Keep Data For Cancelled Job"),
                             QObject::tr ("The job has been cancelled. Keep the data collected so far?"),
@@ -1600,7 +1561,6 @@ XORToolDialog::run_xor ()
         }
       }
     }
-
   }
 
   if (mp_view) {
@@ -1618,4 +1578,3 @@ XORToolDialog::run_xor ()
 }
 
 }
-

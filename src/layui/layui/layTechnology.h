@@ -38,7 +38,7 @@ namespace lay
  *  @brief A base class for an editor for a technology component
  *
  *  A technology component provider can provide an editor for the component
- *  To do so, it must implement a TechnologyComponentEditor that provides an 
+ *  To do so, it must implement a TechnologyComponentEditor that provides an
  *  editor for it's component.
  */
 class LAYUI_PUBLIC TechnologyComponentEditor
@@ -74,7 +74,7 @@ public:
   /**
    *  @brief Sets up the editor with the given technology and component
    */
-  virtual void setup () 
+  virtual void setup ()
   {
     // .. nothing yet ..
   }
@@ -82,7 +82,7 @@ public:
   /**
    *  @brief Commits the edits to the technology and component
    */
-  virtual void commit () 
+  virtual void commit ()
   {
     // .. nothing yet ..
   }
@@ -128,14 +128,14 @@ public:
   /**
    *  @brief Creates the technology component
    */
-  virtual TechnologyComponentEditor *create_editor (QWidget * /*parent*/) const 
+  virtual TechnologyComponentEditor *
+  create_editor (QWidget * /*parent*/) const
   {
     return 0;
   }
 };
-
 }
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

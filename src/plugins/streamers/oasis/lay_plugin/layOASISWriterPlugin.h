@@ -33,7 +33,7 @@ namespace lay
 class OASISWriterOptionPage
   : public StreamWriterOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   OASISWriterOptionPage (QWidget *parent);
@@ -52,4 +52,3 @@ private:
 }
 
 #endif
-

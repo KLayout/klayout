@@ -35,11 +35,11 @@
 
 namespace db
 {
-  class Layout;
-  struct LayerProperties;
+class Layout;
+struct LayerProperties;
 }
 
-namespace lay 
+namespace lay
 {
 
 class LayerProperties;
@@ -54,23 +54,26 @@ class LAYBASIC_PUBLIC HierarchyLevelSelection
 public:
   /**
    *  @brief Describes the mode how to use a hierarchy level spec
-   *  
+   *
    *  absolute - use the value as it is
    *  minimum - use the minimum of the set level (in the level controls) and the value
    *  maximum - use the maximum of the set level (in the level controls) and the value
    */
-  enum level_mode_type { absolute = 0, minimum = 1, maximum = 2 };
+  enum level_mode_type { absolute = 0,
+                         minimum = 1,
+                         maximum = 2 };
 
   /**
    *  @brief Default constructor
    *
-   *  This will create a "neutral" hierarchy level specification without any 
+   *  This will create a "neutral" hierarchy level specification without any
    *  particular selection.
    */
   HierarchyLevelSelection ()
     : m_has_from_level (false), m_from_level_relative (false), m_from_level (0), m_from_mode (absolute),
       m_has_to_level (false), m_to_level_relative (false), m_to_level (0), m_to_mode (absolute)
-  { }
+  {
+  }
 
   /**
    *  @brief Constructor creating a constrained specification
@@ -81,12 +84,13 @@ public:
   HierarchyLevelSelection (int from_level, bool from_level_relative, level_mode_type from_mode, int to_level, bool to_level_relative, level_mode_type to_mode)
     : m_has_from_level (true), m_from_level_relative (from_level_relative), m_from_level (from_level), m_from_mode (from_mode),
       m_has_to_level (true), m_to_level_relative (to_level_relative), m_to_level (to_level), m_to_mode (to_mode)
-  { }
+  {
+  }
 
   /**
    *  @brief Combine two hierarchy level specifications
    *
-   *  The resulting specification will have "b" specifications overridden, if 
+   *  The resulting specification will have "b" specifications overridden, if
    *  there are levels specified in "*this".
    */
   HierarchyLevelSelection combine (const HierarchyLevelSelection &b) const
@@ -125,7 +129,7 @@ public:
   }
 
   /**
-   *  @brief Return the "from_level" 
+   *  @brief Return the "from_level"
    */
   int from_level () const
   {
@@ -193,7 +197,7 @@ public:
   }
 
   /**
-   *  @brief Return the "to_level" 
+   *  @brief Return the "to_level"
    */
   int to_level () const
   {
@@ -243,15 +247,15 @@ public:
    */
   bool operator== (const HierarchyLevelSelection &b) const
   {
-    return m_has_from_level == b.m_has_from_level && 
-           (! m_has_from_level || 
-             (m_from_level_relative == b.m_from_level_relative &&
+    return m_has_from_level == b.m_has_from_level &&
+           (! m_has_from_level ||
+            (m_from_level_relative == b.m_from_level_relative &&
              m_from_level == b.m_from_level &&
              m_from_mode == b.m_from_mode)) &&
            m_has_to_level == b.m_has_to_level &&
-           (! m_has_to_level || 
-             (m_to_level_relative == b.m_to_level_relative &&
-             m_to_level == b.m_to_level && 
+           (! m_has_to_level ||
+            (m_to_level_relative == b.m_to_level_relative &&
+             m_to_level == b.m_to_level &&
              m_to_mode == b.m_to_mode));
   }
 
@@ -364,9 +368,9 @@ private:
   const db::Layout *mp_layout;
   int m_state;
   bool m_selected;
-  std::vector <int> m_state_stack;
-  std::vector <bool> m_selected_stack;
-  std::vector <std::map <db::cell_index_type, std::pair<int, int> > > m_state_machine;
+  std::vector<int> m_state_stack;
+  std::vector<bool> m_selected_stack;
+  std::vector<std::map<db::cell_index_type, std::pair<int, int>>> m_state_machine;
   friend class CellSelector;
 
   /**
@@ -376,14 +380,14 @@ private:
 
   /**
    *  @brief Adds a cell index to a given state with a target state and a selection state
-   *  The target state may be -1 indicating the decision is final. 
+   *  The target state may be -1 indicating the decision is final.
    *  The selected flag can be -1 (no change), 0 (deselect) and 1 (select).
    */
   void add_state_transition (int initial_state, db::cell_index_type cell_index, int target_state, int selected);
 
   /**
    *  @brief Adds all cells to a given state with a target state and a selection state
-   *  The target state may be -1 indicating the decision is final. 
+   *  The target state may be -1 indicating the decision is final.
    *  This transition will be performed for every cell.
    *  The selected flag can be -1 (no change), 0 (deselect) and 1 (select).
    */
@@ -408,7 +412,7 @@ public:
   CellSelector (const CellSelector &d);
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   CellSelector &operator= (const CellSelector &d);
 
@@ -422,7 +426,7 @@ public:
    */
   bool operator!= (const CellSelector &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
@@ -432,7 +436,7 @@ public:
 
   /**
    *  @brief Parse one additional selector contribution from the extractor
-   *  This method can be called multiple times which will add another 
+   *  This method can be called multiple times which will add another
    *  contribution to the selector.
    */
   void parse (tl::Extractor &ex);
@@ -443,8 +447,8 @@ public:
   std::string to_string () const;
 
   /**
-   *  @brief Creates a partial tree selector object 
-   *  This object is the actual selector which can be used to determine whether a 
+   *  @brief Creates a partial tree selector object
+   *  This object is the actual selector which can be used to determine whether a
    *  cell is selected while traversing the tree.
    */
   PartialTreeSelector create_tree_selector (const db::Layout &layout, db::cell_index_type initial_cell) const;
@@ -458,7 +462,7 @@ public:
   }
 
 private:
-  std::vector <std::vector <std::pair <bool, std::string> > > m_selectors;
+  std::vector<std::vector<std::pair<bool, std::string>>> m_selectors;
 };
 
 /**
@@ -470,7 +474,7 @@ public:
   /**
    *  @brief Constructor
    *
-   *  This constructor creates an empty selector matching everything. 
+   *  This constructor creates an empty selector matching everything.
    */
   PropertySelector ();
 
@@ -485,25 +489,25 @@ public:
   ~PropertySelector ();
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   PropertySelector &operator= (const PropertySelector &sel);
 
   /**
-   *  @brief Equality 
+   *  @brief Equality
    */
   bool operator== (const PropertySelector &sel) const;
 
   /**
-   *  @brief Inequality 
+   *  @brief Inequality
    */
   bool operator!= (const PropertySelector &sel) const
   {
-    return !operator== (sel);
+    return ! operator== (sel);
   }
 
   /**
-   *  @brief Less than 
+   *  @brief Less than
    */
   bool operator< (const PropertySelector &sel) const;
 
@@ -538,7 +542,7 @@ public:
   /**
    *  @brief Obtain a list of properties ids that satisfy the selection
    *
-   *  A set of properties ids is determined that each satisfies the given 
+   *  A set of properties ids is determined that each satisfies the given
    *  selection. The set should be empty on enter. Otherwise the results are
    *  not defined.
    *  The return value is true if the ids are to be interpreted inversely (every properties id
@@ -561,8 +565,8 @@ private:
 /**
  *  @brief Representation of a "parsed" layer source specification
  *
- *  This class implements a parser, a container and a dumper for a layer source 
- *  specification. Such a specification consists of a layer, datatype and 
+ *  This class implements a parser, a container and a dumper for a layer source
+ *  specification. Such a specification consists of a layer, datatype and
  *  cellview index currently.
  *  The parser layer source specification implements a "less than" operator for
  *  easy comparison.
@@ -573,7 +577,8 @@ public:
   /**
    *  @brief Enumeration for the special purpose layers
    */
-  enum SpecialPurpose { SP_None = 0, SP_CellFrame };
+  enum SpecialPurpose { SP_None = 0,
+                        SP_CellFrame };
 
   /**
    *  @brief Direct constructor: create from a layer, a datatype and a cellview index
@@ -645,7 +650,7 @@ public:
   /**
    *  @brief Comparison (equality)
    */
-  bool operator== (const ParsedLayerSource &d) const; 
+  bool operator== (const ParsedLayerSource &d) const;
 
   /**
    *  @brief Comparison (inequality)
@@ -658,7 +663,7 @@ public:
   /**
    *  @brief Comparison (less than)
    */
-  bool operator< (const ParsedLayerSource &d) const; 
+  bool operator< (const ParsedLayerSource &d) const;
 
   /**
    *  @brief Gets the color order index
@@ -675,11 +680,11 @@ public:
   {
     return m_cv_index;
   }
-  
+
   /**
    *  @brief Write accessor to the cellview index
    */
-  ParsedLayerSource &cv_index (int cvi) 
+  ParsedLayerSource &cv_index (int cvi)
   {
     m_cv_index = cvi;
     return *this;
@@ -692,7 +697,7 @@ public:
   {
     return m_has_name;
   }
-  
+
   /**
    *  @brief Read accessor to the "name" property
    */
@@ -700,17 +705,17 @@ public:
   {
     return m_name;
   }
-  
+
   /**
    *  @brief Write accessor to the "name" property
    */
-  ParsedLayerSource &name (const std::string &n) 
+  ParsedLayerSource &name (const std::string &n)
   {
-    m_has_name = !n.empty ();
+    m_has_name = ! n.empty ();
     m_name = n;
     return *this;
   }
-  
+
   /**
    *  @brief Reset the name property
    */
@@ -719,7 +724,7 @@ public:
     m_has_name = false;
     return *this;
   }
-  
+
   /**
    *  @brief Read accessor to the "layer_index" property
    */
@@ -727,16 +732,16 @@ public:
   {
     return m_layer_index;
   }
-  
+
   /**
    *  @brief Write accessor to the "layer_index" property
    */
-  ParsedLayerSource &layer_index (int layer_index) 
+  ParsedLayerSource &layer_index (int layer_index)
   {
     m_layer_index = layer_index;
     return *this;
   }
-  
+
   /**
    *  @brief Read accessor to the "layer" property
    */
@@ -744,16 +749,16 @@ public:
   {
     return m_layer;
   }
-  
+
   /**
    *  @brief Write accessor to the "layer" property
    */
-  ParsedLayerSource &layer (int layer) 
+  ParsedLayerSource &layer (int layer)
   {
     m_layer = layer;
     return *this;
   }
-  
+
   /**
    *  @brief Read accessor to the "datatype" property
    */
@@ -765,14 +770,14 @@ public:
   /**
    *  @brief Write accessor to the "datatype" property
    */
-  ParsedLayerSource &datatype (int datatype) 
+  ParsedLayerSource &datatype (int datatype)
   {
     m_datatype = datatype;
     return *this;
   }
-  
+
   /**
-   *  @brief Read accessor to the transformation 
+   *  @brief Read accessor to the transformation
    *
    *  The transformation is in micron units
    */
@@ -800,7 +805,7 @@ public:
   /**
    *  @brief Set the special purpose code
    */
-  void set_special_purpose (SpecialPurpose sp) 
+  void set_special_purpose (SpecialPurpose sp)
   {
     m_special_purpose = sp;
   }
@@ -816,7 +821,7 @@ public:
   /**
    *  @brief Sets the cell selector
    */
-  void set_cell_selector (const CellSelector &cs) 
+  void set_cell_selector (const CellSelector &cs)
   {
     m_cell_sel = cs;
   }
@@ -843,7 +848,7 @@ public:
    *  @brief Read accessor to the property expression
    *
    *  The property expression selects a shape subset by a property selection
-   *  expression. 
+   *  expression.
    */
   const PropertySelector &property_selector () const
   {
@@ -853,7 +858,7 @@ public:
   /**
    *  @brief Set the property expression
    *
-   *  The ownership of the pointer is transferred to the ParsedLayerSource object 
+   *  The ownership of the pointer is transferred to the ParsedLayerSource object
    *  and is deleted by it.
    */
   void set_property_selector (const PropertySelector &sel)
@@ -865,7 +870,7 @@ public:
    *  @brief Concatenate two source specifications
    */
   ParsedLayerSource &operator+= (const ParsedLayerSource &d);
-  
+
   /**
    *  @brief Return a db::LayerProperties object that would match this
    */
@@ -908,4 +913,3 @@ private:
 }
 
 #endif
-

@@ -94,8 +94,7 @@ inline double modulo (double a, double b)
  *  @brief Compute the greatest common divider of two numbers using the euclidian method
  */
 template <class T>
-inline
-T gcd (T a, T b)
+inline T gcd (T a, T b)
 {
   while (! equal (b, T (0))) {
     T h = modulo (a, b);
@@ -109,8 +108,7 @@ T gcd (T a, T b)
  *  @brief Compute the lowest common multiple of two numbers using the euclidian method
  */
 template <class T>
-inline
-T lcm (T a, T b)
+inline T lcm (T a, T b)
 {
   return a * (b / gcd (a, b));
 }
@@ -143,4 +141,3 @@ inline double round (double x, double g)
 }
 
 #endif
-

@@ -31,7 +31,7 @@
 
 namespace db
 {
-  struct LayerProperties;
+struct LayerProperties;
 }
 
 namespace lay
@@ -52,7 +52,7 @@ class LAYBASIC_PUBLIC EditorOptionsPageCollection
 {
 public:
   EditorOptionsPageCollection ();
-  virtual ~EditorOptionsPageCollection () { }
+  virtual ~EditorOptionsPageCollection () {}
 
   virtual void unregister_page (EditorOptionsPage *page) = 0;
   virtual bool has_content () const = 0;
@@ -124,7 +124,7 @@ public:
    *  to deliver the settings.
    *  This callback is not used for toolbox widgets.
    */
-  virtual void apply (lay::Dispatcher * /*root*/) { }
+  virtual void apply (lay::Dispatcher * /*root*/) {}
 
   /**
    *  @brief A callback to setup the page
@@ -132,14 +132,14 @@ public:
    *  the configuration, stored inside the dispatcher.
    *  This callback is not used for toolbox widgets.
    */
-  virtual void setup (lay::Dispatcher * /*root*/) { }
+  virtual void setup (lay::Dispatcher * /*root*/) {}
 
   /**
    *  @brief A callback to cancel the page edits
    *  This callback is used for toolbox widgets if the user presses
    *  "Escape".
    */
-  virtual void cancel () { }
+  virtual void cancel () {}
 
   /**
    *  @brief A callback to commit the values
@@ -147,7 +147,7 @@ public:
    *  "Enter". It can either commit values to the dispatcher
    *  through "config_set", or perform other functions.
    */
-  virtual void commit (lay::Dispatcher * /*root*/) { }
+  virtual void commit (lay::Dispatcher * /*root*/) {}
 
   /**
    *  @brief Configure the page
@@ -155,23 +155,23 @@ public:
    *  data from the plugin to a toolbox widget. This method is not
    *  used by the system directly.
    */
-  virtual void configure (const std::string & /*name*/, const std::string & /*value*/) { }
+  virtual void configure (const std::string & /*name*/, const std::string & /*value*/) {}
 
   /**
    *  @brief Called by the system to commit the current settings into some "recently used" list
    */
-  virtual void commit_recent (lay::Dispatcher * /*root*/) { }
+  virtual void commit_recent (lay::Dispatcher * /*root*/) {}
 
   /**
    *  @brief Called by the system to restore recent settings for a given layer
    */
-  virtual void config_recent_for_layer (lay::Dispatcher * /*root*/, const db::LayerProperties & /*lp*/, int /*cv_index*/) { }
+  virtual void config_recent_for_layer (lay::Dispatcher * /*root*/, const db::LayerProperties & /*lp*/, int /*cv_index*/) {}
 
   /**
    *  @brief Sets the focus to the page
    *  This function is called by the system to establish the focus on this page.
    */
-  virtual void set_focus () { }
+  virtual void set_focus () {}
 
   /**
    *  @brief Returns the widget for the page
@@ -187,7 +187,7 @@ public:
   /**
    *  @brief Changes the visibility of the page
    */
-  virtual void set_visible (bool /*visible*/) { }
+  virtual void set_visible (bool /*visible*/) {}
 
   /**
    *  @brief Returns a flag indicating whether the page is a focus page
@@ -300,10 +300,10 @@ public:
   void init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
 
 protected:
-  virtual void active_cellview_changed () { }
-  virtual void technology_changed (const std::string & /*tech*/) { }
-  virtual void activated () { }
-  virtual void deactivated () { }
+  virtual void active_cellview_changed () {}
+  virtual void technology_changed (const std::string & /*tech*/) {}
+  virtual void activated () {}
+  virtual void deactivated () {}
 
 private:
   EditorOptionsPageCollection *mp_owner;
@@ -349,7 +349,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual ~EditorOptionsPageFactoryBase () { }
+  virtual ~EditorOptionsPageFactoryBase () {}
 
   const std::string &name () const
   {
@@ -391,7 +391,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual ~EditorOptionsPageFactory () { }
+  virtual ~EditorOptionsPageFactory () {}
 
   virtual lay::EditorOptionsPage *create_page (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
   {
@@ -402,4 +402,3 @@ public:
 }
 
 #endif
-

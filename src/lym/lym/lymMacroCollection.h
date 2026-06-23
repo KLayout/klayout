@@ -32,7 +32,7 @@
 #include <set>
 
 #if defined(HAVE_QT)
-#  include <QObject>
+#include <QObject>
 #endif
 
 namespace lym
@@ -50,14 +50,14 @@ class LYM_PUBLIC MacroCollection
 #endif
 {
 #if defined(HAVE_QT)
-Q_OBJECT
+  Q_OBJECT
 #endif
 
 public:
-  typedef std::multimap <std::string, Macro *>::iterator iterator;
-  typedef std::multimap <std::string, Macro *>::const_iterator const_iterator;
-  typedef std::map <std::string, MacroCollection *>::iterator child_iterator;
-  typedef std::map <std::string, MacroCollection *>::const_iterator const_child_iterator;
+  typedef std::multimap<std::string, Macro *>::iterator iterator;
+  typedef std::multimap<std::string, Macro *>::const_iterator const_iterator;
+  typedef std::map<std::string, MacroCollection *>::iterator child_iterator;
+  typedef std::map<std::string, MacroCollection *>::const_iterator const_child_iterator;
 
   /**
    *  @brief Some constants for virtual_mode
@@ -113,7 +113,7 @@ public:
   /**
    *  @brief Collect all Macro and MacroCollection objects inside a tree starting from this collection
    */
-  void collect_used_nodes(std::set <Macro *> &macros, std::set <MacroCollection *> &macro_collections);
+  void collect_used_nodes (std::set<Macro *> &macros, std::set<MacroCollection *> &macro_collections);
 
   /**
    *  @brief Saves all macros in the collection
@@ -536,8 +536,8 @@ private:
   std::string m_path;
   std::string m_description;
   std::string m_category;
-  std::multimap <std::string, Macro *> m_macros;
-  std::map <std::string, MacroCollection *> m_folders;
+  std::multimap<std::string, Macro *> m_macros;
+  std::map<std::string, MacroCollection *> m_folders;
   lym::MacroCollection *mp_parent;
   int m_virtual_mode;
   bool m_readonly;
@@ -588,4 +588,3 @@ private:
 }
 
 #endif
-

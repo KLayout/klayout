@@ -49,10 +49,9 @@ namespace tl
 template <class T> class slist;
 
 template <class T>
-struct slist_node_type
-{
-  slist_node_type (const T &_t) : next (0), t (_t) { }
-  slist_node_type (T &&_t) : next (0), t (_t) { }
+struct slist_node_type {
+  slist_node_type (const T &_t) : next (0), t (_t) {}
+  slist_node_type (T &&_t) : next (0), t (_t) {}
   slist_node_type *next;
   T t;
 };
@@ -71,10 +70,14 @@ public:
   typedef T *pointer;
   typedef void difference_type;
 
-  slist_iterator (node_type *p = 0) : mp_p (p) { }
-  slist_iterator operator++ () { mp_p = mp_p->next; return *this; }
+  slist_iterator (node_type *p = 0) : mp_p (p) {}
+  slist_iterator operator++ ()
+  {
+    mp_p = mp_p->next;
+    return *this;
+  }
 
-  T *operator-> () const
+  T *operator->() const
   {
     return &mp_p->t;
   }
@@ -104,11 +107,15 @@ public:
   typedef const T *pointer;
   typedef void difference_type;
 
-  slist_const_iterator (slist_iterator<T> i) : mp_p (i.mp_p) { }
-  slist_const_iterator (const node_type *p = 0) : mp_p (p) { }
-  slist_const_iterator operator++ () { mp_p = mp_p->next; return *this; }
+  slist_const_iterator (slist_iterator<T> i) : mp_p (i.mp_p) {}
+  slist_const_iterator (const node_type *p = 0) : mp_p (p) {}
+  slist_const_iterator operator++ ()
+  {
+    mp_p = mp_p->next;
+    return *this;
+  }
 
-  const T *operator-> () const
+  const T *operator->() const
   {
     return &mp_p->t;
   }

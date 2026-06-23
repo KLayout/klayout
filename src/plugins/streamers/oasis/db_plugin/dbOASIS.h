@@ -84,7 +84,7 @@ public:
   RepetitionIterator (const RepetitionIterator &d);
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   RepetitionIterator &operator= (const RepetitionIterator &d);
 
@@ -98,7 +98,7 @@ public:
    */
   bool operator!= (const RepetitionIterator &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
@@ -117,7 +117,7 @@ public:
   db::Vector operator* () const;
 
 private:
-  RepetitionIteratorBase *mp_base; 
+  RepetitionIteratorBase *mp_base;
 };
 
 /**
@@ -147,7 +147,7 @@ public:
   Repetition &operator= (RepetitionBase *base);
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   Repetition &operator= (const Repetition &d);
 
@@ -166,7 +166,7 @@ public:
    */
   bool operator!= (const Repetition &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
@@ -175,7 +175,7 @@ public:
   size_t size () const;
 
   /**
-   *  @brief Check, if the repetition is an repetition at all 
+   *  @brief Check, if the repetition is an repetition at all
    *
    *  This method returns true, if the repetition is not singular.
    *  Singular repetitions are created by the default contructor.
@@ -188,8 +188,8 @@ public:
   /**
    *  @brief Checks, if the repetition is a regular one
    *
-   *  This method returns true, if the repetition is regular. It 
-   *  returns true, if the repetition can be represented as a 
+   *  This method returns true, if the repetition is regular. It
+   *  returns true, if the repetition can be represented as a
    *  set of points 0..i*a+j*b (i=0..n-1,j=0..m-1).
    *  This method does not only return a flag but the parameters as
    *  well.
@@ -230,7 +230,7 @@ public:
   }
 
 private:
-  RepetitionBase *mp_base; 
+  RepetitionBase *mp_base;
 };
 
 //  Base classes
@@ -260,7 +260,7 @@ public:
 };
 
 
-class RepetitionIteratorBase 
+class RepetitionIteratorBase
 {
 public:
   RepetitionIteratorBase ()
@@ -284,7 +284,7 @@ public:
 
 //  Regular repetitions
 
-class RegularRepetition 
+class RegularRepetition
   : public RepetitionBase
 {
 public:
@@ -307,7 +307,7 @@ private:
   size_t m_n, m_m;
 };
 
-class RegularRepetitionIterator 
+class RegularRepetitionIterator
   : public RepetitionIteratorBase
 {
 public:
@@ -327,7 +327,7 @@ private:
 
 //  Irregular repetitions
 
-class IrregularRepetition 
+class IrregularRepetition
   : public RepetitionBase
 {
 public:
@@ -343,7 +343,7 @@ public:
   virtual unsigned int type () { return 2; }
   virtual size_t size () const { return m_points.size () + 1; }
 
-  void reserve (size_t n) 
+  void reserve (size_t n)
   {
     m_points.reserve (n);
   }
@@ -361,10 +361,10 @@ public:
 private:
   friend class IrregularRepetitionIterator;
 
-  std::vector <db::Vector> m_points;
+  std::vector<db::Vector> m_points;
 };
 
-class IrregularRepetitionIterator 
+class IrregularRepetitionIterator
   : public RepetitionIteratorBase
 {
 public:
@@ -393,7 +393,7 @@ public:
    *  @brief Set up the modal variable
    *
    *  The reader is required since errors are reported to the reader.
-   *  The name is reported in the error message. 
+   *  The name is reported in the error message.
    *  This constructor creates an uninitialized variable.
    */
   modal_variable (OASISDiagnostics *reader = 0, const char *name = "")
@@ -404,14 +404,14 @@ public:
 
   /**
    *  @brief Get the value of the modal variable
-   * 
+   *
    *  An error will be reported if the value is not initialized.
    */
   const T &get () const;
 
   /**
    *  @brief Get the value of the modal variable
-   * 
+   *
    *  This method does not report an error if the value is not initialized.
    *  After modifying the object, set_initialized is supposed to be called.
    */
@@ -433,7 +433,7 @@ public:
    */
   bool operator!= (const T &t) const
   {
-    return !operator== (t);
+    return ! operator== (t);
   }
 
   /**
@@ -475,7 +475,7 @@ public:
   /**
    *  @brief Reset the initialized state of the variable
    */
-  void reset () 
+  void reset ()
   {
     m_initialized = false;
   }
@@ -486,7 +486,7 @@ public:
    *  This method is supposed to be used after a modification has been performed
    *  with the non-const accessor.
    */
-  void set_initialized () 
+  void set_initialized ()
   {
     m_initialized = true;
   }
@@ -523,4 +523,3 @@ modal_variable<T>::get () const
 }
 
 #endif
-

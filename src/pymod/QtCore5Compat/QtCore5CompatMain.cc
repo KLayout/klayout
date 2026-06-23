@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "QtCore5CompatMain.h"
-DEFINE_PYMOD(QtCore5Compat, "QtCore5Compat", "KLayout/Qt module 'QtCore5Compat'")
+DEFINE_PYMOD (QtCore5Compat, "QtCore5Compat", "KLayout/Qt module 'QtCore5Compat'")

@@ -32,8 +32,9 @@
 #include <string>
 #include <algorithm>
 
-namespace tl {
-  class Extractor;
+namespace tl
+{
+class Extractor;
 }
 
 namespace db
@@ -113,7 +114,7 @@ public:
   /**
    *  @brief Make a matrix from a transformation
    */
-  template <class Tr> 
+  template <class Tr>
   matrix_2d (const Tr &t)
   {
     *this = t.to_matrix2d ();
@@ -245,7 +246,7 @@ public:
   /**
    *  @brief In-place transpose
    */
-  void transpose () 
+  void transpose ()
   {
     std::swap (m_m21, m_m12);
   }
@@ -271,15 +272,15 @@ public:
   /**
    *  @brief In-place invert
    */
-  void invert () 
+  void invert ()
   {
     double d = det ();
     std::swap (m_m11, m_m22);
     std::swap (m_m12, m_m12);
-    m_m11 /= d; 
-    m_m12 /= -d; 
-    m_m21 /= -d; 
-    m_m22 /= d; 
+    m_m11 /= d;
+    m_m12 /= -d;
+    m_m21 /= -d;
+    m_m22 /= d;
   }
 
   /**
@@ -305,7 +306,7 @@ public:
   /**
    *  @brief Return the magnification component of the matrix
    *
-   *  The mag, angle, mirror and shear components can be used to decompose the matrix 
+   *  The mag, angle, mirror and shear components can be used to decompose the matrix
    *  into the geometrical base transformations. This member returns the x and y magnification
    *  components. The order of the execution is mirror, magnification, shear and rotation.
    */
@@ -322,7 +323,7 @@ public:
   /**
    *  @brief Return the x magnification component of the matrix
    *
-   *  The mag, angle, mirror and shear components can be used to decompose the matrix 
+   *  The mag, angle, mirror and shear components can be used to decompose the matrix
    *  into the geometrical base transformations. This member returns the x magnification
    *  component. The order of the execution is mirror, magnification, shear and rotation.
    */
@@ -334,7 +335,7 @@ public:
   /**
    *  @brief Return the y magnification component of the matrix
    *
-   *  The mag, angle, mirror and shear components can be used to decompose the matrix 
+   *  The mag, angle, mirror and shear components can be used to decompose the matrix
    *  into the geometrical base transformations. This member returns the y magnification
    *  component. The order of the execution is mirror, magnification, shear and rotation.
    */
@@ -346,7 +347,7 @@ public:
   /**
    *  @brief Create the magnification matrix
    *
-   *  @param mx The x magnification 
+   *  @param mx The x magnification
    *  @param my The y magnification
    */
   static matrix_2d<C> mag (double mx, double my)
@@ -357,7 +358,7 @@ public:
   /**
    *  @brief Create the magnification matrix with isotropic magnification
    *
-   *  @param m The magnification 
+   *  @param m The magnification
    */
   static matrix_2d<C> mag (double m)
   {
@@ -383,7 +384,7 @@ public:
   /**
    *  @brief Return the mirror component of the matrix
    *
-   *  The mag, angle, mirror and shear components can be used to decompose the matrix 
+   *  The mag, angle, mirror and shear components can be used to decompose the matrix
    *  into the geometrical base transformations. This member returns the mirror
    *  component (mirroring at the y axis). The order of the execution is mirror, magnification, shear and rotation.
    *  The mirror base transformation is M(mirror) = (1, 0 | 0, -1)
@@ -404,7 +405,7 @@ public:
   /**
    *  @brief Determine the rotation component of the matrix and return the angle in degree
    *
-   *  The mag, angle, mirror and shear components can be used to decompose the matrix 
+   *  The mag, angle, mirror and shear components can be used to decompose the matrix
    *  into the geometrical base transformations. This member returns the rotation angle.
    *  The rotation base transformation is M(a) = (cos(a), -sin(a) | sin(a), cos(a))
    */
@@ -425,9 +426,9 @@ public:
   /**
    *  @brief Determine the shear component of the matrix and return the shear angle in degree
    *
-   *  The mag, angle, mirror and shear components can be used to decompose the matrix 
+   *  The mag, angle, mirror and shear components can be used to decompose the matrix
    *  into the geometrical base transformations. This member returns the shear angle.
-   *  The shear angle is the title angle of the y axis towards x and vice versa. The 
+   *  The shear angle is the title angle of the y axis towards x and vice versa. The
    *  area of a rectangle remains constant under shear.
    *  The shear base transformation is M(a) = (1/sqrt(cos^2(a)-sin^2(a)))*(cos(a), sin(a) | sin(a), cos(a))
    */
@@ -566,7 +567,7 @@ public:
   /**
    *  @brief Make a matrix from a transformation
    */
-  template <class Tr> 
+  template <class Tr>
   explicit matrix_3d (const Tr &t)
   {
     *this = t.to_matrix3d ();
@@ -660,7 +661,7 @@ public:
   /**
    *  @brief Returns true, if the point can be transformed
    *
-   *  A point can be transformed if the resulting point is 
+   *  A point can be transformed if the resulting point is
    *  located in the positive z plane.
    */
   bool can_transform (const db::point<C> &p) const;
@@ -743,7 +744,7 @@ public:
   /**
    *  @brief In-place transpose
    */
-  void transpose () 
+  void transpose ()
   {
     *this = transposed ();
   }
@@ -761,7 +762,7 @@ public:
   /**
    *  @brief In-place invert
    */
-  void invert () 
+  void invert ()
   {
     *this = inverted ();
   }
@@ -779,7 +780,7 @@ public:
   /**
    *  @brief Return the magnification component of the matrix
    *
-   *  The mag, rotation, mirror, shear, displacement and perspective components can be used to decompose the matrix 
+   *  The mag, rotation, mirror, shear, displacement and perspective components can be used to decompose the matrix
    *  into the geometrical base transformations. This member returns the magnification
    *  component for both x and y direction (anisotropic magnification). The order of the execution is mirror, magnification, shear, rotation, perspective and displacement.
    */
@@ -839,7 +840,7 @@ public:
   /**
    *  @brief Return the mirror component of the matrix
    *
-   *  The mag, angle, mirror and shear components can be used to decompose the matrix 
+   *  The mag, angle, mirror and shear components can be used to decompose the matrix
    *  into the geometrical base transformations. This member returns the mirror
    *  component (mirroring at the y axis). The order of the execution is mirror, magnification, shear, rotation, perspective and displacement.
    *  The mirror base transformation is M(mirror) = (1, 0 | 0, -1)
@@ -860,7 +861,7 @@ public:
   /**
    *  @brief Determine the rotation component of the matrix and return the angle in degree
    *
-   *  The mag, angle, mirror and shear components can be used to decompose the matrix 
+   *  The mag, angle, mirror and shear components can be used to decompose the matrix
    *  into the geometrical base transformations. This member returns the rotation angle.
    *  The rotation base transformation is M(a) = (cos(a), -sin(a) | sin(a), cos(a))
    */
@@ -890,9 +891,9 @@ public:
   /**
    *  @brief Determine the shear component of the matrix and return the shear angle in degree
    *
-   *  The mag, angle, mirror and shear components can be used to decompose the matrix 
+   *  The mag, angle, mirror and shear components can be used to decompose the matrix
    *  into the geometrical base transformations. This member returns the shear angle.
-   *  The shear angle is the title angle of the y axis towards x and vice versa. The 
+   *  The shear angle is the title angle of the y axis towards x and vice versa. The
    *  area of a rectangle remains constant under shear.
    *  The shear base transformation is M(a) = (1/sqrt(cos^2(a)-sin^2(a)))*(cos(a), sin(a) | sin(a), cos(a))
    */
@@ -917,12 +918,12 @@ public:
   static matrix_3d shear (double a)
   {
     return matrix_3d (Matrix2d::shear (a));
-  } 
+  }
 
   /**
    *  @brief Get the x perspective tilt angle in degree
    *
-   *  To achieve the same visual effect, a different tilt angle has to be chosen for 
+   *  To achieve the same visual effect, a different tilt angle has to be chosen for
    *  a given observer distance z. This method computes the tilt angle for the given observer
    *  distance.
    */
@@ -931,7 +932,7 @@ public:
   /**
    *  @brief Get the y perspective tilt angle in degree
    *
-   *  To achieve the same visual effect, a different tilt angle has to be chosen for 
+   *  To achieve the same visual effect, a different tilt angle has to be chosen for
    *  a given observer distance z. This method computes the tilt angle for the given observer
    *  distance.
    */
@@ -945,7 +946,7 @@ public:
   /**
    *  @brief Returns the matrix for perspective transformation
    *
-   *  To achieve the same visual effect, a different tilt angle has to be chosen for 
+   *  To achieve the same visual effect, a different tilt angle has to be chosen for
    *  a given observer distance z. This method computes the tilt angle for the given observer
    *  distance.
    *
@@ -1003,19 +1004,19 @@ public:
   bool less (const matrix_3d &d) const;
 
 private:
-  double m_m[3][3];
+  double m_m [3][3];
 
   void set (double m11, double m12, double m13, double m21, double m22, double m23, double m31, double m32, double m33)
   {
-    m_m[0][0] = m11;
-    m_m[0][1] = m12;
-    m_m[0][2] = m13;
-    m_m[1][0] = m21;
-    m_m[1][1] = m22;
-    m_m[1][2] = m23;
-    m_m[2][0] = m31;
-    m_m[2][1] = m32;
-    m_m[2][2] = m33;
+    m_m [0][0] = m11;
+    m_m [0][1] = m12;
+    m_m [0][2] = m13;
+    m_m [1][0] = m21;
+    m_m [1][1] = m22;
+    m_m [1][2] = m23;
+    m_m [2][0] = m31;
+    m_m [2][1] = m32;
+    m_m [2][2] = m33;
   }
 };
 
@@ -1023,24 +1024,22 @@ typedef matrix_3d<db::DCoord> Matrix3d;
 typedef matrix_3d<db::Coord> IMatrix3d;
 
 /**
- *  @brief Some adjustment flags 
+ *  @brief Some adjustment flags
  *
  *  These flags can be combined to tell the adjust function which properties to
  *  adjust when the matrix of displacement are adjusted.
  */
-struct MatrixAdjustFlags
-{
-  enum Flags
-  {
-    None = 0,                 //  Don't adjust anything
-    Displacement = 1,         //  Adjust displacement only (needs at least one point)
-    Rotation = 2,             //  Adjust displacement plus rotation (needs two points at least)
-    RotationMirror = 3,       //  Adjust displacement plus rotation and allow mirror (needs three points at least)
-    Magnification = 4,        //  Adjust displacement, rotation (without mirror) and magnification (needs three points at least)
-    MagnificationMirror = 5,  //  Adjust displacement, rotation (plus mirror) and magnification (needs three points at least)
-    Shear = 6,                //  Adjust displacement, rotation (plus mirror), magnification and shear (needs four points at least). Is equivalent to All for a 2d matrix.
-    Perspective = 7,          //  Adjust displacement, rotation (plus mirror), magnification, shear and perspective (needs six points at least). Is equivalent to All for a 3d matrix.
-    All = 8                   //  Adjust all (Shear for Matrix2d and Perspective for Matrix3d)
+struct MatrixAdjustFlags {
+  enum Flags {
+    None = 0,                //  Don't adjust anything
+    Displacement = 1,        //  Adjust displacement only (needs at least one point)
+    Rotation = 2,            //  Adjust displacement plus rotation (needs two points at least)
+    RotationMirror = 3,      //  Adjust displacement plus rotation and allow mirror (needs three points at least)
+    Magnification = 4,       //  Adjust displacement, rotation (without mirror) and magnification (needs three points at least)
+    MagnificationMirror = 5, //  Adjust displacement, rotation (plus mirror) and magnification (needs three points at least)
+    Shear = 6,               //  Adjust displacement, rotation (plus mirror), magnification and shear (needs four points at least). Is equivalent to All for a 2d matrix.
+    Perspective = 7,         //  Adjust displacement, rotation (plus mirror), magnification, shear and perspective (needs six points at least). Is equivalent to All for a 3d matrix.
+    All = 8                  //  Adjust all (Shear for Matrix2d and Perspective for Matrix3d)
   };
 };
 
@@ -1048,8 +1047,8 @@ struct MatrixAdjustFlags
  *  @brief Adjust a matrix and displacement vector to match the given set of landmarks
  *
  *  The flags determine what property to adjust. This function tries to adjust the matrix
- *  and displacement such, that either the matrix and/or displacement are changed as 
- *  little as possible (if few landmarks are given) or that the "after" landmarks will 
+ *  and displacement such, that either the matrix and/or displacement are changed as
+ *  little as possible (if few landmarks are given) or that the "after" landmarks will
  *  match as close as possible to the "before" landmarks (if the problem is overdetermined).
  *
  *  @param matrix Input and adjusted output matrix.
@@ -1059,14 +1058,14 @@ struct MatrixAdjustFlags
  *  @param flags Selects the properties to adjust.
  *  @param fixed_point The index of the fixed point (one that is definitely mapped to the target) or -1 if there is none
  */
-void DB_PUBLIC adjust_matrix (Matrix2d &matrix, db::DVector &disp, const std::vector <db::DPoint> &landmarks_before, const std::vector <db::DPoint> &landmarks_after, MatrixAdjustFlags::Flags flags, int fixed_point = -1);
+void DB_PUBLIC adjust_matrix (Matrix2d &matrix, db::DVector &disp, const std::vector<db::DPoint> &landmarks_before, const std::vector<db::DPoint> &landmarks_after, MatrixAdjustFlags::Flags flags, int fixed_point = -1);
 
 /**
  *  @brief Adjust a 3d matrix to match the given set of landmarks
  *
  *  The flags determine what property to adjust. This function tries to adjust the matrix
- *  such, that either the matrix is changed as little as possible (if few landmarks are given) 
- *  or that the "after" landmarks will match as close as possible to the "before" landmarks 
+ *  such, that either the matrix is changed as little as possible (if few landmarks are given)
+ *  or that the "after" landmarks will match as close as possible to the "before" landmarks
  *  (if the problem is overdetermined).
  *
  *  @param matrix Input and adjusted output matrix.
@@ -1075,7 +1074,7 @@ void DB_PUBLIC adjust_matrix (Matrix2d &matrix, db::DVector &disp, const std::ve
  *  @param flags Selects the properties to adjust.
  *  @param fixed_point The index of the fixed point (one that is definitely mapped to the target) or -1 if there is none
  */
-void DB_PUBLIC adjust_matrix (Matrix3d &matrix, const std::vector <db::DPoint> &landmarks_before, const std::vector <db::DPoint> &landmarks_after, MatrixAdjustFlags::Flags flags, int fixed_point = -1);
+void DB_PUBLIC adjust_matrix (Matrix3d &matrix, const std::vector<db::DPoint> &landmarks_before, const std::vector<db::DPoint> &landmarks_after, MatrixAdjustFlags::Flags flags, int fixed_point = -1);
 
 } // namespace db
 
@@ -1083,18 +1082,17 @@ void DB_PUBLIC adjust_matrix (Matrix3d &matrix, const std::vector <db::DPoint> &
  *  @brief Special extractors for the matrix
  */
 
-namespace tl 
+namespace tl
 {
-  template<> DB_PUBLIC void extractor_impl<db::matrix_2d<db::Coord> > (tl::Extractor &ex, db::matrix_2d<db::Coord> &t);
-  template<> DB_PUBLIC void extractor_impl<db::matrix_2d<db::DCoord> > (tl::Extractor &ex, db::matrix_2d<db::DCoord> &t);
-  template<> DB_PUBLIC void extractor_impl<db::matrix_3d<db::Coord> > (tl::Extractor &ex, db::matrix_3d<db::Coord> &t);
-  template<> DB_PUBLIC void extractor_impl<db::matrix_3d<db::DCoord> > (tl::Extractor &ex, db::matrix_3d<db::DCoord> &t);
+template <> DB_PUBLIC void extractor_impl<db::matrix_2d<db::Coord>> (tl::Extractor &ex, db::matrix_2d<db::Coord> &t);
+template <> DB_PUBLIC void extractor_impl<db::matrix_2d<db::DCoord>> (tl::Extractor &ex, db::matrix_2d<db::DCoord> &t);
+template <> DB_PUBLIC void extractor_impl<db::matrix_3d<db::Coord>> (tl::Extractor &ex, db::matrix_3d<db::Coord> &t);
+template <> DB_PUBLIC void extractor_impl<db::matrix_3d<db::DCoord>> (tl::Extractor &ex, db::matrix_3d<db::DCoord> &t);
 
-  template<> DB_PUBLIC bool test_extractor_impl<db::matrix_2d<db::Coord> > (tl::Extractor &ex, db::matrix_2d<db::Coord> &t);
-  template<> DB_PUBLIC bool test_extractor_impl<db::matrix_2d<db::DCoord> > (tl::Extractor &ex, db::matrix_2d<db::DCoord> &t);
-  template<> DB_PUBLIC bool test_extractor_impl<db::matrix_3d<db::Coord> > (tl::Extractor &ex, db::matrix_3d<db::Coord> &t);
-  template<> DB_PUBLIC bool test_extractor_impl<db::matrix_3d<db::DCoord> > (tl::Extractor &ex, db::matrix_3d<db::DCoord> &t);
+template <> DB_PUBLIC bool test_extractor_impl<db::matrix_2d<db::Coord>> (tl::Extractor &ex, db::matrix_2d<db::Coord> &t);
+template <> DB_PUBLIC bool test_extractor_impl<db::matrix_2d<db::DCoord>> (tl::Extractor &ex, db::matrix_2d<db::DCoord> &t);
+template <> DB_PUBLIC bool test_extractor_impl<db::matrix_3d<db::Coord>> (tl::Extractor &ex, db::matrix_3d<db::Coord> &t);
+template <> DB_PUBLIC bool test_extractor_impl<db::matrix_3d<db::DCoord>> (tl::Extractor &ex, db::matrix_3d<db::DCoord> &t);
 } // namespace tl
 
 #endif
-

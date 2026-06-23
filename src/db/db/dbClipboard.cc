@@ -45,8 +45,7 @@ Clipboard::operator+= (ClipboardObject *object)
   return *this;
 }
 
-void 
-Clipboard::clear ()
+void Clipboard::clear ()
 {
   for (iterator o = begin (); o != end (); ++o) {
     ClipboardObject *p = const_cast<ClipboardObject *> (*o);
@@ -56,4 +55,3 @@ Clipboard::clear ()
 }
 
 }
-

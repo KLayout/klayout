@@ -181,15 +181,16 @@ private:
 /**
  *  @brief Provides a via definition that is selected by "find_via_definitions_for"
  */
-struct SelectedViaDefinition
-{
+struct SelectedViaDefinition {
   SelectedViaDefinition ()
     : lib (0), pcell (0)
-  { }
+  {
+  }
 
   SelectedViaDefinition (db::Library *_lib, db::pcell_id_type _pcell, const db::ViaType &_via_type)
     : lib (_lib), pcell (_pcell), via_type (_via_type)
-  { }
+  {
+  }
 
   /**
    *  @brief The library from which the via is taken
@@ -216,4 +217,3 @@ get_via_definitions (const std::string &technology);
 }
 
 #endif
-

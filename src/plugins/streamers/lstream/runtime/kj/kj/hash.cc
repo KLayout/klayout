@@ -21,10 +21,13 @@
 
 #include "hash.h"
 
-namespace kj {
-namespace _ {  // private
+namespace kj
+{
+namespace _
+{ // private
 
-uint HashCoder::operator*(ArrayPtr<const byte> s) const {
+uint HashCoder::operator* (ArrayPtr<const byte> s) const
+{
   // murmur2 adapted from libc++ source code.
   //
   // TODO(perf): Use CityHash or FarmHash on 64-bit machines? They seem optimized for x86-64; what
@@ -32,12 +35,12 @@ uint HashCoder::operator*(ArrayPtr<const byte> s) const {
 
   constexpr uint m = 0x5bd1e995;
   constexpr uint r = 24;
-  uint h = s.size();
-  const byte* data = s.begin();
-  uint len = s.size();
+  uint h = s.size ();
+  const byte *data = s.begin ();
+  uint len = s.size ();
   for (; len >= 4; data += 4, len -= 4) {
     uint k;
-    memcpy(&k, data, sizeof(k));
+    memcpy (&k, data, sizeof (k));
     k *= m;
     k ^= k >> r;
     k *= m;
@@ -46,13 +49,13 @@ uint HashCoder::operator*(ArrayPtr<const byte> s) const {
   }
   switch (len) {
   case 3:
-    h ^= data[2] << 16;
+    h ^= data [2] << 16;
     KJ_FALLTHROUGH;
   case 2:
-    h ^= data[1] << 8;
+    h ^= data [1] << 8;
     KJ_FALLTHROUGH;
   case 1:
-    h ^= data[0];
+    h ^= data [0];
     h *= m;
   }
   h ^= h >> 13;
@@ -61,5 +64,5 @@ uint HashCoder::operator*(ArrayPtr<const byte> s) const {
   return h;
 }
 
-}  // namespace _ (private)
+} // namespace _ (private)
 } // namespace kj

@@ -37,9 +37,10 @@ namespace lay
  *  @brief The base class for a object properties page
  */
 class LAYVIEW_PUBLIC EditorOptionsPageWidget
-  : public QWidget, public EditorOptionsPage
+  : public QWidget,
+    public EditorOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   EditorOptionsPageWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
@@ -71,4 +72,3 @@ protected:
 #endif
 
 #endif
-

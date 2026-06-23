@@ -50,68 +50,57 @@ RubyInterpreter *RubyInterpreter::instance ()
   return sp_rba_interpreter;
 }
 
-void
-RubyInterpreter::add_package_location (const std::string &)
+void RubyInterpreter::add_package_location (const std::string &)
 {
   // .. nothing ..
 }
 
-void
-RubyInterpreter::remove_package_location (const std::string &)
+void RubyInterpreter::remove_package_location (const std::string &)
 {
   // .. nothing ..
 }
 
-void
-RubyInterpreter::add_path (const std::string &, bool)
+void RubyInterpreter::add_path (const std::string &, bool)
 {
   // .. nothing ..
 }
 
-void
-RubyInterpreter::require (const std::string &)
+void RubyInterpreter::require (const std::string &)
 {
   // .. nothing ..
 }
 
-void 
-RubyInterpreter::set_debugger_scope (const std::string &)
+void RubyInterpreter::set_debugger_scope (const std::string &)
 {
   // .. nothing ..
 }
 
-void 
-RubyInterpreter::remove_debugger_scope ()
+void RubyInterpreter::remove_debugger_scope ()
 {
   // .. nothing ..
 }
 
-void 
-RubyInterpreter::ignore_next_exception ()
+void RubyInterpreter::ignore_next_exception ()
 {
   // .. nothing ..
 }
 
-void
-RubyInterpreter::load_file (const std::string &)
+void RubyInterpreter::load_file (const std::string &)
 {
   // .. nothing ..
 }
 
-void
-RubyInterpreter::eval_string (const char *, const char *file, int line, int)
+void RubyInterpreter::eval_string (const char *, const char *file, int line, int)
 {
   fail (file, line);
 }
 
-void
-RubyInterpreter::eval_string_and_print (const char *, const char *file, int line, int)
+void RubyInterpreter::eval_string_and_print (const char *, const char *file, int line, int)
 {
   fail (file, line);
 }
 
-void
-RubyInterpreter::define_variable (const std::string &, const tl::Variant &)
+void RubyInterpreter::define_variable (const std::string &, const tl::Variant &)
 {
   // .. nothing ..
 }
@@ -121,42 +110,36 @@ gsi::Inspector *RubyInterpreter::inspector (int)
   return 0;
 }
 
-bool
-RubyInterpreter::available () const
+bool RubyInterpreter::available () const
 {
   return false;
 }
 
-int
-RubyInterpreter::initialize (int &argc, char **argv, int (*main_cont)(int &, char **))
+int RubyInterpreter::initialize (int &argc, char **argv, int (*main_cont) (int &, char **))
 {
   int res = 1;
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   res = (*main_cont) (argc, argv);
-END_PROTECTED
+  END_PROTECTED
   return res;
 }
 
-void 
-RubyInterpreter::push_exec_handler (gsi::ExecutionHandler *)
+void RubyInterpreter::push_exec_handler (gsi::ExecutionHandler *)
 {
   // .. nothing ..
 }
 
-void
-RubyInterpreter::remove_exec_handler (gsi::ExecutionHandler *)
+void RubyInterpreter::remove_exec_handler (gsi::ExecutionHandler *)
 {
   // .. nothing ..
 }
 
-void 
-RubyInterpreter::push_console (gsi::Console *)
+void RubyInterpreter::push_console (gsi::Console *)
 {
   // .. nothing ..
 }
 
-void 
-RubyInterpreter::remove_console (gsi::Console *)
+void RubyInterpreter::remove_console (gsi::Console *)
 {
   // .. nothing ..
 }
@@ -175,4 +158,3 @@ RubyInterpreter::eval_expr (const char *, const char *file, int line, int)
 }
 
 }
-

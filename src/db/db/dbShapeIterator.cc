@@ -225,13 +225,9 @@ ShapeIterator::operator= (const ShapeIterator &d)
           short_box_array_iterator_type *d_arr_iter = (short_box_array_iterator_type *) d.m_ad.iter;
           short_box_array_iterator_type *arr_iter = (short_box_array_iterator_type *) m_ad.iter;
           new (arr_iter) short_box_array_iterator_type (*d_arr_iter);
-
         }
-
       }
-
     }
-
   }
   return *this;
 }
@@ -244,8 +240,7 @@ ShapeIterator::skip_array_iter ()
   arr_iter->~Iter ();
 }
 
-void
-ShapeIterator::skip_array ()
+void ShapeIterator::skip_array ()
 {
   if (m_array_iterator_valid) {
     if (m_type == PolygonPtrArray) {
@@ -269,10 +264,9 @@ template <class Sh, class StableTag, class RegionTag>
 struct advance_algorithm_traits;
 
 template <class Sh, class StableTag>
-struct advance_algorithm_traits<Sh, StableTag, ShapeIterator::NoRegionTag>
-{
+struct advance_algorithm_traits<Sh, StableTag, ShapeIterator::NoRegionTag> {
   typedef typename db::layer<Sh, StableTag>::flat_iterator iterator_type;
-  typedef typename db::layer<db::object_with_properties<Sh>, StableTag >::flat_iterator iterator_with_props_type;
+  typedef typename db::layer<db::object_with_properties<Sh>, StableTag>::flat_iterator iterator_with_props_type;
 
   inline static void advance (iterator_type *iter, int /*mode*/)
   {
@@ -298,22 +292,21 @@ struct advance_algorithm_traits<Sh, StableTag, ShapeIterator::NoRegionTag>
   {
     //  use get_layer().begin..() in order to suppress update() - this might change the container
     //  while iterating.
-    return shapes->template get_layer <Sh, StableTag> ().begin_flat ();
+    return shapes->template get_layer<Sh, StableTag> ().begin_flat ();
   }
 
   inline static iterator_with_props_type begin_with_props (const db::Shapes *shapes, const db::Box & /*box*/)
   {
     //  use get_layer().begin..() in order to suppress update() - this might change the container
     //  while iterating.
-    return shapes->template get_layer <db::object_with_properties <Sh>, StableTag> ().begin_flat ();
+    return shapes->template get_layer<db::object_with_properties<Sh>, StableTag> ().begin_flat ();
   }
 };
 
 template <class Sh, class StableTag>
-struct advance_algorithm_traits<Sh, StableTag, ShapeIterator::TouchingRegionTag>
-{
+struct advance_algorithm_traits<Sh, StableTag, ShapeIterator::TouchingRegionTag> {
   typedef typename db::layer<Sh, StableTag>::touching_iterator iterator_type;
-  typedef typename db::layer<db::object_with_properties<Sh>, StableTag >::touching_iterator iterator_with_props_type;
+  typedef typename db::layer<db::object_with_properties<Sh>, StableTag>::touching_iterator iterator_with_props_type;
 
   inline static void advance (iterator_type *iter, int mode)
   {
@@ -347,22 +340,21 @@ struct advance_algorithm_traits<Sh, StableTag, ShapeIterator::TouchingRegionTag>
   {
     //  use get_layer().begin..() in order to suppress update() - this might change the container
     //  while iterating.
-    return shapes->template get_layer <Sh, StableTag> ().begin_touching (box);
+    return shapes->template get_layer<Sh, StableTag> ().begin_touching (box);
   }
 
   inline static iterator_with_props_type begin_with_props (const db::Shapes *shapes, const db::Box &box)
   {
     //  use get_layer().begin..() in order to suppress update() - this might change the container
     //  while iterating.
-    return shapes->template get_layer <db::object_with_properties <Sh>, StableTag> ().begin_touching (box);
+    return shapes->template get_layer<db::object_with_properties<Sh>, StableTag> ().begin_touching (box);
   }
 };
 
 template <class Sh, class StableTag>
-struct advance_algorithm_traits<Sh, StableTag, ShapeIterator::OverlappingRegionTag>
-{
+struct advance_algorithm_traits<Sh, StableTag, ShapeIterator::OverlappingRegionTag> {
   typedef typename db::layer<Sh, StableTag>::overlapping_iterator iterator_type;
-  typedef typename db::layer<db::object_with_properties<Sh>, StableTag >::overlapping_iterator iterator_with_props_type;
+  typedef typename db::layer<db::object_with_properties<Sh>, StableTag>::overlapping_iterator iterator_with_props_type;
 
   inline static void advance (iterator_type *iter, int mode)
   {
@@ -396,20 +388,19 @@ struct advance_algorithm_traits<Sh, StableTag, ShapeIterator::OverlappingRegionT
   {
     //  use get_layer().begin..() in order to suppress update() - this might change the container
     //  while iterating.
-    return shapes->template get_layer <Sh, StableTag> ().begin_overlapping (box);
+    return shapes->template get_layer<Sh, StableTag> ().begin_overlapping (box);
   }
 
   inline static iterator_with_props_type begin_with_props (const db::Shapes *shapes, const db::Box &box)
   {
     //  use get_layer().begin..() in order to suppress update() - this might change the container
     //  while iterating.
-    return shapes->template get_layer <db::object_with_properties <Sh>, StableTag> ().begin_overlapping (box);
+    return shapes->template get_layer<db::object_with_properties<Sh>, StableTag> ().begin_overlapping (box);
   }
 };
 
 template <class Sh, class StableTag, class RegionTag>
-bool
-ShapeIterator::advance_shape (int &mode)
+bool ShapeIterator::advance_shape (int &mode)
 {
   typedef advance_algorithm_traits<Sh, StableTag, RegionTag> algorithm_traits;
   typedef typename algorithm_traits::iterator_type iterator_type;
@@ -431,7 +422,6 @@ ShapeIterator::advance_shape (int &mode)
 
     //  further steps are validation only
     mode = 0;
-
   }
 
   bool sel = (m_flags & (1 << (unsigned int) m_type)) != 0;
@@ -441,7 +431,7 @@ ShapeIterator::advance_shape (int &mode)
 
     iterator_type *iter = (iterator_type *) m_d.iter;
 
-    if (!m_valid && sel) {
+    if (! m_valid && sel) {
       iterator_type i = algorithm_traits::begin (mp_shapes, m_box);
       if (! i.at_end ()) {
         new (iter) iterator_type (i);
@@ -450,7 +440,7 @@ ShapeIterator::advance_shape (int &mode)
     }
 
     if (m_valid) {
-      if (!sel || iter->at_end ()) {
+      if (! sel || iter->at_end ()) {
         m_valid = false;
       } else {
         m_shape = iterator_to_shape (mp_shapes, mp_shapes->template get_layer<Sh, StableTag> (), *iter);
@@ -458,7 +448,6 @@ ShapeIterator::advance_shape (int &mode)
         return true;
       }
     }
-
   }
 
   m_with_props = true;
@@ -467,7 +456,7 @@ ShapeIterator::advance_shape (int &mode)
 
     iterator_with_props_type *iter = (iterator_with_props_type *) m_d.iter;
 
-    if (!m_valid && sel) {
+    if (! m_valid && sel) {
       //  use get_layer().begin_flat() in order to suppress update() - this might change the container
       //  while iterating.
       iterator_with_props_type i = algorithm_traits::begin_with_props (mp_shapes, m_box);
@@ -483,7 +472,7 @@ ShapeIterator::advance_shape (int &mode)
     }
 
     if (m_valid) {
-      if (!sel || iter->at_end ()) {
+      if (! sel || iter->at_end ()) {
         m_valid = false;
       } else {
         m_shape = iterator_to_shape (mp_shapes, mp_shapes->template get_layer<db::object_with_properties<Sh>, StableTag> (), *iter);
@@ -491,7 +480,6 @@ ShapeIterator::advance_shape (int &mode)
         return true;
       }
     }
-
   }
 
   m_with_props = false;
@@ -500,7 +488,7 @@ ShapeIterator::advance_shape (int &mode)
 
 template <class Array>
 void
-ShapeIterator::init_array_iter (typename ShapeIterator::NoRegionTag)
+  ShapeIterator::init_array_iter (typename ShapeIterator::NoRegionTag)
 {
   typedef typename Array::iterator array_iterator;
 
@@ -514,7 +502,7 @@ ShapeIterator::init_array_iter (typename ShapeIterator::NoRegionTag)
 
 template <class Array>
 void
-ShapeIterator::init_array_iter (typename ShapeIterator::TouchingRegionTag)
+  ShapeIterator::init_array_iter (typename ShapeIterator::TouchingRegionTag)
 {
   typedef typename Array::iterator array_iterator;
   typedef typename Array::object_type shape_ptr_type;
@@ -526,7 +514,7 @@ ShapeIterator::init_array_iter (typename ShapeIterator::TouchingRegionTag)
 
 template <class Array>
 void
-ShapeIterator::init_array_iter (typename ShapeIterator::OverlappingRegionTag)
+  ShapeIterator::init_array_iter (typename ShapeIterator::OverlappingRegionTag)
 {
   typedef typename Array::iterator array_iterator;
   typedef typename Array::object_type shape_ptr_type;
@@ -539,8 +527,7 @@ ShapeIterator::init_array_iter (typename ShapeIterator::OverlappingRegionTag)
 }
 
 template <class Array, class StableTag, class RegionTag>
-bool
-ShapeIterator::advance_aref (int &mode)
+bool ShapeIterator::advance_aref (int &mode)
 {
   typedef typename Array::iterator array_iterator;
 
@@ -555,9 +542,8 @@ ShapeIterator::advance_aref (int &mode)
       mode = 1;
     } else {
       //  skip quad -> skip rest of array and move to next shape array
-      skip_array ();  //  sets m_array_iterator_valid = false
+      skip_array (); //  sets m_array_iterator_valid = false
     }
-
   }
 
   while (true) {
@@ -580,9 +566,8 @@ ShapeIterator::advance_aref (int &mode)
 
     m_array = m_shape;
     RegionTag region_tag;
-    init_array_iter <Array> (region_tag);
+    init_array_iter<Array> (region_tag);
     m_array_iterator_valid = true;
-
   }
 
   array_iterator *arr_iter = (array_iterator *) m_ad.iter;
@@ -611,71 +596,90 @@ ShapeIterator::advance_aref (int &mode)
 }
 
 template <class RegionTag, class StableTag>
-void
-ShapeIterator::advance_generic (int mode)
+void ShapeIterator::advance_generic (int mode)
 {
   while (m_type != Null) {
 
     switch (m_type) {
     case Polygon:
-      if (advance_shape<polygon_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<polygon_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case PolygonRef:
-      if (advance_shape<polygon_ref_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<polygon_ref_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case PolygonPtrArray:
-      if (advance_aref<polygon_ptr_array_type, StableTag, RegionTag> (mode)) return;
+      if (advance_aref<polygon_ptr_array_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case SimplePolygon:
-      if (advance_shape<simple_polygon_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<simple_polygon_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case SimplePolygonRef:
-      if (advance_shape<simple_polygon_ref_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<simple_polygon_ref_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case SimplePolygonPtrArray:
-      if (advance_aref<simple_polygon_ptr_array_type, StableTag, RegionTag> (mode)) return;
+      if (advance_aref<simple_polygon_ptr_array_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case Edge:
-      if (advance_shape<edge_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<edge_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case EdgePair:
-      if (advance_shape<edge_pair_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<edge_pair_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case Point:
-      if (advance_shape<point_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<point_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case Path:
-      if (advance_shape<path_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<path_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case PathRef:
-      if (advance_shape<path_ref_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<path_ref_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case PathPtrArray:
-      if (advance_aref<path_ptr_array_type, StableTag, RegionTag> (mode)) return;
+      if (advance_aref<path_ptr_array_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case Box:
-      if (advance_shape<box_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<box_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case BoxArray:
-      if (advance_aref<box_array_type, StableTag, RegionTag> (mode)) return;
+      if (advance_aref<box_array_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case ShortBox:
-      if (advance_shape<short_box_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<short_box_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case ShortBoxArray:
-      if (advance_aref<short_box_array_type, StableTag, RegionTag> (mode)) return;
+      if (advance_aref<short_box_array_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case Text:
-      if (advance_shape<text_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<text_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case TextRef:
-      if (advance_shape<text_ref_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<text_ref_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case TextPtrArray:
-      if (advance_aref<text_ptr_array_type, StableTag, RegionTag> (mode)) return;
+      if (advance_aref<text_ptr_array_type, StableTag, RegionTag> (mode))
+        return;
       break;
     case UserObject:
-      if (advance_shape<user_object_type, StableTag, RegionTag> (mode)) return;
+      if (advance_shape<user_object_type, StableTag, RegionTag> (mode))
+        return;
       break;
     default:
       break;
@@ -686,19 +690,16 @@ ShapeIterator::advance_generic (int mode)
     for (unsigned int m = 1 << (unsigned int) m_type; m_type != Null && (m_flags & m) == 0; m <<= 1) {
       m_type = object_type ((unsigned int) m_type + 1);
     }
-
   }
 }
 
-void
-ShapeIterator::finish_array ()
+void ShapeIterator::finish_array ()
 {
   skip_array ();
   advance (1);
 }
 
-void
-ShapeIterator::advance (int mode)
+void ShapeIterator::advance (int mode)
 {
   if (m_editable) {
     if (m_region_mode == None) {
@@ -721,28 +722,28 @@ ShapeIterator::advance (int mode)
 
 template <class Sh, class StableTag>
 db::Box
-ShapeIterator::quad_box_by_shape (typename ShapeIterator::TouchingRegionTag) const
+  ShapeIterator::quad_box_by_shape (typename ShapeIterator::TouchingRegionTag) const
 {
   tl_assert (m_valid);
   if (! m_with_props) {
     typename db::layer<Sh, StableTag>::touching_iterator *iter = (typename db::layer<Sh, StableTag>::touching_iterator *) m_d.iter;
     return iter->quad_box ();
   } else {
-    typename db::layer<db::object_with_properties<Sh>, StableTag >::touching_iterator *iter = (typename db::layer< db::object_with_properties<Sh>, StableTag>::touching_iterator *) m_d.iter;
+    typename db::layer<db::object_with_properties<Sh>, StableTag>::touching_iterator *iter = (typename db::layer<db::object_with_properties<Sh>, StableTag>::touching_iterator *) m_d.iter;
     return iter->quad_box ();
   }
 }
 
 template <class Sh, class StableTag>
 db::Box
-ShapeIterator::quad_box_by_shape (typename ShapeIterator::OverlappingRegionTag) const
+  ShapeIterator::quad_box_by_shape (typename ShapeIterator::OverlappingRegionTag) const
 {
   tl_assert (m_valid);
   if (! m_with_props) {
     typename db::layer<Sh, StableTag>::overlapping_iterator *iter = (typename db::layer<Sh, StableTag>::overlapping_iterator *) m_d.iter;
     return iter->quad_box ();
   } else {
-    typename db::layer<db::object_with_properties<Sh>, StableTag >::overlapping_iterator *iter = (typename db::layer< db::object_with_properties<Sh>, StableTag>::overlapping_iterator *) m_d.iter;
+    typename db::layer<db::object_with_properties<Sh>, StableTag>::overlapping_iterator *iter = (typename db::layer<db::object_with_properties<Sh>, StableTag>::overlapping_iterator *) m_d.iter;
     return iter->quad_box ();
   }
 }
@@ -824,15 +825,13 @@ ShapeIterator::quad_box () const
 }
 
 template <class Iter>
-void
-ShapeIterator::do_skip_array_quad_iter ()
+void ShapeIterator::do_skip_array_quad_iter ()
 {
   Iter *arr_iter = (Iter *) m_ad.iter;
   arr_iter->skip_quad ();
 }
 
-void
-ShapeIterator::do_skip_array_quad ()
+void ShapeIterator::do_skip_array_quad ()
 {
   if (m_array_iterator_valid) {
     if (m_type == PolygonPtrArray) {
@@ -913,8 +912,7 @@ ShapeIterator::array_quad_box () const
   return db::Box::world ();
 }
 
-void
-ShapeIterator::cleanup ()
+void ShapeIterator::cleanup ()
 {
   //  this trick destroys all iterators that have been allocated in the generic union
   if (m_type != Null) {
@@ -923,7 +921,6 @@ ShapeIterator::cleanup ()
     m_flags = 0;
     advance (0);
     tl_assert (m_type == Null);
-
   }
 }
 

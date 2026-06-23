@@ -30,7 +30,8 @@
 #include "tlGlobPattern.h"
 #include "tlSelect.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief An text filter filtering by a string
@@ -41,8 +42,7 @@ namespace db {
  */
 
 struct DB_PUBLIC TextStringFilter
-  : public TextFilterBase
-{
+  : public TextFilterBase {
   /**
    *  @brief Constructor
    *
@@ -101,8 +101,7 @@ private:
  */
 
 struct DB_PUBLIC TextPatternFilter
-  : public TextFilterBase
-{
+  : public TextFilterBase {
   /**
    *  @brief Constructor
    *

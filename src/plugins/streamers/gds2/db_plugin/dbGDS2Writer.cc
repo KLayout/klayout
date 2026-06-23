@@ -45,48 +45,42 @@ GDS2Writer::GDS2Writer ()
   m_progress.set_unit (1024 * 1024);
 }
 
-void 
-GDS2Writer::write_byte (unsigned char b)
+void GDS2Writer::write_byte (unsigned char b)
 {
   mp_stream->put ((const char *) &b, 1);
 }
 
-void 
-GDS2Writer::write_record_size (int16_t i)
+void GDS2Writer::write_record_size (int16_t i)
 {
   gds2h (i);
-  mp_stream->put ( (char*)(&i), sizeof (i));
+  mp_stream->put ((char *) (&i), sizeof (i));
 }
 
-void 
-GDS2Writer::write_record (int16_t i)
+void GDS2Writer::write_record (int16_t i)
 {
   gds2h (i);
-  mp_stream->put ( (char*)(&i), sizeof (i));
+  mp_stream->put ((char *) (&i), sizeof (i));
 }
 
-void 
-GDS2Writer::write_short (int16_t i)
+void GDS2Writer::write_short (int16_t i)
 {
   gds2h (i);
-  mp_stream->put ( (char*)(&i), sizeof (i));
+  mp_stream->put ((char *) (&i), sizeof (i));
 }
 
-void 
-GDS2Writer::write_int (int32_t l)
+void GDS2Writer::write_int (int32_t l)
 {
   gds2h (l);
-  mp_stream->put ( (char*)(&l), sizeof (l));
+  mp_stream->put ((char *) (&l), sizeof (l));
 }
 
-void 
-GDS2Writer::write_double (double d)
+void GDS2Writer::write_double (double d)
 {
-  char b[8];
-  
-  b[0] = 0;
+  char b [8];
+
+  b [0] = 0;
   if (d < 0) {
-    b[0] = char (0x80);
+    b [0] = char (0x80);
     d = -d;
   }
 
@@ -105,27 +99,25 @@ GDS2Writer::write_double (double d)
   d /= pow (16.0, e - 14);
 
   tl_assert (e >= -64 && e < 64);
-  b[0] |= ((e + 64) & 0x7f);
+  b [0] |= ((e + 64) & 0x7f);
 
   uint64_t m = uint64_t (round (d));
   for (int i = 7; i > 0; --i) {
-    b[i] = (m & 0xff);
+    b [i] = (m & 0xff);
     m >>= 8;
   }
 
   mp_stream->put (b, sizeof (b));
 }
 
-void 
-GDS2Writer::write_time (const short *t)
+void GDS2Writer::write_time (const short *t)
 {
   for (unsigned int i = 0; i < 6; ++i) {
     write_short (t [i]);
   }
 }
 
-void 
-GDS2Writer::write_string (const char *t)
+void GDS2Writer::write_string (const char *t)
 {
   size_t l = strlen (t);
   mp_stream->put (t, l);
@@ -134,8 +126,7 @@ GDS2Writer::write_string (const char *t)
   }
 }
 
-void 
-GDS2Writer::write_string (const std::string &t)
+void GDS2Writer::write_string (const std::string &t)
 {
   size_t l = t.size ();
   mp_stream->put (t.c_str (), l);
@@ -144,11 +135,9 @@ GDS2Writer::write_string (const std::string &t)
   }
 }
 
-void 
-GDS2Writer::progress_checkpoint ()
+void GDS2Writer::progress_checkpoint ()
 {
   m_progress.set (mp_stream->pos ());
 }
 
 } // namespace db
-

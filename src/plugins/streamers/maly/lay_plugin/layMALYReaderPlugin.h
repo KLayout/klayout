@@ -30,7 +30,7 @@
 
 namespace Ui
 {
-  class MALYReaderOptionPage;
+class MALYReaderOptionPage;
 }
 
 namespace lay
@@ -39,7 +39,7 @@ namespace lay
 class MALYReaderOptionPage
   : public StreamReaderOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MALYReaderOptionPage (QWidget *parent);
@@ -55,5 +55,3 @@ private:
 }
 
 #endif
-
-

@@ -28,8 +28,8 @@
 #include "laybasicCommon.h"
 
 #if defined(HAVE_QT)
-#  include <QObject>
-#  include <QBitmap>
+#include <QObject>
+#include <QBitmap>
 #endif
 
 #include "dbObject.h"
@@ -50,16 +50,16 @@ namespace lay
 class LAYBASIC_PUBLIC DitherPatternInfo
 {
 public:
-  /** 
+  /**
    *  @brief The default constructor
    */
   DitherPatternInfo ();
-  
-  /** 
+
+  /**
    *  @brief The copy constructor
    */
   DitherPatternInfo (const DitherPatternInfo &d);
-  
+
   /**
    *  @brief Assignment operator
    */
@@ -94,7 +94,7 @@ public:
    */
   bool operator!= (const DitherPatternInfo &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
@@ -108,7 +108,7 @@ public:
   /**
    *  @brief Write access to the name
    */
-  void set_name (const std::string &name) 
+  void set_name (const std::string &name)
   {
     m_name = name;
   }
@@ -124,7 +124,7 @@ public:
   /**
    *  @brief Write access to the name
    */
-  void set_order_index (unsigned int oi) 
+  void set_order_index (unsigned int oi)
   {
     m_order_index = oi;
   }
@@ -150,9 +150,9 @@ public:
    *  a width that is not a fraction of 32. Such pattern are repeated until
    *  they fill a multiple of 32 bits.
    */
-  const uint32_t * const *pattern () const
+  const uint32_t *const *pattern () const
   {
-    return & (m_pattern[0]);
+    return &(m_pattern [0]);
   }
 
   /**
@@ -233,13 +233,13 @@ public:
   std::vector<std::string> to_strings () const;
 
 private:
-  uint32_t *m_pattern[64];
+  uint32_t *m_pattern [64];
   uint32_t m_buffer [64 * 64];
   unsigned int m_width, m_height;
   unsigned int m_pattern_stride;
   unsigned int m_order_index;
   std::string m_name;
-  mutable std::unique_ptr<std::map<unsigned int, DitherPatternInfo> > m_scaled_pattern;
+  mutable std::unique_ptr<std::map<unsigned int, DitherPatternInfo>> m_scaled_pattern;
 
   void set_pattern_impl (const uint32_t *pattern, unsigned int w, unsigned int h);
   void set_pattern_impl (const uint64_t *pattern, unsigned int w, unsigned int h);
@@ -250,12 +250,11 @@ private:
  *  @brief This class represents the set of dither pattern available
  *
  *  The main method for accessing the pattern is through the "pattern"
- *  method which delivers a DitherPatternInfo object. The pattern can be 
+ *  method which delivers a DitherPatternInfo object. The pattern can be
  *  replaced with a new pattern, except for the first pattern which
- *  cannot be changed. 
+ *  cannot be changed.
  */
-class LAYBASIC_PUBLIC DitherPattern :
-    public db::Object
+class LAYBASIC_PUBLIC DitherPattern : public db::Object
 {
 public:
   typedef std::vector<DitherPatternInfo> pattern_vector;
@@ -310,8 +309,8 @@ public:
    *  @brief Replace the pattern with the given index
    *
    *  The first pattern cannot be replaced. In this case, the change
-   *  request is simply ignored. 
-   *  By replacing the pattern with one with an order_index of 0, 
+   *  request is simply ignored.
+   *  By replacing the pattern with one with an order_index of 0,
    *  the pattern is virtually deleted (such pattern are not shown in the editor)
    */
   void replace_pattern (unsigned int i, const DitherPatternInfo &p);
@@ -319,7 +318,7 @@ public:
   /**
    *  @brief Add a new pattern, searching for a empty slot and returning that index
    *
-   *  This method will look for the first pattern with a order index of 0 
+   *  This method will look for the first pattern with a order index of 0
    *  or create a new entry if no such pattern exists. This entry will be used
    *  to place the pattern to. The order_index will be set to the highest value
    *  plus one thus placing the new pattern at the end of the list in the editor.
@@ -343,13 +342,13 @@ public:
    *  @brief Merge two dither pattern lists
    *
    *  *this is filled with all the pattern of "other" which are not
-   *  member of this list yet. A mapping table is filled, mapping 
+   *  member of this list yet. A mapping table is filled, mapping
    *  an index of "other" to an index inside *this;
    */
   void merge (const DitherPattern &other, std::map<unsigned int, unsigned int> &index_map);
 
   /**
-   *  @brief Return the number stipples 
+   *  @brief Return the number stipples
    */
   unsigned int count () const
   {
@@ -358,7 +357,7 @@ public:
 
   /**
    *  @brief The begin iterator delivering the custom pattern objects
-   * 
+   *
    *  The corresponding end iterator is delivered with end()
    */
   iterator begin_custom () const;
@@ -366,7 +365,7 @@ public:
   /**
    *  @brief The begin iterator delivering all pattern objects
    */
-  iterator begin () const 
+  iterator begin () const
   {
     return m_pattern.begin ();
   }
@@ -374,7 +373,7 @@ public:
   /**
    *  @brief The begin iterator delivering the past-the-end pattern object
    */
-  iterator end () const 
+  iterator end () const
   {
     return m_pattern.end ();
   }
@@ -401,4 +400,3 @@ private:
 }
 
 #endif
-

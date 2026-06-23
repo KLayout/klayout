@@ -42,8 +42,7 @@ Object::~Object ()
   reset ();
 }
 
-void
-Object::reset ()
+void Object::reset ()
 {
   WeakOrSharedPtr *ptrs;
 
@@ -73,25 +72,25 @@ void Object::register_ptr (WeakOrSharedPtr *p)
   tl_assert (p->mp_next == 0);
   tl_assert (p->mp_prev == 0);
 
-  WeakOrSharedPtr *ptrs = (WeakOrSharedPtr *)(size_t (mp_ptrs) & ~size_t (1));
-  bool kept = (size_t (mp_ptrs) & size_t(1));
+  WeakOrSharedPtr *ptrs = (WeakOrSharedPtr *) (size_t (mp_ptrs) & ~size_t (1));
+  bool kept = (size_t (mp_ptrs) & size_t (1));
 
   p->mp_next = ptrs;
   if (ptrs) {
     ptrs->mp_prev = p;
   }
 
-  mp_ptrs = (WeakOrSharedPtr *)(size_t (p) | (kept ? 1 : 0));
+  mp_ptrs = (WeakOrSharedPtr *) (size_t (p) | (kept ? 1 : 0));
 }
 
 void Object::unregister_ptr (WeakOrSharedPtr *p)
 {
-  WeakOrSharedPtr *ptrs = (WeakOrSharedPtr *)(size_t (mp_ptrs) & ~size_t (1));
-  bool kept = (size_t (mp_ptrs) & size_t(1));
+  WeakOrSharedPtr *ptrs = (WeakOrSharedPtr *) (size_t (mp_ptrs) & ~size_t (1));
+  bool kept = (size_t (mp_ptrs) & size_t (1));
 
   if (p == ptrs) {
-    mp_ptrs = (WeakOrSharedPtr *)(size_t (p->mp_next) | (kept ? 1 : 0));
-  } 
+    mp_ptrs = (WeakOrSharedPtr *) (size_t (p->mp_next) | (kept ? 1 : 0));
+  }
   if (p->mp_prev) {
     p->mp_prev->mp_next = p->mp_next;
   }
@@ -103,9 +102,9 @@ void Object::unregister_ptr (WeakOrSharedPtr *p)
 
 void Object::detach_from_all_events ()
 {
-  WeakOrSharedPtr *ptrs = (WeakOrSharedPtr *)(size_t (mp_ptrs) & ~size_t (1));
+  WeakOrSharedPtr *ptrs = (WeakOrSharedPtr *) (size_t (mp_ptrs) & ~size_t (1));
 
-  for (WeakOrSharedPtr *p = ptrs; p; ) {
+  for (WeakOrSharedPtr *p = ptrs; p;) {
     WeakOrSharedPtr *pnext = p->mp_next;
     if (p->is_event ()) {
       p->reset_object ();
@@ -116,7 +115,7 @@ void Object::detach_from_all_events ()
 
 bool Object::has_strong_references () const
 {
-  WeakOrSharedPtr *ptrs = (WeakOrSharedPtr *)(size_t (mp_ptrs) & ~size_t (1));
+  WeakOrSharedPtr *ptrs = (WeakOrSharedPtr *) (size_t (mp_ptrs) & ~size_t (1));
   if (ptrs != mp_ptrs) {
     //  Object is kept
     return true;
@@ -132,12 +131,12 @@ bool Object::has_strong_references () const
 
 void Object::keep_object ()
 {
-  mp_ptrs = (WeakOrSharedPtr *)(size_t (mp_ptrs) | size_t (1));
+  mp_ptrs = (WeakOrSharedPtr *) (size_t (mp_ptrs) | size_t (1));
 }
 
 void Object::release_object ()
 {
-  mp_ptrs = (WeakOrSharedPtr *)(size_t (mp_ptrs) & ~size_t (1));
+  mp_ptrs = (WeakOrSharedPtr *) (size_t (mp_ptrs) & ~size_t (1));
 
   //  If no more strong references are left, we have to delete ourselves
   if (! has_strong_references ()) {
@@ -170,39 +169,39 @@ WeakOrSharedPtr::~WeakOrSharedPtr ()
   reset (0, true, false);
 }
 
-WeakOrSharedPtr &WeakOrSharedPtr::operator= (const WeakOrSharedPtr &o) 
+WeakOrSharedPtr &WeakOrSharedPtr::operator= (const WeakOrSharedPtr &o)
 {
   reset (o.mp_t, o.m_is_shared, o.m_is_event);
   return *this;
 }
 
-namespace {
+namespace
+{
 
-  /**
-   *  @brief Provides the global lock instance
-   */
-  struct GlobalLockInitializer
+/**
+ *  @brief Provides the global lock instance
+ */
+struct GlobalLockInitializer {
+  GlobalLockInitializer ()
   {
-    GlobalLockInitializer ()
-    {
-      if (! sp_lock) {
-        sp_lock = new tl::Mutex ();
-      }
+    if (! sp_lock) {
+      sp_lock = new tl::Mutex ();
     }
+  }
 
-    tl::Mutex &gl ()
-    {
-      return *sp_lock;
-    }
+  tl::Mutex &gl ()
+  {
+    return *sp_lock;
+  }
 
-  private:
-    static tl::Mutex *sp_lock;
-  };
+private:
+  static tl::Mutex *sp_lock;
+};
 
-  tl::Mutex *GlobalLockInitializer::sp_lock = 0;
+tl::Mutex *GlobalLockInitializer::sp_lock = 0;
 
-  //  This ensures the instance is created in the initialization code
-  static GlobalLockInitializer s_gl_init;
+//  This ensures the instance is created in the initialization code
+static GlobalLockInitializer s_gl_init;
 
 }
 
@@ -215,7 +214,7 @@ tl::Mutex &WeakOrSharedPtr::lock ()
   return GlobalLockInitializer ().gl ();
 }
 
-Object *WeakOrSharedPtr::get () 
+Object *WeakOrSharedPtr::get ()
 {
   //  NOTE: this assumes that the pointer access is an atomic operation. Hence no locking.
   return mp_t;
@@ -262,7 +261,7 @@ void WeakOrSharedPtr::reset (Object *t, bool is_shared, bool is_event)
       Object *told = mp_t;
       mp_t->unregister_ptr (this);
       mp_t = 0;
-      if (m_is_shared && told && !told->has_strong_references ()) {
+      if (m_is_shared && told && ! told->has_strong_references ()) {
         to_delete = told;
       }
     }

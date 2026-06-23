@@ -135,8 +135,7 @@ XMLSource::~XMLSource ()
   mp_source = 0;
 }
 
-void
-XMLSource::reset ()
+void XMLSource::reset ()
 {
   mp_source->reset ();
 }
@@ -295,7 +294,7 @@ public:
         m_error_column = XML_GetErrorColumnNumber (mp_parser);
       }
 
-    } while (n == chunk && !m_has_error);
+    } while (n == chunk && ! m_has_error);
   }
 
   void check_error ()
@@ -352,8 +351,7 @@ XMLParser::~XMLParser ()
   mp_data = 0;
 }
 
-void
-XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
+void XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
 {
   mp_data->parse (source, struct_handler);
 
@@ -361,8 +359,7 @@ XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
   mp_data->check_error ();
 }
 
-bool
-XMLParser::is_available ()
+bool XMLParser::is_available ()
 {
   return true;
 }
@@ -418,14 +415,12 @@ SAXHandler::SAXHandler (XMLStructureHandler *sh)
   // .. nothing yet ..
 }
 
-void
-SAXHandler::setDocumentLocator (QXmlLocator *locator)
+void SAXHandler::setDocumentLocator (QXmlLocator *locator)
 {
   mp_locator = locator;
 }
 
-bool
-SAXHandler::startElement (const QString &qs_uri, const QString &qs_lname, const QString &qs_qname, const QXmlAttributes & /*atts*/)
+bool SAXHandler::startElement (const QString &qs_uri, const QString &qs_lname, const QString &qs_qname, const QXmlAttributes & /*atts*/)
 {
   std::string uri (tl::to_string (qs_uri));
   std::string lname (tl::to_string (qs_lname));
@@ -445,8 +440,7 @@ SAXHandler::startElement (const QString &qs_uri, const QString &qs_lname, const 
   return true;
 }
 
-bool
-SAXHandler::endElement (const QString &qs_uri, const QString &qs_lname, const QString &qs_qname)
+bool SAXHandler::endElement (const QString &qs_uri, const QString &qs_lname, const QString &qs_qname)
 {
   std::string uri (tl::to_string (qs_uri));
   std::string lname (tl::to_string (qs_lname));
@@ -466,8 +460,7 @@ SAXHandler::endElement (const QString &qs_uri, const QString &qs_lname, const QS
   return true;
 }
 
-bool
-SAXHandler::characters (const QString &t)
+bool SAXHandler::characters (const QString &t)
 {
   try {
     mp_struct_handler->characters (tl::to_string (t));
@@ -490,24 +483,21 @@ SAXHandler::errorString () const
 }
 
 
-bool
-SAXHandler::error (const QXmlParseException &ex)
+bool SAXHandler::error (const QXmlParseException &ex)
 {
   m_error.reset (new tl::XMLLocatedException (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ()));
   //  stop reading
   return false;
 }
 
-bool
-SAXHandler::fatalError (const QXmlParseException &ex)
+bool SAXHandler::fatalError (const QXmlParseException &ex)
 {
   m_error.reset (new tl::XMLLocatedException (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ()));
   //  stop reading
   return false;
 }
 
-bool
-SAXHandler::warning (const QXmlParseException &ex)
+bool SAXHandler::warning (const QXmlParseException &ex)
 {
   tl::XMLLocatedException lex (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ());
   tl::warn << lex.msg ();
@@ -550,8 +540,7 @@ XMLSource::~XMLSource ()
   mp_source = 0;
 }
 
-void
-XMLSource::reset ()
+void XMLSource::reset ()
 {
   mp_source->reset ();
 }
@@ -643,7 +632,7 @@ public:
     return true;
   }
 
-  qint64 writeData (const char *, qint64) 
+  qint64 writeData (const char *, qint64)
   {
     tl_assert (false);
   }
@@ -657,7 +646,7 @@ public:
       }
 
       qint64 n0 = n;
-      for (const char *rd = 0; n > 0 && (rd = mp_stream->get (1)) != 0; ) {
+      for (const char *rd = 0; n > 0 && (rd = mp_stream->get (1)) != 0;) {
         //  NOTE: we skip CR to compensate for Windows CRLF line terminators (issue #419).
         if (*rd != '\r') {
           *data++ = *rd;
@@ -760,7 +749,7 @@ class XMLParserPrivateData
   : public QXmlSimpleReader
 {
 public:
-  XMLParserPrivateData () : QXmlSimpleReader () { }
+  XMLParserPrivateData () : QXmlSimpleReader () {}
 };
 
 XMLParser::XMLParser ()
@@ -775,8 +764,7 @@ XMLParser::~XMLParser ()
   mp_data = 0;
 }
 
-void 
-XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
+void XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
 {
   SAXHandler handler (&struct_handler);
 
@@ -789,8 +777,7 @@ XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
   }
 }
 
-bool
-XMLParser::is_available ()
+bool XMLParser::is_available ()
 {
   return true;
 }
@@ -816,8 +803,7 @@ XMLSource::~XMLSource ()
   //  .. nothing yet ..
 }
 
-void
-XMLSource::reset ()
+void XMLSource::reset ()
 {
   //  .. nothing yet ..
 }
@@ -895,14 +881,12 @@ XMLParser::~XMLParser ()
   //  .. nothing yet ..
 }
 
-void
-XMLParser::parse (XMLSource &, XMLStructureHandler &)
+void XMLParser::parse (XMLSource &, XMLStructureHandler &)
 {
   tl_assert (false);
 }
 
-bool
-XMLParser::is_available ()
+bool XMLParser::is_available ()
 {
   return false;
 }
@@ -911,7 +895,8 @@ XMLParser::is_available ()
 
 #endif
 
-namespace tl {
+namespace tl
+{
 
 // -----------------------------------------------------------------
 //  The C++ structure definition interface (for use cases see tlXMLParser.ut)
@@ -944,16 +929,14 @@ XMLElementProxy::~XMLElementProxy ()
 
 //  XMLElementBase implementation
 
-void 
-XMLElementBase::write_indent (tl::OutputStream &os, int indent)
+void XMLElementBase::write_indent (tl::OutputStream &os, int indent)
 {
   for (int i = 0; i < indent; ++i) {
     os << " ";
   }
 }
 
-void 
-XMLElementBase::write_string (tl::OutputStream &os, const std::string &s)
+void XMLElementBase::write_string (tl::OutputStream &os, const std::string &s)
 {
   for (const char *cp = s.c_str (); *cp; ++cp) {
     unsigned char c = (unsigned char) *cp;
@@ -980,12 +963,11 @@ XMLElementBase::write_string (tl::OutputStream &os, const std::string &s)
 
 XMLStructureHandler::XMLStructureHandler (const XMLElementBase *root, XMLReaderState *reader_state)
   : mp_root (root), mp_state (reader_state)
-{ 
+{
   // .. nothing yet ..
 }
 
-void
-XMLStructureHandler::start_element (const std::string &uri, const std::string &lname, const std::string &qname)
+void XMLStructureHandler::start_element (const std::string &uri, const std::string &lname, const std::string &qname)
 {
   const XMLElementBase *new_element = 0;
   const XMLElementBase *parent = 0;
@@ -1014,8 +996,7 @@ XMLStructureHandler::start_element (const std::string &uri, const std::string &l
   m_stack.push_back (new_element);
 }
 
-void
-XMLStructureHandler::end_element (const std::string &uri, const std::string &lname, const std::string &qname)
+void XMLStructureHandler::end_element (const std::string &uri, const std::string &lname, const std::string &qname)
 {
   if (m_stack.empty ()) {
     return;
@@ -1033,8 +1014,7 @@ XMLStructureHandler::end_element (const std::string &uri, const std::string &lna
   }
 }
 
-void
-XMLStructureHandler::characters (const std::string &t)
+void XMLStructureHandler::characters (const std::string &t)
 {
   if (! m_stack.empty () && m_stack.back ()) {
     m_stack.back ()->cdata (t, *mp_state);
@@ -1051,7 +1031,7 @@ XMLReaderState::XMLReaderState ()
 
 XMLReaderState::~XMLReaderState ()
 {
-  for (std::vector <XMLReaderProxyBase *>::const_iterator o = m_objects.begin (); o != m_objects.end (); ++o) {
+  for (std::vector<XMLReaderProxyBase *>::const_iterator o = m_objects.begin (); o != m_objects.end (); ++o) {
     (*o)->release ();
     delete *o;
   }
@@ -1067,4 +1047,3 @@ XMLWriterState::XMLWriterState ()
 }
 
 }
-

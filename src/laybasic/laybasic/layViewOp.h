@@ -33,7 +33,7 @@
 namespace lay
 {
 
-const unsigned int wordlen  = 32;
+const unsigned int wordlen = 32;
 const unsigned int wordbits = 5;
 const unsigned int wordones = 0xffffffff;
 
@@ -43,13 +43,13 @@ const unsigned int wordones = 0xffffffff;
  *  Each operator is described by these properties:
  *    - a mode (copy, or, and, xor) which describes what boolean operation to use
  *    - a index for a dither pattern (what bitmap to use as the mask)
- *    - a pen: pen width and style 
+ *    - a pen: pen width and style
  *    - a bitmap index
- *  
+ *
  *  The bitmap index describes which bitmap to take the data from.
  *  Usually bitmaps and combination operators are organized in two vectors: one for the
  *  bitmaps and one for the operators. By default, each operator is associated with the
- *  corresponding bitmap. 
+ *  corresponding bitmap.
  *
  *  However, an operator can be associated with any bitmap by setting the bitmap index.
  *  In this case, the length of the operator list does not need to have the same length
@@ -65,12 +65,16 @@ public:
   /**
    *  @brief The modes provided
    */
-  enum Mode { Copy, Or, And, Xor };
+  enum Mode { Copy,
+              Or,
+              And,
+              Xor };
 
   /**
    *  @brief The pen types provided
    */
-  enum Shape { Rect, Cross };
+  enum Shape { Rect,
+               Cross };
 
   /**
    *  @brief The default ctor
@@ -81,29 +85,29 @@ public:
    *  @brief The constructor given all the parameters to describe the operator
    */
   ViewOp (tl::color_t color, Mode mode, unsigned int line_style_index, unsigned int dither_index, unsigned int dither_offset, Shape shape = Rect, int width = 1, int bitmap_index = -1);
-  
+
   /**
    *  @brief Internal: provide the mask for the "or" part of the operation
    */
   tl::color_t ormask () const
-  { 
-    return m_or; 
+  {
+    return m_or;
   }
 
   /**
    *  @brief Internal: provide the mask for the "and" part of the operation
    */
   tl::color_t andmask () const
-  { 
-    return m_and; 
+  {
+    return m_and;
   }
 
   /**
    *  @brief Internal: provide the mask for the "xor" part of the operation
    */
   tl::color_t xormask () const
-  { 
-    return m_xor; 
+  {
+    return m_xor;
   }
 
   /**
@@ -139,7 +143,7 @@ public:
   }
 
   /**
-   *  @brief Write accessor to the dither pattern index 
+   *  @brief Write accessor to the dither pattern index
    */
   void set_dither_index (unsigned int di)
   {
@@ -147,7 +151,7 @@ public:
   }
 
   /**
-   *  @brief Read accessor to the dither pattern index 
+   *  @brief Read accessor to the dither pattern index
    */
   unsigned int dither_index () const
   {
@@ -191,13 +195,13 @@ public:
    *
    *  Writing -1 to the bitmap index resets the bitmap index to the default.
    */
-  void bitmap_index (int bi) 
+  void bitmap_index (int bi)
   {
     m_bitmap_index = bi;
   }
 
   /**
-   *  @brief Read accessor to the bitmap index 
+   *  @brief Read accessor to the bitmap index
    */
   int bitmap_index () const
   {
@@ -209,14 +213,14 @@ public:
    */
   bool operator== (const ViewOp &d) const
   {
-    return (m_or == d.m_or && m_and == d.m_and && 
+    return (m_or == d.m_or && m_and == d.m_and &&
             m_xor == d.m_xor &&
             m_line_style_index == d.m_line_style_index &&
             m_dither_index == d.m_dither_index && m_dither_offset == d.m_dither_offset &&
             m_width == d.m_width && m_shape == d.m_shape &&
             m_bitmap_index == d.m_bitmap_index);
   }
-  
+
   /**
    *  @brief Comparison
    *
@@ -224,15 +228,24 @@ public:
    */
   bool operator< (const ViewOp &d) const
   {
-    if (m_bitmap_index != d.m_bitmap_index) return m_bitmap_index < d.m_bitmap_index;
-    if (m_or != d.m_or) return (m_or < d.m_or);
-    if (m_and != d.m_and) return m_and < d.m_and;
-    if (m_xor != d.m_xor) return m_xor < d.m_xor;
-    if (m_line_style_index != d.m_line_style_index) return m_line_style_index < d.m_line_style_index;
-    if (m_dither_index != d.m_dither_index) return m_dither_index < d.m_dither_index;
-    if (m_dither_offset != d.m_dither_offset) return m_dither_offset < d.m_dither_offset;
-    if (m_width != d.m_width) return m_width < d.m_width;
-    if (m_shape != d.m_shape) return m_shape < d.m_shape;
+    if (m_bitmap_index != d.m_bitmap_index)
+      return m_bitmap_index < d.m_bitmap_index;
+    if (m_or != d.m_or)
+      return (m_or < d.m_or);
+    if (m_and != d.m_and)
+      return m_and < d.m_and;
+    if (m_xor != d.m_xor)
+      return m_xor < d.m_xor;
+    if (m_line_style_index != d.m_line_style_index)
+      return m_line_style_index < d.m_line_style_index;
+    if (m_dither_index != d.m_dither_index)
+      return m_dither_index < d.m_dither_index;
+    if (m_dither_offset != d.m_dither_offset)
+      return m_dither_offset < d.m_dither_offset;
+    if (m_width != d.m_width)
+      return m_width < d.m_width;
+    if (m_shape != d.m_shape)
+      return m_shape < d.m_shape;
     return false;
   }
 
@@ -252,4 +265,3 @@ private:
 } // namespace lay
 
 #endif
-

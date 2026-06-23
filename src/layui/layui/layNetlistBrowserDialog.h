@@ -34,12 +34,12 @@
 
 namespace Ui
 {
-  class NetlistBrowserDialog;
+class NetlistBrowserDialog;
 }
 
 namespace db
 {
-  class LayoutToNetlist;
+class LayoutToNetlist;
 }
 
 namespace lay
@@ -180,4 +180,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

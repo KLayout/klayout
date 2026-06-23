@@ -103,7 +103,8 @@ static QTabBar *tab_bar_of (QTabWidget *tab)
 //  Implementation of the macro template selection dialog
 
 class MacroTemplateSelectionDialog
-  : public QDialog, private Ui::MacroTemplateSelectionDialog
+  : public QDialog,
+    private Ui::MacroTemplateSelectionDialog
 {
 public:
   MacroTemplateSelectionDialog (QWidget *parent, const std::vector<lym::Macro *> &templates, const std::string &cat)
@@ -128,12 +129,12 @@ public:
 
       bool take = false;
       if ((cat.empty () || cat == "macros") && c.empty ()) {
-        //  take ones without explicit category in "macros" category 
+        //  take ones without explicit category in "macros" category
         take = true;
       } else if (! c.empty ()) {
         //  others are checked whether the category name is part of the category list
         std::vector<std::string> cc = tl::split (c, ",");
-        for (std::vector<std::string>::const_iterator ic = cc.begin (); ic != cc.end () && !take; ++ic) {
+        for (std::vector<std::string>::const_iterator ic = cc.begin (); ic != cc.end () && ! take; ++ic) {
           if (*ic == cat) {
             take = true;
           }
@@ -154,7 +155,7 @@ public:
       if (sep != std::string::npos) {
         group_title = std::string (description, 0, sep);
         description = std::string (description, sep + 2);
-      } 
+      }
 
       QTreeWidgetItem *item = 0;
       if (group_title.empty ()) {
@@ -184,7 +185,6 @@ public:
       QString qd = tl::to_qstring (description + "\n");
       qd.replace (QString::fromUtf8 ("\\n"), QString::fromUtf8 ("\n"));
       item->setText (0, qd);
-
     }
 
     templateView->expandAll ();
@@ -196,7 +196,7 @@ public:
     if (m_template_count <= 1) {
       return m_default_id;
     } else if (exec ()) {
-      if (templateView->currentItem () && templateView->currentItem ()->data (0, Qt::UserRole) != QVariant ()) { 
+      if (templateView->currentItem () && templateView->currentItem ()->data (0, Qt::UserRole) != QVariant ()) {
         return templateView->currentItem ()->data (0, Qt::UserRole).toInt ();
       } else {
         return -1;
@@ -258,8 +258,8 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
     m_os (OS_none),
     m_new_line (true),
     m_highlighters (this),
-    m_in_exec (false), 
-    m_in_breakpoint (false), 
+    m_in_exec (false),
+    m_in_breakpoint (false),
     m_ignore_exec_events (false),
     mp_exec_controller (0),
     mp_current_interpreter (0),
@@ -304,7 +304,7 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
     lay::MacroEditorTree *macro_tree = new lay::MacroEditorTree (treeTab, m_categories [i].name);
     m_macro_trees.push_back (macro_tree);
 
-    treeTab->addTab(macro_tree, tl::to_qstring (m_categories [i].description));
+    treeTab->addTab (macro_tree, tl::to_qstring (m_categories [i].description));
 
     macro_tree->setup (this);
 
@@ -354,7 +354,6 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
     connect (macro_tree, SIGNAL (move_folder (lym::MacroCollection *, lym::MacroCollection *)), this, SLOT (move_folder (lym::MacroCollection *, lym::MacroCollection *)));
     connect (macro_tree, SIGNAL (folder_renamed (lym::MacroCollection *)), this, SLOT (folder_renamed (lym::MacroCollection *)));
     connect (macro_tree, SIGNAL (macro_renamed (lym::Macro *)), this, SLOT (macro_renamed (lym::Macro *)));
-
   }
 
   setObjectName (QString::fromUtf8 ("MacroEditorDialog"));
@@ -523,9 +522,9 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
 #else
   if (res.isCompressed ()) {
 #endif
-    data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+    data = qUncompress ((const unsigned char *) res.data (), (int) res.size ());
   } else {
-    data = QByteArray ((const char *)res.data (), (int)res.size ());
+    data = QByteArray ((const char *) res.data (), (int) res.size ());
   }
 
   //  Read standard templates from :/macro-templates/x
@@ -583,9 +582,7 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
           delete m;
           tl::error << "Reading " << url << ": " << ex.msg ();
         }
-
       }
-
     }
   }
 
@@ -624,9 +621,7 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
       } catch (...) {
         delete m;
       }
-
     }
-
   }
 
   //  finally fetch the templates of the DSL interpreters
@@ -678,13 +673,12 @@ MacroEditorDialog::~MacroEditorDialog ()
 }
 
 MacroEditorDialog *
-MacroEditorDialog::instance () 
+MacroEditorDialog::instance ()
 {
   return s_macro_editor_instance;
 }
 
-void
-MacroEditorDialog::tab_menu_selected ()
+void MacroEditorDialog::tab_menu_selected ()
 {
   QAction *action = dynamic_cast<QAction *> (sender ());
   if (action) {
@@ -692,8 +686,7 @@ MacroEditorDialog::tab_menu_selected ()
   }
 }
 
-void
-MacroEditorDialog::tabs_menu_about_to_show ()
+void MacroEditorDialog::tabs_menu_about_to_show ()
 {
   mp_tabs_menu->clear ();
 
@@ -711,8 +704,7 @@ MacroEditorDialog::tabs_menu_about_to_show ()
   }
 }
 
-void
-MacroEditorDialog::select_category (const std::string &cat)
+void MacroEditorDialog::select_category (const std::string &cat)
 {
   for (size_t i = 0; i < m_categories.size (); ++i) {
     if (m_categories [i].name == cat) {
@@ -721,18 +713,16 @@ MacroEditorDialog::select_category (const std::string &cat)
   }
 }
 
-void
-MacroEditorDialog::clear_log ()
+void MacroEditorDialog::clear_log ()
 {
   mp_console_text->clear ();
   m_new_line = true;
   m_os = OS_none;
 }
 
-void 
-MacroEditorDialog::show (const std::string &cat, bool force_add)
+void MacroEditorDialog::show (const std::string &cat, bool force_add)
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (isMinimized ()) {
     QDialog::showNormal ();
@@ -791,12 +781,11 @@ BEGIN_PROTECTED
         set_run_macro (m);
       }
     }
-
   }
 
   refresh_file_watcher ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
 lay::MacroEditorTree *
@@ -807,8 +796,7 @@ MacroEditorDialog::current_macro_tree ()
   return t;
 }
 
-void
-MacroEditorDialog::config_finalize ()
+void MacroEditorDialog::config_finalize ()
 {
   if (m_needs_update) {
 
@@ -825,12 +813,10 @@ MacroEditorDialog::config_finalize ()
     refresh_file_watcher ();
 
     m_needs_update = false;
-
   }
 }
 
-bool
-MacroEditorDialog::configure (const std::string &name, const std::string &value)
+bool MacroEditorDialog::configure (const std::string &name, const std::string &value)
 {
   //  Reads the dynamic configuration
 
@@ -916,8 +902,7 @@ MacroEditorDialog::configure (const std::string &name, const std::string &value)
   }
 }
 
-void 
-MacroEditorDialog::showEvent (QShowEvent *)
+void MacroEditorDialog::showEvent (QShowEvent *)
 {
   if (! m_window_closed) {
     //  show after showNormal
@@ -946,7 +931,8 @@ MacroEditorDialog::showEvent (QShowEvent *)
       ex.test (";");
       input_field->addItem (tl::to_qstring (h));
     }
-  } catch (...) { }
+  } catch (...) {
+  }
   m_history_index = -1;
   input_field->clearEditText ();
 
@@ -989,10 +975,10 @@ MacroEditorDialog::showEvent (QShowEvent *)
       } else if (ip == "python") {
         m_watch_expressions.push_back (std::make_pair (&lay::ApplicationBase::instance ()->python_interpreter (), expr));
       }
-
     }
 
-  } catch (...) { }
+  } catch (...) {
+  }
 
   try {
     std::string om;
@@ -1003,9 +989,10 @@ MacroEditorDialog::showEvent (QShowEvent *)
       ex.read_word_or_quoted (h);
       ex.test (";");
       //  this will open an editor for the macro with path h
-      editor_for_file (h); 
+      editor_for_file (h);
     }
-  } catch (...) { }
+  } catch (...) {
+  }
 
   std::string am;
   mp_plugin_root->config_get (cfg_macro_editor_active_macro, am);
@@ -1025,7 +1012,7 @@ MacroEditorDialog::showEvent (QShowEvent *)
     editor_for_file (cm);
   }
 
-  for (std::map <lym::Macro *, MacroEditorPage *>::const_iterator page = m_tab_widgets.begin (); page != m_tab_widgets.end (); ++page) {
+  for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator page = m_tab_widgets.begin (); page != m_tab_widgets.end (); ++page) {
     page->second->set_debugging_on (m_debugging_on);
   }
 
@@ -1038,20 +1025,17 @@ MacroEditorDialog::showEvent (QShowEvent *)
   refresh_file_watcher ();
 }
 
-void
-MacroEditorDialog::reject ()
+void MacroEditorDialog::reject ()
 {
   //  .. ignore Esc ..
 }
-  
-void
-MacroEditorDialog::accept ()
+
+void MacroEditorDialog::accept ()
 {
   //  .. ignore Enter ..
 }
-  
-void 
-MacroEditorDialog::closeEvent (QCloseEvent *)
+
+void MacroEditorDialog::closeEvent (QCloseEvent *)
 {
   //  save the debugging enabled state
   mp_plugin_root->config_set (cfg_macro_editor_debugging_enabled, m_debugging_on);
@@ -1084,7 +1068,7 @@ MacroEditorDialog::closeEvent (QCloseEvent *)
 
   //  save the watch expressions
   std::string we;
-  for (std::vector<std::pair<gsi::Interpreter *, std::string> >::const_iterator i = m_watch_expressions.begin (); i != m_watch_expressions.end (); ++i) {
+  for (std::vector<std::pair<gsi::Interpreter *, std::string>>::const_iterator i = m_watch_expressions.begin (); i != m_watch_expressions.end (); ++i) {
     if (! om.empty ()) {
       om += ";";
     }
@@ -1126,14 +1110,13 @@ MacroEditorDialog::closeEvent (QCloseEvent *)
   lay::ApplicationBase::instance ()->python_interpreter ().remove_exec_handler (this);
 }
 
-void 
-MacroEditorDialog::set_debugging_on (bool on)
+void MacroEditorDialog::set_debugging_on (bool on)
 {
   if (m_debugging_on != on) {
 
     m_debugging_on = on;
 
-    for (std::map <lym::Macro *, MacroEditorPage *>::const_iterator page = m_tab_widgets.begin (); page != m_tab_widgets.end (); ++page) {
+    for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator page = m_tab_widgets.begin (); page != m_tab_widgets.end (); ++page) {
       page->second->set_debugging_on (m_debugging_on);
     }
 
@@ -1146,12 +1129,10 @@ MacroEditorDialog::set_debugging_on (bool on)
         lay::ApplicationBase::instance ()->python_interpreter ().remove_exec_handler (this);
       }
     }
-
   }
 }
 
-void
-MacroEditorDialog::process_events (QEventLoop::ProcessEventsFlags flags)
+void MacroEditorDialog::process_events (QEventLoop::ProcessEventsFlags flags)
 {
   if (lay::ApplicationBase::instance ()) {
     //  NOTE: we disable execution of deferred methods to avoid undesired execution of
@@ -1161,8 +1142,8 @@ MacroEditorDialog::process_events (QEventLoop::ProcessEventsFlags flags)
   }
 }
 
-static bool  
-any_modified(lym::MacroCollection *parent)
+static bool
+any_modified (lym::MacroCollection *parent)
 {
   for (lym::MacroCollection::child_iterator c = parent->begin_children (); c != parent->end_children (); ++c) {
     if (any_modified (c->second)) {
@@ -1177,13 +1158,12 @@ any_modified(lym::MacroCollection *parent)
   return false;
 }
 
-bool
-MacroEditorDialog::can_exit ()
+bool MacroEditorDialog::can_exit ()
 {
   if (any_modified (mp_root)) {
-    if (QMessageBox::question (this, QObject::tr ("Save Macros"), 
-                                     QObject::tr ("Some macros are modified. Do you want to save them?"),
-                                     QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes) {
+    if (QMessageBox::question (this, QObject::tr ("Save Macros"),
+                               QObject::tr ("Some macros are modified. Do you want to save them?"),
+                               QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes) {
       save_all_button_clicked ();
     }
   }
@@ -1196,8 +1176,7 @@ MacroEditorDialog::can_exit ()
   return true;
 }
 
-void
-MacroEditorDialog::add_edit_trace (bool compress)
+void MacroEditorDialog::add_edit_trace (bool compress)
 {
   const size_t max_entries = 1000;
 
@@ -1218,9 +1197,7 @@ MacroEditorDialog::add_edit_trace (bool compress)
     m_edit_trace.erase (m_edit_trace.begin () + m_edit_trace_index + 1, m_edit_trace.end ());
   }
 
-  if (compress
-      && m_edit_trace [m_edit_trace_index].path == path
-      && m_edit_trace [m_edit_trace_index].line == line) {
+  if (compress && m_edit_trace [m_edit_trace_index].path == path && m_edit_trace [m_edit_trace_index].line == line) {
 
     //  update position only if the line did not change
     m_edit_trace [m_edit_trace_index].pos = pos;
@@ -1238,15 +1215,13 @@ MacroEditorDialog::add_edit_trace (bool compress)
       m_edit_trace.erase (m_edit_trace.begin ());
       --m_edit_trace_index;
     }
-
   }
 
   backwardButton->setEnabled (m_edit_trace_index > 0);
   forwardButton->setEnabled (m_edit_trace_index + 1 < m_edit_trace.size ());
 }
 
-void
-MacroEditorDialog::clear_edit_trace ()
+void MacroEditorDialog::clear_edit_trace ()
 {
   m_edit_trace.clear ();
   m_edit_trace_index = -1;
@@ -1255,24 +1230,21 @@ MacroEditorDialog::clear_edit_trace ()
   forwardButton->setEnabled (false);
 }
 
-void
-MacroEditorDialog::backward ()
+void MacroEditorDialog::backward ()
 {
   if (m_edit_trace_index > 0) {
     select_trace (m_edit_trace_index - 1);
   }
 }
 
-void
-MacroEditorDialog::forward ()
+void MacroEditorDialog::forward ()
 {
   if (m_edit_trace_index + 1 < m_edit_trace.size ()) {
     select_trace (m_edit_trace_index + 1);
   }
 }
 
-void
-MacroEditorDialog::select_trace (size_t index)
+void MacroEditorDialog::select_trace (size_t index)
 {
   if (index < m_edit_trace.size ()) {
 
@@ -1288,12 +1260,10 @@ MacroEditorDialog::select_trace (size_t index)
     }
 
     m_add_edit_trace_enabled = true;
-
   }
 }
 
-void 
-MacroEditorDialog::immediate_command_text_changed (const QString &text)
+void MacroEditorDialog::immediate_command_text_changed (const QString &text)
 {
   m_history_index = -1;
   if (! m_in_event_handler) {
@@ -1301,8 +1271,7 @@ MacroEditorDialog::immediate_command_text_changed (const QString &text)
   }
 }
 
-void
-MacroEditorDialog::execute (const QString &cmd)
+void MacroEditorDialog::execute (const QString &cmd)
 {
   try {
 
@@ -1333,7 +1302,7 @@ MacroEditorDialog::execute (const QString &cmd)
   } catch (tl::CancelException & /*ex*/) {
 
     //  ignore CancelException
-    
+
   } catch (tl::Exception &ex) {
 
     write_str (ex.msg ().c_str (), OS_stderr);
@@ -1349,8 +1318,7 @@ MacroEditorDialog::execute (const QString &cmd)
   }
 }
 
-void 
-MacroEditorDialog::update_inspected ()
+void MacroEditorDialog::update_inspected ()
 {
   if (! m_in_breakpoint || ! m_in_exec || ! mp_current_interpreter) {
     variableList->set_inspector (0);
@@ -1361,19 +1329,17 @@ MacroEditorDialog::update_inspected ()
     variableList->set_inspector (ci.release ());
 
     update_watches ();
-
   }
 }
 
-void 
-MacroEditorDialog::update_watches ()
+void MacroEditorDialog::update_watches ()
 {
-  std::set <std::string> expressions;
-  for (std::vector<std::pair<gsi::Interpreter *, std::string> >::const_iterator w = m_watch_expressions.begin (); w != m_watch_expressions.end (); ++w) {
+  std::set<std::string> expressions;
+  for (std::vector<std::pair<gsi::Interpreter *, std::string>>::const_iterator w = m_watch_expressions.begin (); w != m_watch_expressions.end (); ++w) {
     expressions.insert (w->second);
   }
 
-  for (int i = 0; i < watchList->topLevelItemCount (); ) {
+  for (int i = 0; i < watchList->topLevelItemCount ();) {
     if (expressions.find (tl::to_string (watchList->topLevelItem (i)->text (0))) == expressions.end ()) {
       delete watchList->takeTopLevelItem (i);
     } else {
@@ -1382,7 +1348,7 @@ MacroEditorDialog::update_watches ()
   }
 
   int i = 0;
-  for (std::vector<std::pair<gsi::Interpreter *, std::string> >::const_iterator w = m_watch_expressions.begin (); w != m_watch_expressions.end (); ++w, ++i) {
+  for (std::vector<std::pair<gsi::Interpreter *, std::string>>::const_iterator w = m_watch_expressions.begin (); w != m_watch_expressions.end (); ++w, ++i) {
 
     QString value;
     if (w->first != mp_current_interpreter) {
@@ -1427,41 +1393,36 @@ MacroEditorDialog::update_watches ()
         f.setWeight (QFont::Normal);
         item->setFont (1, f);
       }
-
     }
 
     watchList->topLevelItem (i)->setDisabled (w->first != mp_current_interpreter);
-    
   }
 }
 
 static QString s_watch_expr;
 
-void
-MacroEditorDialog::edit_watch ()
+void MacroEditorDialog::edit_watch ()
 {
   int index = watchList->indexOfTopLevelItem (watchList->currentItem ());
   if (index >= 0) {
 
     bool ok = false;
     QString we = QInputDialog::getText (this, tr ("Add Watch Expressions"), tr ("Enter expression to evaluate:"), QLineEdit::Normal, watchList->currentItem ()->text (0), &ok);
-    if (ok && ! we.isEmpty()) {
+    if (ok && ! we.isEmpty ()) {
       s_watch_expr = we;
       m_watch_expressions [index].second = tl::to_string (we);
       update_watches ();
     }
-
   }
 }
 
-void
-MacroEditorDialog::add_watch ()
+void MacroEditorDialog::add_watch ()
 {
   if (mp_current_interpreter) {
 
     bool ok = false;
     QString we = QInputDialog::getText (this, tr ("Add Watch Expressions"), tr ("Enter expression to evaluate:"), QLineEdit::Normal, s_watch_expr, &ok);
-    if (ok && ! we.isEmpty()) {
+    if (ok && ! we.isEmpty ()) {
       s_watch_expr = we;
       m_watch_expressions.push_back (std::make_pair (mp_current_interpreter, tl::to_string (we)));
     }
@@ -1469,14 +1430,12 @@ MacroEditorDialog::add_watch ()
     update_watches ();
 
     watchList->setCurrentItem (watchList->topLevelItem (int (m_watch_expressions.size ()) - 1));
-
   }
 }
 
-void
-MacroEditorDialog::del_watches ()
+void MacroEditorDialog::del_watches ()
 {
-  for (int i = 0; i < watchList->topLevelItemCount (); ) {
+  for (int i = 0; i < watchList->topLevelItemCount ();) {
     if (watchList->topLevelItem (i)->isSelected ()) {
       delete watchList->takeTopLevelItem (i);
       m_watch_expressions.erase (m_watch_expressions.begin () + i);
@@ -1486,18 +1445,16 @@ MacroEditorDialog::del_watches ()
   }
 }
 
-void
-MacroEditorDialog::clear_watches ()
+void MacroEditorDialog::clear_watches ()
 {
   watchList->clear ();
   m_watch_expressions.clear ();
 }
 
-bool 
-MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
+bool MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
 {
   //  do not handle events that are not targeted towards widgets
-  QWidget *rec = dynamic_cast <QWidget *> (obj);
+  QWidget *rec = dynamic_cast<QWidget *> (obj);
   if (! rec) {
     return false;
   }
@@ -1511,7 +1468,7 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
 
     if (lay::BusySection::is_busy ()) {
 
-      if (m_in_breakpoint && (dynamic_cast <QInputEvent *> (event) != 0 || dynamic_cast <QPaintEvent *> (event) != 0)) {
+      if (m_in_breakpoint && (dynamic_cast<QInputEvent *> (event) != 0 || dynamic_cast<QPaintEvent *> (event) != 0)) {
 
         //  In breakpoint mode and while processing the events inside the debugger,
         //  ignore all input or paint events targeted to widgets which are not children of this or the assistant dialog.
@@ -1528,7 +1485,6 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
           event->accept ();
           return true;
         }
-
       }
 
     } else {
@@ -1537,13 +1493,11 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
       //  "real" events are processed. In that case, we can postpone excplit processing. This avoids interference
       //  with GUI code run in the debugger.
       m_last_process_events = tl::Clock::current ();
-
     }
-
   }
 
   //  Handle events targeted towards the input edit box. This implements the special behavior of the command line.
-  if (obj == input_field && event->type() == QEvent::KeyPress) {
+  if (obj == input_field && event->type () == QEvent::KeyPress) {
 
     QKeyEvent *key_event = dynamic_cast<QKeyEvent *> (event);
     if (key_event && key_event->key () == Qt::Key_Return) {
@@ -1553,7 +1507,7 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
 
         if (m_history_index >= 0 && m_history_index < input_field->count () && cmd == input_field->itemText (m_history_index)) {
           input_field->removeItem (m_history_index);
-        } 
+        }
         input_field->addItem (cmd);
 
         execute (cmd);
@@ -1561,7 +1515,6 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
         input_field->clearEditText ();
         m_edit_text = QString ();
         m_history_index = -1;
-
       }
 
       //  eat the event
@@ -1581,7 +1534,7 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
         --hi;
         input_field->setCurrentIndex (hi);
       }
-        
+
       m_in_event_handler = false;
       m_history_index = hi;
 
@@ -1605,13 +1558,12 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
         hi = input_field->count ();
         input_field->setEditText (m_edit_text);
       }
-        
+
       m_in_event_handler = false;
       m_history_index = hi;
 
       //  eat the event
       return true;
-
     }
 
   } else if (obj == tab_bar_of (tabWidget) && dynamic_cast<QMouseEvent *> (event) != 0) {
@@ -1619,27 +1571,23 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
     //  just spy on the events, don't eat them
     QMouseEvent *mouse_event = dynamic_cast<QMouseEvent *> (event);
     m_mouse_pos = mouse_event->pos ();
-
   }
 
   return false;
 }
 
-void
-MacroEditorDialog::flush ()
+void MacroEditorDialog::flush ()
 {
   //  .. no specific implementation required for flush() ..
 }
 
-bool
-MacroEditorDialog::is_tty ()
+bool MacroEditorDialog::is_tty ()
 {
   //  TODO: implement ANSI sequences?
   return false;
 }
 
-int
-MacroEditorDialog::columns ()
+int MacroEditorDialog::columns ()
 {
   QFontMetrics fm (mp_console_text->font ());
 #if QT_VERSION >= 0x60000
@@ -1655,8 +1603,7 @@ MacroEditorDialog::columns ()
   }
 }
 
-int
-MacroEditorDialog::rows ()
+int MacroEditorDialog::rows ()
 {
   QFontMetrics fm (mp_console_text->font ());
   int ch = fm.height ();
@@ -1668,8 +1615,7 @@ MacroEditorDialog::rows ()
   }
 }
 
-void 
-MacroEditorDialog::write_str (const char *text, output_stream os)
+void MacroEditorDialog::write_str (const char *text, output_stream os)
 {
   if (! mp_console_text->textCursor ().atEnd ()) {
     QTextCursor c = mp_console_text->textCursor ();
@@ -1684,20 +1630,20 @@ MacroEditorDialog::write_str (const char *text, output_stream os)
 
   if (m_os != os) {
     if (os == OS_stdout) {
-      mp_console_text->setCurrentCharFormat(m_stdout_format);
+      mp_console_text->setCurrentCharFormat (m_stdout_format);
     } else if (os == OS_echo) {
-      mp_console_text->setCurrentCharFormat(m_echo_format);
+      mp_console_text->setCurrentCharFormat (m_echo_format);
     } else if (os == OS_stderr) {
-      mp_console_text->setCurrentCharFormat(m_stderr_format);
-    } 
+      mp_console_text->setCurrentCharFormat (m_stderr_format);
+    }
   }
 
   m_os = os;
 
-  for (const char *t = text; *t; ) {
+  for (const char *t = text; *t;) {
 
     const char *t0 = t;
-    for ( ; *t && *t != '\n'; ++t)
+    for (; *t && *t != '\n'; ++t)
       ;
 
     mp_console_text->insertPlainText (QString::fromUtf8 (t0, t - t0));
@@ -1710,64 +1656,58 @@ MacroEditorDialog::write_str (const char *text, output_stream os)
     } else {
       m_new_line = false;
     }
-
   }
 
   md_update_console_text ();
 }
 
-void
-MacroEditorDialog::update_console_text ()
+void MacroEditorDialog::update_console_text ()
 {
   mp_console_text->ensureCursorVisible ();
 }
 
-void
-MacroEditorDialog::commit ()
+void MacroEditorDialog::commit ()
 {
-  for (std::map <lym::Macro *, MacroEditorPage *>::const_iterator page = m_tab_widgets.begin (); page != m_tab_widgets.end (); ++page) {
+  for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator page = m_tab_widgets.begin (); page != m_tab_widgets.end (); ++page) {
     if (page->second->is_modified ()) {
       page->second->commit ();
     }
   }
 }
 
-void
-MacroEditorDialog::macro_collection_deleted (lym::MacroCollection *collection)
+void MacroEditorDialog::macro_collection_deleted (lym::MacroCollection *collection)
 {
   //  close the tab pages related to the collection we want to delete
-  std::set <lym::Macro *> used_macros;
-  std::set <lym::MacroCollection *> used_collections;
+  std::set<lym::Macro *> used_macros;
+  std::set<lym::MacroCollection *> used_collections;
   collection->collect_used_nodes (used_macros, used_collections);
 
-  for (std::set <lym::Macro *>::iterator mc = used_macros.begin (); mc != used_macros.end (); ++mc) {
+  for (std::set<lym::Macro *>::iterator mc = used_macros.begin (); mc != used_macros.end (); ++mc) {
 
     if (mp_run_macro == *mc) {
       mp_run_macro = 0;
     }
 
-    std::map <lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.find (*mc);
+    std::map<lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.find (*mc);
     if (p != m_tab_widgets.end ()) {
       //  disable the macro on the page - we'll ask for updates when the file
       //  watcher becomes active. So long, the macro is "zombie".
       p->second->connect_macro (0);
       m_tab_widgets.erase (p);
     }
-
   }
 
   refresh_file_watcher ();
   update_ui_to_run_mode ();
 }
 
-void
-MacroEditorDialog::macro_deleted (lym::Macro *macro)
+void MacroEditorDialog::macro_deleted (lym::Macro *macro)
 {
   if (mp_run_macro == macro) {
     mp_run_macro = 0;
   }
 
-  std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
+  std::map<lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
   if (page != m_tab_widgets.end ()) {
     int index = tabWidget->indexOf (page->second);
     if (index >= 0) {
@@ -1778,16 +1718,14 @@ MacroEditorDialog::macro_deleted (lym::Macro *macro)
   update_ui_to_run_mode ();
 }
 
-void
-MacroEditorDialog::macro_collection_changed (lym::MacroCollection * /*collection*/)
+void MacroEditorDialog::macro_collection_changed (lym::MacroCollection * /*collection*/)
 {
   refresh_file_watcher ();
 }
 
-void
-MacroEditorDialog::macro_changed (lym::Macro *macro)
+void MacroEditorDialog::macro_changed (lym::Macro *macro)
 {
-  std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
+  std::map<lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
   if (page != m_tab_widgets.end ()) {
     int index = tabWidget->indexOf (page->second);
     QString tt = tl::to_qstring (macro->summary ());
@@ -1801,8 +1739,7 @@ MacroEditorDialog::macro_changed (lym::Macro *macro)
   }
 }
 
-void
-MacroEditorDialog::do_current_tab_changed ()
+void MacroEditorDialog::do_current_tab_changed ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (page) {
@@ -1816,8 +1753,7 @@ MacroEditorDialog::do_current_tab_changed ()
   }
 }
 
-void 
-MacroEditorDialog::current_tab_changed (int index)
+void MacroEditorDialog::current_tab_changed (int index)
 {
   //  select the current macro - done in a delayed fashion so there is
   //  no interacting during erase of macros
@@ -1826,7 +1762,7 @@ MacroEditorDialog::current_tab_changed (int index)
   add_edit_trace (false);
 
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->widget (index));
-  replaceFrame->setEnabled (page && page->macro () && !page->macro ()->is_readonly ());
+  replaceFrame->setEnabled (page && page->macro () && ! page->macro ()->is_readonly ());
   apply_search ();
 
   do_update_ui_to_run_mode ();
@@ -1845,31 +1781,28 @@ lym::Macro *MacroEditorDialog::create_macro_here (const char *prefix)
 
   if (! collection || collection->is_readonly ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot add a macro here - the folder is read-only")));
-  } 
+  }
 
   return collection->create (prefix);
 }
 
-void
-MacroEditorDialog::macro_renamed (lym::Macro * /*macro*/)
+void MacroEditorDialog::macro_renamed (lym::Macro * /*macro*/)
 {
   refresh_file_watcher ();
 }
 
-void
-MacroEditorDialog::folder_renamed (lym::MacroCollection * /*mc*/)
+void MacroEditorDialog::folder_renamed (lym::MacroCollection * /*mc*/)
 {
   refresh_file_watcher ();
 }
 
-void
-MacroEditorDialog::move_macro (lym::Macro *source, lym::MacroCollection *target)
+void MacroEditorDialog::move_macro (lym::Macro *source, lym::MacroCollection *target)
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (source->parent () != target) {
 
@@ -1878,7 +1811,7 @@ BEGIN_PROTECTED
     m->set_readonly (false);
     m->save ();
 
-    std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (source);
+    std::map<lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (source);
     if (page != m_tab_widgets.end ()) {
       MacroEditorPage *w = page->second;
       w->connect_macro (m);
@@ -1902,26 +1835,24 @@ BEGIN_PROTECTED
     }
 
     refresh_file_watcher ();
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-MacroEditorDialog::move_subfolder (lym::MacroCollection *source, lym::MacroCollection *target)
+void MacroEditorDialog::move_subfolder (lym::MacroCollection *source, lym::MacroCollection *target)
 {
   lym::MacroCollection *mt = target->create_folder (source->name ().c_str ());
   if (! mt) {
     return;
   }
 
-  std::vector <lym::MacroCollection::iterator> m_del;
+  std::vector<lym::MacroCollection::iterator> m_del;
 
   for (lym::MacroCollection::iterator mm = source->begin (); mm != source->end (); ++mm) {
 
     lym::Macro *m = mt->create (mm->second->name ().c_str ());
-    if (!m) {
+    if (! m) {
       continue;
     }
 
@@ -1929,7 +1860,7 @@ MacroEditorDialog::move_subfolder (lym::MacroCollection *source, lym::MacroColle
     m->set_readonly (false);
     m->save ();
 
-    std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (mm->second);
+    std::map<lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (mm->second);
     if (page != m_tab_widgets.end ()) {
       MacroEditorPage *w = page->second;
       w->connect_macro (m);
@@ -1946,11 +1877,11 @@ MacroEditorDialog::move_subfolder (lym::MacroCollection *source, lym::MacroColle
     }
   }
 
-  for (std::vector <lym::MacroCollection::iterator>::const_iterator d = m_del.begin (); d != m_del.end (); ++d) {
+  for (std::vector<lym::MacroCollection::iterator>::const_iterator d = m_del.begin (); d != m_del.end (); ++d) {
     source->erase (*d);
   }
 
-  std::vector <lym::MacroCollection::child_iterator> mc_del;
+  std::vector<lym::MacroCollection::child_iterator> mc_del;
 
   for (lym::MacroCollection::child_iterator m = source->begin_children (); m != source->end_children (); ++m) {
     move_subfolder (m->second, mt);
@@ -1961,19 +1892,18 @@ MacroEditorDialog::move_subfolder (lym::MacroCollection *source, lym::MacroColle
     }
   }
 
-  for (std::vector <lym::MacroCollection::child_iterator>::const_iterator d = mc_del.begin (); d != mc_del.end (); ++d) {
+  for (std::vector<lym::MacroCollection::child_iterator>::const_iterator d = mc_del.begin (); d != mc_del.end (); ++d) {
     source->erase (*d);
   }
 }
 
-void 
-MacroEditorDialog::move_folder (lym::MacroCollection *source, lym::MacroCollection *target)
+void MacroEditorDialog::move_folder (lym::MacroCollection *source, lym::MacroCollection *target)
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (source->parent () != target) {
 
@@ -1985,14 +1915,12 @@ BEGIN_PROTECTED
     }
 
     refresh_file_watcher ();
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MacroEditorDialog::set_editor_focus ()
+void MacroEditorDialog::set_editor_focus ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (! page) {
@@ -2003,8 +1931,7 @@ MacroEditorDialog::set_editor_focus ()
   page->set_editor_focus ();
 }
 
-void  
-MacroEditorDialog::replace_mode_button_clicked ()
+void MacroEditorDialog::replace_mode_button_clicked ()
 {
   if (replaceFrame->isVisible ()) {
     replaceFrame->hide ();
@@ -2016,8 +1943,7 @@ MacroEditorDialog::replace_mode_button_clicked ()
   }
 }
 
-void  
-MacroEditorDialog::find_next_button_clicked ()
+void MacroEditorDialog::find_next_button_clicked ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (! page) {
@@ -2031,8 +1957,7 @@ MacroEditorDialog::find_next_button_clicked ()
   }
 }
 
-void
-MacroEditorDialog::find_prev_button_clicked ()
+void MacroEditorDialog::find_prev_button_clicked ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (! page) {
@@ -2046,8 +1971,7 @@ MacroEditorDialog::find_prev_button_clicked ()
   }
 }
 
-void
-MacroEditorDialog::replace_next_button_clicked ()
+void MacroEditorDialog::replace_next_button_clicked ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (! page) {
@@ -2061,8 +1985,7 @@ MacroEditorDialog::replace_next_button_clicked ()
   }
 }
 
-void
-MacroEditorDialog::replace_all_button_clicked ()
+void MacroEditorDialog::replace_all_button_clicked ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (! page) {
@@ -2074,8 +1997,7 @@ MacroEditorDialog::replace_all_button_clicked ()
   set_editor_focus ();
 }
 
-void
-MacroEditorDialog::search_requested (const QString &s, bool prev)
+void MacroEditorDialog::search_requested (const QString &s, bool prev)
 {
   if (! s.isNull ()) {
     searchEditBox->setText (s);
@@ -2100,8 +2022,7 @@ MacroEditorDialog::search_requested (const QString &s, bool prev)
   }
 }
 
-void
-MacroEditorDialog::search_editing ()
+void MacroEditorDialog::search_editing ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (! page) {
@@ -2114,8 +2035,7 @@ MacroEditorDialog::search_editing ()
   }
 }
 
-void
-MacroEditorDialog::search_finished ()
+void MacroEditorDialog::search_finished ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (! page) {
@@ -2126,8 +2046,7 @@ MacroEditorDialog::search_finished ()
   set_editor_focus ();
 }
 
-void
-MacroEditorDialog::search_edited ()
+void MacroEditorDialog::search_edited ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (! page) {
@@ -2140,8 +2059,7 @@ MacroEditorDialog::search_edited ()
   }
 }
 
-void
-MacroEditorDialog::apply_search (bool if_needed)
+void MacroEditorDialog::apply_search (bool if_needed)
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (! page) {
@@ -2163,14 +2081,13 @@ MacroEditorDialog::apply_search (bool if_needed)
   }
 }
 
-void  
-MacroEditorDialog::save_button_clicked ()
+void MacroEditorDialog::save_button_clicked ()
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   lym::Macro *m = current_macro_tree ()->current_macro ();
   if (m) {
@@ -2184,17 +2101,16 @@ BEGIN_PROTECTED
 
   refresh_file_watcher ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MacroEditorDialog::save_as_button_clicked ()
+void MacroEditorDialog::save_as_button_clicked ()
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   lym::Macro *m = current_macro_tree ()->current_macro ();
   if (! m) {
@@ -2214,14 +2130,12 @@ BEGIN_PROTECTED
     if (lym) {
       open_macro (lym);
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MacroEditorDialog::setup_button_clicked ()
+void MacroEditorDialog::setup_button_clicked ()
 {
   if (m_in_exec) {
     return;
@@ -2233,14 +2147,13 @@ MacroEditorDialog::setup_button_clicked ()
   }
 }
 
-void  
-MacroEditorDialog::properties_button_clicked ()
+void MacroEditorDialog::properties_button_clicked ()
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (! tabWidget->currentWidget ()) {
     return;
@@ -2262,13 +2175,12 @@ BEGIN_PROTECTED
     macro->sync_text_with_properties ();
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MacroEditorDialog::help_requested (const QString &s)
+void MacroEditorDialog::help_requested (const QString &s)
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   //  Do not allow modal popups in breakpoint mode - this would interfere with
   //  event filtering during breakpoint execution
   if (m_in_breakpoint) {
@@ -2276,13 +2188,12 @@ BEGIN_PROTECTED
   }
 
   lay::MainWindow::instance ()->show_assistant_topic (tl::to_string (s));
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-MacroEditorDialog::help_button_clicked ()
+void MacroEditorDialog::help_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   //  Do not allow modal popups in breakpoint mode - this would interfere with
   //  event filtering during breakpoint execution
   if (m_in_breakpoint) {
@@ -2290,15 +2201,14 @@ BEGIN_PROTECTED
   }
 
   lay::MainWindow::instance ()->show_assistant_url ("int:/code/index.xml");
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-MacroEditorDialog::add_button_clicked ()
+void MacroEditorDialog::add_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   new_macro ();
-END_PROTECTED
+  END_PROTECTED
 }
 
 lym::Macro *
@@ -2344,18 +2254,17 @@ MacroEditorDialog::new_macro ()
   return m;
 }
 
-void
-MacroEditorDialog::close_all ()
+void MacroEditorDialog::close_all ()
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   tabWidget->clear ();
 
-  for (std::map <lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.begin (); p != m_tab_widgets.end (); ++p) {
+  for (std::map<lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.begin (); p != m_tab_widgets.end (); ++p) {
     if (p->second) {
       p->second->connect_macro (0);
     }
@@ -2366,35 +2275,31 @@ BEGIN_PROTECTED
 
   refresh_file_watcher ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MacroEditorDialog::close_all_but_this ()
+void MacroEditorDialog::close_all_but_this ()
 {
   close_many (0);
 }
 
-void
-MacroEditorDialog::close_all_left ()
+void MacroEditorDialog::close_all_left ()
 {
   close_many (-1);
 }
 
-void
-MacroEditorDialog::close_all_right ()
+void MacroEditorDialog::close_all_right ()
 {
   close_many (1);
 }
 
-void
-MacroEditorDialog::close_many (int r2c)
+void MacroEditorDialog::close_many (int r2c)
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   int ci = tab_bar_of (tabWidget)->tabAt (m_mouse_pos);
   if (ci < 0) {
@@ -2403,19 +2308,19 @@ BEGIN_PROTECTED
 
   std::set<QWidget *> removed;
 
-  for (int i = tabWidget->count (); i > 0; ) {
+  for (int i = tabWidget->count (); i > 0;) {
     --i;
     if ((r2c == 0 && i != ci) ||
-        (r2c < 0  && i < ci) ||
-        (r2c > 0  && i > ci)) {
+        (r2c < 0 && i < ci) ||
+        (r2c > 0 && i > ci)) {
       removed.insert (tabWidget->widget (i));
       tabWidget->removeTab (i);
     }
   }
 
-  std::map <lym::Macro *, MacroEditorPage *> new_widgets;
+  std::map<lym::Macro *, MacroEditorPage *> new_widgets;
 
-  for (std::map <lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.begin (); p != m_tab_widgets.end (); ++p) {
+  for (std::map<lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.begin (); p != m_tab_widgets.end (); ++p) {
     if (removed.find (p->second) == removed.end ()) {
       new_widgets.insert (*p);
     } else {
@@ -2430,11 +2335,10 @@ BEGIN_PROTECTED
 
   refresh_file_watcher ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MacroEditorDialog::close_requested ()
+void MacroEditorDialog::close_requested ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (sender ());
   if (! m_in_exec && page) {
@@ -2442,14 +2346,13 @@ MacroEditorDialog::close_requested ()
   }
 }
 
-void
-MacroEditorDialog::tab_close_requested (int index)
+void MacroEditorDialog::tab_close_requested (int index)
 {
   if (m_in_exec || index < 0) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (! tabWidget->widget (index)) {
     return;
@@ -2461,7 +2364,7 @@ BEGIN_PROTECTED
     return;
   }
 
-  for (std::map <lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.begin (); p != m_tab_widgets.end (); ++p) {
+  for (std::map<lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.begin (); p != m_tab_widgets.end (); ++p) {
     if (p->second == page) {
       m_tab_widgets.erase (p);
       break;
@@ -2473,23 +2376,21 @@ BEGIN_PROTECTED
 
   refresh_file_watcher ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-MacroEditorDialog::close_button_clicked ()
+void MacroEditorDialog::close_button_clicked ()
 {
   tab_close_requested (tabWidget->currentIndex ());
 }
 
-void 
-MacroEditorDialog::delete_button_clicked()
+void MacroEditorDialog::delete_button_clicked ()
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   lay::MacroEditorTree *ct = current_macro_tree ();
 
@@ -2512,9 +2413,9 @@ BEGIN_PROTECTED
 
     if (p) {
 
-      if (QMessageBox::question (this, QObject::tr ("Delete Folder"), 
-                                       tl::to_qstring (tl::to_string (QObject::tr ("Are you sure to delete the folder ")) + collection->path () + "?"),
-                                       QMessageBox::Ok, QMessageBox::Cancel) != QMessageBox::Ok) {
+      if (QMessageBox::question (this, QObject::tr ("Delete Folder"),
+                                 tl::to_qstring (tl::to_string (QObject::tr ("Are you sure to delete the folder ")) + collection->path () + "?"),
+                                 QMessageBox::Ok, QMessageBox::Cancel) != QMessageBox::Ok) {
         return;
       }
 
@@ -2522,12 +2423,11 @@ BEGIN_PROTECTED
         throw tl::Exception ("Can't delete this folder - there may still be some other files inside it");
       }
       p->erase (collection);
-
     }
 
     ct->set_current (p);
 
- } else if (m) {
+  } else if (m) {
 
     lym::MacroCollection *collection = m->parent ();
     if (m->is_readonly ()) {
@@ -2536,9 +2436,9 @@ BEGIN_PROTECTED
 
     if (collection) {
 
-      if (QMessageBox::question (this, QObject::tr ("Delete Macro File"), 
-                                       tl::to_qstring (tl::to_string (QObject::tr ("Are you sure to delete the macro file ")) + m->path () + "?"),
-                                       QMessageBox::Ok, QMessageBox::Cancel) != QMessageBox::Ok) {
+      if (QMessageBox::question (this, QObject::tr ("Delete Macro File"),
+                                 tl::to_qstring (tl::to_string (QObject::tr ("Are you sure to delete the macro file ")) + m->path () + "?"),
+                                 QMessageBox::Ok, QMessageBox::Cancel) != QMessageBox::Ok) {
         return;
       }
 
@@ -2548,24 +2448,21 @@ BEGIN_PROTECTED
 
       ct->set_current (collection);
       collection->erase (m);
-
     }
-
   }
 
   refresh_file_watcher ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-MacroEditorDialog::rename_button_clicked()
+void MacroEditorDialog::rename_button_clicked ()
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   lay::MacroEditorTree *ct = current_macro_tree ();
   QModelIndex index = ct->currentIndex ();
@@ -2577,11 +2474,10 @@ BEGIN_PROTECTED
     }
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MacroEditorDialog::ensure_writeable_collection_selected ()
+void MacroEditorDialog::ensure_writeable_collection_selected ()
 {
   lay::MacroEditorTree *ct = current_macro_tree ();
   lym::MacroCollection *collection = ct->current_macro_collection ();
@@ -2590,7 +2486,7 @@ MacroEditorDialog::ensure_writeable_collection_selected ()
     if (macro) {
       collection = macro->parent ();
     }
-  } 
+  }
 
   //  Select the first writeable collection if none is selected
   if (! collection || collection->is_readonly ()) {
@@ -2611,10 +2507,10 @@ MacroEditorDialog::ensure_writeable_collection_selected ()
   }
 }
 
-static std::vector<std::pair<std::string, std::string> > 
+static std::vector<std::pair<std::string, std::string>>
 get_custom_paths (lay::Dispatcher *root)
 {
-  std::vector <std::pair<std::string, std::string> > paths;
+  std::vector<std::pair<std::string, std::string>> paths;
 
   std::string mp;
   root->config_get (cfg_custom_macro_paths, mp);
@@ -2631,24 +2527,24 @@ get_custom_paths (lay::Dispatcher *root)
       }
 
       ex.test (";");
-
     }
 
-  } catch (...) { }
+  } catch (...) {
+  }
 
   return paths;
 }
 
 static void
-set_custom_paths (lay::Dispatcher *root, const std::vector<std::pair<std::string, std::string> > &paths)
+set_custom_paths (lay::Dispatcher *root, const std::vector<std::pair<std::string, std::string>> &paths)
 {
   std::string mp;
 
   //  add paths from our category
-  for (std::vector<std::pair<std::string, std::string> >::const_iterator p = paths.begin (); p != paths.end (); ++p) {
+  for (std::vector<std::pair<std::string, std::string>>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
     if (! mp.empty ()) {
       mp += ";";
-    } 
+    }
     mp += tl::to_quoted_string (p->first);
     mp += ":";
     mp += p->second;
@@ -2657,10 +2553,9 @@ set_custom_paths (lay::Dispatcher *root, const std::vector<std::pair<std::string
   root->config_set (cfg_custom_macro_paths, mp);
 }
 
-void
-MacroEditorDialog::file_changed_timer ()
+void MacroEditorDialog::file_changed_timer ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   //  Make the names unique
   std::sort (m_changed_files.begin (), m_changed_files.end ());
@@ -2701,7 +2596,6 @@ BEGIN_PROTECTED
       lay::MacroEditorNotification n ("reload", tl::to_string (tr ("Macro has changed on disk")), tl::Variant (fn));
       n.add_action ("reload", tl::to_string (tr ("Reload")));
       w->second->add_notification (n);
-
     }
   }
 
@@ -2724,7 +2618,6 @@ BEGIN_PROTECTED
       lay::MacroEditorNotification n ("close", tl::to_string (tr ("Macro has been removed on disk")), tl::Variant (fn));
       n.add_action ("close", tl::to_string (tr ("Close tab")));
       w->second->add_notification (n);
-
     }
   }
 
@@ -2733,11 +2626,10 @@ BEGIN_PROTECTED
   m_changed_files.clear ();
   m_removed_files.clear ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MacroEditorDialog::file_changed (const QString &path)
+void MacroEditorDialog::file_changed (const QString &path)
 {
   m_changed_files.push_back (path);
 
@@ -2755,8 +2647,7 @@ MacroEditorDialog::file_changed (const QString &path)
   m_file_changed_timer->start ();
 }
 
-void
-MacroEditorDialog::file_removed (const QString &path)
+void MacroEditorDialog::file_removed (const QString &path)
 {
   m_removed_files.push_back (path);
 
@@ -2774,8 +2665,7 @@ MacroEditorDialog::file_removed (const QString &path)
   m_file_changed_timer->start ();
 }
 
-void
-MacroEditorDialog::sync_file_watcher (lym::MacroCollection * /*collection*/)
+void MacroEditorDialog::sync_file_watcher (lym::MacroCollection * /*collection*/)
 {
 #if 0
   //  this would monitor the whole tree - but it's a little too deep. This
@@ -2798,14 +2688,13 @@ MacroEditorDialog::sync_file_watcher (lym::MacroCollection * /*collection*/)
   }
 #else
   //  This solution monitors the open files only
-  for (std::map <lym::Macro *, MacroEditorPage *>::const_iterator m = m_tab_widgets.begin (); m != m_tab_widgets.end (); ++m) {
+  for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator m = m_tab_widgets.begin (); m != m_tab_widgets.end (); ++m) {
     m_file_watcher->add_file (m->first->path ());
   }
 #endif
 }
 
-void
-MacroEditorDialog::refresh_file_watcher ()
+void MacroEditorDialog::refresh_file_watcher ()
 {
   m_file_watcher->clear ();
   m_file_watcher->enable (false);
@@ -2815,8 +2704,7 @@ MacroEditorDialog::refresh_file_watcher ()
   }
 }
 
-void
-MacroEditorDialog::do_refresh_file_watcher ()
+void MacroEditorDialog::do_refresh_file_watcher ()
 {
   try {
     if (m_file_watcher_enabled) {
@@ -2827,8 +2715,7 @@ MacroEditorDialog::do_refresh_file_watcher ()
   }
 }
 
-void
-MacroEditorDialog::reload_macros ()
+void MacroEditorDialog::reload_macros ()
 {
   m_file_watcher->clear ();
   try {
@@ -2840,10 +2727,9 @@ MacroEditorDialog::reload_macros ()
   }
 }
 
-void
-MacroEditorDialog::refresh ()
+void MacroEditorDialog::refresh ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   //  save all so that we don't get differences in the text
   commit ();
@@ -2851,17 +2737,16 @@ BEGIN_PROTECTED
 
   reload_macros ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-MacroEditorDialog::add_location ()
+void MacroEditorDialog::add_location ()
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   QString new_dir = QFileDialog::getExistingDirectory (this, QObject::tr ("Add Location"));
   if (new_dir.isNull ()) {
@@ -2870,12 +2755,12 @@ BEGIN_PROTECTED
 
   std::string cat = current_macro_tree ()->category ();
 
-  std::vector <std::pair<std::string, std::string> > paths = get_custom_paths (mp_plugin_root);
+  std::vector<std::pair<std::string, std::string>> paths = get_custom_paths (mp_plugin_root);
   std::string new_path = tl::to_string (QFileInfo (new_dir).absoluteFilePath ());
   paths.push_back (std::make_pair (new_path, cat));
 
   lym::MacroCollection *c = mp_root->add_folder (tl::to_string (QObject::tr ("Project")) + " - " + new_path, new_path, cat, false /* writeable */, false /* do not auto-create folders */);
-  if (!c) {
+  if (! c) {
     throw tl::Exception (tl::to_string (QObject::tr ("The selected directory is already installed as custom location")));
   }
 
@@ -2889,17 +2774,16 @@ BEGIN_PROTECTED
 
   refresh_file_watcher ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-MacroEditorDialog::remove_location ()
+void MacroEditorDialog::remove_location ()
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   lay::MacroEditorTree *ct = current_macro_tree ();
   lym::MacroCollection *collection = ct->current_macro_collection ();
@@ -2912,14 +2796,14 @@ BEGIN_PROTECTED
 
   if (! collection) {
     throw tl::Exception (tl::to_string (QObject::tr ("Select tree location to remove")));
-  } 
+  }
 
-  std::vector <std::pair <std::string, std::string> > paths = get_custom_paths (mp_plugin_root);
+  std::vector<std::pair<std::string, std::string>> paths = get_custom_paths (mp_plugin_root);
 
   bool found = false;
 
   //  locate the location in the set of paths
-  for (std::vector <std::pair <std::string, std::string> >::iterator p = paths.begin (); p != paths.end (); ++p) {
+  for (std::vector<std::pair<std::string, std::string>>::iterator p = paths.begin (); p != paths.end (); ++p) {
     if (p->first == collection->path () && p->second == ct->category ()) {
       paths.erase (p);
       found = true;
@@ -2929,7 +2813,7 @@ BEGIN_PROTECTED
 
   if (! found) {
     throw tl::Exception (tl::to_string (QObject::tr ("Unable to remove that location")));
-  } 
+  }
 
   //  actually remove the collection (update is done through the
   //  macro_collection_deleted signal handler).
@@ -2938,17 +2822,16 @@ BEGIN_PROTECTED
   //  save the new paths
   set_custom_paths (mp_plugin_root, paths);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-MacroEditorDialog::import_button_clicked ()
+void MacroEditorDialog::import_button_clicked ()
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   ensure_writeable_collection_selected ();
 
@@ -2977,7 +2860,6 @@ BEGIN_PROTECTED
     }
 
     file_dialog = new lay::FileDialog (lay::MainWindow::instance (), tl::to_string (QObject::tr ("Import Macro File")), filters, "lym");
-
   }
 
   std::string fn;
@@ -2997,22 +2879,20 @@ BEGIN_PROTECTED
     }
 
     ct->set_current (m);
-
   }
 
   refresh_file_watcher ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MacroEditorDialog::new_folder_button_clicked()
+void MacroEditorDialog::new_folder_button_clicked ()
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   ensure_writeable_collection_selected ();
 
@@ -3027,7 +2907,7 @@ BEGIN_PROTECTED
 
   if (! collection || collection->is_readonly ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot create a folder here")));
-  } 
+  }
 
   lym::MacroCollection *mm = collection->create_folder ();
   if (! mm) {
@@ -3041,28 +2921,26 @@ BEGIN_PROTECTED
 
   refresh_file_watcher ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MacroEditorDialog::save_all_button_clicked()
+void MacroEditorDialog::save_all_button_clicked ()
 {
   if (m_in_exec) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   commit ();
   mp_root->save ();
 
   refresh_file_watcher ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MacroEditorDialog::open_macro (lym::Macro *m)
+void MacroEditorDialog::open_macro (lym::Macro *m)
 {
   MacroEditorPage *page = create_page (m);
   m_tab_widgets.insert (std::make_pair (m, page));
@@ -3071,12 +2949,11 @@ MacroEditorDialog::open_macro (lym::Macro *m)
   tabWidget->setCurrentWidget (page);
 }
 
-void 
-MacroEditorDialog::item_double_clicked(lym::Macro *m)
+void MacroEditorDialog::item_double_clicked (lym::Macro *m)
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
-  std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (m);
+  std::map<lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (m);
   if (page == m_tab_widgets.end ()) {
     open_macro (m);
   } else {
@@ -3085,11 +2962,10 @@ BEGIN_PROTECTED
 
   refresh_file_watcher ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-MacroEditorDialog::start_exec (gsi::Interpreter *ec)
+void MacroEditorDialog::start_exec (gsi::Interpreter *ec)
 {
   //  ignore calls from other interpreters
   if (m_in_exec) {
@@ -3135,8 +3011,7 @@ MacroEditorDialog::start_exec (gsi::Interpreter *ec)
   m_ignore_exec_events = false;
 }
 
-void
-MacroEditorDialog::end_exec (gsi::Interpreter *ec)
+void MacroEditorDialog::end_exec (gsi::Interpreter *ec)
 {
   if ((m_in_exec && ec != mp_exec_controller) || m_ignore_exec_events) {
     return;
@@ -3172,11 +3047,11 @@ MacroEditorDialog::end_exec (gsi::Interpreter *ec)
 
 const size_t pseudo_file_offset = std::numeric_limits<size_t>::max () / 2;
 
-size_t   
+size_t
 MacroEditorDialog::id_for_path (gsi::Interpreter *, const std::string &path)
 {
-  for (std::map <lym::Macro *, MacroEditorPage *>::const_iterator m = m_tab_widgets.begin (); m != m_tab_widgets.end (); ++m) {
-    if (tl::is_same_file(m->first->path (), path)) {
+  for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator m = m_tab_widgets.begin (); m != m_tab_widgets.end (); ++m) {
+    if (tl::is_same_file (m->first->path (), path)) {
       m_file_to_widget.push_back (*m);
       return m_file_to_widget.size ();
     }
@@ -3188,7 +3063,7 @@ MacroEditorDialog::id_for_path (gsi::Interpreter *, const std::string &path)
     return m_file_to_widget.size ();
   }
 
-  if (! path.empty () && path[0] == '@') {
+  if (! path.empty () && path [0] == '@') {
     m_include_expanders.push_back (tl::IncludeExpander::from_string (path));
     return pseudo_file_offset + m_include_expanders.size () - 1;
   }
@@ -3196,8 +3071,7 @@ MacroEditorDialog::id_for_path (gsi::Interpreter *, const std::string &path)
   return 0;
 }
 
-void
-MacroEditorDialog::translate_pseudo_id (size_t &file_id, int &line)
+void MacroEditorDialog::translate_pseudo_id (size_t &file_id, int &line)
 {
   if (file_id >= pseudo_file_offset) {
 
@@ -3205,7 +3079,7 @@ MacroEditorDialog::translate_pseudo_id (size_t &file_id, int &line)
 
     std::pair<size_t, int> ck (file_id, line);
 
-    std::map<std::pair<size_t, int>, std::pair<size_t, int> >::iterator ic = m_include_file_id_cache.find (ck);
+    std::map<std::pair<size_t, int>, std::pair<size_t, int>>::iterator ic = m_include_file_id_cache.find (ck);
     if (ic != m_include_file_id_cache.end ()) {
 
       file_id = ic->second.first;
@@ -3239,21 +3113,17 @@ MacroEditorDialog::translate_pseudo_id (size_t &file_id, int &line)
         //  give up.
         file_id = 0;
         line = 0;
-
       }
 
       m_include_file_id_cache.insert (std::make_pair (ck, std::make_pair (file_id, line)));
-
     }
-
   }
 }
 
-void   
-MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_id, int line, const std::string &eclass, const std::string &emsg, const gsi::StackTraceProvider *stack_trace_provider)
+void MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_id, int line, const std::string &eclass, const std::string &emsg, const gsi::StackTraceProvider *stack_trace_provider)
 {
   //  no action if stop on exception is disabled
-  if (!m_stop_on_exception) {
+  if (! m_stop_on_exception) {
     return;
   }
 
@@ -3269,11 +3139,11 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
 
   try {
 
-    //  If the exception is thrown in code that is inside a file managed by the macro collection, 
+    //  If the exception is thrown in code that is inside a file managed by the macro collection,
     //  offer to stop the debugger there.
     std::vector<tl::BacktraceElement> bt = stack_trace_provider->stack_trace ();
     size_t scope_index = stack_trace_provider->scope_index ();
-    if (bt.empty () || !mp_root->find_macro (bt [scope_index].file)) {
+    if (bt.empty () || ! mp_root->find_macro (bt [scope_index].file)) {
       return;
     }
 
@@ -3304,7 +3174,6 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
       }
       mp_plugin_root->config_set (cfg_macro_editor_ignore_exception_list, il);
       return;
-
     }
 
     write_str (emsg.c_str (), OS_stderr);
@@ -3319,7 +3188,7 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
     if (QApplication::activeModalWidget () && QApplication::activeModalWidget () != this) {
 
       //  apparently that is the only way to override the event handling mechanism of Qt:
-      //  if the breakpoint is issued from inside an event handler of a modal dialog, the 
+      //  if the breakpoint is issued from inside an event handler of a modal dialog, the
       //  editor window does not receive events, not even if we requested filtering.
       hide ();
       exec ();
@@ -3327,11 +3196,9 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
 
     } else {
 
-      while (m_in_breakpoint && m_in_exec)
-      {
+      while (m_in_breakpoint && m_in_exec) {
         process_events (QEventLoop::WaitForMoreEvents);
       }
-
     }
 
     leave_breakpoint_mode ();
@@ -3344,8 +3211,7 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
   exit_if_needed ();
 }
 
-void
-MacroEditorDialog::exit_if_needed ()
+void MacroEditorDialog::exit_if_needed ()
 {
   //  Exit if a stop is requested.
   //  NOTE: we must not raise ExitException from outside events (e.g. PyQt5 events)
@@ -3356,8 +3222,7 @@ MacroEditorDialog::exit_if_needed ()
   }
 }
 
-void   
-MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int line, const gsi::StackTraceProvider *stack_trace_provider)
+void MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int line, const gsi::StackTraceProvider *stack_trace_provider)
 {
   exit_if_needed ();
 
@@ -3376,8 +3241,8 @@ MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int lin
 
   //  Note: only scripts running in the context of the execution controller (the one who called start_exec)
   //  can be interrupted and single-stepped, but breakpoints can make the debugger stop in other interpreters.
-  if (file_id > 0 && ((interpreter == mp_exec_controller && m_stop_stack_depth >= 0 && stack_trace_provider->stack_depth () <= m_stop_stack_depth) || 
-                      (interpreter == mp_exec_controller && ! m_continue) || 
+  if (file_id > 0 && ((interpreter == mp_exec_controller && m_stop_stack_depth >= 0 && stack_trace_provider->stack_depth () <= m_stop_stack_depth) ||
+                      (interpreter == mp_exec_controller && ! m_continue) ||
                       (file_id <= m_file_to_widget.size () && m_file_to_widget [file_id - 1].second && m_file_to_widget [file_id - 1].second->exec_model ()->is_breakpoint (line)))) {
 
     try {
@@ -3387,7 +3252,7 @@ MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int lin
       if (QApplication::activeModalWidget () && QApplication::activeModalWidget () != this) {
 
         //  apparently that is the only way to override the event handling mechanism of Qt:
-        //  if the breakpoint is issued from inside an event handler of a modal dialog, the 
+        //  if the breakpoint is issued from inside an event handler of a modal dialog, the
         //  editor window does not receive events, not even if we requested filtering.
         hide ();
         exec ();
@@ -3398,7 +3263,6 @@ MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int lin
         while (m_in_breakpoint && m_in_exec) {
           process_events (QEventLoop::WaitForMoreEvents);
         }
-
       }
 
       leave_breakpoint_mode ();
@@ -3425,14 +3289,11 @@ MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int lin
       m_process_events_interval = std::max (0.05, std::min (2.0, (m_last_process_events - start).seconds () * 5.0));
 
       exit_if_needed ();
-
     }
-
   }
 }
 
-void 
-MacroEditorDialog::enter_breakpoint_mode (gsi::Interpreter *interpreter, const gsi::StackTraceProvider *stack_trace_provider)
+void MacroEditorDialog::enter_breakpoint_mode (gsi::Interpreter *interpreter, const gsi::StackTraceProvider *stack_trace_provider)
 {
   m_in_breakpoint = true;
   m_eval_context = -1;
@@ -3470,14 +3331,13 @@ MacroEditorDialog::enter_breakpoint_mode (gsi::Interpreter *interpreter, const g
   process_events (QEventLoop::ExcludeUserInputEvents);
 
   if (! bt.empty ()) {
-    set_exec_point (&bt[scope_index].file, bt[scope_index].line, int (scope_index));
+    set_exec_point (&bt [scope_index].file, bt [scope_index].line, int (scope_index));
   }
 
   update_inspected ();
 }
 
-void 
-MacroEditorDialog::leave_breakpoint_mode ()
+void MacroEditorDialog::leave_breakpoint_mode ()
 {
   m_in_breakpoint = false;
   m_eval_context = -1;
@@ -3492,14 +3352,12 @@ MacroEditorDialog::leave_breakpoint_mode ()
   }
 }
 
-void 
-MacroEditorDialog::update_ui_to_run_mode ()
+void MacroEditorDialog::update_ui_to_run_mode ()
 {
   dm_update_ui_to_run_mode ();
 }
 
-void
-MacroEditorDialog::do_update_ui_to_run_mode ()
+void MacroEditorDialog::do_update_ui_to_run_mode ()
 {
   double alpha = 0.95;
 
@@ -3567,7 +3425,6 @@ MacroEditorDialog::do_update_ui_to_run_mode ()
       base_color = QColor (int (0.5 + base_color.red () * alpha), base_color.green (), int (0.5 + base_color.blue () * alpha));
       alt_base_color = QColor (int (0.5 + alt_base_color.red () * alpha), alt_base_color.green (), int (0.5 + alt_base_color.blue () * alpha));
       runtimeFrame->hide ();
-
     }
 
   } else {
@@ -3575,7 +3432,6 @@ MacroEditorDialog::do_update_ui_to_run_mode ()
     variableListFrame->setVisible (false);
     variableList->set_inspector (0);
     runtimeFrame->hide ();
-
   }
 
   QPalette p = palette ();
@@ -3588,7 +3444,7 @@ MacroEditorDialog::do_update_ui_to_run_mode ()
   variableList->setPalette (p);
   watchList->setPalette (p);
 
-  std::map <lym::Macro *, MacroEditorPage *>::const_iterator t = m_tab_widgets.find (mp_run_macro);
+  std::map<lym::Macro *, MacroEditorPage *>::const_iterator t = m_tab_widgets.find (mp_run_macro);
   if (t != m_tab_widgets.end ()) {
     int index = tabWidget->indexOf (t->second);
     if (index >= 0) {
@@ -3597,8 +3453,7 @@ MacroEditorDialog::do_update_ui_to_run_mode ()
   }
 }
 
-void 
-MacroEditorDialog::stack_element_double_clicked (QListWidgetItem *item)
+void MacroEditorDialog::stack_element_double_clicked (QListWidgetItem *item)
 {
   std::string f = tl::to_string (item->data (Qt::UserRole).toString ());
 
@@ -3628,12 +3483,12 @@ MacroEditorPage *
 MacroEditorDialog::editor_for_macro (lym::Macro *macro)
 {
   for (std::vector<lay::MacroEditorTree *>::const_iterator mt = m_macro_trees.begin (); mt != m_macro_trees.end (); ++mt) {
-    (*mt)->set_current (macro); 
+    (*mt)->set_current (macro);
   }
 
   MacroEditorPage *editor = 0;
 
-  std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
+  std::map<lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
   if (page == m_tab_widgets.end ()) {
 
     editor = create_page (macro);
@@ -3652,7 +3507,7 @@ MacroEditorDialog::editor_for_macro (lym::Macro *macro)
 
     refresh_file_watcher ();
 
-    for (std::vector <std::pair<lym::Macro *, MacroEditorPage *> >::iterator f = m_file_to_widget.begin (); f != m_file_to_widget.end (); ++f) {
+    for (std::vector<std::pair<lym::Macro *, MacroEditorPage *>>::iterator f = m_file_to_widget.begin (); f != m_file_to_widget.end (); ++f) {
       if (f->first == macro) {
         f->second = editor;
         break;
@@ -3678,8 +3533,7 @@ MacroEditorDialog::editor_for_file (const std::string &path)
   }
 }
 
-void
-MacroEditorDialog::set_exec_point (const std::string *file, int line, int eval_context)
+void MacroEditorDialog::set_exec_point (const std::string *file, int line, int eval_context)
 {
   MacroEditorPage *editor = 0;
   if (file) {
@@ -3693,8 +3547,7 @@ MacroEditorDialog::set_exec_point (const std::string *file, int line, int eval_c
   m_eval_context = eval_context;
 }
 
-void
-MacroEditorDialog::handle_error (tl::ScriptError &re)
+void MacroEditorDialog::handle_error (tl::ScriptError &re)
 {
   //  navigate to the file/line
   MacroEditorPage *editor = editor_for_file (re.sourcefile ());
@@ -3702,11 +3555,10 @@ MacroEditorDialog::handle_error (tl::ScriptError &re)
     editor->set_error_line (re.line ());
   }
 }
- 
-void 
-MacroEditorDialog::breakpoint_button_clicked ()
+
+void MacroEditorDialog::breakpoint_button_clicked ()
 {
-  MacroEditorPage *page = dynamic_cast <MacroEditorPage *> (tabWidget->currentWidget ());
+  MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (! page) {
     return;
   }
@@ -3714,22 +3566,19 @@ MacroEditorDialog::breakpoint_button_clicked ()
   page->exec_model ()->toggle_breakpoint (page->current_line ());
 }
 
-void 
-MacroEditorDialog::clear_breakpoints_button_clicked ()
+void MacroEditorDialog::clear_breakpoints_button_clicked ()
 {
   for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
-    f->second->exec_model ()->set_breakpoints (std::set <int> ());
+    f->second->exec_model ()->set_breakpoints (std::set<int> ());
   }
 }
 
-void
-MacroEditorDialog::pause_button_clicked ()
+void MacroEditorDialog::pause_button_clicked ()
 {
   m_continue = false;
 }
 
-void  
-MacroEditorDialog::stop_button_clicked ()
+void MacroEditorDialog::stop_button_clicked ()
 {
   if (QApplication::activeModalWidget () == this) {
     //  close this window if it was shown in modal mode
@@ -3740,36 +3589,32 @@ MacroEditorDialog::stop_button_clicked ()
   m_continue = false;
 }
 
-void
-MacroEditorDialog::next_step_button_clicked ()
+void MacroEditorDialog::next_step_button_clicked ()
 {
-BEGIN_PROTECTED
-  run (m_in_exec ? std::max (0, m_current_stack_depth) : std::numeric_limits <int>::max (), current_run_macro ());
-END_PROTECTED
+  BEGIN_PROTECTED
+  run (m_in_exec ? std::max (0, m_current_stack_depth) : std::numeric_limits<int>::max (), current_run_macro ());
+  END_PROTECTED
 }
 
-void 
-MacroEditorDialog::single_step_button_clicked ()
+void MacroEditorDialog::single_step_button_clicked ()
 {
-BEGIN_PROTECTED
-  run (std::numeric_limits <int>::max (), current_run_macro ());
-END_PROTECTED
+  BEGIN_PROTECTED
+  run (std::numeric_limits<int>::max (), current_run_macro ());
+  END_PROTECTED
 }
 
-void  
-MacroEditorDialog::run_button_clicked ()
+void MacroEditorDialog::run_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   run (-1, current_run_macro ());
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-MacroEditorDialog::run_this_button_clicked ()
+void MacroEditorDialog::run_this_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   run (-1, 0);
-END_PROTECTED
+  END_PROTECTED
 }
 
 lym::Macro *
@@ -3789,8 +3634,7 @@ MacroEditorDialog::current_run_macro ()
   }
 }
 
-void   
-MacroEditorDialog::run (int stop_stack_depth, lym::Macro *macro)
+void MacroEditorDialog::run (int stop_stack_depth, lym::Macro *macro)
 {
   m_stop_stack_depth = stop_stack_depth;
   m_continue = true;
@@ -3827,9 +3671,9 @@ MacroEditorDialog::run (int stop_stack_depth, lym::Macro *macro)
     }
 
     if (! m_save_all_on_run && any_modified (mp_root)) {
-      if (QMessageBox::question (this, QObject::tr ("Save Macros"), 
-                                       QObject::tr ("Some files are modified and need to be saved before running the macro. Do you want to save them?"),
-                                       QMessageBox::Yes, QMessageBox::Cancel) == QMessageBox::Cancel) {
+      if (QMessageBox::question (this, QObject::tr ("Save Macros"),
+                                 QObject::tr ("Some files are modified and need to be saved before running the macro. Do you want to save them?"),
+                                 QMessageBox::Yes, QMessageBox::Cancel) == QMessageBox::Cancel) {
         return;
       }
     }
@@ -3876,16 +3720,14 @@ MacroEditorDialog::run (int stop_stack_depth, lym::Macro *macro)
       }
     }
 #endif
-
   }
 }
 
-void
-MacroEditorDialog::set_run_macro (lym::Macro *m)
+void MacroEditorDialog::set_run_macro (lym::Macro *m)
 {
   if (m != mp_run_macro) {
 
-    std::map <lym::Macro *, MacroEditorPage *>::const_iterator t = m_tab_widgets.find (mp_run_macro);
+    std::map<lym::Macro *, MacroEditorPage *>::const_iterator t = m_tab_widgets.find (mp_run_macro);
     if (t != m_tab_widgets.end ()) {
       int index = tabWidget->indexOf (t->second);
       if (index >= 0) {
@@ -3906,7 +3748,6 @@ MacroEditorDialog::set_run_macro (lym::Macro *m)
     for (std::vector<lay::MacroEditorTree *>::const_iterator mt = m_macro_trees.begin (); mt != m_macro_trees.end (); ++mt) {
       (*mt)->update_data (); //  to switch icon
     }
-
   }
 }
 
@@ -3923,7 +3764,7 @@ public:
     return new MacroEditorSetupPage (parent);
   }
 
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_styles, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_save_all_on_run, "false"));
@@ -3947,4 +3788,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new MacroEditorPluginDeclaration (), 1500, "MacroEditor");
 
 }
-

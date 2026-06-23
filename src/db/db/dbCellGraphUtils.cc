@@ -42,7 +42,7 @@ CellCounter::CellCounter (const db::Layout *cell_graph, db::cell_index_type star
   m_selection.insert (starting_cell);
 }
 
-size_t 
+size_t
 CellCounter::weight (db::cell_index_type ci)
 {
   cache_t::const_iterator c = m_cache.find (ci);
@@ -53,7 +53,7 @@ CellCounter::weight (db::cell_index_type ci)
     return 0;
   } else {
 
-    const db::Cell *cell = & mp_cell_graph->cell (ci);
+    const db::Cell *cell = &mp_cell_graph->cell (ci);
     size_t count = 0;
 
     for (db::Cell::parent_inst_iterator p = cell->begin_parent_insts (); ! p.at_end (); ++p) {
@@ -63,14 +63,12 @@ CellCounter::weight (db::cell_index_type ci)
     }
 
     if (count == 0) {
-      count = 1;  // top cells have multiplicity 1
+      count = 1; // top cells have multiplicity 1
     }
 
     m_cache.insert (std::make_pair (ci, count));
     return count;
-
   }
 }
 
 }
-
